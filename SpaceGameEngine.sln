@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectFile", "ProjectFile", "{73717249-81A9-4A5D-96D0-D59EA4C9CA9E}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		Doxyfile = Doxyfile
+		LICENSE = LICENSE
+		push.bat = push.bat
 		README.md = README.md
 		SpaceGameEngine.sln.licenseheader = SpaceGameEngine.sln.licenseheader
 	EndProjectSection
@@ -16,9 +19,66 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{95F5FF36-EB19-410C-BE3E-924AF7B5F93C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{E09406D8-3CBC-473A-8715-05471C55AAFA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCpp", "ThirdParty\JsonCpp\JsonCpp.vcxproj", "{7F59A09A-B166-4333-8D73-355AE32E63BC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml2", "ThirdParty\tinyxml2\tinyxml2.vcxproj", "{4782342B-D898-448F-9F25-D10074FAC93B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{F93E7284-FB8F-468F-A220-8A4AA2AEC39F}"
+	ProjectSection(SolutionItems) = preProject
+		Document\Document\ProjectRule.md = Document\Document\ProjectRule.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Catch2", "Catch2", "{FB7ABE02-8208-47F3-B713-0D2315DACFD6}"
+	ProjectSection(SolutionItems) = preProject
+		ThirdParty\Catch2\catch.hpp = ThirdParty\Catch2\catch.hpp
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCatch2", "Test\TestCatch2\TestCatch2.vcxproj", "{98764969-DA8B-4773-9F6F-654806D32AF8}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F59A09A-B166-4333-8D73-355AE32E63BC}.Debug|x64.ActiveCfg = Debug|x64
+		{7F59A09A-B166-4333-8D73-355AE32E63BC}.Debug|x64.Build.0 = Debug|x64
+		{7F59A09A-B166-4333-8D73-355AE32E63BC}.Debug|x86.ActiveCfg = Debug|Win32
+		{7F59A09A-B166-4333-8D73-355AE32E63BC}.Debug|x86.Build.0 = Debug|Win32
+		{7F59A09A-B166-4333-8D73-355AE32E63BC}.Release|x64.ActiveCfg = Release|x64
+		{7F59A09A-B166-4333-8D73-355AE32E63BC}.Release|x64.Build.0 = Release|x64
+		{7F59A09A-B166-4333-8D73-355AE32E63BC}.Release|x86.ActiveCfg = Release|Win32
+		{7F59A09A-B166-4333-8D73-355AE32E63BC}.Release|x86.Build.0 = Release|Win32
+		{4782342B-D898-448F-9F25-D10074FAC93B}.Debug|x64.ActiveCfg = Debug|x64
+		{4782342B-D898-448F-9F25-D10074FAC93B}.Debug|x64.Build.0 = Debug|x64
+		{4782342B-D898-448F-9F25-D10074FAC93B}.Debug|x86.ActiveCfg = Debug|Win32
+		{4782342B-D898-448F-9F25-D10074FAC93B}.Debug|x86.Build.0 = Debug|Win32
+		{4782342B-D898-448F-9F25-D10074FAC93B}.Release|x64.ActiveCfg = Release|x64
+		{4782342B-D898-448F-9F25-D10074FAC93B}.Release|x64.Build.0 = Release|x64
+		{4782342B-D898-448F-9F25-D10074FAC93B}.Release|x86.ActiveCfg = Release|Win32
+		{4782342B-D898-448F-9F25-D10074FAC93B}.Release|x86.Build.0 = Release|Win32
+		{98764969-DA8B-4773-9F6F-654806D32AF8}.Debug|x64.ActiveCfg = Debug|x64
+		{98764969-DA8B-4773-9F6F-654806D32AF8}.Debug|x64.Build.0 = Debug|x64
+		{98764969-DA8B-4773-9F6F-654806D32AF8}.Debug|x86.ActiveCfg = Debug|Win32
+		{98764969-DA8B-4773-9F6F-654806D32AF8}.Debug|x86.Build.0 = Debug|Win32
+		{98764969-DA8B-4773-9F6F-654806D32AF8}.Release|x64.ActiveCfg = Release|x64
+		{98764969-DA8B-4773-9F6F-654806D32AF8}.Release|x64.Build.0 = Release|x64
+		{98764969-DA8B-4773-9F6F-654806D32AF8}.Release|x86.ActiveCfg = Release|Win32
+		{98764969-DA8B-4773-9F6F-654806D32AF8}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7F59A09A-B166-4333-8D73-355AE32E63BC} = {E6CDD526-7136-43BA-A1F6-F93333662CE5}
+		{4782342B-D898-448F-9F25-D10074FAC93B} = {E6CDD526-7136-43BA-A1F6-F93333662CE5}
+		{F93E7284-FB8F-468F-A220-8A4AA2AEC39F} = {95F5FF36-EB19-410C-BE3E-924AF7B5F93C}
+		{FB7ABE02-8208-47F3-B713-0D2315DACFD6} = {E6CDD526-7136-43BA-A1F6-F93333662CE5}
+		{98764969-DA8B-4773-9F6F-654806D32AF8} = {E09406D8-3CBC-473A-8715-05471C55AAFA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}
