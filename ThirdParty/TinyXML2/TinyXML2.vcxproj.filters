@@ -6,4 +6,7 @@
   <ItemGroup>
     <ClInclude Include="tinyxml2.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="TinyXML2.licenseheader" />
+  </ItemGroup>
 </Project>
