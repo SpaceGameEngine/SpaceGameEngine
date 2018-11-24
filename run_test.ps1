@@ -1,12 +1,13 @@
-#you can just attend new test project name
-$test_projects=@("TestCatch2",)
+$configuration=$env:CONFIGURATION
+$platform=$env:PLATFORM
+$solution_directory=$env:APPVEYOR_BUILD_FOLDER
 
-function run_test($configuration,$platform)
+Get-ChildItem $solution_directory\Test | ForEach-Object
 {
-	for($i=0;$i -le $test_projects.count;$i++)
+	if($_.Attributes -eq "Directory")
 	{
-		copy $env:APPVEYOR_BUILD_FOLDER\Binary\$test_projects[$i]\$platform\$configuration\$test_projects[$i].exe $env:APPVEYOR_BUILD_FOLDER\Test\$test_projects[$i]\$test_projects[$i].exe
-		&$env:APPVEYOR_BUILD_FOLDER\Test\$test_projects[$i]\$test_projects[$i].exe
+		Write-Host "Testing"$_
+		copy $solution_directory\Binary\$_\$platform\$configuration\$_.exe $solution_directory\Test\$_\$_.exe
+		&$solution_directory\Test\$_\$_.exe
 	}
 }
-run_test($env:CONFIGURATION,$env:PLATFORM)
