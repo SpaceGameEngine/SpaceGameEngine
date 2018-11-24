@@ -4,6 +4,7 @@ $solution_directory=$env:APPVEYOR_BUILD_FOLDER
 
 Get-ChildItem $solution_directory\Test\ | ForEach-Object
 {
+Write-Host "Testing"$_
 	if($_.Attributes -eq "Directory")
 	{
 		Write-Host "Testing"$_

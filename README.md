@@ -1,1 +1,1 @@
-﻿# Space Game Engine
+﻿# Space Game Engine[![Build status](https://ci.appveyor.com/api/projects/status/qijtygc8lbqdri3j?svg=true)](https://ci.appveyor.com/project/creatorlxd/spacegameengine)
