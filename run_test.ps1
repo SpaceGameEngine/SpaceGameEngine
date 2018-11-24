@@ -8,8 +8,9 @@ Get-ChildItem $solution_directory\Test\ | ForEach-Object
 {
 	if($_.Attributes -eq "Directory")
 	{
-		Write-Output ("Testing "+$_)
-		copy $solution_directory\Binary\$_\$platform\$configuration\$_.exe $solution_directory\Test\$_\$_.exe
-		&$solution_directory\Test\$_\$_.exe
+		$test_name=$_.BaseName
+		Write-Output ("Testing "+$test_name)
+		copy $solution_directory\Binary\$test_name\$platform\$configuration\$test_name.exe $solution_directory\Test\$test_name\$test_name.exe
+		&$solution_directory\Test\$test_name\$test_name.exe
 	}
 }
