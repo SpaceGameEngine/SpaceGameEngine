@@ -2,7 +2,7 @@ $configuration=$env:CONFIGURATION
 $platform=$env:PLATFORM
 $solution_directory=$env:APPVEYOR_BUILD_FOLDER
 
-Get-ChildItem $solution_directory\Test | ForEach-Object
+Get-ChildItem $solution_directory\Test\ | ForEach-Object
 {
 	if($_.Attributes -eq "Directory")
 	{
