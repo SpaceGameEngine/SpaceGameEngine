@@ -1,5 +1,5 @@
 #you can just attend new test project name
-$test_projects=@("TestCatch2")
+[String[]]$test_projects=@("TestCatch2")
 
 function run_test($configuration,$platform)
 {
