@@ -29,7 +29,7 @@ TEST_CASE("Factorials are computed", "[factorial]")
 	REQUIRE(Factorial(10) == 3628800);
 }
 
-TEST_CASE("test std output", "[std]")
+TEST_CASE("TestStdOutput", "[std]")
 {
 	std::cout << "test" << std::endl;
 }
