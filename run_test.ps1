@@ -1,3 +1,5 @@
+Write-Output "Start Testing"
+
 $configuration=$env:CONFIGURATION
 $platform=$env:PLATFORM
 $solution_directory=$env:APPVEYOR_BUILD_FOLDER
