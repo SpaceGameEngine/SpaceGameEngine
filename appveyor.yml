@@ -14,4 +14,4 @@ build:
   project: SpaceGameEngine.sln
 
 test_script:
-  - pwsh ./run_test.ps1
+  - pwsh ./run_test_on_appveyor.ps1

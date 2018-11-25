@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectFile", "ProjectFile"
 		ProjectCommonProperty.props = ProjectCommonProperty.props
 		push.bat = push.bat
 		README.md = README.md
-		run_test.ps1 = run_test.ps1
+		run_test_on_appveyor.ps1 = run_test_on_appveyor.ps1
 		SpaceGameEngine.sln.licenseheader = SpaceGameEngine.sln.licenseheader
 	EndProjectSection
 EndProject
