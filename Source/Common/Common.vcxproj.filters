@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Public">
+      <UniqueIdentifier>{3afd77d1-fff1-4d24-a7ea-6d1eaae28613}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{46edc6b4-1141-4dfe-80ba-d5860cb09029}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Public\TypeDefination.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DoxygenConfig.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
