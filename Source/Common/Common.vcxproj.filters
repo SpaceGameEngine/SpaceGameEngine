@@ -15,5 +15,8 @@
     <ClInclude Include="Private\DoxygenConfig.hpp">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\ForwardDefination.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
