@@ -13,8 +13,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#define CATCH_CONFIG_MAIN
+#pragma once
 #include "../../ThirdParty/Catch2/catch.hpp"
-#include "TestString.hpp"
-#include "TestMemoryManager.hpp"
-#include "TestError.hpp"
+#include "../../Source/Common/Public/Error.h"
+
+using namespace SpaceGameEngine;
+
+class TestError :public Error
+{
+public:
+	inline TestError()
+	{
+		m_ErrorMessage = SGE_TSTR("Test Error");
+	}
+};
+
+TEST_CASE("test error information", "[Common][Error]")
+{
+	ThrowError(TestError(), ErrorLevel::Information);
+}
+
+//TEST_CASE("test error warning", "[Common][Error]")
+//{
+//	ThrowError(TestError(), ErrorLevel::Warning);
+//}
+//
+//TEST_CASE("test error fatal", "[Common][Error]")
+//{
+//	ThrowError(TestError(), ErrorLevel::Fatal);
+//}

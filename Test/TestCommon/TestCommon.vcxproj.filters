@@ -3,4 +3,9 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestString.hpp" />
+    <ClInclude Include="TestMemoryManager.hpp" />
+    <ClInclude Include="TestError.hpp" />
+  </ItemGroup>
 </Project>

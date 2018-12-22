@@ -13,8 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#define CATCH_CONFIG_MAIN
-#include "../../ThirdParty/Catch2/catch.hpp"
-#include "TestString.hpp"
-#include "TestMemoryManager.hpp"
-#include "TestError.hpp"
+#include "../Public/MemoryManager.h"
+#include "../Public/Error.h"
+
+void * SpaceGameEngine::StdAllocator::RawNew(SizeType size)
+{
+	AssertInvalidSize(size, 1, SGE_MAX_MEMORY_SIZE);
+	return new Byte[size];
+}
+
+void SpaceGameEngine::StdAllocator::RawDelete(void * ptr)
+{
+	AssertNullPointer(ptr);
+	delete[] ptr;
+}

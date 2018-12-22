@@ -62,6 +62,16 @@ namespace SpaceGameEngine
 	@brief 64-bit unsigned int
 	*/
 	using UInt64 = uint64_t;
+
+	/*!
+	@brief a byte
+	*/
+	using Byte = UInt8;
+
+	/*!
+	@brief size type
+	*/
+	using SizeType = UInt64;
 	
 	/*!
 	@}

@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "TypeDefination.hpp"
+#include "../../Public/ForwardDefination.hpp"
+#include "../../Public/String.h"
 
 namespace SpaceGameEngine
 {
@@ -23,10 +24,26 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	void AssertNullPointer(const void* ptr);
-	void CheckNullPointer(const void* ptr);
-	void AssertInvalidSize(SizeType size, SizeType min_size, SizeType max_size);
-	void CheckInvalidSize(SizeType size, SizeType min_size, SizeType max_size);
+	class StdTStringImplement
+	{
+	public:
+		StdTStringImplement();
+		StdTStringImplement(const StdTString& str);
+		StdTStringImplement(const StdTChar* pstr);
+
+		StdTStringImplement& operator = (const StdTString& str);
+		StdTStringImplement& operator = (const StdTChar* pstr);
+
+		bool operator ==(const StdTString& str)const;
+		bool operator ==(const StdTChar* pstr)const;
+
+		StdTString ToStdTString()const;
+		const StdTChar* GetConstData()const;
+		StdTChar* GetData();
+		SizeType GetSize();
+	private:
+		StdTString m_Content;
+	};
 
 	/*!
 	@}

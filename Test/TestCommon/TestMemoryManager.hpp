@@ -13,8 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#define CATCH_CONFIG_MAIN
+#pragma once
 #include "../../ThirdParty/Catch2/catch.hpp"
-#include "TestString.hpp"
-#include "TestMemoryManager.hpp"
-#include "TestError.hpp"
+#include "../../Source/Common/Public/MemoryManager.h"
+
+using namespace SpaceGameEngine;
+
+TEST_CASE("Test StdAllocator", "[Common][MemoryManager]")
+{
+	SECTION("test new/delete with type")
+	{
+		Int32* pint = StdAllocator::New<Int32>(3);
+		REQUIRE(*pint == 3);
+		StdAllocator::Delete(pint);
+	}
+	SECTION("test raw new/delete")
+	{
+		Int32* pint = reinterpret_cast<Int32*>(StdAllocator::RawNew(sizeof(Int32)));
+		*pint = 3;
+		REQUIRE(*pint == 3);
+		StdAllocator::RawDelete(pint);
+	}
+}

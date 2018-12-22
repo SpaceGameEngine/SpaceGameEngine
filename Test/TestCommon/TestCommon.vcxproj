@@ -149,6 +149,16 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\Common\Common.vcxproj">
+      <Project>{3d706382-4b3c-4ebc-ac11-ff05c091e4d4}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestError.hpp" />
+    <ClInclude Include="TestMemoryManager.hpp" />
+    <ClInclude Include="TestString.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

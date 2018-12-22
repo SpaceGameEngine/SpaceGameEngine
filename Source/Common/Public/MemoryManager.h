@@ -23,10 +23,34 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	void AssertNullPointer(const void* ptr);
-	void CheckNullPointer(const void* ptr);
-	void AssertInvalidSize(SizeType size, SizeType min_size, SizeType max_size);
-	void CheckInvalidSize(SizeType size, SizeType min_size, SizeType max_size);
+#ifdef _WIN32
+#define SGE_MAX_MEMORY_SIZE INT32_MAX
+#else
+#define SGE_MAX_MEMORY_SIZE INT64_MAX
+#endif
+
+	struct StdAllocator
+	{
+		static void* RawNew(SizeType size);
+		static void RawDelete(void* ptr);
+
+		template<typename T,typename... Arg>
+		static T* New(Arg&&... arg)
+		{
+			return new (RawNew(sizeof(T))) T(std::forward<Arg>(arg)...);
+		}
+
+		template<typename T>
+		static void Delete(T* ptr)
+		{
+			AssertNullPointer(ptr);
+			ptr->~T();
+			RawDelete(ptr);
+		}
+	};
+
+	/*!@todo change the std allocator to my allocator*/
+	using DefaultAllocator = StdAllocator;
 
 	/*!
 	@}

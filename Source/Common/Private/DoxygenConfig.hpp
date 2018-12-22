@@ -18,3 +18,14 @@ limitations under the License.
 /*!
 @defgroup Common Common Module
 */
+
+//template
+/*!
+@ingroup Common
+@{
+*/
+
+/*!
+@}
+*/
+//--------
