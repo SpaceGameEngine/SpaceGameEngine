@@ -29,12 +29,15 @@ namespace SpaceGameEngine
 	{
 	public:
 		StdTStringImplement();
+		StdTStringImplement(const StdTStringImplement& str);
 		StdTStringImplement(const StdTString& str);
 		StdTStringImplement(const StdTChar* pstr);
 
+		StdTStringImplement& operator = (const StdTStringImplement& str);
 		StdTStringImplement& operator = (const StdTString& str);
 		StdTStringImplement& operator = (const StdTChar* pstr);
 
+		bool operator ==(const StdTStringImplement& str)const;
 		bool operator ==(const StdTString& str)const;
 		bool operator ==(const StdTChar* pstr)const;
 

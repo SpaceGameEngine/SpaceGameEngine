@@ -35,6 +35,14 @@ TEST_CASE("Test String", "[Common][String]")
 		//-1 because SGE_TSTR("TestString") has a '\0' char as the end of the str
 		REQUIRE(str.GetSize() == (sizeof(SGE_TSTR("TestString")) / sizeof(StdTChar)) - 1);
 	}
+	SECTION("test copy")
+	{
+		String str = SGE_TSTR("TestString");
+		String str2 = str;
+		REQUIRE(str == str2);
+		//if str's implement is equal with str2's then their raw data address must be same
+		REQUIRE(str.GetData() != str2.GetData());
+	}
 }
 
 TEST_CASE("Test StdTStringImplement")
@@ -51,5 +59,12 @@ TEST_CASE("Test StdTStringImplement")
 		REQUIRE(memcmp(str.GetConstData(), SGE_TSTR("TestString"), str.GetSize()) == 0);
 		//-1 because SGE_TSTR("TestString") has a '\0' char as the end of the str
 		REQUIRE(str.GetSize() == (sizeof(SGE_TSTR("TestString")) / sizeof(StdTChar)) - 1);
+	}
+	SECTION("test copy")
+	{
+		StdTStringImplement str = SGE_TSTR("TestString");
+		StdTStringImplement str2 = str;
+		REQUIRE(str == str2);
+		REQUIRE(str.GetData() != str2.GetData());
 	}
 }

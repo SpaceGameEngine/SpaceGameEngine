@@ -41,18 +41,20 @@ namespace SpaceGameEngine
 	class StdTStringImplement;
 	using StringImplement = StdTStringImplement;
 
-	/*!@todo add String(const String&) and operator = (const String&)*/
 	class String
 	{
 	public:
 		String();
+		String(const String& str);
 		String(const StdTString& str);
 		String(const StdTChar* pstr);
 		~String();
 
+		String& operator = (const String& str);
 		String& operator = (const StdTString& str);
 		String& operator = (const StdTChar* pstr);
 
+		bool operator ==(const String& str)const;
 		bool operator ==(const StdTString& str)const;
 		bool operator ==(const StdTChar* pstr)const;
 

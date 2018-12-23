@@ -22,6 +22,11 @@ SpaceGameEngine::String::String()
 	m_pImplement = DefaultAllocator::New<StringImplement>();
 }
 
+SpaceGameEngine::String::String(const String & str)
+{
+	m_pImplement = DefaultAllocator::New<StringImplement>(*str.m_pImplement);
+}
+
 SpaceGameEngine::String::String(const StdTString & str)
 {
 	m_pImplement = DefaultAllocator::New<StringImplement>(str);
@@ -31,6 +36,12 @@ SpaceGameEngine::String::String(const StdTChar * pstr)
 {
 	AssertNullPointer(pstr);
 	m_pImplement = DefaultAllocator::New<StringImplement>(pstr);
+}
+
+SpaceGameEngine::String & SpaceGameEngine::String::operator=(const String & str)
+{
+	*m_pImplement = *str.m_pImplement;
+	return *this;
 }
 
 SpaceGameEngine::String & SpaceGameEngine::String::operator=(const StdTString & str)
@@ -44,6 +55,11 @@ SpaceGameEngine::String & SpaceGameEngine::String::operator=(const StdTChar * ps
 	AssertNullPointer(pstr);
 	*m_pImplement = pstr;
 	return *this;
+}
+
+bool SpaceGameEngine::String::operator==(const String & str) const
+{
+	return *m_pImplement == *str.m_pImplement;
 }
 
 bool SpaceGameEngine::String::operator==(const StdTString & str)const

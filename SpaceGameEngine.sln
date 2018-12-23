@@ -44,6 +44,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Source\Common\Com
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCommon", "Test\TestCommon\TestCommon.vcxproj", "{0D07F54C-EFA0-4EF9-82D8-0F98342F1087}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{6B44D9C0-3589-476C-8789-6CC132708D99}"
+	ProjectSection(SolutionItems) = preProject
+		Document\Document\Common\Error.md = Document\Document\Common\Error.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -104,6 +109,7 @@ Global
 		{6773FEDB-FBFF-418C-A35E-C2C17690F949} = {E6CDD526-7136-43BA-A1F6-F93333662CE5}
 		{3D706382-4B3C-4EBC-AC11-FF05C091E4D4} = {72DE90D1-ACF7-4F34-8E54-E28BFDE1018F}
 		{0D07F54C-EFA0-4EF9-82D8-0F98342F1087} = {E09406D8-3CBC-473A-8715-05471C55AAFA}
+		{6B44D9C0-3589-476C-8789-6CC132708D99} = {F93E7284-FB8F-468F-A220-8A4AA2AEC39F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}
