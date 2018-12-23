@@ -264,3 +264,4 @@ __pycache__/
 /Binary
 /Document/Reference
 .vscode
+.DS_Store

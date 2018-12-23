@@ -41,7 +41,7 @@ namespace SpaceGameEngine
 	class StdTStringImplement;
 	using StringImplement = StdTStringImplement;
 
-	/*!@todo use stl string with my allocator*/
+	/*!@todo add String(const String&) and operator = (const String&)*/
 	class String
 	{
 	public:

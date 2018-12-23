@@ -36,3 +36,20 @@ TEST_CASE("Test String", "[Common][String]")
 		REQUIRE(str.GetSize() == (sizeof(SGE_TSTR("TestString")) / sizeof(StdTChar)) - 1);
 	}
 }
+
+TEST_CASE("Test StdTStringImplement")
+{
+	SECTION("test use std t string to operate")
+	{
+		StdTStringImplement str = StdTString(SGE_TSTR("TestString"));
+		REQUIRE(str == StdTString(SGE_TSTR("TestString")));
+		REQUIRE(str.GetSize() == StdTString(SGE_TSTR("TestString")).size());
+	}
+	SECTION("test use std t char ptr to operate")
+	{
+		StdTStringImplement str = SGE_TSTR("TestString");
+		REQUIRE(memcmp(str.GetConstData(), SGE_TSTR("TestString"), str.GetSize()) == 0);
+		//-1 because SGE_TSTR("TestString") has a '\0' char as the end of the str
+		REQUIRE(str.GetSize() == (sizeof(SGE_TSTR("TestString")) / sizeof(StdTChar)) - 1);
+	}
+}
