@@ -28,6 +28,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCpp", "ThirdParty\JsonC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{F93E7284-FB8F-468F-A220-8A4AA2AEC39F}"
 	ProjectSection(SolutionItems) = preProject
+		Document\Document\CodeRule.md = Document\Document\CodeRule.md
 		Document\Document\ProjectRule.md = Document\Document\ProjectRule.md
 	EndProjectSection
 EndProject

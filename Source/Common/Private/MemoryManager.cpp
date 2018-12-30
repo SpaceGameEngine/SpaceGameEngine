@@ -27,3 +27,8 @@ void SpaceGameEngine::StdAllocator::RawDelete(void * ptr)
 	AssertNullPointer(ptr);
 	delete[] ptr;
 }
+
+SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManager::MemoryPageHeader::GetFirstMemoryBlock()
+{
+	return reinterpret_cast<MemoryBlockHeader*>(reinterpret_cast<SizeType>(this) + sizeof(MemoryPageHeader));
+}

@@ -53,6 +53,43 @@ namespace SpaceGameEngine
 	using DefaultAllocator = StdAllocator;
 
 	/*!
+	@brief make the memory size aligned using the alignment
+	*/
+#define SGE_MEMORY_ALIGN(size, alignment) (((size) + ((alignment) - 1)) & ~((alignment) - 1))
+
+	/*!
+	@brief the memory manager for the engine to use
+	*/
+	class MemoryManager
+	{
+	public:
+		/*!
+		@brief the header of a memory block which contain the information of the memory block
+		*/
+		struct MemoryBlockHeader
+		{
+			MemoryBlockHeader* m_pNext = nullptr;
+		};
+
+		/*!
+		@brief the header of a memory page which contain the information of the memory page
+		*/
+		struct MemoryPageHeader
+		{
+			/*!
+			@brief get the memory address of the first memory block in the memory page whether there is a memory block in the memory page or not
+			*/
+			MemoryBlockHeader* GetFirstMemoryBlock();
+
+			MemoryPageHeader* m_pNext = nullptr;
+		};
+	public:
+
+	private:
+
+	};
+
+	/*!
 	@}
 	*/
 }

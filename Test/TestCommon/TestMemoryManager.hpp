@@ -35,3 +35,29 @@ TEST_CASE("Test StdAllocator", "[Common][MemoryManager]")
 		StdAllocator::RawDelete(pint);
 	}
 }
+
+TEST_CASE("Test Fundamental Function")
+{
+	SECTION("test memory align macro")
+	{
+		REQUIRE(SGE_MEMORY_ALIGN(1, 2) == 2);
+		REQUIRE(SGE_MEMORY_ALIGN(2, 2) == 2);
+		REQUIRE(SGE_MEMORY_ALIGN(3, 2) == 4);
+		REQUIRE(SGE_MEMORY_ALIGN(5, 2) == 6);
+		REQUIRE(SGE_MEMORY_ALIGN(1, 4) == 4);
+		REQUIRE(SGE_MEMORY_ALIGN(3, 4) == 4);
+		REQUIRE(SGE_MEMORY_ALIGN(4, 4) == 4);
+		REQUIRE(SGE_MEMORY_ALIGN(5, 4) == 8);
+		REQUIRE(SGE_MEMORY_ALIGN(8, 4) == 8);
+		REQUIRE(SGE_MEMORY_ALIGN(11, 4) == 12);
+		REQUIRE(SGE_MEMORY_ALIGN(4, 8) == 8);
+		REQUIRE(SGE_MEMORY_ALIGN(7, 8) == 8);
+		REQUIRE(SGE_MEMORY_ALIGN(11, 8) == 16);
+	}
+	SECTION("test memory page")
+	{
+		MemoryManager::MemoryPageHeader* ppageheader = reinterpret_cast<MemoryManager::MemoryPageHeader*>(StdAllocator::RawNew(sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)));
+		REQUIRE(reinterpret_cast<SizeType>(ppageheader->GetFirstMemoryBlock()) == reinterpret_cast<SizeType>(ppageheader) + sizeof(MemoryManager::MemoryBlockHeader));
+		StdAllocator::RawDelete(ppageheader);
+	}
+}
