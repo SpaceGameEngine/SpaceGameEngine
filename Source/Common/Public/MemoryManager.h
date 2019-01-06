@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "TypeDefination.hpp"
+#include "Utility.hpp"
 
 namespace SpaceGameEngine
 {
@@ -82,6 +83,33 @@ namespace SpaceGameEngine
 			MemoryBlockHeader* GetFirstMemoryBlock();
 
 			MemoryPageHeader* m_pNext = nullptr;
+		};
+
+		/*!
+		@brief the simple allocator that only allocate a sort of memory block
+		*/
+		class SimpleAllocator :public Uncopyable
+		{
+		public:
+			friend MemoryManager;
+
+			SimpleAllocator(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
+			~SimpleAllocator();
+		private:
+			void Set(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
+			void Clear();
+
+			void* Allocate();
+			void Free(void* ptr);
+			
+			/*!
+			@brief get the memory address of the next memory block by giving the memory address of the current memory block
+			@note the result is calculated by the current allocator's constant memory block size
+			*/
+			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
+		private:
+			MemoryBlockHeader* m_pFreeMemoryBlockList;
+			MemoryPageHeader* m_pMemoryPageList;
 		};
 	public:
 

@@ -30,5 +30,37 @@ void SpaceGameEngine::StdAllocator::RawDelete(void * ptr)
 
 SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManager::MemoryPageHeader::GetFirstMemoryBlock()
 {
-	return reinterpret_cast<MemoryBlockHeader*>(reinterpret_cast<SizeType>(this) + sizeof(MemoryPageHeader));
+	return reinterpret_cast<MemoryBlockHeader*>(reinterpret_cast<AddressType>(this) + sizeof(MemoryPageHeader));
+}
+
+SpaceGameEngine::MemoryManager::SimpleAllocator::SimpleAllocator(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment)
+{
+	Set(data_mem_size, page_mem_size, alignment);
+}
+
+SpaceGameEngine::MemoryManager::SimpleAllocator::~SimpleAllocator()
+{
+	Clear();
+}
+
+void SpaceGameEngine::MemoryManager::SimpleAllocator::Set(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment)
+{
+}
+
+void SpaceGameEngine::MemoryManager::SimpleAllocator::Clear()
+{
+}
+
+void * SpaceGameEngine::MemoryManager::SimpleAllocator::Allocate()
+{
+	return nullptr;
+}
+
+void SpaceGameEngine::MemoryManager::SimpleAllocator::Free(void * ptr)
+{
+}
+
+SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManager::SimpleAllocator::GetNextMemoryBlock(MemoryBlockHeader * ptr)
+{
+	return nullptr;
 }

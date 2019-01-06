@@ -33,6 +33,9 @@
     <ClInclude Include="Private\StringImplement\StdTStringImplement.h">
       <Filter>Private\StringImplement</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

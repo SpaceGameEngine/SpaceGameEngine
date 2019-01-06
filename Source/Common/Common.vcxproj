@@ -162,6 +162,7 @@
     <ClInclude Include="Public\MemoryManager.h" />
     <ClInclude Include="Public\String.h" />
     <ClInclude Include="Public\TypeDefination.hpp" />
+    <ClInclude Include="Public\Utility.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp" />

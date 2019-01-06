@@ -45,7 +45,7 @@ TEST_CASE("Test String", "[Common][String]")
 	}
 }
 
-TEST_CASE("Test StdTStringImplement")
+TEST_CASE("Test StdTStringImplement", "[Common][String]")
 {
 	SECTION("test use std t string to operate")
 	{

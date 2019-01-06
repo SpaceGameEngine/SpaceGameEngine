@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include <cstdint>
+#include "ForwardDefination.hpp"
 
 namespace SpaceGameEngine
 {
@@ -22,62 +22,16 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
-
-	/*!
-	@brief 8-bit int
-	*/
-	using Int8 = int8_t;
 	
-	/*!
-	@brief 8-bit unsigned int
-	*/
-	using UInt8 = uint8_t;
+	struct Uncopyable
+	{
+		Uncopyable() = default;
+		Uncopyable(const Uncopyable&) = delete;
+		Uncopyable(Uncopyable&&) = delete;
+		Uncopyable& operator = (const Uncopyable&) = delete;
+		Uncopyable& operator = (Uncopyable&&) = delete;
+	};
 
-	/*!
-	@brief 16-bit int
-	*/
-	using Int16 = int16_t;
-
-	/*!
-	@brief 16-bit unsigned int
-	*/
-	using UInt16 = uint16_t;
-
-	/*!
-	@brief 32-bit int
-	*/
-	using Int32 = int32_t;
-
-	/*!
-	@brief 32-bit unsigned int
-	*/
-	using UInt32 = uint32_t;
-
-	/*!
-	@brief 64-bit int
-	*/
-	using Int64 = int64_t;
-
-	/*!
-	@brief 64-bit unsigned int
-	*/
-	using UInt64 = uint64_t;
-
-	/*!
-	@brief a byte
-	*/
-	using Byte = UInt8;
-
-	/*!
-	@brief size type
-	*/
-	using SizeType = UInt64;
-
-	/*!
-	@brief address type
-	*/
-	using AddressType = UInt64;
-	
 	/*!
 	@}
 	*/

@@ -36,7 +36,7 @@ TEST_CASE("Test StdAllocator", "[Common][MemoryManager]")
 	}
 }
 
-TEST_CASE("Test Fundamental Function")
+TEST_CASE("Test Fundamental Function", "[Common][MemoryManager]")
 {
 	SECTION("test memory align macro")
 	{
@@ -57,7 +57,7 @@ TEST_CASE("Test Fundamental Function")
 	SECTION("test memory page")
 	{
 		MemoryManager::MemoryPageHeader* ppageheader = reinterpret_cast<MemoryManager::MemoryPageHeader*>(StdAllocator::RawNew(sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)));
-		REQUIRE(reinterpret_cast<SizeType>(ppageheader->GetFirstMemoryBlock()) == reinterpret_cast<SizeType>(ppageheader) + sizeof(MemoryManager::MemoryBlockHeader));
+		REQUIRE(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()) == reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryBlockHeader));
 		StdAllocator::RawDelete(ppageheader);
 	}
 }
