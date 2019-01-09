@@ -48,11 +48,13 @@ namespace SpaceGameEngine
 		String(const String& str);
 		String(const StdTString& str);
 		String(const StdTChar* pstr);
+		String(String&& str);
 		~String();
 
 		String& operator = (const String& str);
 		String& operator = (const StdTString& str);
 		String& operator = (const StdTChar* pstr);
+		String& operator = (String&& str);
 
 		bool operator ==(const String& str)const;
 		bool operator ==(const StdTString& str)const;

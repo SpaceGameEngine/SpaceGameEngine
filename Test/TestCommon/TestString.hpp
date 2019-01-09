@@ -43,6 +43,14 @@ TEST_CASE("Test String", "[Common][String]")
 		//if str's implement is equal with str2's then their raw data address must be same
 		REQUIRE(str.GetData() != str2.GetData());
 	}
+	SECTION("test move")
+	{
+		String str = SGE_TSTR("TestString");
+		String str2 = SGE_TSTR("TestString");
+		String str3(std::move(str));
+		String str4 = std::move(str2);
+		REQUIRE(str3 == str4);
+	}
 }
 
 TEST_CASE("Test StdTStringImplement", "[Common][String]")
@@ -66,5 +74,13 @@ TEST_CASE("Test StdTStringImplement", "[Common][String]")
 		StdTStringImplement str2 = str;
 		REQUIRE(str == str2);
 		REQUIRE(str.GetData() != str2.GetData());
+	}
+	SECTION("test move")
+	{
+		StdTStringImplement str = SGE_TSTR("TestString");
+		StdTStringImplement str2 = SGE_TSTR("TestString");
+		StdTStringImplement str3(std::move(str));
+		StdTStringImplement str4 = std::move(str2);
+		REQUIRE(str3 == str4);
 	}
 }

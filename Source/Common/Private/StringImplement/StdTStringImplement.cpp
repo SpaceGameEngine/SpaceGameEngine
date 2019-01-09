@@ -36,6 +36,11 @@ SpaceGameEngine::StdTStringImplement::StdTStringImplement(const StdTChar * pstr)
 	m_Content = pstr;
 }
 
+SpaceGameEngine::StdTStringImplement::StdTStringImplement(StdTStringImplement && str)
+{
+	m_Content = std::move(str.m_Content);
+}
+
 SpaceGameEngine::StdTStringImplement & SpaceGameEngine::StdTStringImplement::operator=(const StdTStringImplement & str)
 {
 	m_Content = str.m_Content;
@@ -52,6 +57,12 @@ SpaceGameEngine::StdTStringImplement & SpaceGameEngine::StdTStringImplement::ope
 {
 	AssertNullPointer(pstr);
 	m_Content = pstr;
+	return *this;
+}
+
+SpaceGameEngine::StdTStringImplement & SpaceGameEngine::StdTStringImplement::operator=(StdTStringImplement && str)
+{
+	m_Content = std::move(str.m_Content);
 	return *this;
 }
 
