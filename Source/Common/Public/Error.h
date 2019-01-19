@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "ForwardDefination.hpp"
-#include "String.h"
+#include "SGEString.h"
 
 namespace SpaceGameEngine
 {

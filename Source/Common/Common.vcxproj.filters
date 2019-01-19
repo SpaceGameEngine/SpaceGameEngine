@@ -21,9 +21,6 @@
     <ClInclude Include="Public\Error.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\String.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Public\MemoryManager.h">
       <Filter>Public</Filter>
     </ClInclude>
@@ -36,12 +33,12 @@
     <ClInclude Include="Public\Utility.hpp">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SGEString.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\String.cpp">
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\MemoryManager.cpp">
@@ -49,6 +46,9 @@
     </ClCompile>
     <ClCompile Include="Private\StringImplement\StdTStringImplement.cpp">
       <Filter>Private\StringImplement</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SGEString.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

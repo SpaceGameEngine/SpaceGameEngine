@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "Catch2/catch.hpp"
-#include "../../Source/Common/Public/String.h"
+#include "SGEString.h"
 #include "../../Source/Common/Private/StringImplement/StdTStringImplement.h"
 
 using namespace SpaceGameEngine;
