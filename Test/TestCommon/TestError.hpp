@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "../../ThirdParty/Catch2/catch.hpp"
-#include "../../Source/Common/Public/Error.h"
+#include "Catch2/catch.hpp"
+#include "Error.h"
 
 using namespace SpaceGameEngine;
 

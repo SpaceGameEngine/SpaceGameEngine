@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "../../Public/ForwardDefination.hpp"
+#include "ForwardDefination.hpp"
 #include "../../Public/String.h"
 
 namespace SpaceGameEngine

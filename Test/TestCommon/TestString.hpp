@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "../../ThirdParty/Catch2/catch.hpp"
+#include "Catch2/catch.hpp"
 #include "../../Source/Common/Public/String.h"
 #include "../../Source/Common/Private/StringImplement/StdTStringImplement.h"
 

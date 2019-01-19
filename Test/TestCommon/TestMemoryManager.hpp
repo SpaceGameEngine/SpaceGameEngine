@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "../../ThirdParty/Catch2/catch.hpp"
-#include "../../Source/Common/Public/MemoryManager.h"
+#include "Catch2/catch.hpp"
+#include "MemoryManager.h"
 
 using namespace SpaceGameEngine;
 

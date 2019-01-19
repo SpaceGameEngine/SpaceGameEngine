@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #define CATCH_CONFIG_MAIN
-#include "../../ThirdParty/Catch2/catch.hpp"
+#include "Catch2/catch.hpp"
 
 unsigned int Factorial(unsigned int number)
 {

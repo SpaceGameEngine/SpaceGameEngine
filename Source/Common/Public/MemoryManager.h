@@ -61,7 +61,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief the memory manager for the engine to use
 	*/
-	class MemoryManager
+	class MemoryManager :public Uncopyable
 	{
 	public:
 		/*!

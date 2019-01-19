@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "../Public/String.h"
-#include "../Private/StringImplement/StdTStringImplement.h"
-#include "../Public/Error.h"
+#include "StringImplement/StdTStringImplement.h"
+#include "Error.h"
 
 SpaceGameEngine::String::String()
 {
