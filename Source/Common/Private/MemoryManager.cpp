@@ -33,9 +33,9 @@ SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManag
 	return reinterpret_cast<MemoryBlockHeader*>(reinterpret_cast<AddressType>(this) + sizeof(MemoryPageHeader));
 }
 
-SpaceGameEngine::MemoryManager::SimpleAllocator::SimpleAllocator(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment)
+SpaceGameEngine::MemoryManager::SimpleAllocator::SimpleAllocator()
 {
-	Set(data_mem_size, page_mem_size, alignment);
+	
 }
 
 SpaceGameEngine::MemoryManager::SimpleAllocator::~SimpleAllocator()

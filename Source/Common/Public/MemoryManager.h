@@ -93,7 +93,7 @@ namespace SpaceGameEngine
 		public:
 			friend MemoryManager;
 
-			SimpleAllocator(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
+			SimpleAllocator();
 			~SimpleAllocator();
 		private:
 			void Set(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
@@ -108,8 +108,7 @@ namespace SpaceGameEngine
 			*/
 			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
 		private:
-			MemoryBlockHeader* m_pFreeMemoryBlockList;
-			MemoryPageHeader* m_pMemoryPageList;
+			
 		};
 	public:
 
