@@ -16,6 +16,7 @@ limitations under the License.
 #include "SGEString.h"
 #include "StringImplement/StdTStringImplement.h"
 #include "Error.h"
+#include "MemoryManager.h"
 
 SpaceGameEngine::String::String()
 {
@@ -94,9 +95,9 @@ SpaceGameEngine::StdTString SpaceGameEngine::String::ToStdTString()const
 	return m_pImplement->ToStdTString();
 }
 
-const SpaceGameEngine::StdTChar * SpaceGameEngine::String::GetConstData() const
+const SpaceGameEngine::StdTChar * SpaceGameEngine::String::GetCString() const
 {
-	return m_pImplement->GetConstData();
+	return m_pImplement->GetCString();
 }
 
 SpaceGameEngine::StdTChar * SpaceGameEngine::String::GetData()

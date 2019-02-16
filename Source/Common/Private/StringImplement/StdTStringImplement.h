@@ -44,7 +44,7 @@ namespace SpaceGameEngine
 		bool operator ==(const StdTChar* pstr)const;
 
 		StdTString ToStdTString()const;
-		const StdTChar* GetConstData()const;
+		const StdTChar* GetCString()const;
 		StdTChar* GetData();
 		SizeType GetSize();
 	private:

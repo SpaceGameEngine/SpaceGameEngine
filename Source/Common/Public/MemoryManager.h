@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "TypeDefination.hpp"
 #include "Utility.hpp"
+#include "Error.h"
 
 namespace SpaceGameEngine
 {
@@ -25,9 +26,9 @@ namespace SpaceGameEngine
 	*/
 
 #ifdef _WIN32
-#define SGE_MAX_MEMORY_SIZE INT32_MAX
+#define SGE_MAX_MEMORY_SIZE UINT32_MAX
 #else
-#define SGE_MAX_MEMORY_SIZE INT64_MAX
+#define SGE_MAX_MEMORY_SIZE UINT64_MAX
 #endif
 
 	struct StdAllocator

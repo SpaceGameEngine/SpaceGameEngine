@@ -31,7 +31,7 @@ TEST_CASE("Test String", "[Common][String]")
 	SECTION("test use std t char ptr to operate")
 	{
 		String str = SGE_TSTR("TestString");
-		REQUIRE(memcmp(str.GetConstData(), SGE_TSTR("TestString"), str.GetSize()) == 0);
+		REQUIRE(memcmp(str.GetData(), SGE_TSTR("TestString"), str.GetSize()) == 0);
 		//-1 because SGE_TSTR("TestString") has a '\0' char as the end of the str
 		REQUIRE(str.GetSize() == (sizeof(SGE_TSTR("TestString")) / sizeof(StdTChar)) - 1);
 	}
@@ -51,6 +51,11 @@ TEST_CASE("Test String", "[Common][String]")
 		String str4 = std::move(str2);
 		REQUIRE(str3 == str4);
 	}
+	SECTION("test cstring")
+	{
+		String str = SGE_TSTR("TestString");
+		REQUIRE(str.GetCString()[str.GetSize()] == '\0');
+	}
 }
 
 TEST_CASE("Test StdTStringImplement", "[Common][String]")
@@ -64,7 +69,7 @@ TEST_CASE("Test StdTStringImplement", "[Common][String]")
 	SECTION("test use std t char ptr to operate")
 	{
 		StdTStringImplement str = SGE_TSTR("TestString");
-		REQUIRE(memcmp(str.GetConstData(), SGE_TSTR("TestString"), str.GetSize()) == 0);
+		REQUIRE(memcmp(str.GetData(), SGE_TSTR("TestString"), str.GetSize()) == 0);
 		//-1 because SGE_TSTR("TestString") has a '\0' char as the end of the str
 		REQUIRE(str.GetSize() == (sizeof(SGE_TSTR("TestString")) / sizeof(StdTChar)) - 1);
 	}
@@ -82,5 +87,10 @@ TEST_CASE("Test StdTStringImplement", "[Common][String]")
 		StdTStringImplement str3(std::move(str));
 		StdTStringImplement str4 = std::move(str2);
 		REQUIRE(str3 == str4);
+	}
+	SECTION("test cstring")
+	{
+		StdTStringImplement str = SGE_TSTR("TestString");
+		REQUIRE(str.GetCString()[str.GetSize()] == '\0');
 	}
 }

@@ -87,7 +87,7 @@ SpaceGameEngine::StdTString SpaceGameEngine::StdTStringImplement::ToStdTString()
 	return m_Content;
 }
 
-const SpaceGameEngine::StdTChar * SpaceGameEngine::StdTStringImplement::GetConstData() const
+const SpaceGameEngine::StdTChar * SpaceGameEngine::StdTStringImplement::GetCString() const
 {
 	return m_Content.c_str();
 }
