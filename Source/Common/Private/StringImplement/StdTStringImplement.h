@@ -31,21 +31,21 @@ namespace SpaceGameEngine
 		StdTStringImplement();
 		StdTStringImplement(const StdTStringImplement& str);
 		StdTStringImplement(const StdTString& str);
-		StdTStringImplement(const StdTChar* pstr);
+		StdTStringImplement(const TChar* pstr);
 		StdTStringImplement(StdTStringImplement&& str);
 
 		StdTStringImplement& operator = (const StdTStringImplement& str);
 		StdTStringImplement& operator = (const StdTString& str);
-		StdTStringImplement& operator = (const StdTChar* pstr);
+		StdTStringImplement& operator = (const TChar* pstr);
 		StdTStringImplement& operator = (StdTStringImplement&& str);
 
 		bool operator ==(const StdTStringImplement& str)const;
 		bool operator ==(const StdTString& str)const;
-		bool operator ==(const StdTChar* pstr)const;
+		bool operator ==(const TChar* pstr)const;
 
 		StdTString ToStdTString()const;
-		const StdTChar* GetCString()const;
-		StdTChar* GetData();
+		const TChar* ToCString()const;
+		TChar* GetData();
 		SizeType GetSize();
 	private:
 		StdTString m_Content;

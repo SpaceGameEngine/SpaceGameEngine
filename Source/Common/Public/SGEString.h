@@ -34,7 +34,7 @@ namespace SpaceGameEngine
 #define StdTCin std::cin
 #define StdTCout std::cout
 #endif
-	using StdTChar = TCHAR;
+	using TChar = TCHAR;
 #define SGE_TSTR(str) _T(str)
 
 	class StdTStringImplement;
@@ -46,22 +46,22 @@ namespace SpaceGameEngine
 		String();
 		String(const String& str);
 		String(const StdTString& str);
-		String(const StdTChar* pstr);
+		String(const TChar* pstr);
 		String(String&& str);
 		~String();
 
 		String& operator = (const String& str);
 		String& operator = (const StdTString& str);
-		String& operator = (const StdTChar* pstr);
+		String& operator = (const TChar* pstr);
 		String& operator = (String&& str);
 
 		bool operator ==(const String& str)const;
 		bool operator ==(const StdTString& str)const;
-		bool operator ==(const StdTChar* pstr)const;
+		bool operator ==(const TChar* pstr)const;
 
 		StdTString ToStdTString()const;
-		const StdTChar* GetCString()const;
-		StdTChar* GetData();
+		const TChar* ToCString()const;
+		TChar* GetData();
 		SizeType GetSize();
 	private:
 		StringImplement* m_pImplement;

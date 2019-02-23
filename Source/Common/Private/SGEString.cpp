@@ -33,7 +33,7 @@ SpaceGameEngine::String::String(const StdTString & str)
 	m_pImplement = DefaultAllocator::New<StringImplement>(str);
 }
 
-SpaceGameEngine::String::String(const StdTChar * pstr)
+SpaceGameEngine::String::String(const TChar * pstr)
 {
 	AssertNullPointer(pstr);
 	m_pImplement = DefaultAllocator::New<StringImplement>(pstr);
@@ -56,7 +56,7 @@ SpaceGameEngine::String & SpaceGameEngine::String::operator=(const StdTString & 
 	return *this;
 }
 
-SpaceGameEngine::String & SpaceGameEngine::String::operator=(const StdTChar * pstr)
+SpaceGameEngine::String & SpaceGameEngine::String::operator=(const TChar * pstr)
 {
 	AssertNullPointer(pstr);
 	*m_pImplement = pstr;
@@ -79,7 +79,7 @@ bool SpaceGameEngine::String::operator==(const StdTString & str)const
 	return *m_pImplement == str;
 }
 
-bool SpaceGameEngine::String::operator==(const StdTChar * pstr)const
+bool SpaceGameEngine::String::operator==(const TChar * pstr)const
 {
 	AssertNullPointer(pstr);
 	return *m_pImplement == pstr;
@@ -95,12 +95,12 @@ SpaceGameEngine::StdTString SpaceGameEngine::String::ToStdTString()const
 	return m_pImplement->ToStdTString();
 }
 
-const SpaceGameEngine::StdTChar * SpaceGameEngine::String::GetCString() const
+const SpaceGameEngine::TChar * SpaceGameEngine::String::ToCString() const
 {
-	return m_pImplement->GetCString();
+	return m_pImplement->ToCString();
 }
 
-SpaceGameEngine::StdTChar * SpaceGameEngine::String::GetData()
+SpaceGameEngine::TChar * SpaceGameEngine::String::GetData()
 {
 	return m_pImplement->GetData();
 }

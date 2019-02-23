@@ -1,6 +1,6 @@
 ﻿# Space Game Engine
 ## Memory Manager
-### `Allocator`
+### `Allocator(concept)`
 &emsp;&emsp;`Allocator`是`SpaceGameEngine`中用来提供内存分配接口的一**系列**类。一个`Allocator`类应该有四个静态成员函数:
 ```c++
 static void* RawNew(SizeType size);
