@@ -24,67 +24,71 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	enum class ErrorLevel
+	struct DebugInformation
 	{
-		/*!
-		@brief outputs the message.
-		*/
-		Information,
-		/*!
-		@brief outputs the error message,means that the error may cause a fatal,the program will enter debug mode in VS when debug.
-		*/
-		Warning,
-		/*!
-		@brief outputs the error message and the program will enter debug mode in VS when debug then will crash.
-		*/
-		Fatal
+		const TChar* m_pFileName;
+		const TChar* m_pFunctionName;
+		int m_LineNumber;
+
+		DebugInformation(const TChar* file_name, const TChar* func_name, int line_number);
 	};
 
-	class Error
-	{
-	public:
-		Error();
-		virtual ~Error();
-		void ShowError()const;
-	protected:
-		String m_ErrorMessage;
-	};
+#ifdef UNICODE
+#define SGE_FILE __FILEW__
+#define SGE_FUNCTION __FUNCTIONW__
+#else
+#define SGE_FILE __FILE__
+#define SGE_FUNCTION __FUNCTION__
+#endif
+#define SGE_LINE __LINE__
+#define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation(SGE_FILE,SGE_FUNCTION,SGE_LINE)
 
-	void ThrowError(const Error& error, ErrorLevel error_level);
+	void ThrowError(const TChar* error_msg, DebugInformation debug_info);
+
+	/*!
+	@brief a example of error class
+	*/
+	struct BlankError
+	{
+		/*!
+		@brief error message
+		*/
+		inline static const TChar sm_pContent[] = SGE_TSTR("Blank Error");
+		/*!
+		@brief a function for judging the condition
+		@retval true error happend
+		@retval false no error happend
+		*/
+		static bool Judge();
+	};
 
 	/*!
 	@brief assert condition when debug
 	*/
 #ifdef _DEBUG
-#define SGE_ASSERT(expr,error_type,error_level)\
-	if(!(expr)) ThrowError(error_type(),error_level);
+#define SGE_ASSERT(error_type,...)\
+	if(error_type::Judge(__VA_ARGS__)) SpaceGameEngine::ThrowError(error_type::sm_pContent,SGE_DEBUG_INFORMATION);
 #else
-#define SGE_ASSERT(expr,error_type,error_level)
+#define SGE_ASSERT(error_type,...)
 #endif
 
 	/*!
 	@brief check condition
 	*/
-#define SGE_CHECK(expr,error_type,error_level)\
-	if(!(expr)) ThrowError(error_type(),error_level);
+#define SGE_CHECK(error_type,...)\
+	if(error_type::Judge(__VA_ARGS__)) SpaceGameEngine::ThrowError(error_type::sm_pContent,SGE_DEBUG_INFORMATION);
 
-	class NullPointerError :public Error
+	struct NullPointerError
 	{
-	public:
-		NullPointerError();
+		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
+		static bool Judge(const void* ptr);
 	};
 
-	void AssertNullPointer(const void* ptr);
-	void CheckNullPointer(const void* ptr);
-
-	class InvalidSizeError :public Error
+	struct InvalidSizeError
 	{
-	public:
-		InvalidSizeError();
+		inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
+		static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
 	};
-
-	void AssertInvalidSize(SizeType size, SizeType min_size, SizeType max_size);
-	void CheckInvalidSize(SizeType size, SizeType min_size, SizeType max_size);
 
 	/*!
 	@}

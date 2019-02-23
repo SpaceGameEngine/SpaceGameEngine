@@ -29,10 +29,12 @@ namespace SpaceGameEngine
 	using StdTString = std::wstring;
 #define StdTCin std::wcin
 #define StdTCout std::wcout
+#define StdToString std::to_wstring
 #else
 	using StdTString = std::string;
 #define StdTCin std::cin
 #define StdTCout std::cout
+#define StdToString std::to_string
 #endif
 	using TChar = TCHAR;
 #define SGE_TSTR(str) _T(str)

@@ -17,73 +17,42 @@ limitations under the License.
 #include <iostream>
 #include <Windows.h>
 
-SpaceGameEngine::Error::Error()
+SpaceGameEngine::DebugInformation::DebugInformation(const TChar * file_name, const TChar * func_name, int line_number)
 {
-	m_ErrorMessage = SGE_TSTR("Empty Error");
+	m_pFileName = file_name;
+	m_pFunctionName = func_name;
+	m_LineNumber = line_number;
 }
 
-SpaceGameEngine::Error::~Error()
+void SpaceGameEngine::ThrowError(const TChar * error_msg, DebugInformation debug_info)
 {
-}
-
-void SpaceGameEngine::Error::ShowError()const
-{
-	/*!@todo use sge's output*/
-	StdTCout << m_ErrorMessage.ToStdTString() << std::endl;
-}
-
-void SpaceGameEngine::ThrowError(const Error & error, ErrorLevel error_level)
-{
-	switch (error_level)
-	{
-	case ErrorLevel::Information:
-		error.ShowError();
-		break;
-	case ErrorLevel::Warning:
-		error.ShowError();
-#ifdef _DEBUG
-		DebugBreak();
+	StdTString output_msg = SGE_TSTR("error happend in ");
+	output_msg += debug_info.m_pFileName;
+	output_msg += SGE_TSTR(" ");
+	output_msg += debug_info.m_pFunctionName;
+	output_msg += SGE_TSTR(" ");
+	output_msg += StdToString(debug_info.m_LineNumber);
+	output_msg += SGE_TSTR(" : ");
+	output_msg += error_msg;
+	/*!@todo use sge's output like log or messagebox*/
+	StdTCout << output_msg << std::endl;
+#if defined(DEBUG)|defined(_DEBUG)
+	DebugBreak();
 #endif
-		break;
-	case ErrorLevel::Fatal:
-		error.ShowError();
-#ifdef _DEBUG
-		DebugBreak();
-#endif
-		abort();
-		break;
-	default:
-		error.ShowError();
-		break;
-	}
+	abort();
 }
 
-void SpaceGameEngine::AssertNullPointer(const void * ptr)
+bool SpaceGameEngine::BlankError::Judge()
 {
-	SGE_ASSERT(ptr, NullPointerError, ErrorLevel::Fatal);
+	return true;
 }
 
-void SpaceGameEngine::CheckNullPointer(const void * ptr)
+bool SpaceGameEngine::NullPointerError::Judge(const void * ptr)
 {
-	SGE_CHECK(ptr, NullPointerError, ErrorLevel::Fatal);
+	return ptr == nullptr;
 }
 
-void SpaceGameEngine::AssertInvalidSize(SizeType size, SizeType min_size, SizeType max_size)
+bool SpaceGameEngine::InvalidSizeError::Judge(SizeType size, SizeType min_size, SizeType max_size)
 {
-	SGE_ASSERT(size >= min_size && size <= max_size, InvalidSizeError, ErrorLevel::Fatal);
-}
-
-void SpaceGameEngine::CheckInvalidSize(SizeType size, SizeType min_size, SizeType max_size)
-{
-	SGE_CHECK(size >= min_size && size <= max_size, InvalidSizeError, ErrorLevel::Fatal);
-}
-
-SpaceGameEngine::NullPointerError::NullPointerError()
-{
-	m_ErrorMessage = SGE_TSTR("Pointer can not be null");
-}
-
-SpaceGameEngine::InvalidSizeError::InvalidSizeError()
-{
-	m_ErrorMessage = SGE_TSTR("The size is invalid");
+	return !(size >= min_size && size <= max_size);
 }

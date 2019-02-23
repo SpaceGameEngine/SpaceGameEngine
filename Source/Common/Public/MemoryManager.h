@@ -45,7 +45,7 @@ namespace SpaceGameEngine
 		template<typename T>
 		static void Delete(T* ptr)
 		{
-			AssertNullPointer(ptr);
+			SGE_ASSERT(NullPointerError, ptr);
 			ptr->~T();
 			RawDelete(ptr);
 		}

@@ -18,13 +18,13 @@ limitations under the License.
 
 void * SpaceGameEngine::StdAllocator::RawNew(SizeType size)
 {
-	AssertInvalidSize(size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidSizeError,size, 1, SGE_MAX_MEMORY_SIZE);
 	return new Byte[size];
 }
 
 void SpaceGameEngine::StdAllocator::RawDelete(void * ptr)
 {
-	AssertNullPointer(ptr);
+	SGE_ASSERT(NullPointerError,ptr);
 	delete[] ptr;
 }
 

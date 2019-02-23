@@ -19,9 +19,7 @@
 
 ### 使用`SpaceGameEngine`中的错误处理机制
 #### 抛出错误
-&emsp;&emsp;如果你直接`include`了`Error.h`的话那么就可以使用`SGE_ASSERT`和`SGE_CHECK`这两个宏来进行上文所说的`Assert`和`Check`了，两个宏的参数都为`(expr,error_type,error_level)`。又或是直接使用`Assert...`和`Check...`系列函数来直接判断（不需要自己写用于判断的表达式）。
-
-&emsp;&emsp;但是如果代码被`Error.h`使用的话（引擎内的代码），就不能直接`#include "Error.h"`了。则必须通过头文件`#include "ForwardDefination.hpp"`、源文件`#include "Error.h"`的方式以使用**前置声明**来进行错误处理，且在这种情况下，头文件中不能使用`SGE_ASSERT`和`SGE_CHECK`这两个宏（因为没有`Error`子类和`ErrorLevel`的声明），而只能使用`Assert...`和`Check...`系列函数的前置声明了。
+&emsp;&emsp;如果你直接`include`了`Error.h`的话那么就可以使用`SGE_ASSERT`和`SGE_CHECK`这两个宏来进行上文所说的`Assert`和`Check`了，两个宏的参数都为`(error_type,...)`。
 
 #### 添加错误类型
-&emsp;&emsp;如果你想要加入你自己的错误类型，你可以直接写个类继承于`Error`，然后在这个类的构造函数中重新给`m_ErrorMessage`赋值即可。其后，你也可以添加一些封装好的`Assert...`和`Check...`函数。如果这个错误类型将用于引擎内部的话，你还应该将这些你自己定义的`Assert...`和`Check...`函数的声明复制到`"ForwardDefination.hpp"`中以提供必要的前置声明以供使用。
+&emsp;&emsp;

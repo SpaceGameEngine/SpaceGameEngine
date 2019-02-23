@@ -19,18 +19,24 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-class TestError :public Error
+struct TestError
 {
-public:
-	inline TestError()
+	inline static const TChar sm_pContent[] = SGE_TSTR("Test Error");
+	inline static bool Judge()
 	{
-		m_ErrorMessage = SGE_TSTR("Test Error");
+		return true;
 	}
 };
 
-TEST_CASE("test error information", "[Common][Error]")
+//TEST_CASE("test error ", "[Common][Error]")
+//{
+//	SGE_ASSERT(TestError);
+//}
+
+TEST_CASE("test normal error ", "[Common][Error]")
 {
-	ThrowError(TestError(), ErrorLevel::Information);
+	SGE_ASSERT(NullPointerError,(void*)1);
+	SGE_ASSERT(InvalidSizeError, 5, 1, 10);
 }
 
 //TEST_CASE("test error warning", "[Common][Error]")
