@@ -18,8 +18,34 @@
 2. 对于那些我们可以预测结果的第三方函数调用就不用`Check`进行检查了，如数学计算函数等。对于那些有着还算好用的错误/异常处理的第三方函数调用，如`STL`等，我们可以信任他们的错误处理机制，不进行`Check`。但对于那些检测错误及其麻烦的，如系统调用等，我们要用`Check`进行检查。
 
 ### 使用`SpaceGameEngine`中的错误处理机制
-#### 抛出错误
-&emsp;&emsp;如果你直接`include`了`Error.h`的话那么就可以使用`SGE_ASSERT`和`SGE_CHECK`这两个宏来进行上文所说的`Assert`和`Check`了，两个宏的参数都为`(error_type,...)`。
+#### `Error(concept)`
+&emsp;&emsp;`Error`不是某个具体类，而是一个概念，代表着一系列类。一个`Error`类应有以下内容:
+```c++
+public:
+	static const TChar sm_pContent[] = SGE_TSTR("错误消息内容");//错误消息内容
 
-#### 添加错误类型
-&emsp;&emsp;
+	static bool Judge();//通过检验其参数来判断是否出错，参数随意，返回true表示有错误发生，返回false表示无错误发生
+```
+&emsp;&emsp;这样，当你需要加入一种新的错误(`Error`)类型时，你只需要自己定义一个类或是结构体，为其加入这些内容即可。
+
+#### `SGE_ASSERT`&`SGE_CHECK`
+&emsp;&emsp;`SGE_ASSERT`、`SGE_CHECK`这两个宏分别对应着前文概念中的`Assert`和`Check`。两者的参数均为`(error_type,...)`，这个`...`代表着`Judge`的实参。
+
+#### 样例
+```c++
+struct NullPointerError
+{
+	inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
+	static bool Judge(const void* ptr);
+};
+
+struct InvalidSizeError
+{
+	inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
+	static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
+};
+```
+```c++
+SGE_ASSERT(NullPointerError,(void*)1);
+SGE_ASSERT(InvalidSizeError, 5, 1, 10);
+```
