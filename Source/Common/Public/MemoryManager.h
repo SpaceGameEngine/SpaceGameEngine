@@ -88,17 +88,23 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief the simple allocator that only allocate a sort of memory block
+		@attention must call SimpleAllocator::Init method after instancing before using
 		*/
 		class SimpleAllocator :public Uncopyable
 		{
+		public:
+			struct SimpleAllocatorNotInitializedError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("SimpleAllocator has not been initialized");
+				static bool Judge(bool is_init);
+			};
 		public:
 			friend MemoryManager;
 
 			SimpleAllocator();
 			~SimpleAllocator();
 		private:
-			void Set(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
-			void Clear();
+			void Init(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
 
 			void* Allocate();
 			void Free(void* ptr);
@@ -109,7 +115,7 @@ namespace SpaceGameEngine
 			*/
 			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
 		private:
-			
+			bool m_IsInitialized;
 		};
 	public:
 

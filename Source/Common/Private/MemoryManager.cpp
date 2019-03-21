@@ -35,32 +35,40 @@ SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManag
 
 SpaceGameEngine::MemoryManager::SimpleAllocator::SimpleAllocator()
 {
-	
+	m_IsInitialized = false;
 }
 
 SpaceGameEngine::MemoryManager::SimpleAllocator::~SimpleAllocator()
 {
-	Clear();
+	if (m_IsInitialized)
+	{
+
+	}
 }
 
-void SpaceGameEngine::MemoryManager::SimpleAllocator::Set(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment)
+void SpaceGameEngine::MemoryManager::SimpleAllocator::Init(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment)
 {
-}
-
-void SpaceGameEngine::MemoryManager::SimpleAllocator::Clear()
-{
+	m_IsInitialized = true;
 }
 
 void * SpaceGameEngine::MemoryManager::SimpleAllocator::Allocate()
 {
+	SGE_ASSERT(SimpleAllocatorNotInitializedError, m_IsInitialized);
 	return nullptr;
 }
 
 void SpaceGameEngine::MemoryManager::SimpleAllocator::Free(void * ptr)
 {
+	SGE_ASSERT(SimpleAllocatorNotInitializedError, m_IsInitialized);
 }
 
 SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManager::SimpleAllocator::GetNextMemoryBlock(MemoryBlockHeader * ptr)
 {
+	SGE_ASSERT(SimpleAllocatorNotInitializedError, m_IsInitialized);
 	return nullptr;
+}
+
+bool SpaceGameEngine::MemoryManager::SimpleAllocator::SimpleAllocatorNotInitializedError::Judge(bool is_init)
+{
+	return !is_init;
 }
