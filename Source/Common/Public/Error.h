@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "ForwardDefination.hpp"
 #include "SGEString.h"
+#include "Platform.hpp"
 
 namespace SpaceGameEngine
 {
@@ -23,6 +24,10 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
+
+#if defined(DEBUG) || defined(_DEBUG)
+#define SGE_DEBUG
+#endif
 
 	struct DebugInformation
 	{
@@ -33,7 +38,7 @@ namespace SpaceGameEngine
 		DebugInformation(const TChar* file_name, const TChar* func_name, int line_number);
 	};
 
-#ifdef UNICODE
+#ifdef SGE_USE_WIDE_CHAR
 #define SGE_FILE __FILEW__
 #define SGE_FUNCTION __FUNCTIONW__
 #else
@@ -65,7 +70,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief assert condition when debug
 	*/
-#ifdef _DEBUG
+#ifdef SGE_DEBUG
 #define SGE_ASSERT(error_type,...)\
 	if(error_type::Judge(__VA_ARGS__)) SpaceGameEngine::ThrowError(error_type::sm_pContent,SGE_DEBUG_INFORMATION);
 #else

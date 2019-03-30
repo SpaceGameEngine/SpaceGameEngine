@@ -36,7 +36,7 @@ void SpaceGameEngine::ThrowError(const TChar * error_msg, DebugInformation debug
 	output_msg += error_msg;
 	/*!@todo use sge's output like log or messagebox*/
 	StdTCout << output_msg << std::endl;
-#if defined(DEBUG)|defined(_DEBUG)
+#if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
 	DebugBreak();
 #endif
 	abort();

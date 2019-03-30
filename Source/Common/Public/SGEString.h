@@ -15,8 +15,8 @@ limitations under the License.
 */
 #pragma once
 #include "ForwardDefination.hpp"
+#include "Platform.hpp"
 #include <string>
-#include <tchar.h>
 
 namespace SpaceGameEngine
 {
@@ -25,19 +25,25 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-#ifdef UNICODE
+#if defined(SGE_WINDOWS) && defined(UNICODE)
+#define SGE_USE_WIDE_CHAR
+#endif
+
+#ifdef SGE_USE_WIDE_CHAR
 	using StdTString = std::wstring;
 #define StdTCin std::wcin
 #define StdTCout std::wcout
 #define StdToString std::to_wstring
+	using TChar = wchar_t;
+#define SGE_TSTR(str) L##str
 #else
 	using StdTString = std::string;
 #define StdTCin std::cin
 #define StdTCout std::cout
 #define StdToString std::to_string
+	using TChar = char;
+#define SGE_TSTR(str) str
 #endif
-	using TChar = TCHAR;
-#define SGE_TSTR(str) _T(str)
 
 	class StdTStringImplement;
 	using StringImplement = StdTStringImplement;

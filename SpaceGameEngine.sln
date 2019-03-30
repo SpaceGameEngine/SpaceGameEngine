@@ -47,6 +47,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCommon", "Test\TestComm
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{6B44D9C0-3589-476C-8789-6CC132708D99}"
 	ProjectSection(SolutionItems) = preProject
+		Document\Document\Common\CharacterEncoding.md = Document\Document\Common\CharacterEncoding.md
 		Document\Document\Common\Error.md = Document\Document\Common\Error.md
 		Document\Document\Common\MemoryManager.md = Document\Document\Common\MemoryManager.md
 	EndProjectSection

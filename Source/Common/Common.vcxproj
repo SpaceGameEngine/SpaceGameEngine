@@ -164,6 +164,7 @@
     <ClInclude Include="Public\Error.h" />
     <ClInclude Include="Public\ForwardDefination.hpp" />
     <ClInclude Include="Public\MemoryManager.h" />
+    <ClInclude Include="Public\Platform.hpp" />
     <ClInclude Include="Public\SGEString.h" />
     <ClInclude Include="Public\TypeDefination.hpp" />
     <ClInclude Include="Public\Utility.hpp" />
