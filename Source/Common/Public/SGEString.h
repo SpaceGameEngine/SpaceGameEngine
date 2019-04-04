@@ -48,6 +48,9 @@ namespace SpaceGameEngine
 	class StdTStringImplement;
 	using StringImplement = StdTStringImplement;
 
+	/*!
+	@todo using template and supported customed allocator and char type
+	*/
 	class String
 	{
 	public:

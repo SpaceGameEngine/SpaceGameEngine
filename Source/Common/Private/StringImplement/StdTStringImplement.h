@@ -24,7 +24,7 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	/*!@todo use my allocator*/
+	/*!@todo using template and supported customed allocator and char type*/
 	class StdTStringImplement
 	{
 	public:
