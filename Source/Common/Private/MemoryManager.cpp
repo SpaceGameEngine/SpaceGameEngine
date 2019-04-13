@@ -33,12 +33,12 @@ SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManag
 	return reinterpret_cast<MemoryBlockHeader*>(reinterpret_cast<AddressType>(this) + sizeof(MemoryPageHeader));
 }
 
-SpaceGameEngine::MemoryManager::SimpleAllocator::SimpleAllocator()
+SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocator()
 {
 	m_IsInitialized = false;
 }
 
-SpaceGameEngine::MemoryManager::SimpleAllocator::~SimpleAllocator()
+SpaceGameEngine::MemoryManager::FixedSizeAllocator::~FixedSizeAllocator()
 {
 	if (m_IsInitialized)
 	{
@@ -46,29 +46,29 @@ SpaceGameEngine::MemoryManager::SimpleAllocator::~SimpleAllocator()
 	}
 }
 
-void SpaceGameEngine::MemoryManager::SimpleAllocator::Init(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment)
+void SpaceGameEngine::MemoryManager::FixedSizeAllocator::Init(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment)
 {
 	m_IsInitialized = true;
 }
 
-void * SpaceGameEngine::MemoryManager::SimpleAllocator::Allocate()
+void * SpaceGameEngine::MemoryManager::FixedSizeAllocator::Allocate()
 {
-	SGE_ASSERT(SimpleAllocatorNotInitializedError, m_IsInitialized);
+	SGE_ASSERT(FixedSizeAllocatorNotInitializedError, m_IsInitialized);
 	return nullptr;
 }
 
-void SpaceGameEngine::MemoryManager::SimpleAllocator::Free(void * ptr)
+void SpaceGameEngine::MemoryManager::FixedSizeAllocator::Free(void * ptr)
 {
-	SGE_ASSERT(SimpleAllocatorNotInitializedError, m_IsInitialized);
+	SGE_ASSERT(FixedSizeAllocatorNotInitializedError, m_IsInitialized);
 }
 
-SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManager::SimpleAllocator::GetNextMemoryBlock(MemoryBlockHeader * ptr)
+SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManager::FixedSizeAllocator::GetNextMemoryBlock(MemoryBlockHeader * ptr)
 {
-	SGE_ASSERT(SimpleAllocatorNotInitializedError, m_IsInitialized);
+	SGE_ASSERT(FixedSizeAllocatorNotInitializedError, m_IsInitialized);
 	return nullptr;
 }
 
-bool SpaceGameEngine::MemoryManager::SimpleAllocator::SimpleAllocatorNotInitializedError::Judge(bool is_init)
+bool SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocatorNotInitializedError::Judge(bool is_init)
 {
 	return !is_init;
 }

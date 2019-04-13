@@ -67,12 +67,22 @@ namespace SpaceGameEngine
 
 	/*!
 	@brief the memory manager for the engine to use
+	@note The MemoryManager is just a common memory manager using the different allocators which represent
+	the different memory allocation strategies.It will choose the proper allocator to manage the memory depend
+	on the current condition.
+	@todo add interface&implement&unittest
+	@todo think about whether using Stack Allocator to allocate large size memory or just use new/delete
+	@todo rewrite document
 	*/
 	class MemoryManager :public Uncopyable
 	{
 	public:
 		/*!
 		@brief the header of a memory block which contain the information of the memory block
+		@note the memory block's information which is stored in MemoryBlockHeader is only used in the allocator,
+		so when the memory block is allocated,its header will be unuseful,to avoid waste,the memory of the header will also
+		be a part of the memory which is allocated.There is a formula of memory size which need to be allocated:
+		`ActualAlllocatedMemorySize=max(MemorySizeWhichUserNeed,sizeof(MemoryBlockHeader))`
 		*/
 		struct MemoryBlockHeader
 		{
@@ -81,11 +91,15 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief the header of a memory page which contain the information of the memory page
+		@note Be different with the MemoryBlockHeader,the MemoryPageHeader will not be erased,and it is
+		always the header of the memory page for the allocator to use it to manage the memory page.The
+		memory blocks will be made of the memory after the MemoryPageHeader.
 		*/
 		struct MemoryPageHeader
 		{
 			/*!
-			@brief get the memory address of the first memory block in the memory page whether there is a memory block in the memory page or not
+			@brief get the memory address of the first memory block in the memory page whether there is
+			a memory block in the memory page or not
 			*/
 			MemoryBlockHeader* GetFirstMemoryBlock();
 
@@ -93,23 +107,23 @@ namespace SpaceGameEngine
 		};
 
 		/*!
-		@brief the simple allocator that only allocate a sort of memory block
-		@attention must call SimpleAllocator::Init method after instancing before using
+		@brief the allocator which can only allocate a fixed size memory while the size of memory it
+		can allocate must be set by calling FixedSizeAllocator::Init method
+		@attention must call FixedSizeAllocator::Init method after instancing before using
+		@todo add implement&unittest
 		*/
-		class SimpleAllocator :public Uncopyable
+		class FixedSizeAllocator :public Uncopyable
 		{
 		public:
-			struct SimpleAllocatorNotInitializedError
+			struct FixedSizeAllocatorNotInitializedError
 			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("SimpleAllocator has not been initialized");
+				inline static const TChar sm_pContent[] = SGE_TSTR("FixedSizeAllocator has not been initialized");
 				static bool Judge(bool is_init);
 			};
 		public:
-			friend MemoryManager;
+			FixedSizeAllocator();
+			~FixedSizeAllocator();
 
-			SimpleAllocator();
-			~SimpleAllocator();
-		private:
 			void Init(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
 
 			void* Allocate();

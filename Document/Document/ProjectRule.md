@@ -1,5 +1,5 @@
 ﻿# Space Game Engine
-## ProjectRule
+## Project Rule
 ### ProjectDefaultProperty
 1. 所有项目都要在属性管理器中添加`ProjectCommonProperty.props`属性文件
 2. 属性页 - 配置属性 - 常规 - Windows SDK版本改为`$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))`
