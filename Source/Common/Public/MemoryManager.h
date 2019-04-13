@@ -32,6 +32,11 @@ namespace SpaceGameEngine
 #define SGE_MAX_MEMORY_SIZE UINT64_MAX
 #endif
 
+	/*!
+	@file
+	@todo add Allocator as a concept when c++20 can be used
+	*/
+
 	struct StdAllocator
 	{
 		static void* RawNew(SizeType size);

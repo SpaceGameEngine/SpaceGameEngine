@@ -51,6 +51,11 @@ namespace SpaceGameEngine
 	void ThrowError(const TChar* error_msg, DebugInformation debug_info);
 
 	/*!
+	@file
+	@todo add Error as a concept when c++20 can be used
+	*/
+
+	/*!
 	@brief a example of error class
 	*/
 	struct BlankError
