@@ -9,7 +9,7 @@ Get-ChildItem $solution_directory\Test\ | ForEach-Object{
 	{
 		$test_name=$_.BaseName
 		Write-Output ("Testing "+$test_name)
-		copy $solution_directory\Binary\$test_name\$platform\$configuration\$test_name.exe $solution_directory\Test\$test_name\$test_name.exe
-		&$solution_directory\Test\$test_name\$test_name.exe
+		cd $solution_directory\Test\$test_name
+		$solution_directory\Binary\$test_name\$platform\$configuration\$test_name.exe
 	}
 }

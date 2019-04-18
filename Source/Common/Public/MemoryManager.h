@@ -61,9 +61,9 @@ namespace SpaceGameEngine
 	using DefaultAllocator = StdAllocator;
 
 	/*!
-	@brief make the memory size aligned using the alignment
+	@brief make the memory size or memory address aligned using the alignment
 	*/
-#define SGE_MEMORY_ALIGN(size, alignment) (((size) + ((alignment) - 1)) & ~((alignment) - 1))
+#define SGE_MEMORY_ALIGN(value, alignment) (((value) + ((alignment) - 1)) & ~((alignment) - 1))
 
 	/*!
 	@brief the memory manager for the engine to use
@@ -73,6 +73,7 @@ namespace SpaceGameEngine
 	@todo add interface&implement&unittest
 	@todo think about whether using Stack Allocator to allocate large size memory or just use new/delete
 	@todo rewrite document
+	@todo think about how to manage allocators which using different alignments
 	*/
 	class MemoryManager :public Uncopyable
 	{
