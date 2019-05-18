@@ -35,6 +35,7 @@ namespace SpaceGameEngine
 	/*!
 	@file
 	@todo add Allocator as a concept when c++20 can be used
+	@todo think about whether Allocator need to change the interface to support aligned allocating which use the customed alignment
 	*/
 
 	struct StdAllocator
