@@ -43,10 +43,10 @@ namespace SpaceGameEngine
 		static void* RawNew(SizeType size);
 		static void RawDelete(void* ptr);
 
-		template<typename T,typename... Arg>
-		static T* New(Arg&&... arg)
+		template<typename T,typename... Args>
+		static T* New(Args&&... arg)
 		{
-			return new (RawNew(sizeof(T))) T(std::forward<Arg>(arg)...);
+			return new (RawNew(sizeof(T))) T(std::forward<Args>(arg)...);
 		}
 
 		template<typename T>

@@ -7,8 +7,8 @@ static void* RawNew(SizeType size);
 
 static void RawDelete(void* ptr);
 
-template<typename T,typename... Arg>
-static T* New(Arg&&... arg);
+template<typename T,typename... Args>
+static T* New(Args&&... arg);
 
 template<typename T>
 static void Delete(T* ptr);
