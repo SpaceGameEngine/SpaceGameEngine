@@ -31,6 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{F9
 		Document\Document\CodeRule.md = Document\Document\CodeRule.md
 		Document\Document\DocumentRule.md = Document\Document\DocumentRule.md
 		Document\Document\ProjectRule.md = Document\Document\ProjectRule.md
+		Document\Document\ProjectStruction.md = Document\Document\ProjectStruction.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Catch2", "Catch2", "{FB7ABE02-8208-47F3-B713-0D2315DACFD6}"
