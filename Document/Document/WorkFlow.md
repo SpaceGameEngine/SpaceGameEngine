@@ -1,4 +1,4 @@
-# Git 工作流程
+﻿# Git 工作流程
 
 本项目的Git工作流程基本上参照[GitHub Flow](https://guides.github.com/introduction/flow/index.html)。
 
