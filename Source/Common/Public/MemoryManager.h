@@ -44,8 +44,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief get default alignment by giving memory size
 	@note the default alignment depends on the allocated
-	memory size,when the size >= 16,the alignment is 16,or the size will be
-	1/2/4/8/16 depends on the concrete size.
+	memory size,when the size >= 16,the alignment is 16,or it will be 4.
 	*/
 	SizeType GetDefaultAlignment(SizeType size);
 

@@ -79,7 +79,7 @@ bool SpaceGameEngine::InvalidAlignmentError::Judge(SizeType alignment)
 	short cot = 0;
 	while (alignment != 0)
 	{
-		if (alignment % 2 == 1)
+		if ((alignment & (SizeType)1) == 1)
 			cot += 1;
 		alignment >>= 1;
 	}
@@ -95,16 +95,5 @@ SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
 	if (size >= 16)
 		return 16;
 	else
-	{
-		short cot = 0;
-		short bycot = 0;
-		while (size != 0)
-		{
-			if (size % 2 == 1)
-				cot += 1;
-			bycot += 1;
-			size >>= 1;
-		}
-		return cot == 1 ? (1 << (bycot - 1)) : (1 << bycot);
-	}
+		return 4;
 }

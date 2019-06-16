@@ -74,16 +74,16 @@ TEST_CASE("Test Fundamental Function", "[Common][MemoryManager]")
 	}
 	SECTION("test default alignment")
 	{
-		REQUIRE(GetDefaultAlignment(1) == 1);
-		REQUIRE(GetDefaultAlignment(2) == 2);
+		REQUIRE(GetDefaultAlignment(1) == 4);
+		REQUIRE(GetDefaultAlignment(2) == 4);
 		REQUIRE(GetDefaultAlignment(3) == 4);
 		REQUIRE(GetDefaultAlignment(4) == 4);
-		REQUIRE(GetDefaultAlignment(5) == 8);
-		REQUIRE(GetDefaultAlignment(6) == 8);
-		REQUIRE(GetDefaultAlignment(7) == 8);
-		REQUIRE(GetDefaultAlignment(8) == 8);
-		REQUIRE(GetDefaultAlignment(9) == 16);
-		REQUIRE(GetDefaultAlignment(15) == 16);
+		REQUIRE(GetDefaultAlignment(5) == 4);
+		REQUIRE(GetDefaultAlignment(6) == 4);
+		REQUIRE(GetDefaultAlignment(7) == 4);
+		REQUIRE(GetDefaultAlignment(8) == 4);
+		REQUIRE(GetDefaultAlignment(9) == 4);
+		REQUIRE(GetDefaultAlignment(15) == 4);
 		REQUIRE(GetDefaultAlignment(16) == 16);
 		REQUIRE(GetDefaultAlignment(17) == 16);
 	}
