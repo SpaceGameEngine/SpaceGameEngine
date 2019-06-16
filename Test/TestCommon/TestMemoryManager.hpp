@@ -60,4 +60,31 @@ TEST_CASE("Test Fundamental Function", "[Common][MemoryManager]")
 		REQUIRE(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()) == reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryBlockHeader));
 		StdAllocator::RawDelete(ppageheader);
 	}
+	SECTION("test alignment check")
+	{
+		REQUIRE(!InvalidAlignmentError::Judge(0));
+		REQUIRE(!InvalidAlignmentError::Judge(1));
+		REQUIRE(!InvalidAlignmentError::Judge(2));
+		REQUIRE(!InvalidAlignmentError::Judge(4));
+		REQUIRE(!InvalidAlignmentError::Judge(8));
+		REQUIRE(InvalidAlignmentError::Judge(3));
+		REQUIRE(InvalidAlignmentError::Judge(5));
+		REQUIRE(InvalidAlignmentError::Judge(6));
+		REQUIRE(InvalidAlignmentError::Judge(7));
+	}
+	SECTION("test default alignment")
+	{
+		REQUIRE(GetDefaultAlignment(1) == 1);
+		REQUIRE(GetDefaultAlignment(2) == 2);
+		REQUIRE(GetDefaultAlignment(3) == 4);
+		REQUIRE(GetDefaultAlignment(4) == 4);
+		REQUIRE(GetDefaultAlignment(5) == 8);
+		REQUIRE(GetDefaultAlignment(6) == 8);
+		REQUIRE(GetDefaultAlignment(7) == 8);
+		REQUIRE(GetDefaultAlignment(8) == 8);
+		REQUIRE(GetDefaultAlignment(9) == 16);
+		REQUIRE(GetDefaultAlignment(15) == 16);
+		REQUIRE(GetDefaultAlignment(16) == 16);
+		REQUIRE(GetDefaultAlignment(17) == 16);
+	}
 }

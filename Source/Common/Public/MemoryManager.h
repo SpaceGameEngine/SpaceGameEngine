@@ -32,6 +32,23 @@ namespace SpaceGameEngine
 #define SGE_MAX_MEMORY_SIZE UINT64_MAX
 #endif
 
+	struct InvalidAlignmentError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The alignment is invalid");
+		/*!
+		@note only the alignment which is 0 or 2^n can pass the judgment.
+		*/
+		static bool Judge(SizeType alignment);
+	};
+
+	/*!
+	@brief get default alignment by giving memory size
+	@note the default alignment depends on the allocated
+	memory size,when the size >= 16,the alignment is 16,or the size will be
+	1/2/4/8/16 depends on the concrete size.
+	*/
+	SizeType GetDefaultAlignment(SizeType size);
+
 	/*!
 	@file
 	@todo add Allocator as a concept when c++20 can be used
@@ -40,13 +57,13 @@ namespace SpaceGameEngine
 
 	struct StdAllocator
 	{
-		static void* RawNew(SizeType size);
+		static void* RawNew(SizeType size, SizeType alignment = 0);
 		static void RawDelete(void* ptr);
 
 		template<typename T,typename... Args>
 		static T* New(Args&&... arg)
 		{
-			return new (RawNew(sizeof(T))) T(std::forward<Args>(arg)...);
+			return new (RawNew(sizeof(T),alignof(T))) T(std::forward<Args>(arg)...);
 		}
 
 		template<typename T>

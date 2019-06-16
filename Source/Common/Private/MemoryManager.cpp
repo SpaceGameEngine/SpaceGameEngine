@@ -16,9 +16,10 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Error.h"
 
-void * SpaceGameEngine::StdAllocator::RawNew(SizeType size)
+void * SpaceGameEngine::StdAllocator::RawNew(SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(InvalidSizeError,size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidAlignmentError, alignment);
 	return new Byte[size];
 }
 
@@ -71,4 +72,39 @@ SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManag
 bool SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocatorNotInitializedError::Judge(bool is_init)
 {
 	return !is_init;
+}
+
+bool SpaceGameEngine::InvalidAlignmentError::Judge(SizeType alignment)
+{
+	short cot = 0;
+	while (alignment != 0)
+	{
+		if (alignment % 2 == 1)
+			cot += 1;
+		alignment >>= 1;
+	}
+	if (cot > 1)	//0 or 2^n can pass the judgment
+		return true;
+	else
+		return false;
+}
+
+SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
+{
+	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+	if (size >= 16)
+		return 16;
+	else
+	{
+		short cot = 0;
+		short bycot = 0;
+		while (size != 0)
+		{
+			if (size % 2 == 1)
+				cot += 1;
+			bycot += 1;
+			size >>= 1;
+		}
+		return cot == 1 ? (1 << (bycot - 1)) : (1 << bycot);
+	}
 }
