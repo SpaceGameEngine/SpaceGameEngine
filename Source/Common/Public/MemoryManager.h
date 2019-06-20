@@ -51,7 +51,6 @@ namespace SpaceGameEngine
 	/*!
 	@file
 	@todo add Allocator as a concept when c++20 can be used
-	@todo think about whether Allocator need to change the interface to support aligned allocating which using the customed alignment
 	*/
 
 	struct StdAllocator
@@ -88,9 +87,6 @@ namespace SpaceGameEngine
 	the different memory allocation strategies.It will choose the proper allocator to manage the memory depend
 	on the current condition.
 	@todo add interface&implement&unittest
-	@todo think about whether using Stack Allocator to allocate large size memory or just use new/delete
-	@todo rewrite document
-	@todo think about how to manage allocators which using different alignments
 	*/
 	class MemoryManager :public Uncopyable
 	{
@@ -117,10 +113,14 @@ namespace SpaceGameEngine
 		{
 			/*!
 			@brief get the memory address of the first memory block in the memory page whether there is
-			a memory block in the memory page or not
+			a memory block in the memory page or not.
 			*/
 			MemoryBlockHeader* GetFirstMemoryBlock();
 
+			/*!
+			@brief the memory offset which is arisen when using aligned allocation.
+			*/
+			SizeType m_Offset = 0;
 			MemoryPageHeader* m_pNext = nullptr;
 		};
 
@@ -128,7 +128,7 @@ namespace SpaceGameEngine
 		@brief the allocator which can only allocate a fixed size memory while the size of memory it
 		can allocate must be set by calling FixedSizeAllocator::Init method
 		@attention must call FixedSizeAllocator::Init method after instancing before using
-		@todo add implement&unittest
+		@todo add mutex
 		*/
 		class FixedSizeAllocator :public Uncopyable
 		{
@@ -142,11 +142,15 @@ namespace SpaceGameEngine
 			FixedSizeAllocator();
 			~FixedSizeAllocator();
 
-			void Init(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
+			/*!
+			@attention the alignment argument can not be 0.
+			*/
+			void Init(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
 
 			void* Allocate();
 			void Free(void* ptr);
 			
+		private:
 			/*!
 			@brief get the memory address of the next memory block by giving the memory address of the current memory block
 			@note the result is calculated by the current allocator's constant memory block size
@@ -154,6 +158,16 @@ namespace SpaceGameEngine
 			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
 		private:
 			bool m_IsInitialized;
+
+			MemoryBlockHeader* m_pFreeMemoryBlocks;
+			SizeType m_FreeMemoryBlockQuantity;
+
+			MemoryPageHeader* m_pMemoryPages;
+			SizeType m_MemoryPageQuantity;
+
+			SizeType m_MemoryBlockSize;
+			SizeType m_MemoryPageSize;
+			SizeType m_Alignment;			
 		};
 	public:
 

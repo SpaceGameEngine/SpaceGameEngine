@@ -1,6 +1,6 @@
 ﻿# Space Game Engine
 ## Memory Manager
-### `SpaceGameEngine`中的内存管理原理
+### `SpaceGameEngine`中的内存管理策略
 #### 内存分配/释放策略
 &emsp;&emsp;对于内存分配/释放请求，内存管理器会根据所请求分配/释放的内存大小来决定使用哪种内存分配/释放策略。
 * 对于那些要求分配/释放的内存大小大于**1024**字节的，会直接使用`new/delete`进行分配或释放。

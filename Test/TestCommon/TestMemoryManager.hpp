@@ -56,8 +56,9 @@ TEST_CASE("Test Fundamental Function", "[Common][MemoryManager]")
 	}
 	SECTION("test memory page")
 	{
-		MemoryManager::MemoryPageHeader* ppageheader = reinterpret_cast<MemoryManager::MemoryPageHeader*>(StdAllocator::RawNew(sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)));
-		REQUIRE(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()) == reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryBlockHeader));
+		MemoryManager::MemoryPageHeader* ppageheader = new (reinterpret_cast<MemoryManager::MemoryPageHeader*>(StdAllocator::RawNew(sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)))) MemoryManager::MemoryPageHeader();
+		REQUIRE(ppageheader->m_Offset == 0);
+		REQUIRE(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()) == reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryPageHeader));
 		StdAllocator::RawDelete(ppageheader);
 	}
 	SECTION("test alignment check")
@@ -86,5 +87,24 @@ TEST_CASE("Test Fundamental Function", "[Common][MemoryManager]")
 		REQUIRE(GetDefaultAlignment(15) == 4);
 		REQUIRE(GetDefaultAlignment(16) == 16);
 		REQUIRE(GetDefaultAlignment(17) == 16);
+	}
+}
+
+TEST_CASE("Test FixedSizeAllocator", "[Common][MemoryManager]")
+{
+	SECTION("test instance")
+	{
+		MemoryManager::FixedSizeAllocator test;
+	}
+	SECTION("test allocate/free")
+	{
+		MemoryManager::FixedSizeAllocator test;
+		test.Init(4, 0xffff, 4);
+		Int32* pint = (Int32*)test.Allocate();
+		*pint = 123456789;
+		test.Free(pint);
+		Int32* pint2 = (Int32*)test.Allocate();
+		REQUIRE(pint == pint2);
+		test.Free(pint2);
 	}
 }
