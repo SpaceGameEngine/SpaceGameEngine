@@ -16,18 +16,28 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Error.h"
 #include <algorithm>
+#ifdef SGE_WINDOWS
+#include <malloc.h>
+#else
+#include <mm_malloc.h>
+#endif
+
+/*!
+@file
+@todo think about other os's _mm_malloc/_mm_free location.
+*/
 
 void * SpaceGameEngine::StdAllocator::RawNew(SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(InvalidSizeError,size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
-	return new Byte[size];
+	return _mm_malloc(size, alignment == 0 ? GetDefaultAlignment(size) : alignment);
 }
 
 void SpaceGameEngine::StdAllocator::RawDelete(void * ptr)
 {
 	SGE_ASSERT(NullPointerError,ptr);
-	delete[] ptr;
+	_mm_free(ptr);
 }
 
 SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManager::MemoryPageHeader::GetFirstMemoryBlock()
@@ -47,7 +57,7 @@ SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocator()
 
 	m_MemoryBlockSize = 0;
 	m_MemoryPageSize = 0;
-	m_Alignment = 0;	
+	m_Alignment = 0;
 }
 
 SpaceGameEngine::MemoryManager::FixedSizeAllocator::~FixedSizeAllocator()

@@ -167,7 +167,7 @@ namespace SpaceGameEngine
 
 			SizeType m_MemoryBlockSize;
 			SizeType m_MemoryPageSize;
-			SizeType m_Alignment;			
+			SizeType m_Alignment;
 		};
 	public:
 
