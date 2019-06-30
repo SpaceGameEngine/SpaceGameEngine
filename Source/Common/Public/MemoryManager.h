@@ -133,19 +133,11 @@ namespace SpaceGameEngine
 		class FixedSizeAllocator :public Uncopyable
 		{
 		public:
-			struct FixedSizeAllocatorNotInitializedError
-			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("FixedSizeAllocator has not been initialized");
-				static bool Judge(bool is_init);
-			};
-		public:
-			FixedSizeAllocator();
-			~FixedSizeAllocator();
-
 			/*!
 			@attention the alignment argument can not be 0.
 			*/
-			void Init(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
+			explicit FixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
+			~FixedSizeAllocator();
 
 			void* Allocate();
 			void Free(void* ptr);
@@ -157,8 +149,6 @@ namespace SpaceGameEngine
 			*/
 			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
 		private:
-			bool m_IsInitialized;
-
 			MemoryBlockHeader* m_pFreeMemoryBlocks;
 			SizeType m_FreeMemoryBlockQuantity;
 

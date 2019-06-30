@@ -45,9 +45,11 @@ SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManag
 	return reinterpret_cast<MemoryBlockHeader*>(reinterpret_cast<AddressType>(this) + sizeof(MemoryPageHeader) + m_Offset);
 }
 
-SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocator()
+SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment)
 {
-	m_IsInitialized = false;
+	SGE_ASSERT(InvalidSizeError, alloc_mem_size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidSizeError, page_mem_size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidAlignmentError, alignment);
 
 	m_pFreeMemoryBlocks = nullptr;
 	m_FreeMemoryBlockQuantity = 0;
@@ -55,43 +57,27 @@ SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocator()
 	m_pMemoryPages = nullptr;
 	m_MemoryPageQuantity = 0;
 
-	m_MemoryBlockSize = 0;
-	m_MemoryPageSize = 0;
-	m_Alignment = 0;
+	m_MemoryBlockSize = SGE_MEMORY_ALIGN(std::max((SizeType)sizeof(MemoryBlockHeader), alloc_mem_size), alignment);
+	m_MemoryPageSize = page_mem_size;
+	m_Alignment = alignment;
 }
 
 SpaceGameEngine::MemoryManager::FixedSizeAllocator::~FixedSizeAllocator()
 {
-	if (m_IsInitialized)
+
+	//only need to release pages' memory
+	MemoryPageHeader* pPage = m_pMemoryPages;
+	MemoryPageHeader* pb;
+	while (pPage)
 	{
-		//only need to release pages' memory
-		MemoryPageHeader* pPage = m_pMemoryPages;
-		MemoryPageHeader* pb;
-		while (pPage)
-		{
-			pb = pPage;
-			pPage = pPage->m_pNext;
-			delete[] reinterpret_cast<Byte*>(pb);
-		}
+		pb = pPage;
+		pPage = pPage->m_pNext;
+		delete[] reinterpret_cast<Byte*>(pb);
 	}
-}
-
-void SpaceGameEngine::MemoryManager::FixedSizeAllocator::Init(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment)
-{
-	SGE_ASSERT(InvalidSizeError, alloc_mem_size, 1, SGE_MAX_MEMORY_SIZE);
-	SGE_ASSERT(InvalidSizeError, page_mem_size, 1, SGE_MAX_MEMORY_SIZE);
-	SGE_ASSERT(InvalidAlignmentError, alignment);
-
-	m_MemoryBlockSize = SGE_MEMORY_ALIGN(std::max((SizeType)sizeof(MemoryBlockHeader), alloc_mem_size), alignment);
-	m_MemoryPageSize = page_mem_size;
-	m_Alignment = alignment;
-
-	m_IsInitialized = true;
 }
 
 void * SpaceGameEngine::MemoryManager::FixedSizeAllocator::Allocate()
 {
-	SGE_ASSERT(FixedSizeAllocatorNotInitializedError, m_IsInitialized);
 	if (!m_pFreeMemoryBlocks)
 	{
 		MemoryPageHeader* pNewPage = reinterpret_cast<MemoryPageHeader*>(new Byte[m_MemoryPageSize]);
@@ -125,7 +111,6 @@ void * SpaceGameEngine::MemoryManager::FixedSizeAllocator::Allocate()
 
 void SpaceGameEngine::MemoryManager::FixedSizeAllocator::Free(void * ptr)
 {
-	SGE_ASSERT(FixedSizeAllocatorNotInitializedError, m_IsInitialized);
 	SGE_ASSERT(NullPointerError, ptr);
 	MemoryBlockHeader* pBlock = reinterpret_cast<MemoryBlockHeader*>(ptr);
 	pBlock->m_pNext = m_pFreeMemoryBlocks;
@@ -135,14 +120,8 @@ void SpaceGameEngine::MemoryManager::FixedSizeAllocator::Free(void * ptr)
 
 SpaceGameEngine::MemoryManager::MemoryBlockHeader * SpaceGameEngine::MemoryManager::FixedSizeAllocator::GetNextMemoryBlock(MemoryBlockHeader * ptr)
 {
-	SGE_ASSERT(FixedSizeAllocatorNotInitializedError, m_IsInitialized);
 	SGE_ASSERT(NullPointerError, ptr);
 	return reinterpret_cast<MemoryBlockHeader*>(reinterpret_cast<Byte*>(ptr) + m_MemoryBlockSize);
-}
-
-bool SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocatorNotInitializedError::Judge(bool is_init)
-{
-	return !is_init;
 }
 
 bool SpaceGameEngine::InvalidAlignmentError::Judge(SizeType alignment)

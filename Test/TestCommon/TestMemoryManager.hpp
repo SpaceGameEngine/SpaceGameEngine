@@ -94,12 +94,11 @@ TEST_CASE("Test FixedSizeAllocator", "[Common][MemoryManager]")
 {
 	SECTION("test instance")
 	{
-		MemoryManager::FixedSizeAllocator test;
+		MemoryManager::FixedSizeAllocator test(4,0xffff,4);
 	}
 	SECTION("test allocate/free")
 	{
-		MemoryManager::FixedSizeAllocator test;
-		test.Init(4, 0xffff, 4);
+		MemoryManager::FixedSizeAllocator test(4, 0xffff, 4);
 		Int32* pint = (Int32*)test.Allocate();
 		*pint = 123456789;
 		test.Free(pint);
