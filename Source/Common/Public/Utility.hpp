@@ -33,6 +33,54 @@ namespace SpaceGameEngine
 	};
 
 	/*!
+	@attention inherit `Singleton<T>` to use it,and define it as a friend in the class and 
+	define the class's constructor as a private function at the same time.
+	*/
+	template<typename T>
+	struct Singleton
+	{
+		/*!
+		@todo use global variable
+		*/
+		inline static T& GetSingleton()
+		{
+			static T g_Content;
+			return g_Content;
+		}
+	};
+
+	template<typename T,typename U>
+	struct Pair
+	{
+		Pair() = default;
+		explicit Pair(const T& t,const U& u)
+			:m_First(t),m_Second(u)
+		{}
+		explicit Pair(T&& t, U&& u)
+			:m_First(t), m_Second(u)
+		{}
+		Pair(const Pair<T, U>& c)
+			:Pair(c.m_First, c.m_Second)
+		{}
+		Pair(Pair<T,U>&& c)
+			:Pair(std::move(c.m_First),std::move(c.m_Second))
+		{}
+		Pair<T, U>& operator = (const Pair<T, U>& c)
+		{
+			m_First = c.m_First;
+			m_Second = c.m_Second;
+			return *this;
+		}
+		Pair<T, U>& operator = (Pair<T, U>&& c)
+		{
+			m_First = std::move(c.m_First);
+			m_Second = std::move(c.m_Second);
+			return *this;
+		}
+		T m_First;
+		U m_Second;
+	};
+	/*!
 	@}
 	*/
 }

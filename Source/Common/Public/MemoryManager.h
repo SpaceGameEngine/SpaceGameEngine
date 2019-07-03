@@ -56,7 +56,7 @@ namespace SpaceGameEngine
 	struct StdAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr);
+		static void RawDelete(void* ptr, SizeType size);
 
 		template<typename T,typename... Args>
 		static T* New(Args&&... arg)
@@ -69,7 +69,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			ptr->~T();
-			RawDelete(ptr);
+			RawDelete(ptr, sizeof(T));
 		}
 	};
 
@@ -88,7 +88,7 @@ namespace SpaceGameEngine
 	on the current condition.
 	@todo add interface&implement&unittest
 	*/
-	class MemoryManager :public Uncopyable
+	class MemoryManager :public Uncopyable, public Singleton<MemoryManager>
 	{
 	public:
 		/*!
@@ -160,9 +160,47 @@ namespace SpaceGameEngine
 			SizeType m_Alignment;
 		};
 	public:
+		friend Singleton<MemoryManager>;
 
+		/*!
+		@attention the alignment can not be larger than 128.
+		*/
+		void* Allocate(SizeType size, SizeType alignment);
+		void Free(void* ptr, SizeType size);
 	private:
+		MemoryManager();
+		
+		/*!
+		@attention the first is size,the second is alignment.
+		*/
+		using RequestInformation = Pair<SizeType, SizeType>;
 
+		/*!
+		@attention the request_info's size must be less than or equal to 2048,
+		the alignment of it can not be larger than 128.
+		*/
+		UInt32 RequestInformationToIndex(const RequestInformation& request_info);
+		/*!
+		@attention the index can not be larger than 526336.
+		*/
+		RequestInformation IndexToRequestInformation(UInt32 index);
+	private:
+		inline static const SizeType sm_MaxFixedSizeAllocatorQuantity = 526337;
+		inline static const SizeType sm_MemoryBlockSizes[] = {
+			// 4-increments
+			4,  8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48,
+			52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96,
+			// 32-increments
+			128, 160, 192, 224, 256, 288, 320, 352, 384,
+			416, 448, 480, 512, 544, 576, 608, 640,
+			// 64-increments
+			704, 768, 832, 896, 960, 1024
+		};
+		inline static const SizeType sm_MaxMemoryBlockSize = 1024;
+		inline static const SizeType sm_MemoryPageSize = 8192;
+
+		FixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
+		SizeType m_MemoryBlockSizeMap[sm_MaxMemoryBlockSize + 1];
 	};
 
 	/*!

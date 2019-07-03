@@ -34,9 +34,10 @@ void * SpaceGameEngine::StdAllocator::RawNew(SizeType size, SizeType alignment)
 	return _mm_malloc(size, alignment == 0 ? GetDefaultAlignment(size) : alignment);
 }
 
-void SpaceGameEngine::StdAllocator::RawDelete(void * ptr)
+void SpaceGameEngine::StdAllocator::RawDelete(void * ptr, SizeType size)
 {
 	SGE_ASSERT(NullPointerError,ptr);
+	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
 	_mm_free(ptr);
 }
 
@@ -136,4 +137,45 @@ SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
 		return 16;
 	else
 		return 4;
+}
+
+void * SpaceGameEngine::MemoryManager::Allocate(SizeType size, SizeType alignment)
+{
+	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidAlignmentError, alignment);
+
+	return nullptr;
+}
+
+void SpaceGameEngine::MemoryManager::Free(void * ptr, SizeType size)
+{
+	SGE_ASSERT(NullPointerError, ptr);
+	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+
+
+}
+
+SpaceGameEngine::MemoryManager::MemoryManager()
+{
+	memset(m_FixedSizeAllocators, 0, sizeof(FixedSizeAllocator*)*sm_MaxFixedSizeAllocatorQuantity);
+	
+	SizeType index = 0;
+	for (SizeType i = 0; i <= sm_MaxMemoryBlockSize; i++)
+	{
+		if (sm_MemoryBlockSizes[index] < i)
+			index += 1;
+		m_MemoryBlockSizeMap[i] = sm_MemoryBlockSizes[index];
+	}
+}
+
+SpaceGameEngine::UInt32 SpaceGameEngine::MemoryManager::RequestInformationToIndex(const RequestInformation & request_info)
+{
+	SGE_ASSERT(InvalidSizeError, request_info.m_First, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidAlignmentError, request_info.m_Second);
+	return (request_info.m_Second << 12) | (request_info.m_First);
+}
+
+SpaceGameEngine::MemoryManager::RequestInformation SpaceGameEngine::MemoryManager::IndexToRequestInformation(UInt32 index)
+{
+	return RequestInformation((index&0b111111111111),(index>>12));
 }

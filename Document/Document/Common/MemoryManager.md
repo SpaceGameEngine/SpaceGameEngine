@@ -15,7 +15,7 @@
 ```c++
 static void* RawNew(SizeType size, SizeType alignment = 0);
 
-static void RawDelete(void* ptr);
+static void RawDelete(void* ptr, SizeType size);
 
 template<typename T,typename... Args>
 static T* New(Args&&... arg);
