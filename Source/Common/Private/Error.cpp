@@ -15,7 +15,10 @@ limitations under the License.
 */
 #include "Error.h"
 #include <iostream>
-#include <Windows.h>
+
+#if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
+	#include <Windows.h>
+#endif
 
 SpaceGameEngine::DebugInformation::DebugInformation(const TChar * file_name, const TChar * func_name, int line_number)
 {
