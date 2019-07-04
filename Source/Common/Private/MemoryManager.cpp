@@ -34,7 +34,7 @@ void * SpaceGameEngine::StdAllocator::RawNew(SizeType size, SizeType alignment)
 	return _mm_malloc(size, alignment == 0 ? GetDefaultAlignment(size) : alignment);
 }
 
-void SpaceGameEngine::StdAllocator::RawDelete(void * ptr, SizeType size)
+void SpaceGameEngine::StdAllocator::RawDelete(void * ptr, SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(NullPointerError,ptr);
 	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
@@ -139,43 +139,79 @@ SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
 		return 4;
 }
 
+SpaceGameEngine::MemoryManager::~MemoryManager()
+{
+	for (SizeType i = 0; i < sm_MaxFixedSizeAllocatorQuantity; i++)
+	{
+		if (m_FixedSizeAllocators[i])
+			delete m_FixedSizeAllocators[i];
+	}
+}
+
 void * SpaceGameEngine::MemoryManager::Allocate(SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
-	return nullptr;
+	if (size > sm_MaxMemoryBlockSize)
+	{
+		return _mm_malloc(size, alignment);
+	}
+	else
+	{
+		SGE_ASSERT(InvalidRequestInformationError, RequestInformation(size, alignment));
+		UInt32 index = RequestInformationToIndex(RequestInformation(size, alignment));
+		if (m_FixedSizeAllocators[index])
+		{
+			return m_FixedSizeAllocators[index]->Allocate();
+		}
+		else
+		{
+			m_FixedSizeAllocators[index] = new FixedSizeAllocator(size, sm_MemoryPageSize, alignment);
+			return m_FixedSizeAllocators[index]->Allocate();
+		}
+	}
 }
 
-void SpaceGameEngine::MemoryManager::Free(void * ptr, SizeType size)
+void SpaceGameEngine::MemoryManager::Free(void * ptr, SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(NullPointerError, ptr);
 	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidAlignmentError, alignment);
 
-
+	if (size > sm_MaxMemoryBlockSize)
+	{
+		_mm_free(ptr);
+	}
+	else
+	{
+		SGE_ASSERT(InvalidRequestInformationError, RequestInformation(size, alignment));
+		UInt32 index = RequestInformationToIndex(RequestInformation(size, alignment));
+		SGE_ASSERT(NullPointerError, m_FixedSizeAllocators[index]);
+		m_FixedSizeAllocators[index]->Free(ptr);
+	}
 }
 
 SpaceGameEngine::MemoryManager::MemoryManager()
 {
 	memset(m_FixedSizeAllocators, 0, sizeof(FixedSizeAllocator*)*sm_MaxFixedSizeAllocatorQuantity);
-	
-	SizeType index = 0;
-	for (SizeType i = 0; i <= sm_MaxMemoryBlockSize; i++)
-	{
-		if (sm_MemoryBlockSizes[index] < i)
-			index += 1;
-		m_MemoryBlockSizeMap[i] = sm_MemoryBlockSizes[index];
-	}
 }
 
 SpaceGameEngine::UInt32 SpaceGameEngine::MemoryManager::RequestInformationToIndex(const RequestInformation & request_info)
 {
 	SGE_ASSERT(InvalidSizeError, request_info.m_First, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, request_info.m_Second);
+	SGE_ASSERT(InvalidRequestInformationError, request_info);
+
 	return (request_info.m_Second << 12) | (request_info.m_First);
 }
 
 SpaceGameEngine::MemoryManager::RequestInformation SpaceGameEngine::MemoryManager::IndexToRequestInformation(UInt32 index)
 {
 	return RequestInformation((index&0b111111111111),(index>>12));
+}
+
+bool SpaceGameEngine::MemoryManager::InvalidRequestInformationError::Judge(const RequestInformation & request_info)
+{
+	return !(request_info.m_First <= 2048 && request_info.m_Second <= 128);
 }

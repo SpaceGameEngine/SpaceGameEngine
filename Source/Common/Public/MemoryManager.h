@@ -56,7 +56,7 @@ namespace SpaceGameEngine
 	struct StdAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size);
+		static void RawDelete(void* ptr, SizeType size, SizeType alignment);
 
 		template<typename T,typename... Args>
 		static T* New(Args&&... arg)
@@ -69,7 +69,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			ptr->~T();
-			RawDelete(ptr, sizeof(T));
+			RawDelete(ptr, sizeof(T), alignof(T));
 		}
 	};
 
@@ -162,11 +162,13 @@ namespace SpaceGameEngine
 	public:
 		friend Singleton<MemoryManager>;
 
+		~MemoryManager();
+
 		/*!
-		@attention the alignment can not be larger than 128.
+		@attention the alignment can not be larger than 128 or equal to 0.
 		*/
 		void* Allocate(SizeType size, SizeType alignment);
-		void Free(void* ptr, SizeType size);
+		void Free(void* ptr, SizeType size, SizeType alignment);
 	private:
 		MemoryManager();
 		
@@ -174,6 +176,16 @@ namespace SpaceGameEngine
 		@attention the first is size,the second is alignment.
 		*/
 		using RequestInformation = Pair<SizeType, SizeType>;
+
+		struct InvalidRequestInformationError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The RequestInformation is invalid");
+			/*!
+			@note the request_info's size must be less than or equal to 2048,
+			the alignment of it can not be larger than 128.
+			*/
+			static bool Judge(const RequestInformation& request_info);
+		};
 
 		/*!
 		@attention the request_info's size must be less than or equal to 2048,
@@ -185,22 +197,14 @@ namespace SpaceGameEngine
 		*/
 		RequestInformation IndexToRequestInformation(UInt32 index);
 	private:
+		/*!
+		@note 526337=((128<<12)|2048)+1
+		*/
 		inline static const SizeType sm_MaxFixedSizeAllocatorQuantity = 526337;
-		inline static const SizeType sm_MemoryBlockSizes[] = {
-			// 4-increments
-			4,  8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48,
-			52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96,
-			// 32-increments
-			128, 160, 192, 224, 256, 288, 320, 352, 384,
-			416, 448, 480, 512, 544, 576, 608, 640,
-			// 64-increments
-			704, 768, 832, 896, 960, 1024
-		};
 		inline static const SizeType sm_MaxMemoryBlockSize = 1024;
 		inline static const SizeType sm_MemoryPageSize = 8192;
 
 		FixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
-		SizeType m_MemoryBlockSizeMap[sm_MaxMemoryBlockSize + 1];
 	};
 
 	/*!

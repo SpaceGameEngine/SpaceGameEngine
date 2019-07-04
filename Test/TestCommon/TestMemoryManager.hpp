@@ -32,7 +32,7 @@ TEST_CASE("Test StdAllocator", "[Common][MemoryManager]")
 		Int32* pint = reinterpret_cast<Int32*>(StdAllocator::RawNew(sizeof(Int32)));
 		*pint = 3;
 		REQUIRE(*pint == 3);
-		StdAllocator::RawDelete(pint,sizeof(Int32));
+		StdAllocator::RawDelete(pint,sizeof(Int32), alignof(Int32));
 	}
 }
 
@@ -59,7 +59,7 @@ TEST_CASE("Test Fundamental Function", "[Common][MemoryManager]")
 		MemoryManager::MemoryPageHeader* ppageheader = new (reinterpret_cast<MemoryManager::MemoryPageHeader*>(StdAllocator::RawNew(sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)))) MemoryManager::MemoryPageHeader();
 		REQUIRE(ppageheader->m_Offset == 0);
 		REQUIRE(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()) == reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryPageHeader));
-		StdAllocator::RawDelete(ppageheader, (sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)));
+		StdAllocator::RawDelete(ppageheader, (sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)), alignof(MemoryManager::MemoryPageHeader));
 	}
 	SECTION("test alignment check")
 	{
@@ -123,5 +123,12 @@ TEST_CASE("Test MemoryManager", "[Common][MemoryManager]")
 		REQUIRE(itor(index).m_Second == 4);
 		auto req = Pair<SizeType,SizeType>(2048,128);
 		REQUIRE(rtoi(req) == 526336);
+	}
+	SECTION("test allocate/free")
+	{
+		Int32* pint = (Int32*)(MemoryManager::GetSingleton().Allocate(sizeof(Int32), alignof(Int32)));
+		*pint = 123456789;
+		REQUIRE(*pint == 123456789);
+		MemoryManager::GetSingleton().Free(pint, sizeof(Int32), alignof(Int32));
 	}
 }
