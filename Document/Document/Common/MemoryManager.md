@@ -18,7 +18,7 @@ static void* RawNew(SizeType size, SizeType alignment = 0);
 static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
 
 template<typename T,typename... Args>
-static T* New(Args&&... arg);
+static T* New(Args&&... args);
 
 template<typename T>
 static void Delete(T* ptr);

@@ -59,9 +59,9 @@ namespace SpaceGameEngine
 		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
 
 		template<typename T,typename... Args>
-		static T* New(Args&&... arg)
+		static T* New(Args&&... args)
 		{
-			return new (RawNew(sizeof(T),alignof(T))) T(std::forward<Args>(arg)...);
+			return new (RawNew(sizeof(T),alignof(T))) T(std::forward<Args>(args)...);
 		}
 
 		template<typename T>
@@ -208,9 +208,9 @@ namespace SpaceGameEngine
 		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
 
 		template<typename T, typename... Args>
-		static T* New(Args&&... arg)
+		static T* New(Args&&... args)
 		{
-			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(arg)...);
+			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
 		}
 
 		template<typename T>
