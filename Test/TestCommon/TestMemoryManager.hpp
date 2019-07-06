@@ -116,13 +116,9 @@ TEST_CASE("Test MemoryManager", "[Common][MemoryManager]")
 	}
 	SECTION("test index and request information convert")
 	{
-		auto itor = [](UInt32 index) -> Pair<SizeType, SizeType> {return Pair<SizeType, SizeType>((index & 0b111111111111), (index >> 12)); };
-		auto rtoi = [](const Pair<SizeType, SizeType>& request_info)->UInt32 {return (request_info.m_Second << 12) | (request_info.m_First); };
-		auto index = rtoi(Pair<SizeType, SizeType>(16, 4));
-		REQUIRE(itor(index).m_First == 16);
-		REQUIRE(itor(index).m_Second == 4);
-		auto req = Pair<SizeType,SizeType>(2048,128);
-		REQUIRE(rtoi(req) == 526336);
+		auto rtoi = [](const Pair<SizeType, SizeType>& request_info)->UInt32 {return (request_info.m_First << 8) | (request_info.m_Second); };
+		auto index = rtoi(Pair<SizeType, SizeType>(1024, 128));
+		REQUIRE(index == 262272);
 	}
 	SECTION("test allocate/free")
 	{

@@ -203,17 +203,12 @@ SpaceGameEngine::UInt32 SpaceGameEngine::MemoryManager::RequestInformationToInde
 	SGE_ASSERT(InvalidAlignmentError, request_info.m_Second);
 	SGE_ASSERT(InvalidRequestInformationError, request_info);
 
-	return (request_info.m_Second << 12) | (request_info.m_First);
-}
-
-SpaceGameEngine::MemoryManager::RequestInformation SpaceGameEngine::MemoryManager::IndexToRequestInformation(UInt32 index)
-{
-	return RequestInformation((index&0b111111111111),(index>>12));
+	return (request_info.m_First << 8) | (request_info.m_Second);
 }
 
 bool SpaceGameEngine::MemoryManager::InvalidRequestInformationError::Judge(const RequestInformation & request_info)
 {
-	return !(request_info.m_First <= 2048 && request_info.m_Second <= 128);
+	return !(request_info.m_First <= 1024 && request_info.m_Second <= 128);
 }
 
 void * SpaceGameEngine::MemoryManagerAllocator::RawNew(SizeType size, SizeType alignment)

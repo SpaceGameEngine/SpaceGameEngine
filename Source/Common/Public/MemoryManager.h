@@ -180,26 +180,22 @@ namespace SpaceGameEngine
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The RequestInformation is invalid");
 			/*!
-			@note the request_info's size must be less than or equal to 2048,
+			@note the request_info's size must be less than or equal to 1024,
 			the alignment of it can not be larger than 128.
 			*/
 			static bool Judge(const RequestInformation& request_info);
 		};
 
 		/*!
-		@attention the request_info's size must be less than or equal to 2048,
+		@attention the request_info's size must be less than or equal to 1024,
 		the alignment of it can not be larger than 128.
 		*/
 		UInt32 RequestInformationToIndex(const RequestInformation& request_info);
-		/*!
-		@attention the index can not be larger than 526336.
-		*/
-		RequestInformation IndexToRequestInformation(UInt32 index);
 	private:
 		/*!
-		@note 526337=((128<<12)|2048)+1
+		@note 262273=((1024<<8)|128)+1
 		*/
-		inline static const SizeType sm_MaxFixedSizeAllocatorQuantity = 526337;
+		inline static const SizeType sm_MaxFixedSizeAllocatorQuantity = 262273;
 		inline static const SizeType sm_MaxMemoryBlockSize = 1024;
 		inline static const SizeType sm_MemoryPageSize = 8192;
 
