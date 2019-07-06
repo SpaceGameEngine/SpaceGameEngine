@@ -56,7 +56,7 @@ namespace SpaceGameEngine
 	struct StdAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment);
+		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
 
 		template<typename T,typename... Args>
 		static T* New(Args&&... arg)
@@ -73,9 +73,6 @@ namespace SpaceGameEngine
 		}
 	};
 
-	/*!@todo change the std allocator to my allocator*/
-	using DefaultAllocator = StdAllocator;
-
 	/*!
 	@brief make the memory size or memory address aligned using the alignment
 	*/
@@ -86,7 +83,6 @@ namespace SpaceGameEngine
 	@note The MemoryManager is just a common memory manager using the different allocators which represent
 	the different memory allocation strategies.It will choose the proper allocator to manage the memory depend
 	on the current condition.
-	@todo add interface&implement&unittest
 	*/
 	class MemoryManager :public Uncopyable, public Singleton<MemoryManager>
 	{
@@ -168,6 +164,9 @@ namespace SpaceGameEngine
 		@attention the alignment can not be larger than 128 or equal to 0.
 		*/
 		void* Allocate(SizeType size, SizeType alignment);
+		/*!
+		@attention the alignment can not be larger than 128 or equal to 0.
+		*/
 		void Free(void* ptr, SizeType size, SizeType alignment);
 	private:
 		MemoryManager();
@@ -206,6 +205,28 @@ namespace SpaceGameEngine
 
 		FixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
 	};
+
+	struct MemoryManagerAllocator
+	{
+		static void* RawNew(SizeType size, SizeType alignment = 0);
+		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+
+		template<typename T, typename... Args>
+		static T* New(Args&&... arg)
+		{
+			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(arg)...);
+		}
+
+		template<typename T>
+		static void Delete(T* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			ptr->~T();
+			RawDelete(ptr, sizeof(T), alignof(T));
+		}
+	};
+
+	using DefaultAllocator = MemoryManagerAllocator;
 
 	/*!
 	@}

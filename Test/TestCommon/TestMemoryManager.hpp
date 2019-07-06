@@ -32,7 +32,7 @@ TEST_CASE("Test StdAllocator", "[Common][MemoryManager]")
 		Int32* pint = reinterpret_cast<Int32*>(StdAllocator::RawNew(sizeof(Int32)));
 		*pint = 3;
 		REQUIRE(*pint == 3);
-		StdAllocator::RawDelete(pint,sizeof(Int32), alignof(Int32));
+		StdAllocator::RawDelete(pint,sizeof(Int32));
 	}
 }
 
@@ -130,5 +130,22 @@ TEST_CASE("Test MemoryManager", "[Common][MemoryManager]")
 		*pint = 123456789;
 		REQUIRE(*pint == 123456789);
 		MemoryManager::GetSingleton().Free(pint, sizeof(Int32), alignof(Int32));
+	}
+}
+
+TEST_CASE("Test MemoryManagerAllocator", "[Common][MemoryManager]")
+{
+	SECTION("test new/delete with type")
+	{
+		Int32* pint = MemoryManagerAllocator::New<Int32>(3);
+		REQUIRE(*pint == 3);
+		MemoryManagerAllocator::Delete(pint);
+	}
+	SECTION("test raw new/delete")
+	{
+		Int32* pint = reinterpret_cast<Int32*>(MemoryManagerAllocator::RawNew(sizeof(Int32)));
+		*pint = 3;
+		REQUIRE(*pint == 3);
+		MemoryManagerAllocator::RawDelete(pint, sizeof(Int32));
 	}
 }
