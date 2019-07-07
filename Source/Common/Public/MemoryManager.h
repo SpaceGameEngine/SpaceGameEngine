@@ -83,6 +83,7 @@ namespace SpaceGameEngine
 	@note The MemoryManager is just a common memory manager using the different allocators which represent
 	the different memory allocation strategies.It will choose the proper allocator to manage the memory depend
 	on the current condition.
+	@todo add mutexs for fixedsizeallocators
 	*/
 	class MemoryManager :public Uncopyable, public Singleton<MemoryManager>
 	{
@@ -124,7 +125,6 @@ namespace SpaceGameEngine
 		@brief the allocator which can only allocate a fixed size memory while the size of memory it
 		can allocate must be set by calling FixedSizeAllocator::Init method
 		@attention must call FixedSizeAllocator::Init method after instancing before using
-		@todo add mutex
 		*/
 		class FixedSizeAllocator :public Uncopyable
 		{
