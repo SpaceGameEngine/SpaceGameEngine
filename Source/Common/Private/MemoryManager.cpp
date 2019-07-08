@@ -161,15 +161,9 @@ void * SpaceGameEngine::MemoryManager::Allocate(SizeType size, SizeType alignmen
 	{
 		SGE_ASSERT(InvalidRequestInformationError, RequestInformation(size, alignment));
 		UInt32 index = RequestInformationToIndex(RequestInformation(size, alignment));
-		if (m_FixedSizeAllocators[index])
-		{
-			return m_FixedSizeAllocators[index]->Allocate();
-		}
-		else
-		{
+		if (!m_FixedSizeAllocators[index])
 			m_FixedSizeAllocators[index] = new FixedSizeAllocator(size, sm_MemoryPageSize, alignment);
-			return m_FixedSizeAllocators[index]->Allocate();
-		}
+		return m_FixedSizeAllocators[index]->Allocate();
 	}
 }
 

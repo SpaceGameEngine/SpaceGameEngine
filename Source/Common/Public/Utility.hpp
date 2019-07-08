@@ -44,8 +44,8 @@ namespace SpaceGameEngine
 		*/
 		inline static T& GetSingleton()
 		{
-			static T g_Content;
-			return g_Content;
+			static T g_Instance;
+			return g_Instance;
 		}
 	};
 
