@@ -32,21 +32,36 @@ namespace SpaceGameEngine
 #define SGE_MAX_MEMORY_SIZE UINT64_MAX
 #endif
 
+	struct InvalidAlignmentError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The alignment is invalid");
+		/*!
+		@note only the alignment which is 0 or 2^n can pass the judgment.
+		*/
+		static bool Judge(SizeType alignment);
+	};
+
+	/*!
+	@brief get default alignment by giving memory size
+	@note the default alignment depends on the allocated
+	memory size,when the size >= 16,the alignment is 16,or it will be 4.
+	*/
+	SizeType GetDefaultAlignment(SizeType size);
+
 	/*!
 	@file
 	@todo add Allocator as a concept when c++20 can be used
-	@todo think about whether Allocator need to change the interface to support aligned allocating which using the customed alignment
 	*/
 
 	struct StdAllocator
 	{
-		static void* RawNew(SizeType size);
-		static void RawDelete(void* ptr);
+		static void* RawNew(SizeType size, SizeType alignment = 0);
+		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
 
 		template<typename T,typename... Args>
-		static T* New(Args&&... arg)
+		static T* New(Args&&... args)
 		{
-			return new (RawNew(sizeof(T))) T(std::forward<Args>(arg)...);
+			return new (RawNew(sizeof(T),alignof(T))) T(std::forward<Args>(args)...);
 		}
 
 		template<typename T>
@@ -54,12 +69,9 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			ptr->~T();
-			RawDelete(ptr);
+			RawDelete(ptr, sizeof(T), alignof(T));
 		}
 	};
-
-	/*!@todo change the std allocator to my allocator*/
-	using DefaultAllocator = StdAllocator;
 
 	/*!
 	@brief make the memory size or memory address aligned using the alignment
@@ -71,12 +83,9 @@ namespace SpaceGameEngine
 	@note The MemoryManager is just a common memory manager using the different allocators which represent
 	the different memory allocation strategies.It will choose the proper allocator to manage the memory depend
 	on the current condition.
-	@todo add interface&implement&unittest
-	@todo think about whether using Stack Allocator to allocate large size memory or just use new/delete
-	@todo rewrite document
-	@todo think about how to manage allocators which using different alignments
+	@todo add mutexs for fixedsizeallocators
 	*/
-	class MemoryManager :public Uncopyable
+	class MemoryManager :public Uncopyable, public Singleton<MemoryManager>
 	{
 	public:
 		/*!
@@ -101,10 +110,14 @@ namespace SpaceGameEngine
 		{
 			/*!
 			@brief get the memory address of the first memory block in the memory page whether there is
-			a memory block in the memory page or not
+			a memory block in the memory page or not.
 			*/
 			MemoryBlockHeader* GetFirstMemoryBlock();
 
+			/*!
+			@brief the memory offset which is arisen when using aligned allocation.
+			*/
+			SizeType m_Offset = 0;
 			MemoryPageHeader* m_pNext = nullptr;
 		};
 
@@ -112,38 +125,104 @@ namespace SpaceGameEngine
 		@brief the allocator which can only allocate a fixed size memory while the size of memory it
 		can allocate must be set by calling FixedSizeAllocator::Init method
 		@attention must call FixedSizeAllocator::Init method after instancing before using
-		@todo add implement&unittest
 		*/
 		class FixedSizeAllocator :public Uncopyable
 		{
 		public:
-			struct FixedSizeAllocatorNotInitializedError
-			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("FixedSizeAllocator has not been initialized");
-				static bool Judge(bool is_init);
-			};
-		public:
-			FixedSizeAllocator();
+			/*!
+			@attention the alignment argument can not be 0.
+			*/
+			explicit FixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
 			~FixedSizeAllocator();
-
-			void Init(SizeType data_mem_size, SizeType page_mem_size, SizeType alignment);
 
 			void* Allocate();
 			void Free(void* ptr);
 			
+		private:
 			/*!
 			@brief get the memory address of the next memory block by giving the memory address of the current memory block
 			@note the result is calculated by the current allocator's constant memory block size
 			*/
 			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
 		private:
-			bool m_IsInitialized;
+			MemoryBlockHeader* m_pFreeMemoryBlocks;
+			SizeType m_FreeMemoryBlockQuantity;
+
+			MemoryPageHeader* m_pMemoryPages;
+			SizeType m_MemoryPageQuantity;
+
+			SizeType m_MemoryBlockSize;
+			SizeType m_MemoryPageSize;
+			SizeType m_Alignment;
 		};
 	public:
+		friend Singleton<MemoryManager>;
 
+		~MemoryManager();
+
+		/*!
+		@attention the alignment can not be larger than 128 or equal to 0.
+		*/
+		void* Allocate(SizeType size, SizeType alignment);
+		/*!
+		@attention the alignment can not be larger than 128 or equal to 0.
+		*/
+		void Free(void* ptr, SizeType size, SizeType alignment);
 	private:
+		MemoryManager();
+		
+		/*!
+		@attention the first is size,the second is alignment.
+		*/
+		using RequestInformation = Pair<SizeType, SizeType>;
 
+		struct InvalidRequestInformationError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The RequestInformation is invalid");
+			/*!
+			@note the request_info's size must be less than or equal to 1024,
+			the alignment of it can not be larger than 128.
+			*/
+			static bool Judge(const RequestInformation& request_info);
+		};
+
+		/*!
+		@attention the request_info's size must be less than or equal to 1024,
+		the alignment of it can not be larger than 128.
+		*/
+		UInt32 RequestInformationToIndex(const RequestInformation& request_info);
+	private:
+		/*!
+		@note 262273=((1024<<8)|128)+1
+		*/
+		inline static const SizeType sm_MaxFixedSizeAllocatorQuantity = 262273;
+		inline static const SizeType sm_MaxMemoryBlockSize = 1024;
+		inline static const SizeType sm_MemoryPageSize = 8192;
+
+		FixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
 	};
+
+	struct MemoryManagerAllocator
+	{
+		static void* RawNew(SizeType size, SizeType alignment = 0);
+		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+
+		template<typename T, typename... Args>
+		static T* New(Args&&... args)
+		{
+			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
+		}
+
+		template<typename T>
+		static void Delete(T* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			ptr->~T();
+			RawDelete(ptr, sizeof(T), alignof(T));
+		}
+	};
+
+	using DefaultAllocator = MemoryManagerAllocator;
 
 	/*!
 	@}

@@ -1,32 +1,26 @@
 ﻿# Space Game Engine
 ## Memory Manager
-### `Allocator(concept)`
+### `SpaceGameEngine`中的内存管理策略
+#### 内存分配/释放策略
+&emsp;&emsp;对于内存分配/释放请求，内存管理器会根据所请求分配/释放的内存大小来决定使用哪种内存分配/释放策略。
+* 对于那些要求分配/释放的内存大小大于**1024**字节的，会直接使用`new/delete`进行分配或释放。
+* 对于那些要求分配/释放的内存大小小于等于**1024**字节的，则采用内存管理器中的**固定大小分配器**进行分配或释放。所谓固定大小分配器，就是最简化的分配器，其只负责分配/释放一种固定大小的内存块。内存管理器中自带一部分的固定大小分配器，内存管理器会从中选取一个所能分配/释放的内存块大小刚好大于或恰好等于所请求分配/释放的内存大小的固定大小分配器去完成这个分配或是释放内存的任务。
+
+#### 内存对齐策略
+&emsp;&emsp;在内存分配时，为了便于内存对齐，我们做了以下约定:对于那些默认对齐方式(`alignment=0`)的分配请求，如果其要求分配的内存大小大于等于16字节，我们让其关于16字节对齐，否则，我们让其关于4字节对齐。当然你也可以自定义对齐方式，但是内存管理器所支持的最大对齐方式为1024字节。
+
+### `SpaceGameEngine`中的内存管理应用
+#### `Allocator(concept)`
 &emsp;&emsp;`Allocator`是`SpaceGameEngine`中用来提供内存分配接口的一**系列**类。一个`Allocator`类应该有四个静态成员函数:
 ```c++
-static void* RawNew(SizeType size);
+static void* RawNew(SizeType size, SizeType alignment = 0);
 
-static void RawDelete(void* ptr);
+static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
 
 template<typename T,typename... Args>
-static T* New(Args&&... arg);
+static T* New(Args&&... args);
 
 template<typename T>
 static void Delete(T* ptr);
 ```
-&emsp;&emsp;目前的`Allocator`类有`StdAllocator`和`MemoryManagerAllocator`两种，`DefaultAllocator`则代表着目前引擎默认使用的`Allocator`。
-
-### `MemoryManager`
-&emsp;&emsp;`MemoryManager`是`SpaceGameEngine`中的内存管理器，它根据**不同的分配要求**来调用其所管理的内存分配器(如`MemoryManager::FixedSizeAllocator`等)以完成内存管理工作。
-
-### `MemoryManager::FixedSizeAllocator`
-&emsp;&emsp;`MemoryManager::FixedSizeAllocator`是一种只负责分配一种固定规格(size)的内存块的分配器。
-
-### `MemoryManager::MemoryBlockHeader`
-&emsp;&emsp;`MemoryManager::MemoryBlockHeader`是`MemoryManager::FixedSizeAllocator`所分配的内存块的头部，其包含有指向下一个内存块的指针。值得注意的是，内存分配遵循这样的一个规则：
-```c++
-实际分配的内存空间大小=max(我们所要的内存空间大小,sizeof(MemoryManager::MemoryBlockHeader));
-```
-这是因为内存块头部的信息只在`MemoryManager::FixedSizeAllocator`对它进行管理时才有用，当整个内存块被分配出去后，其头部的信息就没有存在的必要了。
-
-### `MemoryManager::MemoryPageHeader`
-&emsp;&emsp;`MemoryManager::MemoryPageHeader`与`MemoryManager::MemoryBlockHeader`类似，实际上都是包含了一定的信息的内存区域的头部。然而，与内存块头部不同的是，内存页头部的信息是不会被抹去的，因为内存页头部只在`MemoryManager::FixedSizeAllocator`中被使用。而且内存页才是实际的内存持有者，即`MemoryManager::FixedSizeAllocator`先向系统申请一整个内存页所需的内存空间(头部所占的空间+所要使用的空间，这个空间大小在一个`MemoryManager::FixedSizeAllocator`中是固定不变的)，再在内存页除头部外的内存空间上划分出内存块，以供外部使用，最后，再销毁内存页，释放其所使用的内存空间。当然，一个`MemoryManager::FixedSizeAllocator`中所用到的内存页在大多数情况下都不止一个。
+&emsp;&emsp;目前的`Allocator`类有`StdAllocator`和`MemoryManagerAllocator`两种，`DefaultAllocator`则代表着目前引擎默认使用的`Allocator`。用户只需直接使用这些`Allocator`即可完成内存管理的任务。
