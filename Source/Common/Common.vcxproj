@@ -168,6 +168,7 @@
     <ClInclude Include="Public\SGEString.h" />
     <ClInclude Include="Public\TypeDefination.hpp" />
     <ClInclude Include="Public\Utility.hpp" />
+    <ClInclude Include="Public\concurrent\Thread.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp" />

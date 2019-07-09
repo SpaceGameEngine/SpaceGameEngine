@@ -162,6 +162,7 @@
     <ClInclude Include="TestError.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
     <ClInclude Include="TestString.hpp" />
+    <ClInclude Include="TestConcurrent.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

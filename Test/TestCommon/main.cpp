@@ -18,3 +18,4 @@ limitations under the License.
 #include "TestString.hpp"
 #include "TestMemoryManager.hpp"
 #include "TestError.hpp"
+#include "TestConcurrent.hpp"

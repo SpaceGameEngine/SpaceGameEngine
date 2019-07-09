@@ -39,6 +39,9 @@
     <ClInclude Include="Public\Platform.hpp">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\concurrent\Thread.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
