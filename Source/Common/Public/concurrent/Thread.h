@@ -46,60 +46,27 @@ namespace SpaceGameEngine
 	{
 	public:
 		template<class Function, class... Args>
-		explicit Thread( Function &&f, Args &&... args ) : internal( f, args... ) {}
+		explicit Thread( Function &&f, Args &&... args ) : threadImpl( f, args... ) {}
 
-		~Thread()
-		{
-			if (internal.joinable())
-			{
-				internal.detach();
-			}
-		}
+		~Thread();
 
 		Thread &operator=( Thread &&other ) noexcept = delete;
 
-		bool isJoinable() const noexcept
-		{
-			return internal.joinable();
-		}
+		bool isJoinable() const noexcept;
 
-		void Join()
-		{
-			internal.join();
-		}
+		void Join();
 
-		void Detach()
-		{
-			if (internal.joinable())
-			{
-				internal.detach();
-			}
-		}
+		void Detach();
 
-		void Swap( Thread &other ) noexcept
-		{
-			std::swap( internal, other.internal );
-		}
+		void Swap( Thread &other ) noexcept;
 
-		ThreadID GetThreadID() const noexcept
-		{
-			return internal.get_id();
-		}
+		ThreadID GetThreadID() const noexcept;
 
-		static UInt32 HardwareConcurrency() noexcept
-		{
-			return std::thread::hardware_concurrency();
-		}
+		static UInt32 HardwareConcurrency() noexcept;
 
-		static void Yield() noexcept
-		{
-			std::this_thread::yield();
-		}
+		static void YieldCurrentThread() noexcept;
 
-		static ThreadID GetCurrentThreadID() noexcept
-		{
-			return std::this_thread::get_id();
-		}
+		static ThreadID GetCurrentThreadID() noexcept;
 
 		template<class Rep, class Period>
 		static void Sleep( const std::chrono::duration<Rep, Period> &sleep_duration )
@@ -108,14 +75,11 @@ namespace SpaceGameEngine
 		}
 
 	private:
-		std::thread internal;
+		std::thread threadImpl;
 	};
 
 }
 
-void swap( SpaceGameEngine::Thread &lhs, SpaceGameEngine::Thread &rhs ) noexcept
-{
-	lhs.Swap( rhs );
-}
+void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept;
 
 #endif //SPACEGAMEENGINE_THREAD_H

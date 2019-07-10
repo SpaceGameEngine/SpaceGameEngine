@@ -10,6 +10,12 @@
     <Filter Include="Private\StringImplement">
       <UniqueIdentifier>{a3e6f398-c1b5-4cf7-a89e-7453cdd0fd92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Concurrent">
+      <UniqueIdentifier>{66f612dd-14d1-41be-af45-3a59be642d58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Concurrent">
+      <UniqueIdentifier>{9794a949-eb1f-4fb1-93d3-9fac462bc0e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\TypeDefination.hpp">
@@ -39,8 +45,8 @@
     <ClInclude Include="Public\Platform.hpp">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\concurrent\Thread.h">
-      <Filter>Public</Filter>
+    <ClInclude Include="Public\Concurrent\Thread.h">
+      <Filter>Public\Concurrent</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="Private\SGEString.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Concurrent\Thread.cpp">
+      <Filter>Private\Concurrent</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

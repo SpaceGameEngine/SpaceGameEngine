@@ -17,7 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "Catch2/catch.hpp"
-#include "concurrent/Thread.h"
+#include "Concurrent/Thread.h"
 #include <atomic>
 #include <chrono>
 
