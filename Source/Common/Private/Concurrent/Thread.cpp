@@ -16,40 +16,51 @@ limitations under the License.
 
 #include "Concurrent/Thread.h"
 
+SpaceGameEngine::Thread::Thread() : m_ThreadImpl() {}
+
+SpaceGameEngine::Thread::Thread( SpaceGameEngine::Thread &&other ) noexcept
+		: m_ThreadImpl( std::exchange( other.m_ThreadImpl, std::thread())) {}
+
+SpaceGameEngine::Thread &SpaceGameEngine::Thread::operator=( SpaceGameEngine::Thread &&other ) noexcept
+{
+	m_ThreadImpl = std::exchange( other.m_ThreadImpl, std::thread());
+	return *this;
+}
+
 SpaceGameEngine::Thread::~Thread()
 {
-	if (threadImpl.joinable())
+	if (m_ThreadImpl.joinable())
 	{
-		threadImpl.detach();
+		m_ThreadImpl.detach();
 	}
 }
 
-bool SpaceGameEngine::Thread::isJoinable() const noexcept
+bool SpaceGameEngine::Thread::IsJoinable() const noexcept
 {
-	return threadImpl.joinable();
+	return m_ThreadImpl.joinable();
 }
 
 void SpaceGameEngine::Thread::Join()
 {
-	threadImpl.join();
+	m_ThreadImpl.join();
 }
 
 void SpaceGameEngine::Thread::Detach()
 {
-	if (threadImpl.joinable())
+	if (m_ThreadImpl.joinable())
 	{
-		threadImpl.detach();
+		m_ThreadImpl.detach();
 	}
 }
 
 void SpaceGameEngine::Thread::Swap( SpaceGameEngine::Thread &other ) noexcept
 {
-	std::swap( threadImpl, other.threadImpl );
+	std::swap( m_ThreadImpl, other.m_ThreadImpl );
 }
 
 SpaceGameEngine::ThreadID SpaceGameEngine::Thread::GetThreadID() const noexcept
 {
-	return threadImpl.get_id();
+	return m_ThreadImpl.get_id();
 }
 
 SpaceGameEngine::UInt32 SpaceGameEngine::Thread::HardwareConcurrency() noexcept
@@ -62,7 +73,7 @@ void SpaceGameEngine::Thread::YieldCurrentThread() noexcept
 	std::this_thread::yield();
 }
 
-SpaceGameEngine::ThreadID SpaceGameEngine::Thread::GetCurrentThreadID() noexcept
+SpaceGameEngine::ThreadID SpaceGameEngine::Thread::GetCurrentThreadId() noexcept
 {
 	return std::this_thread::get_id();
 }

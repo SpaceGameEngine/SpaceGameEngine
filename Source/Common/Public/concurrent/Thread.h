@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef SPACEGAMEENGINE_THREAD_H
-#define SPACEGAMEENGINE_THREAD_H
+#pragma once
 
 #include "TypeDefination.hpp"
 
@@ -27,14 +26,14 @@ namespace SpaceGameEngine
 {
 	using ThreadID = std::thread::id;
 
-	/*!\brief Class SpaceGameEngine::Thread is a RAII manager of a std::thread.
+	/*!\brief Class SpaceGameEngine::Thread is a RAII wrapper of a std::thread.
 	 *
 	 * Class SpaceGameEngine::Thread has the most functions of std::thread, which are renamed to match the naming
 	 * standard. Static functions of std::thread and from namespace std::this_thread are included too. Check out
 	 * c++ thread reference for more details.
 	 *
 	 * However, there ARE some noticeable differences between SGE::Thread and std::thread:
-	 * 1. Thread is a RAII manager. That means it initialize a std::thread when being constructed, and detach the
+	 * 1. Thread is a RAII wrapper. That means it initialize a std::thread when being constructed, and detach the
 	 * std::thread (if possible) when being deconstructed.
 	 * 2. operator=() has been deleted.
 	 * 3. SpaceGameEngine::Thread::Detach() will check the joinable state before invoking std::thread::detach() to
@@ -45,14 +44,23 @@ namespace SpaceGameEngine
 	class Thread
 	{
 	public:
+		Thread();
+
+		Thread( Thread && ) noexcept;
+
 		template<class Function, class... Args>
-		explicit Thread( Function &&f, Args &&... args ) : threadImpl( f, args... ) {}
+		explicit Thread( Function &&f, Args &&... args ) : m_ThreadImpl( std::forward<Function>( f ),
+																		 std::forward<Args>( args ) ... ) {};
+
+		Thread( const Thread & ) = delete;
 
 		~Thread();
 
-		Thread &operator=( Thread &&other ) noexcept = delete;
+		Thread &operator=( Thread && ) noexcept;
 
-		bool isJoinable() const noexcept;
+		Thread &operator=( const Thread & ) = delete;
+
+		bool IsJoinable() const noexcept;
 
 		void Join();
 
@@ -66,7 +74,7 @@ namespace SpaceGameEngine
 
 		static void YieldCurrentThread() noexcept;
 
-		static ThreadID GetCurrentThreadID() noexcept;
+		static ThreadID GetCurrentThreadId() noexcept;
 
 		template<class Rep, class Period>
 		static void Sleep( const std::chrono::duration<Rep, Period> &sleep_duration )
@@ -75,11 +83,9 @@ namespace SpaceGameEngine
 		}
 
 	private:
-		std::thread threadImpl;
+		std::thread m_ThreadImpl;
 	};
 
 }
 
-void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept;
-
-#endif //SPACEGAMEENGINE_THREAD_H
+void swap( SpaceGameEngine::Thread &lhs, SpaceGameEngine::Thread &rhs ) noexcept;

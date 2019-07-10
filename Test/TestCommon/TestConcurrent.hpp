@@ -30,12 +30,12 @@ void foo1()
 {
 	Thread::Sleep( 2s );
 	flag.test_and_set();
-	std::cout << "foo1() is running in thread " << Thread::GetCurrentThreadID() << std::endl;
+	std::cout << "foo1() is running in thread " << Thread::GetCurrentThreadId() << std::endl;
 }
 
 TEST_CASE( "basic thread test", "[Common][Concurrent][Thread]" )
 {
-	std::cout << "main test thead " << Thread::GetCurrentThreadID() << std::endl;
+	std::cout << "main test thead " << Thread::GetCurrentThreadId() << std::endl;
 
 	REQUIRE_FALSE( flag.test_and_set());
 	flag.clear();
