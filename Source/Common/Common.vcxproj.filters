@@ -48,6 +48,9 @@
     <ClInclude Include="Public\Concurrent\Thread.h">
       <Filter>Public\Concurrent</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Concurrent\Lock.h">
+      <Filter>Public\Concurrent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -63,6 +66,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\Concurrent\Thread.cpp">
+      <Filter>Private\Concurrent</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Concurrent\Lock.cpp">
       <Filter>Private\Concurrent</Filter>
     </ClCompile>
   </ItemGroup>

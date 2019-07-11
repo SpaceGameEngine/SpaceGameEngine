@@ -4,6 +4,7 @@ add_library(Common
         Private/SGEString.cpp
         Private/StringImplement/StdTStringImplement.cpp
         private/Concurrent/Thread.cpp
+        private/Concurrent/Lock.cpp
         )
 target_include_directories(Common PUBLIC Public)
 target_link_libraries(Common PRIVATE ${THIRD_PARTY_LIBRARIES})

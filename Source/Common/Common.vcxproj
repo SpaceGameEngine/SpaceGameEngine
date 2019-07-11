@@ -169,6 +169,7 @@
     <ClInclude Include="Public\TypeDefination.hpp" />
     <ClInclude Include="Public\Utility.hpp" />
     <ClInclude Include="Public\Concurrent\Thread.h" />
+    <ClInclude Include="Public\Concurrent\Lock.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="Private\SGEString.cpp" />
     <ClCompile Include="Private\StringImplement\StdTStringImplement.cpp" />
     <ClCompile Include="Private\Concurrent\Thread.cpp" />
+    <ClCompile Include="Private\Concurrent\Lock.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

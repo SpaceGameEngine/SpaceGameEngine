@@ -38,7 +38,7 @@ void SpaceGameEngine::Condition::Wait()
 
 void SpaceGameEngine::Condition::Wait( std::function<bool()> pred )
 {
-	conditionImpl.wait( lockImpl, std::move(pred) );
+	conditionImpl.wait( lockImpl, std::move( pred ));
 }
 
 SpaceGameEngine::Condition::Condition( std::unique_lock<std::recursive_timed_mutex> &lock )
@@ -47,12 +47,12 @@ SpaceGameEngine::Condition::Condition( std::unique_lock<std::recursive_timed_mut
 SpaceGameEngine::ReentrantLock::ReentrantLock( SpaceGameEngine::Mutex &mutex ) : lockImpl( mutex.mutexImpl ) {}
 
 SpaceGameEngine::ReentrantLock::ReentrantLock( SpaceGameEngine::ReentrantLock &&other ) noexcept
-		: lockImpl( std::exchange( other.lockImpl, std::recursive_timed_mutex())) {}
+		: lockImpl( std::move( other.lockImpl )) {}
 
 SpaceGameEngine::ReentrantLock &
 SpaceGameEngine::ReentrantLock::operator=( SpaceGameEngine::ReentrantLock &&other ) noexcept
 {
-	lockImpl = std::exchange( other.lockImpl, std::recursive_timed_mutex());
+	lockImpl = std::move( other.lockImpl );
 	return *this;
 }
 
