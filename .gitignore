@@ -265,3 +265,7 @@ __pycache__/
 /Document/Reference
 .vscode
 .DS_Store
+
+# CMake
+/build
+/cmake-build-*
