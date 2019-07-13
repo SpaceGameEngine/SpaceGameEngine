@@ -18,55 +18,55 @@ limitations under the License.
 
 #include <utility>
 
-SpaceGameEngine::Mutex::Mutex() : mutexImpl() {}
+SpaceGameEngine::Mutex::Mutex() : m_MutexImpl() {}
 
 void SpaceGameEngine::Condition::NodifyOne()
 {
-	conditionImpl.notify_one();
+	m_ConditionImpl.notify_one();
 }
 
 void SpaceGameEngine::Condition::NodifyAll()
 {
-	conditionImpl.notify_all();
+	m_ConditionImpl.notify_all();
 
 }
 
 void SpaceGameEngine::Condition::Wait()
 {
-	conditionImpl.wait( lockImpl );
+	m_ConditionImpl.wait( m_LockImpl );
 }
 
 void SpaceGameEngine::Condition::Wait( std::function<bool()> pred )
 {
-	conditionImpl.wait( lockImpl, std::move( pred ));
+	m_ConditionImpl.wait( m_LockImpl, std::move( pred ));
 }
 
 SpaceGameEngine::Condition::Condition( std::unique_lock<std::recursive_timed_mutex> &lock )
-		: lockImpl( lock ) {}
+		: m_LockImpl( lock ) {}
 
-SpaceGameEngine::ReentrantLock::ReentrantLock( SpaceGameEngine::Mutex &mutex ) : lockImpl( mutex.mutexImpl ) {}
+SpaceGameEngine::ReentrantLock::ReentrantLock( SpaceGameEngine::Mutex &mutex ) : m_LockImpl( mutex.m_MutexImpl ) {}
 
 SpaceGameEngine::ReentrantLock::ReentrantLock( SpaceGameEngine::ReentrantLock &&other ) noexcept
-		: lockImpl( std::move( other.lockImpl )) {}
+		: m_LockImpl( std::move( other.m_LockImpl )) {}
 
 SpaceGameEngine::ReentrantLock &
 SpaceGameEngine::ReentrantLock::operator=( SpaceGameEngine::ReentrantLock &&other ) noexcept
 {
-	lockImpl = std::move( other.lockImpl );
+	m_LockImpl = std::move( other.m_LockImpl );
 	return *this;
 }
 
 void SpaceGameEngine::ReentrantLock::Lock()
 {
-	lockImpl.lock();
+	m_LockImpl.lock();
 }
 
 void SpaceGameEngine::ReentrantLock::TryLock()
 {
-	lockImpl.try_lock();
+	m_LockImpl.try_lock();
 }
 
 void SpaceGameEngine::ReentrantLock::Unlock()
 {
-	lockImpl.unlock();
+	m_LockImpl.unlock();
 }

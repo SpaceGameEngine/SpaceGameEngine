@@ -40,7 +40,7 @@ namespace SpaceGameEngine
 		class ScopedLock;
 
 	private:
-		std::recursive_timed_mutex mutexImpl;
+		std::recursive_timed_mutex m_MutexImpl;
 	};
 
 	class Condition
@@ -61,14 +61,14 @@ namespace SpaceGameEngine
 		template<class Rep, class Period>
 		bool WaitFor( const std::chrono::duration<Rep, Period> &rel_time )
 		{
-			return conditionImpl.wait_for( rel_time ) == std::cv_status::no_timeout;
+			return m_ConditionImpl.wait_for( rel_time ) == std::cv_status::no_timeout;
 		}
 
 		template<class Rep, class Period>
 		bool WaitFor( const std::chrono::duration<Rep, Period> &rel_time,
 					  std::function<bool()> pred )
 		{
-			return conditionImpl.wait_for( rel_time, pred );
+			return m_ConditionImpl.wait_for( rel_time, pred );
 		}
 
 		friend class ReentrantLock;
@@ -76,8 +76,8 @@ namespace SpaceGameEngine
 	private:
 		Condition( std::unique_lock<std::recursive_timed_mutex>& lock );
 
-		std::unique_lock<std::recursive_timed_mutex>& lockImpl;
-		std::condition_variable_any conditionImpl;
+		std::unique_lock<std::recursive_timed_mutex>& m_LockImpl;
+		std::condition_variable_any m_ConditionImpl;
 	};
 
 	class ReentrantLock
@@ -104,13 +104,13 @@ namespace SpaceGameEngine
 		template<class Rep, class Period>
 		bool TryLock( const std::chrono::duration<Rep, Period> &timeout_duration )
 		{
-			lockImpl.try_lock_for( timeout_duration );
+			m_LockImpl.try_lock_for( timeout_duration );
 		}
 
 		void Unlock();
 
 	private:
-		std::unique_lock<std::recursive_timed_mutex> lockImpl;
+		std::unique_lock<std::recursive_timed_mutex> m_LockImpl;
 	};
 
 	template<class ... MutexType>
@@ -118,7 +118,7 @@ namespace SpaceGameEngine
 	{
 	public:
 
-		explicit ScopedLock( MutexType &... mutex ) : lockImpl(( mutex.mutexImpl )... )
+		explicit ScopedLock( MutexType &... mutex ) : m_LockImpl(( mutex.m_MutexImpl )... )
 		{
 			static_assert((std::is_same_v<Mutex, MutexType> && ...), "ScopedLock requires SGE::Mutex" );
 		}
@@ -130,6 +130,6 @@ namespace SpaceGameEngine
 		ScopedLock &operator=( const ScopedLock &&other ) = delete;
 
 	private:
-		std::scoped_lock<MutexType ...> lockImpl;
+		std::scoped_lock<MutexType ...> m_LockImpl;
 	};
 }
