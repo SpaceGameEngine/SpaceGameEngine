@@ -97,14 +97,14 @@ namespace SpaceGameEngine
 
 		void Lock();
 
-		void TryLock();
+		bool TryLock();
 
 		Condition newCondition();
 
 		template<class Rep, class Period>
 		bool TryLock( const std::chrono::duration<Rep, Period> &timeout_duration )
 		{
-			m_LockImpl.try_lock_for( timeout_duration );
+			return m_LockImpl.try_lock_for( timeout_duration );
 		}
 
 		void Unlock();
