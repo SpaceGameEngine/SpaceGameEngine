@@ -66,6 +66,11 @@ void SpaceGameEngine::ReentrantLock::TryLock()
 	m_LockImpl.try_lock();
 }
 
+SpaceGameEngine::Condition SpaceGameEngine::ReentrantLock::newCondition()
+{
+	return SpaceGameEngine::Condition( m_LockImpl );
+}
+
 void SpaceGameEngine::ReentrantLock::Unlock()
 {
 	m_LockImpl.unlock();
