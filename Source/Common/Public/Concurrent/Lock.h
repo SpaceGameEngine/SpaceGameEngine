@@ -31,7 +31,7 @@ namespace SpaceGameEngine
 
 		~Mutex() = default;
 
-		Mutex &operator=( const Mutex &&other ) = delete;
+		Mutex &operator=( const Mutex &other ) = delete;
 
 		friend class ReentrantLock;
 
@@ -74,9 +74,9 @@ namespace SpaceGameEngine
 		friend class ReentrantLock;
 
 	private:
-		Condition( std::unique_lock<std::recursive_timed_mutex>& lock );
+		Condition( std::unique_lock<std::recursive_timed_mutex> &lock );
 
-		std::unique_lock<std::recursive_timed_mutex>& m_LockImpl;
+		std::unique_lock<std::recursive_timed_mutex> &m_LockImpl;
 		std::condition_variable_any m_ConditionImpl;
 	};
 
