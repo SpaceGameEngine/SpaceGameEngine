@@ -76,6 +76,9 @@ namespace SpaceGameEngine
 
 		bool TryLock();
 
+		/*!
+		 * \todo use SGE's time utlity instead of <chrono>
+		 */
 		template<class Rep, class Period>
 		bool TryLock( const std::chrono::duration<Rep, Period> &timeout_duration )
 		{
@@ -114,14 +117,24 @@ namespace SpaceGameEngine
 
 		void Wait( RecursiveLock &lock );
 
+		/*!
+		 * \todo use SGE's function instead of std's
+		 */
 		void Wait( RecursiveLock &lock, std::function<bool()> );
 
+		/*!
+		 * \todo use SGE's time utlity instead of <chrono>
+		 */
 		template<class Rep, class Period>
 		bool WaitFor( RecursiveLock &lock, const std::chrono::duration<Rep, Period> &rel_time )
 		{
 			return m_ConditionImpl.wait_for( lock, rel_time ) == std::cv_status::no_timeout;
 		}
 
+		/*!
+		 * \todo use SGE's time utlity instead of <chrono>
+		 * \todo use SGE's function instead of std's
+		 */
 		template<class Rep, class Period>
 		bool WaitFor( RecursiveLock &lock, const std::chrono::duration<Rep, Period> &rel_time,
 					  std::function<bool()> pred )

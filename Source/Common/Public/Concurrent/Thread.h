@@ -76,6 +76,9 @@ namespace SpaceGameEngine
 
 		static ThreadID GetCurrentThreadId() noexcept;
 
+		/*!
+		 * \todo use SGE's time utlity instead of <chrono>
+		 */
 		template<class Rep, class Period>
 		static void Sleep( const std::chrono::duration<Rep, Period> &sleep_duration )
 		{
