@@ -33,7 +33,7 @@ namespace SpaceGameEngine
 
 		Mutex &operator=( const Mutex &other ) = delete;
 
-		friend class ReentrantLock;
+		friend class RecursiveLock;
 
 		template<class ... MutexType>
 		friend
@@ -43,20 +43,20 @@ namespace SpaceGameEngine
 		std::recursive_timed_mutex m_MutexImpl;
 	};
 
-	class ReentrantLock
+	class RecursiveLock
 	{
 	public:
-		ReentrantLock( const ReentrantLock & ) = delete;
+		RecursiveLock( const RecursiveLock & ) = delete;
 
-		ReentrantLock( ReentrantLock &&other ) noexcept;
+		RecursiveLock( RecursiveLock &&other ) noexcept;
 
-		explicit ReentrantLock( Mutex & );
+		explicit RecursiveLock( Mutex & );
 
-		~ReentrantLock() = default;
+		~RecursiveLock() = default;
 
-		ReentrantLock &operator=( const ReentrantLock & ) = delete;
+		RecursiveLock &operator=( const RecursiveLock & ) = delete;
 
-		ReentrantLock &operator=( ReentrantLock &&other ) noexcept;
+		RecursiveLock &operator=( RecursiveLock &&other ) noexcept;
 
 		void Lock();
 
@@ -91,18 +91,18 @@ namespace SpaceGameEngine
 
 		void NodifyAll();
 
-		void Wait( ReentrantLock &lock );
+		void Wait( RecursiveLock &lock );
 
-		void Wait( ReentrantLock &lock, std::function<bool()> );
+		void Wait( RecursiveLock &lock, std::function<bool()> );
 
 		template<class Rep, class Period>
-		bool WaitFor( ReentrantLock &lock, const std::chrono::duration<Rep, Period> &rel_time )
+		bool WaitFor( RecursiveLock &lock, const std::chrono::duration<Rep, Period> &rel_time )
 		{
 			return m_ConditionImpl.wait_for( lock, rel_time ) == std::cv_status::no_timeout;
 		}
 
 		template<class Rep, class Period>
-		bool WaitFor( ReentrantLock &lock, const std::chrono::duration<Rep, Period> &rel_time,
+		bool WaitFor( RecursiveLock &lock, const std::chrono::duration<Rep, Period> &rel_time,
 					  std::function<bool()> pred )
 		{
 			return m_ConditionImpl.wait_for( lock, rel_time, pred );

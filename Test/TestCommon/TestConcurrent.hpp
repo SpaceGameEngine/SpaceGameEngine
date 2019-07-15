@@ -60,7 +60,7 @@ bool flag2_1 = false, flag2_2 = false;
 
 void foo2( Mutex &mutex, bool &run_flag )
 {
-	ReentrantLock lock( mutex );
+	RecursiveLock lock( mutex );
 	lock.Lock();
 	LOG( "foo2 thread " << Thread::GetCurrentThreadId());
 
@@ -90,7 +90,7 @@ bool flag3 = false;
 
 void foo3_lock( Mutex &mutex )
 {
-	ReentrantLock lock( mutex );
+	RecursiveLock lock( mutex );
 	lock.Lock();
 	LOG( "foo3_lock thread " << Thread::GetCurrentThreadId());
 	REQUIRE_FALSE( flag3 );
@@ -101,7 +101,7 @@ void foo3_lock( Mutex &mutex )
 
 void foo3_trylock( Mutex &mutex )
 {
-	ReentrantLock lock( mutex );
+	RecursiveLock lock( mutex );
 	Thread::Sleep( .5s );
 	REQUIRE_FALSE( lock.TryLock());
 	REQUIRE( lock.TryLock( 1s ));
@@ -110,7 +110,7 @@ void foo3_trylock( Mutex &mutex )
 	lock.Unlock();
 }
 
-TEST_CASE( "ReentrantLock TryLock test", "[Common][Concurrent][Lock]" )
+TEST_CASE( "RecursiveLock TryLock test", "[Common][Concurrent][Lock]" )
 {
 	Mutex m;
 	Thread t1( foo3_lock, std::ref( m ));
@@ -163,7 +163,7 @@ TEST_CASE( "Condition test", "[Common][Concurrent][Lock]" )
 		threads.emplace_back(
 				[&]
 				{
-					ReentrantLock lock( m );
+					RecursiveLock lock( m );
 					lock.Lock();
 					LOG( "foo5 thread " << Thread::GetCurrentThreadId());
 					condition.Wait( lock, [&] { return flag; } );

@@ -20,30 +20,30 @@ limitations under the License.
 
 SpaceGameEngine::Mutex::Mutex() : m_MutexImpl() {}
 
-SpaceGameEngine::ReentrantLock::ReentrantLock( SpaceGameEngine::Mutex &mutex )
+SpaceGameEngine::RecursiveLock::RecursiveLock( SpaceGameEngine::Mutex &mutex )
 		: m_LockImpl( mutex.m_MutexImpl, std::defer_lock ) {}
 
-SpaceGameEngine::ReentrantLock::ReentrantLock( SpaceGameEngine::ReentrantLock &&other ) noexcept
+SpaceGameEngine::RecursiveLock::RecursiveLock( SpaceGameEngine::RecursiveLock &&other ) noexcept
 		: m_LockImpl( std::move( other.m_LockImpl )) {}
 
-SpaceGameEngine::ReentrantLock &
-SpaceGameEngine::ReentrantLock::operator=( SpaceGameEngine::ReentrantLock &&other ) noexcept
+SpaceGameEngine::RecursiveLock &
+SpaceGameEngine::RecursiveLock::operator=( SpaceGameEngine::RecursiveLock &&other ) noexcept
 {
 	m_LockImpl = std::move( other.m_LockImpl );
 	return *this;
 }
 
-void SpaceGameEngine::ReentrantLock::Lock()
+void SpaceGameEngine::RecursiveLock::Lock()
 {
 	m_LockImpl.lock();
 }
 
-bool SpaceGameEngine::ReentrantLock::TryLock()
+bool SpaceGameEngine::RecursiveLock::TryLock()
 {
 	return m_LockImpl.try_lock();
 }
 
-void SpaceGameEngine::ReentrantLock::Unlock()
+void SpaceGameEngine::RecursiveLock::Unlock()
 {
 	m_LockImpl.unlock();
 }
@@ -60,12 +60,12 @@ void SpaceGameEngine::Condition::NodifyAll()
 	m_ConditionImpl.notify_all();
 }
 
-void SpaceGameEngine::Condition::Wait( SpaceGameEngine::ReentrantLock &lock )
+void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock &lock )
 {
 	m_ConditionImpl.wait( lock.m_LockImpl );
 }
 
-void SpaceGameEngine::Condition::Wait( SpaceGameEngine::ReentrantLock &lock, std::function<bool()> prec )
+void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock &lock, std::function<bool()> prec )
 {
 	m_ConditionImpl.wait( lock.m_LockImpl, std::move( prec ));
 }
