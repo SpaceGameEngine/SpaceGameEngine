@@ -22,6 +22,13 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
+	/*!\brief Class SpaceGameEngine::Mutex is a wrapper of a std::recursive_timed_mutex
+	 *
+	 * SpaceGameEngine::Mutex does not include functions like lock()/unlock(). The only way to
+	 * lock it is to use SpaceGameEngine::RecursiveLock or SpaceGameEngine::ScopedLock.
+	 *
+	 * Checkout c++ reference for more details.
+	 */
 	class Mutex
 	{
 	public:
@@ -43,6 +50,13 @@ namespace SpaceGameEngine
 		std::recursive_timed_mutex m_MutexImpl;
 	};
 
+	/*!\brief Class SpaceGameEngine::RecursiveLock is a wrapper of a std::unique_lock<std::recursive_timed_mutex>
+	 *
+	 * Unlike std::unique_lock, this class's constructor will not lock the mutex, which is same as using
+	 * std::defer_lock in std::unique_lock's constructor.
+	 *
+	 * Checkout c++ reference for more details.
+	 */
 	class RecursiveLock
 	{
 	public:
@@ -76,6 +90,13 @@ namespace SpaceGameEngine
 		std::unique_lock<std::recursive_timed_mutex> m_LockImpl;
 	};
 
+	/*!\brief Class SpaceGameEngine::Condition is a wrapper of a std::condition_variable_any
+	 *
+	 * SGE::Condition's Wait/WaitFor functions only accept SGE::RecursiveLock instead of any Lockable
+	 * object in std::condition_variable_any's corresponding functions.
+	 *
+	 * Checkout c++ reference for more details.
+	 */
 	class Condition
 	{
 	public:
@@ -112,6 +133,14 @@ namespace SpaceGameEngine
 		std::condition_variable_any m_ConditionImpl;
 	};
 
+	/*!\brief Class SpaceGameEngine::ScopedLock is a warpper of a std::scoped_lock<SpaceGameEngine::Mutex...>
+	 *
+	 * This class's constructor only takes SGE::Mutex.
+	 *
+	 * Checkout c++ reference for more details.
+	 *
+	 * @tparam MutexType each of these must be SpaceGameEngine::Mutex
+	 */
 	template<class ... MutexType>
 	class ScopedLock
 	{
