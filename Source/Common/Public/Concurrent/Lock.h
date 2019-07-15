@@ -43,43 +43,6 @@ namespace SpaceGameEngine
 		std::recursive_timed_mutex m_MutexImpl;
 	};
 
-	class Condition
-	{
-	public:
-		Condition( const Condition & ) = delete;
-
-		Condition &operator=( const Condition & ) = delete;
-
-		void NodifyOne();
-
-		void NodifyAll();
-
-		void Wait();
-
-		void Wait( std::function<bool()> );
-
-		template<class Rep, class Period>
-		bool WaitFor( const std::chrono::duration<Rep, Period> &rel_time )
-		{
-			return m_ConditionImpl.wait_for( rel_time ) == std::cv_status::no_timeout;
-		}
-
-		template<class Rep, class Period>
-		bool WaitFor( const std::chrono::duration<Rep, Period> &rel_time,
-					  std::function<bool()> pred )
-		{
-			return m_ConditionImpl.wait_for( rel_time, pred );
-		}
-
-		friend class ReentrantLock;
-
-	private:
-		Condition( std::unique_lock<std::recursive_timed_mutex> &lock );
-
-		std::unique_lock<std::recursive_timed_mutex> &m_LockImpl;
-		std::condition_variable_any m_ConditionImpl;
-	};
-
 	class ReentrantLock
 	{
 	public:
@@ -99,8 +62,6 @@ namespace SpaceGameEngine
 
 		bool TryLock();
 
-		Condition newCondition();
-
 		template<class Rep, class Period>
 		bool TryLock( const std::chrono::duration<Rep, Period> &timeout_duration )
 		{
@@ -109,8 +70,46 @@ namespace SpaceGameEngine
 
 		void Unlock();
 
+		friend class Condition;
+
 	private:
 		std::unique_lock<std::recursive_timed_mutex> m_LockImpl;
+	};
+
+	class Condition
+	{
+	public:
+		Condition();
+
+		~Condition() = default;
+
+		Condition( const Condition & ) = delete;
+
+		Condition &operator=( const Condition & ) = delete;
+
+		void NodifyOne();
+
+		void NodifyAll();
+
+		void Wait( ReentrantLock &lock );
+
+		void Wait( ReentrantLock &lock, std::function<bool()> );
+
+		template<class Rep, class Period>
+		bool WaitFor( ReentrantLock &lock, const std::chrono::duration<Rep, Period> &rel_time )
+		{
+			return m_ConditionImpl.wait_for( lock, rel_time ) == std::cv_status::no_timeout;
+		}
+
+		template<class Rep, class Period>
+		bool WaitFor( ReentrantLock &lock, const std::chrono::duration<Rep, Period> &rel_time,
+					  std::function<bool()> pred )
+		{
+			return m_ConditionImpl.wait_for( lock, rel_time, pred );
+		}
+
+	private:
+		std::condition_variable_any m_ConditionImpl;
 	};
 
 	template<class ... MutexType>
@@ -130,6 +129,6 @@ namespace SpaceGameEngine
 		ScopedLock &operator=( const ScopedLock &&other ) = delete;
 
 	private:
-		std::scoped_lock<MutexType ...> m_LockImpl;
+		std::scoped_lock<decltype( std::declval<MutexType>().m_MutexImpl )...> m_LockImpl;
 	};
 }

@@ -20,30 +20,6 @@ limitations under the License.
 
 SpaceGameEngine::Mutex::Mutex() : m_MutexImpl() {}
 
-void SpaceGameEngine::Condition::NodifyOne()
-{
-	m_ConditionImpl.notify_one();
-}
-
-void SpaceGameEngine::Condition::NodifyAll()
-{
-	m_ConditionImpl.notify_all();
-
-}
-
-void SpaceGameEngine::Condition::Wait()
-{
-	m_ConditionImpl.wait( m_LockImpl );
-}
-
-void SpaceGameEngine::Condition::Wait( std::function<bool()> pred )
-{
-	m_ConditionImpl.wait( m_LockImpl, std::move( pred ));
-}
-
-SpaceGameEngine::Condition::Condition( std::unique_lock<std::recursive_timed_mutex> &lock )
-		: m_LockImpl( lock ) {}
-
 SpaceGameEngine::ReentrantLock::ReentrantLock( SpaceGameEngine::Mutex &mutex )
 		: m_LockImpl( mutex.m_MutexImpl, std::defer_lock ) {}
 
@@ -67,12 +43,29 @@ bool SpaceGameEngine::ReentrantLock::TryLock()
 	return m_LockImpl.try_lock();
 }
 
-SpaceGameEngine::Condition SpaceGameEngine::ReentrantLock::newCondition()
-{
-	return SpaceGameEngine::Condition( m_LockImpl );
-}
-
 void SpaceGameEngine::ReentrantLock::Unlock()
 {
 	m_LockImpl.unlock();
+}
+
+SpaceGameEngine::Condition::Condition() : m_ConditionImpl() {}
+
+void SpaceGameEngine::Condition::NodifyOne()
+{
+	m_ConditionImpl.notify_one();
+}
+
+void SpaceGameEngine::Condition::NodifyAll()
+{
+	m_ConditionImpl.notify_all();
+}
+
+void SpaceGameEngine::Condition::Wait( SpaceGameEngine::ReentrantLock &lock )
+{
+	m_ConditionImpl.wait( lock.m_LockImpl );
+}
+
+void SpaceGameEngine::Condition::Wait( SpaceGameEngine::ReentrantLock &lock, std::function<bool()> prec )
+{
+	m_ConditionImpl.wait( lock.m_LockImpl, std::move( prec ));
 }

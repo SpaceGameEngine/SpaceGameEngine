@@ -30,12 +30,12 @@ using namespace std::chrono_literals;
 
 #define LOG( s ) std::cout << s << std::endl
 
-std::atomic_flag flag = ATOMIC_FLAG_INIT;
+std::atomic_flag flag1 = ATOMIC_FLAG_INIT;
 
 void foo1()
 {
 	Thread::Sleep( 2s );
-	flag.test_and_set();
+	flag1.test_and_set();
 	LOG( "foo1() is running in thread " << Thread::GetCurrentThreadId());
 }
 
@@ -43,20 +43,20 @@ TEST_CASE( "basic thread test", "[Common][Concurrent][Thread]" )
 {
 	LOG( "main test thead " << Thread::GetCurrentThreadId());
 
-	REQUIRE_FALSE( flag.test_and_set());
-	flag.clear();
+	REQUIRE_FALSE( flag1.test_and_set());
+	flag1.clear();
 
 	Thread t( foo1 );
 
-	REQUIRE_FALSE( flag.test_and_set());
-	flag.clear();
+	REQUIRE_FALSE( flag1.test_and_set());
+	flag1.clear();
 
 	Thread::Sleep( 4s );
 
-	REQUIRE( flag.test_and_set());
+	REQUIRE( flag1.test_and_set());
 }
 
-bool flag1 = false, flag2 = false;
+bool flag2_1 = false, flag2_2 = false;
 
 void foo2( Mutex &mutex, bool &run_flag )
 {
@@ -64,15 +64,15 @@ void foo2( Mutex &mutex, bool &run_flag )
 	lock.Lock();
 	LOG( "foo2 thread " << Thread::GetCurrentThreadId());
 
-	REQUIRE(( !flag1 && !flag2 ));
+	REQUIRE(( !flag2_1 && !flag2_2 ));
 
 	run_flag = true;
-	REQUIRE(( flag1 != flag2 ));
+	REQUIRE(( flag2_1 != flag2_2 ));
 
 	Thread::Sleep( 1s );
 
 	run_flag = false;
-	REQUIRE(( !flag1 && !flag2 ));
+	REQUIRE(( !flag2_1 && !flag2_2 ));
 
 	lock.Unlock();  //optional
 }
@@ -80,8 +80,8 @@ void foo2( Mutex &mutex, bool &run_flag )
 TEST_CASE( "ReentrantLock Lock/Unlock test", "[Common][Concurrent][Lock]" )
 {
 	Mutex m;
-	Thread t1( foo2, std::ref( m ), std::ref( flag1 ));
-	Thread t2( foo2, std::ref( m ), std::ref( flag2 ));
+	Thread t1( foo2, std::ref( m ), std::ref( flag2_1 ));
+	Thread t2( foo2, std::ref( m ), std::ref( flag2_2 ));
 	t1.Join();
 	t2.Join();
 }
@@ -142,9 +142,74 @@ TEST_CASE( "ScopedLock test", "[Common][Concurrent][Lock]" )
 	std::vector<Thread> threads;
 	for (int i = 0; i < 10; i++)
 	{
-		threads.emplace_back( std::ref( m1 ), std::ref( m2 ), std::ref( m3 ));
+		threads.emplace_back( foo4, std::ref( m1 ), std::ref( m2 ), std::ref( m3 ));
 	}
 	for (Thread &thread : threads)
+	{
+		thread.Join();
+	}
+}
+
+TEST_CASE( "Condition test", "[Common][Concurrent][Lock]" )
+{
+	Mutex m;
+	Condition condition;
+	std::vector<Thread> threads;
+	bool flag = false;
+	bool run_flags[10] = { false, false, false, false, false, false, false, false, false, false };
+
+	for (bool &run_flag : run_flags)
+	{
+		threads.emplace_back(
+				[&]
+				{
+					ReentrantLock lock( m );
+					lock.Lock();
+					LOG( "foo5 thread " << Thread::GetCurrentThreadId());
+					condition.Wait( lock, [&] { return flag; } );
+					run_flag = true;
+				} );
+	}
+
+	auto checker = [&]( int need )
+	{
+		int count = 0;
+		for (bool run_flag : run_flags)
+		{
+			if (run_flag)
+			{
+				++count;
+			}
+		}
+		return need == count;
+	};
+
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 0 )));
+
+	condition.NodifyOne();
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 0 )));
+
+	condition.NodifyAll();
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 0 )));
+
+	flag = true;
+
+	condition.NodifyOne();
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 1 )));
+
+	condition.NodifyOne();
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 2 )));
+
+	condition.NodifyAll();
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 10 )));
+
+	for (Thread &thread:threads)
 	{
 		thread.Join();
 	}
