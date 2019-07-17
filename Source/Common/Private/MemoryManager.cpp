@@ -16,6 +16,7 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Error.h"
 #include <algorithm>
+#include <cstring>
 #ifdef SGE_WINDOWS
 #include <malloc.h>
 #else
