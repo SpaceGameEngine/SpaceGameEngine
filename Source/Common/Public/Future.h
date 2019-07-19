@@ -27,6 +27,9 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 
+	/*!
+	 * \brief ExecutionError is thrown when trying to get result of a failed async procedure
+	 */
 	struct ExecutionError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR( "Execution Error" );
@@ -34,6 +37,9 @@ namespace SpaceGameEngine
 		static bool Judge();
 	};
 
+	/*!
+	 * \brief TimeoutError is thrown when it took longer than expected to wait for a result
+	 */
 	struct TimeoutError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR( "Timeout" );
@@ -41,6 +47,13 @@ namespace SpaceGameEngine
 		static bool Judge();
 	};
 
+	/*!
+	 * \brief class Future respects the state of a async procedure
+	 * Future cannot be copied nor moved. You cannot directly construct a Future.
+	 * You can only get a Future by running a async procedure, for example, submitting task to
+	 * an Executor or doing async I/O.
+	 * \tparam ResultType the type of result of the corresponding async procedure
+	 */
 	template<typename ResultType>
 	class Future
 	{
@@ -48,12 +61,22 @@ namespace SpaceGameEngine
 		ResultType m_Result;
 		std::atomic_int8_t m_State;
 		Condition m_Condition;
+
+		Future() = default;
+
 	public:
+		Future( const Future &other ) = delete;
+
+		Future &operator=( const Future &other ) = delete;
+
 		enum class FutureState : int8_t
 		{
 			Working = 0, Succeed = 1, Failed = 2
 		};
 
+		/*!
+		 * \brief Wait for the async procedure ending
+		 */
 		void Wait()
 		{
 			RecursiveLock lock( m_Mutex );
@@ -64,6 +87,11 @@ namespace SpaceGameEngine
 							  } );
 		}
 
+		/*!
+		 * \brief Wait for the async procedure ending in a limited time
+		 * \param rel_time the max waiting time
+		 * \return true if the async procedure ends in time
+		 */
 		template<class Rep, class Period>
 		bool Wait( const std::chrono::duration<Rep, Period> &rel_time )
 		{
@@ -75,6 +103,12 @@ namespace SpaceGameEngine
 										} );
 		}
 
+		/*!
+		 * \brief Get the result of the async procedure
+		 * Block the current thread until the async procedure ends.
+		 * Throw ExecutionError if it fails.
+		 * \return the result of the async procedure
+		 */
 		ResultType Get()
 		{
 			Wait();
@@ -85,6 +119,14 @@ namespace SpaceGameEngine
 			return m_Result;
 		}
 
+		/*!
+		 * \brief Get the result of the async procedure in a limited time
+		 * Block the current thread until the async procedure ends.
+		 * Throw ExecutionError if it fails.
+		 * Throw TimeoutError if blocking too long.
+		 * \param rel_time the max blocking time
+		 * \return the result of the async procedure
+		 */
 		template<class Rep, class Period>
 		ResultType Get( const std::chrono::duration<Rep, Period> &rel_time )
 		{
@@ -100,6 +142,10 @@ namespace SpaceGameEngine
 			return m_Result;
 		}
 
+		/*!
+		 * \brief Get the state of the async procedure.
+		 * \return the state of the async procedure
+		 */
 		FutureState GetState()
 		{
 			return m_State.load();
