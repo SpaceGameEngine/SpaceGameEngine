@@ -65,7 +65,7 @@ void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock &lock )
 	m_ConditionImpl.wait( lock.m_LockImpl );
 }
 
-void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock &lock, std::function<bool()> prec )
+void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock &lock, std::function<bool()> pred )
 {
-	m_ConditionImpl.wait( lock.m_LockImpl, std::move( prec ));
+	m_ConditionImpl.wait( lock.m_LockImpl, std::move( pred ));
 }

@@ -31,20 +31,14 @@ namespace SpaceGameEngine
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR( "Execution Error" );
 
-		static bool Judge( const bool isFailed )
-		{
-			return isFailed;
-		}
+		static bool Judge();
 	};
 
 	struct TimeoutError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR( "Timeout" );
 
-		static bool Judge( const bool isTimeout )
-		{
-			return isTimeout;
-		}
+		static bool Judge();
 	};
 
 	template<typename ResultType>
@@ -84,15 +78,25 @@ namespace SpaceGameEngine
 		ResultType Get()
 		{
 			Wait();
-			SGE_CHECK( ExecutionError, GetState() == FutureState::Failed );
+			if (GetState() == FutureState::Failed)
+			{
+				SGE_CHECK( ExecutionError );
+			}
 			return m_Result;
 		}
 
 		template<class Rep, class Period>
 		ResultType Get( const std::chrono::duration<Rep, Period> &rel_time )
 		{
-			SGE_CHECK( TimeoutError, !Wait( rel_time ));
-			SGE_CHECK( ExecutionError, GetState() == FutureState::Failed );
+			if (!Wait( rel_time ))
+			{
+				SGE_CHECK( TimeoutError );
+			}
+			if (GetState() == FutureState::Failed)
+			{
+				SGE_CHECK( ExecutionError );
+			}
+
 			return m_Result;
 		}
 

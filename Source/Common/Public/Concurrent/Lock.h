@@ -120,7 +120,7 @@ namespace SpaceGameEngine
 		/*!
 		 * \todo use SGE's function instead of std's
 		 */
-		void Wait( RecursiveLock &lock, std::function<bool()> );
+		void Wait( RecursiveLock &lock, std::function<bool()> pred );
 
 		/*!
 		 * \todo use SGE's time utlity instead of <chrono>
