@@ -24,6 +24,11 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
+	/*!
+	 * \ingroup Common
+	 * \{
+	 */
+
 	using ThreadID = std::thread::id;
 
 	/*!\brief Class SpaceGameEngine::Thread is a RAII wrapper of a std::thread.
@@ -88,6 +93,10 @@ namespace SpaceGameEngine
 	private:
 		std::thread m_ThreadImpl;
 	};
+
+	/*!
+	 * \}
+	 */
 
 }
 

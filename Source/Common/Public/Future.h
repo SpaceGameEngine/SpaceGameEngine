@@ -26,6 +26,10 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
+	/*!
+	 * \ingroup Common
+	 * \{
+	 */
 
 	/*!
 	 * \brief ExecutionError is thrown when trying to get result of a failed async procedure
@@ -71,7 +75,9 @@ namespace SpaceGameEngine
 
 		enum class FutureState : int8_t
 		{
-			Working = 0, Succeed = 1, Failed = 2
+			Working = 0,
+			Succeed = 1,
+			Failed = 2
 		};
 
 		/*!
@@ -151,4 +157,8 @@ namespace SpaceGameEngine
 			return m_State.load();
 		}
 	};
+	
+	/*!
+	 * \}
+	 */
 }

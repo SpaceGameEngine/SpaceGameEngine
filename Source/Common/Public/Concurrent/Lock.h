@@ -22,6 +22,11 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
+	/*!
+	 * \ingroup Common
+	 * \{
+	 */
+
 	/*!\brief Class SpaceGameEngine::Mutex is a wrapper of a std::recursive_timed_mutex
 	 *
 	 * SpaceGameEngine::Mutex does not include functions like lock()/unlock(). The only way to
