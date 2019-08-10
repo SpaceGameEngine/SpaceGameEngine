@@ -7,5 +7,6 @@
     <ClInclude Include="TestString.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
     <ClInclude Include="TestError.hpp" />
+    <ClInclude Include="TestConcurrent.hpp" />
   </ItemGroup>
 </Project>
