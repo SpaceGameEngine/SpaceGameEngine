@@ -19,11 +19,11 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-void foo(int i)
+void func_(int i)
 {}
-void foo2(int i, int i2)
+void func_2(int i, int i2)
 {}
-int foo3(int i, int i2)
+int func_3(int i, int i2)
 {
 	return 0;
 }
@@ -46,11 +46,11 @@ TEST_CASE("Test Function", "[Common][Function]")
 {
 	SECTION("test IsCorrectFunction")
 	{
-		REQUIRE(IsCorrectFunction<decltype(foo), void(int)>::Value == true);
-		REQUIRE(IsCorrectFunction<decltype(foo2), void(int)>::Value == false);
-		REQUIRE(IsCorrectFunction<decltype(foo2), void(int,int)>::Value == true);
-		REQUIRE(IsCorrectFunction<decltype(foo3), void(int,int)>::Value == false);
-		REQUIRE(IsCorrectFunction<decltype(foo3), int(int,int)>::Value == true);
+		REQUIRE(IsCorrectFunction<decltype(func_), void(int)>::Value == true);
+		REQUIRE(IsCorrectFunction<decltype(func_2), void(int)>::Value == false);
+		REQUIRE(IsCorrectFunction<decltype(func_2), void(int,int)>::Value == true);
+		REQUIRE(IsCorrectFunction<decltype(func_3), void(int,int)>::Value == false);
+		REQUIRE(IsCorrectFunction<decltype(func_3), int(int,int)>::Value == true);
 		REQUIRE(IsCorrectFunction<functor, void()>::Value == true);
 		REQUIRE(IsCorrectFunction<int, void()>::Value == false);
 	}
@@ -69,8 +69,8 @@ TEST_CASE("Test Function", "[Common][Function]")
 		REQUIRE((void(*)(int))func2.Get<decltype(lambda)>() == (void(*)(int))func.Get<decltype(lambda)>());
 		Function<void(int)> func3 ([](int) {});	//can support lambda
 		Function<void(int)> func4 = [](int) {};	//^^^^^^^^^^^^^^^^^^
-		Function<void(int)> func5 = &foo;		//use function pointer
-		REQUIRE(func5.Get<decltype(&foo)>() == &foo);
+		Function<void(int)> func5 = &func_;		//use function pointer
+		REQUIRE(func5.Get<decltype(&func_)>() == &func_);
 		Function<int(test_func_class*)> func6 = &test_func_class::test;
 		test_func_class tc;
 		REQUIRE(func6(&tc) == tc.test());

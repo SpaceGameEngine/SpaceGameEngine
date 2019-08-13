@@ -30,6 +30,7 @@ namespace SpaceGameEngine
 
 	/*!
 	@brief judge a type is a correct funtion type or not.
+	@warning does not support non-static member function
 	@note use SFINAE
 	*/
 	template<typename T,typename Func>
@@ -51,7 +52,7 @@ namespace SpaceGameEngine
 			return false;
 		}
 	public:
-		inline static constexpr bool Value = Judge<T, Ret, Args...>(0)||std::is_member_function_pointer_v<T>;
+		inline static constexpr bool Value = Judge<T, Ret, Args...>(0);
 	};
 
 	/*!
@@ -149,7 +150,7 @@ namespace SpaceGameEngine
 		template<typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>>
 		inline Function(T&& func)
 		{
-			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
+			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value || std::is_member_function_pointer_v<T>, "Function can only be constructed by callable object");
 			m_pInvoke = [](MetaObject<Allocator>& obj, Args... args)->Ret {
 				return std::invoke(obj.Get<std::decay_t<T>>(), static_cast<Args>(args)...);
 			};
@@ -158,7 +159,7 @@ namespace SpaceGameEngine
 		template<typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>>
 		inline Function& operator = (T&& func)
 		{
-			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
+			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value || std::is_member_function_pointer_v<T>, "Function can only be constructed by callable object");
 			if (SpaceGameEngine::GetMetaData<std::decay_t<T>>() == m_Content.Get().GetMetaData())
 				m_Content = std::forward<T>(func);
 			else

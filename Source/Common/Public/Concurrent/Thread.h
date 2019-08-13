@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2019 Chenxi Xu (@xsun2001)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,9 +53,9 @@ namespace SpaceGameEngine
 
 		Thread( Thread && ) noexcept;
 
-		template<class Function, class... Args>
-		explicit Thread( Function &&f, Args &&... args ) : m_ThreadImpl( std::forward<Function>( f ),
-																		 std::forward<Args>( args ) ... ) {};
+		template<class Func, class... Args>
+		explicit Thread( Func &&f, Args &&... args ) : m_ThreadImpl( std::forward<Func>( f ),
+																		 std::forward<Args>( args ) ... ) {}
 
 		Thread( const Thread & ) = delete;
 

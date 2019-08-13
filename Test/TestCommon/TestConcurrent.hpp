@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2019 Chenxi Xu (@xsun2001)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ limitations under the License.
 #include <atomic>
 #include <chrono>
 #include <vector>
+#include <iostream>
 
 using namespace SpaceGameEngine;
 using namespace std::chrono_literals;
