@@ -161,7 +161,10 @@
   <ItemGroup>
     <ClInclude Include="TestError.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
+    <ClInclude Include="TestMetaData.hpp" />
     <ClInclude Include="TestString.hpp" />
+    <ClInclude Include="TestFunction.hpp" />
+    <ClInclude Include="TestUtility.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

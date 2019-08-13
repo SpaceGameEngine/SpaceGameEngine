@@ -10,6 +10,12 @@
     <Filter Include="Private\StringImplement">
       <UniqueIdentifier>{a3e6f398-c1b5-4cf7-a89e-7453cdd0fd92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\MetaData">
+      <UniqueIdentifier>{91ced584-d594-4d42-a8af-f8adfc07ec57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\MetaData">
+      <UniqueIdentifier>{1f943270-3e73-4237-a6a0-95d39dd66e80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\TypeDefination.hpp">
@@ -39,6 +45,15 @@
     <ClInclude Include="Public\Platform.hpp">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Function.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\MetaData\MetaData.h">
+      <Filter>Public\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\MetaData\MetaObject.hpp">
+      <Filter>Public\MetaData</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -52,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="Private\SGEString.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\MetaData\MetaData.cpp">
+      <Filter>Private\MetaData</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
