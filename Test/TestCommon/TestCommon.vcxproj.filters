@@ -10,5 +10,6 @@
     <ClInclude Include="TestFunction.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
     <ClInclude Include="TestUtility.hpp" />
+    <ClInclude Include="TestConcurrent.hpp" />
   </ItemGroup>
 </Project>

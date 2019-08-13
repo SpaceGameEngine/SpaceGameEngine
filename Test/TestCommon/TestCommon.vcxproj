@@ -165,6 +165,7 @@
     <ClInclude Include="TestString.hpp" />
     <ClInclude Include="TestFunction.hpp" />
     <ClInclude Include="TestUtility.hpp" />
+    <ClInclude Include="TestConcurrent.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
