@@ -30,8 +30,10 @@ int func_3(int i, int i2)
 
 struct functor
 {
-	void operator ()()
-	{}
+	int operator ()()
+	{
+		return 1;
+	}
 };
 
 struct test_func_class
@@ -51,8 +53,9 @@ TEST_CASE("Test Function", "[Common][Function]")
 		REQUIRE(IsCorrectFunction<decltype(func_2), void(int,int)>::Value == true);
 		REQUIRE(IsCorrectFunction<decltype(func_3), void(int,int)>::Value == false);
 		REQUIRE(IsCorrectFunction<decltype(func_3), int(int,int)>::Value == true);
-		REQUIRE(IsCorrectFunction<functor, void()>::Value == true);
+		REQUIRE(IsCorrectFunction<functor, int(void)>::Value == true);
 		REQUIRE(IsCorrectFunction<int, void()>::Value == false);
+		REQUIRE(IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value == false);
 	}
 	SECTION("test IsFunction")
 	{
@@ -60,21 +63,34 @@ TEST_CASE("Test Function", "[Common][Function]")
 		REQUIRE(Function<void()>::IsFunction<decltype(func)>::Value);
 		REQUIRE(!Function<void()>::IsFunction<int>::Value);
 	}
-	SECTION("test instance and copy")
+	SECTION("test instance&copy&invoke")
 	{
-		auto lambda = [](int) {};
-		Function<void(int)> func(lambda);
-		REQUIRE((void(*)(int))lambda == (void(*)(int))func.Get<decltype(lambda)>());
-		Function<void(int)> func2 = func;
-		REQUIRE((void(*)(int))func2.Get<decltype(lambda)>() == (void(*)(int))func.Get<decltype(lambda)>());
-		Function<void(int)> func3 ([](int) {});	//can support lambda
-		Function<void(int)> func4 = [](int) {};	//^^^^^^^^^^^^^^^^^^
+		auto lambda = [](void)->int {return 1; };
+		Function<int(void)> func(lambda);
+		REQUIRE((int(*)(void))lambda == (int(*)(void))func.Get<decltype(lambda)>());
+		REQUIRE(lambda() == func());
+		Function<int(void)> func2 = func;
+		REQUIRE((int(*)(void))func2.Get<decltype(lambda)>() == (int(*)(void))func.Get<decltype(lambda)>());
+		Function<int(void)> func3([]()->int {return 2; });
+		func3 = func2;
+		REQUIRE(func3() == func2());
 		Function<void(int)> func5 = &func_;		//use function pointer
 		REQUIRE(func5.Get<decltype(&func_)>() == &func_);
 		Function<int(test_func_class*)> func6 = &test_func_class::test;
 		test_func_class tc;
 		REQUIRE(func6(&tc) == tc.test());
-		//Function<void()> func_err1 = functor();	//error example
-		//Function<void(int)> func_err2 = 0;	//error example
+		Function<int(void)> func7 = functor();
+		REQUIRE(func7() == functor()());		//use functor
+	}
+	SECTION("test get metadata")
+	{
+		Function<void(int)> func(&func_);
+		REQUIRE(func.GetMetaData() == GetMetaData<decltype(&func_)>());
+	}
+	SECTION("test comparison")
+	{
+		Function<void(int)> func(&func_);
+		Function<void(int)> func2 = func;
+		REQUIRE(func == func2);
 	}
 }
