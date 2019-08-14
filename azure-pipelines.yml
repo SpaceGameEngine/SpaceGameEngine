@@ -1,0 +1,74 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+jobs:
+
+- job: windows
+  pool:
+    vmImage: 'windows-latest'
+
+  steps:
+  - script: |
+      msbuild -version
+      cl
+    displayName: 'check environment'
+
+  - script: |
+      msbuild SpaceGameEngine.sln -m
+    displayName: 'build'
+
+  - script: |
+      Binary\TestCatch2\x64\Debug\TestCatch2.exe
+      Binary\TestCommon\x64\Debug\TestCommon.exe
+    displayName: 'test'
+
+- job: ubuntu
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - script: |
+      cmake -version
+      gcc -v
+      g++ -v
+    displayName: 'check environment'
+
+  - script: |
+      mkdir build
+      cd build
+      cmake ..
+      make -j4
+    displayName: 'build'
+
+  - script: |
+      Test/TestCatch2/TestCatch2
+      Test/TestCommon/TestCommon
+    displayName: 'test'
+
+- job: macos
+  pool:
+    vmImage: 'macos-latest'
+
+  steps:
+  - script: |
+      cmake -version
+      clang -v
+      clang++ -v
+    displayName: 'check environment'
+
+  - script: |
+      mkdir build
+      cd build
+      cmake ..
+      make -j4
+    displayName: 'build'
+
+  - script: |
+      Test/TestCatch2/TestCatch2
+      Test/TestCommon/TestCommon
+    displayName: 'test'
