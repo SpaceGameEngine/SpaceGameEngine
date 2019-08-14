@@ -13,10 +13,12 @@ jobs:
     vmImage: 'windows-latest'
 
   steps:
-  - script: |
-      msbuild -version
-      cl
-    displayName: 'check environment'
+  - task: MSBuild@1
+    displayName: 'build'
+    inputs:
+      solution: 'SpaceGameEngine.sln'
+      maximumCpuCount: true
+      msbuildArchitecture: 'x64'
 
   - script: |
       msbuild SpaceGameEngine.sln -m
