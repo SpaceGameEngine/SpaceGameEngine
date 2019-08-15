@@ -43,13 +43,13 @@ jobs:
       sudo apt-get update
       sudo apt-get install gcc-9
       gcc-9 -v
-      g++-9 -v
+      cpp-9 -v
     displayName: 'upgrade gcc'
 
   - script: |
       mkdir build
       cd build
-      CC=gcc-9 CXX=g++-9 cmake ..
+      CC=gcc-9 CXX=cpp-9 cmake ..
       make -j4
     displayName: 'build'
 
