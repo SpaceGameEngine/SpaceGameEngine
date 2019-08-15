@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include <mutex>
+#include <functional>
 #include <shared_mutex>
 #include <condition_variable>
 
