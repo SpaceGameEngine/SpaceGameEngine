@@ -1,0 +1,24 @@
+trigger:
+  - master
+
+pool:
+  vmImage: 'macos-latest'
+
+steps:
+  - script: |
+      mkdir build
+      cd build
+      cmake ..
+      make -j4
+    displayName: 'build'
+
+  - script: |
+      Test/TestCatch2/TestCatch2 -r junit -o TEST-Catch2.xml
+      Test/TestCommon/TestCommon -r junit -o TEST-Common.xml
+    displayName: 'test'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/TEST-*.xml'
+      failTaskOnFailedTests: true

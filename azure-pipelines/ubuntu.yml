@@ -1,0 +1,32 @@
+trigger:
+  - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - script: |
+      sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+      sudo apt-get update
+      sudo apt-get install gcc-9 g++-9
+      gcc-9 --version
+      g++-9 --version
+    displayName: 'upgrade gcc'
+
+  - script: |
+      mkdir build
+      cd build
+      CC=gcc-9 CXX=g++-9 cmake ..
+      make -j4
+    displayName: 'build'
+
+  - script: |
+      Test/TestCatch2/TestCatch2 -r junit -o TEST-Catch2.xml
+      Test/TestCommon/TestCommon -r junit -o TEST-Common.xml
+    displayName: 'test'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/TEST-*.xml'
+      failTaskOnFailedTests: true

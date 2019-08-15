@@ -267,5 +267,5 @@ __pycache__/
 .DS_Store
 
 # CMake
-/build
+/[Bb]uild*/
 /cmake-build-*
