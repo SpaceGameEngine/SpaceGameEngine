@@ -21,13 +21,17 @@ jobs:
       msbuildArchitecture: 'x64'
 
   - script: |
-      msbuild SpaceGameEngine.sln -m
-    displayName: 'build'
-
-  - script: |
-      Binary\TestCatch2\x64\Debug\TestCatch2.exe
-      Binary\TestCommon\x64\Debug\TestCommon.exe
+      Binary\TestCatch2\x64\Debug\TestCatch2.exe -r junit -o TestCatch2.xml
+      Binary\TestCommon\x64\Debug\TestCommon.exe -r junit -o TestCommon.xml
     displayName: 'test'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/TEST-*.xml'
+      failTaskOnFailedTests: true
+
+  
 
 - job: ubuntu
   pool:
@@ -35,22 +39,30 @@ jobs:
 
   steps:
   - script: |
-      cmake -version
-      gcc -v
-      g++ -v
-    displayName: 'check environment'
+      sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+      sudo apt-get update
+      sudo apt-get install gcc-9
+      gcc-9 -v
+      g++-9 -v
+    displayName: 'upgrade gcc'
 
   - script: |
       mkdir build
       cd build
-      cmake ..
+      CC=gcc-9 CXX=g++-9 cmake ..
       make -j4
     displayName: 'build'
 
   - script: |
-      Test/TestCatch2/TestCatch2
-      Test/TestCommon/TestCommon
+      Test/TestCatch2/TestCatch2 -r junit -o TestCatch2.xml
+      Test/TestCommon/TestCommon -r junit -o TestCommon.xml
     displayName: 'test'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/TEST-*.xml'
+      failTaskOnFailedTests: true
 
 - job: macos
   pool:
@@ -58,12 +70,6 @@ jobs:
 
   steps:
   - script: |
-      cmake -version
-      clang -v
-      clang++ -v
-    displayName: 'check environment'
-
-  - script: |
       mkdir build
       cd build
       cmake ..
@@ -71,6 +77,12 @@ jobs:
     displayName: 'build'
 
   - script: |
-      Test/TestCatch2/TestCatch2
-      Test/TestCommon/TestCommon
+      Test/TestCatch2/TestCatch2 -r junit -o TestCatch2.xml
+      Test/TestCommon/TestCommon -r junit -o TestCommon.xml
     displayName: 'test'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/TEST-*.xml'
+      failTaskOnFailedTests: true
