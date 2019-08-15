@@ -21,8 +21,8 @@ jobs:
       msbuildArchitecture: 'x64'
 
   - script: |
-      Binary\TestCatch2\x64\Debug\TestCatch2.exe -r junit -o TestCatch2.xml
-      Binary\TestCommon\x64\Debug\TestCommon.exe -r junit -o TestCommon.xml
+      Binary\TestCatch2\x64\Debug\TestCatch2.exe -r junit -o TEST-Catch2.xml
+      Binary\TestCommon\x64\Debug\TestCommon.exe -r junit -o TEST-Common.xml
     displayName: 'test'
 
   - task: PublishTestResults@2
@@ -54,8 +54,8 @@ jobs:
     displayName: 'build'
 
   - script: |
-      Test/TestCatch2/TestCatch2 -r junit -o TestCatch2.xml
-      Test/TestCommon/TestCommon -r junit -o TestCommon.xml
+      Test/TestCatch2/TestCatch2 -r junit -o TEST-Catch2.xml
+      Test/TestCommon/TestCommon -r junit -o TEST-Common.xml
     displayName: 'test'
 
   - task: PublishTestResults@2
@@ -77,8 +77,8 @@ jobs:
     displayName: 'build'
 
   - script: |
-      Test/TestCatch2/TestCatch2 -r junit -o TestCatch2.xml
-      Test/TestCommon/TestCommon -r junit -o TestCommon.xml
+      Test/TestCatch2/TestCatch2 -r junit -o TEST-Catch2.xml
+      Test/TestCommon/TestCommon -r junit -o TEST-Common.xml
     displayName: 'test'
 
   - task: PublishTestResults@2
