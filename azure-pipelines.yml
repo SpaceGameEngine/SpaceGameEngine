@@ -42,8 +42,8 @@ jobs:
       sudo add-apt-repository ppa:ubuntu-toolchain-r/test
       sudo apt-get update
       sudo apt-get install gcc-9
-      gcc-9 -v
-      cpp-9 -v
+      gcc-9 --version
+      cpp-9 --version
     displayName: 'upgrade gcc'
 
   - script: |
