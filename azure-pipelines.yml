@@ -41,15 +41,15 @@ jobs:
   - script: |
       sudo add-apt-repository ppa:ubuntu-toolchain-r/test
       sudo apt-get update
-      sudo apt-get install gcc-9
+      sudo apt-get install gcc-9 g++-9
       gcc-9 --version
-      cpp-9 --version
+      g++-9 --version
     displayName: 'upgrade gcc'
 
   - script: |
       mkdir build
       cd build
-      CC=gcc-9 CXX=cpp-9 cmake ..
+      CC=gcc-9 CXX=g++-9 cmake ..
       make -j4
     displayName: 'build'
 
