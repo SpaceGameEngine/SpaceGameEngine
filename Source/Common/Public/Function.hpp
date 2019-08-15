@@ -41,12 +41,12 @@ namespace SpaceGameEngine
 	struct IsCorrectFunction<T, Ret(Args...)>
 	{
 	private:
-		template<typename T, typename Ret, typename... Args>
-		inline static constexpr std::enable_if_t<std::is_same_v<decltype(std::declval<T>()(std::declval<Args>()...)), Ret>, bool> Judge(int)
+		template<typename _T, typename _Ret, typename... _Args>
+		inline static constexpr std::enable_if_t<std::is_same_v<decltype(std::declval<_T>()(std::declval<_Args>()...)), _Ret>, bool> Judge(int)
 		{
 			return true;
 		}
-		template<typename T, typename Ret, typename... Args>
+		template<typename _T, typename _Ret, typename... _Args>
 		inline static constexpr bool Judge(...)
 		{
 			return false;
@@ -71,8 +71,8 @@ namespace SpaceGameEngine
 		{
 			inline static constexpr bool Value = false;
 		};
-		template<typename Allocator, typename Ret,typename... Args>
-		struct IsFunction<Function<Ret(Args...), Allocator>>
+		template<typename _Allocator, typename _Ret,typename... _Args>
+		struct IsFunction<Function<_Ret(_Args...), _Allocator>>
 		{
 			inline static constexpr bool Value = true;
 		};
@@ -152,7 +152,7 @@ namespace SpaceGameEngine
 		{
 			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value || std::is_member_function_pointer_v<T>, "Function can only be constructed by callable object");
 			m_pInvoke = [](MetaObject<Allocator>& obj, Args... args)->Ret {
-				return std::invoke(obj.Get<std::decay_t<T>>(), static_cast<Args>(args)...);
+				return std::invoke(obj.template Get<std::decay_t<T>>(), static_cast<Args>(args)...);
 			};
 			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
 		}
@@ -165,7 +165,7 @@ namespace SpaceGameEngine
 			else
 			{
 				m_pInvoke = [](MetaObject<Allocator>& obj, Args... args)->Ret {
-					return std::invoke(obj.Get<std::decay_t<T>>(), static_cast<Args>(args)...);
+					return std::invoke(obj.template Get<std::decay_t<T>>(), static_cast<Args>(args)...);
 				};
 				m_Content.Release();
 				m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
@@ -176,12 +176,12 @@ namespace SpaceGameEngine
 		template<typename T>
 		T& Get()
 		{
-			return m_Content.Get().Get<T>();
+			return m_Content.Get().template Get<T>();
 		}
 		template<typename T>
 		const T& Get()const
 		{
-			return m_Content.Get().Get<T>();
+			return m_Content.Get().template Get<T>();
 		}
 
 		const MetaData& GetMetaData()const

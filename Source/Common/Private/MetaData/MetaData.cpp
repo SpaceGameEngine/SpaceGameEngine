@@ -15,6 +15,7 @@ limitations under the License.
 */
 #include "MetaData/MetaData.h"
 #include "MemoryManager.h"
+#include <cstring>
 
 SpaceGameEngine::MetaData::MetaData()
 {

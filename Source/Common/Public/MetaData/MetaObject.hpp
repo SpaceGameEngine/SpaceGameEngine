@@ -52,21 +52,21 @@ namespace SpaceGameEngine
 		inline ~MetaObject()
 		{
 			m_pMetaData->m_pDestructor(m_pContent);
-			Allocator::template RawDelete(m_pContent, m_pMetaData->m_Size, m_pMetaData->m_Alignment);
+			Allocator::RawDelete(m_pContent, m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 		}
 
 		inline MetaObject(const MetaObject& obj)
 		{
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pCopyConstructor);
 			m_pMetaData = obj.m_pMetaData;
-			m_pContent = Allocator::template RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
+			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 			m_pMetaData->m_pCopyConstructor(m_pContent, obj.m_pContent);
 		}
 		inline MetaObject(MetaObject&& obj)
 		{
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pMoveConstructor);
 			m_pMetaData = obj.m_pMetaData;
-			m_pContent = Allocator::template RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
+			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 			m_pMetaData->m_pMoveConstructor(m_pContent, obj.m_pContent);
 		}
 		inline MetaObject& operator = (const MetaObject& obj)
@@ -89,7 +89,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pCopyConstructor);
 			m_pMetaData = obj.m_pMetaData;
-			m_pContent = Allocator::template RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
+			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 			m_pMetaData->m_pCopyConstructor(m_pContent, obj.m_pContent);
 		}
 		template<typename OtherAllocator>
@@ -97,7 +97,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pMoveConstructor);
 			m_pMetaData = obj.m_pMetaData;
-			m_pContent = Allocator::template RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
+			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 			m_pMetaData->m_pMoveConstructor(m_pContent, obj.m_pContent);
 		}
 		template<typename OtherAllocator>
@@ -125,7 +125,7 @@ namespace SpaceGameEngine
 			SGE_ASSERT(ImproperMetaDataError, meta_data);
 			SGE_ASSERT(NullPointerError, meta_data.m_pDefaultConstructor);
 			m_pMetaData = &meta_data;
-			m_pContent = Allocator::template RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
+			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 			m_pMetaData->m_pDefaultConstructor(m_pContent);
 		}
 		template<typename T>
@@ -134,7 +134,7 @@ namespace SpaceGameEngine
 			SGE_ASSERT(ImproperMetaDataError, meta_data);
 			SGE_ASSERT(DifferentMetaDataError, meta_data, SpaceGameEngine::GetMetaData<std::decay_t<T>>());
 			m_pMetaData = &meta_data;
-			m_pContent = Allocator::template RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
+			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 			if constexpr (std::is_same_v<std::remove_reference_t<T>, T>)
 			{
 				SGE_ASSERT(NullPointerError, m_pMetaData->m_pMoveConstructor);
