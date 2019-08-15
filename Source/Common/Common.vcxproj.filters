@@ -22,6 +22,9 @@
     <Filter Include="Private\MetaData">
       <UniqueIdentifier>{1f943270-3e73-4237-a6a0-95d39dd66e80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Utility">
+      <UniqueIdentifier>{d471f020-f93f-4cea-86bd-4d71ab07bcbc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\TypeDefination.hpp">
@@ -41,9 +44,6 @@
     </ClInclude>
     <ClInclude Include="Private\StringImplement\StdTStringImplement.h">
       <Filter>Private\StringImplement</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Utility.hpp">
-      <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\SGEString.h">
       <Filter>Public</Filter>
@@ -65,6 +65,12 @@
     </ClInclude>
     <ClInclude Include="Public\MetaData\MetaObject.hpp">
       <Filter>Public\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Utility\Utility.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Utility\ControllableObject.hpp">
+      <Filter>Public\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

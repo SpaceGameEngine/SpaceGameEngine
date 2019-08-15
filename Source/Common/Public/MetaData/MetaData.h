@@ -16,7 +16,7 @@ limitations under the License.
 #pragma once
 #include "SGEString.h"
 #include "Error.h"
-#include "Utility.hpp"
+#include "Utility/Utility.hpp"
 #include <type_traits>
 #include <utility>
 #include <new>

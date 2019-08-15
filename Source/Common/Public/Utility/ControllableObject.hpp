@@ -14,10 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "ForwardDefination.hpp"
-#include "SGEString.h"
-#include "Error.h"
-#include <utility>
+#include "MemoryManager.h"
 
 namespace SpaceGameEngine
 {
@@ -25,86 +22,9 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
-	
-	struct Uncopyable
-	{
-		Uncopyable() = default;
-		Uncopyable(const Uncopyable&) = delete;
-		Uncopyable(Uncopyable&&) = delete;
-		Uncopyable& operator = (const Uncopyable&) = delete;
-		Uncopyable& operator = (Uncopyable&&) = delete;
-	};
-
-	/*!
-	@attention inherit `Singleton<T>` to use it,and define it as a friend in the class and 
-	define the class's constructor as a private function at the same time.
-	*/
-	template<typename T>
-	struct Singleton
-	{
-		/*!
-		@todo use global variable
-		*/
-		inline static T& GetSingleton()
-		{
-			static T g_Instance;
-			return g_Instance;
-		}
-	};
-
-	template<typename T,typename U>
-	struct Pair
-	{
-		Pair() = default;
-		explicit Pair(const T& t,const U& u)
-			:m_First(t),m_Second(u)
-		{}
-		explicit Pair(T&& t, U&& u)
-			:m_First(t), m_Second(u)
-		{}
-		Pair(const Pair<T, U>& c)
-			:Pair(c.m_First, c.m_Second)
-		{}
-		Pair(Pair<T,U>&& c)
-			:Pair(std::move(c.m_First),std::move(c.m_Second))
-		{}
-		Pair<T, U>& operator = (const Pair<T, U>& c)
-		{
-			m_First = c.m_First;
-			m_Second = c.m_Second;
-			return *this;
-		}
-		Pair<T, U>& operator = (Pair<T, U>&& c)
-		{
-			m_First = std::move(c.m_First);
-			m_Second = std::move(c.m_Second);
-			return *this;
-		}
-		T m_First;
-		U m_Second;
-	};
-
-	template<typename T>
-	struct IsComparable
-	{
-	private:
-		template<typename U>
-		inline static constexpr std::enable_if_t<std::is_same_v<decltype(std::declval<U>() == std::declval<U>()), bool>, bool> Judge(int)
-		{
-			return true;
-		}
-		template<typename U>
-		inline static constexpr bool Judge(...)
-		{
-			return false;
-		}
-	public:
-		inline static constexpr bool Value = Judge<T>(0);
-	};
-
 	/*!
 	@brief a wrapper of object which the user can control its lifetime.
-	@note the ControllableObject can automatically release its resource if 
+	@note the ControllableObject can automatically release its resource if
 	the user has not invoked its Release method.
 	*/
 	template<typename T, typename Allocator = DefaultAllocator>
@@ -133,7 +53,7 @@ namespace SpaceGameEngine
 		{}
 		inline ~ControllableObject()
 		{
-			if(m_pContent)
+			if (m_pContent)
 				Allocator::template Delete(m_pContent);
 		}
 
@@ -251,7 +171,6 @@ namespace SpaceGameEngine
 	private:
 		T* m_pContent;
 	};
-
 	/*!
 	@}
 	*/

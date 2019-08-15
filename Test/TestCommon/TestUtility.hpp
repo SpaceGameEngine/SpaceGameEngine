@@ -15,7 +15,8 @@ limitations under the License.
 */
 #pragma once
 #include "Catch2/catch.hpp"
-#include "Utility.hpp"
+#include "Utility/Utility.hpp"
+#include "Utility/ControllableObject.hpp"
 
 using namespace SpaceGameEngine;
 

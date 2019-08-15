@@ -170,9 +170,10 @@
     <ClInclude Include="Public\Platform.hpp" />
     <ClInclude Include="Public\SGEString.h" />
     <ClInclude Include="Public\TypeDefination.hpp" />
-    <ClInclude Include="Public\Utility.hpp" />
     <ClInclude Include="Public\Concurrent\Thread.h" />
     <ClInclude Include="Public\Concurrent\Lock.h" />
+    <ClInclude Include="Public\Utility\ControllableObject.hpp" />
+    <ClInclude Include="Public\Utility\Utility.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp" />
