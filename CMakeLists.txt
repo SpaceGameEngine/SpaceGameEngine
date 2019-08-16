@@ -22,12 +22,15 @@ if (ENABLE_DOXYGEN)
     configure_file(Doxyfile Doxyfile.doxygen COPYONLY)
 endif ()
 
+# Linux Thread Lib
+find_package(Threads REQUIRED)
+
 # Third Party
 add_subdirectory(ThirdParty/Catch2)
 add_subdirectory(ThirdParty/JsonCpp)
 add_subdirectory(ThirdParty/TinyXML2)
 
-set(THIRD_PARTY_LIBRARIES JsonCpp TinyXML2)
+set(THIRD_PARTY_LIBRARIES JsonCpp TinyXML2 ${CMAKE_THREAD_LIBS_INIT})
 
 # Game Engine Modules
 add_subdirectory(Source/Common)
