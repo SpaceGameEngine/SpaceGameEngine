@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "TypeDefination.hpp"
+#include "TypeDefinition.hpp"
 
 #include <functional>
 #include <thread>

@@ -27,12 +27,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Public\TypeDefination.hpp">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\ForwardDefination.hpp">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Error.h">
       <Filter>Public</Filter>
     </ClInclude>
@@ -71,6 +65,12 @@
     </ClInclude>
     <ClInclude Include="Public\Utility\ControllableObject.hpp">
       <Filter>Public\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\TypeDefinition.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\ForwardDefinition.hpp">
+      <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
