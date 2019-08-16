@@ -13,12 +13,12 @@ steps:
     displayName: 'build'
 
   - script: |
-      Test/TestCatch2/TestCatch2 -r junit -o TEST-Catch2.xml
-      Test/TestCommon/TestCommon -r junit -o TEST-Common.xml
+      build/Test/TestCatch2/TestCatch2 -r junit -o TEST-Catch2.xml
+      build/Test/TestCommon/TestCommon -r junit -o TEST-Common.xml
     displayName: 'test'
 
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: '**/TEST-*.xml'
+      testResultsFiles: 'TEST-*.xml'
       failTaskOnFailedTests: true
