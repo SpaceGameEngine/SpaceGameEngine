@@ -40,7 +40,7 @@ limitations under the License.
 #ifdef SGE_UNIX
 #ifdef __x86_64__
 #define SGE_X64
-#elif __i386__ 
+#elif defined(__i386__)
 #define SGE_X86
 #endif
 #endif
