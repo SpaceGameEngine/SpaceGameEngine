@@ -81,11 +81,13 @@ TEST_CASE("Test Function", "[Common][Function]")
 		REQUIRE(func3() == func2());
 		Function<void(int)> func5 = &func_;		//use function pointer
 		REQUIRE(func5.Get<decltype(&func_)>() == &func_);
-		Function<int(test_func_class*)> func6 = &test_func_class::test;
+		Function<int(test_func_class*)> func6 = &test_func_class::test;	//use member function
 		test_func_class tc;
 		REQUIRE(func6(&tc) == tc.test());
-		Function<int(void)> func7 = functor();
-		REQUIRE(func7() == functor()());		//use functor
+		Function<int(void)> func7 = functor();	//use functor
+		REQUIRE(func7() == functor()());
+		Function<int(const test_func_class*)> func8 = &test_func_class::test2;	//use const member function
+		REQUIRE(func8(&tc) == tc.test2());
 	}
 	SECTION("test get metadata")
 	{
