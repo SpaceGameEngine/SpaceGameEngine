@@ -42,6 +42,10 @@ struct test_func_class
 	{
 		return 1;
 	}
+	int test2()const
+	{
+		return 2;
+	}
 };
 
 TEST_CASE("Test Function", "[Common][Function]")
@@ -55,7 +59,8 @@ TEST_CASE("Test Function", "[Common][Function]")
 		REQUIRE(IsCorrectFunction<decltype(func_3), int(int,int)>::Value == true);
 		REQUIRE(IsCorrectFunction<functor, int(void)>::Value == true);
 		REQUIRE(IsCorrectFunction<int, void()>::Value == false);
-		REQUIRE(IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value == false);
+		REQUIRE(IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value == true);
+		REQUIRE(IsCorrectFunction<decltype(&test_func_class::test2), int(const test_func_class*)>::Value == true);
 	}
 	SECTION("test IsFunction")
 	{
