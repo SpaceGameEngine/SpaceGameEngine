@@ -17,10 +17,10 @@ limitations under the License.
 #include <iostream>
 
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
-	#include <Windows.h>
+#include <Windows.h>
 #endif
 
-SpaceGameEngine::DebugInformation::DebugInformation(const TChar * file_name, const TChar * func_name, int line_number)
+SpaceGameEngine::DebugInformation::DebugInformation(const TChar * file_name, const TChar * func_name, UInt32 line_number)
 {
 	m_pFileName = file_name;
 	m_pFunctionName = func_name;

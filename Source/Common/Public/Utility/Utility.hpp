@@ -16,7 +16,6 @@ limitations under the License.
 #pragma once
 #include "ForwardDefinition.hpp"
 #include "SGEString.h"
-#include "Error.h"
 #include <utility>
 
 namespace SpaceGameEngine
@@ -25,7 +24,7 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
-	
+
 	struct Uncopyable
 	{
 		Uncopyable() = default;
@@ -36,7 +35,7 @@ namespace SpaceGameEngine
 	};
 
 	/*!
-	@attention inherit `Singleton<T>` to use it,and define it as a friend in the class and 
+	@attention inherit `Singleton<T>` to use it,and define it as a friend in the class and
 	define the class's constructor as a private function at the same time.
 	*/
 	template<typename T>
@@ -52,12 +51,12 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T,typename U>
+	template<typename T, typename U>
 	struct Pair
 	{
 		Pair() = default;
-		explicit Pair(const T& t,const U& u)
-			:m_First(t),m_Second(u)
+		explicit Pair(const T& t, const U& u)
+			:m_First(t), m_Second(u)
 		{}
 		explicit Pair(T&& t, U&& u)
 			:m_First(t), m_Second(u)
@@ -65,8 +64,8 @@ namespace SpaceGameEngine
 		Pair(const Pair<T, U>& c)
 			:Pair(c.m_First, c.m_Second)
 		{}
-		Pair(Pair<T,U>&& c)
-			:Pair(std::move(c.m_First),std::move(c.m_Second))
+		Pair(Pair<T, U>&& c)
+			:Pair(std::move(c.m_First), std::move(c.m_Second))
 		{}
 		Pair<T, U>& operator = (const Pair<T, U>& c)
 		{

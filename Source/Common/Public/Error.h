@@ -17,6 +17,7 @@ limitations under the License.
 #include "ForwardDefinition.hpp"
 #include "SGEString.h"
 #include "Platform.hpp"
+#include "Utility/Utility.hpp"
 
 namespace SpaceGameEngine
 {
@@ -33,9 +34,9 @@ namespace SpaceGameEngine
 	{
 		const TChar* m_pFileName;
 		const TChar* m_pFunctionName;
-		int m_LineNumber;
+		UInt32 m_LineNumber;
 
-		DebugInformation(const TChar* file_name, const TChar* func_name, int line_number);
+		DebugInformation(const TChar* file_name, const TChar* func_name, UInt32 line_number);
 	};
 
 #ifdef SGE_USE_WIDE_CHAR
@@ -72,22 +73,6 @@ namespace SpaceGameEngine
 		static bool Judge();
 	};
 
-	/*!
-	@brief assert condition when debug
-	*/
-#ifdef SGE_DEBUG
-#define SGE_ASSERT(error_type,...)\
-	if(error_type::Judge(__VA_ARGS__)) SpaceGameEngine::ThrowError(error_type::sm_pContent,SGE_DEBUG_INFORMATION);
-#else
-#define SGE_ASSERT(error_type,...)
-#endif
-
-	/*!
-	@brief check condition
-	*/
-#define SGE_CHECK(error_type,...)\
-	if(error_type::Judge(__VA_ARGS__)) SpaceGameEngine::ThrowError(error_type::sm_pContent,SGE_DEBUG_INFORMATION);
-
 	struct NullPointerError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
@@ -99,6 +84,88 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
 		static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
 	};
+
+	template<typename ErrorType>
+	struct Assert :public Uncopyable
+	{
+	public:
+		inline Assert() = delete;
+
+		template<typename... Args>
+		explicit inline Assert(const DebugInformation& debug_info, Args&&... args)
+			:m_IsDefault(true), m_DebugInformation(debug_info)
+		{
+#ifdef SGE_DEBUG
+			m_Result = ErrorType::Judge(std::forward<Args>(args)...);
+#endif
+		}
+
+		inline ~Assert()
+		{
+#ifdef SGE_DEBUG
+			if (m_IsDefault&&m_Result)
+				ThrowError(ErrorType::sm_pContent, m_DebugInformation);
+#endif
+		}
+
+		template<typename Func, typename... Args>
+		inline void Handle(Func&& func, Args&&... args)
+		{
+#ifdef SGE_DEBUG
+			m_IsDefault = false;
+			if (m_Result)
+				func(std::forward<Args>(args)...);
+#endif
+		}
+	private:
+		bool m_IsDefault;
+		bool m_Result;
+		DebugInformation m_DebugInformation;
+	};
+
+	template<typename ErrorType>
+	struct Check :public Uncopyable
+	{
+	public:
+		inline Check() = delete;
+
+		template<typename... Args>
+		explicit inline Check(const DebugInformation& debug_info, Args&&... args)
+			:m_IsDefault(true), m_DebugInformation(debug_info)
+		{
+			m_Result = ErrorType::Judge(std::forward<Args>(args)...);
+		}
+
+		inline ~Check()
+		{
+			if (m_IsDefault&&m_Result)
+				ThrowError(ErrorType::sm_pContent, m_DebugInformation);
+		}
+
+		template<typename Func, typename... Args>
+		inline void Handle(Func&& func, Args&&... args)
+		{
+			m_IsDefault = false;
+			if (m_Result)
+				func(std::forward<Args>(args)...);
+		}
+	private:
+		bool m_IsDefault;
+		bool m_Result;
+		DebugInformation m_DebugInformation;
+	};
+
+	/*!
+	@brief assert condition when debug
+	*/
+#define SGE_ASSERT(error_type,...)\
+SpaceGameEngine::Assert<error_type>(SGE_DEBUG_INFORMATION,##__VA_ARGS__)
+
+	/*!
+	@brief check condition
+	*/
+#define SGE_CHECK(error_type,...)\
+SpaceGameEngine::Check<error_type>(SGE_DEBUG_INFORMATION,##__VA_ARGS__)
 
 	/*!
 	@}
