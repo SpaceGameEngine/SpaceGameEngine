@@ -28,23 +28,24 @@ struct TestError
 	}
 };
 
-//TEST_CASE("test error ", "[Common][Error]")
+//TEST_CASE("Test error ", "[Common][Error]")
 //{
 //	SGE_ASSERT(TestError);
 //}
 
-TEST_CASE("test normal error ", "[Common][Error]")
+TEST_CASE("Test normal error ", "[Common][Error]")
 {
-	SGE_ASSERT(NullPointerError,(void*)1);
+	SGE_ASSERT(NullPointerError, (void*)1);
 	SGE_ASSERT(InvalidSizeError, 5, 1, 10);
 }
 
-//TEST_CASE("test error warning", "[Common][Error]")
-//{
-//	ThrowError(TestError(), ErrorLevel::Warning);
-//}
-//
-//TEST_CASE("test error fatal", "[Common][Error]")
-//{
-//	ThrowError(TestError(), ErrorLevel::Fatal);
-//}
+TEST_CASE("Test error handle", "[Common][Error]")
+{
+	int test = 0;
+#ifdef SGE_DEBUG
+	SGE_ASSERT(TestError).Handle([&]() {test = 1; });
+	REQUIRE(test == 1);
+#endif
+	SGE_CHECK(TestError).Handle([&]() {test = 2; });
+	REQUIRE(test == 2);
+}

@@ -17,7 +17,7 @@
 1. 对每个函数的参数及所需的环境条件进行`Assert`检查：这不仅仅可以检查编译期的参数，同时在运行时（`Debug`模式下），其也可以检查函数调用的运行时的参数，但函数过程中的问题就无能为力了。
 2. 对于那些我们可以预测结果的第三方函数调用就不用`Check`进行检查了，如数学计算函数等。对于那些有着还算好用的错误/异常处理的第三方函数调用，如`STL`等，我们可以信任他们的错误处理机制，不进行`Check`。但对于那些检测错误及其麻烦的，如系统调用等，我们要用`Check`进行检查。
 
-### 使用`SpaceGameEngine`中的错误处理机制
+### 使用`SpaceGameEngine`中的错误机制
 #### `Error(concept)`
 &emsp;&emsp;`Error`不是某个具体类，而是一个概念，代表着一系列类。一个`Error`类应有以下内容:
 ```c++
@@ -30,6 +30,9 @@ public:
 
 #### `SGE_ASSERT`&`SGE_CHECK`
 &emsp;&emsp;`SGE_ASSERT`、`SGE_CHECK`这两个宏分别对应着前文概念中的`Assert`和`Check`。两者的参数均为`(error_type,...)`，这个`...`代表着`Judge`的实参。
+
+#### 自定义错误处理方式
+&emsp;&emsp;一般情况下，出错会直接导致程序强制退出，这是`SpaceGameEngine`默认的错误处理方式。然而，当你需要自定义错误处理方式时，你可以直接在`SGE_ASSERT`、`SGE_CHECK`这两个宏后调用其`Handle`方法，传入一个可调用对象和若干用于调用该可调用对象的实际参数以实现自定义该`SGE_ASSERT`或是`SGE_CHECK`的错误处理方式。
 
 #### 样例
 ```c++
@@ -48,4 +51,8 @@ struct InvalidSizeError
 ```c++
 SGE_ASSERT(NullPointerError,(void*)1);
 SGE_ASSERT(InvalidSizeError, 5, 1, 10);
+```
+```c++
+int test = 0;
+SGE_ASSERT(TestError).Handle([&]() {test = 1; });
 ```
