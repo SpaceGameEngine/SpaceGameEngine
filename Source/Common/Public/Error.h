@@ -56,23 +56,6 @@ namespace SpaceGameEngine
 	@todo add Error as a concept when c++20 can be used
 	*/
 
-	/*!
-	@brief a example of error class
-	*/
-	struct BlankError
-	{
-		/*!
-		@brief error message
-		*/
-		inline static const TChar sm_pContent[] = SGE_TSTR("Blank Error");
-		/*!
-		@brief a function for judging the condition
-		@retval true error happend
-		@retval false no error happend
-		*/
-		static bool Judge();
-	};
-
 	struct NullPointerError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");

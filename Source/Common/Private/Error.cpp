@@ -45,11 +45,6 @@ void SpaceGameEngine::ThrowError(const TChar * error_msg, DebugInformation debug
 	abort();
 }
 
-bool SpaceGameEngine::BlankError::Judge()
-{
-	return true;
-}
-
 bool SpaceGameEngine::NullPointerError::Judge(const void * ptr)
 {
 	return ptr == nullptr;
