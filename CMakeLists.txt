@@ -26,15 +26,14 @@ endif ()
 find_package(Threads REQUIRED)
 
 # Third Party
-add_subdirectory(ThirdParty/Catch2)
+add_subdirectory(ThirdParty/GoogleTest/source)
 add_subdirectory(ThirdParty/JsonCpp)
 add_subdirectory(ThirdParty/TinyXML2)
 
-set(THIRD_PARTY_LIBRARIES JsonCpp TinyXML2 ${CMAKE_THREAD_LIBS_INIT})
+set(THIRD_PARTY_LIBRARIES gtest JsonCpp TinyXML2)
 
 # Game Engine Modules
 add_subdirectory(Source/Common)
 
 # Tests
-add_subdirectory(Test/TestCatch2)
 add_subdirectory(Test/TestCommon)
