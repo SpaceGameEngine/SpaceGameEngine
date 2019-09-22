@@ -22,17 +22,17 @@ limitations under the License.
 #ifdef _WIN64
 #define SGE_WINDOWS
 #define SGE_X64
-#elif defined(_WIN32)
+#elif defined( _WIN32 )
 #define SGE_WINDOWS
 #define SGE_X86
 #endif
 
-#if defined(__linux__) || defined(__linux)  
+#if defined( __linux__ ) || defined( __linux )
 #define SGE_LINUX
 #define SGE_UNIX
 #endif
 
-#if defined(__APPLE__) || defined(__MACOSX__)
+#if defined( __APPLE__ ) || defined( __MACOSX__ )
 #define SGE_MACOS
 #define SGE_UNIX
 #endif
@@ -40,7 +40,7 @@ limitations under the License.
 #ifdef SGE_UNIX
 #ifdef __x86_64__
 #define SGE_X64
-#elif defined(__i386__)
+#elif defined( __i386__ )
 #define SGE_X86
 #endif
 #endif

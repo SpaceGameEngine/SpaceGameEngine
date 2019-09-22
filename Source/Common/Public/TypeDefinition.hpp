@@ -27,7 +27,7 @@ namespace SpaceGameEngine
 	@brief 8-bit int
 	*/
 	using Int8 = int8_t;
-	
+
 	/*!
 	@brief 8-bit unsigned int
 	*/
@@ -77,7 +77,7 @@ namespace SpaceGameEngine
 	@brief address type
 	*/
 	using AddressType = UInt64;
-	
+
 	/*!
 	@}
 	*/

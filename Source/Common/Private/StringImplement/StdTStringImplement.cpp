@@ -16,88 +16,68 @@ limitations under the License.
 #include "StdTStringImplement.h"
 #include "Error.h"
 
-SpaceGameEngine::StdTStringImplement::StdTStringImplement()
-{
-}
+SpaceGameEngine::StdTStringImplement::StdTStringImplement() {}
 
-SpaceGameEngine::StdTStringImplement::StdTStringImplement(const StdTStringImplement & str)
+SpaceGameEngine::StdTStringImplement::StdTStringImplement( const StdTStringImplement& str )
 {
 	m_Content = str.m_Content;
 }
 
-SpaceGameEngine::StdTStringImplement::StdTStringImplement(const StdTString & str)
-{
-	m_Content = str;
-}
+SpaceGameEngine::StdTStringImplement::StdTStringImplement( const StdTString& str ) { m_Content = str; }
 
-SpaceGameEngine::StdTStringImplement::StdTStringImplement(const TChar * pstr)
+SpaceGameEngine::StdTStringImplement::StdTStringImplement( const TChar* pstr )
 {
-	SGE_ASSERT(NullPointerError, pstr);
+	SGE_ASSERT( NullPointerError, pstr );
 	m_Content = pstr;
 }
 
-SpaceGameEngine::StdTStringImplement::StdTStringImplement(StdTStringImplement && str)
+SpaceGameEngine::StdTStringImplement::StdTStringImplement( StdTStringImplement&& str )
 {
-	m_Content = std::move(str.m_Content);
+	m_Content = std::move( str.m_Content );
 }
 
-SpaceGameEngine::StdTStringImplement & SpaceGameEngine::StdTStringImplement::operator=(const StdTStringImplement & str)
+SpaceGameEngine::StdTStringImplement& SpaceGameEngine::StdTStringImplement::operator=( const StdTStringImplement& str )
 {
 	m_Content = str.m_Content;
 	return *this;
 }
 
-SpaceGameEngine::StdTStringImplement & SpaceGameEngine::StdTStringImplement::operator=(const StdTString & str)
+SpaceGameEngine::StdTStringImplement& SpaceGameEngine::StdTStringImplement::operator=( const StdTString& str )
 {
 	m_Content = str;
 	return *this;
 }
 
-SpaceGameEngine::StdTStringImplement & SpaceGameEngine::StdTStringImplement::operator=(const TChar * pstr)
+SpaceGameEngine::StdTStringImplement& SpaceGameEngine::StdTStringImplement::operator=( const TChar* pstr )
 {
-	SGE_ASSERT(NullPointerError, pstr);
+	SGE_ASSERT( NullPointerError, pstr );
 	m_Content = pstr;
 	return *this;
 }
 
-SpaceGameEngine::StdTStringImplement & SpaceGameEngine::StdTStringImplement::operator=(StdTStringImplement && str)
+SpaceGameEngine::StdTStringImplement& SpaceGameEngine::StdTStringImplement::operator=( StdTStringImplement&& str )
 {
-	m_Content = std::move(str.m_Content);
+	m_Content = std::move( str.m_Content );
 	return *this;
 }
 
-bool SpaceGameEngine::StdTStringImplement::operator==(const StdTStringImplement & str) const
+bool SpaceGameEngine::StdTStringImplement::operator==( const StdTStringImplement& str ) const
 {
 	return m_Content == str.m_Content;
 }
 
-bool SpaceGameEngine::StdTStringImplement::operator==(const StdTString & str)const
-{
-	return m_Content == str;
-}
+bool SpaceGameEngine::StdTStringImplement::operator==( const StdTString& str ) const { return m_Content == str; }
 
-bool SpaceGameEngine::StdTStringImplement::operator==(const TChar * pstr)const
+bool SpaceGameEngine::StdTStringImplement::operator==( const TChar* pstr ) const
 {
-	SGE_ASSERT(NullPointerError, pstr);
+	SGE_ASSERT( NullPointerError, pstr );
 	return m_Content == pstr;
 }
 
-SpaceGameEngine::StdTString SpaceGameEngine::StdTStringImplement::ToStdTString()const
-{
-	return m_Content;
-}
+SpaceGameEngine::StdTString SpaceGameEngine::StdTStringImplement::ToStdTString() const { return m_Content; }
 
-const SpaceGameEngine::TChar * SpaceGameEngine::StdTStringImplement::ToCString() const
-{
-	return m_Content.c_str();
-}
+const SpaceGameEngine::TChar* SpaceGameEngine::StdTStringImplement::ToCString() const { return m_Content.c_str(); }
 
-SpaceGameEngine::TChar * SpaceGameEngine::StdTStringImplement::GetData()
-{
-	return m_Content.data();
-}
+SpaceGameEngine::TChar* SpaceGameEngine::StdTStringImplement::GetData() { return m_Content.data(); }
 
-SpaceGameEngine::SizeType SpaceGameEngine::StdTStringImplement::GetSize()
-{
-	return m_Content.size();
-}
+SpaceGameEngine::SizeType SpaceGameEngine::StdTStringImplement::GetSize() { return m_Content.size(); }

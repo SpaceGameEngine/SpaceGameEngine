@@ -25,7 +25,7 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-#if defined(SGE_WINDOWS) && defined(UNICODE)
+#if defined( SGE_WINDOWS ) && defined( UNICODE )
 #define SGE_USE_WIDE_CHAR
 #endif
 
@@ -35,14 +35,14 @@ namespace SpaceGameEngine
 #define StdTCout std::wcout
 #define StdToString std::to_wstring
 	using TChar = wchar_t;
-#define SGE_TSTR(str) L##str
+#define SGE_TSTR( str ) L##str
 #else
 	using StdTString = std::string;
 #define StdTCin std::cin
 #define StdTCout std::cout
 #define StdToString std::to_string
 	using TChar = char;
-#define SGE_TSTR(str) str
+#define SGE_TSTR( str ) str
 #endif
 
 	class StdTStringImplement;
@@ -55,25 +55,26 @@ namespace SpaceGameEngine
 	{
 	public:
 		String();
-		String(const String& str);
-		String(const StdTString& str);
-		String(const TChar* pstr);
-		String(String&& str);
+		String( const String& str );
+		String( const StdTString& str );
+		String( const TChar* pstr );
+		String( String&& str );
 		~String();
 
-		String& operator = (const String& str);
-		String& operator = (const StdTString& str);
-		String& operator = (const TChar* pstr);
-		String& operator = (String&& str);
+		String& operator=( const String& str );
+		String& operator=( const StdTString& str );
+		String& operator=( const TChar* pstr );
+		String& operator=( String&& str );
 
-		bool operator ==(const String& str)const;
-		bool operator ==(const StdTString& str)const;
-		bool operator ==(const TChar* pstr)const;
+		bool operator==( const String& str ) const;
+		bool operator==( const StdTString& str ) const;
+		bool operator==( const TChar* pstr ) const;
 
-		StdTString ToStdTString()const;
-		const TChar* ToCString()const;
+		StdTString ToStdTString() const;
+		const TChar* ToCString() const;
 		TChar* GetData();
 		SizeType GetSize();
+
 	private:
 		StringImplement* m_pImplement;
 	};
