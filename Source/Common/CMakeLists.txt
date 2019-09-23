@@ -8,4 +8,4 @@ add_library(Common
         Private/MetaData/MetaData.cpp
         )
 target_include_directories(Common PUBLIC Public)
-target_link_libraries(Common PRIVATE ${THIRD_PARTY_LIBRARIES})
+target_link_libraries(Common PUBLIC ${THIRD_PARTY_LIBRARIES})

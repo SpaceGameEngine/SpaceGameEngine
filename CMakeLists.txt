@@ -30,7 +30,8 @@ add_subdirectory(ThirdParty/GoogleTest/source)
 add_subdirectory(ThirdParty/JsonCpp)
 add_subdirectory(ThirdParty/TinyXML2)
 
-set(THIRD_PARTY_LIBRARIES gtest JsonCpp TinyXML2)
+set(THIRD_PARTY_LIBRARIES JsonCpp TinyXML2)
+set(THIRD_PARTY_TEST_LIBRARIES gtest gmock)
 
 # Game Engine Modules
 add_subdirectory(Source/Common)
