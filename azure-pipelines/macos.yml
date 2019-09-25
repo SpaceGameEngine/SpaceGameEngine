@@ -17,10 +17,10 @@ steps:
       make -j4
     displayName: 'build'
 
-  - script: |
-      build/Test/TestCatch2/TestCatch2 -r junit -o TEST-Catch2.xml
-      build/Test/TestCommon/TestCommon -r junit -o TEST-Common.xml
-    displayName: 'test'
+  - task: Bash@3
+    displayName: 'run tests'
+    inputs:
+      filePath: 'azure-pipelines/run-tests.sh'
 
   - task: PublishTestResults@2
     inputs:
