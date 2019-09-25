@@ -5,6 +5,11 @@ pool:
   vmImage: 'macos-latest'
 
 steps:
+  - task: Bash@3
+    displayName: 'setup third-party dependencies'
+    inputs:
+      filePath: 'setup.sh'
+
   - script: |
       mkdir build
       cd build

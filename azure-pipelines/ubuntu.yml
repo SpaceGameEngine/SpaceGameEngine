@@ -13,6 +13,11 @@ steps:
       g++-9 --version
     displayName: 'upgrade gcc'
 
+  - task: Bash@3
+    displayName: 'setup third-party dependencies'
+    inputs:
+      filePath: 'setup.sh'
+
   - script: |
       mkdir build
       cd build

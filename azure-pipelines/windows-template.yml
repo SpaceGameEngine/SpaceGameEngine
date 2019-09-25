@@ -1,4 +1,8 @@
 steps:
+  - task: PowerShell@2
+    inputs:
+      filePath: 'setup.sh1'
+
   - task: MSBuild@1
     displayName: 'build'
     inputs:
