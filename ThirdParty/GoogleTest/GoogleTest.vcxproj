@@ -26,7 +26,6 @@
     <ClCompile Include="source\googletest\src\gtest-test-part.cc" />
     <ClCompile Include="source\googletest\src\gtest-typed-test.cc" />
     <ClCompile Include="source\googletest\src\gtest.cc" />
-    <ClCompile Include="source\googletest\src\gtest_main.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\googletest\src\gtest-internal-inl.h" />
