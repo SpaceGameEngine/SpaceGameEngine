@@ -6,7 +6,7 @@ pool:
 
 steps:
   - task: Bash@3
-    displayName: 'setup third-party dependencies'
+    displayName: 'Setup third-party dependencies'
     inputs:
       filePath: 'setup.sh'
 
@@ -15,15 +15,15 @@ steps:
       cd build
       cmake ..
       make -j4
-    displayName: 'build'
+    displayName: 'Build'
 
   - task: Bash@3
-    displayName: 'run tests'
+    displayName: 'Test'
     inputs:
       filePath: 'azure-pipelines/run-tests.sh'
 
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: '*-REPORT.xml'
+      testResultsFiles: '**/*-REPORT.xml'
       failTaskOnFailedTests: true
