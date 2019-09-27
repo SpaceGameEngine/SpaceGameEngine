@@ -1,0 +1,56 @@
+jobs:
+- template: azure-pipelines/windows-template.yml
+  parameters:
+    name: 'VS2019-x86-Debug'
+    vmImage: 'windows-2019'
+    msbuildArch: 'x86'
+    msbuildConfig: 'Debug'
+
+- template: azure-pipelines/windows-template.yml
+  parameters:
+    name: 'VS2019-x64-Debug'
+    vmImage: 'windows-2019'
+    msbuildArch: 'x64'
+    msbuildConfig: 'Debug'
+
+- template: azure-pipelines/windows-template.yml
+  parameters:
+    name: 'VS2019-x86-Release'
+    vmImage: 'windows-2019'
+    msbuildArch: 'x86'
+    msbuildConfig: 'Release'
+
+- template: azure-pipelines/windows-template.yml
+  parameters:
+    name: 'VS2019-x64-Release'
+    vmImage: 'windows-2019'
+    msbuildArch: 'x64'
+    msbuildConfig: 'Release'
+
+- template: azure-pipelines/windows-template.yml
+  parameters:
+    name: 'VS2017-x86-Debug'
+    vmImage: 'vs2017-win2016'
+    msbuildArch: 'x86'
+    msbuildConfig: 'Debug'
+
+- template: azure-pipelines/windows-template.yml
+  parameters:
+    name: 'VS2017-x64-Debug'
+    vmImage: 'vs2017-win2016'
+    msbuildArch: 'x64'
+    msbuildConfig: 'Debug'
+
+- template: azure-pipelines/windows-template.yml
+  parameters:
+    name: 'VS2017-x86-Release'
+    vmImage: 'vs2017-win2016'
+    msbuildArch: 'x86'
+    msbuildConfig: 'Release'
+
+- template: azure-pipelines/windows-template.yml
+  parameters:
+    name: 'VS2017-x64-Release'
+    vmImage: 'vs2017-win2016'
+    msbuildArch: 'x64'
+    msbuildConfig: 'Release'
