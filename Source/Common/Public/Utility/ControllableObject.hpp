@@ -30,7 +30,7 @@ namespace SpaceGameEngine
 	template<typename T, typename Allocator = DefaultAllocator>
 	class ControllableObject
 	{
-	public:
+	  public:
 		struct HasBeenInitializedError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The ControllableObject has been initialized");
@@ -47,10 +47,12 @@ namespace SpaceGameEngine
 				return !pcontent;
 			}
 		};
-	public:
+
+	  public:
 		inline ControllableObject()
-			:m_pContent(nullptr)
-		{}
+			: m_pContent(nullptr)
+		{
+		}
 		inline ~ControllableObject()
 		{
 			if (m_pContent)
@@ -65,13 +67,13 @@ namespace SpaceGameEngine
 		{
 			m_pContent = Allocator::template New<T>(std::move(obj.Get()));
 		}
-		inline ControllableObject& operator =(const ControllableObject& obj)
+		inline ControllableObject& operator=(const ControllableObject& obj)
 		{
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			*m_pContent = obj.Get();
 			return *this;
 		}
-		inline ControllableObject& operator =(ControllableObject&& obj)
+		inline ControllableObject& operator=(ControllableObject&& obj)
 		{
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			*m_pContent = std::move(obj.Get());
@@ -89,14 +91,14 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::template New<T>(std::move(obj.Get()));
 		}
 		template<typename OtherAllocator>
-		inline ControllableObject& operator =(const ControllableObject<T, OtherAllocator>& obj)
+		inline ControllableObject& operator=(const ControllableObject<T, OtherAllocator>& obj)
 		{
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			*m_pContent = obj.Get();
 			return *this;
 		}
 		template<typename OtherAllocator>
-		inline ControllableObject& operator =(ControllableObject<T, OtherAllocator>&& obj)
+		inline ControllableObject& operator=(ControllableObject<T, OtherAllocator>&& obj)
 		{
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			*m_pContent = std::move(obj.Get());
@@ -111,13 +113,13 @@ namespace SpaceGameEngine
 		{
 			m_pContent = Allocator::template New<T>(std::move(obj));
 		}
-		inline ControllableObject& operator = (const T& obj)
+		inline ControllableObject& operator=(const T& obj)
 		{
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			*m_pContent = obj;
 			return *this;
 		}
-		inline ControllableObject& operator = (T&& obj)
+		inline ControllableObject& operator=(T&& obj)
 		{
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			*m_pContent = std::move(obj);
@@ -141,18 +143,18 @@ namespace SpaceGameEngine
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			return *m_pContent;
 		}
-		inline const T& Get()const
+		inline const T& Get() const
 		{
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			return *m_pContent;
 		}
-		inline bool IsInitialized()const
+		inline bool IsInitialized() const
 		{
 			return m_pContent;
 		}
 
 		template<typename OtherAllocator>
-		inline bool operator == (const ControllableObject<T, OtherAllocator>& obj)const
+		inline bool operator==(const ControllableObject<T, OtherAllocator>& obj) const
 		{
 			if (IsInitialized() != obj.IsInitialized())
 				return false;
@@ -161,14 +163,15 @@ namespace SpaceGameEngine
 			else
 				return true;
 		}
-		inline bool operator == (const T& obj)const
+		inline bool operator==(const T& obj) const
 		{
 			if (IsInitialized())
 				return *m_pContent == obj;
 			else
 				return false;
 		}
-	private:
+
+	  private:
 		T* m_pContent;
 	};
 	/*!

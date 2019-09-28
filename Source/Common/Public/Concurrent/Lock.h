@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2019 Chenxi Xu (@xsun2001)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,22 +37,21 @@ namespace SpaceGameEngine
 	 */
 	class Mutex
 	{
-	public:
+	  public:
 		Mutex();
 
-		Mutex( const Mutex &other ) = delete;
+		Mutex(const Mutex& other) = delete;
 
 		~Mutex() = default;
 
-		Mutex &operator=( const Mutex &other ) = delete;
+		Mutex& operator=(const Mutex& other) = delete;
 
 		friend class RecursiveLock;
 
-		template<class ... MutexType>
-		friend
-		class ScopedLock;
+		template<class... MutexType>
+		friend class ScopedLock;
 
-	private:
+	  private:
 		std::recursive_timed_mutex m_MutexImpl;
 	};
 
@@ -65,18 +64,18 @@ namespace SpaceGameEngine
 	 */
 	class RecursiveLock
 	{
-	public:
-		RecursiveLock( const RecursiveLock & ) = delete;
+	  public:
+		RecursiveLock(const RecursiveLock&) = delete;
 
-		RecursiveLock( RecursiveLock &&other ) noexcept;
+		RecursiveLock(RecursiveLock&& other) noexcept;
 
-		explicit RecursiveLock( Mutex & );
+		explicit RecursiveLock(Mutex&);
 
 		~RecursiveLock() = default;
 
-		RecursiveLock &operator=( const RecursiveLock & ) = delete;
+		RecursiveLock& operator=(const RecursiveLock&) = delete;
 
-		RecursiveLock &operator=( RecursiveLock &&other ) noexcept;
+		RecursiveLock& operator=(RecursiveLock&& other) noexcept;
 
 		void Lock();
 
@@ -86,16 +85,16 @@ namespace SpaceGameEngine
 		 * \todo use SGE's time utlity instead of <chrono>
 		 */
 		template<class Rep, class Period>
-		bool TryLock( const std::chrono::duration<Rep, Period> &timeout_duration )
+		bool TryLock(const std::chrono::duration<Rep, Period>& timeout_duration)
 		{
-			return m_LockImpl.try_lock_for( timeout_duration );
+			return m_LockImpl.try_lock_for(timeout_duration);
 		}
 
 		void Unlock();
 
 		friend class Condition;
 
-	private:
+	  private:
 		std::unique_lock<std::recursive_timed_mutex> m_LockImpl;
 	};
 
@@ -108,33 +107,33 @@ namespace SpaceGameEngine
 	 */
 	class Condition
 	{
-	public:
+	  public:
 		Condition();
 
 		~Condition() = default;
 
-		Condition( const Condition & ) = delete;
+		Condition(const Condition&) = delete;
 
-		Condition &operator=( const Condition & ) = delete;
+		Condition& operator=(const Condition&) = delete;
 
 		void NodifyOne();
 
 		void NodifyAll();
 
-		void Wait( RecursiveLock &lock );
+		void Wait(RecursiveLock& lock);
 
 		/*!
 		 * \todo use SGE's function instead of std's
 		 */
-		void Wait( RecursiveLock &lock, std::function<bool()> pred );
+		void Wait(RecursiveLock& lock, std::function<bool()> pred);
 
 		/*!
 		 * \todo use SGE's time utlity instead of <chrono>
 		 */
 		template<class Rep, class Period>
-		bool WaitFor( RecursiveLock &lock, const std::chrono::duration<Rep, Period> &rel_time )
+		bool WaitFor(RecursiveLock& lock, const std::chrono::duration<Rep, Period>& rel_time)
 		{
-			return m_ConditionImpl.wait_for( lock, rel_time ) == std::cv_status::no_timeout;
+			return m_ConditionImpl.wait_for(lock, rel_time) == std::cv_status::no_timeout;
 		}
 
 		/*!
@@ -142,17 +141,17 @@ namespace SpaceGameEngine
 		 * \todo use SGE's function instead of std's
 		 */
 		template<class Rep, class Period>
-		bool WaitFor( RecursiveLock &lock, const std::chrono::duration<Rep, Period> &rel_time,
-					  std::function<bool()> pred )
+		bool WaitFor(RecursiveLock& lock, const std::chrono::duration<Rep, Period>& rel_time,
+					 std::function<bool()> pred)
 		{
-			return m_ConditionImpl.wait_for( lock, rel_time, pred );
+			return m_ConditionImpl.wait_for(lock, rel_time, pred);
 		}
 
-	private:
+	  private:
 		std::condition_variable_any m_ConditionImpl;
 	};
 
-	/*!\brief Class SpaceGameEngine::ScopedLock is a warpper of a std::scoped_lock<SpaceGameEngine::Mutex...>
+	/*!\brief Class SpaceGameEngine::ScopedLock is a wrapper of a std::scoped_lock<SpaceGameEngine::Mutex...>
 	 *
 	 * This class's constructor only takes SGE::Mutex.
 	 *
@@ -160,23 +159,23 @@ namespace SpaceGameEngine
 	 *
 	 * @tparam MutexType each of these must be SpaceGameEngine::Mutex
 	 */
-	template<class ... MutexType>
+	template<class... MutexType>
 	class ScopedLock
 	{
-	public:
-
-		explicit ScopedLock( MutexType &... mutex ) : m_LockImpl(( mutex.m_MutexImpl )... )
+	  public:
+		explicit ScopedLock(MutexType&... mutex)
+			: m_LockImpl((mutex.m_MutexImpl)...)
 		{
-			static_assert((std::is_same_v<Mutex, MutexType> && ...), "ScopedLock requires SGE::Mutex" );
+			static_assert((std::is_same_v<Mutex, MutexType> && ...), "ScopedLock requires SGE::Mutex");
 		}
 
-		ScopedLock( const ScopedLock & ) = delete;
+		ScopedLock(const ScopedLock&) = delete;
 
 		~ScopedLock() = default;
 
-		ScopedLock &operator=( const ScopedLock &&other ) = delete;
+		ScopedLock& operator=(const ScopedLock&& other) = delete;
 
-	private:
-		std::scoped_lock<decltype( std::declval<MutexType>().m_MutexImpl )...> m_LockImpl;
+	  private:
+		std::scoped_lock<decltype(std::declval<MutexType>().m_MutexImpl)...> m_LockImpl;
 	};
 }

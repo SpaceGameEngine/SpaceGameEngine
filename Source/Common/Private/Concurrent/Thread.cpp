@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2019 Chenxi Xu (@xsun2001)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,19 @@ limitations under the License.
 
 #include "Concurrent/Thread.h"
 
-SpaceGameEngine::Thread::Thread() : m_ThreadImpl() {}
-
-SpaceGameEngine::Thread::Thread( SpaceGameEngine::Thread &&other ) noexcept
-		: m_ThreadImpl( std::exchange( other.m_ThreadImpl, std::thread())) {}
-
-SpaceGameEngine::Thread &SpaceGameEngine::Thread::operator=( SpaceGameEngine::Thread &&other ) noexcept
+SpaceGameEngine::Thread::Thread()
+	: m_ThreadImpl()
 {
-	m_ThreadImpl = std::exchange( other.m_ThreadImpl, std::thread());
+}
+
+SpaceGameEngine::Thread::Thread(SpaceGameEngine::Thread&& other) noexcept
+	: m_ThreadImpl(std::exchange(other.m_ThreadImpl, std::thread()))
+{
+}
+
+SpaceGameEngine::Thread& SpaceGameEngine::Thread::operator=(SpaceGameEngine::Thread&& other) noexcept
+{
+	m_ThreadImpl = std::exchange(other.m_ThreadImpl, std::thread());
 	return *this;
 }
 
@@ -53,9 +58,9 @@ void SpaceGameEngine::Thread::Detach()
 	}
 }
 
-void SpaceGameEngine::Thread::Swap( SpaceGameEngine::Thread &other ) noexcept
+void SpaceGameEngine::Thread::Swap(SpaceGameEngine::Thread& other) noexcept
 {
-	std::swap( m_ThreadImpl, other.m_ThreadImpl );
+	std::swap(m_ThreadImpl, other.m_ThreadImpl);
 }
 
 SpaceGameEngine::ThreadID SpaceGameEngine::Thread::GetThreadID() const noexcept
@@ -78,7 +83,7 @@ SpaceGameEngine::ThreadID SpaceGameEngine::Thread::GetCurrentThreadId() noexcept
 	return std::this_thread::get_id();
 }
 
-void swap( SpaceGameEngine::Thread &lhs, SpaceGameEngine::Thread &rhs ) noexcept
+void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept
 {
-	lhs.Swap( rhs );
+	lhs.Swap(rhs);
 }

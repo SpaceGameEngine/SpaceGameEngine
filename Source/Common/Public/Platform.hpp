@@ -27,7 +27,7 @@ limitations under the License.
 #define SGE_X86
 #endif
 
-#if defined(__linux__) || defined(__linux)  
+#if defined(__linux__) || defined(__linux)
 #define SGE_LINUX
 #define SGE_UNIX
 #endif

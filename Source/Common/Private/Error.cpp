@@ -20,14 +20,14 @@ limitations under the License.
 #include <Windows.h>
 #endif
 
-SpaceGameEngine::DebugInformation::DebugInformation(const TChar * file_name, const TChar * func_name, UInt32 line_number)
+SpaceGameEngine::DebugInformation::DebugInformation(const TChar* file_name, const TChar* func_name, UInt32 line_number)
 {
 	m_pFileName = file_name;
 	m_pFunctionName = func_name;
 	m_LineNumber = line_number;
 }
 
-void SpaceGameEngine::ThrowError(const TChar * error_msg, DebugInformation debug_info)
+void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_info)
 {
 	StdTString output_msg = SGE_TSTR("error happend in ");
 	output_msg += debug_info.m_pFileName;
@@ -45,7 +45,7 @@ void SpaceGameEngine::ThrowError(const TChar * error_msg, DebugInformation debug
 	abort();
 }
 
-bool SpaceGameEngine::NullPointerError::Judge(const void * ptr)
+bool SpaceGameEngine::NullPointerError::Judge(const void* ptr)
 {
 	return ptr == nullptr;
 }

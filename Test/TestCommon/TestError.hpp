@@ -43,9 +43,9 @@ TEST_CASE("Test error handle", "[Common][Error]")
 {
 	int test = 0;
 #ifdef SGE_DEBUG
-	SGE_ASSERT(TestError).Handle([&]() {test = 1; });
+	SGE_ASSERT(TestError).Handle([&]() { test = 1; });
 	REQUIRE(test == 1);
 #endif
-	SGE_CHECK(TestError).Handle([&]() {test = 2; });
+	SGE_CHECK(TestError).Handle([&]() { test = 2; });
 	REQUIRE(test == 2);
 }

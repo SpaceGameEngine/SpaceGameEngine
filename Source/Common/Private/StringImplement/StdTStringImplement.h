@@ -27,27 +27,28 @@ namespace SpaceGameEngine
 	/*!@todo using template and supported customed allocator and char type*/
 	class StdTStringImplement
 	{
-	public:
+	  public:
 		StdTStringImplement();
 		StdTStringImplement(const StdTStringImplement& str);
 		StdTStringImplement(const StdTString& str);
 		StdTStringImplement(const TChar* pstr);
 		StdTStringImplement(StdTStringImplement&& str);
 
-		StdTStringImplement& operator = (const StdTStringImplement& str);
-		StdTStringImplement& operator = (const StdTString& str);
-		StdTStringImplement& operator = (const TChar* pstr);
-		StdTStringImplement& operator = (StdTStringImplement&& str);
+		StdTStringImplement& operator=(const StdTStringImplement& str);
+		StdTStringImplement& operator=(const StdTString& str);
+		StdTStringImplement& operator=(const TChar* pstr);
+		StdTStringImplement& operator=(StdTStringImplement&& str);
 
-		bool operator ==(const StdTStringImplement& str)const;
-		bool operator ==(const StdTString& str)const;
-		bool operator ==(const TChar* pstr)const;
+		bool operator==(const StdTStringImplement& str) const;
+		bool operator==(const StdTString& str) const;
+		bool operator==(const TChar* pstr) const;
 
-		StdTString ToStdTString()const;
-		const TChar* ToCString()const;
+		StdTString ToStdTString() const;
+		const TChar* ToCString() const;
 		TChar* GetData();
 		SizeType GetSize();
-	private:
+
+	  private:
 		StdTString m_Content;
 	};
 

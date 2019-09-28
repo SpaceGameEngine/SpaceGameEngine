@@ -48,22 +48,25 @@ namespace SpaceGameEngine
 	 */
 	class Thread
 	{
-	public:
+	  public:
 		Thread();
 
-		Thread( Thread && ) noexcept;
+		Thread(Thread&&) noexcept;
 
 		template<class Func, class... Args>
-		explicit Thread( Func &&f, Args &&... args ) : m_ThreadImpl( std::forward<Func>( f ),
-																		 std::forward<Args>( args ) ... ) {}
+		explicit Thread(Func&& f, Args&&... args)
+			: m_ThreadImpl(std::forward<Func>(f),
+						   std::forward<Args>(args)...)
+		{
+		}
 
-		Thread( const Thread & ) = delete;
+		Thread(const Thread&) = delete;
 
 		~Thread();
 
-		Thread &operator=( Thread && ) noexcept;
+		Thread& operator=(Thread&&) noexcept;
 
-		Thread &operator=( const Thread & ) = delete;
+		Thread& operator=(const Thread&) = delete;
 
 		bool IsJoinable() const noexcept;
 
@@ -71,7 +74,7 @@ namespace SpaceGameEngine
 
 		void Detach();
 
-		void Swap( Thread &other ) noexcept;
+		void Swap(Thread& other) noexcept;
 
 		ThreadID GetThreadID() const noexcept;
 
@@ -85,12 +88,12 @@ namespace SpaceGameEngine
 		 * \todo use SGE's time utlity instead of <chrono>
 		 */
 		template<class Rep, class Period>
-		static void Sleep( const std::chrono::duration<Rep, Period> &sleep_duration )
+		static void Sleep(const std::chrono::duration<Rep, Period>& sleep_duration)
 		{
-			std::this_thread::sleep_for( sleep_duration );
+			std::this_thread::sleep_for(sleep_duration);
 		}
 
-	private:
+	  private:
 		std::thread m_ThreadImpl;
 	};
 
@@ -100,4 +103,4 @@ namespace SpaceGameEngine
 
 }
 
-void swap( SpaceGameEngine::Thread &lhs, SpaceGameEngine::Thread &rhs ) noexcept;
+void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept;

@@ -53,7 +53,7 @@ namespace SpaceGameEngine
 	*/
 	class String
 	{
-	public:
+	  public:
 		String();
 		String(const String& str);
 		String(const StdTString& str);
@@ -61,20 +61,21 @@ namespace SpaceGameEngine
 		String(String&& str);
 		~String();
 
-		String& operator = (const String& str);
-		String& operator = (const StdTString& str);
-		String& operator = (const TChar* pstr);
-		String& operator = (String&& str);
+		String& operator=(const String& str);
+		String& operator=(const StdTString& str);
+		String& operator=(const TChar* pstr);
+		String& operator=(String&& str);
 
-		bool operator ==(const String& str)const;
-		bool operator ==(const StdTString& str)const;
-		bool operator ==(const TChar* pstr)const;
+		bool operator==(const String& str) const;
+		bool operator==(const StdTString& str) const;
+		bool operator==(const TChar* pstr) const;
 
-		StdTString ToStdTString()const;
-		const TChar* ToCString()const;
+		StdTString ToStdTString() const;
+		const TChar* ToCString() const;
 		TChar* GetData();
 		SizeType GetSize();
-	private:
+
+	  private:
 		StringImplement* m_pImplement;
 	};
 

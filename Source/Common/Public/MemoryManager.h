@@ -58,10 +58,10 @@ namespace SpaceGameEngine
 		static void* RawNew(SizeType size, SizeType alignment = 0);
 		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
 
-		template<typename T,typename... Args>
+		template<typename T, typename... Args>
 		static T* New(Args&&... args)
 		{
-			return new (RawNew(sizeof(T),alignof(T))) T(std::forward<Args>(args)...);
+			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
 		}
 
 		template<typename T>
@@ -76,7 +76,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief make the memory size or memory address aligned using the alignment
 	*/
-#define SGE_MEMORY_ALIGN(value, alignment) (((value) + ((alignment) - 1)) & ~((alignment) - 1))
+#define SGE_MEMORY_ALIGN(value, alignment) (((value) + ((alignment)-1)) & ~((alignment)-1))
 
 	/*!
 	@brief the memory manager for the engine to use
@@ -85,9 +85,9 @@ namespace SpaceGameEngine
 	on the current condition.
 	@todo add mutexs for fixedsizeallocators
 	*/
-	class MemoryManager :public Uncopyable, public Singleton<MemoryManager>
+	class MemoryManager : public Uncopyable, public Singleton<MemoryManager>
 	{
-	public:
+	  public:
 		/*!
 		@brief the header of a memory block which contain the information of the memory block
 		@note the memory block's information which is stored in MemoryBlockHeader is only used in the allocator,
@@ -126,9 +126,9 @@ namespace SpaceGameEngine
 		can allocate must be set by calling FixedSizeAllocator::Init method
 		@attention must call FixedSizeAllocator::Init method after instancing before using
 		*/
-		class FixedSizeAllocator :public Uncopyable
+		class FixedSizeAllocator : public Uncopyable
 		{
-		public:
+		  public:
 			/*!
 			@attention the alignment argument can not be 0.
 			*/
@@ -137,14 +137,15 @@ namespace SpaceGameEngine
 
 			void* Allocate();
 			void Free(void* ptr);
-			
-		private:
+
+		  private:
 			/*!
 			@brief get the memory address of the next memory block by giving the memory address of the current memory block
 			@note the result is calculated by the current allocator's constant memory block size
 			*/
 			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
-		private:
+
+		  private:
 			MemoryBlockHeader* m_pFreeMemoryBlocks;
 			SizeType m_FreeMemoryBlockQuantity;
 
@@ -155,7 +156,8 @@ namespace SpaceGameEngine
 			SizeType m_MemoryPageSize;
 			SizeType m_Alignment;
 		};
-	public:
+
+	  public:
 		friend Singleton<MemoryManager>;
 
 		~MemoryManager();
@@ -168,9 +170,10 @@ namespace SpaceGameEngine
 		@attention the alignment can not be larger than 128 or equal to 0.
 		*/
 		void Free(void* ptr, SizeType size, SizeType alignment);
-	private:
+
+	  private:
 		MemoryManager();
-		
+
 		/*!
 		@attention the first is size,the second is alignment.
 		*/
@@ -191,7 +194,8 @@ namespace SpaceGameEngine
 		the alignment of it can not be larger than 128.
 		*/
 		UInt32 RequestInformationToIndex(const RequestInformation& request_info);
-	private:
+
+	  private:
 		/*!
 		@note 262273=((1024<<8)|128)+1
 		*/

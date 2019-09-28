@@ -5,11 +5,11 @@ VisualStudioVersion = 15.0.28307.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectFile", "ProjectFile", "{73717249-81A9-4A5D-96D0-D59EA4C9CA9E}"
 	ProjectSection(SolutionItems) = preProject
+		.clang-format = .clang-format
 		.gitignore = .gitignore
 		Doxyfile = Doxyfile
 		LICENSE = LICENSE
 		ProjectCommonProperty.props = ProjectCommonProperty.props
-		push.bat = push.bat
 		README.md = README.md
 		SpaceGameEngine.sln.licenseheader = SpaceGameEngine.sln.licenseheader
 	EndProjectSection

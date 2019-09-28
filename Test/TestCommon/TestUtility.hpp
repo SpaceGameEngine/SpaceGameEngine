@@ -23,14 +23,15 @@ using namespace SpaceGameEngine;
 class test_cmp
 {
 	int i;
-public:
-	bool operator == (const test_cmp&)const = delete;
+
+  public:
+	bool operator==(const test_cmp&) const = delete;
 };
 class test_cmp2
 {
 	int i;
 };
-bool operator == (const test_cmp2&, const test_cmp2&) = delete;
+bool operator==(const test_cmp2&, const test_cmp2&) = delete;
 
 TEST_CASE("Test IsComparable", "[Common][Utility]")
 {
@@ -59,12 +60,12 @@ struct test_controllable_object_class
 		i = 3;
 	}
 
-	test_controllable_object_class& operator = (const test_controllable_object_class& obj)
+	test_controllable_object_class& operator=(const test_controllable_object_class& obj)
 	{
 		i = 4;
 		return *this;
 	}
-	test_controllable_object_class& operator = (test_controllable_object_class&& obj)
+	test_controllable_object_class& operator=(test_controllable_object_class&& obj)
 	{
 		i = 5;
 		return *this;
@@ -101,7 +102,7 @@ TEST_CASE("Test ControllableObject", "[Common][Utility]")
 		test5.Init();
 		test5 = std::move(test);
 		REQUIRE(test5.Get().i == 5);
-		test_controllable_object_class _test,_test2;
+		test_controllable_object_class _test, _test2;
 		ControllableObject<test_controllable_object_class> test6(_test);
 		REQUIRE(test6.Get().i == 2);
 		ControllableObject<test_controllable_object_class> test7(std::move(_test));
@@ -112,7 +113,6 @@ TEST_CASE("Test ControllableObject", "[Common][Utility]")
 		REQUIRE(test8.Get().i == 4);
 		test8 = std::move(_test2);
 		REQUIRE(test8.Get().i == 5);
-
 	}
 	SECTION("test comparison")
 	{

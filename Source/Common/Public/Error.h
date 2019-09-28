@@ -47,7 +47,7 @@ namespace SpaceGameEngine
 #define SGE_FUNCTION __FUNCTION__
 #endif
 #define SGE_LINE __LINE__
-#define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation(SGE_FILE,SGE_FUNCTION,SGE_LINE)
+#define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation(SGE_FILE, SGE_FUNCTION, SGE_LINE)
 
 	void ThrowError(const TChar* error_msg, DebugInformation debug_info);
 
@@ -69,14 +69,14 @@ namespace SpaceGameEngine
 	};
 
 	template<typename ErrorType>
-	struct Assert :public Uncopyable
+	struct Assert : public Uncopyable
 	{
-	public:
+	  public:
 		inline Assert() = delete;
 
 		template<typename... Args>
 		explicit inline Assert(const DebugInformation& debug_info, Args&&... args)
-			:m_IsDefault(true), m_DebugInformation(debug_info)
+			: m_IsDefault(true), m_DebugInformation(debug_info)
 		{
 #ifdef SGE_DEBUG
 			m_Result = ErrorType::Judge(std::forward<Args>(args)...);
@@ -86,7 +86,7 @@ namespace SpaceGameEngine
 		inline ~Assert()
 		{
 #ifdef SGE_DEBUG
-			if (m_IsDefault&&m_Result)
+			if (m_IsDefault && m_Result)
 				ThrowError(ErrorType::sm_pContent, m_DebugInformation);
 #endif
 		}
@@ -100,28 +100,29 @@ namespace SpaceGameEngine
 				func(std::forward<Args>(args)...);
 #endif
 		}
-	private:
+
+	  private:
 		bool m_IsDefault;
 		bool m_Result;
 		DebugInformation m_DebugInformation;
 	};
 
 	template<typename ErrorType>
-	struct Check :public Uncopyable
+	struct Check : public Uncopyable
 	{
-	public:
+	  public:
 		inline Check() = delete;
 
 		template<typename... Args>
 		explicit inline Check(const DebugInformation& debug_info, Args&&... args)
-			:m_IsDefault(true), m_DebugInformation(debug_info)
+			: m_IsDefault(true), m_DebugInformation(debug_info)
 		{
 			m_Result = ErrorType::Judge(std::forward<Args>(args)...);
 		}
 
 		inline ~Check()
 		{
-			if (m_IsDefault&&m_Result)
+			if (m_IsDefault && m_Result)
 				ThrowError(ErrorType::sm_pContent, m_DebugInformation);
 		}
 
@@ -132,7 +133,8 @@ namespace SpaceGameEngine
 			if (m_Result)
 				func(std::forward<Args>(args)...);
 		}
-	private:
+
+	  private:
 		bool m_IsDefault;
 		bool m_Result;
 		DebugInformation m_DebugInformation;
@@ -141,14 +143,14 @@ namespace SpaceGameEngine
 	/*!
 	@brief assert condition when debug
 	*/
-#define SGE_ASSERT(error_type,...)\
-SpaceGameEngine::Assert<error_type>(SGE_DEBUG_INFORMATION,##__VA_ARGS__)
+#define SGE_ASSERT(error_type, ...) \
+	SpaceGameEngine::Assert<error_type>(SGE_DEBUG_INFORMATION, ##__VA_ARGS__)
 
 	/*!
 	@brief check condition
 	*/
-#define SGE_CHECK(error_type,...)\
-SpaceGameEngine::Check<error_type>(SGE_DEBUG_INFORMATION,##__VA_ARGS__)
+#define SGE_CHECK(error_type, ...) \
+	SpaceGameEngine::Check<error_type>(SGE_DEBUG_INFORMATION, ##__VA_ARGS__)
 
 	/*!
 	@}

@@ -39,12 +39,12 @@ struct test_metadata_class
 		i = 3;
 	}
 
-	test_metadata_class& operator = (const test_metadata_class& obj)
+	test_metadata_class& operator=(const test_metadata_class& obj)
 	{
 		i = 4;
 		return *this;
 	}
-	test_metadata_class& operator = (test_metadata_class&& obj)
+	test_metadata_class& operator=(test_metadata_class&& obj)
 	{
 		i = 5;
 		return *this;
@@ -53,7 +53,7 @@ struct test_metadata_class
 	int i;
 };
 
-bool operator == (const test_metadata_class& t1, const test_metadata_class& t2)
+bool operator==(const test_metadata_class& t1, const test_metadata_class& t2)
 {
 	return t1.i == t2.i;
 }
@@ -77,7 +77,7 @@ TEST_CASE("Test MetaData", "[Common][MetaData]")
 	SECTION("test metadata's functions")
 	{
 		decltype(auto) test = GetMetaData<test_metadata_class>();
-		test_metadata_class t1,t2;
+		test_metadata_class t1, t2;
 		t1.i = 10;
 		test.m_pDefaultConstructor(&t1);
 		REQUIRE(t1.i == 1);
@@ -87,7 +87,8 @@ TEST_CASE("Test MetaData", "[Common][MetaData]")
 		REQUIRE(t1.i == 3);
 		test.m_pCopyAssignment(&t1, &t2);
 		REQUIRE(t1.i == 4);
-		test.m_pMoveAssignment(&t1, &t2);;
+		test.m_pMoveAssignment(&t1, &t2);
+		;
 		REQUIRE(t1.i == 5);
 		t1.i = t2.i;
 		REQUIRE(test.m_pComparison(&t1, &t2));

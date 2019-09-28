@@ -29,13 +29,13 @@ namespace SpaceGameEngine
 	template<typename Allocator = DefaultAllocator>
 	class MetaObject
 	{
-	public:
+	  public:
 		struct ImproperMetaDataError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The MetaData is improper for the MetaObject");
 			inline static bool Judge(const MetaData& meta_data)
 			{
-				return !(meta_data.m_pName != nullptr&&InvalidSizeError::Judge(meta_data.m_Size, 1, SGE_MAX_MEMORY_SIZE) == false && ((meta_data.m_Alignment & (meta_data.m_Alignment - 1)) == 0 && meta_data.m_Alignment != 0) && meta_data.m_pDestructor != nullptr);
+				return !(meta_data.m_pName != nullptr && InvalidSizeError::Judge(meta_data.m_Size, 1, SGE_MAX_MEMORY_SIZE) == false && ((meta_data.m_Alignment & (meta_data.m_Alignment - 1)) == 0 && meta_data.m_Alignment != 0) && meta_data.m_pDestructor != nullptr);
 			}
 		};
 
@@ -47,7 +47,8 @@ namespace SpaceGameEngine
 				return !(meta_data1 == meta_data2);
 			}
 		};
-	public:
+
+	  public:
 		inline MetaObject() = delete;
 		inline ~MetaObject()
 		{
@@ -69,14 +70,14 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 			m_pMetaData->m_pMoveConstructor(m_pContent, obj.m_pContent);
 		}
-		inline MetaObject& operator = (const MetaObject& obj)
+		inline MetaObject& operator=(const MetaObject& obj)
 		{
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pCopyAssignment);
 			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, *obj.m_pMetaData);
 			m_pMetaData->m_pCopyAssignment(m_pContent, obj.m_pContent);
 			return *this;
 		}
-		inline MetaObject& operator = (MetaObject&& obj)
+		inline MetaObject& operator=(MetaObject&& obj)
 		{
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pMoveAssignment);
 			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, *obj.m_pMetaData);
@@ -101,7 +102,7 @@ namespace SpaceGameEngine
 			m_pMetaData->m_pMoveConstructor(m_pContent, obj.m_pContent);
 		}
 		template<typename OtherAllocator>
-		inline MetaObject& operator = (const MetaObject<OtherAllocator>& obj)
+		inline MetaObject& operator=(const MetaObject<OtherAllocator>& obj)
 		{
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pCopyAssignment);
 			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, *obj.m_pMetaData);
@@ -109,7 +110,7 @@ namespace SpaceGameEngine
 			return *this;
 		}
 		template<typename OtherAllocator>
-		inline MetaObject& operator = (MetaObject<OtherAllocator>&& obj)
+		inline MetaObject& operator=(MetaObject<OtherAllocator>&& obj)
 		{
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pMoveAssignment);
 			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, *obj.m_pMetaData);
@@ -146,8 +147,8 @@ namespace SpaceGameEngine
 				m_pMetaData->m_pCopyConstructor(m_pContent, &obj);
 			}
 		}
-		
-		inline const MetaData& GetMetaData()const
+
+		inline const MetaData& GetMetaData() const
 		{
 			return *m_pMetaData;
 		}
@@ -155,7 +156,7 @@ namespace SpaceGameEngine
 		{
 			return m_pContent;
 		}
-		inline const void* GetData()const
+		inline const void* GetData() const
 		{
 			return m_pContent;
 		}
@@ -170,18 +171,19 @@ namespace SpaceGameEngine
 			return *reinterpret_cast<T*>(m_pContent);
 		}
 		template<typename T>
-		inline const T& Get()const
+		inline const T& Get() const
 		{
 			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, SpaceGameEngine::GetMetaData<std::decay_t<T>>());
 			return *reinterpret_cast<T*>(m_pContent);
 		}
-	private:
+
+	  private:
 		const MetaData* m_pMetaData;
 		void* m_pContent;
 	};
 
-	template<typename Allocator1,typename Allocator2>
-	inline bool operator == (const MetaObject<Allocator1>& m1, const MetaObject<Allocator2>& m2)
+	template<typename Allocator1, typename Allocator2>
+	inline bool operator==(const MetaObject<Allocator1>& m1, const MetaObject<Allocator2>& m2)
 	{
 		if (m1.GetMetaData() == m2.GetMetaData())
 		{
