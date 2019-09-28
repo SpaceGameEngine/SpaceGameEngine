@@ -87,7 +87,7 @@ namespace SpaceGameEngine
 	*/
 	class MemoryManager : public Uncopyable, public Singleton<MemoryManager>
 	{
-	  public:
+	public:
 		/*!
 		@brief the header of a memory block which contain the information of the memory block
 		@note the memory block's information which is stored in MemoryBlockHeader is only used in the allocator,
@@ -128,7 +128,7 @@ namespace SpaceGameEngine
 		*/
 		class FixedSizeAllocator : public Uncopyable
 		{
-		  public:
+		public:
 			/*!
 			@attention the alignment argument can not be 0.
 			*/
@@ -138,14 +138,14 @@ namespace SpaceGameEngine
 			void* Allocate();
 			void Free(void* ptr);
 
-		  private:
+		private:
 			/*!
 			@brief get the memory address of the next memory block by giving the memory address of the current memory block
 			@note the result is calculated by the current allocator's constant memory block size
 			*/
 			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
 
-		  private:
+		private:
 			MemoryBlockHeader* m_pFreeMemoryBlocks;
 			SizeType m_FreeMemoryBlockQuantity;
 
@@ -157,7 +157,7 @@ namespace SpaceGameEngine
 			SizeType m_Alignment;
 		};
 
-	  public:
+	public:
 		friend Singleton<MemoryManager>;
 
 		~MemoryManager();
@@ -171,7 +171,7 @@ namespace SpaceGameEngine
 		*/
 		void Free(void* ptr, SizeType size, SizeType alignment);
 
-	  private:
+	private:
 		MemoryManager();
 
 		/*!
@@ -195,7 +195,7 @@ namespace SpaceGameEngine
 		*/
 		UInt32 RequestInformationToIndex(const RequestInformation& request_info);
 
-	  private:
+	private:
 		/*!
 		@note 262273=((1024<<8)|128)+1
 		*/

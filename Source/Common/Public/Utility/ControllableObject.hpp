@@ -30,7 +30,7 @@ namespace SpaceGameEngine
 	template<typename T, typename Allocator = DefaultAllocator>
 	class ControllableObject
 	{
-	  public:
+	public:
 		struct HasBeenInitializedError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The ControllableObject has been initialized");
@@ -48,7 +48,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-	  public:
+	public:
 		inline ControllableObject()
 			: m_pContent(nullptr)
 		{
@@ -171,7 +171,7 @@ namespace SpaceGameEngine
 				return false;
 		}
 
-	  private:
+	private:
 		T* m_pContent;
 	};
 	/*!

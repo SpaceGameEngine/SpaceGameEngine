@@ -29,7 +29,7 @@ namespace SpaceGameEngine
 	template<typename Allocator = DefaultAllocator>
 	class MetaObject
 	{
-	  public:
+	public:
 		struct ImproperMetaDataError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The MetaData is improper for the MetaObject");
@@ -48,7 +48,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-	  public:
+	public:
 		inline MetaObject() = delete;
 		inline ~MetaObject()
 		{
@@ -177,7 +177,7 @@ namespace SpaceGameEngine
 			return *reinterpret_cast<T*>(m_pContent);
 		}
 
-	  private:
+	private:
 		const MetaData* m_pMetaData;
 		void* m_pContent;
 	};

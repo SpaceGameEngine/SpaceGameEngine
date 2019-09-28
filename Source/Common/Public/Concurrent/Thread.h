@@ -48,7 +48,7 @@ namespace SpaceGameEngine
 	 */
 	class Thread
 	{
-	  public:
+	public:
 		Thread();
 
 		Thread(Thread&&) noexcept;
@@ -93,7 +93,7 @@ namespace SpaceGameEngine
 			std::this_thread::sleep_for(sleep_duration);
 		}
 
-	  private:
+	private:
 		std::thread m_ThreadImpl;
 	};
 

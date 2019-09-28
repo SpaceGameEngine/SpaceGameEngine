@@ -37,7 +37,7 @@ namespace SpaceGameEngine
 	 */
 	class Mutex
 	{
-	  public:
+	public:
 		Mutex();
 
 		Mutex(const Mutex& other) = delete;
@@ -51,7 +51,7 @@ namespace SpaceGameEngine
 		template<class... MutexType>
 		friend class ScopedLock;
 
-	  private:
+	private:
 		std::recursive_timed_mutex m_MutexImpl;
 	};
 
@@ -64,7 +64,7 @@ namespace SpaceGameEngine
 	 */
 	class RecursiveLock
 	{
-	  public:
+	public:
 		RecursiveLock(const RecursiveLock&) = delete;
 
 		RecursiveLock(RecursiveLock&& other) noexcept;
@@ -94,7 +94,7 @@ namespace SpaceGameEngine
 
 		friend class Condition;
 
-	  private:
+	private:
 		std::unique_lock<std::recursive_timed_mutex> m_LockImpl;
 	};
 
@@ -107,7 +107,7 @@ namespace SpaceGameEngine
 	 */
 	class Condition
 	{
-	  public:
+	public:
 		Condition();
 
 		~Condition() = default;
@@ -147,7 +147,7 @@ namespace SpaceGameEngine
 			return m_ConditionImpl.wait_for(lock, rel_time, pred);
 		}
 
-	  private:
+	private:
 		std::condition_variable_any m_ConditionImpl;
 	};
 
@@ -162,7 +162,7 @@ namespace SpaceGameEngine
 	template<class... MutexType>
 	class ScopedLock
 	{
-	  public:
+	public:
 		explicit ScopedLock(MutexType&... mutex)
 			: m_LockImpl((mutex.m_MutexImpl)...)
 		{
@@ -175,7 +175,7 @@ namespace SpaceGameEngine
 
 		ScopedLock& operator=(const ScopedLock&& other) = delete;
 
-	  private:
+	private:
 		std::scoped_lock<decltype(std::declval<MutexType>().m_MutexImpl)...> m_LockImpl;
 	};
 }

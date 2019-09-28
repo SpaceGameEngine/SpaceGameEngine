@@ -53,7 +53,7 @@ namespace SpaceGameEngine
 	*/
 	class String
 	{
-	  public:
+	public:
 		String();
 		String(const String& str);
 		String(const StdTString& str);
@@ -75,7 +75,7 @@ namespace SpaceGameEngine
 		TChar* GetData();
 		SizeType GetSize();
 
-	  private:
+	private:
 		StringImplement* m_pImplement;
 	};
 

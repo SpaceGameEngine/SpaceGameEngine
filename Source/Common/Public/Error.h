@@ -71,7 +71,7 @@ namespace SpaceGameEngine
 	template<typename ErrorType>
 	struct Assert : public Uncopyable
 	{
-	  public:
+	public:
 		inline Assert() = delete;
 
 		template<typename... Args>
@@ -101,7 +101,7 @@ namespace SpaceGameEngine
 #endif
 		}
 
-	  private:
+	private:
 		bool m_IsDefault;
 		bool m_Result;
 		DebugInformation m_DebugInformation;
@@ -110,7 +110,7 @@ namespace SpaceGameEngine
 	template<typename ErrorType>
 	struct Check : public Uncopyable
 	{
-	  public:
+	public:
 		inline Check() = delete;
 
 		template<typename... Args>
@@ -134,7 +134,7 @@ namespace SpaceGameEngine
 				func(std::forward<Args>(args)...);
 		}
 
-	  private:
+	private:
 		bool m_IsDefault;
 		bool m_Result;
 		DebugInformation m_DebugInformation;

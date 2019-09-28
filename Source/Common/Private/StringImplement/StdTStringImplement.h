@@ -27,7 +27,7 @@ namespace SpaceGameEngine
 	/*!@todo using template and supported customed allocator and char type*/
 	class StdTStringImplement
 	{
-	  public:
+	public:
 		StdTStringImplement();
 		StdTStringImplement(const StdTStringImplement& str);
 		StdTStringImplement(const StdTString& str);
@@ -48,7 +48,7 @@ namespace SpaceGameEngine
 		TChar* GetData();
 		SizeType GetSize();
 
-	  private:
+	private:
 		StdTString m_Content;
 	};
 

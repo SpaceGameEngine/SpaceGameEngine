@@ -59,7 +59,7 @@ namespace SpaceGameEngine
 	template<typename T, typename Ret, typename... Args>
 	struct IsCorrectFunction<T, Ret(Args...)>
 	{
-	  private:
+	private:
 		template<typename _T, typename _Ret, typename... _Args>
 		inline static constexpr std::enable_if_t<std::is_same_v<decltype(std::declval<_T>()(std::declval<_Args>()...)), _Ret>, bool> Judge(int)
 		{
@@ -71,7 +71,7 @@ namespace SpaceGameEngine
 			return false;
 		}
 
-	  public:
+	public:
 		inline static constexpr bool Value = Judge<T, Ret, Args...>(0);
 	};
 
@@ -86,7 +86,7 @@ namespace SpaceGameEngine
 	template<typename Allocator, typename Ret, typename... Args>
 	class Function<Ret(Args...), Allocator>
 	{
-	  public:
+	public:
 		template<typename T>
 		struct IsFunction
 		{
@@ -98,7 +98,7 @@ namespace SpaceGameEngine
 			inline static constexpr bool Value = true;
 		};
 
-	  public:
+	public:
 		inline Function() = delete;
 		inline ~Function()
 		{
@@ -227,7 +227,7 @@ namespace SpaceGameEngine
 			return m_Content == func.m_Content;
 		}
 
-	  private:
+	private:
 		Ret (*m_pInvoke)(MetaObject<Allocator>&, Args...);
 		ControllableObject<MetaObject<Allocator>> m_Content;
 	};

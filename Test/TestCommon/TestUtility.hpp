@@ -24,7 +24,7 @@ class test_cmp
 {
 	int i;
 
-  public:
+public:
 	bool operator==(const test_cmp&) const = delete;
 };
 class test_cmp2

@@ -90,7 +90,7 @@ namespace SpaceGameEngine
 	template<typename T>
 	struct IsComparable
 	{
-	  private:
+	private:
 		template<typename U>
 		inline static constexpr std::enable_if_t<std::is_same_v<decltype(std::declval<U>() == std::declval<U>()), bool>, bool> Judge(int)
 		{
@@ -102,7 +102,7 @@ namespace SpaceGameEngine
 			return false;
 		}
 
-	  public:
+	public:
 		inline static constexpr bool Value = Judge<T>(0);
 	};
 	/*!
