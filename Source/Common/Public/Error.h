@@ -36,7 +36,7 @@ namespace SpaceGameEngine
 		const TChar* m_pFunctionName;
 		UInt32 m_LineNumber;
 
-		DebugInformation( const TChar* file_name, const TChar* func_name, UInt32 line_number );
+		DebugInformation(const TChar* file_name, const TChar* func_name, UInt32 line_number);
 	};
 
 #ifdef SGE_USE_WIDE_CHAR
@@ -49,7 +49,7 @@ namespace SpaceGameEngine
 #define SGE_LINE __LINE__
 #define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation( SGE_FILE, SGE_FUNCTION, SGE_LINE )
 
-	void ThrowError( const TChar* error_msg, DebugInformation debug_info );
+	void ThrowError(const TChar* error_msg, DebugInformation debug_info);
 
 	/*!
 	@file
@@ -58,14 +58,14 @@ namespace SpaceGameEngine
 
 	struct NullPointerError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR( "Pointer can not be null" );
-		static bool Judge( const void* ptr );
+		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
+		static bool Judge(const void* ptr);
 	};
 
 	struct InvalidSizeError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR( "The size is invalid" );
-		static bool Judge( SizeType size, SizeType min_size, SizeType max_size );
+		inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
+		static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
 	};
 
 	template <typename ErrorType>
@@ -75,29 +75,29 @@ namespace SpaceGameEngine
 		inline Assert() = delete;
 
 		template <typename... Args>
-		explicit inline Assert( const DebugInformation& debug_info, Args&&... args )
-			: m_IsDefault( true ), m_DebugInformation( debug_info )
+		explicit inline Assert(const DebugInformation& debug_info, Args&&... args)
+			: m_IsDefault(true), m_DebugInformation(debug_info)
 		{
 #ifdef SGE_DEBUG
-			m_Result = ErrorType::Judge( std::forward<Args>( args )... );
+			m_Result = ErrorType::Judge(std::forward<Args>(args)...);
 #endif
 		}
 
 		inline ~Assert()
 		{
 #ifdef SGE_DEBUG
-			if ( m_IsDefault && m_Result )
-				ThrowError( ErrorType::sm_pContent, m_DebugInformation );
+			if (m_IsDefault && m_Result)
+				ThrowError(ErrorType::sm_pContent, m_DebugInformation);
 #endif
 		}
 
 		template <typename Func, typename... Args>
-		inline void Handle( Func&& func, Args&&... args )
+		inline void Handle(Func&& func, Args&&... args)
 		{
 #ifdef SGE_DEBUG
 			m_IsDefault = false;
-			if ( m_Result )
-				func( std::forward<Args>( args )... );
+			if (m_Result)
+				func(std::forward<Args>(args)...);
 #endif
 		}
 
@@ -114,24 +114,24 @@ namespace SpaceGameEngine
 		inline Check() = delete;
 
 		template <typename... Args>
-		explicit inline Check( const DebugInformation& debug_info, Args&&... args )
-			: m_IsDefault( true ), m_DebugInformation( debug_info )
+		explicit inline Check(const DebugInformation& debug_info, Args&&... args)
+			: m_IsDefault(true), m_DebugInformation(debug_info)
 		{
-			m_Result = ErrorType::Judge( std::forward<Args>( args )... );
+			m_Result = ErrorType::Judge(std::forward<Args>(args)...);
 		}
 
 		inline ~Check()
 		{
-			if ( m_IsDefault && m_Result )
-				ThrowError( ErrorType::sm_pContent, m_DebugInformation );
+			if (m_IsDefault && m_Result)
+				ThrowError(ErrorType::sm_pContent, m_DebugInformation);
 		}
 
 		template <typename Func, typename... Args>
-		inline void Handle( Func&& func, Args&&... args )
+		inline void Handle(Func&& func, Args&&... args)
 		{
 			m_IsDefault = false;
-			if ( m_Result )
-				func( std::forward<Args>( args )... );
+			if (m_Result)
+				func(std::forward<Args>(args)...);
 		}
 
 	private:

@@ -20,23 +20,23 @@ limitations under the License.
 #include <Windows.h>
 #endif
 
-SpaceGameEngine::DebugInformation::DebugInformation( const TChar* file_name, const TChar* func_name,
-													 UInt32 line_number )
+SpaceGameEngine::DebugInformation::DebugInformation(const TChar* file_name, const TChar* func_name,
+	UInt32 line_number)
 {
 	m_pFileName = file_name;
 	m_pFunctionName = func_name;
 	m_LineNumber = line_number;
 }
 
-void SpaceGameEngine::ThrowError( const TChar* error_msg, DebugInformation debug_info )
+void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_info)
 {
-	StdTString output_msg = SGE_TSTR( "error happend in " );
+	StdTString output_msg = SGE_TSTR("error happend in ");
 	output_msg += debug_info.m_pFileName;
-	output_msg += SGE_TSTR( " " );
+	output_msg += SGE_TSTR(" ");
 	output_msg += debug_info.m_pFunctionName;
-	output_msg += SGE_TSTR( " " );
-	output_msg += StdToString( debug_info.m_LineNumber );
-	output_msg += SGE_TSTR( " : " );
+	output_msg += SGE_TSTR(" ");
+	output_msg += StdToString(debug_info.m_LineNumber);
+	output_msg += SGE_TSTR(" : ");
 	output_msg += error_msg;
 	/*!@todo use sge's output like log or messagebox*/
 	StdTCout << output_msg << std::endl;
@@ -46,9 +46,9 @@ void SpaceGameEngine::ThrowError( const TChar* error_msg, DebugInformation debug
 	abort();
 }
 
-bool SpaceGameEngine::NullPointerError::Judge( const void* ptr ) { return ptr == nullptr; }
+bool SpaceGameEngine::NullPointerError::Judge(const void* ptr) { return ptr == nullptr; }
 
-bool SpaceGameEngine::InvalidSizeError::Judge( SizeType size, SizeType min_size, SizeType max_size )
+bool SpaceGameEngine::InvalidSizeError::Judge(SizeType size, SizeType min_size, SizeType max_size)
 {
-	return !( size >= min_size && size <= max_size );
+	return !(size >= min_size && size <= max_size);
 }

@@ -54,9 +54,9 @@ TEST_CASE("Test Function", "[Common][Function]")
 	{
 		REQUIRE(IsCorrectFunction<decltype(func_), void(int)>::Value == true);
 		REQUIRE(IsCorrectFunction<decltype(func_2), void(int)>::Value == false);
-		REQUIRE(IsCorrectFunction<decltype(func_2), void(int,int)>::Value == true);
-		REQUIRE(IsCorrectFunction<decltype(func_3), void(int,int)>::Value == false);
-		REQUIRE(IsCorrectFunction<decltype(func_3), int(int,int)>::Value == true);
+		REQUIRE(IsCorrectFunction<decltype(func_2), void(int, int)>::Value == true);
+		REQUIRE(IsCorrectFunction<decltype(func_3), void(int, int)>::Value == false);
+		REQUIRE(IsCorrectFunction<decltype(func_3), int(int, int)>::Value == true);
 		REQUIRE(IsCorrectFunction<functor, int(void)>::Value == true);
 		REQUIRE(IsCorrectFunction<int, void()>::Value == false);
 		REQUIRE(IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value == true);

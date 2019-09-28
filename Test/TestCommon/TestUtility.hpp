@@ -101,7 +101,7 @@ TEST_CASE("Test ControllableObject", "[Common][Utility]")
 		test5.Init();
 		test5 = std::move(test);
 		REQUIRE(test5.Get().i == 5);
-		test_controllable_object_class _test,_test2;
+		test_controllable_object_class _test, _test2;
 		ControllableObject<test_controllable_object_class> test6(_test);
 		REQUIRE(test6.Get().i == 2);
 		ControllableObject<test_controllable_object_class> test7(std::move(_test));

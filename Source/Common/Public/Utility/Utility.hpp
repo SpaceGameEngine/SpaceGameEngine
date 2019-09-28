@@ -28,10 +28,10 @@ namespace SpaceGameEngine
 	struct Uncopyable
 	{
 		Uncopyable() = default;
-		Uncopyable( const Uncopyable& ) = delete;
-		Uncopyable( Uncopyable&& ) = delete;
-		Uncopyable& operator=( const Uncopyable& ) = delete;
-		Uncopyable& operator=( Uncopyable&& ) = delete;
+		Uncopyable(const Uncopyable&) = delete;
+		Uncopyable(Uncopyable&&) = delete;
+		Uncopyable& operator=(const Uncopyable&) = delete;
+		Uncopyable& operator=(Uncopyable&&) = delete;
 	};
 
 	/*!
@@ -55,20 +55,20 @@ namespace SpaceGameEngine
 	struct Pair
 	{
 		Pair() = default;
-		explicit Pair( const T& t, const U& u ) : m_First( t ), m_Second( u ) {}
-		explicit Pair( T&& t, U&& u ) : m_First( t ), m_Second( u ) {}
-		Pair( const Pair<T, U>& c ) : Pair( c.m_First, c.m_Second ) {}
-		Pair( Pair<T, U>&& c ) : Pair( std::move( c.m_First ), std::move( c.m_Second ) ) {}
-		Pair<T, U>& operator=( const Pair<T, U>& c )
+		explicit Pair(const T& t, const U& u) : m_First(t), m_Second(u) {}
+		explicit Pair(T&& t, U&& u) : m_First(t), m_Second(u) {}
+		Pair(const Pair<T, U>& c) : Pair(c.m_First, c.m_Second) {}
+		Pair(Pair<T, U>&& c) : Pair(std::move(c.m_First), std::move(c.m_Second)) {}
+		Pair<T, U>& operator=(const Pair<T, U>& c)
 		{
 			m_First = c.m_First;
 			m_Second = c.m_Second;
 			return *this;
 		}
-		Pair<T, U>& operator=( Pair<T, U>&& c )
+		Pair<T, U>& operator=(Pair<T, U>&& c)
 		{
-			m_First = std::move( c.m_First );
-			m_Second = std::move( c.m_Second );
+			m_First = std::move(c.m_First);
+			m_Second = std::move(c.m_Second);
 			return *this;
 		}
 		T m_First;
@@ -81,19 +81,19 @@ namespace SpaceGameEngine
 	private:
 		template <typename U>
 		inline static constexpr std::enable_if_t<
-			std::is_same_v<decltype( std::declval<U>() == std::declval<U>() ), bool>, bool>
-		Judge( int )
+			std::is_same_v<decltype(std::declval<U>() == std::declval<U>()), bool>, bool>
+			Judge(int)
 		{
 			return true;
 		}
 		template <typename U>
-		inline static constexpr bool Judge( ... )
+		inline static constexpr bool Judge(...)
 		{
 			return false;
 		}
 
 	public:
-		inline static constexpr bool Value = Judge<T>( 0 );
+		inline static constexpr bool Value = Judge<T>(0);
 	};
 	/*!
 	@}

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2019 Chenxi Xu (@xsun2001)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,20 +20,20 @@ limitations under the License.
 
 SpaceGameEngine::Mutex::Mutex() : m_MutexImpl() {}
 
-SpaceGameEngine::RecursiveLock::RecursiveLock( SpaceGameEngine::Mutex& mutex )
-	: m_LockImpl( mutex.m_MutexImpl, std::defer_lock )
+SpaceGameEngine::RecursiveLock::RecursiveLock(SpaceGameEngine::Mutex& mutex)
+	: m_LockImpl(mutex.m_MutexImpl, std::defer_lock)
 {
 }
 
-SpaceGameEngine::RecursiveLock::RecursiveLock( SpaceGameEngine::RecursiveLock&& other ) noexcept
-	: m_LockImpl( std::move( other.m_LockImpl ) )
+SpaceGameEngine::RecursiveLock::RecursiveLock(SpaceGameEngine::RecursiveLock&& other) noexcept
+	: m_LockImpl(std::move(other.m_LockImpl))
 {
 }
 
 SpaceGameEngine::RecursiveLock&
-SpaceGameEngine::RecursiveLock::operator=( SpaceGameEngine::RecursiveLock&& other ) noexcept
+SpaceGameEngine::RecursiveLock::operator=(SpaceGameEngine::RecursiveLock&& other) noexcept
 {
-	m_LockImpl = std::move( other.m_LockImpl );
+	m_LockImpl = std::move(other.m_LockImpl);
 	return *this;
 }
 
@@ -49,12 +49,12 @@ void SpaceGameEngine::Condition::NodifyOne() { m_ConditionImpl.notify_one(); }
 
 void SpaceGameEngine::Condition::NodifyAll() { m_ConditionImpl.notify_all(); }
 
-void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock& lock )
+void SpaceGameEngine::Condition::Wait(SpaceGameEngine::RecursiveLock& lock)
 {
-	m_ConditionImpl.wait( lock.m_LockImpl );
+	m_ConditionImpl.wait(lock.m_LockImpl);
 }
 
-void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock& lock, std::function<bool()> pred )
+void SpaceGameEngine::Condition::Wait(SpaceGameEngine::RecursiveLock& lock, std::function<bool()> pred)
 {
-	m_ConditionImpl.wait( lock.m_LockImpl, std::move( pred ) );
+	m_ConditionImpl.wait(lock.m_LockImpl, std::move(pred));
 }

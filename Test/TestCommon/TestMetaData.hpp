@@ -77,7 +77,7 @@ TEST_CASE("Test MetaData", "[Common][MetaData]")
 	SECTION("test metadata's functions")
 	{
 		decltype(auto) test = GetMetaData<test_metadata_class>();
-		test_metadata_class t1,t2;
+		test_metadata_class t1, t2;
 		t1.i = 10;
 		test.m_pDefaultConstructor(&t1);
 		REQUIRE(t1.i == 1);
