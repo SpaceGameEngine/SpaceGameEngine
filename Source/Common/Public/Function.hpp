@@ -39,42 +39,42 @@ namespace SpaceGameEngine
 	};
 
 	template <typename Ret, typename... Args>
-	struct IsCorrectFunction<Ret(*)(Args...), Ret(Args...)>
+	struct IsCorrectFunction<Ret ( * )( Args... ), Ret( Args... )>
 	{
 		inline static constexpr bool Value = true;
 	};
 
 	template <typename Ret, typename Class, typename... Args>
-	struct IsCorrectFunction<Ret(Class::*)(Args...), Ret(Class*, Args...)>
+	struct IsCorrectFunction<Ret ( Class::* )( Args... ), Ret( Class*, Args... )>
 	{
 		inline static constexpr bool Value = true;
 	};
 
 	template <typename Ret, typename Class, typename... Args>
-	struct IsCorrectFunction<Ret(Class::*)(Args...) const, Ret(const Class*, Args...)>
+	struct IsCorrectFunction<Ret ( Class::* )( Args... ) const, Ret( const Class*, Args... )>
 	{
 		inline static constexpr bool Value = true;
 	};
 
 	template <typename T, typename Ret, typename... Args>
-	struct IsCorrectFunction<T, Ret(Args...)>
+	struct IsCorrectFunction<T, Ret( Args... )>
 	{
 	private:
 		template <typename _T, typename _Ret, typename... _Args>
 		inline static constexpr std::enable_if_t<
-			std::is_same_v<decltype(std::declval<_T>()(std::declval<_Args>()...)), _Ret>, bool>
-			Judge(int)
+			std::is_same_v<decltype( std::declval<_T>()( std::declval<_Args>()... ) ), _Ret>, bool>
+		Judge( int )
 		{
 			return true;
 		}
 		template <typename _T, typename _Ret, typename... _Args>
-		inline static constexpr bool Judge(...)
+		inline static constexpr bool Judge( ... )
 		{
 			return false;
 		}
 
 	public:
-		inline static constexpr bool Value = Judge<T, Ret, Args...>(0);
+		inline static constexpr bool Value = Judge<T, Ret, Args...>( 0 );
 	};
 
 	/*!
@@ -86,7 +86,7 @@ namespace SpaceGameEngine
 	};
 
 	template <typename Allocator, typename Ret, typename... Args>
-	class Function<Ret(Args...), Allocator>
+	class Function<Ret( Args... ), Allocator>
 	{
 	public:
 		template <typename T>
@@ -95,7 +95,7 @@ namespace SpaceGameEngine
 			inline static constexpr bool Value = false;
 		};
 		template <typename _Allocator, typename _Ret, typename... _Args>
-		struct IsFunction<Function<_Ret(_Args...), _Allocator>>
+		struct IsFunction<Function<_Ret( _Args... ), _Allocator>>
 		{
 			inline static constexpr bool Value = true;
 		};
@@ -104,94 +104,94 @@ namespace SpaceGameEngine
 		inline Function() = delete;
 		inline ~Function() {}
 
-		inline Function(const Function& func) : m_pInvoke(func.m_pInvoke), m_Content(func.m_Content) {}
-		inline Function(Function&& func) : m_pInvoke(func.m_pInvoke), m_Content(std::move(func.m_Content)) {}
-		inline Function& operator=(const Function& func)
+		inline Function( const Function& func ) : m_pInvoke( func.m_pInvoke ), m_Content( func.m_Content ) {}
+		inline Function( Function&& func ) : m_pInvoke( func.m_pInvoke ), m_Content( std::move( func.m_Content ) ) {}
+		inline Function& operator=( const Function& func )
 		{
-			if (m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData())
+			if ( m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData() )
 				m_Content = func.m_Content;
 			else
 			{
 				m_pInvoke = func.m_pInvoke;
 				m_Content.Release();
-				m_Content.Init(func.m_Content.Get());
+				m_Content.Init( func.m_Content.Get() );
 			}
 			return *this;
 		}
-		inline Function& operator=(Function&& func)
+		inline Function& operator=( Function&& func )
 		{
-			if (m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData())
-				m_Content = std::move(func.m_Content);
+			if ( m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData() )
+				m_Content = std::move( func.m_Content );
 			else
 			{
 				m_pInvoke = func.m_pInvoke;
 				m_Content.Release();
-				m_Content.Init(std::move(func.m_Content.Get()));
+				m_Content.Init( std::move( func.m_Content.Get() ) );
 			}
 			return *this;
 		}
 
 		template <typename OtherAllocator>
-		inline Function(const Function<Ret(Args...), OtherAllocator>& func)
-			: m_pInvoke(func.m_pInvoke), m_Content(func.m_Content)
+		inline Function( const Function<Ret( Args... ), OtherAllocator>& func )
+			: m_pInvoke( func.m_pInvoke ), m_Content( func.m_Content )
 		{
 		}
 		template <typename OtherAllocator>
-		inline Function(Function<Ret(Args...), OtherAllocator>&& func)
-			: m_pInvoke(func.m_pInvoke), m_Content(std::move(func.m_Content))
+		inline Function( Function<Ret( Args... ), OtherAllocator>&& func )
+			: m_pInvoke( func.m_pInvoke ), m_Content( std::move( func.m_Content ) )
 		{
 		}
 		template <typename OtherAllocator>
-		inline Function& operator=(const Function<Ret(Args...), OtherAllocator>& func)
+		inline Function& operator=( const Function<Ret( Args... ), OtherAllocator>& func )
 		{
-			if (m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData())
+			if ( m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData() )
 				m_Content = func.m_Content;
 			else
 			{
 				m_pInvoke = func.m_pInvoke;
 				m_Content.Release();
-				m_Content.Init(func.m_Content.Get());
+				m_Content.Init( func.m_Content.Get() );
 			}
 			return *this;
 		}
 		template <typename OtherAllocator>
-		inline Function& operator=(Function<Ret(Args...), OtherAllocator>&& func)
+		inline Function& operator=( Function<Ret( Args... ), OtherAllocator>&& func )
 		{
-			if (m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData())
-				m_Content = std::move(func.m_Content);
+			if ( m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData() )
+				m_Content = std::move( func.m_Content );
 			else
 			{
 				m_pInvoke = func.m_pInvoke;
 				m_Content.Release();
-				m_Content.Init(std::move(func.m_Content.Get()));
+				m_Content.Init( std::move( func.m_Content.Get() ) );
 			}
 			return *this;
 		}
 
 		template <typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>>
-		inline Function(T&& func)
+		inline Function( T&& func )
 		{
-			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value,
-				"Function can only be constructed by callable object");
-			m_pInvoke = [](MetaObject<Allocator>& obj, Args... args) -> Ret {
-				return std::invoke(obj.template Get<std::decay_t<T>>(), static_cast<Args>(args)...);
+			static_assert( IsCorrectFunction<std::decay_t<T>, Ret( Args... )>::Value,
+						   "Function can only be constructed by callable object" );
+			m_pInvoke = []( MetaObject<Allocator>& obj, Args... args ) -> Ret {
+				return std::invoke( obj.template Get<std::decay_t<T>>(), static_cast<Args>( args )... );
 			};
-			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
+			m_Content.Init( SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>( func ) );
 		}
 		template <typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>>
-		inline Function& operator=(T&& func)
+		inline Function& operator=( T&& func )
 		{
-			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value,
-				"Function can only be constructed by callable object");
-			if (SpaceGameEngine::GetMetaData<std::decay_t<T>>() == m_Content.Get().GetMetaData())
-				m_Content = std::forward<T>(func);
+			static_assert( IsCorrectFunction<std::decay_t<T>, Ret( Args... )>::Value,
+						   "Function can only be constructed by callable object" );
+			if ( SpaceGameEngine::GetMetaData<std::decay_t<T>>() == m_Content.Get().GetMetaData() )
+				m_Content = std::forward<T>( func );
 			else
 			{
-				m_pInvoke = [](MetaObject<Allocator>& obj, Args... args) -> Ret {
-					return std::invoke(obj.template Get<std::decay_t<T>>(), static_cast<Args>(args)...);
+				m_pInvoke = []( MetaObject<Allocator>& obj, Args... args ) -> Ret {
+					return std::invoke( obj.template Get<std::decay_t<T>>(), static_cast<Args>( args )... );
 				};
 				m_Content.Release();
-				m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
+				m_Content.Init( SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>( func ) );
 			}
 			return *this;
 		}
@@ -209,16 +209,16 @@ namespace SpaceGameEngine
 
 		const MetaData& GetMetaData() const { return m_Content.Get().GetMetaData(); }
 
-		Ret operator()(Args... args) { return m_pInvoke(m_Content.Get(), static_cast<Args>(args)...); }
+		Ret operator()( Args... args ) { return m_pInvoke( m_Content.Get(), static_cast<Args>( args )... ); }
 
 		template <typename OtherAllocator>
-		bool operator==(const Function<Ret(Args...), OtherAllocator>& func) const
+		bool operator==( const Function<Ret( Args... ), OtherAllocator>& func ) const
 		{
 			return m_Content == func.m_Content;
 		}
 
 	private:
-		Ret(*m_pInvoke)(MetaObject<Allocator>&, Args...);
+		Ret ( *m_pInvoke )( MetaObject<Allocator>&, Args... );
 		ControllableObject<MetaObject<Allocator>> m_Content;
 	};
 	/*!

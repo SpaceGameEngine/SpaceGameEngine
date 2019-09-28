@@ -31,21 +31,21 @@ SpaceGameEngine::MetaData::MetaData()
 	m_pComparison = nullptr;
 }
 
-SpaceGameEngine::MetaData::MetaData(const char* name, SizeType size, SizeType alignment,
-	void(*default_constructor)(void*),
-	void(*copy_constructor)(void*, const void*),
-	void(*move_constructor)(void*, void*),
-	void* (*copy_assignment)(void*, const void*),
-	void* (*move_assignment)(void*, void*), void(*destructor)(void*),
-	bool(*comparison)(const void*, const void*))
-	: m_pName(name), m_Size(size), m_Alignment(alignment), m_pDefaultConstructor(default_constructor),
-	m_pCopyConstructor(copy_constructor), m_pMoveConstructor(move_constructor),
-	m_pCopyAssignment(copy_assignment), m_pMoveAssignment(move_assignment), m_pDestructor(destructor),
-	m_pComparison(comparison)
+SpaceGameEngine::MetaData::MetaData( const char* name, SizeType size, SizeType alignment,
+									 void ( *default_constructor )( void* ),
+									 void ( *copy_constructor )( void*, const void* ),
+									 void ( *move_constructor )( void*, void* ),
+									 void* ( *copy_assignment )(void*, const void*),
+									 void* ( *move_assignment )(void*, void*), void ( *destructor )( void* ),
+									 bool ( *comparison )( const void*, const void* ) )
+	: m_pName( name ), m_Size( size ), m_Alignment( alignment ), m_pDefaultConstructor( default_constructor ),
+	  m_pCopyConstructor( copy_constructor ), m_pMoveConstructor( move_constructor ),
+	  m_pCopyAssignment( copy_assignment ), m_pMoveAssignment( move_assignment ), m_pDestructor( destructor ),
+	  m_pComparison( comparison )
 {
 }
 
-bool SpaceGameEngine::operator==(const MetaData& meta_data1, const MetaData& meta_data2)
+bool SpaceGameEngine::operator==( const MetaData& meta_data1, const MetaData& meta_data2 )
 {
-	return memcmp(&meta_data1, &meta_data2, sizeof(MetaData)) == 0;
+	return memcmp( &meta_data1, &meta_data2, sizeof( MetaData ) ) == 0;
 }

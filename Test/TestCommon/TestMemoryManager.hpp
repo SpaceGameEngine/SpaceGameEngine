@@ -32,7 +32,7 @@ TEST_CASE("Test StdAllocator", "[Common][MemoryManager]")
 		Int32* pint = reinterpret_cast<Int32*>(StdAllocator::RawNew(sizeof(Int32)));
 		*pint = 3;
 		REQUIRE(*pint == 3);
-		StdAllocator::RawDelete(pint, sizeof(Int32));
+		StdAllocator::RawDelete(pint,sizeof(Int32));
 	}
 }
 
@@ -94,7 +94,7 @@ TEST_CASE("Test FixedSizeAllocator", "[Common][MemoryManager]")
 {
 	SECTION("test instance")
 	{
-		MemoryManager::FixedSizeAllocator test(4, 0xffff, 4);
+		MemoryManager::FixedSizeAllocator test(4,0xffff,4);
 	}
 	SECTION("test allocate/free")
 	{

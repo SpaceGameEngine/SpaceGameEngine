@@ -35,115 +35,115 @@ std::atomic_flag flag1 = ATOMIC_FLAG_INIT;
 
 void foo1()
 {
-	Thread::Sleep(2s);
+	Thread::Sleep( 2s );
 	flag1.test_and_set();
-	LOG("foo1() is running in thread " << Thread::GetCurrentThreadId());
+	LOG( "foo1() is running in thread " << Thread::GetCurrentThreadId());
 }
 
-TEST_CASE("basic thread test", "[Common][Concurrent][Thread]")
+TEST_CASE( "basic thread test", "[Common][Concurrent][Thread]" )
 {
-	LOG("main test thead " << Thread::GetCurrentThreadId());
+	LOG( "main test thead " << Thread::GetCurrentThreadId());
 
-	REQUIRE_FALSE(flag1.test_and_set());
+	REQUIRE_FALSE( flag1.test_and_set());
 	flag1.clear();
 
-	Thread t(foo1);
+	Thread t( foo1 );
 
-	REQUIRE_FALSE(flag1.test_and_set());
+	REQUIRE_FALSE( flag1.test_and_set());
 	flag1.clear();
 
-	Thread::Sleep(4s);
+	Thread::Sleep( 4s );
 
-	REQUIRE(flag1.test_and_set());
+	REQUIRE( flag1.test_and_set());
 }
 
 bool flag2_1 = false, flag2_2 = false;
 
-void foo2(Mutex &mutex, bool &run_flag)
+void foo2( Mutex &mutex, bool &run_flag )
 {
-	RecursiveLock lock(mutex);
+	RecursiveLock lock( mutex );
 	lock.Lock();
-	LOG("foo2 thread " << Thread::GetCurrentThreadId());
+	LOG( "foo2 thread " << Thread::GetCurrentThreadId());
 
-	REQUIRE((!flag2_1 && !flag2_2));
+	REQUIRE(( !flag2_1 && !flag2_2 ));
 
 	run_flag = true;
-	REQUIRE((flag2_1 != flag2_2));
+	REQUIRE(( flag2_1 != flag2_2 ));
 
-	Thread::Sleep(1s);
+	Thread::Sleep( 1s );
 
 	run_flag = false;
-	REQUIRE((!flag2_1 && !flag2_2));
+	REQUIRE(( !flag2_1 && !flag2_2 ));
 
 	lock.Unlock();  //optional
 }
 
-TEST_CASE("ReentrantLock Lock/Unlock test", "[Common][Concurrent][Lock]")
+TEST_CASE( "ReentrantLock Lock/Unlock test", "[Common][Concurrent][Lock]" )
 {
 	Mutex m;
-	Thread t1(foo2, std::ref(m), std::ref(flag2_1));
-	Thread t2(foo2, std::ref(m), std::ref(flag2_2));
+	Thread t1( foo2, std::ref( m ), std::ref( flag2_1 ));
+	Thread t2( foo2, std::ref( m ), std::ref( flag2_2 ));
 	t1.Join();
 	t2.Join();
 }
 
 bool flag3 = false;
 
-void foo3_lock(Mutex &mutex)
+void foo3_lock( Mutex &mutex )
 {
-	RecursiveLock lock(mutex);
+	RecursiveLock lock( mutex );
 	lock.Lock();
-	LOG("foo3_lock thread " << Thread::GetCurrentThreadId());
-	REQUIRE_FALSE(flag3);
-	Thread::Sleep(1s);
+	LOG( "foo3_lock thread " << Thread::GetCurrentThreadId());
+	REQUIRE_FALSE( flag3 );
+	Thread::Sleep( 1s );
 	flag3 = true;
 	lock.Unlock();
 }
 
-void foo3_trylock(Mutex &mutex)
+void foo3_trylock( Mutex &mutex )
 {
-	RecursiveLock lock(mutex);
-	Thread::Sleep(.5s);
-	REQUIRE_FALSE(lock.TryLock());
-	REQUIRE(lock.TryLock(1s));
-	LOG("foo3_trylock thread " << Thread::GetCurrentThreadId());
-	REQUIRE(flag3);
+	RecursiveLock lock( mutex );
+	Thread::Sleep( .5s );
+	REQUIRE_FALSE( lock.TryLock());
+	REQUIRE( lock.TryLock( 1s ));
+	LOG( "foo3_trylock thread " << Thread::GetCurrentThreadId());
+	REQUIRE( flag3 );
 	lock.Unlock();
 }
 
-TEST_CASE("RecursiveLock TryLock test", "[Common][Concurrent][Lock]")
+TEST_CASE( "RecursiveLock TryLock test", "[Common][Concurrent][Lock]" )
 {
 	Mutex m;
-	Thread t1(foo3_lock, std::ref(m));
-	Thread t2(foo3_trylock, std::ref(m));
+	Thread t1( foo3_lock, std::ref( m ));
+	Thread t2( foo3_trylock, std::ref( m ));
 	t1.Join();
 	t2.Join();
 }
 
 bool flag4 = false;
 
-void foo4(Mutex &m1, Mutex &m2, Mutex &m3)
+void foo4( Mutex &m1, Mutex &m2, Mutex &m3 )
 {
-	ScopedLock lock(m1, m2, m3);
+	ScopedLock lock( m1, m2, m3 );
 
-	LOG("foo4 thread " << Thread::GetCurrentThreadId());
+	LOG( "foo4 thread " << Thread::GetCurrentThreadId());
 
-	REQUIRE_FALSE(flag4);
+	REQUIRE_FALSE( flag4 );
 	flag4 = true;
 
-	Thread::Sleep(.1s);
+	Thread::Sleep( .1s );
 
-	REQUIRE(flag4);
+	REQUIRE( flag4 );
 	flag4 = false;
 }
 
-TEST_CASE("ScopedLock test", "[Common][Concurrent][Lock]")
+TEST_CASE( "ScopedLock test", "[Common][Concurrent][Lock]" )
 {
 	Mutex m1, m2, m3;
 	std::vector<Thread> threads;
 	for (int i = 0; i < 10; i++)
 	{
-		threads.emplace_back(foo4, std::ref(m1), std::ref(m2), std::ref(m3));
+		threads.emplace_back( foo4, std::ref( m1 ), std::ref( m2 ), std::ref( m3 ));
 	}
 	for (Thread &thread : threads)
 	{
@@ -151,7 +151,7 @@ TEST_CASE("ScopedLock test", "[Common][Concurrent][Lock]")
 	}
 }
 
-TEST_CASE("Condition test", "[Common][Concurrent][Lock]")
+TEST_CASE( "Condition test", "[Common][Concurrent][Lock]" )
 {
 	Mutex m;
 	Condition condition;
@@ -162,17 +162,17 @@ TEST_CASE("Condition test", "[Common][Concurrent][Lock]")
 	for (bool &run_flag : run_flags)
 	{
 		threads.emplace_back(
-			[&]
-		{
-			RecursiveLock lock(m);
-			lock.Lock();
-			LOG("foo5 thread " << Thread::GetCurrentThreadId());
-			condition.Wait(lock, [&] { return flag; });
-			run_flag = true;
-		});
+				[&]
+				{
+					RecursiveLock lock( m );
+					lock.Lock();
+					LOG( "foo5 thread " << Thread::GetCurrentThreadId());
+					condition.Wait( lock, [&] { return flag; } );
+					run_flag = true;
+				} );
 	}
 
-	auto checker = [&](int need)
+	auto checker = [&]( int need )
 	{
 		int count = 0;
 		for (bool run_flag : run_flags)
@@ -185,32 +185,32 @@ TEST_CASE("Condition test", "[Common][Concurrent][Lock]")
 		return need == count;
 	};
 
-	Thread::Sleep(.5s);
-	REQUIRE((checker(0)));
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 0 )));
 
 	condition.NodifyOne();
-	Thread::Sleep(.5s);
-	REQUIRE((checker(0)));
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 0 )));
 
 	condition.NodifyAll();
-	Thread::Sleep(.5s);
-	REQUIRE((checker(0)));
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 0 )));
 
 	flag = true;
 
 	condition.NodifyOne();
-	Thread::Sleep(.5s);
-	REQUIRE((checker(1)));
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 1 )));
 
 	condition.NodifyOne();
-	Thread::Sleep(.5s);
-	REQUIRE((checker(2)));
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 2 )));
 
 	condition.NodifyAll();
-	Thread::Sleep(.5s);
-	REQUIRE((checker(10)));
+	Thread::Sleep( .5s );
+	REQUIRE(( checker( 10 )));
 
-	for (Thread &thread : threads)
+	for (Thread &thread:threads)
 	{
 		thread.Join();
 	}

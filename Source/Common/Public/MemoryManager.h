@@ -34,11 +34,11 @@ namespace SpaceGameEngine
 
 	struct InvalidAlignmentError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The alignment is invalid");
+		inline static const TChar sm_pContent[] = SGE_TSTR( "The alignment is invalid" );
 		/*!
 		@note only the alignment which is 0 or 2^n can pass the judgment.
 		*/
-		static bool Judge(SizeType alignment);
+		static bool Judge( SizeType alignment );
 	};
 
 	/*!
@@ -46,7 +46,7 @@ namespace SpaceGameEngine
 	@note the default alignment depends on the allocated
 	memory size,when the size >= 16,the alignment is 16,or it will be 4.
 	*/
-	SizeType GetDefaultAlignment(SizeType size);
+	SizeType GetDefaultAlignment( SizeType size );
 
 	/*!
 	@file
@@ -55,21 +55,21 @@ namespace SpaceGameEngine
 
 	struct StdAllocator
 	{
-		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+		static void* RawNew( SizeType size, SizeType alignment = 0 );
+		static void RawDelete( void* ptr, SizeType size, SizeType alignment = 0 );
 
 		template <typename T, typename... Args>
-		static T* New(Args&&... args)
+		static T* New( Args&&... args )
 		{
-			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
+			return new ( RawNew( sizeof( T ), alignof( T ) ) ) T( std::forward<Args>( args )... );
 		}
 
 		template <typename T>
-		static void Delete(T* ptr)
+		static void Delete( T* ptr )
 		{
-			SGE_ASSERT(NullPointerError, ptr);
+			SGE_ASSERT( NullPointerError, ptr );
 			ptr->~T();
-			RawDelete(ptr, sizeof(T), alignof(T));
+			RawDelete( ptr, sizeof( T ), alignof( T ) );
 		}
 	};
 
@@ -132,11 +132,11 @@ namespace SpaceGameEngine
 			/*!
 			@attention the alignment argument can not be 0.
 			*/
-			explicit FixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
+			explicit FixedSizeAllocator( SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment );
 			~FixedSizeAllocator();
 
 			void* Allocate();
-			void Free(void* ptr);
+			void Free( void* ptr );
 
 		private:
 			/*!
@@ -144,7 +144,7 @@ namespace SpaceGameEngine
 			block
 			@note the result is calculated by the current allocator's constant memory block size
 			*/
-			MemoryBlockHeader* GetNextMemoryBlock(MemoryBlockHeader* ptr);
+			MemoryBlockHeader* GetNextMemoryBlock( MemoryBlockHeader* ptr );
 
 		private:
 			MemoryBlockHeader* m_pFreeMemoryBlocks;
@@ -166,11 +166,11 @@ namespace SpaceGameEngine
 		/*!
 		@attention the alignment can not be larger than 128 or equal to 0.
 		*/
-		void* Allocate(SizeType size, SizeType alignment);
+		void* Allocate( SizeType size, SizeType alignment );
 		/*!
 		@attention the alignment can not be larger than 128 or equal to 0.
 		*/
-		void Free(void* ptr, SizeType size, SizeType alignment);
+		void Free( void* ptr, SizeType size, SizeType alignment );
 
 	private:
 		MemoryManager();
@@ -182,19 +182,19 @@ namespace SpaceGameEngine
 
 		struct InvalidRequestInformationError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The RequestInformation is invalid");
+			inline static const TChar sm_pContent[] = SGE_TSTR( "The RequestInformation is invalid" );
 			/*!
 			@note the request_info's size must be less than or equal to 1024,
 			the alignment of it can not be larger than 128.
 			*/
-			static bool Judge(const RequestInformation& request_info);
+			static bool Judge( const RequestInformation& request_info );
 		};
 
 		/*!
 		@attention the request_info's size must be less than or equal to 1024,
 		the alignment of it can not be larger than 128.
 		*/
-		UInt32 RequestInformationToIndex(const RequestInformation& request_info);
+		UInt32 RequestInformationToIndex( const RequestInformation& request_info );
 
 	private:
 		/*!
@@ -209,21 +209,21 @@ namespace SpaceGameEngine
 
 	struct MemoryManagerAllocator
 	{
-		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+		static void* RawNew( SizeType size, SizeType alignment = 0 );
+		static void RawDelete( void* ptr, SizeType size, SizeType alignment = 0 );
 
 		template <typename T, typename... Args>
-		static T* New(Args&&... args)
+		static T* New( Args&&... args )
 		{
-			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
+			return new ( RawNew( sizeof( T ), alignof( T ) ) ) T( std::forward<Args>( args )... );
 		}
 
 		template <typename T>
-		static void Delete(T* ptr)
+		static void Delete( T* ptr )
 		{
-			SGE_ASSERT(NullPointerError, ptr);
+			SGE_ASSERT( NullPointerError, ptr );
 			ptr->~T();
-			RawDelete(ptr, sizeof(T), alignof(T));
+			RawDelete( ptr, sizeof( T ), alignof( T ) );
 		}
 	};
 
