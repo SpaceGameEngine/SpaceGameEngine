@@ -20,41 +20,52 @@ limitations under the License.
 
 SpaceGameEngine::Mutex::Mutex() : m_MutexImpl() {}
 
-SpaceGameEngine::RecursiveLock::RecursiveLock( SpaceGameEngine::Mutex& mutex )
-	: m_LockImpl( mutex.m_MutexImpl, std::defer_lock )
-{
-}
+SpaceGameEngine::RecursiveLock::RecursiveLock( SpaceGameEngine::Mutex &mutex )
+		: m_LockImpl( mutex.m_MutexImpl, std::defer_lock ) {}
 
-SpaceGameEngine::RecursiveLock::RecursiveLock( SpaceGameEngine::RecursiveLock&& other ) noexcept
-	: m_LockImpl( std::move( other.m_LockImpl ) )
-{
-}
+SpaceGameEngine::RecursiveLock::RecursiveLock( SpaceGameEngine::RecursiveLock &&other ) noexcept
+		: m_LockImpl( std::move( other.m_LockImpl )) {}
 
-SpaceGameEngine::RecursiveLock&
-SpaceGameEngine::RecursiveLock::operator=( SpaceGameEngine::RecursiveLock&& other ) noexcept
+SpaceGameEngine::RecursiveLock &
+SpaceGameEngine::RecursiveLock::operator=( SpaceGameEngine::RecursiveLock &&other ) noexcept
 {
 	m_LockImpl = std::move( other.m_LockImpl );
 	return *this;
 }
 
-void SpaceGameEngine::RecursiveLock::Lock() { m_LockImpl.lock(); }
+void SpaceGameEngine::RecursiveLock::Lock()
+{
+	m_LockImpl.lock();
+}
 
-bool SpaceGameEngine::RecursiveLock::TryLock() { return m_LockImpl.try_lock(); }
+bool SpaceGameEngine::RecursiveLock::TryLock()
+{
+	return m_LockImpl.try_lock();
+}
 
-void SpaceGameEngine::RecursiveLock::Unlock() { m_LockImpl.unlock(); }
+void SpaceGameEngine::RecursiveLock::Unlock()
+{
+	m_LockImpl.unlock();
+}
 
 SpaceGameEngine::Condition::Condition() : m_ConditionImpl() {}
 
-void SpaceGameEngine::Condition::NodifyOne() { m_ConditionImpl.notify_one(); }
+void SpaceGameEngine::Condition::NodifyOne()
+{
+	m_ConditionImpl.notify_one();
+}
 
-void SpaceGameEngine::Condition::NodifyAll() { m_ConditionImpl.notify_all(); }
+void SpaceGameEngine::Condition::NodifyAll()
+{
+	m_ConditionImpl.notify_all();
+}
 
-void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock& lock )
+void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock &lock )
 {
 	m_ConditionImpl.wait( lock.m_LockImpl );
 }
 
-void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock& lock, std::function<bool()> pred )
+void SpaceGameEngine::Condition::Wait( SpaceGameEngine::RecursiveLock &lock, std::function<bool()> pred )
 {
-	m_ConditionImpl.wait( lock.m_LockImpl, std::move( pred ) );
+	m_ConditionImpl.wait( lock.m_LockImpl, std::move( pred ));
 }

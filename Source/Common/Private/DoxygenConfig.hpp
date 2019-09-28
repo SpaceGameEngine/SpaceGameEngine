@@ -19,7 +19,7 @@ limitations under the License.
 @defgroup Common Common Module
 */
 
-// template
+//template
 /*!
 @ingroup Common
 @{

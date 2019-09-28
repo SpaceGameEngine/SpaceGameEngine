@@ -26,4 +26,4 @@ namespace SpaceGameEngine
 	/*!
 	@}
 	*/
-} // namespace SpaceGameEngine
+}

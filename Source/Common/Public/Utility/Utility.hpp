@@ -28,17 +28,17 @@ namespace SpaceGameEngine
 	struct Uncopyable
 	{
 		Uncopyable() = default;
-		Uncopyable( const Uncopyable& ) = delete;
-		Uncopyable( Uncopyable&& ) = delete;
-		Uncopyable& operator=( const Uncopyable& ) = delete;
-		Uncopyable& operator=( Uncopyable&& ) = delete;
+		Uncopyable(const Uncopyable&) = delete;
+		Uncopyable(Uncopyable&&) = delete;
+		Uncopyable& operator = (const Uncopyable&) = delete;
+		Uncopyable& operator = (Uncopyable&&) = delete;
 	};
 
 	/*!
 	@attention inherit `Singleton<T>` to use it,and define it as a friend in the class and
 	define the class's constructor as a private function at the same time.
 	*/
-	template <typename T>
+	template<typename T>
 	struct Singleton
 	{
 		/*!
@@ -51,49 +51,54 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template <typename T, typename U>
+	template<typename T, typename U>
 	struct Pair
 	{
 		Pair() = default;
-		explicit Pair( const T& t, const U& u ) : m_First( t ), m_Second( u ) {}
-		explicit Pair( T&& t, U&& u ) : m_First( t ), m_Second( u ) {}
-		Pair( const Pair<T, U>& c ) : Pair( c.m_First, c.m_Second ) {}
-		Pair( Pair<T, U>&& c ) : Pair( std::move( c.m_First ), std::move( c.m_Second ) ) {}
-		Pair<T, U>& operator=( const Pair<T, U>& c )
+		explicit Pair(const T& t, const U& u)
+			:m_First(t), m_Second(u)
+		{}
+		explicit Pair(T&& t, U&& u)
+			:m_First(t), m_Second(u)
+		{}
+		Pair(const Pair<T, U>& c)
+			:Pair(c.m_First, c.m_Second)
+		{}
+		Pair(Pair<T, U>&& c)
+			:Pair(std::move(c.m_First), std::move(c.m_Second))
+		{}
+		Pair<T, U>& operator = (const Pair<T, U>& c)
 		{
 			m_First = c.m_First;
 			m_Second = c.m_Second;
 			return *this;
 		}
-		Pair<T, U>& operator=( Pair<T, U>&& c )
+		Pair<T, U>& operator = (Pair<T, U>&& c)
 		{
-			m_First = std::move( c.m_First );
-			m_Second = std::move( c.m_Second );
+			m_First = std::move(c.m_First);
+			m_Second = std::move(c.m_Second);
 			return *this;
 		}
 		T m_First;
 		U m_Second;
 	};
 
-	template <typename T>
+	template<typename T>
 	struct IsComparable
 	{
 	private:
-		template <typename U>
-		inline static constexpr std::enable_if_t<
-			std::is_same_v<decltype( std::declval<U>() == std::declval<U>() ), bool>, bool>
-		Judge( int )
+		template<typename U>
+		inline static constexpr std::enable_if_t<std::is_same_v<decltype(std::declval<U>() == std::declval<U>()), bool>, bool> Judge(int)
 		{
 			return true;
 		}
-		template <typename U>
-		inline static constexpr bool Judge( ... )
+		template<typename U>
+		inline static constexpr bool Judge(...)
 		{
 			return false;
 		}
-
 	public:
-		inline static constexpr bool Value = Judge<T>( 0 );
+		inline static constexpr bool Value = Judge<T>(0);
 	};
 	/*!
 	@}
