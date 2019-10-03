@@ -1,56 +1,56 @@
 jobs:
 - template: windows-template.yml
   parameters:
-    name: 'VS2019-x86-Debug'
+    name: 'VS2019_x86_Debug'
     vmImage: 'windows-2019'
     msbuildArch: 'x86'
     msbuildConfig: 'Debug'
 
 - template: windows-template.yml
   parameters:
-    name: 'VS2019-x64-Debug'
+    name: 'VS2019_x64_Debug'
     vmImage: 'windows-2019'
     msbuildArch: 'x64'
     msbuildConfig: 'Debug'
 
 - template: windows-template.yml
   parameters:
-    name: 'VS2019-x86-Release'
+    name: 'VS2019_x86_Release'
     vmImage: 'windows-2019'
     msbuildArch: 'x86'
     msbuildConfig: 'Release'
 
 - template: windows-template.yml
   parameters:
-    name: 'VS2019-x64-Release'
+    name: 'VS2019_x64_Release'
     vmImage: 'windows-2019'
     msbuildArch: 'x64'
     msbuildConfig: 'Release'
 
 - template: windows-template.yml
   parameters:
-    name: 'VS2017-x86-Debug'
+    name: 'VS2017_x86_Debug'
     vmImage: 'vs2017-win2016'
     msbuildArch: 'x86'
     msbuildConfig: 'Debug'
 
 - template: windows-template.yml
   parameters:
-    name: 'VS2017-x64-Debug'
+    name: 'VS2017_x64_Debug'
     vmImage: 'vs2017-win2016'
     msbuildArch: 'x64'
     msbuildConfig: 'Debug'
 
 - template: windows-template.yml
   parameters:
-    name: 'VS2017-x86-Release'
+    name: 'VS2017_x86_Release'
     vmImage: 'vs2017-win2016'
     msbuildArch: 'x86'
     msbuildConfig: 'Release'
 
 - template: windows-template.yml
   parameters:
-    name: 'VS2017-x64-Release'
+    name: 'VS2017_x64_Release'
     vmImage: 'vs2017-win2016'
     msbuildArch: 'x64'
     msbuildConfig: 'Release'
