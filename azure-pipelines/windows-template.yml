@@ -1,0 +1,30 @@
+jobs:
+- job: ${{ parameters.name }}
+  pool: 
+    vmImage: ${{ parameters.vmImage }}
+  steps:
+  - task: PowerShell@2
+    displayName: 'Setup third-party dependencies'
+    inputs:
+      filePath: 'setup.ps1'
+
+  - task: MSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'SpaceGameEngine.sln'
+      maximumCpuCount: true
+      configuration: ${{ parameters.msbuildConfig }}
+      msbuildArchitecture: ${{ parameters.msbuildArch }}
+
+  - task: PowerShell@2
+    displayName: 'Test'
+    inputs:
+      filePath: 'run-tests.ps1'
+      arguments: ${{ parameters.msbuildArch }} ${{ parameters.msbuildConfig }}
+
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/*-REPORT.xml'
+      failTaskOnFailedTests: true
