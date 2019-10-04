@@ -19,7 +19,7 @@ jobs:
   - task: PowerShell@2
     displayName: 'Test'
     inputs:
-      filePath: 'run-tests.ps1'
+      filePath: 'azure-pipelines/run-tests.ps1'
       arguments: ${{ parameters.msbuildArch }} ${{ parameters.msbuildConfig }}
 
 
