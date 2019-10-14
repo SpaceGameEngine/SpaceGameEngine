@@ -21,7 +21,6 @@ SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyParentheses: false
-SpaceInEmptyBlock: false
 SpacesBeforeTrailingComments: 4
 SpacesInAngles: false
 SpacesInCStyleCastParentheses: false

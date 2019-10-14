@@ -1,10 +1,11 @@
 ﻿#ifdef _WIN32
-#pragma comment ( lib, "Shlwapi.lib" )
+#pragma comment(lib, "Shlwapi.lib")
 #endif
 
 #include <benchmark/benchmark.h>
 
-static void BM_StringCreation(benchmark::State& state) {
+static void BM_StringCreation(benchmark::State& state)
+{
 	for (auto _ : state)
 		std::string empty_string;
 }
@@ -12,7 +13,8 @@ static void BM_StringCreation(benchmark::State& state) {
 BENCHMARK(BM_StringCreation);
 
 // Define another benchmark
-static void BM_StringCopy(benchmark::State& state) {
+static void BM_StringCopy(benchmark::State& state)
+{
 	std::string x = "hello";
 	for (auto _ : state)
 		std::string copy(x);

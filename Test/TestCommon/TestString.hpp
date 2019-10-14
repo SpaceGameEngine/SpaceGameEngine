@@ -20,71 +20,71 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-TEST( String, StdTStringConvertTest )
+TEST(String, StdTStringConvertTest)
 {
-	String str = StdTString( SGE_TSTR( "TestString" ) );
-	ASSERT_EQ( str, StdTString( SGE_TSTR( "TestString" ) ) );
-	ASSERT_EQ( str.GetSize(), StdTString( SGE_TSTR( "TestString" ) ).size() );
+	String str = StdTString(SGE_TSTR("TestString"));
+	ASSERT_EQ(str, StdTString(SGE_TSTR("TestString")));
+	ASSERT_EQ(str.GetSize(), StdTString(SGE_TSTR("TestString")).size());
 }
-TEST( String, TCharConvertTest )
+TEST(String, TCharConvertTest)
 {
-	String str = SGE_TSTR( "TestString" );
-	ASSERT_EQ( memcmp( str.GetData(), SGE_TSTR( "TestString" ), str.GetSize() ), 0 );
+	String str = SGE_TSTR("TestString");
+	ASSERT_EQ(memcmp(str.GetData(), SGE_TSTR("TestString"), str.GetSize()), 0);
 	//-1 because SGE_TSTR("TestString") has a '\0' char as the end of the str
-	ASSERT_EQ( str.GetSize(), ( sizeof( SGE_TSTR( "TestString" ) ) / sizeof( TChar ) ) - 1 );
+	ASSERT_EQ(str.GetSize(), (sizeof(SGE_TSTR("TestString")) / sizeof(TChar)) - 1);
 }
-TEST( String, CopyTest )
+TEST(String, CopyTest)
 {
-	String str = SGE_TSTR( "TestString" );
+	String str = SGE_TSTR("TestString");
 	String str2 = str;
-	ASSERT_EQ( str, str2 );
+	ASSERT_EQ(str, str2);
 	// if str's implement is equal with str2's then their raw data address must be same
-	ASSERT_NE( str.GetData(), str2.GetData() );
+	ASSERT_NE(str.GetData(), str2.GetData());
 }
-TEST( String, MoveTest )
+TEST(String, MoveTest)
 {
-	String str = SGE_TSTR( "TestString" );
-	String str2 = SGE_TSTR( "TestString" );
-	String str3( std::move( str ) );
-	String str4 = std::move( str2 );
-	ASSERT_EQ( str3, str4 );
+	String str = SGE_TSTR("TestString");
+	String str2 = SGE_TSTR("TestString");
+	String str3(std::move(str));
+	String str4 = std::move(str2);
+	ASSERT_EQ(str3, str4);
 }
-TEST( String, ToCStringTest )
+TEST(String, ToCStringTest)
 {
-	String str = SGE_TSTR( "TestString" );
-	ASSERT_EQ( str.ToCString()[str.GetSize()], '\0' );
+	String str = SGE_TSTR("TestString");
+	ASSERT_EQ(str.ToCString()[str.GetSize()], '\0');
 }
 
-TEST( StdTStringImplement, StdTStringConvertTest )
+TEST(StdTStringImplement, StdTStringConvertTest)
 {
-	StdTStringImplement str = StdTString( SGE_TSTR( "TestString" ) );
-	ASSERT_EQ( str, StdTString( SGE_TSTR( "TestString" ) ) );
-	ASSERT_EQ( str.GetSize(), StdTString( SGE_TSTR( "TestString" ) ).size() );
+	StdTStringImplement str = StdTString(SGE_TSTR("TestString"));
+	ASSERT_EQ(str, StdTString(SGE_TSTR("TestString")));
+	ASSERT_EQ(str.GetSize(), StdTString(SGE_TSTR("TestString")).size());
 }
-TEST( StdTStringImplement, TCharConvertTest )
+TEST(StdTStringImplement, TCharConvertTest)
 {
-	StdTStringImplement str = SGE_TSTR( "TestString" );
-	ASSERT_EQ( memcmp( str.GetData(), SGE_TSTR( "TestString" ), str.GetSize() ), 0 );
+	StdTStringImplement str = SGE_TSTR("TestString");
+	ASSERT_EQ(memcmp(str.GetData(), SGE_TSTR("TestString"), str.GetSize()), 0);
 	//-1 because SGE_TSTR("TestString") has a '\0' char as the end of the str
-	ASSERT_EQ( str.GetSize(), ( sizeof( SGE_TSTR( "TestString" ) ) / sizeof( TChar ) ) - 1 );
+	ASSERT_EQ(str.GetSize(), (sizeof(SGE_TSTR("TestString")) / sizeof(TChar)) - 1);
 }
-TEST( StdTStringImplement, CopyTest )
+TEST(StdTStringImplement, CopyTest)
 {
-	StdTStringImplement str = SGE_TSTR( "TestString" );
+	StdTStringImplement str = SGE_TSTR("TestString");
 	StdTStringImplement str2 = str;
-	ASSERT_EQ( str, str2 );
-	ASSERT_NE( str.GetData(), str2.GetData() );
+	ASSERT_EQ(str, str2);
+	ASSERT_NE(str.GetData(), str2.GetData());
 }
-TEST( StdTStringImplement, MoveTest )
+TEST(StdTStringImplement, MoveTest)
 {
-	StdTStringImplement str = SGE_TSTR( "TestString" );
-	StdTStringImplement str2 = SGE_TSTR( "TestString" );
-	StdTStringImplement str3( std::move( str ) );
-	StdTStringImplement str4 = std::move( str2 );
-	ASSERT_EQ( str3, str4 );
+	StdTStringImplement str = SGE_TSTR("TestString");
+	StdTStringImplement str2 = SGE_TSTR("TestString");
+	StdTStringImplement str3(std::move(str));
+	StdTStringImplement str4 = std::move(str2);
+	ASSERT_EQ(str3, str4);
 }
-TEST( StdTStringImplement, ToCStringTest )
+TEST(StdTStringImplement, ToCStringTest)
 {
-	StdTStringImplement str = SGE_TSTR( "TestString" );
-	ASSERT_EQ( str.ToCString()[str.GetSize()], '\0' );
+	StdTStringImplement str = SGE_TSTR("TestString");
+	ASSERT_EQ(str.ToCString()[str.GetSize()], '\0');
 }

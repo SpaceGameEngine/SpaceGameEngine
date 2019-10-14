@@ -19,120 +19,120 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-TEST( MemoryManager, StdAllocatorNewDeleteTest )
+TEST(MemoryManager, StdAllocatorNewDeleteTest)
 {
-	Int32* pint = StdAllocator::New<Int32>( 3 );
-	ASSERT_EQ( *pint, 3 );
-	StdAllocator::Delete( pint );
+	Int32* pint = StdAllocator::New<Int32>(3);
+	ASSERT_EQ(*pint, 3);
+	StdAllocator::Delete(pint);
 }
 
-TEST( MemoryManager, StdAllocatorRawNewDeleteTest )
+TEST(MemoryManager, StdAllocatorRawNewDeleteTest)
 {
-	Int32* pint = reinterpret_cast<Int32*>( StdAllocator::RawNew( sizeof( Int32 ) ) );
+	Int32* pint = reinterpret_cast<Int32*>(StdAllocator::RawNew(sizeof(Int32)));
 	*pint = 3;
-	ASSERT_EQ( *pint, 3 );
-	StdAllocator::RawDelete( pint, sizeof( Int32 ) );
+	ASSERT_EQ(*pint, 3);
+	StdAllocator::RawDelete(pint, sizeof(Int32));
 }
 
-TEST( MemoryManager, MemoryAlignMacroTest )
+TEST(MemoryManager, MemoryAlignMacroTest)
 {
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 1, 2 ), 2 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 2, 2 ), 2 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 3, 2 ), 4 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 5, 2 ), 6 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 1, 4 ), 4 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 3, 4 ), 4 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 4, 4 ), 4 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 5, 4 ), 8 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 8, 4 ), 8 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 11, 4 ), 12 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 4, 8 ), 8 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 7, 8 ), 8 );
-	ASSERT_EQ( SGE_MEMORY_ALIGN( 11, 8 ), 16 );
+	ASSERT_EQ(SGE_MEMORY_ALIGN(1, 2), 2);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(2, 2), 2);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(3, 2), 4);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(5, 2), 6);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(1, 4), 4);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(3, 4), 4);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(4, 4), 4);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(5, 4), 8);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(8, 4), 8);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(11, 4), 12);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(4, 8), 8);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(7, 8), 8);
+	ASSERT_EQ(SGE_MEMORY_ALIGN(11, 8), 16);
 }
 
-TEST( MemoryManager, MemoryPageTest )
+TEST(MemoryManager, MemoryPageTest)
 {
 	MemoryManager::MemoryPageHeader* ppageheader =
-		new ( reinterpret_cast<MemoryManager::MemoryPageHeader*>( StdAllocator::RawNew(
-			sizeof( MemoryManager::MemoryPageHeader ) + sizeof( MemoryManager::MemoryBlockHeader ) ) ) )
+		new (reinterpret_cast<MemoryManager::MemoryPageHeader*>(StdAllocator::RawNew(
+			sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader))))
 			MemoryManager::MemoryPageHeader();
-	ASSERT_EQ( ppageheader->m_Offset, 0 );
-	ASSERT_EQ( reinterpret_cast<AddressType>( ppageheader->GetFirstMemoryBlock() ),
-			   reinterpret_cast<AddressType>( ppageheader ) + sizeof( MemoryManager::MemoryPageHeader ) );
-	StdAllocator::RawDelete( ppageheader,
-							 ( sizeof( MemoryManager::MemoryPageHeader ) + sizeof( MemoryManager::MemoryBlockHeader ) ),
-							 alignof( MemoryManager::MemoryPageHeader ) );
+	ASSERT_EQ(ppageheader->m_Offset, 0);
+	ASSERT_EQ(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()),
+			  reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryPageHeader));
+	StdAllocator::RawDelete(ppageheader,
+							(sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)),
+							alignof(MemoryManager::MemoryPageHeader));
 }
 
-TEST( MemoryManager, InvalidAlignmentErrorTest )
+TEST(MemoryManager, InvalidAlignmentErrorTest)
 {
-	ASSERT_FALSE( InvalidAlignmentError::Judge( 0 ) );
-	ASSERT_FALSE( InvalidAlignmentError::Judge( 1 ) );
-	ASSERT_FALSE( InvalidAlignmentError::Judge( 2 ) );
-	ASSERT_FALSE( InvalidAlignmentError::Judge( 4 ) );
-	ASSERT_FALSE( InvalidAlignmentError::Judge( 8 ) );
-	ASSERT_TRUE( InvalidAlignmentError::Judge( 3 ) );
-	ASSERT_TRUE( InvalidAlignmentError::Judge( 5 ) );
-	ASSERT_TRUE( InvalidAlignmentError::Judge( 6 ) );
-	ASSERT_TRUE( InvalidAlignmentError::Judge( 7 ) );
+	ASSERT_FALSE(InvalidAlignmentError::Judge(0));
+	ASSERT_FALSE(InvalidAlignmentError::Judge(1));
+	ASSERT_FALSE(InvalidAlignmentError::Judge(2));
+	ASSERT_FALSE(InvalidAlignmentError::Judge(4));
+	ASSERT_FALSE(InvalidAlignmentError::Judge(8));
+	ASSERT_TRUE(InvalidAlignmentError::Judge(3));
+	ASSERT_TRUE(InvalidAlignmentError::Judge(5));
+	ASSERT_TRUE(InvalidAlignmentError::Judge(6));
+	ASSERT_TRUE(InvalidAlignmentError::Judge(7));
 }
 
-TEST( MemoryManager, GetDefaultAlignmentTest )
+TEST(MemoryManager, GetDefaultAlignmentTest)
 {
-	ASSERT_EQ( GetDefaultAlignment( 1 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 2 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 3 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 4 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 5 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 6 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 7 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 8 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 9 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 15 ), 4 );
-	ASSERT_EQ( GetDefaultAlignment( 16 ), 16 );
-	ASSERT_EQ( GetDefaultAlignment( 17 ), 16 );
+	ASSERT_EQ(GetDefaultAlignment(1), 4);
+	ASSERT_EQ(GetDefaultAlignment(2), 4);
+	ASSERT_EQ(GetDefaultAlignment(3), 4);
+	ASSERT_EQ(GetDefaultAlignment(4), 4);
+	ASSERT_EQ(GetDefaultAlignment(5), 4);
+	ASSERT_EQ(GetDefaultAlignment(6), 4);
+	ASSERT_EQ(GetDefaultAlignment(7), 4);
+	ASSERT_EQ(GetDefaultAlignment(8), 4);
+	ASSERT_EQ(GetDefaultAlignment(9), 4);
+	ASSERT_EQ(GetDefaultAlignment(15), 4);
+	ASSERT_EQ(GetDefaultAlignment(16), 16);
+	ASSERT_EQ(GetDefaultAlignment(17), 16);
 }
 
-TEST( MemoryManager, FixedSizeAllocatorTest )
+TEST(MemoryManager, FixedSizeAllocatorTest)
 {
-	MemoryManager::FixedSizeAllocator test( 4, 0xffff, 4 );
-	Int32* pint = (Int32*) test.Allocate();
+	MemoryManager::FixedSizeAllocator test(4, 0xffff, 4);
+	Int32* pint = (Int32*)test.Allocate();
 	*pint = 123456789;
-	test.Free( pint );
-	Int32* pint2 = (Int32*) test.Allocate();
-	ASSERT_EQ( pint, pint2 );
-	test.Free( pint2 );
+	test.Free(pint);
+	Int32* pint2 = (Int32*)test.Allocate();
+	ASSERT_EQ(pint, pint2);
+	test.Free(pint2);
 }
 
-TEST( MemoryManager, IndexConvertTest )
+TEST(MemoryManager, IndexConvertTest)
 {
-	auto rtoi = []( const Pair<SizeType, SizeType>& request_info ) -> UInt32 {
-		return ( request_info.m_First << 8 ) | ( request_info.m_Second );
+	auto rtoi = [](const Pair<SizeType, SizeType>& request_info) -> UInt32 {
+		return (request_info.m_First << 8) | (request_info.m_Second);
 	};
-	auto index = rtoi( Pair<SizeType, SizeType>( 1024, 128 ) );
-	ASSERT_EQ( index, 262272 );
+	auto index = rtoi(Pair<SizeType, SizeType>(1024, 128));
+	ASSERT_EQ(index, 262272);
 }
 
-TEST( MemoryManager, MemoryManagerTest )
+TEST(MemoryManager, MemoryManagerTest)
 {
-	Int32* pint = (Int32*) ( MemoryManager::GetSingleton().Allocate( sizeof( Int32 ), alignof( Int32 ) ) );
+	Int32* pint = (Int32*)(MemoryManager::GetSingleton().Allocate(sizeof(Int32), alignof(Int32)));
 	*pint = 123456789;
-	ASSERT_EQ( *pint, 123456789 );
-	MemoryManager::GetSingleton().Free( pint, sizeof( Int32 ), alignof( Int32 ) );
+	ASSERT_EQ(*pint, 123456789);
+	MemoryManager::GetSingleton().Free(pint, sizeof(Int32), alignof(Int32));
 }
 
-TEST( MemoryManager, MMAllocatorNewDeleteTest )
+TEST(MemoryManager, MMAllocatorNewDeleteTest)
 {
-	Int32* pint = MemoryManagerAllocator::New<Int32>( 3 );
-	ASSERT_EQ( *pint, 3 );
-	MemoryManagerAllocator::Delete( pint );
+	Int32* pint = MemoryManagerAllocator::New<Int32>(3);
+	ASSERT_EQ(*pint, 3);
+	MemoryManagerAllocator::Delete(pint);
 }
 
-TEST( MemoryManager, MMAllocatorRawNewDeleteTest )
+TEST(MemoryManager, MMAllocatorRawNewDeleteTest)
 {
-	Int32* pint = reinterpret_cast<Int32*>( MemoryManagerAllocator::RawNew( sizeof( Int32 ) ) );
+	Int32* pint = reinterpret_cast<Int32*>(MemoryManagerAllocator::RawNew(sizeof(Int32)));
 	*pint = 3;
-	ASSERT_EQ( *pint, 3 );
-	MemoryManagerAllocator::RawDelete( pint, sizeof( Int32 ) );
+	ASSERT_EQ(*pint, 3);
+	MemoryManagerAllocator::RawDelete(pint, sizeof(Int32));
 }
