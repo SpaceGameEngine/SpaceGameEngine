@@ -26,7 +26,7 @@ endif ()
 find_package(Threads REQUIRED)
 
 # Third Party
-set(BENCHMARK_ENABLE_TESTING OFF)
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Enable testing of the benchmark library." FORCE)
 
 add_subdirectory(ThirdParty/GoogleTest/source)
 add_subdirectory(ThirdParty/GoogleBenchmark/source)
