@@ -7,7 +7,8 @@ foreach ($line in [System.IO.File]::ReadLines("$input")) {
     if(Test-Path -Path "$clone_path" -PathType Container) {
         Echo "Directory $clone_path exists. Omit it."
     } else {
-        &"git" "clone" "-b" "$($args[1])" "--depth=1" "$($args[2])" "$clone_path"
+        Echo "Init $($args[0])."
+        &"git" "clone" "-q" "--config" "advice.detachedHead=false" "-b" "$($args[1])" "--depth=1" "$($args[2])" "$clone_path"
     }
 
 }
