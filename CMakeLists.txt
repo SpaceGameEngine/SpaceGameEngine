@@ -27,14 +27,20 @@ find_package(Threads REQUIRED)
 
 # Third Party
 add_subdirectory(ThirdParty/GoogleTest/source)
+add_subdirectory(ThirdParty/GoogleBenchmark/source)
 add_subdirectory(ThirdParty/JsonCpp)
 add_subdirectory(ThirdParty/TinyXML2)
 
+set(BENCHMARK_ENABLE_TESTING OFF)
+
 set(THIRD_PARTY_LIBRARIES JsonCpp TinyXML2)
-set(THIRD_PARTY_TEST_LIBRARIES gtest gmock)
+set(THIRD_PARTY_TEST_LIBRARIES gtest gmock benchmark)
 
 # Game Engine Modules
 add_subdirectory(Source/Common)
 
 # Tests
 add_subdirectory(Test/TestCommon)
+
+# Benchmarks
+add_subdirectory(Benchmark/BenchmarkCommon)

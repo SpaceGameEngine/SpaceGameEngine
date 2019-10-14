@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0837a18a-2df2-491c-a4e3-dd89fd607564}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\src\arraysize.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\benchmark_api_internal.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\benchmark_register.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\benchmark_runner.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\check.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\colorprint.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\commandlineflags.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\complexity.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\counter.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\cycleclock.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\internal_macros.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\log.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\mutex.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\re.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\sleep.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\statistics.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\string_util.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\thread_manager.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\thread_timer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\src\timers.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\src\benchmark.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\benchmark_api_internal.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\benchmark_main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\benchmark_name.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\benchmark_register.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\benchmark_runner.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\colorprint.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\commandlineflags.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\complexity.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\console_reporter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\counter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\csv_reporter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\json_reporter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\reporter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\sleep.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\statistics.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\string_util.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\sysinfo.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\timers.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
