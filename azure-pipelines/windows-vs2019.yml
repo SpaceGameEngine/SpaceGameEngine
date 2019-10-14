@@ -1,8 +1,0 @@
-trigger:
-  - master
-
-pool:
-  vmImage: 'windows-2019'
-
-steps:
-  - template: 'windows-template.yml'

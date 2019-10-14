@@ -14,92 +14,70 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Catch2/catch.hpp"
 #include "Function.hpp"
+#include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
 
-void func_(int i)
-{
-}
-void func_2(int i, int i2)
-{
-}
-int func_3(int i, int i2)
-{
-	return 0;
-}
+void func_( int i ) {}
+void func_2( int i, int i2 ) {}
+int func_3( int i, int i2 ) { return 0; }
 
 struct functor
 {
-	int operator()()
-	{
-		return 1;
-	}
+	int operator()() { return 1; }
 };
 
 struct test_func_class
 {
-	int test()
-	{
-		return 1;
-	}
-	int test2() const
-	{
-		return 2;
-	}
+	int test() { return 1; }
 };
 
-TEST_CASE("Test Function", "[Common][Function]")
+TEST( Function, IsCorrectFunctionTest )
 {
-	SECTION("test IsCorrectFunction")
-	{
-		REQUIRE(IsCorrectFunction<decltype(func_), void(int)>::Value == true);
-		REQUIRE(IsCorrectFunction<decltype(func_2), void(int)>::Value == false);
-		REQUIRE(IsCorrectFunction<decltype(func_2), void(int, int)>::Value == true);
-		REQUIRE(IsCorrectFunction<decltype(func_3), void(int, int)>::Value == false);
-		REQUIRE(IsCorrectFunction<decltype(func_3), int(int, int)>::Value == true);
-		REQUIRE(IsCorrectFunction<functor, int(void)>::Value == true);
-		REQUIRE(IsCorrectFunction<int, void()>::Value == false);
-		REQUIRE(IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value == true);
-		REQUIRE(IsCorrectFunction<decltype(&test_func_class::test2), int(const test_func_class*)>::Value == true);
-	}
-	SECTION("test IsFunction")
-	{
-		Function<void()> func([]() {});
-		REQUIRE(Function<void()>::IsFunction<decltype(func)>::Value);
-		REQUIRE(!Function<void()>::IsFunction<int>::Value);
-	}
-	SECTION("test instance&copy&invoke")
-	{
-		auto lambda = [](void) -> int { return 1; };
-		Function<int(void)> func(lambda);
-		REQUIRE((int (*)(void))lambda == (int (*)(void))func.Get<decltype(lambda)>());
-		REQUIRE(lambda() == func());
-		Function<int(void)> func2 = func;
-		REQUIRE((int (*)(void))func2.Get<decltype(lambda)>() == (int (*)(void))func.Get<decltype(lambda)>());
-		Function<int(void)> func3([]() -> int { return 2; });
-		func3 = func2;
-		REQUIRE(func3() == func2());
-		Function<void(int)> func5 = &func_;	   //use function pointer
-		REQUIRE(func5.Get<decltype(&func_)>() == &func_);
-		Function<int(test_func_class*)> func6 = &test_func_class::test;	   //use member function
-		test_func_class tc;
-		REQUIRE(func6(&tc) == tc.test());
-		Function<int(void)> func7 = functor();	  //use functor
-		REQUIRE(func7() == functor()());
-		Function<int(const test_func_class*)> func8 = &test_func_class::test2;	  //use const member function
-		REQUIRE(func8(&tc) == tc.test2());
-	}
-	SECTION("test get metadata")
-	{
-		Function<void(int)> func(&func_);
-		REQUIRE(func.GetMetaData() == GetMetaData<decltype(&func_)>());
-	}
-	SECTION("test comparison")
-	{
-		Function<void(int)> func(&func_);
-		Function<void(int)> func2 = func;
-		REQUIRE(func == func2);
-	}
+	ASSERT_TRUE( ( IsCorrectFunction<decltype( func_ ), void( int )>::Value ) );
+	ASSERT_FALSE( ( IsCorrectFunction<decltype( func_2 ), void( int )>::Value ) );
+	ASSERT_TRUE( ( IsCorrectFunction<decltype( func_2 ), void( int, int )>::Value ) );
+	ASSERT_FALSE( ( IsCorrectFunction<decltype( func_3 ), void( int, int )>::Value ) );
+	ASSERT_TRUE( ( IsCorrectFunction<decltype( func_3 ), int( int, int )>::Value ) );
+	ASSERT_TRUE( ( IsCorrectFunction<functor, int( void )>::Value ) );
+	ASSERT_FALSE( ( IsCorrectFunction<int, void()>::Value ) );
+	ASSERT_FALSE( ( IsCorrectFunction<decltype( &test_func_class::test ), int( test_func_class* )>::Value ) );
+}
+TEST( Function, IsFunctionTest )
+{
+	Function<void()> func( []() {} );
+	ASSERT_TRUE( Function<void()>::IsFunction<decltype( func )>::Value );
+	ASSERT_TRUE( !Function<void()>::IsFunction<int>::Value );
+}
+TEST( Function, ConstractionTest )
+{
+	auto lambda = []( void ) -> int { return 1; };
+	Function<int( void )> func( lambda );
+	ASSERT_TRUE( (int ( * )( void )) lambda == (int ( * )( void )) func.Get<decltype( lambda )>() );
+	ASSERT_TRUE( lambda() == func() );
+	Function<int( void )> func2 = func;
+	ASSERT_TRUE( (int ( * )( void )) func2.Get<decltype( lambda )>() ==
+				 (int ( * )( void )) func.Get<decltype( lambda )>() );
+	Function<int( void )> func3( []() -> int { return 2; } );
+	func3 = func2;
+	ASSERT_TRUE( func3() == func2() );
+	Function<void( int )> func5 = &func_; // use function pointer
+	ASSERT_TRUE( func5.Get<decltype( &func_ )>() == &func_ );
+	Function<int( test_func_class* )> func6 = &test_func_class::test;
+	test_func_class tc;
+	ASSERT_TRUE( func6( &tc ) == tc.test() );
+	Function<int( void )> func7 = functor();
+	ASSERT_TRUE( func7() == functor()() ); // use functor
+}
+TEST( Function, MetaDataTest )
+{
+	Function<void( int )> func( &func_ );
+	ASSERT_TRUE( func.GetMetaData() == GetMetaData<decltype( &func_ )>() );
+}
+TEST( Function, ComparisionTest )
+{
+	Function<void( int )> func( &func_ );
+	Function<void( int )> func2 = func;
+	ASSERT_EQ( func, func2 );
 }

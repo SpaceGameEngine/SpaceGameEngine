@@ -13,12 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#define CATCH_CONFIG_MAIN
-#include "Catch2/catch.hpp"
+#include "gtest/gtest.h"
 #include "TestString.hpp"
 #include "TestMemoryManager.hpp"
-#include "TestError.hpp"
 #include "TestFunction.hpp"
 #include "TestMetaData.hpp"
 #include "TestUtility.hpp"
 #include "TestConcurrent.hpp"
+
+int main( int argc, char** argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS();
+}

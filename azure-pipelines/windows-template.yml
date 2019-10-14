@@ -1,18 +1,31 @@
-steps:
-  - task: MSBuild@1
-    displayName: 'build'
+jobs:
+- job: ${{ parameters.name }}
+  pool: 
+    vmImage: ${{ parameters.vmImage }}
+  steps:
+  - task: PowerShell@2
+    displayName: 'Setup third-party dependencies'
+    inputs:
+      filePath: 'setup.ps1'
+  - task: VSBuild@1
+    displayName: 'Build'
     inputs:
       solution: 'SpaceGameEngine.sln'
       maximumCpuCount: true
-      msbuildArchitecture: 'x64'
-
-  - script: |
-      Binary\TestCatch2\x64\Debug\TestCatch2.exe -r junit -o TEST-Catch2.xml
-      Binary\TestCommon\x64\Debug\TestCommon.exe -r junit -o TEST-Common.xml
-    displayName: 'test'
-
+      configuration: ${{ parameters.msbuildConfig }}
+      platform: ${{ parameters.msbuildArch }}
+  - task: PowerShell@2
+    displayName: 'Test'
+    inputs:
+      filePath: 'azure-pipelines/run-tests.ps1'
+      arguments: ${{ parameters.msbuildArch }} ${{ parameters.msbuildConfig }}
+  - task: PowerShell@2
+    displayName: 'Benchmark'
+    inputs:
+      filePath: 'azure-pipelines/run-benchmarks.ps1'
+      arguments: ${{ parameters.msbuildArch }} ${{ parameters.msbuildConfig }}
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: '**/TEST-*.xml'
+      testResultsFiles: '**/*-REPORT.xml'
       failTaskOnFailedTests: true

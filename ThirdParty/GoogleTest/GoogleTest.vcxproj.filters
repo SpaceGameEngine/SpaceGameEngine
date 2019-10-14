@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="GTest Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="GMock Files">
+      <UniqueIdentifier>{3208afea-5897-48e7-84eb-a925872462a5}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\googletest\src\gtest.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-death-test.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-filepath.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-port.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-printers.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-test-part.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-typed-test.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googlemock\src\gmock.cc">
+      <Filter>GMock Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googlemock\src\gmock-cardinalities.cc">
+      <Filter>GMock Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googlemock\src\gmock-internal-utils.cc">
+      <Filter>GMock Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googlemock\src\gmock-matchers.cc">
+      <Filter>GMock Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googlemock\src\gmock-spec-builders.cc">
+      <Filter>GMock Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\googletest\src\gtest-internal-inl.h">
+      <Filter>GTest Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

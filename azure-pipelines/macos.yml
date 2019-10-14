@@ -5,20 +5,30 @@ pool:
   vmImage: 'macos-latest'
 
 steps:
+  - task: Bash@3
+    displayName: 'Setup third-party dependencies'
+    inputs:
+      filePath: 'setup.sh'
+
   - script: |
       mkdir build
       cd build
       cmake ..
       make -j4
-    displayName: 'build'
+    displayName: 'Build'
 
-  - script: |
-      build/Test/TestCatch2/TestCatch2 -r junit -o TEST-Catch2.xml
-      build/Test/TestCommon/TestCommon -r junit -o TEST-Common.xml
-    displayName: 'test'
+  - task: Bash@3
+    displayName: 'Test'
+    inputs:
+      filePath: 'azure-pipelines/run-tests.sh'
+
+  - task: Bash@3
+    displayName: 'Benchmark'
+    inputs:
+      filePath: 'azure-pipelines/run-benchmarks.sh'
 
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: 'TEST-*.xml'
+      testResultsFiles: '**/*-REPORT.xml'
       failTaskOnFailedTests: true
