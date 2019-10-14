@@ -19,6 +19,11 @@ jobs:
     inputs:
       filePath: 'azure-pipelines/run-tests.ps1'
       arguments: ${{ parameters.msbuildArch }} ${{ parameters.msbuildConfig }}
+  - task: PowerShell@2
+    displayName: 'Benchmark'
+    inputs:
+      filePath: 'azure-pipelines/run-benchmarks.ps1'
+      arguments: ${{ parameters.msbuildArch }} ${{ parameters.msbuildConfig }}
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'

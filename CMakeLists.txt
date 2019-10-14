@@ -26,12 +26,12 @@ endif ()
 find_package(Threads REQUIRED)
 
 # Third Party
+set(BENCHMARK_ENABLE_TESTING OFF)
+
 add_subdirectory(ThirdParty/GoogleTest/source)
 add_subdirectory(ThirdParty/GoogleBenchmark/source)
 add_subdirectory(ThirdParty/JsonCpp)
 add_subdirectory(ThirdParty/TinyXML2)
-
-set(BENCHMARK_ENABLE_TESTING OFF)
 
 set(THIRD_PARTY_LIBRARIES JsonCpp TinyXML2)
 set(THIRD_PARTY_TEST_LIBRARIES gtest gmock benchmark)
