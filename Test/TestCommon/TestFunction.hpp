@@ -44,6 +44,10 @@ struct test_func_class
 	{
 		return 1;
 	}
+	int test2() const
+	{
+		return 2;
+	}
 };
 
 TEST(Function, IsCorrectFunctionTest)
@@ -55,7 +59,8 @@ TEST(Function, IsCorrectFunctionTest)
 	ASSERT_TRUE((IsCorrectFunction<decltype(func_3), int(int, int)>::Value));
 	ASSERT_TRUE((IsCorrectFunction<functor, int(void)>::Value));
 	ASSERT_FALSE((IsCorrectFunction<int, void()>::Value));
-	ASSERT_FALSE((IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value));
+	ASSERT_TRUE((IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value));
+	ASSERT_TRUE((IsCorrectFunction<decltype(&test_func_class::test2), int(const test_func_class*)>::Value));
 }
 TEST(Function, IsFunctionTest)
 {
