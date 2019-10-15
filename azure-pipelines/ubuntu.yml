@@ -4,39 +4,44 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-  - script: |
-      sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-      sudo apt-get update
-      sudo apt-get install gcc-9 g++-9
-      gcc-9 --version
-      g++-9 --version
-    displayName: 'Upgrade gcc'
-
-  - task: Bash@3
-    displayName: 'Setup third-party dependencies'
-    inputs:
-      filePath: 'setup.sh'
-
-  - script: |
-      mkdir build
-      cd build
-      CC=gcc-9 CXX=g++-9 cmake ..
-      make -j4
-    displayName: 'Build'
-
-  - task: Bash@3
-    displayName: 'Test'
-    inputs:
-      filePath: 'azure-pipelines/run-tests.sh'
-
-  - task: Bash@3
-    displayName: 'Benchmark'
-    inputs:
-      filePath: 'azure-pipelines/run-benchmarks.sh'
-
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: '**/*-REPORT.xml'
-      failTaskOnFailedTests: true
+jobs:
+  - job: 'Ubuntu_Debug'
+    steps:
+      - task: Bash@3
+          displayName: 'Setup GCC'
+          inputs:
+            filePath: 'azure-pipelines/setup-gcc9.sh'
+      - template: cmake-template.yml
+        parameters:
+          toolchain: CC=gcc-9 CXX=g++-9
+          buildType: Debug
+  - job: 'Ubuntu_Release'
+    steps:
+      - task: Bash@3
+          displayName: 'Setup GCC'
+          inputs:
+            filePath: 'azure-pipelines/setup-gcc9.sh'
+      - template: cmake-template.yml
+        parameters:
+          toolchain: CC=gcc-9 CXX=g++-9
+          buildType: Release
+  - job: 'Ubuntu_RelWithDebInfo'
+    steps:
+      - task: Bash@3
+          displayName: 'Setup GCC'
+          inputs:
+            filePath: 'azure-pipelines/setup-gcc9.sh'
+      - template: cmake-template.yml
+        parameters:
+          toolchain: CC=gcc-9 CXX=g++-9
+          buildType: RelWithDebInfo
+  - job: 'Ubuntu_MinSizeRel'
+    steps:
+      - task: Bash@3
+          displayName: 'Setup GCC'
+          inputs:
+            filePath: 'azure-pipelines/setup-gcc9.sh'
+      - template: cmake-template.yml
+        parameters:
+          toolchain: CC=gcc-9 CXX=g++-9
+          buildType: MinSizeRel

@@ -4,31 +4,24 @@ trigger:
 pool:
   vmImage: 'macos-latest'
 
-steps:
-  - task: Bash@3
-    displayName: 'Setup third-party dependencies'
-    inputs:
-      filePath: 'setup.sh'
-
-  - script: |
-      mkdir build
-      cd build
-      cmake ..
-      make -j4
-    displayName: 'Build'
-
-  - task: Bash@3
-    displayName: 'Test'
-    inputs:
-      filePath: 'azure-pipelines/run-tests.sh'
-
-  - task: Bash@3
-    displayName: 'Benchmark'
-    inputs:
-      filePath: 'azure-pipelines/run-benchmarks.sh'
-
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: '**/*-REPORT.xml'
-      failTaskOnFailedTests: true
+jobs:
+  - job: 'MacOS_Debug'
+    steps:
+      - template: cmake-template.yml
+        parameters:
+          buildType: Debug
+  - job: 'MacOS_Release'
+    steps:
+      - template: cmake-template.yml
+        parameters:
+          buildType: Release
+  - job: 'MacOS_RelWithDebInfo'
+    steps:
+      - template: cmake-template.yml
+        parameters:
+          buildType: RelWithDebInfo
+  - job: 'MacOS_MinSizeRel'
+    steps:
+      - template: cmake-template.yml
+        parameters:
+          buildType: MinSizeRel

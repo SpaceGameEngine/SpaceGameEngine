@@ -1,0 +1,24 @@
+steps:
+  - task: Bash@3
+    displayName: 'Setup third-party dependencies'
+    inputs:
+      filePath: 'setup.sh'
+  - script: |
+      mkdir build
+      cd build
+      ${{ parameters.toolchain }} cmake .. -DCMAKE_BUILD_TYPE=${{ parameters.buildType }}
+      make -j4
+    displayName: 'Build'
+  - task: Bash@3
+    displayName: 'Test'
+    inputs:
+      filePath: 'azure-pipelines/run-tests.sh'
+  - task: Bash@3
+    displayName: 'Benchmark'
+    inputs:
+      filePath: 'azure-pipelines/run-benchmarks.sh'
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/*-REPORT.xml'
+      failTaskOnFailedTests: true
