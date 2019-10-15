@@ -17,6 +17,7 @@ jobs:
   - task: PowerShell@2
     displayName: 'Test'
     inputs:
+      ignoreLASTEXITCODE: true
       filePath: 'azure-pipelines/run-tests.ps1'
       arguments: ${{ parameters.msbuildArch }} ${{ parameters.msbuildConfig }}
   - task: PowerShell@2
