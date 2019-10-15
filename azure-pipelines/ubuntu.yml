@@ -8,9 +8,9 @@ jobs:
   - job: 'Ubuntu_Debug'
     steps:
       - task: Bash@3
-          displayName: 'Setup GCC'
-          inputs:
-            filePath: 'azure-pipelines/setup-gcc9.sh'
+        displayName: 'Setup GCC'
+        inputs:
+          filePath: 'azure-pipelines/setup-gcc9.sh'
       - template: cmake-template.yml
         parameters:
           toolchain: CC=gcc-9 CXX=g++-9
@@ -18,9 +18,9 @@ jobs:
   - job: 'Ubuntu_Release'
     steps:
       - task: Bash@3
-          displayName: 'Setup GCC'
-          inputs:
-            filePath: 'azure-pipelines/setup-gcc9.sh'
+        displayName: 'Setup GCC'
+        inputs:
+          filePath: 'azure-pipelines/setup-gcc9.sh'
       - template: cmake-template.yml
         parameters:
           toolchain: CC=gcc-9 CXX=g++-9
@@ -28,9 +28,9 @@ jobs:
   - job: 'Ubuntu_RelWithDebInfo'
     steps:
       - task: Bash@3
-          displayName: 'Setup GCC'
-          inputs:
-            filePath: 'azure-pipelines/setup-gcc9.sh'
+        displayName: 'Setup GCC'
+        inputs:
+          filePath: 'azure-pipelines/setup-gcc9.sh'
       - template: cmake-template.yml
         parameters:
           toolchain: CC=gcc-9 CXX=g++-9
@@ -38,9 +38,9 @@ jobs:
   - job: 'Ubuntu_MinSizeRel'
     steps:
       - task: Bash@3
-          displayName: 'Setup GCC'
-          inputs:
-            filePath: 'azure-pipelines/setup-gcc9.sh'
+        displayName: 'Setup GCC'
+        inputs:
+          filePath: 'azure-pipelines/setup-gcc9.sh'
       - template: cmake-template.yml
         parameters:
           toolchain: CC=gcc-9 CXX=g++-9
