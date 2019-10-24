@@ -231,6 +231,12 @@ namespace SpaceGameEngine
 		Ret (*m_pInvoke)(MetaObject<Allocator>&, Args...);
 		ControllableObject<MetaObject<Allocator>> m_Content;
 	};
+
+	/*!
+	@file
+	@todo add bind and other functional support.
+	*/
+
 	/*!
 	@}
 	*/
