@@ -36,7 +36,7 @@ void BM_FunctionCreate(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_StdFunctionCreate);
+BENCHMARK(BM_FunctionCreate);
 
 void BM_StdFunction1(benchmark::State& state)
 {
