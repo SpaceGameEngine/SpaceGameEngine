@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\StringImplement\StdTStringImplement.h" />
+    <ClInclude Include="Public\Container\Vector.hpp" />
     <ClInclude Include="Public\Error.h" />
     <ClInclude Include="Public\ForwardDefinition.hpp" />
     <ClInclude Include="Public\Function.hpp" />

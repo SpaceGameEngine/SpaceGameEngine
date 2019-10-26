@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29306.81
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectFile", "ProjectFile", "{73717249-81A9-4A5D-96D0-D59EA4C9CA9E}"
 	ProjectSection(SolutionItems) = preProject
@@ -59,6 +59,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmark", "Benchmark", "{027AF1FE-F0B3-47B7-A781-7D7EF43D2ECF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BenchmarkCommon", "Benchmark\BenchmarkCommon\BenchmarkCommon.vcxproj", "{E5EEFCBF-790E-4515-A13C-D90D0E5E1086}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Container", "Container", "{5C7E3D68-FEBE-44E8-A289-63E01D984092}"
+	ProjectSection(SolutionItems) = preProject
+		Document\Document\Common\Container\Container.md = Document\Document\Common\Container\Container.md
+		Document\Document\Common\Container\Vector.md = Document\Document\Common\Container\Vector.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -139,6 +145,7 @@ Global
 		{D7662B21-F269-400C-95C2-3B498E34DE38} = {E6CDD526-7136-43BA-A1F6-F93333662CE5}
 		{D8691B82-5BB1-4351-81A5-7A2CB374FD6E} = {E6CDD526-7136-43BA-A1F6-F93333662CE5}
 		{E5EEFCBF-790E-4515-A13C-D90D0E5E1086} = {027AF1FE-F0B3-47B7-A781-7D7EF43D2ECF}
+		{5C7E3D68-FEBE-44E8-A289-63E01D984092} = {6B44D9C0-3589-476C-8789-6CC132708D99}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}

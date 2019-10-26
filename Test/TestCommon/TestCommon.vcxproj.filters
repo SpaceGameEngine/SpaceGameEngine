@@ -6,10 +6,10 @@
   <ItemGroup>
     <ClInclude Include="TestString.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
-    <ClInclude Include="TestError.hpp" />
     <ClInclude Include="TestFunction.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
     <ClInclude Include="TestUtility.hpp" />
     <ClInclude Include="TestConcurrent.hpp" />
+    <ClInclude Include="TestVector.hpp" />
   </ItemGroup>
 </Project>

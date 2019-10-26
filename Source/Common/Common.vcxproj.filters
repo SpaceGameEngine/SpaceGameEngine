@@ -25,6 +25,9 @@
     <Filter Include="Public\Utility">
       <UniqueIdentifier>{d471f020-f93f-4cea-86bd-4d71ab07bcbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Container">
+      <UniqueIdentifier>{6e20eaba-a53f-4f95-9843-636b94d5a98e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -71,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="Public\ForwardDefinition.hpp">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\Vector.hpp">
+      <Filter>Public\Container</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
