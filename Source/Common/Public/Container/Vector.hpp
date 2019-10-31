@@ -38,23 +38,29 @@ namespace SpaceGameEngine
 		{
 			m_RealSize = 4;
 			m_Size = 0;
-			m_pContent = Allocator::template RawNew(m_RealSize * sizeof(T), alignof(T));
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 		}
 
 		inline ~Vector()
 		{
 			if (m_pContent)
-				Allocator::template RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					reinterpret_cast<T*>((AddressType)m_pContent + i * sizeof(T))->~T();
+				}
+				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+			}
 		}
 
 		inline Vector(const Vector& v)
 		{
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
-			m_pContent = Allocator::template RawNew(m_RealSize * sizeof(T), alignof(T));
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				new (m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>(v.m_pContent + i * sizeof(T)));
+				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
 			}
 		}
 		inline Vector(Vector&& v)
@@ -68,15 +74,15 @@ namespace SpaceGameEngine
 		{
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				reinterpret_cast<T*>(m_pContent + i * sizeof(T))->~T();
+				reinterpret_cast<T*>((AddressType)m_pContent + i * sizeof(T))->~T();
 			}
 
 			if (v.m_Size > m_RealSize)
 			{
-				Allocator::template RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 				m_RealSize = v.m_RealSize;
 				m_Size = v.m_Size;
-				m_pContent = Allocator::template RawNew(m_RealSize * sizeof(T), alignof(T));
+				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			}
 			else
 			{
@@ -84,13 +90,13 @@ namespace SpaceGameEngine
 			}
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				new (m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>(v.m_pContent + i * sizeof(T)));
+				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
 			}
 			return *this;
 		}
 		inline Vector& operator=(Vector&& v)
 		{
-			Allocator::template RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
 			m_pContent = v.m_pContent;
@@ -103,10 +109,10 @@ namespace SpaceGameEngine
 		{
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
-			m_pContent = Allocator::template RawNew(m_RealSize * sizeof(T), alignof(T));
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				new (m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>(v.m_pContent + i * sizeof(T)));
+				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
 			}
 		}
 		template<typename OtherAllocator>
@@ -123,15 +129,15 @@ namespace SpaceGameEngine
 		{
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				reinterpret_cast<T*>(m_pContent + i * sizeof(T))->~T();
+				reinterpret_cast<T*>((AddressType)m_pContent + i * sizeof(T))->~T();
 			}
 
 			if (v.m_Size > m_RealSize)
 			{
-				Allocator::template RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 				m_RealSize = v.m_RealSize;
 				m_Size = v.m_Size;
-				m_pContent = Allocator::template RawNew(m_RealSize * sizeof(T), alignof(T));
+				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			}
 			else
 			{
@@ -139,7 +145,7 @@ namespace SpaceGameEngine
 			}
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				new (m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>(v.m_pContent + i * sizeof(T)));
+				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
 			}
 			return *this;
 		}
@@ -147,7 +153,7 @@ namespace SpaceGameEngine
 		inline Vector& operator=(Vector<T, OtherAllocator>&& v)
 		{
 			//todo
-			Allocator::template RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
 			m_pContent = v.m_pContent;
@@ -168,9 +174,9 @@ namespace SpaceGameEngine
 			else
 			{
 				auto pbuffer = m_pContent;
-				m_pContent = Allocator::template RawNew(size * sizeof(T), alignof(T));
+				m_pContent = Allocator::RawNew(size * sizeof(T), alignof(T));
 				memcpy(m_pContent, pbuffer, m_Size * sizeof(T));
-				Allocator::template RawDelete(pbuffer, m_RealSize * sizeof(T), alignof(T));
+				Allocator::RawDelete(pbuffer, m_RealSize * sizeof(T), alignof(T));
 				m_RealSize = size;
 			}
 		}

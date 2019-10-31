@@ -222,3 +222,18 @@ void SpaceGameEngine::MemoryManagerAllocator::RawDelete(void* ptr, SizeType size
 
 	MemoryManager::GetSingleton().Free(ptr, size, alignment == 0 ? GetDefaultAlignment(size) : alignment);
 }
+
+void* SpaceGameEngine::AllocatorObject::RawNew(SizeType size, SizeType alignment)
+{
+	return m_pRawNewFunction(size, alignment);
+}
+
+void SpaceGameEngine::AllocatorObject::RawDelete(void* ptr, SizeType size, SizeType alignment)
+{
+	m_pRawDeleteFunction(ptr, size, alignment);
+}
+
+SpaceGameEngine::AllocatorObject::AllocatorObject(void* (*prawnew)(SizeType, SizeType), void (*prawdelete)(void*, SizeType, SizeType))
+	: m_pRawNewFunction(prawnew), m_pRawDeleteFunction(prawdelete)
+{
+}

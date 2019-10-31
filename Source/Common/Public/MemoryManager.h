@@ -229,6 +229,44 @@ namespace SpaceGameEngine
 	using DefaultAllocator = MemoryManagerAllocator;
 
 	/*!
+	@brief a wrapper of the Allocators.
+	*/
+	class AllocatorObject
+	{
+	public:
+		template<typename Allocator>
+		friend AllocatorObject GetAllocatorObjectByAllocator();
+
+		void* RawNew(SizeType size, SizeType alignment = 0);
+		void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+
+		template<typename T, typename... Args>
+		T* New(Args&&... args)
+		{
+			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
+		}
+		template<typename T>
+		void Delete(T* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			ptr->~T();
+			RawDelete(ptr, sizeof(T), alignof(T));
+		}
+
+	private:
+		AllocatorObject(void* (*prawnew)(SizeType, SizeType), void (*prawdelete)(void*, SizeType, SizeType));
+
+	private:
+		void* (*m_pRawNewFunction)(SizeType, SizeType);
+		void (*m_pRawDeleteFunction)(void*, SizeType, SizeType);
+	};
+
+	template<typename Allocator = DefaultAllocator>
+	inline AllocatorObject GetAllocatorObjectByAllocator()
+	{
+		return AllocatorObject(&Allocator::RawNew, &Allocator::RawDelete);
+	}
+	/*!
 	@}
 	*/
 }

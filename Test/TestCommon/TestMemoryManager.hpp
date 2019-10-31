@@ -136,3 +136,17 @@ TEST(MemoryManager, MMAllocatorRawNewDeleteTest)
 	ASSERT_EQ(*pint, 3);
 	MemoryManagerAllocator::RawDelete(pint, sizeof(Int32));
 }
+
+TEST(AllocatorObject, InstanceTest)
+{
+	AllocatorObject test = GetAllocatorObjectByAllocator();
+	int* ptest = test.New<int>(1);
+	ASSERT_EQ(*ptest, 1);
+	auto pbuffer = ptest;
+	test.Delete(ptest);
+	ptest = (int*)test.RawNew(sizeof(int), alignof(int));
+	*ptest = 2;
+	ASSERT_EQ(*ptest, 2);
+	ASSERT_EQ(ptest, pbuffer);	  //allocation in the same thread is sequent now.
+	test.RawDelete(ptest, sizeof(int), alignof(int));
+}
