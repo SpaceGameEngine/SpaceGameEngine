@@ -63,7 +63,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Container", "Container", "{5C7E3D68-FEBE-44E8-A289-63E01D984092}"
 	ProjectSection(SolutionItems) = preProject
 		Document\Document\Common\Container\Container.md = Document\Document\Common\Container\Container.md
-		Document\Document\Common\Container\Vector.md = Document\Document\Common\Container\Vector.md
 	EndProjectSection
 EndProject
 Global
