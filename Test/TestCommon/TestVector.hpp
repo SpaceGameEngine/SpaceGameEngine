@@ -60,6 +60,7 @@ struct test_vector_class
 	{
 		mi = 2;
 		std::cout << "copy assignment" << std::endl;
+		return *this;
 	}
 	~test_vector_class()
 	{
@@ -72,5 +73,7 @@ TEST(StdVector, CopyTest)
 {
 	std::vector<test_vector_class> test = {0, 1, 2};
 	std::vector<test_vector_class> test2 = {0, 0, 0};
+	std::vector<test_vector_class> test3 = {1};
 	test2 = test;
+	test3 = test2;
 }
