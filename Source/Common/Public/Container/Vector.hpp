@@ -37,10 +37,15 @@ namespace SpaceGameEngine
 	released safely,and the free part of the new memory will be regard as the
 	new pre-allocated memory.
 	@attention
-	1. you'd better not make a pointer which associates to the object in the Vector
+	1. You'd better not make a pointer which associates to the object in the Vector
 	which will be modified and re-allocate its memory frequently.That's because
 	the old memory address you get will be invalid after the Vector re-allocating
 	its memory.
+	2. The moving operation may not as fast as you thought when you try to move
+	a Vector with a type of Allocator to another Vector with another type of Allocator.
+	Under this circumstance,the Vector can not just copy another Vector's m_pContent,
+	it will call the T's moving constructor by using the objects in another Vector
+	one by one.
 	*/
 	template<typename T, typename Allocator = DefaultAllocator>
 	class Vector
@@ -51,6 +56,11 @@ namespace SpaceGameEngine
 
 		inline static const constexpr SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(T);
 
+		/*!
+		@brief Default constructor of Vector.
+		@note By default,the Vector will pre-allocate a memory which can contain four
+		T object.
+		*/
 		inline Vector()
 		{
 			m_RealSize = 4;
@@ -58,18 +68,28 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 		}
 
+		/*!
+		@brief Destructor of Vector.
+		@note If the Vector has not been moved to another Vector,its m_pContent will never
+		been nullptr,so we need to call the objects' destructors and release the memory.
+		*/
 		inline ~Vector()
 		{
 			if (m_pContent)
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
-					reinterpret_cast<T*>((AddressType)m_pContent + i * sizeof(T))->~T();
+					GetObject(i).~T();
 				}
 				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 			}
 		}
 
+		/*!
+		@brief Copy constructor of Vector.
+		@note The Vector first allocates the needed memory and then calls the every object's
+		copy constructor by using another Vector's objects.	
+		*/
 		inline Vector(const Vector& v)
 		{
 			m_RealSize = v.m_RealSize;
@@ -77,9 +97,15 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
+				new (&GetObject(i)) T(v.GetObject(i));
 			}
 		}
+		/*!
+		@brief Move constructor of Vector.
+		@note Because of using the same type of Allocator,so the Vector can just copy the
+		another Vector's m_pContent simply,and then set another Vector's m_pContent to
+		nullptr to avoid the twice releases of the memory.
+		*/
 		inline Vector(Vector&& v)
 		{
 			m_RealSize = v.m_RealSize;
@@ -87,6 +113,13 @@ namespace SpaceGameEngine
 			m_pContent = v.m_pContent;
 			v.m_pContent = nullptr;
 		}
+		/*!
+		@brief Copy assignment of Vector.
+		@note There are two situations when copy assignment is called.If the Vector's m_Size
+		is larger than another Vector's,the Vector will release the redundant objects to fit
+		another Vector's size and call the others' copy assignment by giving another Vector's
+		objects.
+		*/
 		inline Vector& operator=(const Vector& v)
 		{
 			for (SizeType i = 0; i < m_Size; i++)
@@ -205,6 +238,18 @@ namespace SpaceGameEngine
 		inline SizeType GetRealSize()
 		{
 			return m_RealSize;
+		}
+
+		inline T& GetObject(SizeType index)
+		{
+			SGE_ASSERT(InvalidSizeError, index, 0, m_Size - 1);
+			return *reinterpret_cast<T*>((AddressType)(m_pContent) + index * sizeof(T));
+		}
+
+		inline const T& GetObject(SizeType index) const
+		{
+			SGE_ASSERT(InvalidSizeError, index, 0, m_Size - 1);
+			return *reinterpret_cast<T*>((AddressType)(m_pContent) + index * sizeof(T));
 		}
 
 	private:

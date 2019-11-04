@@ -37,8 +37,16 @@ TEST(Vector, SetRealSizeTest)
 	ASSERT_TRUE(test.GetRealSize() == 2);
 }
 
+TEST(Vector, GetObjectTest)
+{
+	//todo
+}
+
 struct test_vector_class
 {
+	test_vector_class()
+	{
+	}
 	test_vector_class(int i)
 	{
 		mi = 0;
@@ -46,10 +54,12 @@ struct test_vector_class
 	test_vector_class(const test_vector_class&)
 	{
 		mi = 1;
+		std::cout << "copy construction" << std::endl;
 	}
 	test_vector_class& operator=(const test_vector_class&)
 	{
 		mi = 2;
+		std::cout << "copy assignment" << std::endl;
 	}
 	~test_vector_class()
 	{
@@ -61,5 +71,6 @@ struct test_vector_class
 TEST(StdVector, CopyTest)
 {
 	std::vector<test_vector_class> test = {0, 1, 2};
-	std::vector<test_vector_class> test2 = test;
+	std::vector<test_vector_class> test2 = {0, 0, 0};
+	test2 = test;
 }
