@@ -13,5 +13,7 @@
 		* `Private\` 模块中私有的代码
 * **Test** 测试代码
 	* `$(ProjectName)` 各种测试模块
+* **Benchmark** 基准性能测试代码
+	* `$(ProjectName)` 各种基准测试模块
 * **ThirdParty** 第三方代码
 	* `$(ProjectName)` 各种第三方代码包装而成的模块

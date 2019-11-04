@@ -18,6 +18,8 @@ limitations under the License.
 #include <functional>
 #include <Function.hpp>
 
+// ----------
+
 void BM_StdFunctionCreate(benchmark::State& state)
 {
 	for (auto _ : state)
@@ -26,9 +28,7 @@ void BM_StdFunctionCreate(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_StdFunctionCreate);
-
-void BM_FunctionCreate(benchmark::State& state)
+void BM_SgeFunctionCreate(benchmark::State& state)
 {
 	for (auto _ : state)
 	{
@@ -36,61 +36,93 @@ void BM_FunctionCreate(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_FunctionCreate);
+BENCHMARK(BM_StdFunctionCreate)->Iterations(1000000);
+BENCHMARK(BM_SgeFunctionCreate)->Iterations(1000000);
+
+// ----------
+
+int bm_add(int a, int b)
+{
+	return a + b;
+}
+
+void BM_DirectInvoke1(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		bm_add(1, 2);
+	}
+}
+
+auto stdFunction1 = &bm_add;
 
 void BM_StdFunction1(benchmark::State& state)
 {
-	auto lambda = [](int a, int b) -> int { return a + b; };
 	for (auto _ : state)
 	{
-		std::function<int(int, int)> func = lambda;
-		func(1, 2);
+		stdFunction1(1, 1);
 	}
 }
 
-BENCHMARK(BM_StdFunction1);
+SpaceGameEngine::Function<int(int, int)> sgeFunc1 = &bm_add;
 
-void BM_Function1(benchmark::State& state)
+void BM_SgeFunction1(benchmark::State& state)
 {
-	auto lambda = [](int a, int b) -> int { return a + b; };
 	for (auto _ : state)
 	{
-		SpaceGameEngine::Function<int(int, int)> func = lambda;
-		func(1, 2);
+		sgeFunc1(1, 2);
 	}
 }
 
-BENCHMARK(BM_Function1);
+BENCHMARK(BM_DirectInvoke1)->Iterations(1000000);
+BENCHMARK(BM_StdFunction1)->Iterations(1000000);
+BENCHMARK(BM_SgeFunction1)->Iterations(1000000);
+
+// ----------
 
 struct bm_func_class
 {
-	inline void add(int a, int b)
+	void add(int a, int b)
 	{
 		result = a + b;
 	}
 	int result;
 };
 
+bm_func_class bm_test_obj;
+
+void BM_DirectInvoke2(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		bm_test_obj.add(1, 2);
+	}
+}
+
+std::function<void(bm_func_class*, int, int)> stdFunc2 = &bm_func_class::add;
+
 void BM_StdFunction2(benchmark::State& state)
 {
-	bm_func_class t;
 	for (auto _ : state)
 	{
-		std::function<void(bm_func_class*, int, int)> func = &bm_func_class::add;
-		func(&t, 1, 2);
+		stdFunc2(&bm_test_obj, 1, 2);
 	}
 }
 
-BENCHMARK(BM_StdFunction2);
+SpaceGameEngine::Function<void(bm_func_class*, int, int)> sgeFunc2 = &bm_func_class::add;
 
-void BM_Function2(benchmark::State& state)
+void BM_SgeFunction2(benchmark::State& state)
 {
 	bm_func_class t;
 	for (auto _ : state)
 	{
-		SpaceGameEngine::Function<void(bm_func_class*, int, int)> func = &bm_func_class::add;
-		func(&t, 1, 2);
+
+		sgeFunc2(&bm_test_obj, 1, 2);
 	}
 }
 
-BENCHMARK(BM_Function2);
+BENCHMARK(BM_DirectInvoke2)->Iterations(1000000);
+BENCHMARK(BM_StdFunction2)->Iterations(1000000);
+BENCHMARK(BM_SgeFunction2)->Iterations(1000000);
+
+// ----------
