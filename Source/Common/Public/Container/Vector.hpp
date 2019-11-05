@@ -124,7 +124,7 @@ namespace SpaceGameEngine
 		*/
 		inline Vector& operator=(const Vector& v)
 		{
-			for (SizeType i = 0; i < m_Size; i++)
+			/*for (SizeType i = 0; i < m_Size; i++)
 			{
 				reinterpret_cast<T*>((AddressType)m_pContent + i * sizeof(T))->~T();
 			}
@@ -143,7 +143,7 @@ namespace SpaceGameEngine
 			for (SizeType i = 0; i < m_Size; i++)
 			{
 				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
-			}
+			}*/
 			return *this;
 		}
 		inline Vector& operator=(Vector&& v)
