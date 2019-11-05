@@ -118,7 +118,9 @@ namespace SpaceGameEngine
 		@note There are two situations when copy assignment is called.If the Vector's m_Size
 		is larger than another Vector's,the Vector will release the redundant objects to fit
 		another Vector's size and call the others' copy assignment by giving another Vector's
-		objects.
+		objects.Or the Vector will call its objects' destructor,then re-allocate its memory
+		to fit another Vector's size and call its new objects' copy constructor using another
+		Vector's objects.
 		*/
 		inline Vector& operator=(const Vector& v)
 		{
