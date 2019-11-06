@@ -20,32 +20,11 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-TEST(Vector, InstanceTest)
-{
-	Vector<int> test;
-	ASSERT_TRUE((std::is_same_v<decltype(test)::ValueType, int>));
-	ASSERT_TRUE((std::is_same_v<decltype(test)::AllocatorType, DefaultAllocator>));
-	ASSERT_TRUE(test.GetRealSize() == 4);
-	ASSERT_TRUE(test.GetSize() == 0);
-}
-
-TEST(Vector, SetRealSizeTest)
-{
-	Vector<int> test;
-	test.SetRealSize(2);
-	ASSERT_TRUE(test.GetSize() == 0);
-	ASSERT_TRUE(test.GetRealSize() == 2);
-}
-
-TEST(Vector, GetObjectTest)
-{
-	//todo
-}
-
 struct test_vector_class
 {
 	test_vector_class()
 	{
+		mi = 0;
 	}
 	test_vector_class(int i)
 	{
@@ -62,12 +41,65 @@ struct test_vector_class
 		std::cout << "copy assignment" << std::endl;
 		return *this;
 	}
+	test_vector_class(test_vector_class&&)
+	{
+		mi = 3;
+		std::cout << "move construction" << std::endl;
+	}
+	test_vector_class& operator=(test_vector_class&&)
+	{
+		mi = 4;
+		std::cout << "move assignment" << std::endl;
+		return *this;
+	}
 	~test_vector_class()
 	{
 		std::cout << "destruction" << std::endl;
 	}
 	int mi;
 };
+
+TEST(Vector, InstanceTest)
+{
+	Vector<int> test;
+	ASSERT_TRUE((std::is_same_v<decltype(test)::ValueType, int>));
+	ASSERT_TRUE((std::is_same_v<decltype(test)::AllocatorType, DefaultAllocator>));
+	ASSERT_TRUE(test.GetRealSize() == 4);
+	ASSERT_TRUE(test.GetSize() == 0);
+}
+
+TEST(Vector, CopyConstructionTest)
+{
+	//todo
+}
+
+TEST(Vector, MoveConstructionTest)
+{
+	//todo
+}
+
+TEST(Vector, CopyAssignmentTest)
+{
+	//todo
+}
+
+TEST(Vector, MoveAssignmentTest)
+{
+	//todo
+}
+
+TEST(Vector, SetRealSizeTest)
+{
+	Vector<int> test;
+	test.SetRealSize(2);
+	ASSERT_TRUE(test.GetSize() == 0);
+	ASSERT_TRUE(test.GetRealSize() == 2);
+}
+
+TEST(Vector, GetObjectTest)
+{
+	//todo
+}
 
 TEST(StdVector, CopyTest)
 {

@@ -115,35 +115,58 @@ namespace SpaceGameEngine
 		}
 		/*!
 		@brief Copy assignment of Vector.
-		@note There are two situations when copy assignment is called.If the Vector's m_Size
-		is larger than another Vector's,the Vector will release the redundant objects to fit
-		another Vector's size and call the others' copy assignment by giving another Vector's
-		objects.Or the Vector will call its objects' destructor,then re-allocate its memory
-		to fit another Vector's size and call its new objects' copy constructor using another
-		Vector's objects.
+		@note There are three situations when copy assignment is called.If the Vector's m_Size
+		is larger than or equal to another Vector's,the Vector will release the redundant
+		objects to fit another Vector's size and call the others' copy assignment by giving
+		another Vector's objects.Or if the Vector's m_RealSize is larger than or equal to
+		another Vector's size,the Vector will call its old objects' copy assignment and then
+		use copy construction to construct new objects to make it be equal to another Vector.
+		At last,if the Vector's m_RealSize is less than another Vector's size,the Vector will
+		call its objects' destructor,then re-allocate its memory to fit another Vector's size
+		and call its new objects' copy constructor using another Vector's objects.
 		*/
 		inline Vector& operator=(const Vector& v)
 		{
-			/*for (SizeType i = 0; i < m_Size; i++)
+			if (m_Size >= v.m_Size)
 			{
-				reinterpret_cast<T*>((AddressType)m_pContent + i * sizeof(T))->~T();
+				for (SizeType i = v.m_Size; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
+				m_Size = v.m_Size;
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i) = v.GetObject(i);
+				}
 			}
-
-			if (v.m_Size > m_RealSize)
+			else if (m_RealSize >= v.m_Size)
 			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i) = v.GetObject(i);
+				}
+				SizeType buffer = m_Size;
+				m_Size = v.m_Size;
+				for (SizeType i = buffer; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(v.GetObject(i));
+				}
+			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
 				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 				m_RealSize = v.m_RealSize;
 				m_Size = v.m_Size;
 				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(v.GetObject(i));
+				}
 			}
-			else
-			{
-				m_Size = v.m_Size;
-			}
-			for (SizeType i = 0; i < m_Size; i++)
-			{
-				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
-			}*/
 			return *this;
 		}
 		inline Vector& operator=(Vector&& v)
