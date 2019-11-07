@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include <initializer_list>
 #include "TypeDefinition.hpp"
 #include "MemoryManager.h"
 #include "Error.h"
@@ -327,6 +328,54 @@ namespace SpaceGameEngine
 				}
 			}
 			return *this;
+		}
+
+		inline Vector(std::initializer_list<T> list)
+		{
+			m_Size = list.size();
+			m_RealSize = list.size() * 2;
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+			for (SizeType i = 0; i < m_Size; i++)
+			{
+				new (&GetObject(i)) T(*(list.begin() + i));
+			}
+		}
+
+		template<typename STLContainer,
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<std::decay_t<STLContainer>>().size()), typename std::decay_t<STLContainer>::size_type>, bool>,
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<std::decay_t<STLContainer>>().begin()), typename std::decay_t<STLContainer>::iterator>, bool>,
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<typename std::decay_t<STLContainer>::iterator>() + 1), typename std::decay_t<STLContainer>::iterator>, bool>>
+		inline Vector(STLContainer&& stl_container)
+		{
+			m_Size = stl_container.size();
+			m_RealSize = stl_container.size() * 2;
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+			if constexpr (std::is_same_v<std::decay_t<STLContainer>, STLContainer>)
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(std::move(*(stl_container.begin() + i)));
+				}
+			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(*(stl_container.begin() + i));
+				}
+			}
+		}
+
+		inline Vector(SizeType size, const T& val)
+		{
+			SGE_ASSERT(InvalidSizeError, size, 0, sm_MaxSize);
+			m_Size = size;
+			m_RealSize = size * 2;
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+			for (SizeType i = 0; i < m_Size; i++)
+			{
+				new (&GetObject(i)) T(val);
+			}
 		}
 
 		/*!
