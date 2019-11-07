@@ -169,8 +169,18 @@ namespace SpaceGameEngine
 			}
 			return *this;
 		}
+		/*!
+		@brief Move assignment of Vector.
+		@note The Vector will invoke its objects' destructor,then release its memory
+		and just copy another Vector's m_pContent and set it to the nullptr after the
+		operation.
+		*/
 		inline Vector& operator=(Vector&& v)
 		{
+			for (SizeType i = 0; i < m_Size; i++)
+			{
+				GetObject(i).~T();
+			}
 			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
@@ -179,6 +189,10 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		/*!
+		@brief Copy Constructor of Vector which accepts Vector with different Allocators as the argument.
+		@note Same as the normal version.
+		*/
 		template<typename OtherAllocator>
 		inline Vector(const Vector<T, OtherAllocator>& v)
 		{
@@ -187,52 +201,131 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
+				new (&GetObject(i)) T(v.GetObject(i));
 			}
 		}
+		/*!
+		@brief Move Constructor of Vector which accepts Vector with different Allocators as the argument.
+		@note Because of the different Allocators,the Vector can not just copy another Vector's m_pContent.
+		Instead,the Vector will allocate needed memory and then call the every object's move constructor
+		by giving another Vector's objects.
+		*/
 		template<typename OtherAllocator>
 		inline Vector(Vector<T, OtherAllocator>&& v)
 		{
-			//todo
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
-			m_pContent = v.m_pContent;
-			v.m_pContent = nullptr;
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+			for (SizeType i = 0; i < m_Size; i++)
+			{
+				new (&GetObject(i)) T(std::move(v.GetObject(i)));
+			}
 		}
+		/*!
+		@brief Copy assignment of Vector which accepts Vector with different Allocators as the argument.
+		@note Same as the normal version.
+		*/
 		template<typename OtherAllocator>
 		inline Vector& operator=(const Vector<T, OtherAllocator>& v)
 		{
-			for (SizeType i = 0; i < m_Size; i++)
+			if (m_Size >= v.m_Size)
 			{
-				reinterpret_cast<T*>((AddressType)m_pContent + i * sizeof(T))->~T();
+				for (SizeType i = v.m_Size; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
+				m_Size = v.m_Size;
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i) = v.GetObject(i);
+				}
 			}
-
-			if (v.m_Size > m_RealSize)
+			else if (m_RealSize >= v.m_Size)
 			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i) = v.GetObject(i);
+				}
+				SizeType buffer = m_Size;
+				m_Size = v.m_Size;
+				for (SizeType i = buffer; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(v.GetObject(i));
+				}
+			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
 				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 				m_RealSize = v.m_RealSize;
 				m_Size = v.m_Size;
 				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			}
-			else
-			{
-				m_Size = v.m_Size;
-			}
-			for (SizeType i = 0; i < m_Size; i++)
-			{
-				new ((AddressType)m_pContent + i * sizeof(T)) T(*reinterpret_cast<T*>((AddressType)v.m_pContent + i * sizeof(T)));
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(v.GetObject(i));
+				}
 			}
 			return *this;
 		}
+		/*!
+		@brief Move assignment of Vector which accepts Vector with different Allocators as the argument.
+		@note Because of the different Allocators,the Vector can not just copy another Vector's m_pContent.
+		There are three situations when the move assignment is called.If the Vector's m_Size
+		is larger than or equal to another Vector's,the Vector will release the redundant
+		objects to fit another Vector's size and call the others' move assignment by giving
+		another Vector's objects.Or if the Vector's m_RealSize is larger than or equal to
+		another Vector's size,the Vector will call its old objects' move assignment and then
+		use move construction to construct new objects to make it be equal to another Vector.
+		At last,if the Vector's m_RealSize is less than another Vector's size,the Vector will
+		call its objects' destructor,then re-allocate its memory to fit another Vector's size
+		and call its new objects' move constructor using another Vector's objects.
+		*/
 		template<typename OtherAllocator>
 		inline Vector& operator=(Vector<T, OtherAllocator>&& v)
 		{
-			//todo
-			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
-			m_RealSize = v.m_RealSize;
-			m_Size = v.m_Size;
-			m_pContent = v.m_pContent;
-			v.m_pContent = nullptr;
+			if (m_Size >= v.m_Size)
+			{
+				for (SizeType i = v.m_Size; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
+				m_Size = v.m_Size;
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i) = std::move(v.GetObject(i));
+				}
+			}
+			else if (m_RealSize >= v.m_Size)
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i) = std::move(v.GetObject(i));
+				}
+				SizeType buffer = m_Size;
+				m_Size = v.m_Size;
+				for (SizeType i = buffer; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(std::move(v.GetObject(i)));
+				}
+			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
+				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+				m_RealSize = v.m_RealSize;
+				m_Size = v.m_Size;
+				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(std::move(v.GetObject(i)));
+				}
+			}
 			return *this;
 		}
 
