@@ -333,8 +333,8 @@ namespace SpaceGameEngine
 		@brief set the real size which the vector allocates.
 		@warning the size you set can not be less than the vector's size.
 		@note unless the size you set is equal to the vector's previous real size,this method
-		will make the vector re-allocate the memory.However,it is not just copy the memory
-		simply.The Vector will first allocate new memory and use the old objects
+		will make the vector re-allocate the memory.However,it is not just copying the memory
+		simply.The Vector will allocate new memory first and use the old objects
 		to construct new objects using move construction,and then call the old objects'
 		destructor,finally,release the old memory.
 		*/
