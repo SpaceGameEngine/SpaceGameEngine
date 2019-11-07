@@ -94,6 +94,7 @@ TEST(Vector, SetRealSizeTest)
 	test.SetRealSize(2);
 	ASSERT_TRUE(test.GetSize() == 0);
 	ASSERT_TRUE(test.GetRealSize() == 2);
+	//todo
 }
 
 TEST(Vector, GetObjectTest)
