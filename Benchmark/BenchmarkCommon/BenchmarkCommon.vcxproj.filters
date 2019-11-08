@@ -4,6 +4,9 @@
     <ClInclude Include="BenchmarkFunction.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BenchmarkMemoryManager.hpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
 </Project>

@@ -4,5 +4,6 @@
 
 #include <benchmark/benchmark.h>
 #include "BenchmarkFunction.hpp"
+#include "BenchmarkMemoryManager.hpp"
 
 BENCHMARK_MAIN();
