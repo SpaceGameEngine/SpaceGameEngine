@@ -17,11 +17,6 @@ limitations under the License.
 #include "Error.h"
 #include <algorithm>
 #include <cstring>
-#ifdef SGE_WINDOWS
-#include <malloc.h>
-#else
-#include <mm_malloc.h>
-#endif
 
 /*!
 @file

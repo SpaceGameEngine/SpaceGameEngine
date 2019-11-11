@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#ifdef SGE_WINDOWS
+#include <malloc.h>
+#else
+#include <mm_malloc.h>
+#endif
 #include "TypeDefinition.hpp"
 #include "Utility/Utility.hpp"
 #include "Error.h"
