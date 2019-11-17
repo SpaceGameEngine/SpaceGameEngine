@@ -130,7 +130,20 @@ TEST(Vector, SizeConstructionTest)
 
 TEST(Vector, CopyConstructionTest)
 {
-	//todo
+	Vector<test_vector_class> v1{0, 1, 2};
+	Vector<test_vector_class> v2 = v1;
+	for (SizeType i = 0; i < v2.GetSize(); i++)
+	{
+		ASSERT_TRUE(v2.GetObject(i).content == v1.GetObject(i).content);
+		ASSERT_TRUE(v2.GetObject(i).mi == 1);
+	}
+
+	Vector<test_vector_class, StdAllocator> v3 = v1;
+	for (SizeType i = 0; i < v3.GetSize(); i++)
+	{
+		ASSERT_TRUE(v3.GetObject(i).content == v1.GetObject(i).content);
+		ASSERT_TRUE(v3.GetObject(i).mi == 1);
+	}
 }
 
 TEST(Vector, MoveConstructionTest)

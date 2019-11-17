@@ -197,8 +197,8 @@ namespace SpaceGameEngine
 		template<typename OtherAllocator>
 		inline Vector(const Vector<T, OtherAllocator>& v)
 		{
-			m_RealSize = v.m_RealSize;
-			m_Size = v.m_Size;
+			m_RealSize = v.GetRealSize();
+			m_Size = v.GetSize();
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			for (SizeType i = 0; i < m_Size; i++)
 			{
@@ -409,11 +409,11 @@ namespace SpaceGameEngine
 			}
 		}
 
-		inline SizeType GetSize()
+		inline SizeType GetSize() const
 		{
 			return m_Size;
 		}
-		inline SizeType GetRealSize()
+		inline SizeType GetRealSize() const
 		{
 			return m_RealSize;
 		}
