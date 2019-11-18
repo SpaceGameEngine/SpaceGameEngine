@@ -208,16 +208,24 @@ TEST(Vector, MoveAssignmentTest)
 
 TEST(Vector, SetRealSizeTest)
 {
-	Vector<int> test;
+	Vector<int> test = {0, 1};
+	ASSERT_TRUE(test.GetObject(0) == 0);
+	ASSERT_TRUE(test.GetObject(1) == 1);
+	ASSERT_TRUE(test.GetSize() == 2);
+	ASSERT_TRUE(test.GetRealSize() == 4);
 	test.SetRealSize(2);
-	ASSERT_TRUE(test.GetSize() == 0);
+	ASSERT_TRUE(test.GetSize() == 2);
 	ASSERT_TRUE(test.GetRealSize() == 2);
-	//todo
+	ASSERT_TRUE(test.GetObject(0) == 0);
+	ASSERT_TRUE(test.GetObject(1) == 1);
 }
 
 TEST(Vector, GetObjectTest)
 {
-	//todo
+	Vector<int> v = {0, 1, 2};
+	ASSERT_TRUE(v.GetObject(1) == 1);
+	v.GetObject(1) = 3;
+	ASSERT_TRUE(v.GetObject(1) == 3);
 }
 
 TEST(StdVector, CopyTest)
