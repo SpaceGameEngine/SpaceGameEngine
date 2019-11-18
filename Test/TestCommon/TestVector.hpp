@@ -130,8 +130,8 @@ TEST(Vector, SizeConstructionTest)
 
 TEST(Vector, CopyConstructionTest)
 {
-	Vector<test_vector_class> v1{0, 1, 2};
-	Vector<test_vector_class> v2 = v1;
+	Vector<test_vector_class, MemoryManagerAllocator> v1{0, 1, 2};
+	Vector<test_vector_class, MemoryManagerAllocator> v2 = v1;
 	for (SizeType i = 0; i < v2.GetSize(); i++)
 	{
 		ASSERT_TRUE(v2.GetObject(i).content == v1.GetObject(i).content);
@@ -148,17 +148,62 @@ TEST(Vector, CopyConstructionTest)
 
 TEST(Vector, MoveConstructionTest)
 {
-	//todo
+	Vector<test_vector_class, MemoryManagerAllocator> v1_1{0, 1, 2};
+	Vector<test_vector_class, MemoryManagerAllocator> v1_2{0, 1, 2};
+	Vector<test_vector_class, MemoryManagerAllocator> v2 = std::move(v1_1);
+	for (SizeType i = 0; i < v2.GetSize(); i++)
+	{
+		ASSERT_TRUE(v2.GetObject(i).content == i);
+		ASSERT_TRUE(v2.GetObject(i).mi == 1);
+	}
+
+	Vector<test_vector_class, StdAllocator> v3 = std::move(v1_2);
+	for (SizeType i = 0; i < v3.GetSize(); i++)
+	{
+		ASSERT_TRUE(v3.GetObject(i).content == i);
+		ASSERT_TRUE(v3.GetObject(i).mi == 3);
+	}
 }
 
 TEST(Vector, CopyAssignmentTest)
 {
-	//todo
+	Vector<test_vector_class, MemoryManagerAllocator> v1 = {0, 1, 2};
+	Vector<test_vector_class, MemoryManagerAllocator> v2 = {0};
+	v2 = v1;
+	ASSERT_TRUE(v2.GetSize() == v1.GetSize());
+	for (SizeType i = 0; i < v2.GetSize(); i++)
+	{
+		ASSERT_TRUE(v2.GetObject(i).content == v1.GetObject(i).content);
+	}
+
+	Vector<test_vector_class, StdAllocator> v3 = {0};
+	v3 = v1;
+	ASSERT_TRUE(v3.GetSize() == v1.GetSize());
+	for (SizeType i = 0; i < v3.GetSize(); i++)
+	{
+		ASSERT_TRUE(v3.GetObject(i).content == v1.GetObject(i).content);
+	}
 }
 
 TEST(Vector, MoveAssignmentTest)
 {
-	//todo
+	Vector<test_vector_class, MemoryManagerAllocator> v1_1 = {0, 1, 2};
+	Vector<test_vector_class, MemoryManagerAllocator> v1_2 = {0, 1, 2};
+	Vector<test_vector_class, MemoryManagerAllocator> v2 = {0};
+	v2 = std::move(v1_1);
+	ASSERT_TRUE(v2.GetSize() == 3);
+	for (SizeType i = 0; i < v2.GetSize(); i++)
+	{
+		ASSERT_TRUE(v2.GetObject(i).content == i);
+	}
+
+	Vector<test_vector_class, StdAllocator> v3 = {0};
+	v3 = std::move(v1_2);
+	ASSERT_TRUE(v3.GetSize() == 3);
+	for (SizeType i = 0; i < v3.GetSize(); i++)
+	{
+		ASSERT_TRUE(v3.GetObject(i).content == i);
+	}
 }
 
 TEST(Vector, SetRealSizeTest)

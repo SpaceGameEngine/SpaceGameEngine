@@ -214,8 +214,8 @@ namespace SpaceGameEngine
 		template<typename OtherAllocator>
 		inline Vector(Vector<T, OtherAllocator>&& v)
 		{
-			m_RealSize = v.m_RealSize;
-			m_Size = v.m_Size;
+			m_RealSize = v.GetRealSize();
+			m_Size = v.GetSize();
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			for (SizeType i = 0; i < m_Size; i++)
 			{
@@ -229,26 +229,26 @@ namespace SpaceGameEngine
 		template<typename OtherAllocator>
 		inline Vector& operator=(const Vector<T, OtherAllocator>& v)
 		{
-			if (m_Size >= v.m_Size)
+			if (m_Size >= v.GetSize())
 			{
-				for (SizeType i = v.m_Size; i < m_Size; i++)
+				for (SizeType i = v.GetSize(); i < m_Size; i++)
 				{
 					GetObject(i).~T();
 				}
-				m_Size = v.m_Size;
+				m_Size = v.GetSize();
 				for (SizeType i = 0; i < m_Size; i++)
 				{
 					GetObject(i) = v.GetObject(i);
 				}
 			}
-			else if (m_RealSize >= v.m_Size)
+			else if (m_RealSize >= v.GetSize())
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
 					GetObject(i) = v.GetObject(i);
 				}
 				SizeType buffer = m_Size;
-				m_Size = v.m_Size;
+				m_Size = v.GetSize();
 				for (SizeType i = buffer; i < m_Size; i++)
 				{
 					new (&GetObject(i)) T(v.GetObject(i));
@@ -261,8 +261,8 @@ namespace SpaceGameEngine
 					GetObject(i).~T();
 				}
 				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
-				m_RealSize = v.m_RealSize;
-				m_Size = v.m_Size;
+				m_RealSize = v.GetRealSize();
+				m_Size = v.GetSize();
 				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 				for (SizeType i = 0; i < m_Size; i++)
 				{
@@ -287,26 +287,26 @@ namespace SpaceGameEngine
 		template<typename OtherAllocator>
 		inline Vector& operator=(Vector<T, OtherAllocator>&& v)
 		{
-			if (m_Size >= v.m_Size)
+			if (m_Size >= v.GetSize())
 			{
-				for (SizeType i = v.m_Size; i < m_Size; i++)
+				for (SizeType i = v.GetSize(); i < m_Size; i++)
 				{
 					GetObject(i).~T();
 				}
-				m_Size = v.m_Size;
+				m_Size = v.GetSize();
 				for (SizeType i = 0; i < m_Size; i++)
 				{
 					GetObject(i) = std::move(v.GetObject(i));
 				}
 			}
-			else if (m_RealSize >= v.m_Size)
+			else if (m_RealSize >= v.GetSize())
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
 					GetObject(i) = std::move(v.GetObject(i));
 				}
 				SizeType buffer = m_Size;
-				m_Size = v.m_Size;
+				m_Size = v.GetSize();
 				for (SizeType i = buffer; i < m_Size; i++)
 				{
 					new (&GetObject(i)) T(std::move(v.GetObject(i)));
@@ -319,8 +319,8 @@ namespace SpaceGameEngine
 					GetObject(i).~T();
 				}
 				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
-				m_RealSize = v.m_RealSize;
-				m_Size = v.m_Size;
+				m_RealSize = v.GetRealSize();
+				m_Size = v.GetSize();
 				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 				for (SizeType i = 0; i < m_Size; i++)
 				{
