@@ -78,6 +78,9 @@
     <ClInclude Include="Public\Container\Vector.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\Iterator.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
