@@ -35,27 +35,27 @@ namespace SpaceGameEngine
 		@brief iterator must have a constructor,but its concrete form need to be designed according
 		to the concrete container.
 		*/
-		Iterator(...){};
+		inline Iterator(...){};
 
-		Iterator(const Iterator&){};
+		inline Iterator(const Iterator&){};
 
-		Iterator& operator=(const Iterator&){};
+		inline Iterator& operator=(const Iterator&){};
 
-		Iterator& operator+(SizeType){};
+		inline Iterator& operator+(SizeType){};
 
-		Iterator& operator+=(SizeType){};
+		inline Iterator& operator+=(SizeType){};
 
-		Iterator& operator-(SizeType){};
+		inline Iterator& operator-(SizeType){};
 
-		Iterator& operator-=(SizeType){};
+		inline Iterator& operator-=(SizeType){};
 
-		T* operator->(){};
+		inline T* operator->(){};
 
-		const T* operator->() const {};
+		inline const T* operator->() const {};
 
-		T& operator*(){};
+		inline T& operator*(){};
 
-		const T& operator*() const {};
+		inline const T& operator*() const {};
 
 	private:
 	};
@@ -64,7 +64,7 @@ namespace SpaceGameEngine
 	@brief get iterator type from a template container class instance.
 	@note the reason why we need this mpl-function is that the simple container typename in its
 	definition scope will be interpreted into a template container class instance instead of a
-	template.But what the Iterator type need is a template.However,it is seemed that this little
+	template.But what the Iterator type needs is a template.However,it is seemed that this little
 	question is not easy for people to realize,so I write this mpl-function to provide people
 	an easier way to get the result,instead of using things like GetTemplate by giving the simple
 	container typename in its definition scope as the template container class instance to get
