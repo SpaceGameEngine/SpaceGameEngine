@@ -51,11 +51,7 @@ namespace SpaceGameEngine
 
 		inline T* operator->(){};
 
-		inline const T* operator->() const {};
-
 		inline T& operator*(){};
-
-		inline const T& operator*() const {};
 
 	private:
 	};

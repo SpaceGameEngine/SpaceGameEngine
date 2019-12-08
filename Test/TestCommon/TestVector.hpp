@@ -237,10 +237,8 @@ TEST(StdVector, CopyTest)
 	test3 = test2;
 }
 
-TEST(StdVector, GetBeginTest)
+TEST(StdVector, IteratorGetBeginTest)
 {
 	Vector<int> test1 = {0, 1, 2};
-	const Vector<int> test2 = {0, 1, 2};
 	auto iter1 = test1.GetBegin<Iterator>();
-	auto iter2 = test2.GetBegin<Iterator>();
 }

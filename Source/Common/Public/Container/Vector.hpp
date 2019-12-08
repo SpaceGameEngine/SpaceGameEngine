@@ -442,25 +442,9 @@ namespace SpaceGameEngine
 			static_assert(false, "Can not use this type to get begin iterator");
 		}
 
-		/*!
-		@brief get the begin iterator of the Vector.
-		@note it can just accept the iterator type.If you want to define your own iterator type,
-		you need to specialize this template method to make Vector support your iterator type.
-		*/
-		template<template<template<typename...> class, typename> class IteratorType>
-		inline const typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin() const
-		{
-			static_assert(false, "Can not use this type to get begin iterator");
-		}
-
 	public:
 		template<>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin<Iterator>()
-		{
-		}
-
-		template<>
-		inline const typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin<Iterator>() const
 		{
 		}
 
