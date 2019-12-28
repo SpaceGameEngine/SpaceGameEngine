@@ -60,6 +60,7 @@ struct test_vector_class
 	}
 	~test_vector_class()
 	{
+		mi = -1;
 		// std::cout << "destruction" << std::endl;
 	}
 	int mi;
@@ -236,6 +237,37 @@ TEST(Vector, GetDataTest)
 	ASSERT_TRUE(*v1.GetData() == 0);
 	ASSERT_TRUE(v2.GetData() == &v2.GetObject(0));
 	ASSERT_TRUE(*v2.GetData() == 0);
+}
+
+TEST(Vector, ClearTest)
+{
+	Vector<test_vector_class> v = {0, 1, 2};
+	ASSERT_TRUE(v.GetSize() == 3);
+	ASSERT_TRUE(v.GetRealSize() == 6);
+	v.Clear();
+	ASSERT_TRUE(v.GetSize() == 0);
+	ASSERT_TRUE(v.GetRealSize() == 4);
+	ASSERT_TRUE(v.GetData() != nullptr);
+}
+
+TEST(Vector, SetSizeTest)
+{
+	Vector<test_vector_class> v = {0, 1, 2};
+	ASSERT_TRUE(v.GetSize() == 3);
+	ASSERT_TRUE(v.GetRealSize() == 6);
+	v.SetSize(2, test_vector_class());
+	ASSERT_TRUE(v.GetSize() == 2);
+	ASSERT_TRUE(v.GetRealSize() == 6);
+	ASSERT_TRUE((v.GetData() + 2)->mi == -1);
+	v.SetSize(6, test_vector_class(1));
+	ASSERT_TRUE(v.GetSize() == 6);
+	ASSERT_TRUE(v.GetRealSize() == 6);
+	ASSERT_TRUE((v.GetBegin<Iterator>() + 5)->content == 1);
+	v.SetSize(8, test_vector_class());
+	ASSERT_TRUE(v.GetSize() == 8);
+	ASSERT_TRUE(v.GetRealSize() == 16);
+	ASSERT_TRUE(v.GetBegin<Iterator>()->mi == 3);
+	ASSERT_TRUE((v.GetBegin<Iterator>() + 6)->mi == 1);
 }
 
 TEST(VectorIterator, GetBeginTest)

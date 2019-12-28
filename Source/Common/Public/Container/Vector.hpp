@@ -410,6 +410,67 @@ namespace SpaceGameEngine
 			}
 		}
 
+		/*!
+		@brief clear all elements in the Vector and set size to zero.
+		@note also makes real size to the default value.
+		*/
+		inline void Clear()
+		{
+			for (SizeType i = 0; i < m_Size; i++)
+			{
+				GetObject(i).~T();
+			}
+			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+			m_Size = 0;
+			m_RealSize = 4;
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+		}
+
+		/*!
+		@brief set the Vector's size.
+		@note There are three situations when the function is called.When
+		the size we set is less than the Vector's old size,the Vector
+		will release its spare elements.When the size we set is larger than
+		the Vector's old size but less than its real size,the Vector will
+		use the val argument to construct the new elements by calling T's
+		copy constructor.Finally,if the size is larger than the real size,
+		it will cause the memory's re-allocation,the old elements will be
+		moved to the new location and the new elements will be constructed
+		by the val argument.
+		*/
+		inline void SetSize(SizeType size, const T& val)
+		{
+			if (size == m_Size)
+				return;
+			else if (size < m_Size)
+			{
+				for (SizeType i = size; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
+				m_Size = size;
+			}
+			else if (size <= m_RealSize)
+			{
+				SizeType buffer = m_Size;
+				m_Size = size;
+				for (SizeType i = buffer; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(val);
+				}
+			}
+			else
+			{
+				SetRealSize(2 * size);
+				SizeType buffer = m_Size;
+				m_Size = size;
+				for (SizeType i = buffer; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(val);
+				}
+			}
+		}
+
 		inline T* GetData()
 		{
 			return reinterpret_cast<T*>(m_pContent);
