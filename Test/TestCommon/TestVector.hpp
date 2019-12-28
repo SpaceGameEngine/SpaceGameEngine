@@ -245,6 +245,13 @@ TEST(VectorIterator, GetBeginTest)
 	ASSERT_TRUE(*iter1 == 0);
 }
 
+TEST(VectorIterator, GetEndTest)
+{
+	Vector<int> test1 = {0, 1, 2};
+	auto iter1 = test1.GetEnd<Iterator>();
+	ASSERT_TRUE(*(iter1 - 1) == 2);
+}
+
 TEST(VectorIterator, CopyTest)
 {
 	Vector<int> v = {0, 1, 2};
