@@ -551,13 +551,13 @@ namespace SpaceGameEngine
 		template<>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin<Iterator>()
 		{
-			return GetIteratorTypeInstance<Iterator, Vector, T>::Result(reinterpret_cast<T*>(m_pContent));
+			return typename GetIteratorTypeInstance<Iterator, Vector, T>::Result(reinterpret_cast<T*>(m_pContent));
 		}
 
 		template<>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetEnd<Iterator>()
 		{
-			return GetIteratorTypeInstance<Iterator, Vector, T>::Result(reinterpret_cast<T*>(m_pContent) + m_Size);
+			return typename GetIteratorTypeInstance<Iterator, Vector, T>::Result(reinterpret_cast<T*>(m_pContent) + m_Size);
 		}
 
 	private:
