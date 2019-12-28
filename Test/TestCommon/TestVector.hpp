@@ -228,17 +228,67 @@ TEST(Vector, GetObjectTest)
 	ASSERT_TRUE(v.GetObject(1) == 3);
 }
 
-TEST(StdVector, CopyTest)
+TEST(Vector, GetDataTest)
 {
-	std::vector<test_vector_class> test = {0, 1, 2};
-	std::vector<test_vector_class> test2 = {0, 0, 0};
-	std::vector<test_vector_class> test3 = {1};
-	test2 = test;
-	test3 = test2;
+	Vector<int> v1 = {0, 1, 2};
+	const Vector<int> v2 = {0, 1, 2};
+	ASSERT_TRUE(v1.GetData() == &v1.GetObject(0));
+	ASSERT_TRUE(*v1.GetData() == 0);
+	ASSERT_TRUE(v2.GetData() == &v2.GetObject(0));
+	ASSERT_TRUE(*v2.GetData() == 0);
 }
 
-TEST(StdVector, IteratorGetBeginTest)
+TEST(VectorIterator, GetBeginTest)
 {
 	Vector<int> test1 = {0, 1, 2};
 	auto iter1 = test1.GetBegin<Iterator>();
+	ASSERT_TRUE(*iter1 == 0);
+}
+
+TEST(VectorIterator, CopyTest)
+{
+	Vector<int> v = {0, 1, 2};
+	auto iter1 = v.GetBegin<Iterator>();
+	auto iter2 = iter1;
+	auto iter3 = v.GetBegin<Iterator>() + 1;
+	ASSERT_TRUE(*iter1 == *iter2 && *iter1 == 0);
+	ASSERT_TRUE(*iter3 == 1);
+	iter3 = iter2;
+	ASSERT_TRUE(*iter3 == *iter2 && *iter2 == 0);
+}
+
+TEST(VectorIterator, CalculationOperatorTest)
+{
+	Vector<int> v = {0, 1, 2, 3, 4};
+	for (auto i = v.GetBegin<Iterator>(); i != v.GetBegin<Iterator>() + v.GetSize(); i += 1)
+	{
+		ASSERT_TRUE(*i == v.GetObject(i - v.GetBegin<Iterator>()));
+	}
+	for (auto i = v.GetBegin<Iterator>(); i != v.GetBegin<Iterator>() + v.GetSize(); i = i + 1)
+	{
+		ASSERT_TRUE(*i == v.GetObject(i - v.GetBegin<Iterator>()));
+	}
+	for (auto i = v.GetBegin<Iterator>() + v.GetSize() - 1; (i == v.GetBegin<Iterator>() - 1) == false; i -= 1)
+	{
+		ASSERT_TRUE(*i == v.GetObject(i - v.GetBegin<Iterator>()));
+	}
+	for (auto i = v.GetBegin<Iterator>() + v.GetSize() - 1; (i == v.GetBegin<Iterator>() - 1) == false; i = i - 1)
+	{
+		ASSERT_TRUE(*i == v.GetObject(i - v.GetBegin<Iterator>()));
+	}
+}
+
+TEST(VectorIterator, GetTest)
+{
+	Vector<test_vector_class> v = {0, 1, 2};
+	auto iter = v.GetBegin<Iterator>();
+	ASSERT_TRUE((*iter).content == 0);
+	ASSERT_TRUE(iter->content == 0);
+}
+
+TEST(VectorIterator, OutOfRangeErrorTest)
+{
+	Vector<int> test = {0, 1, 2};
+	ASSERT_TRUE((Iterator<Vector, int>::OutOfRangeError::Judge(test.GetBegin<Iterator>(), test.GetData(), test.GetData() + test.GetSize()) == false));
+	ASSERT_TRUE((Iterator<Vector, int>::OutOfRangeError::Judge(test.GetBegin<Iterator>() - 1, test.GetData(), test.GetData() + test.GetSize()) == true));
 }

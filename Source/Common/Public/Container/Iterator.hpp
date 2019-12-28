@@ -31,29 +31,67 @@ namespace SpaceGameEngine
 	class Iterator
 	{
 	public:
-		/*!
-		@brief iterator must have a constructor,but its concrete form need to be designed according
-		to the concrete container.
-		*/
-		inline Iterator(...){};
+		inline Iterator(const Iterator&)
+		{
+		}
 
-		inline Iterator(const Iterator&){};
+		inline Iterator& operator=(const Iterator&)
+		{
+		}
 
-		inline Iterator& operator=(const Iterator&){};
+		inline Iterator operator+(SizeType) const
+		{
+		}
 
-		inline Iterator& operator+(SizeType){};
+		inline Iterator& operator+=(SizeType)
+		{
+		}
 
-		inline Iterator& operator+=(SizeType){};
+		inline Iterator operator-(SizeType) const
+		{
+		}
 
-		inline Iterator& operator-(SizeType){};
+		inline Iterator& operator-=(SizeType)
+		{
+		}
 
-		inline Iterator& operator-=(SizeType){};
+		inline SizeType operator-(const Iterator&) const
+		{
+		}
 
-		inline T* operator->(){};
+		inline T* operator->() const
+		{
+		}
 
-		inline T& operator*(){};
+		inline T& operator*() const
+		{
+		}
+
+		inline bool operator==(const Iterator&) const
+		{
+		}
+
+		inline bool operator!=(const Iterator&) const
+		{
+		}
+
+		struct OutOfRangeError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+			inline static bool Judge(...)
+			{
+				return true;
+			}
+		};
 
 	private:
+		/*!
+		@note iterator must have a constructor,but its concrete form need to be designed according
+		to the concrete container.And to avoid the invalid construction of the iterator,this constructor
+		must be private.We need to use friend-definition to give the types and functions which we
+		can believe the ability to construct the iterator.
+		*/
+		inline Iterator(...){};
 	};
 
 	/*!

@@ -410,6 +410,16 @@ namespace SpaceGameEngine
 			}
 		}
 
+		inline T* GetData()
+		{
+			return reinterpret_cast<T*>(m_pContent);
+		}
+
+		inline const T* GetData() const
+		{
+			return reinterpret_cast<T*>(m_pContent);
+		}
+
 		inline SizeType GetSize() const
 		{
 			return m_Size;
@@ -439,13 +449,25 @@ namespace SpaceGameEngine
 		template<template<template<typename...> class, typename> class IteratorType>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin()
 		{
-			static_assert(false, "Can not use this type to get begin iterator");
+			static_assert(false, "Can not use this type to store iterator");
+		}
+
+		/*!
+		@brief get the const begin iterator of the Vector.
+		@note it can just accept the iterator type.If you want to define your own iterator type,
+		you need to specialize this template method to make Vector support your iterator type.
+		*/
+		template<template<template<typename...> class, typename> class IteratorType>
+		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin() const
+		{
+			static_assert(false, "Can not use this type to store const iterator");
 		}
 
 	public:
 		template<>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin<Iterator>()
 		{
+			return GetIteratorTypeInstance<Iterator, Vector, T>::Result(reinterpret_cast<T*>(m_pContent));
 		}
 
 	private:
@@ -458,6 +480,86 @@ namespace SpaceGameEngine
 	class Iterator<Vector, T>
 	{
 	public:
+		struct OutOfRangeError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+			inline static bool Judge(const Iterator<Vector, T>& iter, T* begin, T* end)
+			{
+				return !(iter.m_pContent >= begin && iter.m_pContent <= end);
+			}
+		};
+
+	public:
+		friend OutOfRangeError;
+
+		template<typename _T, typename Allocator>
+		friend class Vector;
+
+		inline Iterator<Vector, T>(const Iterator<Vector, T>& iter)
+		{
+			m_pContent = iter.m_pContent;
+		}
+
+		inline Iterator<Vector, T>& operator=(const Iterator<Vector, T>& iter)
+		{
+			m_pContent = iter.m_pContent;
+			return *this;
+		}
+
+		inline Iterator<Vector, T> operator+(SizeType i) const
+		{
+			return Iterator<Vector, T>(m_pContent + i);
+		}
+
+		inline Iterator<Vector, T>& operator+=(SizeType i)
+		{
+			m_pContent += i;
+			return *this;
+		}
+
+		inline Iterator<Vector, T> operator-(SizeType i) const
+		{
+			return Iterator<Vector, T>(m_pContent - i);
+		}
+
+		inline Iterator<Vector, T>& operator-=(SizeType i)
+		{
+			m_pContent -= i;
+			return *this;
+		}
+
+		inline SizeType operator-(const Iterator<Vector, T>& iter) const
+		{
+			return ((AddressType)m_pContent - (AddressType)iter.m_pContent) / sizeof(T);
+		}
+
+		inline T* operator->() const
+		{
+			return m_pContent;
+		}
+
+		inline T& operator*() const
+		{
+			return *m_pContent;
+		}
+
+		inline bool operator==(const Iterator<Vector, T>& iter) const
+		{
+			return m_pContent == iter.m_pContent;
+		}
+
+		inline bool operator!=(const Iterator<Vector, T>& iter) const
+		{
+			return m_pContent != iter.m_pContent;
+		}
+
+	private:
+		inline explicit Iterator<Vector, T>(T* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			m_pContent = ptr;
+		}
+
 	private:
 		T* m_pContent;
 	};
