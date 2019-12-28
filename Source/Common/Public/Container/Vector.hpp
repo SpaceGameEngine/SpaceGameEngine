@@ -428,6 +428,7 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief set the Vector's size.
+		@param val the default value of the new elements.
 		@note There are three situations when the function is called.When
 		the size we set is less than the Vector's old size,the Vector
 		will release its spare elements.When the size we set is larger than
