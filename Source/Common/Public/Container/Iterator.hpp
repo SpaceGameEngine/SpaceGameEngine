@@ -31,6 +31,16 @@ namespace SpaceGameEngine
 	class Iterator
 	{
 	public:
+		template<typename Allocator>
+		inline static Iterator GetBegin(Container<T, Allocator>&)
+		{
+		}
+
+		template<typename Allocator>
+		inline static Iterator GetEnd(Container<T, Allocator>&)
+		{
+		}
+
 		inline Iterator(const Iterator&)
 		{
 		}

@@ -506,58 +506,25 @@ namespace SpaceGameEngine
 		/*!
 		@brief get the begin iterator of the Vector.
 		@note it can just accept the iterator type.If you want to define your own iterator type,
-		you need to specialize this template method to make Vector support your iterator type.
+		you need to write a template method called GetBegin in your iterator type to make Vector
+		support your iterator type.
 		*/
 		template<template<template<typename...> class, typename> class IteratorType>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin()
 		{
-			static_assert(false, "Can not use this type to store iterator");
-		}
-
-		/*!
-		@brief get the const begin iterator of the Vector.
-		@note it can just accept the iterator type.If you want to define your own iterator type,
-		you need to specialize this template method to make Vector support your iterator type.
-		*/
-		template<template<template<typename...> class, typename> class IteratorType>
-		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin() const
-		{
-			static_assert(false, "Can not use this type to store const iterator");
+			return typename GetIteratorTypeInstance<Iterator, Vector, T>::Result::template GetBegin(*this);
 		}
 
 		/*!
 		@brief get the end iterator of the Vector.
 		@note it can just accept the iterator type.If you want to define your own iterator type,
-		you need to specialize this template method to make Vector support your iterator type.
+		you need to write a template method called GetEnd in your iterator type to make Vector
+		support your iterator type.
 		*/
 		template<template<template<typename...> class, typename> class IteratorType>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetEnd()
 		{
-			static_assert(false, "Can not use this type to store iterator");
-		}
-
-		/*!
-		@brief get the const end iterator of the Vector.
-		@note it can just accept the iterator type.If you want to define your own iterator type,
-		you need to specialize this template method to make Vector support your iterator type.
-		*/
-		template<template<template<typename...> class, typename> class IteratorType>
-		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetEnd() const
-		{
-			static_assert(false, "Can not use this type to store const iterator");
-		}
-
-	public:
-		template<>
-		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin<Iterator>()
-		{
-			return typename GetIteratorTypeInstance<Iterator, Vector, T>::Result(reinterpret_cast<T*>(m_pContent));
-		}
-
-		template<>
-		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetEnd<Iterator>()
-		{
-			return typename GetIteratorTypeInstance<Iterator, Vector, T>::Result(reinterpret_cast<T*>(m_pContent) + m_Size);
+			return typename GetIteratorTypeInstance<Iterator, Vector, T>::Result::template GetEnd(*this);
 		}
 
 	private:
@@ -582,8 +549,17 @@ namespace SpaceGameEngine
 	public:
 		friend OutOfRangeError;
 
-		template<typename _T, typename Allocator>
-		friend class Vector;
+		template<typename Allocator>
+		inline static Iterator<Vector, T> GetBegin(Vector<T, Allocator>& vec)
+		{
+			return Iterator<Vector, T>(vec.GetData());
+		}
+
+		template<typename Allocator>
+		inline static Iterator<Vector, T> GetEnd(Vector<T, Allocator>& vec)
+		{
+			return Iterator<Vector, T>(vec.GetData() + vec.GetSize());
+		}
 
 		inline Iterator<Vector, T>(const Iterator<Vector, T>& iter)
 		{
