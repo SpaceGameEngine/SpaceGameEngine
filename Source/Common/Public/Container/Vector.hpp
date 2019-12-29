@@ -503,6 +503,18 @@ namespace SpaceGameEngine
 			return *reinterpret_cast<T*>((AddressType)(m_pContent) + index * sizeof(T));
 		}
 
+		inline T& operator[](SizeType index)
+		{
+			SGE_ASSERT(InvalidSizeError, index, 0, m_Size - 1);
+			return GetObject(index);
+		}
+
+		inline const T& operator[](SizeType index) const
+		{
+			SGE_ASSERT(InvalidSizeError, index, 0, m_Size - 1);
+			return GetObject(index);
+		}
+
 		/*!
 		@brief get the begin iterator of the Vector.
 		@note it can just accept the iterator type.If you want to define your own iterator type,

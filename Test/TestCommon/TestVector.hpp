@@ -272,6 +272,16 @@ TEST(Vector, SetSizeTest)
 	ASSERT_TRUE((v.GetBegin<Iterator>() + 6)->mi == 1);
 }
 
+TEST(Vector, GetObjectByOperatorTest)
+{
+	Vector<int> v = {0, 1, 2};
+	const Vector<int> cv = {0, 1, 2};
+	ASSERT_TRUE(v[1] == 1);
+	ASSERT_TRUE(cv[1] == 1);
+	v[2] = 0;
+	ASSERT_TRUE(v.GetObject(2) == 0);
+}
+
 TEST(VectorIterator, GetBeginTest)
 {
 	Vector<int> test1 = {0, 1, 2};
