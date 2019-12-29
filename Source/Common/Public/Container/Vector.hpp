@@ -512,7 +512,7 @@ namespace SpaceGameEngine
 		template<template<template<typename...> class, typename> class IteratorType>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin()
 		{
-			return typename GetIteratorTypeInstance<Iterator, Vector, T>::Result::template GetBegin(*this);
+			return GetIteratorTypeInstance<Iterator, Vector, T>::Result::template GetBegin(*this);
 		}
 
 		/*!
@@ -524,7 +524,7 @@ namespace SpaceGameEngine
 		template<template<template<typename...> class, typename> class IteratorType>
 		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetEnd()
 		{
-			return typename GetIteratorTypeInstance<Iterator, Vector, T>::Result::template GetEnd(*this);
+			return GetIteratorTypeInstance<Iterator, Vector, T>::Result::template GetEnd(*this);
 		}
 
 	private:
