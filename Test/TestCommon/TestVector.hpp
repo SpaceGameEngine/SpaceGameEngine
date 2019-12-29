@@ -258,7 +258,9 @@ TEST(Vector, SetSizeTest)
 	v.SetSize(2, test_vector_class());
 	ASSERT_TRUE(v.GetSize() == 2);
 	ASSERT_TRUE(v.GetRealSize() == 6);
+#ifndef SGE_DEBUG	 //destructor action may be optimized in release mode
 	ASSERT_TRUE((v.GetData() + 2)->mi == -1);
+#endif
 	v.SetSize(6, test_vector_class(1));
 	ASSERT_TRUE(v.GetSize() == 6);
 	ASSERT_TRUE(v.GetRealSize() == 6);
