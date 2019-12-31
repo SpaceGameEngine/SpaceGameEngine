@@ -16,7 +16,7 @@ limitations under the License.
 #pragma once
 #include <vector>
 #include "benchmark/benchmark.h"
-#include "MemoryManager.h"
+#include "Memory/MemoryManager.h"
 
 // ----------
 

@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "Error.h"
-#include "MemoryManager.h"
+#include "Memory/MemoryManager.h"
 #include "MetaData/MetaObject.hpp"
 #include "Utility/ControllableObject.hpp"
 #include <type_traits>

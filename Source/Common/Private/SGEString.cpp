@@ -16,7 +16,7 @@ limitations under the License.
 #include "SGEString.h"
 #include "StringImplement/StdTStringImplement.h"
 #include "Error.h"
-#include "MemoryManager.h"
+#include "Memory/MemoryManager.h"
 
 SpaceGameEngine::String::String()
 {

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "MemoryManager.h"
+#include "Memory/MemoryManager.h"
 #include "Error.h"
 #include <algorithm>
 #include <cstring>
@@ -123,16 +123,13 @@ SpaceGameEngine::MemoryManager::MemoryBlockHeader* SpaceGameEngine::MemoryManage
 
 bool SpaceGameEngine::InvalidAlignmentError::Judge(SizeType alignment)
 {
-	return !((alignment & (alignment - 1)) == 0);
+	return (alignment & (alignment - 1)) != 0;
 }
 
 SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
 {
 	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
-	if (size >= 16)
-		return 16;
-	else
-		return 4;
+	return size >= 16 ? 16 : 4;
 }
 
 SpaceGameEngine::MemoryManager::~MemoryManager()
