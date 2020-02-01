@@ -522,9 +522,9 @@ namespace SpaceGameEngine
 		support your iterator type.
 		*/
 		template<template<template<typename...> class, typename> class IteratorType>
-		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetBegin()
+		inline typename GetIteratorTypeInstance<IteratorType, Vector, T>::Result GetBegin()
 		{
-			return GetIteratorTypeInstance<Iterator, Vector, T>::Result::template GetBegin(*this);
+			return GetIteratorTypeInstance<IteratorType, Vector, T>::Result::template GetBegin(*this);
 		}
 
 		/*!
@@ -534,9 +534,9 @@ namespace SpaceGameEngine
 		support your iterator type.
 		*/
 		template<template<template<typename...> class, typename> class IteratorType>
-		inline typename GetIteratorTypeInstance<Iterator, Vector, T>::Result GetEnd()
+		inline typename GetIteratorTypeInstance<IteratorType, Vector, T>::Result GetEnd()
 		{
-			return GetIteratorTypeInstance<Iterator, Vector, T>::Result::template GetEnd(*this);
+			return GetIteratorTypeInstance<IteratorType, Vector, T>::Result::template GetEnd(*this);
 		}
 
 	private:
@@ -554,6 +554,8 @@ namespace SpaceGameEngine
 			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
 			inline static bool Judge(const Iterator<Vector, T>& iter, T* begin, T* end)
 			{
+				SGE_ASSERT(NullPointerError, begin);
+				SGE_ASSERT(NullPointerError, end);
 				return !(iter.m_pContent >= begin && iter.m_pContent <= end);
 			}
 		};

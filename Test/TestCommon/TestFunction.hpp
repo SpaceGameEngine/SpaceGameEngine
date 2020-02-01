@@ -68,7 +68,7 @@ TEST(Function, IsFunctionTest)
 	ASSERT_TRUE(Function<void()>::IsFunction<decltype(func)>::Value);
 	ASSERT_TRUE(!Function<void()>::IsFunction<int>::Value);
 }
-TEST(Function, ConstractionTest)
+TEST(Function, ConstructionTest)
 {
 	auto lambda = [](void) -> int { return 1; };
 	Function<int(void)> func(lambda);
@@ -87,6 +87,8 @@ TEST(Function, ConstractionTest)
 	ASSERT_TRUE(func6(&tc) == tc.test());
 	Function<int(void)> func7 = functor();
 	ASSERT_TRUE(func7() == functor()());	// use functor
+	Function<int(int)> func8 = [](int i) { return i; };
+	ASSERT_TRUE(func8(1) == 1);
 }
 TEST(Function, MetaDataTest)
 {
