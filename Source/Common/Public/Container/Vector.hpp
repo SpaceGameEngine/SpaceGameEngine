@@ -30,11 +30,11 @@ namespace SpaceGameEngine
 	/*!
 	@brief Vector is a type of ordered container which is non-thread-safe.
 	@note It uses a method called pre-allocating to allocate its memory which
-	it need.If it does not contain any object,it will pre-allocate a memory
-	which can contain four objects.If you insert a new object,and the memory
+	it needs.If it does not contain any object,it will pre-allocate a memory
+	which can contain 4 objects.If you insert a new object,and the memory which
 	the Vector needs after the inserting is larger than the memory it holds
 	before at the same time,it will re-allocate another memory which as twice
-	large as the previous one,and after that,it will copy the contents of the
+	large as the previous one,and after that,it will copy the content of the
 	old memory and paste them into the new one.Finally the old memory will be
 	released safely,and the free part of the new memory will be regard as the
 	new pre-allocated memory.

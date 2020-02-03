@@ -14,20 +14,15 @@
 	* `Iterator GetEnd();`
 	* `ConstIterator GetConstBegin() const;`
 	* `ConstIterator GetConstEnd() const;`
-	* `Insert`
-		* `Iterator Insert(ConstIterator pos,const T& val);`
-		* `Iterator Insert(ConstIterator pos,T&& val);`
-		* `Iterator Insert(ConstIterator pos,SizeType size,const T& val);`
-		* `Iterator Insert(ConstIterator pos,OtherIterator first,OtherIterator last);`
-		* `Iterator Insert(ConstIterator pos,std::initializer_list<T> list);`
+	* `Add`
+		* `Iterator Add(const T&);`
+		* `Iterator Add(T&&);`
 	* `Remove`
-		* `Iterator Remove(ConstIterator pos);`
-		* `Iterator Remove(ConstIterator first,ConstIterator last);`
-		* `Iterator Remove(const Function<bool(const T&)>& func);`
+		* `void Remove(ConstIterator pos);`
+		* `void Remove(const Function<bool(const T&)>& func);`
 	* `Find`
 		* `Iterator Find(const T& val);`
 		* `ConstIterator Find(const T& val) const;`
 		* `Iterator Find(const Function<bool(const T&)>& func);`
 		* `ConstIterator Find(const Function<bool(const T&)>& func) const;`
 		* `void Find(const Function<bool(const T&)>& judge,const Function<void(const T&)>& action) const;`
-	* `void Modify(const Function<bool(const T&)>& judge,const Function<void(T&)>& action);`
