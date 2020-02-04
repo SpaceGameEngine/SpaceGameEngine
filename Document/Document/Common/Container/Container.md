@@ -12,13 +12,13 @@
 	* `void Clear();`
 	* `Iterator GetBegin();`
 	* `Iterator GetEnd();`
-	* `ConstIterator GetConstBegin() const;`
-	* `ConstIterator GetConstEnd() const;`
+	* `ConstIterator GetBegin() const;`
+	* `ConstIterator GetEnd() const;`
 	* `Add`
 		* `Iterator Add(const T&);`
 		* `Iterator Add(T&&);`
 	* `Remove`
-		* `void Remove(ConstIterator pos);`
+		* `void Remove(const ConstIterator& pos);`
 		* `void Remove(const Function<bool(const T&)>& func);`
 	* `Find`
 		* `Iterator Find(const T& val);`
