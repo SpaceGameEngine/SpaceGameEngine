@@ -20,3 +20,19 @@ limitations under the License.
 #include "Container/ContainerImplement.hpp"
 
 using namespace SpaceGameEngine;
+
+TEST(ContainerConcept, IsEqualityComparable)
+{
+	ASSERT_TRUE((IsEqualityComparable<int, long>::Result));
+	ASSERT_FALSE((IsEqualityComparable<std::string, float>::Result));
+	ASSERT_TRUE((IsEqualityComparable<int, int>::Result));
+	ASSERT_TRUE((IsEqualityComparable<double>::Result));
+}
+
+TEST(ContainerConcept, IsTotallyOrdered)
+{
+	ASSERT_TRUE((IsTotallyOrdered<int, long>::Result));
+	ASSERT_FALSE((IsTotallyOrdered<std::string, float>::Result));
+	ASSERT_TRUE((IsTotallyOrdered<int, int>::Result));
+	ASSERT_TRUE((IsTotallyOrdered<double>::Result));
+}

@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include <type_traits>
 
 namespace SpaceGameEngine
 {
@@ -22,6 +23,106 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	/*!
+	@file
+	@todo use cpp20's concept instead of sfinae(change IsXxx to Xxx).
+	*/
+
+	template<typename T>
+	struct IsDefaultConstructible
+	{
+		inline static constexpr const bool Result = std::is_default_constructible_v<T>;
+	};
+
+	template<typename T>
+	struct IsCopyConstructible
+	{
+		inline static constexpr const bool Result = std::is_copy_constructible_v<T>;
+	};
+
+	template<typename T>
+	struct IsMoveConstructible
+	{
+		inline static constexpr const bool Result = std::is_move_constructible_v<T>;
+	};
+
+	template<typename T>
+	struct IsCopyAssignable
+	{
+		inline static constexpr const bool Result = std::is_copy_assignable_v<T>;
+	};
+
+	template<typename T>
+	struct IsMoveAssignable
+	{
+		inline static constexpr const bool Result = std::is_move_assignable_v<T>;
+	};
+
+	template<typename T>
+	struct IsMovable
+	{
+		inline static constexpr const bool Result = IsMoveConstructible<T>::Result && IsMoveAssignable<T>::Result;
+	};
+
+	template<typename T>
+	struct IsCopyable
+	{
+		inline static constexpr const bool Result = IsMovable<T>::Result && IsCopyConstructible<T>::Result && IsCopyAssignable<T>::Result;
+	};
+
+	template<typename T, typename U = T>
+	struct IsEqualityComparable
+	{
+	private:
+		template<typename _T, typename _U>
+		inline static constexpr std::enable_if_t<
+			std::is_same_v<decltype(std::declval<const std::remove_cv_t<_T>&>() == std::declval<const std::remove_cv_t<_U>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_T>&>() != std::declval<const std::remove_cv_t<_U>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_U>&>() == std::declval<const std::remove_cv_t<_T>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_U>&>() != std::declval<const std::remove_cv_t<_T>&>()), bool>,
+			bool>
+		Check(int)
+		{
+			return true;
+		}
+		template<typename _T, typename _U>
+		inline static constexpr bool Check(...)
+		{
+			return false;
+		}
+
+	public:
+		inline static constexpr const bool Result = Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
+	};
+
+	template<typename T, typename U = T>
+	struct IsTotallyOrdered
+	{
+	private:
+		template<typename _T, typename _U>
+		inline static constexpr std::enable_if_t<
+			std::is_same_v<decltype(std::declval<const std::remove_cv_t<_T>&>() < std::declval<const std::remove_cv_t<_U>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_T>&>() > std::declval<const std::remove_cv_t<_U>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_T>&>() <= std::declval<const std::remove_cv_t<_U>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_T>&>() >= std::declval<const std::remove_cv_t<_U>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_U>&>() < std::declval<const std::remove_cv_t<_T>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_U>&>() > std::declval<const std::remove_cv_t<_T>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_U>&>() <= std::declval<const std::remove_cv_t<_T>&>()), bool> &&
+				std::is_same_v<decltype(std::declval<const std::remove_cv_t<_U>&>() >= std::declval<const std::remove_cv_t<_T>&>()), bool>,
+			bool>
+		Check(int)
+		{
+			return true;
+		}
+		template<typename _T, typename _U>
+		inline static constexpr bool Check(...)
+		{
+			return false;
+		}
+
+	public:
+		inline static constexpr const bool Result = IsEqualityComparable<T, U>::Result && Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
+	};
 	/*!
 	@}
 	*/
