@@ -81,6 +81,15 @@
     <ClInclude Include="Public\Container\Iterator.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\ContainerConcept.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\ContainerInterface.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\ContainerImplement.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

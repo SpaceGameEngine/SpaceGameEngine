@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.902
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectFile", "ProjectFile", "{73717249-81A9-4A5D-96D0-D59EA4C9CA9E}"
 	ProjectSection(SolutionItems) = preProject
@@ -63,6 +63,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Container", "Container", "{5C7E3D68-FEBE-44E8-A289-63E01D984092}"
 	ProjectSection(SolutionItems) = preProject
 		Document\Document\Common\Container\Container.md = Document\Document\Common\Container\Container.md
+		Document\Document\Common\Container\ContainerConcept.md = Document\Document\Common\Container\ContainerConcept.md
+		Document\Document\Common\Container\ContainerImplement.md = Document\Document\Common\Container\ContainerImplement.md
+		Document\Document\Common\Container\ContainerInterface.md = Document\Document\Common\Container\ContainerInterface.md
 		Document\Document\Common\Container\Iterator.md = Document\Document\Common\Container\Iterator.md
 	EndProjectSection
 EndProject

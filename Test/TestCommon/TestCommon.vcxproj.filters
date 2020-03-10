@@ -11,5 +11,6 @@
     <ClInclude Include="TestUtility.hpp" />
     <ClInclude Include="TestConcurrent.hpp" />
     <ClInclude Include="TestVector.hpp" />
+    <ClInclude Include="TestContainer.hpp" />
   </ItemGroup>
 </Project>
