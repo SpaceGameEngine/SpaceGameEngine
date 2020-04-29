@@ -296,6 +296,20 @@ TEST(VectorIterator, GetEndTest)
 	ASSERT_TRUE(*(iter1 - 1) == 2);
 }
 
+TEST(VectorIterator, GetConstBeginTest)
+{
+	Vector<int> test1 = {0, 1, 2};
+	auto iter1 = test1.GetConstBegin();
+	ASSERT_TRUE(*iter1 == 0);
+}
+
+TEST(VectorIterator, GetConstEndTest)
+{
+	Vector<int> test1 = {0, 1, 2};
+	auto iter1 = test1.GetConstEnd();
+	ASSERT_TRUE(*(iter1 - 1) == 2);
+}
+
 TEST(VectorIterator, CopyTest)
 {
 	Vector<int> v = {0, 1, 2};
@@ -327,6 +341,22 @@ TEST(VectorIterator, CalculationOperatorTest)
 	{
 		ASSERT_TRUE(*i == v.GetObject(i - v.GetBegin()));
 	}
+	for (auto i = v.GetConstBegin(); i != v.GetConstBegin() + v.GetSize(); i += 1)
+	{
+		ASSERT_TRUE(*i == v.GetObject(i - v.GetConstBegin()));
+	}
+	for (auto i = v.GetConstBegin(); i != v.GetConstBegin() + v.GetSize(); i = i + 1)
+	{
+		ASSERT_TRUE(*i == v.GetObject(i - v.GetConstBegin()));
+	}
+	for (auto i = v.GetConstBegin() + v.GetSize() - 1; (i == v.GetConstBegin() - 1) == false; i -= 1)
+	{
+		ASSERT_TRUE(*i == v.GetObject(i - v.GetConstBegin()));
+	}
+	for (auto i = v.GetConstBegin() + v.GetSize() - 1; (i == v.GetConstBegin() - 1) == false; i = i - 1)
+	{
+		ASSERT_TRUE(*i == v.GetObject(i - v.GetConstBegin()));
+	}
 }
 
 TEST(VectorIterator, GetTest)
@@ -335,6 +365,9 @@ TEST(VectorIterator, GetTest)
 	auto iter = v.GetBegin();
 	ASSERT_TRUE((*iter).content == 0);
 	ASSERT_TRUE(iter->content == 0);
+	auto citer = v.GetConstBegin();
+	ASSERT_TRUE((*citer).content == 0);
+	ASSERT_TRUE(citer->content == 0);
 }
 
 TEST(VectorIterator, OutOfRangeErrorTest)
@@ -342,4 +375,6 @@ TEST(VectorIterator, OutOfRangeErrorTest)
 	Vector<int> test = {0, 1, 2};
 	ASSERT_TRUE((Vector<int>::Iterator::OutOfRangeError::Judge(test.GetBegin(), test.GetData(), test.GetData() + test.GetSize()) == false));
 	ASSERT_TRUE((Vector<int>::Iterator::OutOfRangeError::Judge(test.GetBegin() - 1, test.GetData(), test.GetData() + test.GetSize()) == true));
+	ASSERT_TRUE((Vector<int>::ConstIterator::OutOfRangeError::Judge(test.GetConstBegin(), test.GetData(), test.GetData() + test.GetSize()) == false));
+	ASSERT_TRUE((Vector<int>::ConstIterator::OutOfRangeError::Judge(test.GetConstBegin() - 1, test.GetData(), test.GetData() + test.GetSize()) == true));
 }
