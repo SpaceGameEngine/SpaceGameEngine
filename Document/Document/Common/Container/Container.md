@@ -12,17 +12,5 @@
 	* `void Clear();`
 	* `Iterator GetBegin();`
 	* `Iterator GetEnd();`
-	* `ConstIterator GetBegin() const;`
-	* `ConstIterator GetEnd() const;`
-	* `Add`
-		* `Iterator Add(const T&);`
-		* `Iterator Add(T&&);`
-	* `Remove`
-		* `void Remove(const ConstIterator& pos);`
-		* `void Remove(const Function<bool(const T&)>& func);`
-	* `Find`
-		* `Iterator Find(const T& val);`
-		* `ConstIterator Find(const T& val) const;`
-		* `Iterator Find(const Function<bool(const T&)>& func);`
-		* `ConstIterator Find(const Function<bool(const T&)>& func) const;`
-		* `void Find(const Function<bool(const T&)>& judge,const Function<void(const T&)>& action) const;`
+	* `ConstIterator GetConstBegin() const;`
+	* `ConstIterator GetConstEnd() const;`
