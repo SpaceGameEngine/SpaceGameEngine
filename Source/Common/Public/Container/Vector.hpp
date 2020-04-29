@@ -693,22 +693,22 @@ namespace SpaceGameEngine
 
 		inline Iterator GetBegin()
 		{
-			return Iterator((T*)m_pContent);
+			return Iterator(reinterpret_cast<T*>(m_pContent));
 		}
 
 		inline Iterator GetEnd()
 		{
-			return Iterator((T*)(m_pContent) + m_Size);
+			return Iterator(reinterpret_cast<T*>(m_pContent) + m_Size);
 		}
 
 		inline ConstIterator GetConstBegin()
 		{
-			return ConstIterator((T*)m_pContent);
+			return ConstIterator(reinterpret_cast<T*>(m_pContent));
 		}
 
 		inline ConstIterator GetConstEnd()
 		{
-			return ConstIterator((T*)(m_pContent) + m_Size);
+			return ConstIterator(reinterpret_cast<T*>(m_pContent) + m_Size);
 		}
 
 	private:
