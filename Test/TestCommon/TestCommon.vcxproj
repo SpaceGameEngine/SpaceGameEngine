@@ -170,7 +170,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestContainer.hpp" />
+    <ClInclude Include="TestContainerConcept.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
     <ClInclude Include="TestString.hpp" />
