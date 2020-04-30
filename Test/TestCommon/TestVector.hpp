@@ -282,6 +282,21 @@ TEST(Vector, GetObjectByOperatorTest)
 	ASSERT_TRUE(v.GetObject(2) == 0);
 }
 
+TEST(Vector, PushBackTest)
+{
+	Vector<test_vector_class> v = {0, 1, 2};
+	ASSERT_TRUE(v.GetSize() == 3);
+	test_vector_class val(3);
+	auto& val_r = v.PushBack(val);
+	ASSERT_TRUE(val_r.content == val.content && val_r.content == 3);
+	ASSERT_TRUE(v.GetSize() == 4);
+	ASSERT_TRUE(val_r.mi == 1);
+	auto& val_r2 = v.PushBack(test_vector_class(4));
+	ASSERT_TRUE(val_r2.content == 4);
+	ASSERT_TRUE(v.GetSize() == 5);
+	ASSERT_TRUE(val_r2.mi == 3);
+}
+
 TEST(VectorIterator, GetBeginTest)
 {
 	Vector<int> test1 = {0, 1, 2};

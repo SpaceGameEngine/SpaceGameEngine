@@ -711,6 +711,38 @@ namespace SpaceGameEngine
 			return ConstIterator(reinterpret_cast<T*>(m_pContent) + m_Size);
 		}
 
+		inline T& PushBack(const T& val)
+		{
+			if (m_Size + 1 <= m_RealSize)
+			{
+				new (reinterpret_cast<T*>(m_pContent) + m_Size) T(val);
+				m_Size += 1;
+			}
+			else
+			{
+				SetRealSize(2 * m_RealSize);
+				new (reinterpret_cast<T*>(m_pContent) + m_Size) T(val);
+				m_Size += 1;
+			}
+			return GetObject(m_Size - 1);
+		}
+
+		inline T& PushBack(T&& val)
+		{
+			if (m_Size + 1 <= m_RealSize)
+			{
+				new (reinterpret_cast<T*>(m_pContent) + m_Size) T(std::move(val));
+				m_Size += 1;
+			}
+			else
+			{
+				SetRealSize(2 * m_RealSize);
+				new (reinterpret_cast<T*>(m_pContent) + m_Size) T(std::move(val));
+				m_Size += 1;
+			}
+			return GetObject(m_Size - 1);
+		}
+
 	private:
 		void* m_pContent;
 		SizeType m_RealSize;
