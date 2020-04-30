@@ -297,6 +297,15 @@ TEST(Vector, PushBackTest)
 	ASSERT_TRUE(val_r2.mi == 3);
 }
 
+TEST(VectorIterator, IsVectorIteratorTest)
+{
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Result == true));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstIterator>::Result == true));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<int>::Result == false));
+	ASSERT_TRUE((Vector<float>::IsVectorIterator<Vector<int>::Iterator>::Result == false));
+	ASSERT_TRUE((Vector<float>::IsVectorIterator<Vector<int>::ConstIterator>::Result == false));
+}
+
 TEST(VectorIterator, GetBeginTest)
 {
 	Vector<int> test1 = {0, 1, 2};

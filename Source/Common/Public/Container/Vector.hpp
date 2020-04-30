@@ -743,6 +743,42 @@ namespace SpaceGameEngine
 			return GetObject(m_Size - 1);
 		}
 
+		/*!
+		@brief check the type to make sure that it is one of the Vector's Iterator Types.
+		@todo use concept
+		*/
+		template<typename U>
+		struct IsVectorIterator
+		{
+		private:
+			template<typename _U>
+			inline static constexpr std::enable_if_t<
+				IsError<typename _U::OutOfRangeError, const _U&, T*, T*>::Result &&
+					std::is_same_v<decltype(new _U(std::declval<_U>())), _U*> &&
+					std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
+					std::is_same_v<decltype(std::declval<_U>() + std::declval<SizeType>()), _U> &&
+					std::is_same_v<decltype(std::declval<_U>() += std::declval<SizeType>()), _U&> &&
+					std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
+					std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
+					std::is_same_v<decltype(std::declval<_U>() - std::declval<_U>()), SizeType> &&
+					(std::is_same_v<decltype(std::declval<_U>().operator->()), T*> || std::is_same_v<decltype(std::declval<_U>().operator->()), const T*>)&&(std::is_same_v<decltype(std::declval<_U>().operator*()), T&> || std::is_same_v<decltype(std::declval<_U>().operator*()), const T&>)&&std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
+					std::is_same_v<decltype(std::declval<_U>() != std::declval<_U>()), bool>,
+				bool>
+			Check(int)
+			{
+				return true;
+			}
+
+			template<typename _U>
+			inline static constexpr bool Check(...)
+			{
+				return false;
+			}
+
+		public:
+			inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
+		};
+
 	private:
 		void* m_pContent;
 		SizeType m_RealSize;
