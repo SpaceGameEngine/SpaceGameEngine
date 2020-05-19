@@ -701,12 +701,12 @@ namespace SpaceGameEngine
 			return Iterator(reinterpret_cast<T*>(m_pContent) + m_Size);
 		}
 
-		inline ConstIterator GetConstBegin()
+		inline ConstIterator GetConstBegin() const
 		{
 			return ConstIterator(reinterpret_cast<T*>(m_pContent));
 		}
 
-		inline ConstIterator GetConstEnd()
+		inline ConstIterator GetConstEnd() const
 		{
 			return ConstIterator(reinterpret_cast<T*>(m_pContent) + m_Size);
 		}
