@@ -112,6 +112,12 @@ TEST(Utility_ControllableObject, CopyTest)
 	ASSERT_EQ(test8.Get().i, 4);
 	test8 = std::move(_test2);
 	ASSERT_EQ(test8.Get().i, 5);
+
+	ControllableObject<int, StdAllocator> test9(9);
+	ControllableObject<int, MemoryManagerAllocator> test10(10);
+	test10 = test9;
+	ASSERT_EQ(test9, test10);
+	ASSERT_EQ(test10.Get(), 9);
 }
 
 TEST(Utility_ControllableObject, ComparasionTest)

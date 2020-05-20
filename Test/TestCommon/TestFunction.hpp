@@ -101,3 +101,13 @@ TEST(Function, ComparisionTest)
 	Function<void(int)> func2 = func;
 	ASSERT_EQ(func, func2);
 }
+TEST(Function, CopyTest)
+{
+	Function<void(int)> func(&func_);
+	Function<void(int), MemoryManagerAllocator> func2([](int) -> void {});
+	Function<void(int), StdAllocator> func3([](int) -> void {});
+	func2 = func;
+	func3 = func2;
+	ASSERT_EQ(func, func2);
+	ASSERT_EQ(func2, func3);
+}

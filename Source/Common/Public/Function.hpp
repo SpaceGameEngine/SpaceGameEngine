@@ -99,6 +99,9 @@ namespace SpaceGameEngine
 		};
 
 	public:
+		template<typename _T, typename _Allocator>
+		friend class Function;
+
 		inline Function() = delete;
 		inline ~Function()
 		{
@@ -139,12 +142,12 @@ namespace SpaceGameEngine
 
 		template<typename OtherAllocator>
 		inline Function(const Function<Ret(Args...), OtherAllocator>& func)
-			: m_pInvoke(func.m_pInvoke), m_Content(func.m_Content)
+			: m_pInvoke((decltype(m_pInvoke))func.m_pInvoke), m_Content(func.m_Content)
 		{
 		}
 		template<typename OtherAllocator>
 		inline Function(Function<Ret(Args...), OtherAllocator>&& func)
-			: m_pInvoke(func.m_pInvoke), m_Content(std::move(func.m_Content))
+			: m_pInvoke((decltype(m_pInvoke))func.m_pInvoke), m_Content(std::move(func.m_Content))
 		{
 		}
 		template<typename OtherAllocator>
@@ -154,7 +157,7 @@ namespace SpaceGameEngine
 				m_Content = func.m_Content;
 			else
 			{
-				m_pInvoke = func.m_pInvoke;
+				m_pInvoke = (decltype(m_pInvoke))func.m_pInvoke;
 				m_Content.Release();
 				m_Content.Init(func.m_Content.Get());
 			}
@@ -167,7 +170,7 @@ namespace SpaceGameEngine
 				m_Content = std::move(func.m_Content);
 			else
 			{
-				m_pInvoke = func.m_pInvoke;
+				m_pInvoke = (decltype(m_pInvoke))func.m_pInvoke;
 				m_Content.Release();
 				m_Content.Init(std::move(func.m_Content.Get()));
 			}
@@ -229,7 +232,7 @@ namespace SpaceGameEngine
 
 	private:
 		Ret (*m_pInvoke)(MetaObject<Allocator>&, Args...);
-		ControllableObject<MetaObject<Allocator>> m_Content;
+		ControllableObject<MetaObject<Allocator>, Allocator> m_Content;
 	};
 
 	/*!
