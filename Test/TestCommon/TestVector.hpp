@@ -300,7 +300,7 @@ TEST(Vector, PushBackTest)
 	{
 		val.content = i;
 		auto& val_r3 = v.PushBack(val);
-		ASSERT_TRUE(v.GetSize(), 6 + i);
+		ASSERT_TRUE(v.GetSize() == 6 + i);
 		ASSERT_TRUE(val_r3.content == i);
 		ASSERT_TRUE(val_r3.mi == 1);
 	}

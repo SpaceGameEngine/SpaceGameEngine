@@ -825,7 +825,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, const T& val)
 		{
-			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 			SizeType index = iter - IteratorType::GetBegin(*this);
 			if (index == m_Size)
 			{
@@ -852,7 +852,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, T&& val)
 		{
-			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 			SizeType index = iter - IteratorType::GetBegin(*this);
 			if (index == m_Size)
 			{
@@ -879,7 +879,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, SizeType size, const T& val)
 		{
-			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
 			SizeType index = iter - IteratorType::GetBegin(*this);
 			if (index == m_Size)
@@ -935,7 +935,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<IsIterator<AnotherIteratorType, T>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
-			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 			SizeType size = end - begin;
 			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
 			SizeType index = iter - IteratorType::GetBegin(*this);
@@ -994,7 +994,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, std::initializer_list<T> ilist)
 		{
-			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 			SizeType size = ilist.size();
 			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
 			SizeType index = iter - IteratorType::GetBegin(*this);
