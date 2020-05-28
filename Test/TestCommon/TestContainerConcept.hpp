@@ -19,7 +19,7 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-TEST(ContainerConcept, IsEqualityComparable)
+TEST(ContainerConcept, IsEqualityComparableTest)
 {
 	ASSERT_TRUE((IsEqualityComparable<int, long>::Result));
 	ASSERT_FALSE((IsEqualityComparable<std::string, float>::Result));
@@ -27,10 +27,17 @@ TEST(ContainerConcept, IsEqualityComparable)
 	ASSERT_TRUE((IsEqualityComparable<double>::Result));
 }
 
-TEST(ContainerConcept, IsTotallyOrdered)
+TEST(ContainerConcept, IsTotallyOrderedTest)
 {
 	ASSERT_TRUE((IsTotallyOrdered<int, long>::Result));
 	ASSERT_FALSE((IsTotallyOrdered<std::string, float>::Result));
 	ASSERT_TRUE((IsTotallyOrdered<int, int>::Result));
 	ASSERT_TRUE((IsTotallyOrdered<double>::Result));
+}
+
+TEST(ContainerConcept, IsIteratorTest)
+{
+	ASSERT_TRUE((IsIterator<Vector<int>::Iterator, int>::Result));
+	ASSERT_TRUE((IsIterator<Vector<int>::ConstIterator, int>::Result));
+	ASSERT_FALSE((IsIterator<int, int>::Result));
 }

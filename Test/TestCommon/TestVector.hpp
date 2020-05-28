@@ -295,6 +295,169 @@ TEST(Vector, PushBackTest)
 	ASSERT_TRUE(val_r2.content == 4);
 	ASSERT_TRUE(v.GetSize() == 5);
 	ASSERT_TRUE(val_r2.mi == 3);
+
+	for (int i = 0; i < 50; i++)
+	{
+		val.content = i;
+		auto& val_r3 = v.PushBack(val);
+		ASSERT_TRUE(v.GetSize(), 6 + i);
+		ASSERT_TRUE(val_r3.content == i);
+		ASSERT_TRUE(val_r3.mi == 1);
+	}
+}
+
+TEST(Vector, EmplaceBackTest)
+{
+	Vector<test_vector_class> v = {0, 1, 2};
+	ASSERT_TRUE(v.GetSize() == 3);
+	auto& val_r = v.EmplaceBack(3);
+	ASSERT_TRUE(val_r.content == 3);
+	ASSERT_TRUE(v.GetSize() == 4);
+	ASSERT_TRUE(val_r.mi == 0);
+
+	for (int i = 0; i < 50; i++)
+	{
+		auto& val_r2 = v.EmplaceBack(i);
+		ASSERT_TRUE(val_r2.content == i);
+		ASSERT_TRUE(v.GetSize() == 5 + i);
+		ASSERT_TRUE(val_r2.mi == 0);
+	}
+}
+
+TEST(Vector, InsertTest)
+{
+	Vector<test_vector_class> v1 = {0, 1, 2};
+
+	test_vector_class val = -1;
+	auto i1 = v1.Insert(v1.GetBegin(), val);
+	ASSERT_TRUE(v1.GetSize() == 4);
+	ASSERT_TRUE(v1[0].content == -1);
+	ASSERT_TRUE(v1[3].mi == 3);
+	for (int i = 1; i < 3; i++)
+		ASSERT_TRUE(v1[i].mi == 4);
+	ASSERT_EQ(v1[0].mi, 2);
+	ASSERT_TRUE(i1->content == -1);
+
+	val = 3;
+	auto i2 = v1.Insert(v1.GetEnd(), val);
+	ASSERT_TRUE(v1.GetSize() == 5);
+	ASSERT_EQ(v1[4].content, 3);
+	ASSERT_TRUE(v1[3].mi == 3);
+	for (int i = 1; i < 3; i++)
+		ASSERT_TRUE(v1[i].mi == 4);
+	ASSERT_TRUE(v1[0].mi == 2);
+	ASSERT_TRUE(v1[4].mi == 1);
+	ASSERT_TRUE(i2->content == 3);
+
+	val = -2;
+	auto i3 = v1.Insert(v1.GetConstBegin() + 1, val);
+	ASSERT_TRUE(v1.GetSize() == 6);
+	ASSERT_TRUE(v1[1].content == -2);
+	ASSERT_TRUE(v1[0].content == -1);
+	ASSERT_TRUE(v1[1].mi == 2);
+	ASSERT_TRUE(v1[0].mi == 2);
+	for (int i = 2; i < 5; i++)
+		ASSERT_TRUE(v1[i].mi == 4);
+	ASSERT_TRUE(v1[5].mi == 3);
+	ASSERT_TRUE(i3->content == -2);
+
+	val = 4;
+	auto i4 = v1.Insert(v1.GetConstEnd() - 1, val);
+	ASSERT_TRUE(v1.GetSize() == 7);
+	ASSERT_TRUE(v1[6].content == 3);
+	ASSERT_TRUE(v1[5].content == 4);
+	ASSERT_TRUE(i4->content == 4);
+
+	val = -3;
+	auto i5 = v1.Insert(v1.GetBegin(), std::move(val));
+	ASSERT_TRUE(i5->mi == 4);
+	ASSERT_TRUE(i5->content == -3);
+
+	Vector<test_vector_class> v2 = {0, 1};
+	auto i6 = v2.Insert(v2.GetConstBegin(), 4, -1);
+	ASSERT_EQ(i6->content, -1);
+	ASSERT_EQ(v2.GetSize(), 6);
+	for (int i = 0; i < 4; i++)
+		ASSERT_EQ(v2[i].content, -1);
+	ASSERT_EQ(v2[4].content, 0);
+	ASSERT_EQ(v2[5].content, 1);
+
+	auto i7 = v2.Insert(v2.GetConstBegin() + 1, 4, -2);
+	ASSERT_EQ(i7->content, -2);
+	ASSERT_EQ(v2.GetSize(), 10);
+	ASSERT_EQ(v2[0].content, -1);
+	for (int i = 1; i < 5; i++)
+		ASSERT_EQ(v2[i].content, -2);
+	for (int i = 5; i < 8; i++)
+		ASSERT_EQ(v2[i].content, -1);
+	ASSERT_EQ(v2[8].content, 0);
+	ASSERT_EQ(v2[9].content, 1);
+
+	auto i8 = v2.Insert(v2.GetEnd(), 8, 2);
+	ASSERT_EQ(i8->content, 2);
+	ASSERT_EQ(v2.GetSize(), 18);
+	ASSERT_EQ(v2[0].content, -1);
+	for (int i = 1; i < 5; i++)
+		ASSERT_EQ(v2[i].content, -2);
+	for (int i = 5; i < 8; i++)
+		ASSERT_EQ(v2[i].content, -1);
+	ASSERT_EQ(v2[8].content, 0);
+	ASSERT_EQ(v2[9].content, 1);
+	for (int i = 10; i < 18; i++)
+		ASSERT_EQ(v2[i].content, 2);
+
+	auto i9 = v2.Insert(v2.GetConstEnd(), 20, 3);
+	ASSERT_EQ(i9->content, 3);
+	ASSERT_EQ(v2.GetSize(), 38);
+	ASSERT_EQ(v2[0].content, -1);
+	for (int i = 1; i < 5; i++)
+		ASSERT_EQ(v2[i].content, -2);
+	for (int i = 5; i < 8; i++)
+		ASSERT_EQ(v2[i].content, -1);
+	ASSERT_EQ(v2[8].content, 0);
+	ASSERT_EQ(v2[9].content, 1);
+	for (int i = 10; i < 18; i++)
+		ASSERT_EQ(v2[i].content, 2);
+	for (int i = 18; i < 38; i++)
+		ASSERT_EQ(v2[i].content, 3);
+
+	Vector<test_vector_class> v3 = {0, 1};
+	auto i10 = v3.Insert(v3.GetConstBegin() + 1, v2.GetBegin(), v2.GetBegin() + 8);
+	ASSERT_EQ(i10->content, v2.GetBegin()->content);
+	ASSERT_EQ(v3.GetSize(), 10);
+	ASSERT_EQ(v3[0].content, 0);
+	ASSERT_EQ(v3[9].content, 1);
+	for (int i = 1; i < 9; i++)
+		ASSERT_EQ(v3[i].content, v2[i - 1].content);
+
+	auto i11 = v3.Insert(v3.GetEnd(), v1.GetBegin(), v1.GetEnd());
+	ASSERT_EQ(i11->content, v1.GetBegin()->content);
+	ASSERT_EQ(v3.GetSize(), 10 + v1.GetSize());
+	ASSERT_EQ(v3[0].content, 0);
+	ASSERT_EQ(v3[9].content, 1);
+	for (int i = 1; i < 9; i++)
+		ASSERT_EQ(v3[i].content, v2[i - 1].content);
+	for (int i = 10; i < 10 + v1.GetSize(); i++)
+		ASSERT_EQ(v3[i].content, v1[i - 10].content);
+
+	Vector<test_vector_class> v4 = {0, 1};
+	auto i12 = v4.Insert(v4.GetBegin(), {-3, -2, -1});
+	ASSERT_EQ(i12->content, -3);
+	ASSERT_EQ(v4.GetSize(), 5);
+	for (int i = 0; i < 3; i++)
+		ASSERT_EQ(v4[i].content, i - 3);
+	ASSERT_EQ(v4[3].content, 0);
+	ASSERT_EQ(v4[4].content, 1);
+
+	auto i13 = v4.Insert(v4.GetConstEnd(), {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15});
+	ASSERT_EQ(i13->content, 1);
+	ASSERT_EQ(v4.GetSize(), 20);
+	for (int i = 0; i < 3; i++)
+		ASSERT_EQ(v4[i].content, i - 3);
+	ASSERT_EQ(v4[3].content, 0);
+	ASSERT_EQ(v4[4].content, 1);
+	for (int i = 5; i < 20; i++)
+		ASSERT_EQ(v4[i].content, i - 4);
 }
 
 TEST(VectorIterator, IsVectorIteratorTest)

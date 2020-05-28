@@ -535,6 +535,16 @@ namespace SpaceGameEngine
 			friend OutOfRangeError;
 			friend Vector;
 
+			inline static Iterator GetBegin(Vector& v)
+			{
+				return v.GetBegin();
+			}
+
+			inline static Iterator GetEnd(Vector& v)
+			{
+				return v.GetEnd();
+			}
+
 			inline Iterator(const Iterator& iter)
 			{
 				m_pContent = iter.m_pContent;
@@ -621,6 +631,16 @@ namespace SpaceGameEngine
 		public:
 			friend OutOfRangeError;
 			friend Vector;
+
+			inline static ConstIterator GetBegin(const Vector& v)
+			{
+				return v.GetConstBegin();
+			}
+
+			inline static ConstIterator GetEnd(const Vector& v)
+			{
+				return v.GetConstEnd();
+			}
 
 			inline ConstIterator(const ConstIterator& iter)
 			{
@@ -743,6 +763,22 @@ namespace SpaceGameEngine
 			return GetObject(m_Size - 1);
 		}
 
+		template<typename... Args>
+		inline T& EmplaceBack(Args&&... args)
+		{
+			if (m_Size + 1 <= m_RealSize)
+			{
+				new (reinterpret_cast<T*>(m_pContent) + m_Size) T(std::forward<Args>(args)...);
+				m_Size += 1;
+			}
+			else
+			{
+				SetRealSize(2 * m_RealSize);
+				new (reinterpret_cast<T*>(m_pContent) + m_Size) T(std::forward<Args>(args)...);
+				m_Size += 1;
+			}
+			return GetObject(m_Size - 1);
+		}
 		/*!
 		@brief check the type to make sure that it is one of the Vector's Iterator Types.
 		@todo use concept
@@ -754,6 +790,8 @@ namespace SpaceGameEngine
 			template<typename _U>
 			inline static constexpr std::enable_if_t<
 				IsError<typename _U::OutOfRangeError, const _U&, T*, T*>::Result &&
+					std::is_same_v<decltype(_U::GetBegin(*(new Vector))), _U> &&
+					std::is_same_v<decltype(_U::GetEnd(*(new Vector))), _U> &&
 					std::is_same_v<decltype(new _U(std::declval<_U>())), _U*> &&
 					std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
 					std::is_same_v<decltype(std::declval<_U>() + std::declval<SizeType>()), _U> &&
@@ -778,6 +816,233 @@ namespace SpaceGameEngine
 		public:
 			inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
 		};
+
+		/*!
+		@brief insert a value to the Vector before the iterator.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
+		inline Iterator Insert(const IteratorType& iter, const T& val)
+		{
+			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SizeType index = iter - IteratorType::GetBegin(*this);
+			if (index == m_Size)
+			{
+				PushBack(val);
+				return Iterator(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+			}
+			else
+			{
+				PushBack(std::move(GetObject(m_Size - 1)));
+				for (SizeType i = m_Size - 2; i > index; i--)
+				{
+					GetObject(i) = std::move(GetObject(i - 1));
+				}
+				GetObject(index) = val;
+				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+			}
+		}
+
+		/*!
+		@brief insert a value to the Vector before the iterator.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
+		inline Iterator Insert(const IteratorType& iter, T&& val)
+		{
+			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SizeType index = iter - IteratorType::GetBegin(*this);
+			if (index == m_Size)
+			{
+				PushBack(std::move(val));
+				return Iterator(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+			}
+			else
+			{
+				PushBack(std::move(GetObject(m_Size - 1)));
+				for (SizeType i = m_Size - 2; i > index; i--)
+				{
+					GetObject(i) = std::move(GetObject(i - 1));
+				}
+				GetObject(index) = std::move(val);
+				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+			}
+		}
+
+		/*!
+		@brief insert some same values to the Vector before the iterator.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
+		inline Iterator Insert(const IteratorType& iter, SizeType size, const T& val)
+		{
+			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
+			SizeType index = iter - IteratorType::GetBegin(*this);
+			if (index == m_Size)
+			{
+				if (m_Size + size > m_RealSize)
+				{
+					SetRealSize(2 * (m_Size + size));
+				}
+
+				for (SizeType i = m_Size; i < m_Size + size; i++)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(val);
+				}
+				m_Size += size;
+
+				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+			}
+			else
+			{
+				if (m_Size + size > m_RealSize)
+				{
+					SetRealSize(2 * (m_Size + size));
+				}
+
+				for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+				}
+				for (SizeType i = m_Size - 1; i >= index + size; i--)
+				{
+					GetObject(i) = std::move(GetObject(i - size));
+				}
+				for (SizeType i = index; i < std::min(index + size, m_Size); i++)
+				{
+					GetObject(i) = val;
+				}
+				for (SizeType i = m_Size; i < index + size; i++)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(val);
+				}
+				m_Size += size;
+
+				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+			}
+		}
+
+		/*!
+		@brief insert some values to the Vector before the iterator by giving iterators.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@note use copy not move to insert elements.
+		*/
+		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<IsIterator<AnotherIteratorType, T>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
+		inline Iterator Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
+		{
+			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SizeType size = end - begin;
+			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
+			SizeType index = iter - IteratorType::GetBegin(*this);
+			if (index == m_Size)
+			{
+				if (m_Size + size > m_RealSize)
+				{
+					SetRealSize(2 * (m_Size + size));
+				}
+
+				auto aiter = begin;
+				for (SizeType i = m_Size; i < m_Size + size; i++, aiter += 1)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+				}
+				m_Size += size;
+
+				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+			}
+			else
+			{
+				if (m_Size + size > m_RealSize)
+				{
+					SetRealSize(2 * (m_Size + size));
+				}
+
+				for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+				}
+				for (SizeType i = m_Size - 1; i >= index + size; i--)
+				{
+					GetObject(i) = std::move(GetObject(i - size));
+				}
+				auto aiter = begin;
+				for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
+				{
+					GetObject(i) = *aiter;
+				}
+				for (SizeType i = m_Size; i < index + size; i++, aiter += 1)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+				}
+				m_Size += size;
+
+				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+			}
+		}
+
+		/*!
+		@brief insert some values to the Vector before the iterator by giving initializer_list.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@note use copy not move to insert elements.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
+		inline Iterator Insert(const IteratorType& iter, std::initializer_list<T> ilist)
+		{
+			SGE_ASSERT(IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SizeType size = ilist.size();
+			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
+			SizeType index = iter - IteratorType::GetBegin(*this);
+			if (index == m_Size)
+			{
+				if (m_Size + size > m_RealSize)
+				{
+					SetRealSize(2 * (m_Size + size));
+				}
+
+				auto aiter = ilist.begin();
+				for (SizeType i = m_Size; i < m_Size + size; i++, aiter += 1)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+				}
+				m_Size += size;
+
+				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+			}
+			else
+			{
+				if (m_Size + size > m_RealSize)
+				{
+					SetRealSize(2 * (m_Size + size));
+				}
+
+				for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+				}
+				for (SizeType i = m_Size - 1; i >= index + size; i--)
+				{
+					GetObject(i) = std::move(GetObject(i - size));
+				}
+				auto aiter = ilist.begin();
+				for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
+				{
+					GetObject(i) = *aiter;
+				}
+				for (SizeType i = m_Size; i < index + size; i++, aiter += 1)
+				{
+					new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+				}
+				m_Size += size;
+
+				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+			}
+		}
 
 	private:
 		void* m_pContent;
