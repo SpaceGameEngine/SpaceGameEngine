@@ -60,6 +60,15 @@ namespace SpaceGameEngine
 
 		static_assert(IsCopyable<T>::Result, "Vector does not support this type");
 
+		struct EmptyVectorError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The Vector is empty");
+			inline static bool Judge(SizeType size)
+			{
+				return size == 0;
+			}
+		};
+
 		/*!
 		@brief Default constructor of Vector.
 		@note By default,the Vector will pre-allocate a memory which can contain four
@@ -821,6 +830,7 @@ namespace SpaceGameEngine
 		@brief insert a value to the Vector before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@return Iterator pointing to the inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, const T& val)
@@ -848,6 +858,7 @@ namespace SpaceGameEngine
 		@brief insert a value to the Vector before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@return Iterator pointing to the inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, T&& val)
@@ -875,12 +886,14 @@ namespace SpaceGameEngine
 		@brief insert some same values to the Vector before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning the size can not be zero.
+		@return Iterator pointing to the first inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, SizeType size, const T& val)
 		{
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
-			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
+			SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
 			SizeType index = iter - IteratorType::GetBegin(*this);
 			if (index == m_Size)
 			{
@@ -930,14 +943,18 @@ namespace SpaceGameEngine
 		@brief insert some values to the Vector before the iterator by giving iterators.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning this function can not check whether the given two arguments(begin&end) are out of their range or not.
+		@warning the begin&end's Container can not be the current Vector.
+		@warning the (end-begin) can not be zero.
+		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
-		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<IsIterator<AnotherIteratorType, T>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
+		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType, T>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
 		inline Iterator Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
+			SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
 			SizeType index = iter - IteratorType::GetBegin(*this);
 			if (index == m_Size)
 			{
@@ -989,6 +1006,8 @@ namespace SpaceGameEngine
 		@brief insert some values to the Vector before the iterator by giving initializer_list.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning the size of initializer_list can not be zero.
+		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
@@ -996,7 +1015,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 			SizeType size = ilist.size();
-			SGE_ASSERT(InvalidSizeError, m_Size + size, 0, sm_MaxSize);
+			SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
 			SizeType index = iter - IteratorType::GetBegin(*this);
 			if (index == m_Size)
 			{
@@ -1042,6 +1061,71 @@ namespace SpaceGameEngine
 
 				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
 			}
+		}
+
+		/*!
+		@brief remove the last element in the Vector.
+		*/
+		inline void PopBack()
+		{
+			SGE_ASSERT(EmptyVectorError, m_Size);
+
+			GetObject(m_Size - 1).~T();
+
+			m_Size -= 1;
+		}
+
+		/*!
+		@brief remove a element in Vector by giving a iterator.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@return the iterator which points to the next element after the removing has been done.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
+		inline IteratorType Remove(const IteratorType& iter)
+		{
+			SGE_ASSERT(EmptyVectorError, m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+
+			iter->~T();
+
+			for (auto i = iter; i != IteratorType::GetEnd(*this) - 1; i += 1)
+			{
+				new (&const_cast<T&>(*i)) T(std::move(const_cast<T&>(*(i + 1))));
+			}
+
+			m_Size -= 1;
+
+			return iter;
+		}
+
+		/*!
+		@brief remove some elements in Vector by giving the iterators.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@warning the begin&end's Container must be current Vector.
+		@return the iterator which points to the next element after the removing has been done.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>, bool>>
+		inline IteratorType Remove(const IteratorType& begin, const IteratorType& end)
+		{
+			SGE_ASSERT(EmptyVectorError, m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, begin, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, end, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+			SizeType size = end - begin;
+			SGE_ASSERT(InvalidSizeError, size, 1, m_Size);
+
+			for (auto i = begin; i != end; i += 1)
+			{
+				const_cast<T&>(*i).~T();
+			}
+			for (auto i = end; i != IteratorType::GetEnd(*this); i += 1)
+			{
+				new (&const_cast<T&>(*(i - size))) T(std::move(const_cast<T&>(*i)));
+			}
+
+			m_Size -= size;
+			return begin;
 		}
 
 	private:

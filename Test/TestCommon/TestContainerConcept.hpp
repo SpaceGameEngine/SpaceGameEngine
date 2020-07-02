@@ -35,9 +35,9 @@ TEST(ContainerConcept, IsTotallyOrderedTest)
 	ASSERT_TRUE((IsTotallyOrdered<double>::Result));
 }
 
-TEST(ContainerConcept, IsIteratorTest)
+TEST(ContainerConcept, IsSequentialIteratorTest)
 {
-	ASSERT_TRUE((IsIterator<Vector<int>::Iterator, int>::Result));
-	ASSERT_TRUE((IsIterator<Vector<int>::ConstIterator, int>::Result));
-	ASSERT_FALSE((IsIterator<int, int>::Result));
+	ASSERT_TRUE((IsSequentialIterator<Vector<int>::Iterator, int>::Result));
+	ASSERT_TRUE((IsSequentialIterator<Vector<int>::ConstIterator, int>::Result));
+	ASSERT_FALSE((IsSequentialIterator<int, int>::Result));
 }

@@ -131,7 +131,7 @@ namespace SpaceGameEngine
 	@todo use concept.
 	*/
 	template<typename U, typename T>
-	struct IsIterator
+	struct IsSequentialIterator
 	{
 	private:
 		template<typename _U>
