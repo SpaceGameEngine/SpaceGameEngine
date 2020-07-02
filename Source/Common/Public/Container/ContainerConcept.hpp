@@ -139,8 +139,8 @@ namespace SpaceGameEngine
 			//IsError<typename _U::OutOfRangeError, const _U&, T*, T*>::Result &&
 			//	std::is_same_v<decltype(_U::GetBegin(*(new Vector))), _U> &&
 			//	std::is_same_v<decltype(_U::GetEnd(*(new Vector))), _U> &&
-			//	std::is_same_v<decltype(new _U(std::declval<_U>())), _U*> &&
-			std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
+			std::is_same_v<decltype(new _U(std::declval<_U>())), _U*> &&
+				std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
 				std::is_same_v<decltype(std::declval<_U>() + std::declval<SizeType>()), _U> &&
 				std::is_same_v<decltype(std::declval<_U>() += std::declval<SizeType>()), _U&> &&
 				//std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&

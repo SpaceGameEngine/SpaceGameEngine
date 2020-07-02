@@ -473,7 +473,9 @@ TEST(Vector, PopBackTest)
 	}
 
 	test.PopBack();
+#ifdef SGE_DEBUG
 	ASSERT_EQ((&test[2] + 1)->mi, -1);
+#endif
 	ASSERT_EQ(test.GetSize(), 3);
 	for (int i = 0; i < test.GetSize(); i++)
 	{
@@ -620,12 +622,14 @@ TEST(Vector, RemoveTest)
 	ASSERT_EQ(test7.GetSize(), 1);
 	ASSERT_EQ(test7[0].mi, 1);
 	ASSERT_EQ(test7[0].content, 0);
+
+#ifdef SGE_DEBUG
 	for (int i = 2; i < 6; i++)
 	{
 		ASSERT_EQ((&test7[0] + i)->content, i);
 		ASSERT_EQ((&test7[0] + i)->mi, -1);
 	}
-
+#endif
 	Vector<test_vector_class> test8 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test8.GetSize(), 6);
@@ -640,11 +644,13 @@ TEST(Vector, RemoveTest)
 	ASSERT_EQ(test8.GetSize(), 1);
 	ASSERT_EQ(test8[0].mi, 3);
 	ASSERT_EQ(test8[0].content, 5);
+#ifdef SGE_DEBUG
 	for (int i = 1; i < 5; i++)
 	{
 		ASSERT_EQ((&test8[0] + i)->content, i);
 		ASSERT_EQ((&test8[0] + i)->mi, -1);
 	}
+#endif
 }
 
 TEST(VectorIterator, IsVectorIteratorTest)
