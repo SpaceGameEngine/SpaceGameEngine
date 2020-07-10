@@ -653,6 +653,86 @@ TEST(Vector, RemoveTest)
 #endif
 }
 
+TEST(Vector, FindTest)
+{
+	Vector<int> test1 = {0, 1, 2, 3, 4, 5, 6};
+	ASSERT_EQ(*(test1.Find(3)), 3);
+	ASSERT_EQ(test1.Find(2) - test1.GetBegin(), 2);
+	ASSERT_EQ(test1.Find(7), test1.GetEnd());
+
+	const Vector<int> test2 = {0, 1, 2, 3, 4, 5, 6};
+	ASSERT_EQ(*(test2.Find(3)), 3);
+	ASSERT_EQ(test2.Find(2) - test2.GetConstBegin(), 2);
+	ASSERT_EQ(test2.Find(7), test2.GetConstEnd());
+}
+
+TEST(Vector, FindByFunctionTest)
+{
+	Vector<int> test1 = {0, 1, 2, 3, 4, 5, 6};
+	auto iter1 = test1.FindByFunction(Function<bool(const int&)>([](const int& i) { return i == 3; }));
+	ASSERT_EQ(*iter1, 3);
+
+	const Vector<int> test2 = {0, 1, 2, 3, 4, 5, 6};
+	auto iter2 = test2.FindByFunction(Function<bool(const int&)>([](const int& i) { return i == 3; }));
+	ASSERT_EQ(*iter2, 3);
+}
+
+TEST(Vector, FindAllTest)
+{
+	Vector<int> test1 = {0, 1, 2, 0, 1, 2};
+	int cot1 = 0;
+	test1.FindAll(0, Function<void(int&)>([&](int& i) {
+					  ASSERT_EQ(i, 0);
+					  i = 3;
+					  cot1 += 1;
+				  }));
+
+	ASSERT_EQ(cot1, 2);
+	ASSERT_EQ(test1[0], 3);
+	ASSERT_EQ(test1[3], 3);
+
+	const Vector<int> test2 = {0, 1, 2, 0, 1, 2};
+	int cot2 = 0;
+	test2.FindAll(0, Function<void(const int&)>([&](const int& i) {
+					  cot2 += 1;
+					  ASSERT_EQ(i, 0);
+				  }));
+	ASSERT_EQ(cot2, 2);
+}
+
+TEST(Vector, FindAllByFunctionTest)
+{
+	Vector<int> test1 = {0, 1, 2, 3, 4, 5, 6};
+	int cot1 = 0;
+	test1.FindAllByFunction(Function<bool(const int& i)>([](const int& i) {
+								return i % 2 == 0;
+							}),
+							Function<void(int&)>([&](int& i) {
+								ASSERT_EQ(i % 2, 0);
+								cot1 += 1;
+								i = 10;
+							}));
+	ASSERT_EQ(cot1, 4);
+	for (int i = 0; i < test1.GetSize(); i++)
+	{
+		if (i % 2 == 0)
+		{
+			ASSERT_EQ(test1[i], 10);
+		}
+	}
+
+	const Vector<int> test2 = {0, 1, 2, 3, 4, 5, 6};
+	int cot2 = 0;
+	test2.FindAllByFunction(Function<bool(const int& i)>([](const int& i) {
+								return i % 2 == 0;
+							}),
+							Function<void(const int&)>([&](const int& i) {
+								ASSERT_EQ(i % 2, 0);
+								cot2 += 1;
+							}));
+	ASSERT_EQ(cot2, 4);
+}
+
 TEST(VectorIterator, IsVectorIteratorTest)
 {
 	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Result == true));

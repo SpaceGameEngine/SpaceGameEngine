@@ -181,8 +181,8 @@ namespace SpaceGameEngine
 		inline Function(T&& func)
 		{
 			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
-			m_pInvoke = [](MetaObject<Allocator>& obj, Args... args) -> Ret {
-				return std::invoke(obj.template Get<std::decay_t<T>>(), static_cast<Args>(args)...);
+			m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
+				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 			};
 			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
 		}
@@ -194,8 +194,8 @@ namespace SpaceGameEngine
 				m_Content = std::forward<T>(func);
 			else
 			{
-				m_pInvoke = [](MetaObject<Allocator>& obj, Args... args) -> Ret {
-					return std::invoke(obj.template Get<std::decay_t<T>>(), static_cast<Args>(args)...);
+				m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
+					return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 				};
 				m_Content.Release();
 				m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
@@ -219,7 +219,7 @@ namespace SpaceGameEngine
 			return m_Content.Get().GetMetaData();
 		}
 
-		Ret operator()(Args... args)
+		Ret operator()(Args... args) const
 		{
 			return m_pInvoke(m_Content.Get(), static_cast<Args>(args)...);
 		}
@@ -231,7 +231,7 @@ namespace SpaceGameEngine
 		}
 
 	private:
-		Ret (*m_pInvoke)(MetaObject<Allocator>&, Args...);
+		Ret (*m_pInvoke)(const MetaObject<Allocator>&, Args...);
 		ControllableObject<MetaObject<Allocator>, Allocator> m_Content;
 	};
 
