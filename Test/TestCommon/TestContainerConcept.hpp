@@ -19,6 +19,54 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+struct test_trivial
+{
+};
+
+struct test_trivial_constructor
+{
+	test_trivial_constructor()
+	{
+	}
+};
+
+struct test_trivial_copy_constructor
+{
+	test_trivial_copy_constructor(test_trivial_copy_constructor& t)
+	{
+	}
+};
+
+struct test_trivial_move_constructor
+{
+	test_trivial_move_constructor(test_trivial_move_constructor&& t)
+	{
+	}
+};
+
+struct test_trivial_copy_operator
+{
+	test_trivial_copy_operator& operator=(const test_trivial_copy_operator& t)
+	{
+		return *this;
+	}
+};
+
+struct test_trivial_move_operator
+{
+	test_trivial_move_operator& operator=(test_trivial_move_operator&& t)
+	{
+		return *this;
+	}
+};
+
+struct test_trivial_destructor
+{
+	~test_trivial_destructor()
+	{
+	}
+};
+
 TEST(ContainerConcept, IsEqualityComparableTest)
 {
 	ASSERT_TRUE((IsEqualityComparable<int, long>::Result));
@@ -40,4 +88,16 @@ TEST(ContainerConcept, IsSequentialIteratorTest)
 	ASSERT_TRUE((IsSequentialIterator<Vector<int>::Iterator, int>::Result));
 	ASSERT_TRUE((IsSequentialIterator<Vector<int>::ConstIterator, int>::Result));
 	ASSERT_FALSE((IsSequentialIterator<int, int>::Result));
+}
+
+TEST(ContainerConcept, IsTrivialTest)
+{
+	ASSERT_TRUE(IsTrivial<int>::Result);
+	ASSERT_TRUE(IsTrivial<test_trivial>::Result);
+	ASSERT_FALSE(IsTrivial<test_trivial_constructor>::Result);
+	ASSERT_FALSE(IsTrivial<test_trivial_copy_constructor>::Result);
+	ASSERT_FALSE(IsTrivial<test_trivial_move_constructor>::Result);
+	ASSERT_FALSE(IsTrivial<test_trivial_copy_operator>::Result);
+	ASSERT_FALSE(IsTrivial<test_trivial_move_operator>::Result);
+	ASSERT_FALSE(IsTrivial<test_trivial_destructor>::Result);
 }

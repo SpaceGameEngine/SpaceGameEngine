@@ -163,6 +163,12 @@ namespace SpaceGameEngine
 	public:
 		inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
 	};
+
+	template<typename T>
+	struct IsTrivial
+	{
+		inline static constexpr const bool Result = std::is_trivial_v<T>;
+	};
 	/*!
 	@}
 	*/
