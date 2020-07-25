@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include <initializer_list>
+#include <cstring>
 #include "TypeDefinition.hpp"
 #include "MemoryManager.h"
 #include "Error.h"
