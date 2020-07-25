@@ -91,9 +91,15 @@ namespace SpaceGameEngine
 		{
 			if (m_pContent)
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i).~T();
+				}
+				else
+				{
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
 				}
 				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 			}
@@ -109,9 +115,16 @@ namespace SpaceGameEngine
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			for (SizeType i = 0; i < m_Size; i++)
+			if constexpr (IsTrivial<T>::Result)
 			{
-				new (&GetObject(i)) T(v.GetObject(i));
+				std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
+			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(v.GetObject(i));
+				}
 			}
 		}
 		/*!
@@ -143,42 +156,69 @@ namespace SpaceGameEngine
 		{
 			if (m_Size >= v.m_Size)
 			{
-				for (SizeType i = v.m_Size; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i).~T();
+					m_Size = v.m_Size;
+					std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
 				}
-				m_Size = v.m_Size;
-				for (SizeType i = 0; i < m_Size; i++)
+				else
 				{
-					GetObject(i) = v.GetObject(i);
+					for (SizeType i = v.m_Size; i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
+					m_Size = v.m_Size;
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i) = v.GetObject(i);
+					}
 				}
 			}
 			else if (m_RealSize >= v.m_Size)
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i) = v.GetObject(i);
+					m_Size = v.m_Size;
+					std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
 				}
-				SizeType buffer = m_Size;
-				m_Size = v.m_Size;
-				for (SizeType i = buffer; i < m_Size; i++)
+				else
 				{
-					new (&GetObject(i)) T(v.GetObject(i));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i) = v.GetObject(i);
+					}
+					SizeType buffer = m_Size;
+					m_Size = v.m_Size;
+					for (SizeType i = buffer; i < m_Size; i++)
+					{
+						new (&GetObject(i)) T(v.GetObject(i));
+					}
 				}
 			}
 			else
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i).~T();
+					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					m_RealSize = v.m_RealSize;
+					m_Size = v.m_Size;
+					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+					std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
 				}
-				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
-				m_RealSize = v.m_RealSize;
-				m_Size = v.m_Size;
-				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-				for (SizeType i = 0; i < m_Size; i++)
+				else
 				{
-					new (&GetObject(i)) T(v.GetObject(i));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
+					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					m_RealSize = v.m_RealSize;
+					m_Size = v.m_Size;
+					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						new (&GetObject(i)) T(v.GetObject(i));
+					}
 				}
 			}
 			return *this;
@@ -191,10 +231,17 @@ namespace SpaceGameEngine
 		*/
 		inline Vector& operator=(Vector&& v)
 		{
-			for (SizeType i = 0; i < m_Size; i++)
+			if constexpr (IsTrivial<T>::Result)
 			{
-				GetObject(i).~T();
 			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
+			}
+
 			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
@@ -213,9 +260,17 @@ namespace SpaceGameEngine
 			m_RealSize = v.GetRealSize();
 			m_Size = v.GetSize();
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			for (SizeType i = 0; i < m_Size; i++)
+
+			if constexpr (IsTrivial<T>::Result)
 			{
-				new (&GetObject(i)) T(v.GetObject(i));
+				std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
+			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(v.GetObject(i));
+				}
 			}
 		}
 		/*!
@@ -230,9 +285,17 @@ namespace SpaceGameEngine
 			m_RealSize = v.GetRealSize();
 			m_Size = v.GetSize();
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			for (SizeType i = 0; i < m_Size; i++)
+
+			if constexpr (IsTrivial<T>::Result)
 			{
-				new (&GetObject(i)) T(std::move(v.GetObject(i)));
+				std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
+			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(std::move(v.GetObject(i)));
+				}
 			}
 		}
 		/*!
@@ -244,42 +307,69 @@ namespace SpaceGameEngine
 		{
 			if (m_Size >= v.GetSize())
 			{
-				for (SizeType i = v.GetSize(); i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i).~T();
+					m_Size = v.GetSize();
+					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
-				m_Size = v.GetSize();
-				for (SizeType i = 0; i < m_Size; i++)
+				else
 				{
-					GetObject(i) = v.GetObject(i);
+					for (SizeType i = v.GetSize(); i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
+					m_Size = v.GetSize();
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i) = v.GetObject(i);
+					}
 				}
 			}
 			else if (m_RealSize >= v.GetSize())
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i) = v.GetObject(i);
+					m_Size = v.GetSize();
+					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
-				SizeType buffer = m_Size;
-				m_Size = v.GetSize();
-				for (SizeType i = buffer; i < m_Size; i++)
+				else
 				{
-					new (&GetObject(i)) T(v.GetObject(i));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i) = v.GetObject(i);
+					}
+					SizeType buffer = m_Size;
+					m_Size = v.GetSize();
+					for (SizeType i = buffer; i < m_Size; i++)
+					{
+						new (&GetObject(i)) T(v.GetObject(i));
+					}
 				}
 			}
 			else
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i).~T();
+					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					m_RealSize = v.GetRealSize();
+					m_Size = v.GetSize();
+					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
-				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
-				m_RealSize = v.GetRealSize();
-				m_Size = v.GetSize();
-				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-				for (SizeType i = 0; i < m_Size; i++)
+				else
 				{
-					new (&GetObject(i)) T(v.GetObject(i));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
+					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					m_RealSize = v.GetRealSize();
+					m_Size = v.GetSize();
+					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						new (&GetObject(i)) T(v.GetObject(i));
+					}
 				}
 			}
 			return *this;
@@ -302,42 +392,69 @@ namespace SpaceGameEngine
 		{
 			if (m_Size >= v.GetSize())
 			{
-				for (SizeType i = v.GetSize(); i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i).~T();
+					m_Size = v.GetSize();
+					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
-				m_Size = v.GetSize();
-				for (SizeType i = 0; i < m_Size; i++)
+				else
 				{
-					GetObject(i) = std::move(v.GetObject(i));
+					for (SizeType i = v.GetSize(); i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
+					m_Size = v.GetSize();
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i) = std::move(v.GetObject(i));
+					}
 				}
 			}
 			else if (m_RealSize >= v.GetSize())
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i) = std::move(v.GetObject(i));
+					m_Size = v.GetSize();
+					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
-				SizeType buffer = m_Size;
-				m_Size = v.GetSize();
-				for (SizeType i = buffer; i < m_Size; i++)
+				else
 				{
-					new (&GetObject(i)) T(std::move(v.GetObject(i)));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i) = std::move(v.GetObject(i));
+					}
+					SizeType buffer = m_Size;
+					m_Size = v.GetSize();
+					for (SizeType i = buffer; i < m_Size; i++)
+					{
+						new (&GetObject(i)) T(std::move(v.GetObject(i)));
+					}
 				}
 			}
 			else
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i).~T();
+					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					m_RealSize = v.GetRealSize();
+					m_Size = v.GetSize();
+					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
-				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
-				m_RealSize = v.GetRealSize();
-				m_Size = v.GetSize();
-				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-				for (SizeType i = 0; i < m_Size; i++)
+				else
 				{
-					new (&GetObject(i)) T(std::move(v.GetObject(i)));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
+					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					m_RealSize = v.GetRealSize();
+					m_Size = v.GetSize();
+					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						new (&GetObject(i)) T(std::move(v.GetObject(i)));
+					}
 				}
 			}
 			return *this;
@@ -348,9 +465,16 @@ namespace SpaceGameEngine
 			m_Size = list.size();
 			m_RealSize = list.size() * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			for (SizeType i = 0; i < m_Size; i++)
+			if constexpr (IsTrivial<T>::Result)
 			{
-				new (&GetObject(i)) T(*(list.begin() + i));
+				std::memcpy(m_pContent, list.begin(), m_Size * sizeof(T));
+			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					new (&GetObject(i)) T(*(list.begin() + i));
+				}
 			}
 		}
 
@@ -409,13 +533,20 @@ namespace SpaceGameEngine
 			{
 				auto pbuffer = m_pContent;
 				m_pContent = Allocator::RawNew(size * sizeof(T), alignof(T));
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					new (&GetObject(i)) T(std::move(*reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)));
+					std::memcpy(m_pContent, pbuffer, m_Size * sizeof(T));
 				}
-				for (SizeType i = 0; i < m_Size; i++)
+				else
 				{
-					reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)->~T();
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						new (&GetObject(i)) T(std::move(*reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)));
+					}
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)->~T();
+					}
 				}
 				Allocator::RawDelete(pbuffer, m_RealSize * sizeof(T), alignof(T));
 				m_RealSize = size;
@@ -428,10 +559,17 @@ namespace SpaceGameEngine
 		*/
 		inline void Clear()
 		{
-			for (SizeType i = 0; i < m_Size; i++)
+			if constexpr (IsTrivial<T>::Result)
 			{
-				GetObject(i).~T();
 			}
+			else
+			{
+				for (SizeType i = 0; i < m_Size; i++)
+				{
+					GetObject(i).~T();
+				}
+			}
+
 			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
 			m_Size = 0;
 			m_RealSize = 4;
@@ -457,9 +595,15 @@ namespace SpaceGameEngine
 				return;
 			else if (size < m_Size)
 			{
-				for (SizeType i = size; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Result)
 				{
-					GetObject(i).~T();
+				}
+				else
+				{
+					for (SizeType i = size; i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
 				}
 				m_Size = size;
 			}
@@ -1088,7 +1232,13 @@ namespace SpaceGameEngine
 			SGE_ASSERT(EmptyVectorError, m_Size);
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 
-			iter->~T();
+			if constexpr (IsTrivial<T>::Result)
+			{
+			}
+			else
+			{
+				iter->~T();
+			}
 
 			for (auto i = iter; i != IteratorType::GetEnd(*this) - 1; i += 1)
 			{
@@ -1116,10 +1266,17 @@ namespace SpaceGameEngine
 			SizeType size = end - begin;
 			SGE_ASSERT(InvalidSizeError, size, 1, m_Size);
 
-			for (auto i = begin; i != end; i += 1)
+			if constexpr (IsTrivial<T>::Result)
 			{
-				const_cast<T&>(*i).~T();
 			}
+			else
+			{
+				for (auto i = begin; i != end; i += 1)
+				{
+					const_cast<T&>(*i).~T();
+				}
+			}
+
 			for (auto i = end; i != IteratorType::GetEnd(*this); i += 1)
 			{
 				new (&const_cast<T&>(*(i - size))) T(std::move(const_cast<T&>(*i)));
