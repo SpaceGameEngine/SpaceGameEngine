@@ -212,52 +212,6 @@ namespace SpaceGameEngine
 		FixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
 	};
 
-	struct S1
-	{
-		int work(int x)
-		{
-			return 1;
-		}
-	};
-
-	struct S2
-	{
-		int work(int x)
-		{
-			return 2;
-		}
-	};
-
-	template<int limit, typename LowStrategy, typename HighStrategy>
-	struct SS
-	{
-		LowStrategy l;
-		HighStrategy h;
-		int work(int x)
-		{
-			if (x < limit)
-			{
-				return l.work(x);
-			}
-			else
-			{
-				return h.work(x);
-			}
-		}
-	};
-
-	template<typename AllocateStrategy>
-	class MM_Test
-	{
-		AllocateStrategy allocateStrategy;
-
-	public:
-		int doIt(int x)
-		{
-			return allocateStrategy.work(x);
-		}
-	};
-
 	struct MemoryManagerAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);
