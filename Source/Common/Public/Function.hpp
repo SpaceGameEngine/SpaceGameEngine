@@ -188,7 +188,7 @@ namespace SpaceGameEngine
 		}
 		template<typename T,
 				 typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Result == false, bool>,
-				 typename = std::enable_if_t<std::is_same_v<std::decay_t<decltype(std::declval<decltype(m_Content)>() = std::forward<T>(std::declval<T&&>()))>, std::decay_t<decltype(m_Content)>>, bool>>
+				 typename = std::enable_if_t<std::is_same_v<std::decay_t<decltype(std::declval<ControllableObject<MetaObject<Allocator>, Allocator>>() = std::forward<T>(std::declval<T&&>()))>, ControllableObject<MetaObject<Allocator>, Allocator>>, bool>>
 		inline Function& operator=(T&& func)
 		{
 			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Result, "Function can only be constructed by callable object");
