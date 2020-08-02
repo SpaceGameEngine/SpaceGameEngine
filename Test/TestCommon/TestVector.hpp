@@ -23,16 +23,19 @@ using namespace SpaceGameEngine;
 struct test_vector_class
 {
 	test_vector_class()
+		: destruction_hook([]() {})
 	{
 		content = 0;
 		mi = 0;
 	}
 	test_vector_class(int i)
+		: destruction_hook([]() {})
 	{
 		content = i;
 		mi = 0;
 	}
 	test_vector_class(const test_vector_class& t)
+		: destruction_hook([]() {})
 	{
 		content = t.content;
 		mi = 1;
@@ -46,6 +49,7 @@ struct test_vector_class
 		return *this;
 	}
 	test_vector_class(test_vector_class&& t)
+		: destruction_hook([]() {})
 	{
 		content = t.content;
 		mi = 3;
@@ -61,10 +65,12 @@ struct test_vector_class
 	~test_vector_class()
 	{
 		mi = -1;
+		destruction_hook();
 		// std::cout << "destruction" << std::endl;
 	}
 	int mi;
 	int content;
+	Function<void()> destruction_hook;
 };
 
 struct test_vector_class2
@@ -132,7 +138,9 @@ TEST(Vector, SizeConstructionTest)
 TEST(Vector, CopyConstructionTest)
 {
 	Vector<test_vector_class, MemoryManagerAllocator> v1{0, 1, 2};
+	ASSERT_EQ(v1.GetSize(), 3);
 	Vector<test_vector_class, MemoryManagerAllocator> v2 = v1;
+	ASSERT_EQ(v2.GetSize(), v1.GetSize());
 	for (SizeType i = 0; i < v2.GetSize(); i++)
 	{
 		ASSERT_TRUE(v2.GetObject(i).content == v1.GetObject(i).content);
@@ -140,18 +148,38 @@ TEST(Vector, CopyConstructionTest)
 	}
 
 	Vector<test_vector_class, StdAllocator> v3 = v1;
+	ASSERT_EQ(v3.GetSize(), v1.GetSize());
 	for (SizeType i = 0; i < v3.GetSize(); i++)
 	{
 		ASSERT_TRUE(v3.GetObject(i).content == v1.GetObject(i).content);
 		ASSERT_TRUE(v3.GetObject(i).mi == 1);
 	}
+
+	Vector<int, StdAllocator> v4 = {0, 1, 2};
+	ASSERT_EQ(v4.GetSize(), 3);
+	ASSERT_EQ(v4[0], 0);
+	ASSERT_EQ(v4[1], 1);
+	ASSERT_EQ(v4[2], 2);
+
+	Vector<int, StdAllocator> v5 = v4;
+	ASSERT_EQ(v5.GetSize(), v4.GetSize());
+	for (int i = 0; i < v5.GetSize(); i++)
+		ASSERT_EQ(v4[i], v5[i]);
+
+	Vector<int, MemoryManagerAllocator> v6 = v4;
+	ASSERT_EQ(v6.GetSize(), v4.GetSize());
+	for (int i = 0; i < v6.GetSize(); i++)
+		ASSERT_EQ(v4[i], v6[i]);
 }
 
 TEST(Vector, MoveConstructionTest)
 {
 	Vector<test_vector_class, MemoryManagerAllocator> v1_1{0, 1, 2};
 	Vector<test_vector_class, MemoryManagerAllocator> v1_2{0, 1, 2};
+	ASSERT_EQ(v1_1.GetSize(), 3);
+	ASSERT_EQ(v1_2.GetSize(), 3);
 	Vector<test_vector_class, MemoryManagerAllocator> v2 = std::move(v1_1);
+	ASSERT_EQ(v2.GetSize(), 3);
 	for (SizeType i = 0; i < v2.GetSize(); i++)
 	{
 		ASSERT_TRUE(v2.GetObject(i).content == i);
@@ -159,51 +187,263 @@ TEST(Vector, MoveConstructionTest)
 	}
 
 	Vector<test_vector_class, StdAllocator> v3 = std::move(v1_2);
+	ASSERT_EQ(v3.GetSize(), 3);
 	for (SizeType i = 0; i < v3.GetSize(); i++)
 	{
 		ASSERT_TRUE(v3.GetObject(i).content == i);
 		ASSERT_TRUE(v3.GetObject(i).mi == 3);
 	}
+
+	Vector<int, StdAllocator> v4_1 = {0, 1, 2};
+	ASSERT_EQ(v4_1.GetSize(), 3);
+	Vector<int, StdAllocator> v4_2 = {0, 1, 2};
+	ASSERT_EQ(v4_2.GetSize(), 3);
+
+	Vector<int, StdAllocator> v5(std::move(v4_1));
+	ASSERT_EQ(v5.GetSize(), 3);
+	for (int i = 0; i < v5.GetSize(); i++)
+		ASSERT_EQ(v5[i], i);
+
+	Vector<int, MemoryManagerAllocator> v6(std::move(v4_2));
+	ASSERT_EQ(v6.GetSize(), 3);
+	for (int i = 0; i < v6.GetSize(); i++)
+		ASSERT_EQ(v6[i], i);
 }
 
 TEST(Vector, CopyAssignmentTest)
 {
 	Vector<test_vector_class, MemoryManagerAllocator> v1 = {0, 1, 2};
-	Vector<test_vector_class, MemoryManagerAllocator> v2 = {0};
-	v2 = v1;
-	ASSERT_TRUE(v2.GetSize() == v1.GetSize());
-	for (SizeType i = 0; i < v2.GetSize(); i++)
+	ASSERT_EQ(v1.GetSize(), 3);
+	ASSERT_EQ(v1.GetRealSize(), 6);
+	Vector<test_vector_class, MemoryManagerAllocator> v1_1 = {0};
+	ASSERT_EQ(v1_1.GetSize(), 1);
+	ASSERT_EQ(v1_1.GetRealSize(), 2);
+	Vector<test_vector_class, MemoryManagerAllocator> v1_2 = {1, 0};
+	ASSERT_EQ(v1_2.GetSize(), 2);
+	ASSERT_EQ(v1_2.GetRealSize(), 4);
+	Vector<test_vector_class, MemoryManagerAllocator> v1_3 = {3, 2, 1, 0};
+	ASSERT_EQ(v1_3.GetSize(), 4);
+	ASSERT_EQ(v1_3.GetRealSize(), 8);
+	v1_1 = v1;
+	ASSERT_EQ(v1_1.GetSize(), v1.GetSize());
+	ASSERT_EQ(v1_1.GetRealSize(), v1.GetRealSize());
+	for (SizeType i = 0; i < v1_1.GetSize(); i++)
 	{
-		ASSERT_TRUE(v2.GetObject(i).content == v1.GetObject(i).content);
+		ASSERT_TRUE(v1_1.GetObject(i).content == v1.GetObject(i).content);
+	}
+	v1_2 = v1;
+	ASSERT_EQ(v1_2.GetSize(), v1.GetSize());
+	ASSERT_EQ(v1_2.GetRealSize(), 4);
+	for (SizeType i = 0; i < v1_2.GetSize(); i++)
+	{
+		ASSERT_TRUE(v1_2.GetObject(i).content == v1.GetObject(i).content);
+	}
+	v1_3 = v1;
+	ASSERT_EQ(v1_3.GetSize(), v1.GetSize());
+	ASSERT_EQ(v1_3.GetRealSize(), 8);
+	for (SizeType i = 0; i < v1_3.GetSize(); i++)
+	{
+		ASSERT_TRUE(v1_3.GetObject(i).content == v1.GetObject(i).content);
 	}
 
-	Vector<test_vector_class, StdAllocator> v3 = {0};
-	v3 = v1;
-	ASSERT_TRUE(v3.GetSize() == v1.GetSize());
-	for (SizeType i = 0; i < v3.GetSize(); i++)
+	Vector<test_vector_class, StdAllocator> v2_1 = {0};
+	ASSERT_EQ(v2_1.GetSize(), 1);
+	ASSERT_EQ(v2_1.GetRealSize(), 2);
+	Vector<test_vector_class, StdAllocator> v2_2 = {1, 0};
+	ASSERT_EQ(v2_2.GetSize(), 2);
+	ASSERT_EQ(v2_2.GetRealSize(), 4);
+	Vector<test_vector_class, StdAllocator> v2_3 = {3, 2, 1, 0};
+	ASSERT_EQ(v2_3.GetSize(), 4);
+	ASSERT_EQ(v2_3.GetRealSize(), 8);
+	v2_1 = v1;
+	ASSERT_EQ(v2_1.GetSize(), v1.GetSize());
+	ASSERT_EQ(v2_1.GetRealSize(), v1.GetRealSize());
+	for (SizeType i = 0; i < v2_1.GetSize(); i++)
 	{
-		ASSERT_TRUE(v3.GetObject(i).content == v1.GetObject(i).content);
+		ASSERT_TRUE(v2_1.GetObject(i).content == v1.GetObject(i).content);
+	}
+	v2_2 = v1;
+	ASSERT_EQ(v2_2.GetSize(), v1.GetSize());
+	ASSERT_EQ(v2_2.GetRealSize(), 4);
+	for (SizeType i = 0; i < v2_2.GetSize(); i++)
+	{
+		ASSERT_TRUE(v2_2.GetObject(i).content == v1.GetObject(i).content);
+	}
+	v2_3 = v1;
+	ASSERT_EQ(v2_3.GetSize(), v1.GetSize());
+	ASSERT_EQ(v2_3.GetRealSize(), 8);
+	for (SizeType i = 0; i < v2_3.GetSize(); i++)
+	{
+		ASSERT_TRUE(v2_3.GetObject(i).content == v1.GetObject(i).content);
+	}
+
+	Vector<int, MemoryManagerAllocator> v3 = {0, 1, 2};
+	ASSERT_EQ(v3.GetSize(), 3);
+	ASSERT_EQ(v3.GetRealSize(), 6);
+	Vector<int, MemoryManagerAllocator> v3_1 = {0};
+	ASSERT_EQ(v3_1.GetSize(), 1);
+	ASSERT_EQ(v3_1.GetRealSize(), 2);
+	Vector<int, MemoryManagerAllocator> v3_2 = {1, 0};
+	ASSERT_EQ(v3_2.GetSize(), 2);
+	ASSERT_EQ(v3_2.GetRealSize(), 4);
+	Vector<int, MemoryManagerAllocator> v3_3 = {3, 2, 1, 0};
+	ASSERT_EQ(v3_3.GetSize(), 4);
+	ASSERT_EQ(v3_3.GetRealSize(), 8);
+
+	v3_1 = v3;
+	ASSERT_EQ(v3_1.GetSize(), v3.GetSize());
+	ASSERT_EQ(v3_1.GetRealSize(), v3.GetRealSize());
+	for (SizeType i = 0; i < v3_1.GetSize(); i++)
+	{
+		ASSERT_TRUE(v3_1.GetObject(i) == v3.GetObject(i));
+	}
+
+	v3_2 = v3;
+	ASSERT_EQ(v3_2.GetSize(), v3.GetSize());
+	ASSERT_EQ(v3_2.GetRealSize(), 4);
+	for (SizeType i = 0; i < v3_2.GetSize(); i++)
+	{
+		ASSERT_TRUE(v3_2.GetObject(i) == v3.GetObject(i));
+	}
+
+	v3_3 = v3;
+	ASSERT_EQ(v3_3.GetSize(), v3.GetSize());
+	ASSERT_EQ(v3_3.GetRealSize(), 8);
+	for (SizeType i = 0; i < v3_3.GetSize(); i++)
+	{
+		ASSERT_TRUE(v3_3.GetObject(i) == v3.GetObject(i));
+	}
+
+	Vector<int, StdAllocator> v4_1 = {0};
+	ASSERT_EQ(v4_1.GetSize(), 1);
+	ASSERT_EQ(v4_1.GetRealSize(), 2);
+	Vector<int, StdAllocator> v4_2 = {1, 0};
+	ASSERT_EQ(v4_2.GetSize(), 2);
+	ASSERT_EQ(v4_2.GetRealSize(), 4);
+	Vector<int, StdAllocator> v4_3 = {3, 2, 1, 0};
+	ASSERT_EQ(v4_3.GetSize(), 4);
+	ASSERT_EQ(v4_3.GetRealSize(), 8);
+
+	v4_1 = v3;
+	ASSERT_EQ(v4_1.GetSize(), v3.GetSize());
+	ASSERT_EQ(v4_1.GetRealSize(), v3.GetRealSize());
+	for (SizeType i = 0; i < v4_1.GetSize(); i++)
+	{
+		ASSERT_TRUE(v4_1.GetObject(i) == v3.GetObject(i));
+	}
+
+	v4_2 = v3;
+	ASSERT_EQ(v4_2.GetSize(), v3.GetSize());
+	ASSERT_EQ(v4_2.GetRealSize(), 4);
+	for (SizeType i = 0; i < v4_2.GetSize(); i++)
+	{
+		ASSERT_TRUE(v4_2.GetObject(i) == v3.GetObject(i));
+	}
+
+	v4_3 = v3;
+	ASSERT_EQ(v4_3.GetSize(), v3.GetSize());
+	ASSERT_EQ(v4_3.GetRealSize(), 8);
+	for (SizeType i = 0; i < v4_3.GetSize(); i++)
+	{
+		ASSERT_TRUE(v4_3.GetObject(i) == v3.GetObject(i));
 	}
 }
 
 TEST(Vector, MoveAssignmentTest)
 {
-	Vector<test_vector_class, MemoryManagerAllocator> v1_1 = {0, 1, 2};
-	Vector<test_vector_class, MemoryManagerAllocator> v1_2 = {0, 1, 2};
-	Vector<test_vector_class, MemoryManagerAllocator> v2 = {0};
-	v2 = std::move(v1_1);
-	ASSERT_TRUE(v2.GetSize() == 3);
-	for (SizeType i = 0; i < v2.GetSize(); i++)
+	Vector<test_vector_class, MemoryManagerAllocator> v1 = {0};
+	ASSERT_EQ(v1.GetSize(), 1);
+	ASSERT_EQ(v1.GetRealSize(), 2);
+	v1 = Vector<test_vector_class, MemoryManagerAllocator>({0, 1, 2, 3});
+	ASSERT_EQ(v1.GetSize(), 4);
+	ASSERT_EQ(v1.GetRealSize(), 8);
+	for (SizeType i = 0; i < v1.GetSize(); i++)
 	{
-		ASSERT_TRUE(v2.GetObject(i).content == i);
+		ASSERT_EQ(v1[i].content, i);
+		ASSERT_EQ(v1[i].mi, 1);
 	}
 
-	Vector<test_vector_class, StdAllocator> v3 = {0};
-	v3 = std::move(v1_2);
-	ASSERT_TRUE(v3.GetSize() == 3);
+	Vector<test_vector_class, MemoryManagerAllocator> v2 = {1, 0};
+	ASSERT_EQ(v2.GetSize(), 2);
+	ASSERT_EQ(v2.GetRealSize(), 4);
+	v2 = Vector<test_vector_class, StdAllocator>({0, 1, 2});
+	ASSERT_EQ(v2.GetSize(), 3);
+	ASSERT_EQ(v2.GetRealSize(), 4);
+	for (SizeType i = 0; i < v2.GetSize(); i++)
+	{
+		ASSERT_EQ(v2[i].content, i);
+		if (i >= 2)
+			ASSERT_EQ(v2[i].mi, 3);
+		else
+			ASSERT_EQ(v2[i].mi, 4);
+	}
+
+	Vector<test_vector_class, MemoryManagerAllocator> v3 = {1};
+	ASSERT_EQ(v3.GetSize(), 1);
+	ASSERT_EQ(v3.GetRealSize(), 2);
+	v3 = Vector<test_vector_class, StdAllocator>({0, 1, 2});
+	ASSERT_EQ(v3.GetSize(), 3);
+	ASSERT_EQ(v3.GetRealSize(), 6);
 	for (SizeType i = 0; i < v3.GetSize(); i++)
 	{
-		ASSERT_TRUE(v3.GetObject(i).content == i);
+		ASSERT_EQ(v3[i].content, i);
+		ASSERT_EQ(v3[i].mi, 3);
+	}
+
+	Vector<test_vector_class, MemoryManagerAllocator> v4 = {3, 2, 1, 0};
+	ASSERT_EQ(v4.GetSize(), 4);
+	ASSERT_EQ(v4.GetRealSize(), 8);
+	v4 = Vector<test_vector_class, StdAllocator>({0, 1, 2});
+	ASSERT_EQ(v4.GetSize(), 3);
+	ASSERT_EQ(v4.GetRealSize(), 8);
+	for (SizeType i = 0; i < v4.GetSize(); i++)
+	{
+		ASSERT_EQ(v4[i].content, i);
+		ASSERT_EQ(v4[i].mi, 4);
+	}
+
+	Vector<int, MemoryManagerAllocator> v5 = {1};
+	ASSERT_EQ(v5.GetSize(), 1);
+	ASSERT_EQ(v5.GetRealSize(), 2);
+	v5 = Vector<int, MemoryManagerAllocator>({0, 1, 2, 3});
+	ASSERT_EQ(v5.GetSize(), 4);
+	ASSERT_EQ(v5.GetRealSize(), 8);
+	for (SizeType i = 0; i < v5.GetSize(); i++)
+	{
+		ASSERT_EQ(v5[i], i);
+	}
+
+	Vector<int, MemoryManagerAllocator> v6 = {1, 0};
+	ASSERT_EQ(v6.GetSize(), 2);
+	ASSERT_EQ(v6.GetRealSize(), 4);
+	v6 = Vector<int, StdAllocator>({0, 1, 2});
+	ASSERT_EQ(v6.GetSize(), 3);
+	ASSERT_EQ(v6.GetRealSize(), 4);
+	for (SizeType i = 0; i < v6.GetSize(); i++)
+	{
+		ASSERT_EQ(v6[i], i);
+	}
+
+	Vector<int, MemoryManagerAllocator> v7 = {1};
+	ASSERT_EQ(v7.GetSize(), 1);
+	ASSERT_EQ(v7.GetRealSize(), 2);
+	v7 = Vector<int, StdAllocator>({0, 1, 2});
+	ASSERT_EQ(v7.GetSize(), 3);
+	ASSERT_EQ(v7.GetRealSize(), 6);
+	for (SizeType i = 0; i < v7.GetSize(); i++)
+	{
+		ASSERT_EQ(v7[i], i);
+	}
+
+	Vector<int, MemoryManagerAllocator> v8 = {3, 2, 1, 0};
+	ASSERT_EQ(v8.GetSize(), 4);
+	ASSERT_EQ(v8.GetRealSize(), 8);
+	v8 = Vector<int, StdAllocator>({0, 1, 2});
+	ASSERT_EQ(v8.GetSize(), 3);
+	ASSERT_EQ(v8.GetRealSize(), 8);
+	for (SizeType i = 0; i < v8.GetSize(); i++)
+	{
+		ASSERT_EQ(v8[i], i);
 	}
 }
 
@@ -219,6 +459,26 @@ TEST(Vector, SetRealSizeTest)
 	ASSERT_TRUE(test.GetRealSize() == 2);
 	ASSERT_TRUE(test.GetObject(0) == 0);
 	ASSERT_TRUE(test.GetObject(1) == 1);
+
+	Vector<test_vector_class> test2 = {1, 0};
+	ASSERT_TRUE(test2.GetObject(0).content == 1);
+	ASSERT_TRUE(test2.GetObject(1).content == 0);
+	ASSERT_TRUE(test2.GetSize() == 2);
+	ASSERT_TRUE(test2.GetRealSize() == 4);
+	int des_cot = 0;
+	for (SizeType i = 0; i < test2.GetSize(); i++)
+	{
+		test2[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+	}
+	ASSERT_EQ(des_cot, 0);
+	test2.SetRealSize(2);
+	ASSERT_EQ(des_cot, 2);
+	ASSERT_TRUE(test2.GetSize() == 2);
+	ASSERT_TRUE(test2.GetRealSize() == 2);
+	ASSERT_TRUE(test2.GetObject(0).content == 1);
+	ASSERT_TRUE(test2.GetObject(1).content == 0);
 }
 
 TEST(Vector, GetObjectTest)
@@ -244,10 +504,27 @@ TEST(Vector, ClearTest)
 	Vector<test_vector_class> v = {0, 1, 2};
 	ASSERT_TRUE(v.GetSize() == 3);
 	ASSERT_TRUE(v.GetRealSize() == 6);
+	int des_cot = 0;
+	for (SizeType i = 0; i < v.GetSize(); i++)
+	{
+		v[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+	}
+	ASSERT_EQ(des_cot, 0);
 	v.Clear();
+	ASSERT_EQ(des_cot, 3);
 	ASSERT_TRUE(v.GetSize() == 0);
 	ASSERT_TRUE(v.GetRealSize() == 4);
 	ASSERT_TRUE(v.GetData() != nullptr);
+
+	Vector<int> v2 = {2, 1, 0};
+	ASSERT_EQ(v2.GetSize(), 3);
+	ASSERT_EQ(v2.GetRealSize(), 6);
+	v2.Clear();
+	ASSERT_EQ(v2.GetSize(), 0);
+	ASSERT_EQ(v2.GetRealSize(), 4);
+	ASSERT_TRUE(v2.GetData() != nullptr);
 }
 
 TEST(Vector, SetSizeTest)
@@ -255,12 +532,15 @@ TEST(Vector, SetSizeTest)
 	Vector<test_vector_class> v = {0, 1, 2};
 	ASSERT_TRUE(v.GetSize() == 3);
 	ASSERT_TRUE(v.GetRealSize() == 6);
+	int des_cot = 0;
+	v[2].destruction_hook = [&]() {
+		des_cot += 1;
+	};
+	ASSERT_EQ(des_cot, 0);
 	v.SetSize(2, test_vector_class());
 	ASSERT_TRUE(v.GetSize() == 2);
 	ASSERT_TRUE(v.GetRealSize() == 6);
-#ifdef SGE_DEBUG	//destructor action may be optimized in release mode
-	ASSERT_TRUE((v.GetData() + 2)->mi == -1);
-#endif
+	ASSERT_EQ(des_cot, 1);
 	v.SetSize(6, test_vector_class(1));
 	ASSERT_TRUE(v.GetSize() == 6);
 	ASSERT_TRUE(v.GetRealSize() == 6);
@@ -270,6 +550,47 @@ TEST(Vector, SetSizeTest)
 	ASSERT_TRUE(v.GetRealSize() == 16);
 	ASSERT_TRUE(v.GetBegin()->mi == 3);
 	ASSERT_TRUE((v.GetBegin() + 6)->mi == 1);
+
+	Vector<int> v2 = {0, 1, 2};
+	ASSERT_EQ(v2.GetSize(), 3);
+	ASSERT_EQ(v2.GetRealSize(), 6);
+	for (SizeType i = 0; i < v2.GetSize(); i++)
+	{
+		ASSERT_EQ(v2[i], i);
+	}
+	v2.SetSize(2, 0);
+	ASSERT_EQ(v2.GetSize(), 2);
+	ASSERT_EQ(v2.GetRealSize(), 6);
+	for (SizeType i = 0; i < v2.GetSize(); i++)
+	{
+		ASSERT_EQ(v2[i], i);
+	}
+	v2.SetSize(6, 10);
+	ASSERT_EQ(v2.GetSize(), 6);
+	ASSERT_EQ(v2.GetRealSize(), 6);
+	for (SizeType i = 0; i < 2; i++)
+	{
+		ASSERT_EQ(v2[i], i);
+	}
+	for (SizeType i = 2; i < v2.GetSize(); i++)
+	{
+		ASSERT_EQ(v2[i], 10);
+	}
+	v2.SetSize(8, 11);
+	ASSERT_EQ(v2.GetSize(), 8);
+	ASSERT_EQ(v2.GetRealSize(), 16);
+	for (SizeType i = 0; i < 2; i++)
+	{
+		ASSERT_EQ(v2[i], i);
+	}
+	for (SizeType i = 2; i < 6; i++)
+	{
+		ASSERT_EQ(v2[i], 10);
+	}
+	for (SizeType i = 6; i < 8; i++)
+	{
+		ASSERT_EQ(v2[i], 11);
+	}
 }
 
 TEST(Vector, GetObjectByOperatorTest)
@@ -487,141 +808,287 @@ TEST(Vector, PopBackTest)
 TEST(Vector, RemoveTest)
 {
 	Vector<test_vector_class> test1 = {0, 1, 2, 3, 4, 5};
+	Vector<int> itest1 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test1.GetSize(), 6);
+	ASSERT_EQ(itest1.GetSize(), 6);
+
+	int des_cot = 0;
+
 	for (int i = 0; i < 6; i++)
 	{
 		ASSERT_EQ(test1[i].mi, 1);
 		ASSERT_EQ(test1[i].content, i);
+		test1[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+
+		ASSERT_EQ(itest1[i], i);
 	}
 
+	ASSERT_EQ(des_cot, 0);
+
 	auto iter1 = test1.Remove(test1.GetBegin() + 1);
+	auto iiter1 = itest1.Remove(itest1.GetBegin() + 1);
+
+	ASSERT_EQ(des_cot, 1);
 
 	ASSERT_EQ(test1.GetSize(), 5);
 	ASSERT_EQ(test1[0].mi, 1);
 	ASSERT_EQ(test1[0].content, 0);
+
+	ASSERT_EQ(itest1.GetSize(), 5);
+	ASSERT_EQ(itest1[0], 0);
+
 	for (int i = 1; i < 5; i++)
 	{
 		ASSERT_EQ(test1[i].mi, 3);
 		ASSERT_EQ(test1[i].content, i + 1);
+
+		ASSERT_EQ(itest1[i], i + 1);
 	}
 	ASSERT_EQ(iter1->mi, 3);
 	ASSERT_EQ(iter1->content, 2);
 
+	ASSERT_EQ(*iiter1, 2);
+
 	Vector<test_vector_class> test2 = {0, 1, 2, 3, 4, 5};
+	Vector<int> itest2 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test2.GetSize(), 6);
+	ASSERT_EQ(itest2.GetSize(), 6);
+
+	des_cot = 0;
+
 	for (int i = 0; i < 6; i++)
 	{
 		ASSERT_EQ(test2[i].mi, 1);
 		ASSERT_EQ(test2[i].content, i);
+		test2[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+
+		ASSERT_EQ(itest2[i], i);
 	}
 
+	ASSERT_EQ(des_cot, 0);
+
 	auto iter2 = test2.Remove(test2.GetBegin());
+	auto iiter2 = itest2.Remove(itest2.GetBegin());
+
+	ASSERT_EQ(des_cot, 1);
 
 	ASSERT_EQ(test2.GetSize(), 5);
+	ASSERT_EQ(itest2.GetSize(), 5);
+
 	for (int i = 0; i < 5; i++)
 	{
 		ASSERT_EQ(test2[i].mi, 3);
 		ASSERT_EQ(test2[i].content, i + 1);
+
+		ASSERT_EQ(itest2[i], i + 1);
 	}
 	ASSERT_EQ(iter2->mi, 3);
 	ASSERT_EQ(iter2->content, 1);
 
+	ASSERT_EQ(*iiter2, 1);
+
 	Vector<test_vector_class> test3 = {0, 1, 2, 3, 4, 5};
+	Vector<int> itest3 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test3.GetSize(), 6);
+	ASSERT_EQ(itest3.GetSize(), 6);
+
+	des_cot = 0;
+
 	for (int i = 0; i < 6; i++)
 	{
 		ASSERT_EQ(test3[i].mi, 1);
 		ASSERT_EQ(test3[i].content, i);
+		test3[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+
+		ASSERT_EQ(itest3[i], i);
 	}
 
+	ASSERT_EQ(des_cot, 0);
+
 	auto iter3 = test3.Remove(test3.GetEnd() - 1);
+	auto iiter3 = itest3.Remove(itest3.GetEnd() - 1);
+
+	ASSERT_EQ(des_cot, 1);
 
 	ASSERT_EQ(test3.GetSize(), 5);
+	ASSERT_EQ(itest3.GetSize(), 5);
+
 	for (int i = 0; i < 5; i++)
 	{
 		ASSERT_EQ(test3[i].mi, 1);
 		ASSERT_EQ(test3[i].content, i);
+
+		ASSERT_EQ(itest3[i], i);
 	}
 	ASSERT_EQ(iter3, test3.GetEnd());
+	ASSERT_EQ(iiter3, itest3.GetEnd());
 
 	Vector<test_vector_class> test4 = {0, 1, 2, 3, 4, 5};
+	Vector<int> itest4 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test4.GetSize(), 6);
+	ASSERT_EQ(itest4.GetSize(), 6);
+
+	des_cot = 0;
+
 	for (int i = 0; i < 6; i++)
 	{
 		ASSERT_EQ(test4[i].mi, 1);
 		ASSERT_EQ(test4[i].content, i);
+		test4[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
 	}
 
+	ASSERT_EQ(des_cot, 0);
+
 	auto iter4 = test4.Remove(test4.GetConstBegin() + 1);
+	auto iiter4 = itest4.Remove(itest4.GetConstBegin() + 1);
+
+	ASSERT_EQ(des_cot, 1);
 
 	ASSERT_EQ(test4.GetSize(), 5);
+	ASSERT_EQ(itest4.GetSize(), 5);
+
 	ASSERT_EQ(test4[0].mi, 1);
 	ASSERT_EQ(test4[0].content, 0);
+	ASSERT_EQ(itest4[0], 0);
+
 	for (int i = 1; i < 5; i++)
 	{
 		ASSERT_EQ(test4[i].mi, 3);
 		ASSERT_EQ(test4[i].content, i + 1);
+
+		ASSERT_EQ(itest4[i], i + 1);
 	}
 	ASSERT_EQ(iter4->mi, 3);
 	ASSERT_EQ(iter4->content, 2);
+	ASSERT_EQ(*iiter4, 2);
 
 	Vector<test_vector_class> test5 = {0, 1, 2, 3, 4, 5};
+	Vector<int> itest5 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test5.GetSize(), 6);
+	ASSERT_EQ(itest5.GetSize(), 6);
+
+	des_cot = 0;
+
 	for (int i = 0; i < 6; i++)
 	{
 		ASSERT_EQ(test5[i].mi, 1);
 		ASSERT_EQ(test5[i].content, i);
+		test5[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+
+		ASSERT_EQ(itest5[i], i);
 	}
 
+	ASSERT_EQ(des_cot, 0);
+
 	auto iter5 = test5.Remove(test5.GetConstBegin());
+	auto iiter5 = itest5.Remove(itest5.GetConstBegin());
+
+	ASSERT_EQ(des_cot, 1);
 
 	ASSERT_EQ(test5.GetSize(), 5);
+	ASSERT_EQ(itest5.GetSize(), 5);
+
 	for (int i = 0; i < 5; i++)
 	{
 		ASSERT_EQ(test5[i].mi, 3);
 		ASSERT_EQ(test5[i].content, i + 1);
+
+		ASSERT_EQ(itest5[i], i + 1);
 	}
 	ASSERT_EQ(iter5->mi, 3);
 	ASSERT_EQ(iter5->content, 1);
 
+	ASSERT_EQ(*iiter5, 1);
+
 	Vector<test_vector_class> test6 = {0, 1, 2, 3, 4, 5};
+	Vector<int> itest6 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test6.GetSize(), 6);
+	ASSERT_EQ(itest6.GetSize(), 6);
+
+	des_cot = 0;
+
 	for (int i = 0; i < 6; i++)
 	{
 		ASSERT_EQ(test6[i].mi, 1);
 		ASSERT_EQ(test6[i].content, i);
+		test6[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+
+		ASSERT_EQ(itest6[i], i);
 	}
 
+	ASSERT_EQ(des_cot, 0);
+
 	auto iter6 = test6.Remove(test6.GetConstEnd() - 1);
+	auto iiter6 = itest6.Remove(itest6.GetConstEnd() - 1);
 
 	ASSERT_EQ(test6.GetSize(), 5);
+	ASSERT_EQ(itest6.GetSize(), 5);
+
 	for (int i = 0; i < 5; i++)
 	{
 		ASSERT_EQ(test6[i].mi, 1);
 		ASSERT_EQ(test6[i].content, i);
+
+		ASSERT_EQ(itest6[i], i);
 	}
+
 	ASSERT_EQ(iter6, test6.GetConstEnd());
+	ASSERT_EQ(iiter6, itest6.GetConstEnd());
 
 	Vector<test_vector_class> test7 = {0, 1, 2, 3, 4, 5};
+	Vector<int> itest7 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test7.GetSize(), 6);
+	ASSERT_EQ(itest7.GetSize(), 6);
+
+	des_cot = 0;
+
 	for (int i = 0; i < 6; i++)
 	{
 		ASSERT_EQ(test7[i].mi, 1);
 		ASSERT_EQ(test7[i].content, i);
+		test7[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+
+		ASSERT_EQ(itest7[i], i);
 	}
 
+	ASSERT_EQ(des_cot, 0);
+
 	auto iter7 = test7.Remove(test7.GetBegin() + 1, test7.GetEnd());
+	auto iiter7 = itest7.Remove(itest7.GetBegin() + 1, itest7.GetEnd());
+
+	ASSERT_EQ(des_cot, 5);
 
 	ASSERT_EQ(test7.GetSize(), 1);
+	ASSERT_EQ(itest7.GetSize(), 1);
+
 	ASSERT_EQ(test7[0].mi, 1);
 	ASSERT_EQ(test7[0].content, 0);
+
+	ASSERT_EQ(itest7[0], 0);
+
+	ASSERT_EQ(iter7, test7.GetEnd());
+	ASSERT_EQ(iiter7, itest7.GetEnd());
 
 #ifdef SGE_DEBUG
 	for (int i = 2; i < 6; i++)
@@ -631,19 +1098,41 @@ TEST(Vector, RemoveTest)
 	}
 #endif
 	Vector<test_vector_class> test8 = {0, 1, 2, 3, 4, 5};
+	Vector<int> itest8 = {0, 1, 2, 3, 4, 5};
 
 	ASSERT_EQ(test8.GetSize(), 6);
+	ASSERT_EQ(itest8.GetSize(), 6);
+
+	des_cot = 0;
+
 	for (int i = 0; i < 6; i++)
 	{
 		ASSERT_EQ(test8[i].mi, 1);
 		ASSERT_EQ(test8[i].content, i);
+		test8[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+
+		ASSERT_EQ(itest8[i], i);
 	}
 
+	ASSERT_EQ(des_cot, 0);
+
 	auto iter8 = test8.Remove(test8.GetConstBegin(), test8.GetConstEnd() - 1);
+	auto iiter8 = itest8.Remove(itest8.GetConstBegin(), itest8.GetConstEnd() - 1);
+
+	ASSERT_EQ(des_cot, 5);
 
 	ASSERT_EQ(test8.GetSize(), 1);
+	ASSERT_EQ(itest8.GetSize(), 1);
+
 	ASSERT_EQ(test8[0].mi, 3);
 	ASSERT_EQ(test8[0].content, 5);
+
+	ASSERT_EQ(itest8[0], 5);
+
+	ASSERT_EQ(iter8, test8.GetConstBegin());
+	ASSERT_EQ(iiter8, itest8.GetConstBegin());
 #ifdef SGE_DEBUG
 	for (int i = 1; i < 5; i++)
 	{

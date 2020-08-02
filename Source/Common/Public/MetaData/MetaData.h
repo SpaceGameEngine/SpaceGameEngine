@@ -132,7 +132,7 @@ namespace SpaceGameEngine
 	template<typename T>
 	inline bool (*QueryComparison())(const void*, const void*)
 	{
-		if constexpr (IsComparable<T>::Value)
+		if constexpr (IsComparable<T>::Result)
 			return [](const void* arg1, const void* arg2) -> bool {
 				SGE_ASSERT(NullPointerError, arg1);
 				SGE_ASSERT(NullPointerError, arg2);

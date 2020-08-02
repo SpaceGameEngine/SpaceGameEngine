@@ -1292,7 +1292,7 @@ namespace SpaceGameEngine
 		@note use normal O(n) algorithm.
 		@return the iterator which points to the first matching element, return end iterator if no matching.
 		*/
-		Iterator Find(const T& val)
+		inline Iterator Find(const T& val)
 		{
 			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
 			{
@@ -1309,7 +1309,7 @@ namespace SpaceGameEngine
 		@note use normal O(n) algorithm.
 		@return the iterator which points to the first matching element, return end iterator if no matching.
 		*/
-		ConstIterator Find(const T& val) const
+		inline ConstIterator Find(const T& val) const
 		{
 			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
 			{
@@ -1327,7 +1327,7 @@ namespace SpaceGameEngine
 		@return the iterator which points to the first matching element, return end iterator if no matching.
 		*/
 		template<typename FunctionAllocator>
-		Iterator FindByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func)
+		inline Iterator FindByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func)
 		{
 			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
 			{
@@ -1345,7 +1345,7 @@ namespace SpaceGameEngine
 		@return the iterator which points to the first matching element, return end iterator if no matching.
 		*/
 		template<typename FunctionAllocator>
-		ConstIterator FindByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func) const
+		inline ConstIterator FindByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func) const
 		{
 			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
 			{
@@ -1362,7 +1362,7 @@ namespace SpaceGameEngine
 		@note use normal O(n) algorithm.
 		*/
 		template<typename FunctionAllocator>
-		void FindAll(const T& val, const Function<void(T&), FunctionAllocator>& process_func)
+		inline void FindAll(const T& val, const Function<void(T&), FunctionAllocator>& process_func)
 		{
 			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
 			{
@@ -1378,7 +1378,7 @@ namespace SpaceGameEngine
 		@note use normal O(n) algorithm.
 		*/
 		template<typename FunctionAllocator>
-		void FindAll(const T& val, const Function<void(const T&), FunctionAllocator>& process_func) const
+		inline void FindAll(const T& val, const Function<void(const T&), FunctionAllocator>& process_func) const
 		{
 			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
 			{
@@ -1394,7 +1394,7 @@ namespace SpaceGameEngine
 		@note use normal O(n) algorithm.
 		*/
 		template<typename FunctionAllocator, typename AnotherFunctionAllocator>
-		void FindAllByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func, const Function<void(T&), AnotherFunctionAllocator>& process_func)
+		inline void FindAllByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func, const Function<void(T&), AnotherFunctionAllocator>& process_func)
 		{
 			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
 			{
@@ -1410,7 +1410,7 @@ namespace SpaceGameEngine
 		@note use normal O(n) algorithm.
 		*/
 		template<typename FunctionAllocator, typename AnotherFunctionAllocator>
-		void FindAllByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func, const Function<void(const T&), AnotherFunctionAllocator>& process_func) const
+		inline void FindAllByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func, const Function<void(const T&), AnotherFunctionAllocator>& process_func) const
 		{
 			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
 			{

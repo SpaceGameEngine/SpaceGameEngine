@@ -103,7 +103,7 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr bool Value = Judge<T>(0);
+		inline static constexpr bool Result = Judge<T>(0);
 	};
 	/*!
 	@}
