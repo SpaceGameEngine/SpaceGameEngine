@@ -17,23 +17,24 @@ limitations under the License.
 #include <Memory/Detail/AllocatorUtil.h>
 #include <Memory/Detail/SegregatedFitAllocator.h>
 #include "Memory/MemoryManager.h"
+#include "Concurrent/Thread.h"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
 
 TEST(MemoryManager, StdAllocatorNewDeleteTest)
 {
-	Int32* pint = StdAllocator::New<Int32>(3);
+	Int32* pint = SpaceGameEngine::StdAllocator::New<Int32>(3);
 	ASSERT_EQ(*pint, 3);
-	StdAllocator::Delete(pint);
+	SpaceGameEngine::StdAllocator::Delete(pint);
 }
 
 TEST(MemoryManager, StdAllocatorRawNewDeleteTest)
 {
-	Int32* pint = reinterpret_cast<Int32*>(StdAllocator::RawNew(sizeof(Int32)));
+	Int32* pint = reinterpret_cast<Int32*>(SpaceGameEngine::StdAllocator::RawNew(sizeof(Int32)));
 	*pint = 3;
 	ASSERT_EQ(*pint, 3);
-	StdAllocator::RawDelete(pint, sizeof(Int32));
+	SpaceGameEngine::StdAllocator::RawDelete(pint, sizeof(Int32));
 }
 
 TEST(MemoryManager, MemoryAlignMacroTest)
@@ -56,15 +57,15 @@ TEST(MemoryManager, MemoryAlignMacroTest)
 TEST(MemoryManager, MemoryPageTest)
 {
 	MemoryManager::MemoryPageHeader* ppageheader =
-		new (reinterpret_cast<MemoryManager::MemoryPageHeader*>(StdAllocator::RawNew(
+		new (reinterpret_cast<MemoryManager::MemoryPageHeader*>(SpaceGameEngine::StdAllocator::RawNew(
 			sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader))))
 			MemoryManager::MemoryPageHeader();
 	ASSERT_EQ(ppageheader->m_Offset, 0);
 	ASSERT_EQ(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()),
 			  reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryPageHeader));
-	StdAllocator::RawDelete(ppageheader,
-							(sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)),
-							alignof(MemoryManager::MemoryPageHeader));
+	SpaceGameEngine::StdAllocator::RawDelete(ppageheader,
+											 (sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)),
+											 alignof(MemoryManager::MemoryPageHeader));
 }
 
 TEST(MemoryManager, InvalidAlignmentErrorTest)
@@ -174,4 +175,51 @@ TEST(MM, MM)
 	tga.deallocate(p3, 1, 0);
 	tga.deallocate(p4, 11, 0);
 	tga.deallocate(p5, 111, 0);
+}
+
+void concurrent_test()
+{
+	for (int i = 0; i < 100; i++)
+	{
+	}
+}
+
+template<typename AllocatorType>
+class ThreadSafetyTester : public ::testing::Test
+{
+public:
+	void run_test(int idx)
+	{
+		std::vector<Int32*> pints;
+		for (int i = 0; i < 1e5; i++)
+		{
+			Int32* pint = AllocatorType::template New<Int32>(1);
+			*pint = idx * 1e6 + i;
+			pints.push_back(pint);
+		}
+		bool ok = true;
+		for (int i = 0; i < 1e5; i++)
+		{
+			if (*pints[i] != idx * 1e6 + i)
+			{
+				ok = false;
+				break;
+			}
+		}
+		ASSERT_TRUE(ok);
+	}
+};
+using AllocatorsToBeTested = ::testing::Types<SpaceGameEngine::StdAllocator, SpaceGameEngine::MemoryManagerAllocator>;
+TYPED_TEST_CASE(ThreadSafetyTester, AllocatorsToBeTested);
+TYPED_TEST(ThreadSafetyTester, ThreadSafetyTest)
+{
+	std::vector<Thread> threads;
+	for (int i = 0; i < 20; i++)
+	{
+		threads.emplace_back([=]() { this->run_test(i); });
+	}
+	for (int i = 0; i < 20; i++)
+	{
+		threads[i].Join();
+	}
 }
