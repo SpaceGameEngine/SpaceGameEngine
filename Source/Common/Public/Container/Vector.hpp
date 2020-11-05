@@ -772,8 +772,46 @@ namespace SpaceGameEngine
 			_T* m_pContent;
 		};
 
+		template<typename IteratorType>
+		class VectorReverseIteratorImpl : public ReverseIteratorImpl<IteratorType>
+		{
+		public:
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const VectorReverseIteratorImpl& iter, T* begin, T* end)
+				{
+					SGE_ASSERT(NullPointerError, begin);
+					SGE_ASSERT(NullPointerError, end);
+					return !(iter.m_pContent >= begin && iter.m_pContent <= end);
+				}
+			};
+
+		public:
+			friend OutOfRangeError;
+			friend Vector;
+
+			inline static VectorReverseIteratorImpl GetBegin(const Vector& v)
+			{
+				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) + v.m_Size - 1);
+			}
+
+			inline static VectorReverseIteratorImpl GetEnd(const Vector& v)
+			{
+				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) - 1);
+			}
+
+		private:
+			VectorReverseIteratorImpl(T* ptr)
+				: ReverseIteratorImpl<IteratorType>(ptr)
+			{
+			}
+		};
+
 		using Iterator = IteratorImpl<T>;
 		using ConstIterator = IteratorImpl<const T>;
+		using ReverseIterator = VectorReverseIteratorImpl<IteratorImpl<T>>;
+		using ConstReverseIterator = VectorReverseIteratorImpl<IteratorImpl<const T>>;
 
 		inline Iterator GetBegin()
 		{
@@ -793,6 +831,26 @@ namespace SpaceGameEngine
 		inline ConstIterator GetConstEnd() const
 		{
 			return ConstIterator::GetEnd(*this);
+		}
+
+		inline ReverseIterator GetReverseBegin()
+		{
+			return ReverseIterator::GetBegin(*this);
+		}
+
+		inline ReverseIterator GetReverseEnd()
+		{
+			return ReverseIterator::GetEnd(*this);
+		}
+
+		inline ConstReverseIterator GetConstReverseBegin() const
+		{
+			return ConstReverseIterator::GetBegin(*this);
+		}
+
+		inline ConstReverseIterator GetConstReverseEnd() const
+		{
+			return ConstReverseIterator::GetEnd(*this);
 		}
 
 		inline T& PushBack(const T& val)
