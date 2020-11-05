@@ -101,3 +101,10 @@ TEST(ContainerConcept, IsTrivialTest)
 	ASSERT_FALSE(IsTrivial<test_trivial_move_operator>::Result);
 	ASSERT_FALSE(IsTrivial<test_trivial_destructor>::Result);
 }
+
+TEST(ContainerConcept, IsBidirectionalIteratorTest)
+{
+	ASSERT_TRUE((IsBidirectionalIterator<Vector<int>::Iterator, int>::Result));
+	ASSERT_TRUE((IsBidirectionalIterator<Vector<int>::ConstIterator, int>::Result));
+	ASSERT_FALSE((IsBidirectionalIterator<int, int>::Result));
+}
