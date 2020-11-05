@@ -691,7 +691,7 @@ namespace SpaceGameEngine
 		public:
 			friend OutOfRangeError;
 			friend Vector;
-			friend ReverseIteratorImpl;
+			friend ReverseIteratorImpl<IteratorImpl<_T>>;
 
 			inline static IteratorImpl GetBegin(const Vector& v)
 			{
