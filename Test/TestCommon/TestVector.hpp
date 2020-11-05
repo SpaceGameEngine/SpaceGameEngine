@@ -1224,11 +1224,15 @@ TEST(Vector, FindAllByFunctionTest)
 
 TEST(VectorIterator, IsVectorIteratorTest)
 {
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Result == true));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstIterator>::Result == true));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Result));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstIterator>::Result));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ReverseIterator>::Result));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Result));
 	ASSERT_TRUE((Vector<int>::IsVectorIterator<int>::Result == false));
-	ASSERT_TRUE((Vector<float>::IsVectorIterator<Vector<int>::Iterator>::Result == false));
-	ASSERT_TRUE((Vector<float>::IsVectorIterator<Vector<int>::ConstIterator>::Result == false));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::Iterator>::Result));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstIterator>::Result));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ReverseIterator>::Result));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Result));
 }
 
 TEST(VectorIterator, GetBeginTest)
@@ -1257,6 +1261,34 @@ TEST(VectorIterator, GetConstEndTest)
 	Vector<int> test1 = {0, 1, 2};
 	auto iter1 = test1.GetConstEnd();
 	ASSERT_TRUE(*(iter1 - 1) == 2);
+}
+
+TEST(VectorIterator, GetReverseBeginTest)
+{
+	Vector<int> test1 = {0, 1, 2};
+	auto iter1 = test1.GetReverseBegin();
+	ASSERT_EQ(*iter1, 2);
+}
+
+TEST(VectorIterator, GetReverseEndTest)
+{
+	Vector<int> test1 = {0, 1, 2};
+	auto iter1 = test1.GetReverseEnd();
+	ASSERT_EQ(*(iter1 - 1), 0);
+}
+
+TEST(VectorIterator, GetConstReverseBeginTest)
+{
+	Vector<int> test1 = {0, 1, 2};
+	auto iter1 = test1.GetConstReverseBegin();
+	ASSERT_EQ(*iter1, 2);
+}
+
+TEST(VectorIterator, GetConstReverseEndTest)
+{
+	Vector<int> test1 = {0, 1, 2};
+	auto iter1 = test1.GetConstReverseEnd();
+	ASSERT_EQ(*(iter1 - 1), 0);
 }
 
 TEST(VectorIterator, CopyTest)
@@ -1306,6 +1338,38 @@ TEST(VectorIterator, CalculationOperatorTest)
 	{
 		ASSERT_TRUE(*i == v.GetObject(i - v.GetConstBegin()));
 	}
+	for (auto i = v.GetReverseBegin(); i != v.GetReverseBegin() + v.GetSize(); i += 1)
+	{
+		ASSERT_EQ(*i, v.GetObject(v.GetReverseEnd() - i - 1));
+	}
+	for (auto i = v.GetReverseBegin(); i != v.GetReverseEnd(); i = i + 1)
+	{
+		ASSERT_EQ(*i, v.GetObject(v.GetReverseEnd() - i - 1));
+	}
+	for (auto i = v.GetReverseEnd() - 1; i != v.GetReverseBegin() - 1; i -= 1)
+	{
+		ASSERT_EQ(*i, v.GetObject(v.GetReverseEnd() - i - 1));
+	}
+	for (auto i = v.GetReverseEnd() - 1; i != v.GetReverseBegin() - 1; i = i - 1)
+	{
+		ASSERT_EQ(*i, v.GetObject(v.GetReverseEnd() - i - 1));
+	}
+	for (auto i = v.GetConstReverseBegin(); i != v.GetConstReverseBegin() + v.GetSize(); i += 1)
+	{
+		ASSERT_EQ(*i, v.GetObject(v.GetConstReverseEnd() - i - 1));
+	}
+	for (auto i = v.GetConstReverseBegin(); i != v.GetConstReverseEnd(); i = i + 1)
+	{
+		ASSERT_EQ(*i, v.GetObject(v.GetConstReverseEnd() - i - 1));
+	}
+	for (auto i = v.GetConstReverseEnd() - 1; i != v.GetConstReverseBegin() - 1; i -= 1)
+	{
+		ASSERT_EQ(*i, v.GetObject(v.GetConstReverseEnd() - i - 1));
+	}
+	for (auto i = v.GetConstReverseEnd() - 1; i != v.GetConstReverseBegin() - 1; i = i - 1)
+	{
+		ASSERT_EQ(*i, v.GetObject(v.GetConstReverseEnd() - i - 1));
+	}
 }
 
 TEST(VectorIterator, GetTest)
@@ -1317,6 +1381,12 @@ TEST(VectorIterator, GetTest)
 	auto citer = v.GetConstBegin();
 	ASSERT_TRUE((*citer).content == 0);
 	ASSERT_TRUE(citer->content == 0);
+	auto riter = v.GetReverseBegin();
+	ASSERT_EQ((*riter).content, 2);
+	ASSERT_EQ(riter->content, 2);
+	auto criter = v.GetConstReverseBegin();
+	ASSERT_EQ((*criter).content, 2);
+	ASSERT_EQ(criter->content, 2);
 }
 
 TEST(VectorIterator, OutOfRangeErrorTest)
@@ -1326,4 +1396,8 @@ TEST(VectorIterator, OutOfRangeErrorTest)
 	ASSERT_TRUE((Vector<int>::Iterator::OutOfRangeError::Judge(test.GetBegin() - 1, test.GetData(), test.GetData() + test.GetSize()) == true));
 	ASSERT_TRUE((Vector<int>::ConstIterator::OutOfRangeError::Judge(test.GetConstBegin(), test.GetData(), test.GetData() + test.GetSize()) == false));
 	ASSERT_TRUE((Vector<int>::ConstIterator::OutOfRangeError::Judge(test.GetConstBegin() - 1, test.GetData(), test.GetData() + test.GetSize()) == true));
+	ASSERT_FALSE((Vector<int>::ReverseIterator::OutOfRangeError::Judge(test.GetReverseBegin(), test.GetData() - 1, test.GetData() + test.GetSize() - 1)));
+	ASSERT_TRUE((Vector<int>::ReverseIterator::OutOfRangeError::Judge(test.GetReverseBegin() - 1, test.GetData() - 1, test.GetData() + test.GetSize() - 1)));
+	ASSERT_FALSE((Vector<int>::ConstReverseIterator::OutOfRangeError::Judge(test.GetConstReverseBegin(), test.GetData() - 1, test.GetData() + test.GetSize() - 1)));
+	ASSERT_TRUE((Vector<int>::ConstReverseIterator::OutOfRangeError::Judge(test.GetConstReverseBegin() - 1, test.GetData() - 1, test.GetData() + test.GetSize() - 1)));
 }

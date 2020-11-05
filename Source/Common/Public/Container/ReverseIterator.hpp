@@ -41,8 +41,8 @@ namespace SpaceGameEngine
 
 	public:
 		inline ReverseIteratorImpl(const ReverseIteratorImpl& iter)
+			: m_Content(iter)
 		{
-			m_Content = iter.m_Content;
 		}
 
 		inline ReverseIteratorImpl& operator=(const ReverseIteratorImpl& iter)

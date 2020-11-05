@@ -783,7 +783,7 @@ namespace SpaceGameEngine
 				{
 					SGE_ASSERT(NullPointerError, begin);
 					SGE_ASSERT(NullPointerError, end);
-					return !(iter.m_pContent >= begin && iter.m_pContent <= end);
+					return !(iter.operator->() >= begin && iter.operator->() <= end);
 				}
 			};
 
@@ -801,9 +801,62 @@ namespace SpaceGameEngine
 				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) - 1);
 			}
 
+			inline VectorReverseIteratorImpl(const VectorReverseIteratorImpl& iter)
+				: ReverseIteratorImpl<IteratorType>(iter)
+			{
+			}
+
+			inline VectorReverseIteratorImpl& operator=(const VectorReverseIteratorImpl& iter)
+			{
+				ReverseIteratorImpl<IteratorType>::operator=(iter);
+				return *this;
+			}
+
+			inline VectorReverseIteratorImpl operator+(SizeType i) const
+			{
+				return ReverseIteratorImpl<IteratorType>::operator+(i);
+			}
+
+			inline VectorReverseIteratorImpl& operator+=(SizeType i)
+			{
+				ReverseIteratorImpl<IteratorType>::operator+=(i);
+				return *this;
+			}
+
+			inline VectorReverseIteratorImpl operator-(SizeType i) const
+			{
+				return ReverseIteratorImpl<IteratorType>::operator-(i);
+			}
+
+			inline VectorReverseIteratorImpl& operator-=(SizeType i)
+			{
+				ReverseIteratorImpl<IteratorType>::operator-=(i);
+				return *this;
+			}
+
+			inline SizeType operator-(const VectorReverseIteratorImpl& iter)
+			{
+				return ReverseIteratorImpl<IteratorType>::operator-(iter);
+			}
+
+			inline bool operator==(const VectorReverseIteratorImpl& iter)
+			{
+				return ReverseIteratorImpl<IteratorType>::operator==(iter);
+			}
+
+			inline bool operator!=(const VectorReverseIteratorImpl& iter)
+			{
+				return ReverseIteratorImpl<IteratorType>::operator!=(iter);
+			}
+
 		private:
-			VectorReverseIteratorImpl(T* ptr)
+			inline VectorReverseIteratorImpl(T* ptr)
 				: ReverseIteratorImpl<IteratorType>(ptr)
+			{
+			}
+
+			inline VectorReverseIteratorImpl(const ReverseIteratorImpl<IteratorType>& iter)
+				: ReverseIteratorImpl<IteratorType>(iter)
 			{
 			}
 		};
