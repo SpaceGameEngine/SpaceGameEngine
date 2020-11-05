@@ -21,6 +21,7 @@ limitations under the License.
 #include "Error.h"
 #include "ContainerConcept.hpp"
 #include "Function.hpp"
+#include "ReverseIterator.hpp"
 
 namespace SpaceGameEngine
 {
@@ -672,13 +673,14 @@ namespace SpaceGameEngine
 			return GetObject(index);
 		}
 
-		class Iterator
+		template<typename _T>
+		class IteratorImpl
 		{
 		public:
 			struct OutOfRangeError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
-				inline static bool Judge(const Iterator& iter, T* begin, T* end)
+				inline static bool Judge(const IteratorImpl& iter, _T* begin, _T* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
 					SGE_ASSERT(NullPointerError, end);
@@ -689,201 +691,108 @@ namespace SpaceGameEngine
 		public:
 			friend OutOfRangeError;
 			friend Vector;
+			friend ReverseIteratorImpl;
 
-			inline static Iterator GetBegin(Vector& v)
+			inline static IteratorImpl GetBegin(const Vector& v)
 			{
-				return v.GetBegin();
+				return IteratorImpl(reinterpret_cast<_T*>(v.m_pContent));
 			}
 
-			inline static Iterator GetEnd(Vector& v)
+			inline static IteratorImpl GetEnd(const Vector& v)
 			{
-				return v.GetEnd();
+				return IteratorImpl(reinterpret_cast<_T*>(v.m_pContent) + v.m_Size);
 			}
 
-			inline Iterator(const Iterator& iter)
+			inline IteratorImpl(const IteratorImpl& iter)
 			{
 				m_pContent = iter.m_pContent;
 			}
 
-			inline Iterator& operator=(const Iterator& iter)
+			inline IteratorImpl& operator=(const IteratorImpl& iter)
 			{
 				m_pContent = iter.m_pContent;
 				return *this;
 			}
 
-			inline Iterator operator+(SizeType i) const
+			inline IteratorImpl operator+(SizeType i) const
 			{
-				return Iterator(m_pContent + i);
+				return IteratorImpl(m_pContent + i);
 			}
 
-			inline Iterator& operator+=(SizeType i)
+			inline IteratorImpl& operator+=(SizeType i)
 			{
 				m_pContent += i;
 				return *this;
 			}
 
-			inline Iterator operator-(SizeType i) const
+			inline IteratorImpl operator-(SizeType i) const
 			{
-				return Iterator(m_pContent - i);
+				return IteratorImpl(m_pContent - i);
 			}
 
-			inline Iterator& operator-=(SizeType i)
+			inline IteratorImpl& operator-=(SizeType i)
 			{
 				m_pContent -= i;
 				return *this;
 			}
 
-			inline SizeType operator-(const Iterator& iter) const
+			inline SizeType operator-(const IteratorImpl& iter) const
 			{
-				return ((AddressType)m_pContent - (AddressType)iter.m_pContent) / sizeof(T);
+				return ((AddressType)m_pContent - (AddressType)iter.m_pContent) / sizeof(_T);
 			}
 
-			inline T* operator->() const
+			inline _T* operator->() const
 			{
 				return m_pContent;
 			}
 
-			inline T& operator*() const
+			inline _T& operator*() const
 			{
 				return *m_pContent;
 			}
 
-			inline bool operator==(const Iterator& iter) const
+			inline bool operator==(const IteratorImpl& iter) const
 			{
 				return m_pContent == iter.m_pContent;
 			}
 
-			inline bool operator!=(const Iterator& iter) const
+			inline bool operator!=(const IteratorImpl& iter) const
 			{
 				return m_pContent != iter.m_pContent;
 			}
 
 		private:
-			inline explicit Iterator(T* ptr)
+			inline explicit IteratorImpl(_T* ptr)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
 				m_pContent = ptr;
 			}
 
 		private:
-			T* m_pContent;
+			_T* m_pContent;
 		};
 
-		class ConstIterator
-		{
-		public:
-			struct OutOfRangeError
-			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
-				inline static bool Judge(const ConstIterator& iter, T* begin, T* end)
-				{
-					SGE_ASSERT(NullPointerError, begin);
-					SGE_ASSERT(NullPointerError, end);
-					return !(iter.m_pContent >= begin && iter.m_pContent <= end);
-				}
-			};
-
-		public:
-			friend OutOfRangeError;
-			friend Vector;
-
-			inline static ConstIterator GetBegin(const Vector& v)
-			{
-				return v.GetConstBegin();
-			}
-
-			inline static ConstIterator GetEnd(const Vector& v)
-			{
-				return v.GetConstEnd();
-			}
-
-			inline ConstIterator(const ConstIterator& iter)
-			{
-				m_pContent = iter.m_pContent;
-			}
-
-			inline ConstIterator& operator=(const ConstIterator& iter)
-			{
-				m_pContent = iter.m_pContent;
-				return *this;
-			}
-
-			inline ConstIterator operator+(SizeType i) const
-			{
-				return ConstIterator(m_pContent + i);
-			}
-
-			inline ConstIterator& operator+=(SizeType i)
-			{
-				m_pContent += i;
-				return *this;
-			}
-
-			inline ConstIterator operator-(SizeType i) const
-			{
-				return ConstIterator(m_pContent - i);
-			}
-
-			inline ConstIterator& operator-=(SizeType i)
-			{
-				m_pContent -= i;
-				return *this;
-			}
-
-			inline SizeType operator-(const ConstIterator& iter) const
-			{
-				return ((AddressType)m_pContent - (AddressType)iter.m_pContent) / sizeof(T);
-			}
-
-			inline const T* operator->() const
-			{
-				return m_pContent;
-			}
-
-			inline const T& operator*() const
-			{
-				return *m_pContent;
-			}
-
-			inline bool operator==(const ConstIterator& iter) const
-			{
-				return m_pContent == iter.m_pContent;
-			}
-
-			inline bool operator!=(const ConstIterator& iter) const
-			{
-				return m_pContent != iter.m_pContent;
-			}
-
-		private:
-			inline explicit ConstIterator(const T* ptr)
-			{
-				SGE_ASSERT(NullPointerError, ptr);
-				m_pContent = ptr;
-			}
-
-		private:
-			const T* m_pContent;
-		};
+		using Iterator = IteratorImpl<T>;
+		using ConstIterator = IteratorImpl<const T>;
 
 		inline Iterator GetBegin()
 		{
-			return Iterator(reinterpret_cast<T*>(m_pContent));
+			return Iterator::GetBegin(*this);
 		}
 
 		inline Iterator GetEnd()
 		{
-			return Iterator(reinterpret_cast<T*>(m_pContent) + m_Size);
+			return Iterator::GetEnd(*this);
 		}
 
 		inline ConstIterator GetConstBegin() const
 		{
-			return ConstIterator(reinterpret_cast<T*>(m_pContent));
+			return ConstIterator::GetBegin(*this);
 		}
 
 		inline ConstIterator GetConstEnd() const
 		{
-			return ConstIterator(reinterpret_cast<T*>(m_pContent) + m_Size);
+			return ConstIterator::GetEnd(*this);
 		}
 
 		inline T& PushBack(const T& val)

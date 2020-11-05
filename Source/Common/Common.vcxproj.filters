@@ -81,6 +81,9 @@
     <ClInclude Include="Public\Container\ContainerConcept.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\ReverseIterator.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

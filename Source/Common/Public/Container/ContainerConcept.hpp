@@ -146,7 +146,7 @@ namespace SpaceGameEngine
 				//std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
 				//std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
 				std::is_same_v<decltype(std::declval<_U>() - std::declval<_U>()), SizeType> &&
-				(std::is_same_v<decltype(std::declval<_U>().operator->()), T*> || std::is_same_v<decltype(std::declval<_U>().operator->()), const T*>)&&(std::is_same_v<decltype(std::declval<_U>().operator*()), T&> || std::is_same_v<decltype(std::declval<_U>().operator*()), const T&>)&&std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
+				(std::is_same_v<decltype(std::declval<_U>().operator->()), T*> /* || std::is_same_v<decltype(std::declval<_U>().operator->()), const T*>*/) && (std::is_same_v<decltype(std::declval<_U>().operator*()), T&> /* || std::is_same_v<decltype(std::declval<_U>().operator*()), const T&>*/) && std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
 				std::is_same_v<decltype(std::declval<_U>() != std::declval<_U>()), bool>,
 			bool>
 		Check(int)
