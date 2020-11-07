@@ -999,31 +999,47 @@ namespace SpaceGameEngine
 		@return Iterator pointing to the inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
-		inline Iterator Insert(const IteratorType& iter, const T& val)
+		inline IteratorType Insert(const IteratorType& iter, const T& val)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == m_Size)
+				{
+					PushBack(val);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+				}
+				else
+				{
+					PushBack(std::move(GetObject(m_Size - 1)));
+					for (SizeType i = m_Size - 2; i > index; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - 1));
+					}
+					GetObject(index) = val;
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
 			}
 			else	//reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-			}
-			SizeType index = iter - IteratorType::GetBegin(*this);
-			if (index == m_Size)
-			{
-				PushBack(val);
-				return Iterator(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-			}
-			else
-			{
-				PushBack(std::move(GetObject(m_Size - 1)));
-				for (SizeType i = m_Size - 2; i > index; i--)
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == 0)
 				{
-					GetObject(i) = std::move(GetObject(i - 1));
+					PushBack(val);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				}
-				GetObject(index) = val;
-				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+				else
+				{
+					PushBack(std::move(GetObject(m_Size - 1)));
+					for (SizeType i = 1; i < index; i++)
+					{
+						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+					}
+					GetObject(m_Size - 1 - index) = val;
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);
+				}
 			}
 		}
 
@@ -1034,31 +1050,47 @@ namespace SpaceGameEngine
 		@return Iterator pointing to the inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
-		inline Iterator Insert(const IteratorType& iter, T&& val)
+		inline IteratorType Insert(const IteratorType& iter, T&& val)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == m_Size)
+				{
+					PushBack(std::move(val));
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+				}
+				else
+				{
+					PushBack(std::move(GetObject(m_Size - 1)));
+					for (SizeType i = m_Size - 2; i > index; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - 1));
+					}
+					GetObject(index) = std::move(val);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
 			}
 			else	//reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-			}
-			SizeType index = iter - IteratorType::GetBegin(*this);
-			if (index == m_Size)
-			{
-				PushBack(std::move(val));
-				return Iterator(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-			}
-			else
-			{
-				PushBack(std::move(GetObject(m_Size - 1)));
-				for (SizeType i = m_Size - 2; i > index; i--)
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == 0)
 				{
-					GetObject(i) = std::move(GetObject(i - 1));
+					PushBack(std::move(val));
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				}
-				GetObject(index) = std::move(val);
-				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+				else
+				{
+					PushBack(std::move(GetObject(m_Size - 1)));
+					for (SizeType i = 1; i < index; i++)
+					{
+						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+					}
+					GetObject(m_Size - 1 - index) = std::move(val);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);
+				}
 			}
 		}
 
@@ -1070,59 +1102,103 @@ namespace SpaceGameEngine
 		@return Iterator pointing to the first inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
-		inline Iterator Insert(const IteratorType& iter, SizeType size, const T& val)
+		inline IteratorType Insert(const IteratorType& iter, SizeType size, const T& val)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == m_Size)
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
+
+					for (SizeType i = m_Size; i < m_Size + size; i++)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(val);
+					}
+					m_Size += size;
+
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
+				else
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
+
+					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+					}
+					for (SizeType i = m_Size - 1; i >= index + size; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - size));
+					}
+					for (SizeType i = index; i < std::min(index + size, m_Size); i++)
+					{
+						GetObject(i) = val;
+					}
+					for (SizeType i = m_Size; i < index + size; i++)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(val);
+					}
+					m_Size += size;
+
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
 			}
 			else	//reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-			}
-			SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
-			SizeType index = iter - IteratorType::GetBegin(*this);
-			if (index == m_Size)
-			{
-				if (m_Size + size > m_RealSize)
+				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == 0)
 				{
-					SetRealSize(2 * (m_Size + size));
-				}
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
 
-				for (SizeType i = m_Size; i < m_Size + size; i++)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(val);
-				}
-				m_Size += size;
+					for (SizeType i = m_Size; i < m_Size + size; i++)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(val);
+					}
+					m_Size += size;
 
-				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
-			}
-			else
-			{
-				if (m_Size + size > m_RealSize)
-				{
-					SetRealSize(2 * (m_Size + size));
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				}
+				else
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
 
-				for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
-				}
-				for (SizeType i = m_Size - 1; i >= index + size; i--)
-				{
-					GetObject(i) = std::move(GetObject(i - size));
-				}
-				for (SizeType i = index; i < std::min(index + size, m_Size); i++)
-				{
-					GetObject(i) = val;
-				}
-				for (SizeType i = m_Size; i < index + size; i++)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(val);
-				}
-				m_Size += size;
+					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+					}
+					for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - size));
+					}
+					for (SizeType i = m_Size - index; i < std::min(m_Size - index + size, m_Size); i++)
+					{
+						GetObject(i) = val;
+					}
+					for (SizeType i = m_Size; i < m_Size - index + size; i++)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(val);
+					}
+					m_Size += size;
 
-				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - index - 1);
+				}
 			}
 		}
 
@@ -1136,63 +1212,116 @@ namespace SpaceGameEngine
 		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
-		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType, T>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
-		inline Iterator Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
+		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType, T>::Result || IsSequentialIterator<AnotherIteratorType, const T>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		inline IteratorType Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+				SizeType size = end - begin;
+				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == m_Size)
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
+
+					auto aiter = begin;
+					for (SizeType i = m_Size; i < m_Size + size; i++, aiter += 1)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+					}
+					m_Size += size;
+
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
+				else
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
+
+					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+					}
+					for (SizeType i = m_Size - 1; i >= index + size; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - size));
+					}
+					auto aiter = begin;
+					for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
+					{
+						GetObject(i) = *aiter;
+					}
+					for (SizeType i = m_Size; i < index + size; i++, aiter += 1)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+					}
+					m_Size += size;
+
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
 			}
 			else	//reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-			}
-			SizeType size = end - begin;
-			SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
-			SizeType index = iter - IteratorType::GetBegin(*this);
-			if (index == m_Size)
-			{
-				if (m_Size + size > m_RealSize)
+				SizeType size = end - begin;
+				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == 0)
 				{
-					SetRealSize(2 * (m_Size + size));
-				}
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
 
-				auto aiter = begin;
-				for (SizeType i = m_Size; i < m_Size + size; i++, aiter += 1)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
-				}
-				m_Size += size;
+					auto aiter = begin;
+					for (SizeType i = m_Size + size - 1; i >= m_Size; i--, aiter += 1)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+						if (i == 0)
+							break;
+					}
+					m_Size += size;
 
-				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
-			}
-			else
-			{
-				if (m_Size + size > m_RealSize)
-				{
-					SetRealSize(2 * (m_Size + size));
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				}
+				else
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
 
-				for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
-				}
-				for (SizeType i = m_Size - 1; i >= index + size; i--)
-				{
-					GetObject(i) = std::move(GetObject(i - size));
-				}
-				auto aiter = begin;
-				for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
-				{
-					GetObject(i) = *aiter;
-				}
-				for (SizeType i = m_Size; i < index + size; i++, aiter += 1)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
-				}
-				m_Size += size;
+					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+					}
+					for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - size));
+					}
+					auto aiter = begin;
+					for (SizeType i = m_Size - index + size - 1; i >= m_Size; i--, aiter += 1)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+						if (i == 0)
+							break;
+					}
+					for (SizeType i = std::min(m_Size - index + size, m_Size) - 1; i >= m_Size - index; i--, aiter += 1)
+					{
+						GetObject(i) = *aiter;
+						if (i == 0)
+							break;
+					}
+					m_Size += size;
 
-				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - index - 1);
+				}
 			}
 		}
 
@@ -1205,62 +1334,115 @@ namespace SpaceGameEngine
 		@note use copy not move to insert elements.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
-		inline Iterator Insert(const IteratorType& iter, std::initializer_list<T> ilist)
+		inline IteratorType Insert(const IteratorType& iter, std::initializer_list<T> ilist)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+				SizeType size = ilist.size();
+				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == m_Size)
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
+
+					auto aiter = ilist.begin();
+					for (SizeType i = m_Size; i < m_Size + size; i++, aiter += 1)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+					}
+					m_Size += size;
+
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
+				else
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
+
+					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+					}
+					for (SizeType i = m_Size - 1; i >= index + size; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - size));
+					}
+					auto aiter = ilist.begin();
+					for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
+					{
+						GetObject(i) = *aiter;
+					}
+					for (SizeType i = m_Size; i < index + size; i++, aiter += 1)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+					}
+					m_Size += size;
+
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
 			}
 			else	//reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-			}
-			SizeType size = ilist.size();
-			SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
-			SizeType index = iter - IteratorType::GetBegin(*this);
-			if (index == m_Size)
-			{
-				if (m_Size + size > m_RealSize)
+				SizeType size = ilist.size();
+				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == 0)
 				{
-					SetRealSize(2 * (m_Size + size));
-				}
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
 
-				auto aiter = ilist.begin();
-				for (SizeType i = m_Size; i < m_Size + size; i++, aiter += 1)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
-				}
-				m_Size += size;
+					auto aiter = ilist.begin();
+					for (SizeType i = m_Size + size - 1; i >= m_Size; i--, aiter += 1)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+						if (i == 0)
+							break;
+					}
+					m_Size += size;
 
-				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
-			}
-			else
-			{
-				if (m_Size + size > m_RealSize)
-				{
-					SetRealSize(2 * (m_Size + size));
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				}
+				else
+				{
+					if (m_Size + size > m_RealSize)
+					{
+						SetRealSize(2 * (m_Size + size));
+					}
 
-				for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
-				}
-				for (SizeType i = m_Size - 1; i >= index + size; i--)
-				{
-					GetObject(i) = std::move(GetObject(i - size));
-				}
-				auto aiter = ilist.begin();
-				for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
-				{
-					GetObject(i) = *aiter;
-				}
-				for (SizeType i = m_Size; i < index + size; i++, aiter += 1)
-				{
-					new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
-				}
-				m_Size += size;
+					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+					}
+					for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - size));
+					}
+					auto aiter = ilist.begin();
+					for (SizeType i = m_Size - index + size - 1; i >= m_Size; i--, aiter += 1)
+					{
+						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+						if (i == 0)
+							break;
+					}
+					for (SizeType i = std::min(m_Size - index + size, m_Size) - 1; i >= m_Size - index; i--, aiter += 1)
+					{
+						GetObject(i) = *aiter;
+						if (i == 0)
+							break;
+					}
+					m_Size += size;
 
-				return Iterator(reinterpret_cast<T*>(m_pContent) + index);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - index - 1);
+				}
 			}
 		}
 

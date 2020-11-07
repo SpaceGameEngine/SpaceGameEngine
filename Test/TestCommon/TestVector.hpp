@@ -1410,12 +1410,125 @@ TEST(VectorIterator, ReverseIteratorTest)
 
 	int i1 = 3;
 	ASSERT_EQ(v1.GetSize(), 3);
-	v1.Insert(v1.GetReverseBegin(), i1);
+	auto iter1 = v1.Insert(v1.GetReverseBegin(), i1);
 	ASSERT_EQ(v1.GetSize(), 4);
 	ASSERT_EQ(v1[3], 3);
+	ASSERT_EQ(v1[2], 2);
+	ASSERT_EQ(*iter1, 3);
 
 	i1 = -1;
-	v1.Insert(v1.GetReverseEnd(), std::move(i1));
+	auto iter2 = v1.Insert(v1.GetReverseEnd(), i1);
 	ASSERT_EQ(v1.GetSize(), 5);
 	ASSERT_EQ(v1[0], -1);
+	ASSERT_EQ(v1[1], 0);
+	ASSERT_EQ(*iter2, -1);
+
+	Vector<test_vector_class> v2 = {0, 1, 2};
+
+	test_vector_class i2 = 3;
+
+	ASSERT_EQ(v2.GetSize(), 3);
+	auto iter3 = v2.Insert(v2.GetReverseBegin(), std::move(i2));
+	ASSERT_EQ(v2.GetSize(), 4);
+	ASSERT_EQ(v2[3].content, 3);
+	ASSERT_EQ(v2[3].mi, 3);
+	ASSERT_EQ(v2[2].content, 2);
+	ASSERT_EQ(iter3->content, 3);
+	ASSERT_EQ(iter3->mi, 3);
+
+	i2 = -1;
+	auto iter4 = v2.Insert(v2.GetReverseEnd(), std::move(i2));
+	ASSERT_EQ(v2.GetSize(), 5);
+	ASSERT_EQ(v2[0].content, -1);
+	ASSERT_EQ(v2[0].mi, 4);
+	ASSERT_EQ(v2[1].content, 0);
+	ASSERT_EQ(iter4->content, -1);
+	ASSERT_EQ(iter4->mi, 4);
+
+	Vector<int> v3 = {0, 1, 2, 3, 4};
+
+	ASSERT_EQ(v3.GetSize(), 5);
+	auto iter5 = v3.Insert(v3.GetReverseBegin(), 3, 10);
+	ASSERT_EQ(v3.GetSize(), 8);
+	for (SizeType i = 5; i < 8; i++)
+		ASSERT_EQ(v3[i], 10);
+	for (auto i = iter5; i != iter5 + 3; i += 1)
+		ASSERT_EQ(*i, 10);
+
+	auto iter6 = v3.Insert(v3.GetReverseEnd(), 3, -1);
+	ASSERT_EQ(v3.GetSize(), 11);
+	for (SizeType i = 0; i < 3; i++)
+		ASSERT_EQ(v3[i], -1);
+	for (auto i = iter6; i != iter6 + 3; i += 1)
+		ASSERT_EQ(*i, -1);
+
+	auto iter7 = v3.Insert(v3.GetReverseBegin() + 1, 50, 5);
+	ASSERT_EQ(v3.GetSize(), 61);
+	ASSERT_EQ(v3[60], 10);
+	for (SizeType i = 10; i < 60; i++)
+		ASSERT_EQ(v3[i], 5);
+	ASSERT_EQ(v3[9], 10);
+	ASSERT_EQ(v3[8], 10);
+	for (auto i = iter7; i != iter7 + 50; i += 1)
+		ASSERT_EQ(*i, 5);
+
+	Vector<int> v4 = {0, 1, 2, 3, 4};
+	Vector<int> d1 = {7, 6, 5};
+
+	ASSERT_EQ(v4.GetSize(), 5);
+	auto iter8 = v4.Insert(v4.GetReverseBegin(), d1.GetConstBegin(), d1.GetConstEnd());
+	ASSERT_EQ(v4.GetSize(), 8);
+	ASSERT_EQ(*iter8, 7);
+	for (SizeType i = 0; i < 8; i++)
+		ASSERT_EQ(v4[i], i);
+	for (auto i = iter8; i != v4.GetReverseEnd(); i += 1)
+		ASSERT_EQ(*i, 7 - (i - v4.GetReverseBegin()));
+
+	Vector<int> d2 = {-3, -2, -1};
+	auto iter9 = v4.Insert(v4.GetReverseEnd(), d2.GetReverseBegin(), d2.GetReverseEnd());
+	ASSERT_EQ(v4.GetSize(), 11);
+	ASSERT_EQ(*iter9, -1);
+	for (SizeType i = 0; i < 11; i++)
+		ASSERT_EQ(v4[i], i - 3);
+	for (auto i = iter9; i != v4.GetReverseEnd(); i += 1)
+		ASSERT_EQ(*i, -4 + (int)(v4.GetReverseEnd() - i));
+
+	Vector<int> v5 = {0, 1, 2, 3, 7};
+	Vector<int> d3 = {6, 5, 4};
+	auto iter10 = v5.Insert(v5.GetReverseBegin() + 1, d3.GetBegin(), d3.GetEnd());
+	ASSERT_EQ(v5.GetSize(), 8);
+	ASSERT_EQ(*iter10, 6);
+	for (SizeType i = 0; i < 8; i++)
+		ASSERT_EQ(v5[i], i);
+	for (auto i = iter10; i != v5.GetReverseEnd(); i += 1)
+		ASSERT_EQ(*i, 7 - (int)(i - v5.GetReverseBegin()));
+
+	Vector<int> v6 = {0, 1, 2, 3, 4};
+
+	ASSERT_EQ(v6.GetSize(), 5);
+	auto iter11 = v6.Insert(v6.GetReverseBegin(), {7, 6, 5});
+	ASSERT_EQ(v6.GetSize(), 8);
+	ASSERT_EQ(*iter11, 7);
+	for (SizeType i = 0; i < 8; i++)
+		ASSERT_EQ(v6[i], i);
+	for (auto i = iter11; i != v6.GetReverseEnd(); i += 1)
+		ASSERT_EQ(*i, 7 - (i - v6.GetReverseBegin()));
+
+	auto iter12 = v6.Insert(v6.GetReverseEnd(), {-1, -2, -3});
+	ASSERT_EQ(v6.GetSize(), 11);
+	ASSERT_EQ(*iter12, -1);
+	for (SizeType i = 0; i < 11; i++)
+		ASSERT_EQ(v6[i], i - 3);
+	for (auto i = iter12; i != v6.GetReverseEnd(); i += 1)
+		ASSERT_EQ(*i, -4 + (int)(v6.GetReverseEnd() - i));
+
+	Vector<int> v7 = {0, 1, 10};
+	ASSERT_EQ(v7.GetSize(), 3);
+	auto iter13 = v7.Insert(v7.GetReverseBegin() + 1, {9, 8, 7, 6, 5, 4, 3, 2});
+	ASSERT_EQ(v7.GetSize(), 11);
+	ASSERT_EQ(*iter13, 9);
+	for (SizeType i = 0; i < 11; i++)
+		ASSERT_EQ(v7[i], i);
+	for (auto i = iter13; i != v7.GetReverseEnd(); i += 1)
+		ASSERT_EQ(*i, 10 - (i - v7.GetReverseBegin()));
 }
