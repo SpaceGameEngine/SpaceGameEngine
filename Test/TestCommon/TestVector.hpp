@@ -1531,4 +1531,35 @@ TEST(VectorIterator, ReverseIteratorTest)
 		ASSERT_EQ(v7[i], i);
 	for (auto i = iter13; i != v7.GetReverseEnd(); i += 1)
 		ASSERT_EQ(*i, 10 - (i - v7.GetReverseBegin()));
+
+	Vector<int> v8 = {0, 1, 2, 3, 4};
+	ASSERT_EQ(v8.GetSize(), 5);
+	v8.Remove(v8.GetReverseBegin());
+	ASSERT_EQ(v8.GetSize(), 4);
+	for (SizeType i = 0; i < 4; i++)
+	{
+		ASSERT_EQ(v8[i], i);
+	}
+
+	v8.Remove(v8.GetReverseEnd() - 1);
+	ASSERT_EQ(v8.GetSize(), 3);
+	for (SizeType i = 0; i < 3; i++)
+	{
+		ASSERT_EQ(v8[i], i + 1);
+	}
+
+	v8.Remove(v8.GetReverseBegin() + 1);
+	ASSERT_EQ(v8.GetSize(), 2);
+	ASSERT_EQ(v8[0], 1);
+	ASSERT_EQ(v8[1], 3);
+
+	Vector<int> v9 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+	ASSERT_EQ(v9.GetSize(), 10);
+	v9.Remove(v9.GetReverseBegin() + 2, v9.GetReverseEnd() - 2);
+	ASSERT_EQ(v9.GetSize(), 4);
+	ASSERT_EQ(v9[0], 0);
+	ASSERT_EQ(v9[1], 1);
+	ASSERT_EQ(v9[2], 8);
+	ASSERT_EQ(v9[3], 9);
 }

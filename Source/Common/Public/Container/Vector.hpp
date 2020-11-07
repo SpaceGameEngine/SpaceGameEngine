@@ -1478,11 +1478,20 @@ namespace SpaceGameEngine
 				iter->~T();
 			}
 
-			for (auto i = iter; i != IteratorType::GetEnd(*this) - 1; i += 1)
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
-				new (&const_cast<T&>(*i)) T(std::move(const_cast<T&>(*(i + 1))));
+				for (auto i = iter; i != IteratorType::GetEnd(*this) - 1; i += 1)
+				{
+					new (&const_cast<T&>(*i)) T(std::move(const_cast<T&>(*(i + 1))));
+				}
 			}
-
+			else	//reverse
+			{
+				for (auto i = iter; i != IteratorType::GetBegin(*this); i -= 1)
+				{
+					new (&const_cast<T&>(*i)) T(std::move(const_cast<T&>(*(i - 1))));
+				}
+			}
 			m_Size -= 1;
 
 			return iter;
@@ -1523,13 +1532,24 @@ namespace SpaceGameEngine
 				}
 			}
 
-			for (auto i = end; i != IteratorType::GetEnd(*this); i += 1)
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
-				new (&const_cast<T&>(*(i - size))) T(std::move(const_cast<T&>(*i)));
+				for (auto i = end; i != IteratorType::GetEnd(*this); i += 1)
+				{
+					new (&const_cast<T&>(*(i - size))) T(std::move(const_cast<T&>(*i)));
+				}
+				m_Size -= size;
+				return begin;
 			}
-
-			m_Size -= size;
-			return begin;
+			else	//reverse
+			{
+				for (auto i = begin - 1; i != IteratorType::GetBegin(*this) - 1; i -= 1)
+				{
+					new (&const_cast<T&>(*(i + size))) T(std::move(const_cast<T&>(*i)));
+				}
+				m_Size -= size;
+				return end;
+			}
 		}
 
 		/*!
