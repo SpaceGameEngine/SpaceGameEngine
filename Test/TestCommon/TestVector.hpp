@@ -1401,3 +1401,21 @@ TEST(VectorIterator, OutOfRangeErrorTest)
 	ASSERT_FALSE((Vector<int>::ConstReverseIterator::OutOfRangeError::Judge(test.GetConstReverseBegin(), test.GetData() - 1, test.GetData() + test.GetSize() - 1)));
 	ASSERT_TRUE((Vector<int>::ConstReverseIterator::OutOfRangeError::Judge(test.GetConstReverseBegin() - 1, test.GetData() - 1, test.GetData() + test.GetSize() - 1)));
 }
+
+TEST(VectorIterator, ReverseIteratorTest)
+{
+	Vector<int> v1 = {0, 1, 2};
+
+	ASSERT_EQ(v1.GetReverseEnd() - Vector<int>::ReverseIterator::GetBegin(v1), 3);
+
+	int i1 = 3;
+	ASSERT_EQ(v1.GetSize(), 3);
+	v1.Insert(v1.GetReverseBegin(), i1);
+	ASSERT_EQ(v1.GetSize(), 4);
+	ASSERT_EQ(v1[3], 3);
+
+	i1 = -1;
+	v1.Insert(v1.GetReverseEnd(), std::move(i1));
+	ASSERT_EQ(v1.GetSize(), 5);
+	ASSERT_EQ(v1[0], -1);
+}
