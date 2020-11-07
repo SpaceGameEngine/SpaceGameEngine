@@ -86,7 +86,7 @@ TEST(ContainerConcept, IsTotallyOrderedTest)
 TEST(ContainerConcept, IsSequentialIteratorTest)
 {
 	ASSERT_TRUE((IsSequentialIterator<Vector<int>::Iterator, int>::Result));
-	ASSERT_TRUE((IsSequentialIterator<Vector<int>::ConstIterator, int>::Result));
+	ASSERT_TRUE((IsSequentialIterator<Vector<int>::ConstIterator, const int>::Result));
 	ASSERT_FALSE((IsSequentialIterator<int, int>::Result));
 }
 
@@ -100,4 +100,11 @@ TEST(ContainerConcept, IsTrivialTest)
 	ASSERT_FALSE(IsTrivial<test_trivial_copy_operator>::Result);
 	ASSERT_FALSE(IsTrivial<test_trivial_move_operator>::Result);
 	ASSERT_FALSE(IsTrivial<test_trivial_destructor>::Result);
+}
+
+TEST(ContainerConcept, IsBidirectionalIteratorTest)
+{
+	ASSERT_TRUE((IsBidirectionalIterator<Vector<int>::Iterator, int>::Result));
+	ASSERT_TRUE((IsBidirectionalIterator<Vector<int>::ConstIterator, const int>::Result));
+	ASSERT_FALSE((IsBidirectionalIterator<int, int>::Result));
 }
