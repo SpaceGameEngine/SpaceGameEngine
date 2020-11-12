@@ -37,7 +37,10 @@ namespace SpaceGameEngine
 	template<template<typename> class IteratorImpl, typename T>
 	class ReverseIteratorImpl<IteratorImpl<T>>
 	{
-		static_assert((IsBidirectionalIterator<IteratorImpl<T>, T>::Result), "only the bidirectional iterator type can be passed to get the reverse iterator.");
+	public:
+		static_assert((IsBidirectionalIterator<IteratorImpl<T>>::Result), "only the bidirectional iterator type can be passed to get the reverse iterator.");
+
+		using ValueType = T;
 
 	public:
 		inline ReverseIteratorImpl(const ReverseIteratorImpl& iter)

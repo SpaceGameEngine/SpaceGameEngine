@@ -130,7 +130,7 @@ namespace SpaceGameEngine
 	@param T the type which the U can get.
 	@todo use concept.
 	*/
-	template<typename U, typename T>
+	template<typename U>
 	struct IsSequentialIterator
 	{
 	private:
@@ -146,7 +146,7 @@ namespace SpaceGameEngine
 				//std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
 				//std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
 				std::is_same_v<decltype(std::declval<_U>() - std::declval<_U>()), SizeType> &&
-				(std::is_same_v<decltype(std::declval<_U>().operator->()), T*> /* || std::is_same_v<decltype(std::declval<_U>().operator->()), const T*>*/) && (std::is_same_v<decltype(std::declval<_U>().operator*()), T&> /* || std::is_same_v<decltype(std::declval<_U>().operator*()), const T&>*/) && std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
+				(std::is_same_v<decltype(std::declval<_U>().operator->()), typename _U::ValueType*>)&&(std::is_same_v<decltype(std::declval<_U>().operator*()), typename _U::ValueType&>)&&std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
 				std::is_same_v<decltype(std::declval<_U>() != std::declval<_U>()), bool>,
 			bool>
 		Check(int)
@@ -176,13 +176,13 @@ namespace SpaceGameEngine
 	@param T the type which the U can get.
 	@todo use concept.
 	*/
-	template<typename U, typename T>
+	template<typename U>
 	struct IsBidirectionalIterator
 	{
 	private:
 		template<typename _U>
 		inline static constexpr std::enable_if_t<
-			IsSequentialIterator<_U, T>::Result &&
+			IsSequentialIterator<_U>::Result &&
 				std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
 				std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&>,
 			bool>

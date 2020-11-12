@@ -688,6 +688,8 @@ namespace SpaceGameEngine
 				}
 			};
 
+			using ValueType = _T;
+
 		public:
 			friend OutOfRangeError;
 			friend Vector;
@@ -786,6 +788,8 @@ namespace SpaceGameEngine
 					return !(iter.operator->() >= begin && iter.operator->() <= end);
 				}
 			};
+
+			using ValueType = typename IteratorType::ValueType;
 
 		public:
 			friend OutOfRangeError;
@@ -965,7 +969,7 @@ namespace SpaceGameEngine
 			template<typename _U>
 			inline static constexpr std::enable_if_t<
 				IsError<typename _U::OutOfRangeError, const _U&, T*, T*>::Result &&
-					std::is_same_v<decltype(_U::GetBegin(*(new Vector))), _U> &&
+					(std::is_same_v<typename _U::ValueType, T> || std::is_same_v<typename _U::ValueType, const T>)&&std::is_same_v<decltype(_U::GetBegin(*(new Vector))), _U> &&
 					std::is_same_v<decltype(_U::GetEnd(*(new Vector))), _U> &&
 					std::is_same_v<decltype(new _U(std::declval<_U>())), _U*> &&
 					std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
@@ -1212,7 +1216,7 @@ namespace SpaceGameEngine
 		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
-		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType, T>::Result || IsSequentialIterator<AnotherIteratorType, const T>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Result, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Result, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
 		inline IteratorType Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
