@@ -13,20 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+#pragma once
 #include "gtest/gtest.h"
-#include "TestError.hpp"
-#include "TestString.hpp"
-#include "TestMemoryManager.hpp"
-#include "TestFunction.hpp"
-#include "TestMetaData.hpp"
-#include "TestUtility.hpp"
-#include "TestConcurrent.hpp"
-#include "TestVector.hpp"
-#include "TestContainerConcept.hpp"
-#include "TestRange.hpp"
+#include "Container/Range/RangeCore.hpp"
+#include "Container/Vector.hpp"
+#include <vector>
 
-int main(int argc, char** argv)
+using namespace SpaceGameEngine;
+
+TEST(RangeCore, InstanceTest)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	Vector<int> v1 = {0, 1, 2, 3, 4, 5};
+	Range r1(v1.GetBegin(), v1.GetEnd());
+}
+
+TEST(RangeCore, GetBeginAndGetEndTest)
+{
+	Vector<int> v1 = {0, 1, 2, 3, 4, 5};
+	Range r1(v1.GetBegin(), v1.GetEnd());
+	ASSERT_EQ(r1.GetEnd() - r1.GetBegin(), v1.GetSize());
+	for (auto i1 = r1.GetBegin(); r1.GetEnd() != i1; i1 += 1)
+	{
+		ASSERT_EQ(*i1, i1 - r1.GetBegin());
+	}
 }

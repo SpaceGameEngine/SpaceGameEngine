@@ -28,6 +28,9 @@
     <Filter Include="Public\Container">
       <UniqueIdentifier>{6e20eaba-a53f-4f95-9843-636b94d5a98e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Container\Range">
+      <UniqueIdentifier>{697fc222-43d5-49f9-9265-010df72ba5db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -83,6 +86,9 @@
     </ClInclude>
     <ClInclude Include="Public\Container\ReverseIterator.hpp">
       <Filter>Public\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\Range\RangeCore.hpp">
+      <Filter>Public\Container\Range</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
