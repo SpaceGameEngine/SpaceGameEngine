@@ -31,6 +31,9 @@
     <Filter Include="Public\Container\Range">
       <UniqueIdentifier>{697fc222-43d5-49f9-9265-010df72ba5db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\Utility">
+      <UniqueIdentifier>{c29e37a6-b78b-451a-800c-e813bc85499c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -90,6 +93,9 @@
     <ClInclude Include="Public\Container\Range\RangeCore.hpp">
       <Filter>Public\Container\Range</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\AutoReleaseBuffer.h">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -112,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="Private\MetaData\MetaData.cpp">
       <Filter>Private\MetaData</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Utility\AutoReleaseBuffer.cpp">
+      <Filter>Private\Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
