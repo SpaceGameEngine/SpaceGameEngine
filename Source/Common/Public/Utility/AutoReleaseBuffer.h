@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "Utility.hpp"
+#include "MemoryManager.h"
 #include "Container/Vector.hpp"
 #include "Function.hpp"
 
@@ -40,6 +41,16 @@ namespace SpaceGameEngine
 
 		AutoReleaseBuffer(AutoReleaseBuffer&& a);
 		AutoReleaseBuffer& operator=(AutoReleaseBuffer&& a);
+
+		template<typename T, typename Allocator = DefaultAllocator, typename... Args>
+		inline T* NewObject(Args&&... args)
+		{
+			T* re = Allocator::template New<T>(std::forward<Args>(args)...);
+			m_Functions.EmplaceBack([re]() {
+				Allocator::Delete(re);
+			});
+			return re;
+		}
 
 	private:
 		Vector<Function<void()>> m_Functions;
