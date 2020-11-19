@@ -96,6 +96,12 @@
     <ClInclude Include="Public\Utility\AutoReleaseBuffer.h">
       <Filter>Public\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\Range\TransformCore.hpp">
+      <Filter>Public\Container\Range</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\Range\Cast.hpp">
+      <Filter>Public\Container\Range</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

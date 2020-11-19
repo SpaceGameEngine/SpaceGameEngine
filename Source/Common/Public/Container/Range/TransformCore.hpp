@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "../ContainerConcept.hpp"
+#include "RangeCore.hpp"
+#include "Utility/AutoReleaseBuffer.h"
 
 namespace SpaceGameEngine
 {
@@ -22,11 +23,12 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
+
 	/*!
-	@brief a generic object that represents a sequence.
+	@brief a generic object that represents a transform between the ranges.
 	*/
 	template<typename IteratorType, typename SentinelType = IteratorType>
-	class Range
+	class Transform
 	{
 	public:
 		static_assert((IsSequentialIterator<IteratorType>::Result), "the IteratorType is not a SequentialIterator");
@@ -36,26 +38,25 @@ namespace SpaceGameEngine
 		using ValueType = typename IteratorType::ValueType;
 		using BeginIteratorType = IteratorType;
 		using EndIteratorType = SentinelType;
+		using RangeType = Range<IteratorType, SentinelType>;
 
-		inline Range(const IteratorType& b, const SentinelType& e)
-			: m_BeginIterator(b), m_EndIterator(e)
+		template<typename _IteratorType, typename _SentinelType = _IteratorType, typename Allocator = DefaultAllocator>
+		friend Vector<typename _IteratorType::ValueType, Allocator> CastToVector(const Transform<_IteratorType, _SentinelType>& transform);
+
+		explicit inline Transform(const Function<RangeType(AutoReleaseBuffer&)>& func)
+			: m_Function(func)
 		{
 		}
 
-		inline IteratorType GetBegin() const
+		inline Transform(const RangeType& range)
+			: m_Function([range](AutoReleaseBuffer&) { return range; })
 		{
-			return m_BeginIterator;
-		}
-
-		inline SentinelType GetEnd() const
-		{
-			return m_EndIterator;
 		}
 
 	private:
-		IteratorType m_BeginIterator;
-		SentinelType m_EndIterator;
+		Function<RangeType(AutoReleaseBuffer&)> m_Function;
 	};
+
 	/*!
 	@}
 	*/

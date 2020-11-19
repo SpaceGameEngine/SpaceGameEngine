@@ -18,6 +18,8 @@ limitations under the License.
 #include "Container/Range/RangeCore.hpp"
 #include "Container/Vector.hpp"
 #include <vector>
+#include "Container/Range/TransformCore.hpp"
+#include "Container/Range/Cast.hpp"
 
 using namespace SpaceGameEngine;
 
@@ -36,4 +38,14 @@ TEST(RangeCore, GetBeginAndGetEndTest)
 	{
 		ASSERT_EQ(*i1, i1 - r1.GetBegin());
 	}
+}
+
+TEST(Cast, CastToVectorTest)
+{
+	Vector<int> v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	Transform t(Range(v.GetBegin(), v.GetEnd()));
+	Vector<int> v2 = CastToVector(t);
+	ASSERT_EQ(v.GetSize(), v2.GetSize());
+	for (int i = 0; i < v.GetSize(); i++)
+		ASSERT_EQ(v[i], v2[i]);
 }
