@@ -40,7 +40,7 @@ namespace SpaceGameEngine
 		using EndIteratorType = SentinelType;
 		using RangeType = Range<IteratorType, SentinelType>;
 
-		template<typename _IteratorType, typename _SentinelType = _IteratorType, typename Allocator = DefaultAllocator>
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
 		friend Vector<typename _IteratorType::ValueType, Allocator> CastToVector(const Transform<_IteratorType, _SentinelType>& transform);
 
 		explicit inline Transform(const Function<RangeType(AutoReleaseBuffer&)>& func)
