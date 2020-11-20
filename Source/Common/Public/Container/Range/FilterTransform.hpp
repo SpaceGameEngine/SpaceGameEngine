@@ -14,7 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include "Container/ContainerConcept.hpp"
+#include "Container/Vector.hpp"
+#include "MemoryManager.h"
 #include "TransformCore.hpp"
+#include "Function.hpp"
 
 namespace SpaceGameEngine
 {
@@ -22,6 +26,22 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
+
+	/*!
+	@brief return the range which all elements can pass the filter function(return true).
+	*/
+	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
+	inline Transform<typename Vector<typename IteratorType::ValueType>::Iterator, typename Vector<typename IteratorType::ValueType>::Iterator> MakeFilterTransform(const Transform<IteratorType, SentinelType>& transform, const Function<bool(const typename IteratorType::ValueType&)>& filter_func)
+	{
+		return Transform<typename Vector<typename IteratorType::ValueType>::Iterator, typename Vector<typename IteratorType::ValueType>::Iterator>([=](AutoReleaseBuffer& arbuff) {
+			auto pvec = arbuff.NewObject<Vector<typename IteratorType::ValueType>, Allocator>();
+			auto range = transform.m_Function(arbuff);
+			for (auto iter = range.GetBegin(); range.GetEnd() != iter; iter += 1)
+				if (filter_func(*iter) == true)
+					pvec->EmplaceBack(*iter);
+			return Range(pvec->GetBegin(), pvec->GetEnd());
+		});
+	}
 
 	/*!
 	@}

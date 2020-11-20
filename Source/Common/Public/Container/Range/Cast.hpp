@@ -29,7 +29,7 @@ namespace SpaceGameEngine
 		auto re_range = transform.m_Function(arbuff);
 		Vector<typename IteratorType::ValueType, Allocator> re;
 		for (auto iter = re_range.GetBegin(); re_range.GetEnd() != iter; iter += 1)
-			re.EmplaceBack(std::move(*iter));
+			re.EmplaceBack(*iter);
 		return re;
 	}
 	/*!

@@ -127,7 +127,6 @@ namespace SpaceGameEngine
 	/*!
 	@brief check the type to make sure that it is sequential Iterator Type.
 	@param U the type need to be checked.
-	@param T the type which the U can get.
 	@todo use concept.
 	*/
 	template<typename U>
@@ -173,7 +172,6 @@ namespace SpaceGameEngine
 	/*!
 	@brief check the type to make sure that it is bidirectional Iterator Type.
 	@param U the type need to be checked.
-	@param T the type which the U can get.
 	@todo use concept.
 	*/
 	template<typename U>
@@ -185,6 +183,35 @@ namespace SpaceGameEngine
 			IsSequentialIterator<_U>::Result &&
 				std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
 				std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&>,
+			bool>
+		Check(int)
+		{
+			return true;
+		}
+
+		template<typename _U>
+		inline static constexpr bool Check(...)
+		{
+			return false;
+		}
+
+	public:
+		inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
+	};
+
+	/*!
+	@brief check the type to make sure that it is range Type.
+	@param U the type need to be checked.
+	@todo use concept.
+	*/
+	template<typename U>
+	struct IsRange
+	{
+	private:
+		template<typename _U>
+		inline static constexpr std::enable_if_t<
+			IsBidirectionalIterator<decltype(std::declval<_U>().GetBegin())>::Result &&
+				IsBidirectionalIterator<decltype(std::declval<_U>().GetEnd())>::Result,
 			bool>
 		Check(int)
 		{

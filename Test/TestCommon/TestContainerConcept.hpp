@@ -108,3 +108,9 @@ TEST(ContainerConcept, IsBidirectionalIteratorTest)
 	ASSERT_TRUE((IsBidirectionalIterator<Vector<int>::ConstIterator>::Result));
 	ASSERT_FALSE((IsBidirectionalIterator<int>::Result));
 }
+
+TEST(ContainerConcept, IsRangeTest)
+{
+	ASSERT_TRUE((IsRange<Vector<int>>::Result));
+	ASSERT_FALSE((IsRange<int>::Result));
+}
