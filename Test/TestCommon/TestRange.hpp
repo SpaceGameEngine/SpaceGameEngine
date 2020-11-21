@@ -51,10 +51,21 @@ TEST(Cast, CastToVectorTest)
 		ASSERT_EQ(v[i], v2[i]);
 }
 
-TEST(FilterTransform, RunTest)
+TEST(FilterTransform, MakeFilterTransformTest)
 {
 	Vector<int> v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	Transform t = MakeFilterTransform(Transform(Range(v.GetBegin(), v.GetEnd())), [](const int& i) { return i % 2 == 0; });
+	Vector<int> v2 = CastToVector(t);
+	Vector<int> cv2 = {0, 2, 4, 6, 8};
+	ASSERT_EQ(v2.GetSize(), cv2.GetSize());
+	for (int i = 0; i < v2.GetSize(); i++)
+		ASSERT_EQ(v2[i], cv2[i]);
+}
+
+TEST(FilterTransform, FilterTransformTest)
+{
+	Vector<int> v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	Transform t = Transform(Range(v.GetBegin(), v.GetEnd())) | FilterTransform<int>([](const int& i) { return i % 2 == 0; });
 	Vector<int> v2 = CastToVector(t);
 	Vector<int> cv2 = {0, 2, 4, 6, 8};
 	ASSERT_EQ(v2.GetSize(), cv2.GetSize());

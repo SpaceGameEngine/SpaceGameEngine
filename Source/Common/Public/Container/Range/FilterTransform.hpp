@@ -31,9 +31,13 @@ namespace SpaceGameEngine
 	@brief return the range which all elements can pass the filter function(return true).
 	*/
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
-	inline Transform<typename Vector<typename IteratorType::ValueType>::Iterator, typename Vector<typename IteratorType::ValueType>::Iterator> MakeFilterTransform(const Transform<IteratorType, SentinelType>& transform, const Function<bool(const typename IteratorType::ValueType&)>& filter_func)
+	inline Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator> MakeFilterTransform(const Transform<IteratorType, SentinelType>& transform, const Function<bool(const typename IteratorType::ValueType&)>& filter_func)
 	{
-		return Transform<typename Vector<typename IteratorType::ValueType>::Iterator, typename Vector<typename IteratorType::ValueType>::Iterator>([=](AutoReleaseBuffer& arbuff) {
+		static_assert((IsSequentialIterator<IteratorType>::Result), "the IteratorType is not a SequentialIterator");
+		static_assert((IsSequentialIterator<SentinelType>::Result), "the SentinelType is not a SequentialIterator");
+		static_assert((std::is_same_v<typename IteratorType::ValueType, typename SentinelType::ValueType>), "the IteratorType and the SentinelType must have the same value type");
+
+		return Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator>([=](AutoReleaseBuffer& arbuff) {
 			auto pvec = arbuff.NewObject<Vector<typename IteratorType::ValueType>, Allocator>();
 			auto range = transform.m_Function(arbuff);
 			for (auto iter = range.GetBegin(); range.GetEnd() != iter; iter += 1)
@@ -43,6 +47,29 @@ namespace SpaceGameEngine
 		});
 	}
 
+	template<typename T, typename Allocator = DefaultAllocator>
+	class FilterTransform
+	{
+	public:
+		using ValueType = T;
+
+		template<typename IteratorType, typename SentinelType, typename Allocator>
+		friend inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const FilterTransform<typename IteratorType::ValueType, Allocator>& filter_transform);
+
+		inline FilterTransform(const Function<bool(const ValueType&)>& filter)
+			: m_FilterFunction(filter)
+		{
+		}
+
+	private:
+		Function<bool(const ValueType&)> m_FilterFunction;
+	};
+
+	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
+	inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const FilterTransform<typename IteratorType::ValueType, Allocator>& filter_transform)
+	{
+		return MakeFilterTransform(transform, filter_transform.m_FilterFunction);
+	}
 	/*!
 	@}
 	*/
