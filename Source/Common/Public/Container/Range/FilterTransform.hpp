@@ -53,8 +53,8 @@ namespace SpaceGameEngine
 	public:
 		using ValueType = T;
 
-		template<typename IteratorType, typename SentinelType, typename Allocator>
-		friend inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const FilterTransform<typename IteratorType::ValueType, Allocator>& filter_transform);
+		template<typename IteratorType, typename SentinelType, typename _Allocator>
+		friend inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const FilterTransform<typename IteratorType::ValueType, _Allocator>& filter_transform);
 
 		inline FilterTransform(const Function<bool(const ValueType&)>& filter)
 			: m_FilterFunction(filter)
