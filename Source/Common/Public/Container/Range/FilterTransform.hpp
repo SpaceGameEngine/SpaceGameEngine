@@ -38,7 +38,7 @@ namespace SpaceGameEngine
 		static_assert((std::is_same_v<typename IteratorType::ValueType, typename SentinelType::ValueType>), "the IteratorType and the SentinelType must have the same value type");
 
 		return Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator>([=](AutoReleaseBuffer& arbuff) {
-			auto pvec = arbuff.NewObject<Vector<typename IteratorType::ValueType>, Allocator>();
+			auto pvec = arbuff.NewObject<Vector<typename IteratorType::ValueType, Allocator>, Allocator>();
 			auto range = transform.m_Function(arbuff);
 			for (auto iter = range.GetBegin(); range.GetEnd() != iter; iter += 1)
 				if (filter_func(*iter) == true)
