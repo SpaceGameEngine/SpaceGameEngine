@@ -29,9 +29,8 @@ namespace SpaceGameEngine
 	class Range
 	{
 	public:
-		static_assert((IsSequentialIterator<IteratorType>::Result), "the IteratorType is not a SequentialIterator");
-		static_assert((IsSequentialIterator<SentinelType>::Result), "the SentinelType is not a SequentialIterator");
-		static_assert((std::is_same_v<typename IteratorType::ValueType, typename SentinelType::ValueType>), "the IteratorType and the SentinelType must have the same value type");
+		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
 
 		using ValueType = typename IteratorType::ValueType;
 		using BeginIteratorType = IteratorType;

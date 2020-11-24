@@ -227,6 +227,75 @@ namespace SpaceGameEngine
 	public:
 		inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
 	};
+
+	/*!
+	@brief check the type to make sure that it is Iterator Type can be used in Range.
+	@param U the type need to be checked.
+	@todo use concept.
+	*/
+	template<typename U>
+	struct IsRangeIterator
+	{
+	private:
+		template<typename _U>
+		inline static constexpr std::enable_if_t<
+			//IsError<typename _U::OutOfRangeError, const _U&, T*, T*>::Result &&
+			//	std::is_same_v<decltype(_U::GetBegin(*(new Vector))), _U> &&
+			//	std::is_same_v<decltype(_U::GetEnd(*(new Vector))), _U> &&
+			std::is_same_v<decltype(new _U(std::declval<_U>())), _U*> &&
+				std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
+				std::is_same_v<decltype(std::declval<_U>() + std::declval<SizeType>()), _U> &&
+				std::is_same_v<decltype(std::declval<_U>() += std::declval<SizeType>()), _U&> &&
+				//std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
+				//std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
+				//std::is_same_v<decltype(std::declval<_U>() - std::declval<_U>()), SizeType> &&
+				(std::is_same_v<decltype(std::declval<_U>().operator->()), typename _U::ValueType*>)&&(std::is_same_v<decltype(std::declval<_U>().operator*()), typename _U::ValueType&>)&&std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
+				std::is_same_v<decltype(std::declval<_U>() != std::declval<_U>()), bool>,
+			bool>
+		Check(int)
+		{
+			return true;
+		}
+
+		template<typename _U>
+		inline static constexpr bool Check(...)
+		{
+			return false;
+		}
+
+	public:
+		inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
+	};
+
+	/*!
+	@brief check the type to make sure that it is Sentinel Type can be used in Range.
+	@param U the type need to be checked.
+	@param I the iterator type which need to be compared with the sentinel type.
+	@todo use concept.
+	*/
+	template<typename U, typename I>
+	struct IsRangeSentinel
+	{
+	private:
+		template<typename _U, typename _I>
+		inline static constexpr std::enable_if_t<
+			std::is_same_v<decltype(std::declval<_U>() != std::declval<_I>()), bool>,
+			bool>
+		Check(int)
+		{
+			return true;
+		}
+
+		template<typename _U, typename _I>
+		inline static constexpr bool Check(...)
+		{
+			return false;
+		}
+
+	public:
+		inline static constexpr const bool Result = Check<std::remove_cv_t<U>, std::remove_cv_t<I>>(0);
+	};
+
 	/*!
 	@}
 	*/

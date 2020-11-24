@@ -105,6 +105,12 @@
     <ClInclude Include="Public\Container\Range\FilterTransform.hpp">
       <Filter>Public\Container\Range</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\Range\Sequence.hpp">
+      <Filter>Public\Container\Range</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\Range\InfiniteSentinel.hpp">
+      <Filter>Public\Container\Range</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

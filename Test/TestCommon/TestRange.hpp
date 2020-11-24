@@ -21,6 +21,7 @@ limitations under the License.
 #include "Container/Range/TransformCore.hpp"
 #include "Container/Range/Cast.hpp"
 #include "Container/Range/FilterTransform.hpp"
+#include "Container/Range/Sequence.hpp"
 
 using namespace SpaceGameEngine;
 
@@ -83,4 +84,28 @@ TEST(FilterTransform, FilterTransformTest)
 	ASSERT_EQ(v3.GetSize(), cv1.GetSize());
 	for (int i = 0; i < v3.GetSize(); i++)
 		ASSERT_EQ(v3[i], cv1[i]);
+}
+
+TEST(SequenceIterator, IsRangeIteratorTest)
+{
+	ASSERT_TRUE((IsRangeIterator<SequenceIterator<int, int>>::Result));
+	ASSERT_TRUE((IsRangeIterator<SequenceIterator<int, char>>::Result));
+	ASSERT_TRUE((IsRangeIterator<SequenceIterator<float, int>>::Result));
+}
+
+TEST(SequenceIterator, MakeInfiniteSequenceTest)
+{
+	Range r = MakeInfiniteSequence(0, 1);
+	int cot = 0;
+	for (auto i = r.GetBegin(); r.GetEnd() != i && cot < 10; i += 1, cot += 1)
+		ASSERT_EQ(*i, cot);
+}
+
+TEST(SequenceIterator, MakeSequenceTest)
+{
+	Range r = MakeSequence(0, 1, 10);
+	Vector v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	auto iter = v.GetBegin();
+	for (auto i = r.GetBegin(); r.GetEnd() != i; i += 1, iter += 1)
+		ASSERT_EQ(*i, *iter);
 }

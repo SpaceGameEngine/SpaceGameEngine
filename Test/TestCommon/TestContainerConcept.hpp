@@ -114,3 +114,17 @@ TEST(ContainerConcept, IsRangeTest)
 	ASSERT_TRUE((IsRange<Vector<int>>::Result));
 	ASSERT_FALSE((IsRange<int>::Result));
 }
+
+TEST(ContainerConcept, IsRangeIteratorTest)
+{
+	ASSERT_TRUE((IsRangeIterator<Vector<int>::Iterator>::Result));
+	ASSERT_TRUE((IsRangeIterator<Vector<int>::ConstIterator>::Result));
+	ASSERT_FALSE((IsRangeIterator<int>::Result));
+}
+
+TEST(ContainerConcept, IsRangeSentinelTest)
+{
+	ASSERT_TRUE((IsRangeSentinel<Vector<int>::Iterator, Vector<int>::Iterator>::Result));
+	ASSERT_TRUE((IsRangeSentinel<Vector<int>::ConstIterator, Vector<int>::ConstIterator>::Result));
+	ASSERT_FALSE((IsRangeSentinel<Vector<int>::Iterator, int>::Result));
+}

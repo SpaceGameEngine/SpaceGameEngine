@@ -33,9 +33,8 @@ namespace SpaceGameEngine
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
 	inline Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator> MakeFilterTransform(const Transform<IteratorType, SentinelType>& transform, const Function<bool(const typename IteratorType::ValueType&)>& filter_func)
 	{
-		static_assert((IsSequentialIterator<IteratorType>::Result), "the IteratorType is not a SequentialIterator");
-		static_assert((IsSequentialIterator<SentinelType>::Result), "the SentinelType is not a SequentialIterator");
-		static_assert((std::is_same_v<typename IteratorType::ValueType, typename SentinelType::ValueType>), "the IteratorType and the SentinelType must have the same value type");
+		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
 
 		return Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator>([=](AutoReleaseBuffer& arbuff) {
 			auto pvec = arbuff.NewObject<Vector<typename IteratorType::ValueType, Allocator>, Allocator>();
