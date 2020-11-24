@@ -111,6 +111,9 @@
     <ClInclude Include="Public\Container\Range\InfiniteSentinel.hpp">
       <Filter>Public\Container\Range</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\Range\TakeTransform.hpp">
+      <Filter>Public\Container\Range</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

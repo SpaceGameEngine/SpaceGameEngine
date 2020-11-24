@@ -167,6 +167,7 @@
     <ClInclude Include="Public\Container\Range\InfiniteSentinel.hpp" />
     <ClInclude Include="Public\Container\Range\RangeCore.hpp" />
     <ClInclude Include="Public\Container\Range\Sequence.hpp" />
+    <ClInclude Include="Public\Container\Range\TakeTransform.hpp" />
     <ClInclude Include="Public\Container\Range\TransformCore.hpp" />
     <ClInclude Include="Public\Container\ReverseIterator.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />

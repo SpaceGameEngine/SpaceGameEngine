@@ -22,6 +22,7 @@ limitations under the License.
 #include "Container/Range/Cast.hpp"
 #include "Container/Range/FilterTransform.hpp"
 #include "Container/Range/Sequence.hpp"
+#include "Container/Range/TakeTransform.hpp"
 
 using namespace SpaceGameEngine;
 
@@ -108,4 +109,46 @@ TEST(SequenceIterator, MakeSequenceTest)
 	auto iter = v.GetBegin();
 	for (auto i = r.GetBegin(); r.GetEnd() != i; i += 1, iter += 1)
 		ASSERT_EQ(*i, *iter);
+}
+
+TEST(TakeTransform, MakeTakeTransformTest)
+{
+	Vector<int> v1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	Vector<int> rv1 = CastToVector(MakeTakeTransform(Transform(Range(v1.GetBegin(), v1.GetEnd())), 5));
+	ASSERT_EQ(rv1.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		ASSERT_EQ(v1[i], rv1[i]);
+
+	Transform t1 = MakeTakeTransform(Transform(MakeSequence(0, 1, 10)), 5);
+	Vector<int, StdAllocator> rv2 = CastToVector<Vector<int>::Iterator, Vector<int>::Iterator, StdAllocator>(t1);
+	ASSERT_EQ(rv2.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		ASSERT_EQ(v1[i], rv2[i]);
+
+	Transform t2 = MakeTakeTransform<SequenceIterator<int, int>, InfiniteSentinel, StdAllocator>(Transform(MakeInfiniteSequence(1, 1)), 5);
+	Vector<int> rv3 = CastToVector(t2);
+	ASSERT_EQ(rv3.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		ASSERT_EQ(v1[i], rv3[i] - 1);
+}
+
+TEST(TakeTransform, TakeTransformTest)
+{
+	Vector<int> v1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	Vector<int> rv1 = CastToVector(Transform(Range(v1.GetBegin(), v1.GetEnd())) | TakeTransform<int>(5));
+	ASSERT_EQ(rv1.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		ASSERT_EQ(v1[i], rv1[i]);
+
+	Transform t1 = Transform(MakeSequence(0, 1, 10)) | TakeTransform<int>(5);
+	Vector<int, StdAllocator> rv2 = CastToVector<Vector<int>::Iterator, Vector<int>::Iterator, StdAllocator>(t1);
+	ASSERT_EQ(rv2.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		ASSERT_EQ(v1[i], rv2[i]);
+
+	Transform t2 = Transform(MakeInfiniteSequence(1, 1)) | TakeTransform<int, StdAllocator>(5);
+	Vector<int> rv3 = CastToVector(t2);
+	ASSERT_EQ(rv3.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		ASSERT_EQ(v1[i], rv3[i] - 1);
 }

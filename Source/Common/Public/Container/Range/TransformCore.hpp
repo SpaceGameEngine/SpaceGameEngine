@@ -45,6 +45,9 @@ namespace SpaceGameEngine
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
 		friend Transform<typename Vector<typename _IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename _IteratorType::ValueType, Allocator>::Iterator> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
 
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend Transform<typename Vector<typename _IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename _IteratorType::ValueType, Allocator>::Iterator> MakeTakeTransform(const Transform<_IteratorType, _SentinelType>& transform, SizeType n);
+
 		explicit inline Transform(const Function<RangeType(AutoReleaseBuffer&)>& func)
 			: m_Function(func)
 		{
