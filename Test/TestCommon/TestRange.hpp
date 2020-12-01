@@ -94,6 +94,11 @@ TEST(SequenceIterator, IsRangeIteratorTest)
 	ASSERT_TRUE((IsRangeIterator<SequenceIterator<float, int>>::Result));
 }
 
+TEST(SequenceIterator, RangeConceptTest)
+{
+	ASSERT_TRUE((IsRangeBidirectionalIterator<SequenceIterator<int, int>>::Result));
+}
+
 TEST(SequenceIterator, MakeInfiniteSequenceTest)
 {
 	Range r = MakeInfiniteSequence(0, 1);

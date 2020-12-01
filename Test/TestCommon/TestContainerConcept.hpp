@@ -128,3 +128,10 @@ TEST(ContainerConcept, IsRangeSentinelTest)
 	ASSERT_TRUE((IsRangeSentinel<Vector<int>::ConstIterator, Vector<int>::ConstIterator>::Result));
 	ASSERT_FALSE((IsRangeSentinel<Vector<int>::Iterator, int>::Result));
 }
+
+TEST(ContainerConcept, IsRangeBidirectionalIteratorTest)
+{
+	ASSERT_TRUE((IsRangeBidirectionalIterator<Vector<int>::Iterator>::Result));
+	ASSERT_TRUE((IsRangeBidirectionalIterator<Vector<int>::ConstIterator>::Result));
+	ASSERT_FALSE((IsRangeBidirectionalIterator<int>::Result));
+}

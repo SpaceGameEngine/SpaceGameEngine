@@ -65,6 +65,21 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		inline SequenceIterator operator-(SizeType size) const
+		{
+			SequenceIterator re(*this);
+			for (SizeType i = 0; i < size; i++)
+				re.m_Content -= re.m_Increment;
+			return re;
+		}
+
+		inline SequenceIterator& operator-=(SizeType size)
+		{
+			for (SizeType i = 0; i < size; i++)
+				m_Content -= m_Increment;
+			return *this;
+		}
+
 		inline T* operator->()
 		{
 			return &m_Content;

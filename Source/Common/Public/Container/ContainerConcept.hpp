@@ -297,6 +297,36 @@ namespace SpaceGameEngine
 	};
 
 	/*!
+	@brief check the type to make sure that it is Bidirectional Iterator Type can be used in Range.
+	@param U the type need to be checked.
+	@todo use concept.
+	*/
+	template<typename U>
+	struct IsRangeBidirectionalIterator
+	{
+	private:
+		template<typename _U>
+		inline static constexpr std::enable_if_t<
+			IsRangeIterator<_U>::Result &&
+				std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
+				std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&>,
+			bool>
+		Check(int)
+		{
+			return true;
+		}
+
+		template<typename _U>
+		inline static constexpr bool Check(...)
+		{
+			return false;
+		}
+
+	public:
+		inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
+	};
+
+	/*!
 	@}
 	*/
 }
