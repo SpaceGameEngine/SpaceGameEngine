@@ -99,7 +99,7 @@ TEST(MemoryManager, GetDefaultAlignmentTest)
 
 TEST(MemoryManager, FixedSizeAllocatorTest)
 {
-	MemoryManager::FixedSizeAllocator test(4, 0xffff, 4);
+	MemoryManager::LockedFixedSizeAllocator test(4, 0xffff, 4);
 	Int32* pint = (Int32*)test.Allocate();
 	*pint = 123456789;
 	test.Free(pint);
