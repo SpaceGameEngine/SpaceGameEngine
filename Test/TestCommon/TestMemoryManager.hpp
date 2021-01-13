@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include <Memory/Detail/AllocatorUtil.h>
-#include <Memory/Detail/SegregatedFitAllocator.h>
 #include "Memory/MemoryManager.h"
 #include "Concurrent/Thread.h"
 #include "gtest/gtest.h"
@@ -138,50 +136,6 @@ TEST(MemoryManager, MMAllocatorRawNewDeleteTest)
 	*pint = 3;
 	ASSERT_EQ(*pint, 3);
 	MemoryManagerAllocator::RawDelete(pint, sizeof(Int32));
-}
-
-template<int i>
-struct DammyAllocator
-{
-	void* allocate(SizeType size, SizeType alignment)
-	{
-		return new int(i);
-	}
-	void deallocate(void* pointer, SizeType size, SizeType alignment)
-	{
-		delete (int*)pointer;
-	}
-};
-
-TEST(MM, MM)
-{
-	SpaceGameEngine::Detail::DoubleGradedAllocator<DammyAllocator<1>, 10, DammyAllocator<2>> dga{};
-	SpaceGameEngine::Detail::TripleGradedAllocator<DammyAllocator<1>, 10, DammyAllocator<2>, 100, DammyAllocator<3>> tga{};
-
-	int* p1 = static_cast<int*>(dga.allocate(1, 0));
-	int* p2 = static_cast<int*>(dga.allocate(11, 0));
-	int* p3 = static_cast<int*>(tga.allocate(1, 0));
-	int* p4 = static_cast<int*>(tga.allocate(11, 0));
-	int* p5 = static_cast<int*>(tga.allocate(111, 0));
-
-	ASSERT_EQ(*p1, 1);
-	ASSERT_EQ(*p2, 2);
-	ASSERT_EQ(*p3, 1);
-	ASSERT_EQ(*p4, 2);
-	ASSERT_EQ(*p5, 3);
-
-	dga.deallocate(p1, 1, 0);
-	dga.deallocate(p2, 11, 0);
-	tga.deallocate(p3, 1, 0);
-	tga.deallocate(p4, 11, 0);
-	tga.deallocate(p5, 111, 0);
-}
-
-void concurrent_test()
-{
-	for (int i = 0; i < 100; i++)
-	{
-	}
 }
 
 template<typename AllocatorType>
