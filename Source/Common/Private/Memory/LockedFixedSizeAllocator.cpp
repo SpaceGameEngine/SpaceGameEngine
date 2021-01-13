@@ -13,14 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "LockedFixedSizeAllocator.h"
+#include "Memory/LockedFixedSizeAllocator.h"
 #include "Error.h"
 #include <algorithm>
+
+using namespace SpaceGameEngine;
 
 /*!
 @file
 @todo think about other os's _mm_malloc/_mm_free location.
 */
+
+MemoryBlockHeader* MemoryPageHeader::GetFirstMemoryBlock()
+{
+	return reinterpret_cast<MemoryBlockHeader*>(reinterpret_cast<AddressType>(this) + sizeof(MemoryPageHeader) + m_Offset);
+}
 
 LockedFixedSizeAllocator::LockedFixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment)
 {

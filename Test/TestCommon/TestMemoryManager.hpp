@@ -14,26 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Memory/MemoryManager.h"
+#include "Memory/Allocators.h"
 #include "Concurrent/Thread.h"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
-
-TEST(MemoryManager, StdAllocatorNewDeleteTest)
-{
-	Int32* pint = SpaceGameEngine::StdAllocator::New<Int32>(3);
-	ASSERT_EQ(*pint, 3);
-	SpaceGameEngine::StdAllocator::Delete(pint);
-}
-
-TEST(MemoryManager, StdAllocatorRawNewDeleteTest)
-{
-	Int32* pint = reinterpret_cast<Int32*>(SpaceGameEngine::StdAllocator::RawNew(sizeof(Int32)));
-	*pint = 3;
-	ASSERT_EQ(*pint, 3);
-	SpaceGameEngine::StdAllocator::RawDelete(pint, sizeof(Int32));
-}
 
 TEST(MemoryManager, MemoryAlignMacroTest)
 {
@@ -50,20 +35,6 @@ TEST(MemoryManager, MemoryAlignMacroTest)
 	ASSERT_EQ(SGE_MEMORY_ALIGN(4, 8), 8);
 	ASSERT_EQ(SGE_MEMORY_ALIGN(7, 8), 8);
 	ASSERT_EQ(SGE_MEMORY_ALIGN(11, 8), 16);
-}
-
-TEST(MemoryManager, MemoryPageTest)
-{
-	MemoryManager::MemoryPageHeader* ppageheader =
-		new (reinterpret_cast<MemoryManager::MemoryPageHeader*>(SpaceGameEngine::StdAllocator::RawNew(
-			sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader))))
-			MemoryManager::MemoryPageHeader();
-	ASSERT_EQ(ppageheader->m_Offset, 0);
-	ASSERT_EQ(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()),
-			  reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryPageHeader));
-	SpaceGameEngine::StdAllocator::RawDelete(ppageheader,
-											 (sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)),
-											 alignof(MemoryManager::MemoryPageHeader));
 }
 
 TEST(MemoryManager, InvalidAlignmentErrorTest)
@@ -95,18 +66,7 @@ TEST(MemoryManager, GetDefaultAlignmentTest)
 	ASSERT_EQ(GetDefaultAlignment(17), 16);
 }
 
-TEST(MemoryManager, FixedSizeAllocatorTest)
-{
-	MemoryManager::LockedFixedSizeAllocator test(4, 0xffff, 4);
-	Int32* pint = (Int32*)test.Allocate();
-	*pint = 123456789;
-	test.Free(pint);
-	Int32* pint2 = (Int32*)test.Allocate();
-	ASSERT_EQ(pint, pint2);
-	test.Free(pint2);
-}
-
-TEST(MemoryManager, IndexConvertTest)
+TEST(SegregatedFitAllocator, IndexConvertTest)
 {
 	auto rtoi = [](const Pair<SizeType, SizeType>& request_info) -> UInt32 {
 		return (request_info.m_First << 8) | (request_info.m_Second);
@@ -115,27 +75,20 @@ TEST(MemoryManager, IndexConvertTest)
 	ASSERT_EQ(index, 262272);
 }
 
-TEST(MemoryManager, MemoryManagerTest)
-{
-	Int32* pint = (Int32*)(MemoryManager::GetSingleton().Allocate(sizeof(Int32), alignof(Int32)));
-	*pint = 123456789;
-	ASSERT_EQ(*pint, 123456789);
-	MemoryManager::GetSingleton().Free(pint, sizeof(Int32), alignof(Int32));
-}
+using AllocatorsToBeTested = ::testing::Types<SpaceGameEngine::NativeAllocator, SpaceGameEngine::SegregatedFitAllocator>;
 
-TEST(MemoryManager, MMAllocatorNewDeleteTest)
+template<typename AllocatorType>
+class AllocatorTestBase : public ::testing::Test
 {
-	Int32* pint = MemoryManagerAllocator::New<Int32>(3);
-	ASSERT_EQ(*pint, 3);
-	MemoryManagerAllocator::Delete(pint);
-}
+};
+TYPED_TEST_CASE(AllocatorTestBase, AllocatorsToBeTested);
 
-TEST(MemoryManager, MMAllocatorRawNewDeleteTest)
+TYPED_TEST(AllocatorTestBase, BasicAllocateTest)
 {
-	Int32* pint = reinterpret_cast<Int32*>(MemoryManagerAllocator::RawNew(sizeof(Int32)));
-	*pint = 3;
+	using AllocatorType = SpaceGameEngine::AllocatorWrapper<TypeParam>;
+	Int32* pint = AllocatorType::template New<Int32>(3);
 	ASSERT_EQ(*pint, 3);
-	MemoryManagerAllocator::RawDelete(pint, sizeof(Int32));
+	AllocatorType::template Delete(pint);
 }
 
 template<typename AllocatorType>
@@ -147,7 +100,7 @@ public:
 		std::vector<Int32*> pints;
 		for (int i = 0; i < 1e5; i++)
 		{
-			Int32* pint = AllocatorType::template New<Int32>(1);
+			Int32* pint = AllocatorWrapper<AllocatorType>::template New<Int32>(1);
 			*pint = idx * 1e6 + i;
 			pints.push_back(pint);
 		}
@@ -163,7 +116,6 @@ public:
 		ASSERT_TRUE(ok);
 	}
 };
-using AllocatorsToBeTested = ::testing::Types<SpaceGameEngine::StdAllocator, SpaceGameEngine::MemoryManagerAllocator>;
 TYPED_TEST_CASE(ThreadSafetyTester, AllocatorsToBeTested);
 TYPED_TEST(ThreadSafetyTester, ThreadSafetyTest)
 {

@@ -68,6 +68,18 @@ namespace SpaceGameEngine
 		static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
 	};
 
+	/*!
+	 * @todo Should InvalidAlignmentError be here?
+	 */
+	struct InvalidAlignmentError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The alignment is invalid");
+		/*!
+		@note only the alignment which is 0 or 2^n can pass the judgment.
+		*/
+		static bool Judge(SizeType alignment);
+	};
+
 	template<typename ErrorType>
 	struct Assert : public Uncopyable
 	{

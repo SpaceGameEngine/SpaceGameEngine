@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "Error.h"
-#include "Memory/MemoryManager.h"
+#include "Memory/SegregatedFitAllocator.h"
 #include "MetaData/MetaObject.hpp"
 #include "Utility/ControllableObject.hpp"
 #include <type_traits>
@@ -78,7 +78,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief a callable object wrapper.
 	*/
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T, typename Allocator = DefaultMemoryManager>
 	class Function
 	{
 	};

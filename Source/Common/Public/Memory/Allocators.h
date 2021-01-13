@@ -1,4 +1,3 @@
-
 /*
 Copyright 2019 Chenxi Xu (@xsun2001)
 
@@ -18,3 +17,46 @@ limitations under the License.
 #pragma once
 #include <type_traits>
 #include <functional>
+#include "SegregatedFitAllocator.h"
+#include "NativeAllocator.h"
+#include "Utility/Utility.hpp"
+
+namespace SpaceGameEngine
+{
+	using DefaultAllocator = SpaceGameEngine::SegregatedFitAllocator;
+
+	template<typename AllocatorType>
+	class AllocatorWrapper : SpaceGameEngine::Singleton<AllocatorType>
+	{
+		friend SpaceGameEngine::Singleton<AllocatorType>;
+
+	public:
+		static void* RawNew(SizeType size, SizeType alignment = 0)
+		{
+			return AllocatorWrapper<AllocatorType>::GetSingleton().Allocate(size, alignment);
+		}
+		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0)
+		{
+			AllocatorWrapper<AllocatorType>::GetSingleton().Free(ptr, size, alignment);
+		}
+
+		template<typename T, typename... Args>
+		static T* New(Args&&... args)
+		{
+			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
+		}
+
+		template<typename T>
+		static void Delete(T* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			ptr->~T();
+			RawDelete(ptr, sizeof(T), alignof(T));
+		}
+
+	private:
+		AllocatorWrapper() = default;
+	};
+
+	using DefaultMemoryManager = AllocatorWrapper<DefaultAllocator>;
+}

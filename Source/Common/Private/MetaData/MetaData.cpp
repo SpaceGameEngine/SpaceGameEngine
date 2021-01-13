@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "MetaData/MetaData.h"
-#include "Memory/MemoryManager.h"
+#include "Memory/SegregatedFitAllocator.h"
 #include <cstring>
 
 SpaceGameEngine::MetaData::MetaData()

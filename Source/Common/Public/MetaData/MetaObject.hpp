@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "MetaData.h"
-#include "Memory/MemoryManager.h"
+#include "Memory/Allocators.h"
 
 namespace SpaceGameEngine
 {
@@ -26,7 +26,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief a wrapper of object which erases its type.
 	*/
-	template<typename Allocator = DefaultAllocator>
+	template<typename Allocator = DefaultMemoryManager>
 	class MetaObject
 	{
 	public:

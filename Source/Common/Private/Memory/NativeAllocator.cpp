@@ -14,19 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "Memory/MemoryManager.h"
 #include "Error.h"
 #include <algorithm>
+#include <Memory/NativeAllocator.h>
+#include "NativeAllocator.h"
 
-void* SpaceGameEngine::StdAllocator::RawNew(SizeType size, SizeType alignment)
+void* SpaceGameEngine::NativeAllocator::Allocate(SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
-	std::iterator
 	return _mm_malloc(size, alignment == 0 ? GetDefaultAlignment(size) : alignment);
 }
 
-void SpaceGameEngine::StdAllocator::RawDelete(void* ptr, SizeType size, SizeType alignment)
+void SpaceGameEngine::NativeAllocator::Free(void* ptr, SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(NullPointerError, ptr);
 	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);

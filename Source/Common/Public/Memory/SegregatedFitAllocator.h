@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 #pragma once
 #ifdef SGE_WINDOWS
 #include <malloc.h>
@@ -25,6 +26,7 @@ limitations under the License.
 #include "Error.h"
 #include "Platform.hpp"
 #include "Concurrent/Lock.h"
+#include "LockedFixedSizeAllocator.h"
 
 namespace SpaceGameEngine
 {
@@ -32,21 +34,6 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
-
-#ifdef SGE_X86
-#define SGE_MAX_MEMORY_SIZE UINT32_MAX
-#elif defined(SGE_X64)
-#define SGE_MAX_MEMORY_SIZE UINT64_MAX
-#endif
-
-	struct InvalidAlignmentError
-	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The alignment is invalid");
-		/*!
-		@note only the alignment which is 0 or 2^n can pass the judgment.
-		*/
-		static bool Judge(SizeType alignment);
-	};
 
 	/*!
 	@brief get default alignment by giving memory size
@@ -56,70 +43,29 @@ namespace SpaceGameEngine
 	SizeType GetDefaultAlignment(SizeType size);
 
 	/*!
-	@file
-	@todo add Allocator as a concept when c++20 can be used
-	*/
-
-	struct StdAllocator
-	{
-		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
-
-		template<typename T, typename... Args>
-		static T* New(Args&&... args)
-		{
-			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
-		}
-
-		template<typename T>
-		static void Delete(T* ptr)
-		{
-			SGE_ASSERT(NullPointerError, ptr);
-			ptr->~T();
-			RawDelete(ptr, sizeof(T), alignof(T));
-		}
-	};
-
-	/*!
-	@brief make the memory size or memory address aligned using the alignment
-	*/
-#define SGE_MEMORY_ALIGN(value, alignment) (((value) + ((alignment)-1)) & ~((alignment)-1))
-
-	/*!
 	@brief the memory manager for the engine to use
-	@note The MemoryManager is just a common memory manager using the different allocators which represent
+	@note The SegregatedFitAllocator is just a common memory manager using the different allocators which represent
 	the different memory allocation strategies.It will choose the proper allocator to manage the memory depend
 	on the current condition.
-	@todo add mutexs for fixedsizeallocators
 	*/
-	class MemoryManager : public Uncopyable, public Singleton<MemoryManager>
+	class SegregatedFitAllocator : public Uncopyable
 	{
 	public:
+		SegregatedFitAllocator();
 
-
-		/*!
-		@brief the allocator which can only allocate a fixed size memory while the size of memory it
-		can allocate must be set by calling LockedFixedSizeAllocator::Init method
-		@attention must call LockedFixedSizeAllocator::Init method after instancing before using
-		*/
-
-	public:
-		friend Singleton<MemoryManager>;
-
-		~MemoryManager();
+		~SegregatedFitAllocator();
 
 		/*!
 		@attention the alignment can not be larger than 128 or equal to 0.
 		*/
 		void* Allocate(SizeType size, SizeType alignment);
+
 		/*!
 		@attention the alignment can not be larger than 128 or equal to 0.
 		*/
 		void Free(void* ptr, SizeType size, SizeType alignment);
 
 	private:
-		MemoryManager();
-
 		/*!
 		@attention the first is size,the second is alignment.
 		*/
@@ -151,28 +97,6 @@ namespace SpaceGameEngine
 
 		LockedFixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
 	};
-
-	struct MemoryManagerAllocator
-	{
-		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
-
-		template<typename T, typename... Args>
-		static T* New(Args&&... args)
-		{
-			return new (RawNew(sizeof(T), alignof(T))) T(std::forward<Args>(args)...);
-		}
-
-		template<typename T>
-		static void Delete(T* ptr)
-		{
-			SGE_ASSERT(NullPointerError, ptr);
-			ptr->~T();
-			RawDelete(ptr, sizeof(T), alignof(T));
-		}
-	};
-
-	using DefaultAllocator = MemoryManagerAllocator;
 
 	/*!
 	@}

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Memory/MemoryManager.h"
+#include "Memory/Allocators.h"
 
 namespace SpaceGameEngine
 {
@@ -27,7 +27,7 @@ namespace SpaceGameEngine
 	@note the ControllableObject can automatically release its resource if
 	the user has not invoked its Release method.
 	*/
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T, typename Allocator = DefaultMemoryManager>
 	class ControllableObject
 	{
 	public:

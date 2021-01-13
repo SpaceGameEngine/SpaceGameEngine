@@ -16,7 +16,7 @@ limitations under the License.
 #pragma once
 #include <vector>
 #include "benchmark/benchmark.h"
-#include "Memory/MemoryManager.h"
+#include "Memory/SegregatedFitAllocator.h"
 
 // ----------
 
@@ -45,7 +45,7 @@ void BM_AllocFixedSize_stdnew(benchmark::State& state)
 void BM_AllocFixedSize_FixedSizeAllocator(benchmark::State& state)
 {
 	auto size = state.range(0);
-	SpaceGameEngine::MemoryManager::LockedFixedSizeAllocator allocator(size, 4096, 4);
+	SpaceGameEngine::SegregatedFitAllocator::LockedFixedSizeAllocator allocator(size, 4096, 4);
 	for (auto _ : state)
 	{
 		void* ptr = allocator.Allocate();
