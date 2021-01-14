@@ -1,8 +1,4 @@
-#include <atomic>
-#include <cstdint>
-#include <cstdlib>
-#include <string>
-#include "Platform.hpp"
+#include "Memory/BitmapFixedSizeAllocator.h"
 
 // | next_page | next_page_lock | page_type | remaining | bitmap | blocks |
 // |     8     |       1        |     1     |     2     |  bc*4  |  bc*bs | 4096
@@ -13,98 +9,96 @@
 // pagesize = 4096, sp = 8, si = 4, bs = 8
 // bitmap_count = 15.707692308 < 16
 
-typedef std::atomic<uint32_t> atomic_uint;
+using namespace SpaceGameEngine;
 
-const uint16_t block_count[] = {502, 253, 169, 127, 101, 84, 72, 63};
-const uint8_t block_size[] = {8, 16, 24, 32, 40, 48, 56, 64};
-const uint8_t bitmap_count[] = {16, 8, 6, 4, 4, 3, 3, 2};
-const uint8_t bitmap_offset[] = {10, 3, 23, 1, 27, 12, 24, 1};
+const UInt16 block_count[] = {502, 253, 169, 127, 101, 84, 72, 63};
+const UInt8 block_size[] = {8, 16, 24, 32, 40, 48, 56, 64};
+const UInt8 bitmap_count[] = {16, 8, 6, 4, 4, 3, 3, 2};
+const UInt8 bitmap_offset[] = {10, 3, 23, 1, 27, 12, 24, 1};
 
-void* get_next_page(void* mm_page)
+void* BitmapFixedSizeAllocator::GetNextPage()
 {
 	// return mm_page + 0
 	return *reinterpret_cast<void**>(mm_page);
 }
 
-std::atomic_flag* get_next_page_lock(void* mm_page)
+std::atomic_flag* BitmapFixedSizeAllocator::GetNextPageLock()
 {
 	// return mm_page + 8
 	return reinterpret_cast<std::atomic_flag*>(reinterpret_cast<uint64_t>(mm_page) | 0x8);
 }
 
-uint8_t get_page_type(void* mm_page)
+UInt8 BitmapFixedSizeAllocator::GetPageType()
 {
 	// return mm_page + 9
 	return *reinterpret_cast<uint8_t*>(reinterpret_cast<uint64_t>(mm_page) | 0x9);
 }
 
-std::atomic<uint16_t>* get_remaining(void* mm_page)
+std::atomic<UInt16>* BitmapFixedSizeAllocator::GetRemaining()
 {
 	// return mm_page + 10
 	return reinterpret_cast<std::atomic<uint16_t>*>(reinterpret_cast<uint64_t>(mm_page) | 0xA);
 }
 
 // 1 is free
-atomic_uint* get_bitmap(void* mm_page)
+atomic_uint* BitmapFixedSizeAllocator::GetBitmap()
 {
 	// return mm_page + 12
 	return reinterpret_cast<atomic_uint*>(reinterpret_cast<uint64_t>(mm_page) | 0xC);
 }
 
-void* get_block_base(void* mm_page)
+void* BitmapFixedSizeAllocator::GetBlockBase()
 {
 	// return mm_page + 12 + bc * 8
-	return reinterpret_cast<void*>((reinterpret_cast<uint64_t>(mm_page) | 0xC) + (bitmap_count[get_page_type(mm_page)] << 3));
+	return reinterpret_cast<void*>((reinterpret_cast<uint64_t>(mm_page) | 0xC) + (bitmap_count[GetPageType()] << 3));
 }
 
-void set_next_page(void* mm_page, void* next_page)
+void BitmapFixedSizeAllocator::SetNextPage(void* next_page)
 {
 	*reinterpret_cast<void**>(mm_page) = next_page;
 }
 
 #include <thread>
-void lock_next_page(void* mm_page)
+void BitmapFixedSizeAllocator::LockNextPage()
 {
-	while (get_next_page_lock(mm_page)->test_and_set(std::memory_order_acquire))
+	while (GetNextPageLock()->test_and_set(std::memory_order_acquire))
 	{
 		std::this_thread::yield();
 	}
 }
 
-void unlock_next_page(void* mm_page)
+void BitmapFixedSizeAllocator::UnlockNextPage()
 {
-	get_next_page_lock(mm_page)->clear(std::memory_order_release);
+	GetNextPageLock()->clear(std::memory_order_release);
 }
 
-void* new_mm_page(uint64_t page_size, uint8_t page_type)
+BitmapFixedSizeAllocator::BitmapFixedSizeAllocator(SizeType page_size, UInt8 page_type)
 {
 	// Allocate memory page
-	void* mm_page = aligned_alloc(page_size, page_size);
+	mm_page = aligned_alloc(page_size, page_size);
 
 	// Init next_page next_page_lock page_type remaining
 	// Use placement new because atomic_init will be de deprecated in c++20
 	*reinterpret_cast<void**>(mm_page) = nullptr;
-	new (get_next_page_lock(mm_page)) std::atomic_flag(false);
+	new (GetNextPageLock()) std::atomic_flag(false);
 	*reinterpret_cast<uint8_t*>(reinterpret_cast<uint64_t>(mm_page) | 0x9) = page_type;
-	new (get_remaining(mm_page)) std::atomic<uint16_t>(block_count[page_type]);
+	new (GetRemaining()) std::atomic<uint16_t>(block_count[page_type]);
 
 	// Init bitmap
-	atomic_uint* bitmap = get_bitmap(mm_page);
+	atomic_uint* bitmap = GetBitmap();
 	for (int i = 0; i < bitmap_count[page_type] - 1; i++)
 	{
 		new (bitmap + i) atomic_uint(0xFFFFFFFF);
 	}
 	new (bitmap + (bitmap_count[page_type] - 1)) atomic_uint(0xFFFFFFFF >> bitmap_offset[page_type]);
-
-	return mm_page;
 }
 
-void* allocate_block(void* mm_page)
+void* BitmapFixedSizeAllocator::Allocate()
 {
-	const uint8_t page_type = get_page_type(mm_page), bmc = bitmap_count[page_type], bs = block_size[page_type];
-	atomic_uint* bitmap = get_bitmap(mm_page);
+	const uint8_t page_type = GetPageType(), bmc = bitmap_count[page_type], bs = block_size[page_type];
+	atomic_uint* bitmap = GetBitmap();
 	uint32_t old_bitmap, new_bitmap, ffs;
-	uint64_t block_base = reinterpret_cast<uint64_t>(get_block_base(mm_page)), allocated_block;
+	uint64_t block_base = reinterpret_cast<uint64_t>(GetBlockBase()), allocated_block;
 	for (int i = 0; i < bmc; i++)
 	{
 		do
@@ -121,26 +115,26 @@ void* allocate_block(void* mm_page)
 		} while (!bitmap[i].compare_exchange_weak(old_bitmap, new_bitmap));
 		if (ffs)
 		{
-			get_remaining(mm_page)->fetch_sub(1u);
+			GetRemaining()->fetch_sub(1u);
 			return reinterpret_cast<void*>(allocated_block);
 		}
 	}
 	return nullptr;
 }
 
-void deallocate_block(void* mm_page, void* block)
+void BitmapFixedSizeAllocator::Free(void* block)
 {
-	const uint8_t page_type = get_page_type(mm_page), bs = block_size[page_type];
-	const uint16_t block_id = (reinterpret_cast<uint64_t>(block) - reinterpret_cast<uint64_t>(get_block_base(mm_page))) / bs;
+	const uint8_t page_type = GetPageType(), bs = block_size[page_type];
+	const uint16_t block_id = (reinterpret_cast<uint64_t>(block) - reinterpret_cast<uint64_t>(GetBlockBase())) / bs;
 	const uint8_t bitmap_idx = block_id >> 5, bitmap_bit = block_id & 31;
-	atomic_uint* bitmap = get_bitmap(mm_page) + bitmap_idx;
+	atomic_uint* bitmap = GetBitmap() + bitmap_idx;
 	unsigned int old_bitmap, new_bitmap;
 	do
 	{
 		old_bitmap = bitmap->load();
 		new_bitmap = old_bitmap | (1 << bitmap_bit);
 	} while (!bitmap->compare_exchange_weak(old_bitmap, new_bitmap));
-	get_remaining(mm_page)->fetch_add(1u);
+	GetRemaining()->fetch_add(1u);
 }
 
 #ifdef DEBUG
