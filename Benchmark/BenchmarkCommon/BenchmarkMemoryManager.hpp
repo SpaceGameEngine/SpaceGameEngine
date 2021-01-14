@@ -16,67 +16,18 @@ limitations under the License.
 #pragma once
 #include <vector>
 #include "benchmark/benchmark.h"
-#include "Memory/SegregatedFitAllocator.h"
+#include "Memory/Allocators.h"
 
-// ----------
-
-void BM_AllocFixedSize_malloc(benchmark::State& state)
+template<typename AllocatorType>
+void BM_AllocationThroughput(benchmark::State& state)
 {
 	auto size = state.range(0);
 	for (auto _ : state)
 	{
-		void* ptr = _mm_malloc(size, 4);
+		void* ptr = SpaceGameEngine::AllocatorWrapper<AllocatorType>::RawNew(size, 4);
 	}
-	state.SetBytesProcessed(
-		static_cast<int64_t>(state.iterations()) * size);
+	state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * size);
 }
 
-void BM_AllocFixedSize_stdnew(benchmark::State& state)
-{
-	auto size = state.range(0);
-	for (auto _ : state)
-	{
-		void* ptr = new char[size];
-	}
-	state.SetBytesProcessed(
-		static_cast<int64_t>(state.iterations()) * size);
-}
-
-void BM_AllocFixedSize_FixedSizeAllocator(benchmark::State& state)
-{
-	auto size = state.range(0);
-	SpaceGameEngine::SegregatedFitAllocator::LockedFixedSizeAllocator allocator(size, 4096, 4);
-	for (auto _ : state)
-	{
-		void* ptr = allocator.Allocate();
-	}
-	state.SetBytesProcessed(
-		static_cast<int64_t>(state.iterations()) * size);
-}
-
-template<class AllocatorType>
-void BM_AllocFixedSize_SGEAllocator(benchmark::State& state)
-{
-	auto size = state.range(0);
-	AllocatorType allocator;
-	for (auto _ : state)
-	{
-		void* ptr = allocator.RawNew(size, 4);
-	}
-	state.SetBytesProcessed(
-		static_cast<int64_t>(state.iterations()) * size);
-}
-
-BENCHMARK(BM_AllocFixedSize_malloc)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
-BENCHMARK(BM_AllocFixedSize_stdnew)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
-BENCHMARK(BM_AllocFixedSize_FixedSizeAllocator)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
-BENCHMARK_TEMPLATE(BM_AllocFixedSize_SGEAllocator, SpaceGameEngine::StdAllocator)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
-BENCHMARK_TEMPLATE(BM_AllocFixedSize_SGEAllocator, SpaceGameEngine::MemoryManagerAllocator)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
-
-// ----------
-
-// ----------
-
-
-
-// ----------
+BENCHMARK_TEMPLATE(BM_AllocationThroughput, SpaceGameEngine::NativeAllocator)->ThreadRange(1, 16)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
+BENCHMARK_TEMPLATE(BM_AllocationThroughput, SpaceGameEngine::SegregatedFitAllocator)->ThreadRange(1, 16)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
