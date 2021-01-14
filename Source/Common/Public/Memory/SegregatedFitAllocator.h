@@ -15,12 +15,6 @@ limitations under the License.
 */
 
 #pragma once
-#ifdef SGE_WINDOWS
-#include <malloc.h>
-#else
-#include <mm_malloc.h>
-#include <iostream>
-#endif
 #include "TypeDefinition.hpp"
 #include "Utility/Utility.hpp"
 #include "Error.h"
@@ -34,13 +28,6 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
-
-	/*!
-	@brief get default alignment by giving memory size
-	@note the default alignment depends on the allocated
-	memory size,when the size >= 16,the alignment is 16,or it will be 4.
-	*/
-	SizeType GetDefaultAlignment(SizeType size);
 
 	/*!
 	@brief the memory manager for the engine to use

@@ -13,21 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+#include "Memory/AllocatorBase.h"
 #include "Memory/SegregatedFitAllocator.h"
 #include "Error.h"
 #include <algorithm>
 #include <cstring>
 
-bool SpaceGameEngine::InvalidAlignmentError::Judge(SizeType alignment)
-{
-	return (alignment & (alignment - 1)) != 0;
-}
-
-SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
-{
-	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
-	return size >= 16 ? 16 : 4;
-}
+#ifdef SGE_WINDOWS
+#include <malloc.h>
+#else
+#include <mm_malloc.h>
+#include <iostream>
+#endif
 
 SpaceGameEngine::SegregatedFitAllocator::~SegregatedFitAllocator()
 {

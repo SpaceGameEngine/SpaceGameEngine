@@ -16,8 +16,15 @@ limitations under the License.
 
 #include "Error.h"
 #include <algorithm>
-#include <Memory/NativeAllocator.h>
-#include "NativeAllocator.h"
+#include "Memory/AllocatorBase.h"
+#include "Memory/NativeAllocator.h"
+
+#ifdef SGE_WINDOWS
+#include <malloc.h>
+#else
+#include <mm_malloc.h>
+#include <iostream>
+#endif
 
 void* SpaceGameEngine::NativeAllocator::Allocate(SizeType size, SizeType alignment)
 {

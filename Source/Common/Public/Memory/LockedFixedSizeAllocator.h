@@ -5,17 +5,6 @@
 namespace SpaceGameEngine
 {
 
-#ifdef SGE_X86
-#define SGE_MAX_MEMORY_SIZE UINT32_MAX
-#elif defined(SGE_X64)
-#define SGE_MAX_MEMORY_SIZE UINT64_MAX
-#endif
-
-	/*!
-	@brief make the memory size or memory address aligned using the alignment
-	*/
-#define SGE_MEMORY_ALIGN(value, alignment) (((value) + ((alignment)-1)) & ~((alignment)-1))
-
 	/*!
 	@brief the header of a memory block which contain the information of the memory block
 	@note the memory block's information which is stored in MemoryBlockHeader is only used in the allocator,

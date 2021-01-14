@@ -1,6 +1,9 @@
 add_library(Common
         Private/Error.cpp
+        Private/Memory/AllocatorBase.cpp
+        Private/Memory/NativeAllocator.cpp
         Private/Memory/LockedFixedSizeAllocator.cpp
+        Private/Memory/SegregatedFitAllocator.cpp
         Private/SGEString.cpp
         Private/StringImplement/StdTStringImplement.cpp
         Private/Concurrent/Thread.cpp

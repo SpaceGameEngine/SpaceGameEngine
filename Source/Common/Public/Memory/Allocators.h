@@ -17,8 +17,9 @@ limitations under the License.
 #pragma once
 #include <type_traits>
 #include <functional>
-#include "SegregatedFitAllocator.h"
-#include "NativeAllocator.h"
+#include "Memory/AllocatorBase.h"
+#include "Memory/SegregatedFitAllocator.h"
+#include "Memory/NativeAllocator.h"
 #include "Utility/Utility.hpp"
 
 namespace SpaceGameEngine
