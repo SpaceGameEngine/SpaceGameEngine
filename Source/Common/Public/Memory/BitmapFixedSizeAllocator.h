@@ -3,17 +3,24 @@
 #include <cstdlib>
 #include <string>
 #include "TypeDefinition.hpp"
+#include "Utility/Utility.hpp"
+#define PAGE_SIZE 4096
 typedef std::atomic<uint32_t> atomic_uint;
 namespace SpaceGameEngine
 {
-	class BitmapFixedSizeAllocator
+	class NewSegregatedFitAllocator;
+	class BitmapFixedSizeAllocator : public Uncopyable
 	{
 	public:
-		BitmapFixedSizeAllocator(SizeType page_size, UInt8 page_type);
+		explicit BitmapFixedSizeAllocator(UInt8 page_type);
+		~BitmapFixedSizeAllocator();
 		void* Allocate();
 		void Free(void* ptr);
+		bool TryFree(void* ptr);
+		friend NewSegregatedFitAllocator;
+
 	private:
-		void* GetNextPage();
+		BitmapFixedSizeAllocator* GetNextPage();
 		std::atomic_flag* GetNextPageLock();
 		UInt8 GetPageType();
 		std::atomic<UInt16>* GetRemaining();
@@ -23,6 +30,6 @@ namespace SpaceGameEngine
 		void LockNextPage();
 		void UnlockNextPage();
 
-		void* mm_page;
+		Byte mm_page[PAGE_SIZE];
 	};
 }

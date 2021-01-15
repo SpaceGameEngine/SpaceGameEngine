@@ -16,10 +16,10 @@ const UInt8 block_size[] = {8, 16, 24, 32, 40, 48, 56, 64};
 const UInt8 bitmap_count[] = {16, 8, 6, 4, 4, 3, 3, 2};
 const UInt8 bitmap_offset[] = {10, 3, 23, 1, 27, 12, 24, 1};
 
-void* BitmapFixedSizeAllocator::GetNextPage()
+BitmapFixedSizeAllocator* BitmapFixedSizeAllocator::GetNextPage()
 {
 	// return mm_page + 0
-	return *reinterpret_cast<void**>(mm_page);
+	return *reinterpret_cast<BitmapFixedSizeAllocator**>(mm_page);
 }
 
 std::atomic_flag* BitmapFixedSizeAllocator::GetNextPageLock()
@@ -72,11 +72,8 @@ void BitmapFixedSizeAllocator::UnlockNextPage()
 	GetNextPageLock()->clear(std::memory_order_release);
 }
 
-BitmapFixedSizeAllocator::BitmapFixedSizeAllocator(SizeType page_size, UInt8 page_type)
+BitmapFixedSizeAllocator::BitmapFixedSizeAllocator(UInt8 page_type)
 {
-	// Allocate memory page
-	mm_page = aligned_alloc(page_size, page_size);
-
 	// Init next_page next_page_lock page_type remaining
 	// Use placement new because atomic_init will be de deprecated in c++20
 	*reinterpret_cast<void**>(mm_page) = nullptr;
@@ -91,6 +88,15 @@ BitmapFixedSizeAllocator::BitmapFixedSizeAllocator(SizeType page_size, UInt8 pag
 		new (bitmap + i) atomic_uint(0xFFFFFFFF);
 	}
 	new (bitmap + (bitmap_count[page_type] - 1)) atomic_uint(0xFFFFFFFF >> bitmap_offset[page_type]);
+}
+
+BitmapFixedSizeAllocator::~BitmapFixedSizeAllocator()
+{
+	LockNextPage();
+	auto next_page = GetNextPage();
+	delete reinterpret_cast<BitmapFixedSizeAllocator*>(next_page);
+	SetNextPage(nullptr);
+	UnlockNextPage();
 }
 
 void* BitmapFixedSizeAllocator::Allocate()
@@ -121,7 +127,6 @@ void* BitmapFixedSizeAllocator::Allocate()
 	}
 	return nullptr;
 }
-
 void BitmapFixedSizeAllocator::Free(void* block)
 {
 	const uint8_t page_type = GetPageType(), bs = block_size[page_type];
@@ -135,6 +140,15 @@ void BitmapFixedSizeAllocator::Free(void* block)
 		new_bitmap = old_bitmap | (1 << bitmap_bit);
 	} while (!bitmap->compare_exchange_weak(old_bitmap, new_bitmap));
 	GetRemaining()->fetch_add(1u);
+}
+bool BitmapFixedSizeAllocator::TryFree(void* ptr)
+{
+	if ((reinterpret_cast<UInt64>(ptr) >> 12) == (reinterpret_cast<UInt64>(this) >> 12))
+	{
+		Free(ptr);
+		return true;
+	}
+	return false;
 }
 
 #ifdef DEBUG
