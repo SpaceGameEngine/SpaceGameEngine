@@ -31,3 +31,4 @@ void BM_AllocationThroughput(benchmark::State& state)
 
 BENCHMARK_TEMPLATE(BM_AllocationThroughput, SpaceGameEngine::NativeAllocator)->ThreadRange(1, 16)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
 BENCHMARK_TEMPLATE(BM_AllocationThroughput, SpaceGameEngine::SegregatedFitAllocator)->ThreadRange(1, 16)->RangeMultiplier(2)->Range(1 << 2, 1 << 10);
+BENCHMARK_TEMPLATE(BM_AllocationThroughput, SpaceGameEngine::NewSegregatedFitAllocator)->ThreadRange(1, 16)->RangeMultiplier(2)->Range(1 << 3, 1 << 6);

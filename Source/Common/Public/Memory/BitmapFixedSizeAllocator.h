@@ -21,7 +21,7 @@ namespace SpaceGameEngine
 
 	private:
 		BitmapFixedSizeAllocator* GetNextPage();
-		std::atomic_flag* GetNextPageLock();
+		std::atomic<bool>* GetNextPageLock();
 		UInt8 GetPageType();
 		std::atomic<UInt16>* GetRemaining();
 		atomic_uint* GetBitmap();

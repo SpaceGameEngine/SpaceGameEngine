@@ -75,7 +75,7 @@ TEST(SegregatedFitAllocator, IndexConvertTest)
 	ASSERT_EQ(index, 262272);
 }
 
-using AllocatorsToBeTested = ::testing::Types<SpaceGameEngine::NativeAllocator, SpaceGameEngine::SegregatedFitAllocator>;
+using AllocatorsToBeTested = ::testing::Types<SpaceGameEngine::NativeAllocator, SpaceGameEngine::SegregatedFitAllocator, SpaceGameEngine::NewSegregatedFitAllocator>;
 
 template<typename AllocatorType>
 class AllocatorTestBase : public ::testing::Test
@@ -116,15 +116,16 @@ public:
 		ASSERT_TRUE(ok);
 	}
 };
+#define THREAD_NUMBER 10
 TYPED_TEST_CASE(ThreadSafetyTester, AllocatorsToBeTested);
 TYPED_TEST(ThreadSafetyTester, ThreadSafetyTest)
 {
 	std::vector<Thread> threads;
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < THREAD_NUMBER; i++)
 	{
 		threads.emplace_back([=]() { this->run_test(i); });
 	}
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < THREAD_NUMBER; i++)
 	{
 		threads[i].Join();
 	}

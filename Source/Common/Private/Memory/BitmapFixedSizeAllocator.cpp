@@ -22,10 +22,10 @@ BitmapFixedSizeAllocator* BitmapFixedSizeAllocator::GetNextPage()
 	return *reinterpret_cast<BitmapFixedSizeAllocator**>(mm_page);
 }
 
-std::atomic_flag* BitmapFixedSizeAllocator::GetNextPageLock()
+std::atomic<bool>* BitmapFixedSizeAllocator::GetNextPageLock()
 {
 	// return mm_page + 8
-	return reinterpret_cast<std::atomic_flag*>(reinterpret_cast<uint64_t>(mm_page) | 0x8);
+	return reinterpret_cast<std::atomic<bool>*>(reinterpret_cast<uint64_t>(mm_page) | 0x8);
 }
 
 UInt8 BitmapFixedSizeAllocator::GetPageType()
@@ -49,8 +49,8 @@ atomic_uint* BitmapFixedSizeAllocator::GetBitmap()
 
 void* BitmapFixedSizeAllocator::GetBlockBase()
 {
-	// return mm_page + 12 + bc * 8
-	return reinterpret_cast<void*>((reinterpret_cast<uint64_t>(mm_page) | 0xC) + (bitmap_count[GetPageType()] << 3));
+	// return mm_page + 12 + bmc * 4
+	return reinterpret_cast<void*>((reinterpret_cast<uint64_t>(mm_page) | 0xC) + (bitmap_count[GetPageType()] << 2));
 }
 
 void BitmapFixedSizeAllocator::SetNextPage(void* next_page)
@@ -58,18 +58,24 @@ void BitmapFixedSizeAllocator::SetNextPage(void* next_page)
 	*reinterpret_cast<void**>(mm_page) = next_page;
 }
 
-#include <thread>
 void BitmapFixedSizeAllocator::LockNextPage()
 {
-	while (GetNextPageLock()->test_and_set(std::memory_order_acquire))
+	for (;;)
 	{
-		std::this_thread::yield();
+		if (!GetNextPageLock()->exchange(true, std::memory_order_acquire))
+		{
+			break;
+		}
+		while (GetNextPageLock()->load(std::memory_order_relaxed))
+		{
+			__builtin_ia32_pause();
+		}
 	}
 }
 
 void BitmapFixedSizeAllocator::UnlockNextPage()
 {
-	GetNextPageLock()->clear(std::memory_order_release);
+	GetNextPageLock()->store(false, std::memory_order_release);
 }
 
 BitmapFixedSizeAllocator::BitmapFixedSizeAllocator(UInt8 page_type)
@@ -77,7 +83,7 @@ BitmapFixedSizeAllocator::BitmapFixedSizeAllocator(UInt8 page_type)
 	// Init next_page next_page_lock page_type remaining
 	// Use placement new because atomic_init will be de deprecated in c++20
 	*reinterpret_cast<void**>(mm_page) = nullptr;
-	new (GetNextPageLock()) std::atomic_flag(false);
+	new (GetNextPageLock()) std::atomic<bool>(false);
 	*reinterpret_cast<uint8_t*>(reinterpret_cast<uint64_t>(mm_page) | 0x9) = page_type;
 	new (GetRemaining()) std::atomic<uint16_t>(block_count[page_type]);
 
@@ -101,6 +107,10 @@ BitmapFixedSizeAllocator::~BitmapFixedSizeAllocator()
 
 void* BitmapFixedSizeAllocator::Allocate()
 {
+	if (GetRemaining()->load(std::memory_order_relaxed) == 0)
+	{
+		return nullptr;
+	}
 	const uint8_t page_type = GetPageType(), bmc = bitmap_count[page_type], bs = block_size[page_type];
 	atomic_uint* bitmap = GetBitmap();
 	uint32_t old_bitmap, new_bitmap, ffs;
@@ -109,7 +119,7 @@ void* BitmapFixedSizeAllocator::Allocate()
 	{
 		do
 		{
-			old_bitmap = bitmap[i].load();
+			old_bitmap = bitmap[i].load(std::memory_order_relaxed);
 			/*!
 			 * @todo use portable ffs function
 			 */

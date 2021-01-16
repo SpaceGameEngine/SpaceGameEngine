@@ -19,6 +19,7 @@ limitations under the License.
 #include <functional>
 #include "Memory/AllocatorBase.h"
 #include "Memory/SegregatedFitAllocator.h"
+#include "Memory/NewSegregatedFitAllocator.h"
 #include "Memory/NativeAllocator.h"
 #include "Utility/Utility.hpp"
 

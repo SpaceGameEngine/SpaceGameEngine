@@ -26,7 +26,7 @@ void* NewSegregatedFitAllocator::Allocate(SizeType size, SizeType alignment)
 			auto next_page = allocator->GetNextPage();
 			if (next_page == nullptr)
 			{
-				next_page = new (aligned_alloc(PAGE_SIZE, PAGE_SIZE)) BitmapFixedSizeAllocator(i);
+				next_page = new (aligned_alloc(PAGE_SIZE, PAGE_SIZE)) BitmapFixedSizeAllocator(level);
 				allocator->SetNextPage(next_page);
 			}
 			allocator->UnlockNextPage();
@@ -59,6 +59,9 @@ void NewSegregatedFitAllocator::Free(void* ptr, SizeType size, SizeType alignmen
 }
 UInt8 NewSegregatedFitAllocator::GetSizeLevel(UInt32 size)
 {
-	auto level = (size >> 3) - 1;
-	return level >= 8 ? 8 : level;
+	if (size <= 8)
+		return 0;
+	if (size > 64)
+		return 8;
+	return (size >> 3) - 1;
 }
