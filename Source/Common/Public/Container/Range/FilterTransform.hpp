@@ -27,6 +27,31 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	template<typename IteratorType, typename SentinelType = IteratorType>
+	class FilterIterator
+	{
+	public:
+		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+
+		using ValueType = typename IteratorType::ValueType;
+
+		inline FilterIterator(const FilterIterator& iter)
+			: m_Iterator(iter.m_Iterator), m_pFilterFunction(iter.m_pFilterFunction)
+		{
+		}
+
+	private:
+		inline FilterIterator(const IteratorType& iter, Function<bool(const typename IteratorType::ValueType&)>& func)
+			: m_Iterator(iter), m_pFilterFunction(&func)
+		{
+		}
+
+	private:
+		IteratorType m_Iterator;
+		const Function<bool(const typename IteratorType::ValueType&)>* m_pFilterFunction;
+	};
+
 	/*!
 	@brief return the range which all elements can pass the filter function(return true).
 	*/
