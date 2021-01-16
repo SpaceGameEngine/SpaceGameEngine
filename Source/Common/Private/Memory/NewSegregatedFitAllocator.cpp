@@ -1,9 +1,16 @@
 #include "Memory/NewSegregatedFitAllocator.h"
+
+#ifdef SGE_WINDOWS
+#define AlignedAlloc _mm_malloc
+#else
+#define AlignedAlloc aligned_alloc
+#endif
+
 NewSegregatedFitAllocator::NewSegregatedFitAllocator()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		allocatorHeaders[i] = new (aligned_alloc(PAGE_SIZE, PAGE_SIZE)) BitmapFixedSizeAllocator(i);
+		allocatorHeaders[i] = new (AlignedAlloc(PAGE_SIZE, PAGE_SIZE)) BitmapFixedSizeAllocator(i);
 	}
 }
 void* NewSegregatedFitAllocator::Allocate(SizeType size, SizeType alignment)
@@ -11,7 +18,7 @@ void* NewSegregatedFitAllocator::Allocate(SizeType size, SizeType alignment)
 	auto level = GetSizeLevel(size);
 	if (level == 8)
 	{
-		return aligned_alloc(alignment, size);
+		return AlignedAlloc(alignment, size);
 	}
 	else
 	{
@@ -26,7 +33,7 @@ void* NewSegregatedFitAllocator::Allocate(SizeType size, SizeType alignment)
 			auto next_page = allocator->GetNextPage();
 			if (next_page == nullptr)
 			{
-				next_page = new (aligned_alloc(PAGE_SIZE, PAGE_SIZE)) BitmapFixedSizeAllocator(level);
+				next_page = new (AlignedAlloc(PAGE_SIZE, PAGE_SIZE)) BitmapFixedSizeAllocator(level);
 				allocator->SetNextPage(next_page);
 			}
 			allocator->UnlockNextPage();

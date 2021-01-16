@@ -58,6 +58,13 @@ void BitmapFixedSizeAllocator::SetNextPage(void* next_page)
 	*reinterpret_cast<void**>(mm_page) = next_page;
 }
 
+#ifdef SGE_WINDOWS
+#include <Windows.h>
+#define PAUSE_THREAD YieldProcessor
+#else
+#define PAUSE_THREAD __builtin_ia32_pause
+#endif
+
 void BitmapFixedSizeAllocator::LockNextPage()
 {
 	for (;;)
@@ -68,7 +75,7 @@ void BitmapFixedSizeAllocator::LockNextPage()
 		}
 		while (GetNextPageLock()->load(std::memory_order_relaxed))
 		{
-			__builtin_ia32_pause();
+			PAUSE_THREAD();
 		}
 	}
 }
@@ -113,21 +120,38 @@ void* BitmapFixedSizeAllocator::Allocate()
 	}
 	const uint8_t page_type = GetPageType(), bmc = bitmap_count[page_type], bs = block_size[page_type];
 	atomic_uint* bitmap = GetBitmap();
-	uint32_t old_bitmap, new_bitmap, ffs;
+	uint32_t old_bitmap, new_bitmap;
+
+#ifdef SGE_WINDOWS
+	unsigned long ffs;
+#else
+	uint32_t ffs;
+#endif
+
 	uint64_t block_base = reinterpret_cast<uint64_t>(GetBlockBase()), allocated_block;
 	for (int i = 0; i < bmc; i++)
 	{
 		do
 		{
 			old_bitmap = bitmap[i].load(std::memory_order_relaxed);
-			/*!
-			 * @todo use portable ffs function
-			 */
+
+#ifdef SGE_WINDOWS
+			if (!_BitScanForward(&ffs, old_bitmap))
+			{
+				break;
+			}
+#else
 			ffs = __builtin_ffs(old_bitmap);
 			if (ffs == 0)
+			{
 				break;
-			allocated_block = block_base + (((i << 5) | (ffs - 1)) * bs);
-			new_bitmap = old_bitmap & ~(1 << (ffs - 1));
+			}
+			--ffs;
+#endif
+
+			allocated_block = block_base + (((i << 5) | ffs) * bs);
+			new_bitmap = old_bitmap & ~(1 << ffs);
+			++ffs;
 		} while (!bitmap[i].compare_exchange_weak(old_bitmap, new_bitmap));
 		if (ffs)
 		{

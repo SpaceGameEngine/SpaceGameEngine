@@ -164,7 +164,13 @@
     <ClInclude Include="Public\Error.h" />
     <ClInclude Include="Public\ForwardDefinition.hpp" />
     <ClInclude Include="Public\Function.hpp" />
-    <ClInclude Include="Public\MemoryManager.h" />
+    <ClInclude Include="Public\Memory\AllocatorBase.h" />
+    <ClInclude Include="Public\Memory\Allocators.h" />
+    <ClInclude Include="Public\Memory\BitmapFixedSizeAllocator.h" />
+    <ClInclude Include="Public\Memory\LockedFixedSizeAllocator.h" />
+    <ClInclude Include="Public\Memory\NativeAllocator.h" />
+    <ClInclude Include="Public\Memory\NewSegregatedFitAllocator.h" />
+    <ClInclude Include="Public\Memory\SegregatedFitAllocator.h" />
     <ClInclude Include="Public\MetaData\MetaData.h" />
     <ClInclude Include="Public\MetaData\MetaObject.hpp" />
     <ClInclude Include="Public\Platform.hpp" />
@@ -177,7 +183,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp" />
-    <ClCompile Include="Private\MemoryManager.cpp" />
+    <ClCompile Include="Private\Memory\AllocatorBase.cpp" />
+    <ClCompile Include="Private\Memory\BitmapFixedSizeAllocator.cpp" />
+    <ClCompile Include="Private\Memory\LockedFixedSizeAllocator.cpp" />
+    <ClCompile Include="Private\Memory\NativeAllocator.cpp" />
+    <ClCompile Include="Private\Memory\NewSegregatedFitAllocator.cpp" />
+    <ClCompile Include="Private\Memory\SegregatedFitAllocator.cpp" />
     <ClCompile Include="Private\MetaData\MetaData.cpp" />
     <ClCompile Include="Private\SGEString.cpp" />
     <ClCompile Include="Private\StringImplement\StdTStringImplement.cpp" />
