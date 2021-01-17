@@ -21,7 +21,7 @@ limitations under the License.
 #include "TypeDefinition.hpp"
 #include "Utility/Utility.hpp"
 #define PAGE_SIZE 4096
-typedef std::atomic<UInt32> atomic_uint;
+typedef std::atomic<SpaceGameEngine::UInt32> atomic_uint;
 namespace SpaceGameEngine
 {
 	class NewSegregatedFitAllocator;
@@ -38,7 +38,7 @@ namespace SpaceGameEngine
 	private:
 		BitmapFixedSizeAllocator* GetNextPage();
 		std::atomic<bool>* GetNextPageLock();
-		UInt8 GetPageType();
+		SpaceGameEngine::UInt8 GetPageType();
 		std::atomic<UInt16>* GetRemaining();
 		atomic_uint* GetBitmap();
 		void* GetBlockBase();
