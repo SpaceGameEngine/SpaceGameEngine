@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Chenxi Xu (@xsun2001)
+Copyright 2021 Chenxi Xu (@xsun2001)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-	using DefaultAllocator = SpaceGameEngine::SegregatedFitAllocator;
-
 	template<typename AllocatorType>
 	class AllocatorWrapper : SpaceGameEngine::Singleton<AllocatorType>
 	{
@@ -60,5 +58,5 @@ namespace SpaceGameEngine
 		AllocatorWrapper() = default;
 	};
 
-	using DefaultMemoryManager = AllocatorWrapper<DefaultAllocator>;
+	using DefaultAllocator = AllocatorWrapper<SegregatedFitAllocator>;
 }

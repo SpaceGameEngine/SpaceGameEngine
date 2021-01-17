@@ -26,7 +26,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief a wrapper of object which erases its type.
 	*/
-	template<typename Allocator = DefaultMemoryManager>
+	template<typename Allocator = DefaultAllocator>
 	class MetaObject
 	{
 	public:

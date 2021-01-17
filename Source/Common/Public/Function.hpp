@@ -78,7 +78,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief a callable object wrapper.
 	*/
-	template<typename T, typename Allocator = DefaultMemoryManager>
+	template<typename T, typename Allocator = DefaultAllocator>
 	class Function
 	{
 	};

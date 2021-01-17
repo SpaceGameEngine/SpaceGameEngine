@@ -20,28 +20,28 @@ limitations under the License.
 
 SpaceGameEngine::String::String()
 {
-	m_pImplement = DefaultMemoryManager::New<StringImplement>();
+	m_pImplement = DefaultAllocator::New<StringImplement>();
 }
 
 SpaceGameEngine::String::String(const String& str)
 {
-	m_pImplement = DefaultMemoryManager::New<StringImplement>(*str.m_pImplement);
+	m_pImplement = DefaultAllocator::New<StringImplement>(*str.m_pImplement);
 }
 
 SpaceGameEngine::String::String(const StdTString& str)
 {
-	m_pImplement = DefaultMemoryManager::New<StringImplement>(str);
+	m_pImplement = DefaultAllocator::New<StringImplement>(str);
 }
 
 SpaceGameEngine::String::String(const TChar* pstr)
 {
 	SGE_ASSERT(NullPointerError, pstr);
-	m_pImplement = DefaultMemoryManager::New<StringImplement>(pstr);
+	m_pImplement = DefaultAllocator::New<StringImplement>(pstr);
 }
 
 SpaceGameEngine::String::String(String&& str)
 {
-	m_pImplement = DefaultMemoryManager::New<StringImplement>(std::move(*str.m_pImplement));
+	m_pImplement = DefaultAllocator::New<StringImplement>(std::move(*str.m_pImplement));
 }
 
 SpaceGameEngine::String& SpaceGameEngine::String::operator=(const String& str)
@@ -87,7 +87,7 @@ bool SpaceGameEngine::String::operator==(const TChar* pstr) const
 
 SpaceGameEngine::String::~String()
 {
-	DefaultMemoryManager::Delete(m_pImplement);
+	DefaultAllocator::Delete(m_pImplement);
 }
 
 SpaceGameEngine::StdTString SpaceGameEngine::String::ToStdTString() const

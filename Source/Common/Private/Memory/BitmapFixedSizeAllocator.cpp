@@ -1,3 +1,19 @@
+/*
+Copyright 2021 Chenxi Xu (@xsun2001)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include "Memory/BitmapFixedSizeAllocator.h"
 
 // | next_page | next_page_lock | page_type | remaining | bitmap | blocks |
@@ -25,32 +41,32 @@ BitmapFixedSizeAllocator* BitmapFixedSizeAllocator::GetNextPage()
 std::atomic<bool>* BitmapFixedSizeAllocator::GetNextPageLock()
 {
 	// return mm_page + 8
-	return reinterpret_cast<std::atomic<bool>*>(reinterpret_cast<uint64_t>(mm_page) | 0x8);
+	return reinterpret_cast<std::atomic<bool>*>(reinterpret_cast<UInt64>(mm_page) | 0x8);
 }
 
 UInt8 BitmapFixedSizeAllocator::GetPageType()
 {
 	// return mm_page + 9
-	return *reinterpret_cast<uint8_t*>(reinterpret_cast<uint64_t>(mm_page) | 0x9);
+	return *reinterpret_cast<UInt8*>(reinterpret_cast<UInt64>(mm_page) | 0x9);
 }
 
 std::atomic<UInt16>* BitmapFixedSizeAllocator::GetRemaining()
 {
 	// return mm_page + 10
-	return reinterpret_cast<std::atomic<uint16_t>*>(reinterpret_cast<uint64_t>(mm_page) | 0xA);
+	return reinterpret_cast<std::atomic<UInt16>*>(reinterpret_cast<UInt64>(mm_page) | 0xA);
 }
 
 // 1 is free
 atomic_uint* BitmapFixedSizeAllocator::GetBitmap()
 {
 	// return mm_page + 12
-	return reinterpret_cast<atomic_uint*>(reinterpret_cast<uint64_t>(mm_page) | 0xC);
+	return reinterpret_cast<atomic_uint*>(reinterpret_cast<UInt64>(mm_page) | 0xC);
 }
 
 void* BitmapFixedSizeAllocator::GetBlockBase()
 {
 	// return mm_page + 12 + bmc * 4
-	return reinterpret_cast<void*>((reinterpret_cast<uint64_t>(mm_page) | 0xC) + (bitmap_count[GetPageType()] << 2));
+	return reinterpret_cast<void*>((reinterpret_cast<UInt64>(mm_page) | 0xC) + (bitmap_count[GetPageType()] << 2));
 }
 
 void BitmapFixedSizeAllocator::SetNextPage(void* next_page)
@@ -91,8 +107,8 @@ BitmapFixedSizeAllocator::BitmapFixedSizeAllocator(UInt8 page_type)
 	// Use placement new because atomic_init will be de deprecated in c++20
 	*reinterpret_cast<void**>(mm_page) = nullptr;
 	new (GetNextPageLock()) std::atomic<bool>(false);
-	*reinterpret_cast<uint8_t*>(reinterpret_cast<uint64_t>(mm_page) | 0x9) = page_type;
-	new (GetRemaining()) std::atomic<uint16_t>(block_count[page_type]);
+	*reinterpret_cast<UInt8*>(reinterpret_cast<UInt64>(mm_page) | 0x9) = page_type;
+	new (GetRemaining()) std::atomic<UInt16>(block_count[page_type]);
 
 	// Init bitmap
 	atomic_uint* bitmap = GetBitmap();
@@ -118,17 +134,17 @@ void* BitmapFixedSizeAllocator::Allocate()
 	{
 		return nullptr;
 	}
-	const uint8_t page_type = GetPageType(), bmc = bitmap_count[page_type], bs = block_size[page_type];
+	const UInt8	page_type = GetPageType(), bmc = bitmap_count[page_type], bs = block_size[page_type];
 	atomic_uint* bitmap = GetBitmap();
-	uint32_t old_bitmap, new_bitmap;
+	UInt32 old_bitmap, new_bitmap;
 
 #ifdef SGE_WINDOWS
 	unsigned long ffs;
 #else
-	uint32_t ffs;
+	UInt32 ffs;
 #endif
 
-	uint64_t block_base = reinterpret_cast<uint64_t>(GetBlockBase()), allocated_block;
+	UInt64 block_base = reinterpret_cast<UInt64>(GetBlockBase()), allocated_block;
 	for (int i = 0; i < bmc; i++)
 	{
 		do
@@ -163,9 +179,9 @@ void* BitmapFixedSizeAllocator::Allocate()
 }
 void BitmapFixedSizeAllocator::Free(void* block)
 {
-	const uint8_t page_type = GetPageType(), bs = block_size[page_type];
-	const uint16_t block_id = (reinterpret_cast<uint64_t>(block) - reinterpret_cast<uint64_t>(GetBlockBase())) / bs;
-	const uint8_t bitmap_idx = block_id >> 5, bitmap_bit = block_id & 31;
+	const UInt8 page_type = GetPageType(), bs = block_size[page_type];
+	const UInt16 block_id = (reinterpret_cast<UInt64>(block) - reinterpret_cast<UInt64>(GetBlockBase())) / bs;
+	const UInt8 bitmap_idx = block_id >> 5, bitmap_bit = block_id & 31;
 	atomic_uint* bitmap = GetBitmap() + bitmap_idx;
 	unsigned int old_bitmap, new_bitmap;
 	do

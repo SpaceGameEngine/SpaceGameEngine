@@ -116,7 +116,7 @@ public:
 		ASSERT_TRUE(ok);
 	}
 };
-#define THREAD_NUMBER 10
+#define THREAD_NUMBER 1
 TYPED_TEST_CASE(ThreadSafetyTester, AllocatorsToBeTested);
 TYPED_TEST(ThreadSafetyTester, ThreadSafetyTest)
 {

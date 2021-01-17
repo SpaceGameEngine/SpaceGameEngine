@@ -27,7 +27,7 @@ namespace SpaceGameEngine
 	@note the ControllableObject can automatically release its resource if
 	the user has not invoked its Release method.
 	*/
-	template<typename T, typename Allocator = DefaultMemoryManager>
+	template<typename T, typename Allocator = DefaultAllocator>
 	class ControllableObject
 	{
 	public:
