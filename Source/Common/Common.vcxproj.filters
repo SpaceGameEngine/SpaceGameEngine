@@ -25,12 +25,15 @@
     <Filter Include="Public\Utility">
       <UniqueIdentifier>{d471f020-f93f-4cea-86bd-4d71ab07bcbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Memory">
+      <UniqueIdentifier>{7d64dcbe-50fc-4179-a950-433881de966f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Memory">
+      <UniqueIdentifier>{bc93fe8e-9c8c-4b13-85e3-e60a4ba9bee7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\MemoryManager.h">
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Private\DoxygenConfig.hpp">
@@ -72,12 +75,30 @@
     <ClInclude Include="Public\ForwardDefinition.hpp">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Memory\AllocatorBase.h">
+      <Filter>Public\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Memory\Allocators.h">
+      <Filter>Public\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Memory\BitmapFixedSizeAllocator.h">
+      <Filter>Public\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Memory\LockedFixedSizeAllocator.h">
+      <Filter>Public\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Memory\NewSegregatedFitAllocator.h">
+      <Filter>Public\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Memory\NativeAllocator.h">
+      <Filter>Public\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Memory\SegregatedFitAllocator.h">
+      <Filter>Public\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\MemoryManager.cpp">
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\StringImplement\StdTStringImplement.cpp">
@@ -94,6 +115,24 @@
     </ClCompile>
     <ClCompile Include="Private\MetaData\MetaData.cpp">
       <Filter>Private\MetaData</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Memory\AllocatorBase.cpp">
+      <Filter>Private\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Memory\BitmapFixedSizeAllocator.cpp">
+      <Filter>Private\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Memory\LockedFixedSizeAllocator.cpp">
+      <Filter>Private\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Memory\NativeAllocator.cpp">
+      <Filter>Private\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Memory\NewSegregatedFitAllocator.cpp">
+      <Filter>Private\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Memory\SegregatedFitAllocator.cpp">
+      <Filter>Private\Memory</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

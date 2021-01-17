@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "MetaData.h"
-#include "MemoryManager.h"
+#include "Memory/Allocators.h"
 
 namespace SpaceGameEngine
 {
