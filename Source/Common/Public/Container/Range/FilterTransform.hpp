@@ -83,7 +83,7 @@ namespace SpaceGameEngine
 		friend class FilterSentinel<IteratorType, SentinelType>;
 
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
-		friend Transform<FilterIterator<_IteratorType, _SentinelType>, typename FilterSentinel<_IteratorType, _SentinelType>> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
+		friend Transform<FilterIterator<_IteratorType, _SentinelType>, FilterSentinel<_IteratorType, _SentinelType>> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
 
 		using ValueType = typename IteratorType::ValueType;
 
@@ -210,7 +210,7 @@ namespace SpaceGameEngine
 
 		return Transform<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>([=](AutoReleaseBuffer& arbuff) {
 			auto range = transform.m_Function(arbuff);
-			auto filter_range_info = arbuff.NewObject<FilterIterator<IteratorType, SentinelType>::RangeInformation, Allocator>(range.GetBegin(), range.GetEnd(), filter_func);
+			auto filter_range_info = arbuff.NewObject<typename FilterIterator<IteratorType, SentinelType>::RangeInformation, Allocator>(range.GetBegin(), range.GetEnd(), filter_func);
 			return Range(FilterIterator<IteratorType, SentinelType>(range.GetBegin(), *filter_range_info), FilterSentinel<IteratorType, SentinelType>(*filter_range_info));
 		});
 	}
