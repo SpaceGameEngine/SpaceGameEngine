@@ -29,7 +29,7 @@ namespace SpaceGameEngine
 	class SequenceIterator
 	{
 	public:
-		using ValueType = T;
+		using ValueType = const T;
 
 		template<typename T2, typename U2>
 		friend Range<SequenceIterator<T2, U2>, InfiniteSentinel> MakeInfiniteSequence(const T2& start, const U2& step);
@@ -80,22 +80,12 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		inline T* operator->()
+		inline ValueType* operator->() const
 		{
 			return &m_Content;
 		}
 
-		inline T& operator*()
-		{
-			return m_Content;
-		}
-
-		inline const T* operator->() const
-		{
-			return &m_Content;
-		}
-
-		inline const T& operator*() const
+		inline ValueType& operator*() const
 		{
 			return m_Content;
 		}
@@ -127,6 +117,9 @@ namespace SpaceGameEngine
 		return Range(SequenceIterator(start, step), InfiniteSentinel());
 	}
 
+	/*!
+	@brief Make a sequence likes [start,end) with the giving step increasing.
+	*/
 	template<typename T, typename U = T>
 	inline Range<SequenceIterator<T, U>, SequenceIterator<T, U>> MakeSequence(const T& start, const U& step, const T& end)
 	{

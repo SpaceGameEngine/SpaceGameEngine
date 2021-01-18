@@ -110,10 +110,11 @@ TEST(SequenceIterator, MakeInfiniteSequenceTest)
 TEST(SequenceIterator, MakeSequenceTest)
 {
 	Range r = MakeSequence(0, 1, 10);
-	Vector v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	Vector v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	auto iter = v.GetBegin();
 	for (auto i = r.GetBegin(); r.GetEnd() != i; i += 1, iter += 1)
 		ASSERT_EQ(*i, *iter);
+	ASSERT_EQ(iter, v.GetEnd());
 }
 
 TEST(TakeTransform, MakeTakeTransformTest)
@@ -145,13 +146,13 @@ TEST(TakeTransform, TakeTransformTest)
 	for (int i = 0; i < 5; i++)
 		ASSERT_EQ(v1[i], rv1[i]);
 
-	Transform t1 = Transform(MakeSequence(0, 1, 10)) | TakeTransform<int>(5);
+	Transform t1 = Transform(MakeSequence(0, 1, 10)) | TakeTransform(5);
 	Vector<int, StdAllocator> rv2 = CastToVector<Vector<int>::Iterator, Vector<int>::Iterator, StdAllocator>(t1);
 	ASSERT_EQ(rv2.GetSize(), 5);
 	for (int i = 0; i < 5; i++)
 		ASSERT_EQ(v1[i], rv2[i]);
 
-	Transform t2 = Transform(MakeInfiniteSequence(1, 1)) | TakeTransform<int, StdAllocator>(5);
+	Transform t2 = Transform(MakeInfiniteSequence(1, 1)) | TakeTransform<StdAllocator>(5);
 	Vector<int> rv3 = CastToVector(t2);
 	ASSERT_EQ(rv3.GetSize(), 5);
 	for (int i = 0; i < 5; i++)

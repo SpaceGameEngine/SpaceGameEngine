@@ -27,13 +27,13 @@ namespace SpaceGameEngine
 	@brief return the range which takes n elements from the begin of the input range.
 	*/
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
-	inline Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator> MakeTakeTransform(const Transform<IteratorType, SentinelType>& transform, SizeType n)
+	inline Transform<typename Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>::Iterator, typename Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>::Iterator> MakeTakeTransform(const Transform<IteratorType, SentinelType>& transform, SizeType n)
 	{
 		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
 		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
 
-		return Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator>([=](AutoReleaseBuffer& arbuff) {
-			auto pvec = arbuff.NewObject<Vector<typename IteratorType::ValueType, Allocator>, Allocator>();
+		return Transform<typename Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>::Iterator, typename Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>::Iterator>([=](AutoReleaseBuffer& arbuff) {
+			auto pvec = arbuff.NewObject<Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>, Allocator>();
 			auto range = transform.m_Function(arbuff);
 			SizeType cnt = 0;
 			for (auto iter = range.GetBegin(); range.GetEnd() != iter && cnt < n; iter += 1, cnt += 1)
@@ -42,26 +42,24 @@ namespace SpaceGameEngine
 		});
 	}
 
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename Allocator = DefaultAllocator>
 	class TakeTransform
 	{
 	public:
-		using ValueType = T;
-
 		template<typename IteratorType, typename SentinelType, typename _Allocator>
-		friend inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const TakeTransform<typename IteratorType::ValueType, _Allocator>& take_transform);
+		friend inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const TakeTransform<_Allocator>& take_transform);
 
-		inline TakeTransform(const T& size)
+		inline TakeTransform(SizeType size)
 			: m_Size(size)
 		{
 		}
 
 	private:
-		T m_Size;
+		SizeType m_Size;
 	};
 
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
-	inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const TakeTransform<typename IteratorType::ValueType, Allocator>& take_transform)
+	inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const TakeTransform<Allocator>& take_transform)
 	{
 		return MakeTakeTransform(transform, take_transform.m_Size);
 	}

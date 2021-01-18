@@ -26,30 +26,146 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
+	template<typename IteratorType, typename SentinelType>
+	class FilterIterator;
+
+	template<typename IteratorType, typename SentinelType = IteratorType, bool IsBidirectional = IsRangeBidirectionalIterator<IteratorType>::Result>
+	class FilterIteratorExtensionForReverse
+	{
+	};
+
+	template<typename IteratorType, typename SentinelType>
+	class FilterIteratorExtensionForReverse<IteratorType, SentinelType, true>
+	{
+	private:
+		/*!
+		@brief Make the m_Iterator to be valid by checking with the filter function in the range information.
+		@note If can not find the valid iterator, the m_Iterator will be the iterator which
+		equals to the (begin iterator - 1) in the range information.
+		*/
+		inline void MakeValidBack()
+		{
+			while ((!reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_FilterFunction(*(reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator))) && reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_End != reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator)
+				reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator -= 1;
+		}
+
+	public:
+		inline FilterIterator<IteratorType, SentinelType> operator-(SizeType size) const
+		{
+			FilterIterator<IteratorType, SentinelType> re(*reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this));
+			while (size--)
+			{
+				re.m_Iterator -= 1;
+				re.MakeValidBack();
+			}
+			return re;
+		}
+
+		inline FilterIterator<IteratorType, SentinelType>& operator-=(SizeType size)
+		{
+			while (size--)
+			{
+				reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator -= 1;
+				MakeValidBack();
+			}
+			return *reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this);
+		}
+	};
 
 	template<typename IteratorType, typename SentinelType = IteratorType>
-	class FilterIterator
+	class FilterIterator : public FilterIteratorExtensionForReverse<IteratorType, SentinelType>
 	{
 	public:
 		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
 		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
 
+		friend class FilterIteratorExtensionForReverse<IteratorType, SentinelType, IsRangeBidirectionalIterator<IteratorType>::Result>;
+
 		using ValueType = typename IteratorType::ValueType;
 
 		inline FilterIterator(const FilterIterator& iter)
-			: m_Iterator(iter.m_Iterator), m_pFilterFunction(iter.m_pFilterFunction)
+			: m_Iterator(iter.m_Iterator), m_pRangeInformation(iter.m_pRangeInformation)
 		{
+			MakeValidForward();
 		}
 
-	private:
-		inline FilterIterator(const IteratorType& iter, Function<bool(const typename IteratorType::ValueType&)>& func)
-			: m_Iterator(iter), m_pFilterFunction(&func)
+		inline FilterIterator& operator=(const FilterIterator& iter)
 		{
+			m_Iterator = iter.m_Iterator;
+			m_pRangeInformation = iter.m_pRangeInformation;
+			return *this;
+		}
+
+		inline FilterIterator operator+(SizeType size) const
+		{
+			FilterIterator re(*this);
+			while (size--)
+			{
+				re.m_Iterator += 1;
+				re.MakeValidForward();
+			}
+			return re;
+		}
+
+		inline FilterIterator& operator+=(SizeType size)
+		{
+			while (size--)
+			{
+				m_Iterator += 1;
+				MakeValidForward();
+			}
+			return *this;
+		}
+
+		inline auto operator->() const -> decltype(this->m_Iterator.operator->())
+		{
+			return m_Iterator.operator->();
+		}
+
+		inline auto operator*() const -> decltype(this->m_Iterator.operator*())
+		{
+			return m_Iterator.operator*();
+		}
+
+		inline bool operator==(const FilterIterator& iter) const
+		{
+			return m_Iterator == iter.m_Iterator && m_pRangeInformation == iter.m_pRangeInformation;
+		}
+
+		inline bool operator!=(const FilterIterator& iter) const
+		{
+			return m_Iterator != iter.m_Iterator || m_pRangeInformation != iter.m_pRangeInformation;
+		}
+
+	public:
+		struct RangeInformation
+		{
+			IteratorType m_Begin;
+			SentinelType m_End;
+			Function<bool(const typename IteratorType::ValueType&)> m_FilterFunction;
+		};
+
+	private:
+		inline FilterIterator(const IteratorType& iter, RangeInformation& rinfo)
+			: m_Iterator(iter), m_pRangeInformation(&rinfo)
+		{
+			MakeValidForward();
+		}
+
+		/*!
+		@brief Make the m_Iterator to be valid by checking with the filter function in the range information.
+		@note If can not find the valid iterator, the m_Iterator will be the iterator which
+		equals to the end sentinel in the range information.
+		*/
+		inline void MakeValidForward()
+		{
+			while ((!m_pRangeInformation->m_FilterFunction(*m_Iterator)) && m_pRangeInformation->m_End != m_Iterator)
+				m_Iterator += 1;
 		}
 
 	private:
 		IteratorType m_Iterator;
-		const Function<bool(const typename IteratorType::ValueType&)>* m_pFilterFunction;
+		const RangeInformation* m_pRangeInformation;
 	};
 
 	/*!
