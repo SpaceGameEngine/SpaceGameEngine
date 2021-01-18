@@ -23,11 +23,11 @@ namespace SpaceGameEngine
 	@{
 	*/
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
-	inline Vector<typename IteratorType::ValueType, Allocator> CastToVector(const Transform<IteratorType, SentinelType>& transform)
+	inline Vector<typename std::remove_cv_t<typename IteratorType::ValueType>, Allocator> CastToVector(const Transform<IteratorType, SentinelType>& transform)
 	{
 		AutoReleaseBuffer arbuff;
 		auto re_range = transform.m_Function(arbuff);
-		Vector<typename IteratorType::ValueType, Allocator> re;
+		Vector<typename std::remove_cv_t<typename IteratorType::ValueType>, Allocator> re;
 		for (auto iter = re_range.GetBegin(); re_range.GetEnd() != iter; iter += 1)
 			re.EmplaceBack(*iter);
 		return re;

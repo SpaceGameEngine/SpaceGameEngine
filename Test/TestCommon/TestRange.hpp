@@ -158,3 +158,24 @@ TEST(TakeTransform, TakeTransformTest)
 	for (int i = 0; i < 5; i++)
 		ASSERT_EQ(v1[i], rv3[i] - 1);
 }
+
+TEST(MakeInfiniteSequenceFilterTake, MakeInfiniteSequenceFilterTakeTest)
+{
+	Transform t1 = Transform(MakeInfiniteSequence(0, 1)) | FilterTransform<int>([](const int& i) -> bool { return i % 2 == 0; }) | TakeTransform(10);
+	auto v1 = CastToVector(t1);
+	ASSERT_EQ(v1.GetSize(), 10);
+	Vector cv1 = {0, 2, 4, 6, 8, 10, 12, 14, 16, 18};
+	auto iter1 = cv1.GetBegin();
+	for (auto i = v1.GetBegin(); v1.GetEnd() != i; i += 1, iter1 += 1)
+		ASSERT_EQ(*i, *iter1);
+	ASSERT_EQ(iter1, cv1.GetEnd());
+
+	Transform t2 = Transform(MakeInfiniteSequence(1, 1)) | FilterTransform<int, StdAllocator>([](const int& i) -> bool { return i % 2 == 1; }) | TakeTransform<StdAllocator>(10);
+	auto v2 = CastToVector<decltype(t2)::BeginIteratorType, decltype(t2)::EndIteratorType, StdAllocator>(t2);
+	ASSERT_EQ(v2.GetSize(), 10);
+	Vector cv2 = {1, 3, 5, 7, 9, 11, 13, 15, 17, 19};
+	auto iter2 = cv2.GetBegin();
+	for (auto i = v2.GetBegin(); v2.GetEnd() != i; i += 1, iter2 += 1)
+		ASSERT_EQ(*i, *iter2);
+	ASSERT_EQ(iter2, cv2.GetEnd());
+}

@@ -45,7 +45,7 @@ namespace SpaceGameEngine
 		*/
 		inline void MakeValidBack()
 		{
-			while ((!reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_FilterFunction(*(reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator))) && reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_End != reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator)
+			while ((!reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_FilterFunction(*(reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator))) && reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_Begin - 1 != reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator)
 				reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator -= 1;
 		}
 
@@ -80,6 +80,10 @@ namespace SpaceGameEngine
 		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
 
 		friend class FilterIteratorExtensionForReverse<IteratorType, SentinelType, IsRangeBidirectionalIterator<IteratorType>::Result>;
+		friend class FilterSentinel<IteratorType, SentinelType>;
+
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend Transform<FilterIterator<_IteratorType, _SentinelType>, typename FilterSentinel<_IteratorType, _SentinelType>> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
 
 		using ValueType = typename IteratorType::ValueType;
 
@@ -117,12 +121,12 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		inline auto operator->() const -> decltype(this->m_Iterator.operator->())
+		inline ValueType* operator->() const
 		{
 			return m_Iterator.operator->();
 		}
 
-		inline auto operator*() const -> decltype(this->m_Iterator.operator*())
+		inline ValueType& operator*() const
 		{
 			return m_Iterator.operator*();
 		}
@@ -143,6 +147,11 @@ namespace SpaceGameEngine
 			IteratorType m_Begin;
 			SentinelType m_End;
 			Function<bool(const typename IteratorType::ValueType&)> m_FilterFunction;
+
+			inline RangeInformation(const IteratorType& beg, const SentinelType& end, const Function<bool(const typename IteratorType::ValueType&)>& filter)
+				: m_Begin(beg), m_End(end), m_FilterFunction(filter)
+			{
+			}
 		};
 
 	private:
@@ -168,22 +177,41 @@ namespace SpaceGameEngine
 		const RangeInformation* m_pRangeInformation;
 	};
 
+	template<typename IteratorType, typename SentinelType = IteratorType>
+	class FilterSentinel
+	{
+	public:
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend Transform<FilterIterator<_IteratorType, _SentinelType>, FilterSentinel<_IteratorType, _SentinelType>> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
+
+		inline bool operator!=(const FilterIterator<IteratorType, SentinelType>& iter) const
+		{
+			return m_pRangeInformation->m_End != iter.m_Iterator;
+		}
+
+	private:
+		FilterSentinel(typename FilterIterator<IteratorType, SentinelType>::RangeInformation& range_info)
+			: m_pRangeInformation(&range_info)
+		{
+		}
+
+	private:
+		const typename FilterIterator<IteratorType, SentinelType>::RangeInformation* m_pRangeInformation;
+	};
+
 	/*!
 	@brief return the range which all elements can pass the filter function(return true).
 	*/
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
-	inline Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator> MakeFilterTransform(const Transform<IteratorType, SentinelType>& transform, const Function<bool(const typename IteratorType::ValueType&)>& filter_func)
+	inline Transform<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>> MakeFilterTransform(const Transform<IteratorType, SentinelType>& transform, const Function<bool(const typename IteratorType::ValueType&)>& filter_func)
 	{
 		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
 		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
 
-		return Transform<typename Vector<typename IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename IteratorType::ValueType, Allocator>::Iterator>([=](AutoReleaseBuffer& arbuff) {
-			auto pvec = arbuff.NewObject<Vector<typename IteratorType::ValueType, Allocator>, Allocator>();
+		return Transform<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>([=](AutoReleaseBuffer& arbuff) {
 			auto range = transform.m_Function(arbuff);
-			for (auto iter = range.GetBegin(); range.GetEnd() != iter; iter += 1)
-				if (filter_func(*iter) == true)
-					pvec->EmplaceBack(*iter);
-			return Range(pvec->GetBegin(), pvec->GetEnd());
+			auto filter_range_info = arbuff.NewObject<FilterIterator<IteratorType, SentinelType>::RangeInformation, Allocator>(range.GetBegin(), range.GetEnd(), filter_func);
+			return Range(FilterIterator<IteratorType, SentinelType>(range.GetBegin(), *filter_range_info), FilterSentinel<IteratorType, SentinelType>(*filter_range_info));
 		});
 	}
 
@@ -194,7 +222,7 @@ namespace SpaceGameEngine
 		using ValueType = T;
 
 		template<typename IteratorType, typename SentinelType, typename _Allocator>
-		friend inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const FilterTransform<typename IteratorType::ValueType, _Allocator>& filter_transform);
+		friend inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const FilterTransform<typename std::remove_cv_t<typename IteratorType::ValueType>, _Allocator>& filter_transform);
 
 		inline FilterTransform(const Function<bool(const ValueType&)>& filter)
 			: m_FilterFunction(filter)
@@ -206,7 +234,7 @@ namespace SpaceGameEngine
 	};
 
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
-	inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const FilterTransform<typename IteratorType::ValueType, Allocator>& filter_transform)
+	inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const FilterTransform<typename std::remove_cv_t<typename IteratorType::ValueType>, Allocator>& filter_transform)
 	{
 		return MakeFilterTransform(transform, filter_transform.m_FilterFunction);
 	}

@@ -30,7 +30,7 @@ namespace SpaceGameEngine
 	{
 	public:
 		template<typename IteratorType>
-		inline bool operator!=(const IteratorType& iter)
+		inline bool operator!=(const IteratorType& iter) const
 		{
 			return true;
 		}

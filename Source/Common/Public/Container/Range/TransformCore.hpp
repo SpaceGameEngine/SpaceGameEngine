@@ -24,6 +24,12 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	template<typename IteratorType, typename SentinelType>
+	class FilterIterator;
+
+	template<typename IteratorType, typename SentinelType>
+	class FilterSentinel;
+
 	/*!
 	@brief a generic object that represents a transform between the ranges.
 	*/
@@ -40,10 +46,10 @@ namespace SpaceGameEngine
 		using RangeType = Range<IteratorType, SentinelType>;
 
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
-		friend Vector<typename _IteratorType::ValueType, Allocator> CastToVector(const Transform<_IteratorType, _SentinelType>& transform);
+		friend Vector<typename std::remove_cv_t<typename _IteratorType::ValueType>, Allocator> CastToVector(const Transform<_IteratorType, _SentinelType>& transform);
 
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
-		friend Transform<typename Vector<typename _IteratorType::ValueType, Allocator>::Iterator, typename Vector<typename _IteratorType::ValueType, Allocator>::Iterator> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
+		friend Transform<FilterIterator<_IteratorType, _SentinelType>, FilterSentinel<_IteratorType, _SentinelType>> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
 
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
 		friend Transform<typename Vector<std::remove_cv_t<typename _IteratorType::ValueType>, Allocator>::Iterator, typename Vector<std::remove_cv_t<typename _IteratorType::ValueType>, Allocator>::Iterator> MakeTakeTransform(const Transform<_IteratorType, _SentinelType>& transform, SizeType n);
