@@ -175,7 +175,7 @@ namespace SpaceGameEngine
 	@todo use concept.
 	*/
 	template<typename U>
-	struct IsBidirectionalIterator
+	struct IsBidirectionalSequentialIterator
 	{
 	private:
 		template<typename _U>
@@ -210,8 +210,8 @@ namespace SpaceGameEngine
 	private:
 		template<typename _U>
 		inline static constexpr std::enable_if_t<
-			IsBidirectionalIterator<decltype(std::declval<_U>().GetBegin())>::Result &&
-				IsBidirectionalIterator<decltype(std::declval<_U>().GetEnd())>::Result,
+			IsBidirectionalSequentialIterator<decltype(std::declval<_U>().GetBegin())>::Result &&
+				IsBidirectionalSequentialIterator<decltype(std::declval<_U>().GetEnd())>::Result,
 			bool>
 		Check(int)
 		{

@@ -21,7 +21,7 @@ limitations under the License.
 #include "Error.h"
 #include "ContainerConcept.hpp"
 #include "Function.hpp"
-#include "ReverseIterator.hpp"
+#include "ReverseSequentialIterator.hpp"
 
 namespace SpaceGameEngine
 {
@@ -693,7 +693,7 @@ namespace SpaceGameEngine
 		public:
 			friend OutOfRangeError;
 			friend Vector;
-			friend ReverseIteratorImpl<IteratorImpl<_T>>;
+			friend ReverseSequentialIterator<IteratorImpl<_T>>;
 
 			inline static IteratorImpl GetBegin(const Vector& v)
 			{
@@ -775,7 +775,7 @@ namespace SpaceGameEngine
 		};
 
 		template<typename IteratorType>
-		class VectorReverseIteratorImpl : public ReverseIteratorImpl<IteratorType>
+		class VectorReverseIteratorImpl : public ReverseSequentialIterator<IteratorType>
 		{
 		public:
 			struct OutOfRangeError
@@ -806,61 +806,61 @@ namespace SpaceGameEngine
 			}
 
 			inline VectorReverseIteratorImpl(const VectorReverseIteratorImpl& iter)
-				: ReverseIteratorImpl<IteratorType>(iter)
+				: ReverseSequentialIterator<IteratorType>(iter)
 			{
 			}
 
 			inline VectorReverseIteratorImpl& operator=(const VectorReverseIteratorImpl& iter)
 			{
-				ReverseIteratorImpl<IteratorType>::operator=(iter);
+				ReverseSequentialIterator<IteratorType>::operator=(iter);
 				return *this;
 			}
 
 			inline VectorReverseIteratorImpl operator+(SizeType i) const
 			{
-				return ReverseIteratorImpl<IteratorType>::operator+(i);
+				return ReverseSequentialIterator<IteratorType>::operator+(i);
 			}
 
 			inline VectorReverseIteratorImpl& operator+=(SizeType i)
 			{
-				ReverseIteratorImpl<IteratorType>::operator+=(i);
+				ReverseSequentialIterator<IteratorType>::operator+=(i);
 				return *this;
 			}
 
 			inline VectorReverseIteratorImpl operator-(SizeType i) const
 			{
-				return ReverseIteratorImpl<IteratorType>::operator-(i);
+				return ReverseSequentialIterator<IteratorType>::operator-(i);
 			}
 
 			inline VectorReverseIteratorImpl& operator-=(SizeType i)
 			{
-				ReverseIteratorImpl<IteratorType>::operator-=(i);
+				ReverseSequentialIterator<IteratorType>::operator-=(i);
 				return *this;
 			}
 
 			inline SizeType operator-(const VectorReverseIteratorImpl& iter) const
 			{
-				return ReverseIteratorImpl<IteratorType>::operator-(iter);
+				return ReverseSequentialIterator<IteratorType>::operator-(iter);
 			}
 
 			inline bool operator==(const VectorReverseIteratorImpl& iter) const
 			{
-				return ReverseIteratorImpl<IteratorType>::operator==(iter);
+				return ReverseSequentialIterator<IteratorType>::operator==(iter);
 			}
 
 			inline bool operator!=(const VectorReverseIteratorImpl& iter) const
 			{
-				return ReverseIteratorImpl<IteratorType>::operator!=(iter);
+				return ReverseSequentialIterator<IteratorType>::operator!=(iter);
 			}
 
 		private:
 			inline VectorReverseIteratorImpl(T* ptr)
-				: ReverseIteratorImpl<IteratorType>(ptr)
+				: ReverseSequentialIterator<IteratorType>(ptr)
 			{
 			}
 
-			inline VectorReverseIteratorImpl(const ReverseIteratorImpl<IteratorType>& iter)
-				: ReverseIteratorImpl<IteratorType>(iter)
+			inline VectorReverseIteratorImpl(const ReverseSequentialIterator<IteratorType>& iter)
+				: ReverseSequentialIterator<IteratorType>(iter)
 			{
 			}
 		};

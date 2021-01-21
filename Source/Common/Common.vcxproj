@@ -166,10 +166,11 @@
     <ClInclude Include="Public\Container\Range\FilterTransform.hpp" />
     <ClInclude Include="Public\Container\Range\InfiniteSentinel.hpp" />
     <ClInclude Include="Public\Container\Range\RangeCore.hpp" />
+    <ClInclude Include="Public\Container\Range\ReverseTransform.hpp" />
     <ClInclude Include="Public\Container\Range\Sequence.hpp" />
     <ClInclude Include="Public\Container\Range\TakeTransform.hpp" />
     <ClInclude Include="Public\Container\Range\TransformCore.hpp" />
-    <ClInclude Include="Public\Container\ReverseIterator.hpp" />
+    <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />
     <ClInclude Include="Public\Error.h" />
     <ClInclude Include="Public\ForwardDefinition.hpp" />

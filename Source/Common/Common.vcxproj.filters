@@ -87,9 +87,6 @@
     <ClInclude Include="Public\Container\ContainerConcept.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Container\ReverseIterator.hpp">
-      <Filter>Public\Container</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Container\Range\RangeCore.hpp">
       <Filter>Public\Container\Range</Filter>
     </ClInclude>
@@ -113,6 +110,12 @@
     </ClInclude>
     <ClInclude Include="Public\Container\Range\TakeTransform.hpp">
       <Filter>Public\Container\Range</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\Range\ReverseTransform.hpp">
+      <Filter>Public\Container\Range</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp">
+      <Filter>Public\Container</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

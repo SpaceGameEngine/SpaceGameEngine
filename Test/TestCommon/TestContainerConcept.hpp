@@ -102,11 +102,11 @@ TEST(ContainerConcept, IsTrivialTest)
 	ASSERT_FALSE(IsTrivial<test_trivial_destructor>::Result);
 }
 
-TEST(ContainerConcept, IsBidirectionalIteratorTest)
+TEST(ContainerConcept, IsBidirectionalSequentialIteratorTest)
 {
-	ASSERT_TRUE((IsBidirectionalIterator<Vector<int>::Iterator>::Result));
-	ASSERT_TRUE((IsBidirectionalIterator<Vector<int>::ConstIterator>::Result));
-	ASSERT_FALSE((IsBidirectionalIterator<int>::Result));
+	ASSERT_TRUE((IsBidirectionalSequentialIterator<Vector<int>::Iterator>::Result));
+	ASSERT_TRUE((IsBidirectionalSequentialIterator<Vector<int>::ConstIterator>::Result));
+	ASSERT_FALSE((IsBidirectionalSequentialIterator<int>::Result));
 }
 
 TEST(ContainerConcept, IsRangeTest)
