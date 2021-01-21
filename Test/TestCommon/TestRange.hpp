@@ -180,3 +180,20 @@ TEST(MakeInfiniteSequenceFilterTake, MakeInfiniteSequenceFilterTakeTest)
 		ASSERT_EQ(*i, *iter2);
 	ASSERT_EQ(iter2, cv2.GetEnd());
 }
+
+TEST(ReverseTransform, MakeReverseTransformTest)
+{
+	Vector<int> v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	Transform t = MakeReverseTransform(Transform(Range(v.GetBegin(), v.GetEnd())));
+	Vector<int> v2 = CastToVector(t);
+	Vector<int> cv1 = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+	ASSERT_EQ(v2.GetSize(), cv1.GetSize());
+	for (int i = 0; i < v2.GetSize(); i++)
+		ASSERT_EQ(v2[i], cv1[i]);
+
+	Transform t2 = MakeReverseTransform<decltype(v.GetBegin()), decltype(v.GetEnd()), StdAllocator>(Transform(Range(v.GetBegin(), v.GetEnd())));
+	Vector<int> v3 = CastToVector(t2);
+	ASSERT_EQ(v3.GetSize(), cv1.GetSize());
+	for (int i = 0; i < v3.GetSize(); i++)
+		ASSERT_EQ(v3[i], cv1[i]);
+}

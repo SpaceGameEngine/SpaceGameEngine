@@ -181,6 +181,9 @@ namespace SpaceGameEngine
 	class FilterSentinel
 	{
 	public:
+		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
 		friend Transform<FilterIterator<_IteratorType, _SentinelType>, FilterSentinel<_IteratorType, _SentinelType>> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
 

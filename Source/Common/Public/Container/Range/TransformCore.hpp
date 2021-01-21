@@ -30,6 +30,12 @@ namespace SpaceGameEngine
 	template<typename IteratorType, typename SentinelType>
 	class FilterSentinel;
 
+	template<typename IteratorType, typename SentinelType>
+	class ReverseIterator;
+
+	template<typename IteratorType, typename SentinelType>
+	class ReverseSentinel;
+
 	/*!
 	@brief a generic object that represents a transform between the ranges.
 	*/
@@ -53,6 +59,9 @@ namespace SpaceGameEngine
 
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
 		friend Transform<typename Vector<std::remove_cv_t<typename _IteratorType::ValueType>, Allocator>::Iterator, typename Vector<std::remove_cv_t<typename _IteratorType::ValueType>, Allocator>::Iterator> MakeTakeTransform(const Transform<_IteratorType, _SentinelType>& transform, SizeType n);
+
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend Transform<ReverseIterator<_IteratorType, _SentinelType>, ReverseSentinel<_IteratorType, _SentinelType>> MakeReverseTransform(const Transform<_IteratorType, _SentinelType>& transform);
 
 		explicit inline Transform(const Function<RangeType(AutoReleaseBuffer&)>& func)
 			: m_Function(func)

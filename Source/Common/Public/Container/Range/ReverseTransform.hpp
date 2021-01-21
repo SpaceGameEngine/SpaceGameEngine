@@ -35,6 +35,8 @@ namespace SpaceGameEngine
 		using ValueType = typename IteratorType::ValueType;
 
 		friend class ReverseSentinel<IteratorType, SentinelType>;
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend Transform<ReverseIterator<_IteratorType, _SentinelType>, ReverseSentinel<_IteratorType, _SentinelType>> MakeReverseTransform(const Transform<_IteratorType, _SentinelType>& transform);
 
 		inline ReverseIterator(const ReverseIterator& iter)
 			: m_Iterator(iter.m_Iterator)
@@ -108,6 +110,12 @@ namespace SpaceGameEngine
 	class ReverseSentinel
 	{
 	public:
+		static_assert((IsRangeBidirectionalIterator<IteratorType>::Result), "the IteratorType is not a Bidirectional RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend Transform<ReverseIterator<_IteratorType, _SentinelType>, ReverseSentinel<_IteratorType, _SentinelType>> MakeReverseTransform(const Transform<_IteratorType, _SentinelType>& transform);
+
 		inline bool operator!=(const ReverseIterator<IteratorType, SentinelType>& iter) const
 		{
 			return m_Sentinel != static_cast<IteratorType>(iter);
@@ -122,6 +130,26 @@ namespace SpaceGameEngine
 	private:
 		SentinelType m_Sentinel;
 	};
+
+	/*!
+	@brief return the range which all elements have been reversed.
+	@note The function's default implement suit the situation which the SentinelType equals
+	to the IteratorType. If you want it to support iterators which do not suit the condition 
+	above, you need to specify this function.
+	*/
+	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
+	inline Transform<ReverseIterator<IteratorType, SentinelType>, ReverseSentinel<IteratorType, SentinelType>> MakeReverseTransform(const Transform<IteratorType, SentinelType>& transform)
+	{
+		static_assert((IsRangeBidirectionalIterator<IteratorType>::Result), "the IteratorType is not a Bidirectional RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+
+		static_assert((std::is_same_v<IteratorType, SentinelType>), "default implement does not suit this condition, IteratorType need to be same with the SentinelType.");
+		return Transform<ReverseIterator<IteratorType, SentinelType>, ReverseSentinel<IteratorType, SentinelType>>([=](AutoReleaseBuffer& arbuff) {
+			auto range = transform.m_Function(arbuff);
+			return Range(ReverseIterator<IteratorType, SentinelType>(range.GetEnd() - 1), ReverseSentinel<IteratorType, SentinelType>(range.GetBegin() - 1));
+		});
+	}
+
 	/*!
 	@}
 	*/
