@@ -150,6 +150,16 @@ namespace SpaceGameEngine
 		});
 	}
 
+	template<typename Allocator = DefaultAllocator>
+	class ReverseTransform
+	{
+	};
+
+	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
+	inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const ReverseTransform<Allocator>& reverse_transform)
+	{
+		return MakeReverseTransform<IteratorType, SentinelType, Allocator>(transform);
+	}
 	/*!
 	@}
 	*/

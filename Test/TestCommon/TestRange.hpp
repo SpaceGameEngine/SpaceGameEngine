@@ -197,3 +197,35 @@ TEST(ReverseTransform, MakeReverseTransformTest)
 	for (int i = 0; i < v3.GetSize(); i++)
 		ASSERT_EQ(v3[i], cv1[i]);
 }
+
+TEST(ReverseTransform, ReverseTransformTest)
+{
+	Vector<int> v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	Transform t = Transform(Range(v.GetBegin(), v.GetEnd())) | ReverseTransform();
+	Vector<int> v2 = CastToVector(t);
+	Vector<int> cv1 = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+	ASSERT_EQ(v2.GetSize(), cv1.GetSize());
+	for (int i = 0; i < v2.GetSize(); i++)
+		ASSERT_EQ(v2[i], cv1[i]);
+
+	Transform t2 = Transform(Range(v.GetBegin(), v.GetEnd())) | ReverseTransform<StdAllocator>();
+	Vector<int> v3 = CastToVector(t2);
+	ASSERT_EQ(v3.GetSize(), cv1.GetSize());
+	for (int i = 0; i < v3.GetSize(); i++)
+		ASSERT_EQ(v3[i], cv1[i]);
+}
+
+TEST(ReverseTransform, MakeSequenceReverseTest)
+{
+	Vector<int> cv = {4, 3, 2, 1, 0};
+
+	Vector<int> v1 = CastToVector(Transform(MakeSequence(0, 1, 5)) | ReverseTransform());
+	ASSERT_EQ(cv.GetSize(), v1.GetSize());
+	for (SizeType i = 0; i < cv.GetSize(); i++)
+		ASSERT_EQ(cv[i], v1[i]);
+
+	Vector<int> v2 = CastToVector(Transform(MakeSequence(0, 1, 5)) | ReverseTransform<StdAllocator>());
+	ASSERT_EQ(cv.GetSize(), v2.GetSize());
+	for (SizeType i = 0; i < cv.GetSize(); i++)
+		ASSERT_EQ(cv[i], v2[i]);
+}

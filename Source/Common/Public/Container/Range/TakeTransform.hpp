@@ -47,7 +47,7 @@ namespace SpaceGameEngine
 	{
 	public:
 		template<typename IteratorType, typename SentinelType, typename _Allocator>
-		friend inline auto operator|(const Transform<IteratorType, SentinelType>& transform, const TakeTransform<_Allocator>& take_transform);
+		friend auto operator|(const Transform<IteratorType, SentinelType>& transform, const TakeTransform<_Allocator>& take_transform);
 
 		inline TakeTransform(SizeType size)
 			: m_Size(size)
