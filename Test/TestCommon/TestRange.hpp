@@ -244,3 +244,28 @@ TEST(ReverseTransform, MakeSequenceFilterReverseTest)
 	for (SizeType i = 0; i < cv.GetSize(); i++)
 		ASSERT_EQ(cv[i], v2[i]);
 }
+
+TEST(MakeInfiniteSequenceFilterTakeReverse, MakeInfiniteSequenceFilterTakeReverseTest)
+{
+	Vector cv = {20, 18, 16, 14, 12, 10, 8, 6, 4, 2};
+
+	Vector v1 = CastToVector(
+		MakeReverseTransform(
+			MakeTakeTransform(
+				MakeFilterTransform(
+					Transform(MakeInfiniteSequence(1, 1)),
+					[](const int& i) { return i % 2 == 0; }),
+				10)));
+	ASSERT_EQ(v1.GetSize(), cv.GetSize());
+	for (SizeType i = 0; i < cv.GetSize(); i++)
+		ASSERT_EQ(v1[i], cv[i]);
+
+	auto t1 = Transform(MakeInfiniteSequence(1, 1));
+	auto t2 = MakeFilterTransform<decltype(t1)::BeginIteratorType, decltype(t1)::EndIteratorType, StdAllocator>(t1, [](const int& i) { return i % 2 == 0; });
+	auto t3 = MakeTakeTransform<decltype(t2)::BeginIteratorType, decltype(t2)::EndIteratorType, StdAllocator>(t2, 10);
+	auto t4 = MakeReverseTransform<decltype(t3)::BeginIteratorType, decltype(t3)::EndIteratorType, StdAllocator>(t3);
+	auto v2 = CastToVector<decltype(t4)::BeginIteratorType, decltype(t4)::EndIteratorType, StdAllocator>(t4);
+	ASSERT_EQ(v2.GetSize(), cv.GetSize());
+	for (SizeType i = 0; i < cv.GetSize(); i++)
+		ASSERT_EQ(v2[i], cv[i]);
+}
