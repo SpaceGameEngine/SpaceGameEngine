@@ -63,6 +63,9 @@ namespace SpaceGameEngine
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
 		friend Transform<ReverseIterator<_IteratorType, _SentinelType>, ReverseSentinel<_IteratorType, _SentinelType>> MakeReverseTransform(const Transform<_IteratorType, _SentinelType>& transform);
 
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend struct CustomReverseFunctor;
+
 		explicit inline Transform(const Function<RangeType(AutoReleaseBuffer&)>& func)
 			: m_Function(func)
 		{

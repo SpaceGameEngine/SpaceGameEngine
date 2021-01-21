@@ -229,3 +229,18 @@ TEST(ReverseTransform, MakeSequenceReverseTest)
 	for (SizeType i = 0; i < cv.GetSize(); i++)
 		ASSERT_EQ(cv[i], v2[i]);
 }
+
+TEST(ReverseTransform, MakeSequenceFilterReverseTest)
+{
+	Vector<int> cv = {9, 7, 5, 3, 1};
+
+	Vector<int> v1 = CastToVector(Transform(MakeSequence(0, 1, 10)) | FilterTransform<int>([](const int& i) -> bool { return i % 2 == 1; }) | ReverseTransform());
+	ASSERT_EQ(cv.GetSize(), v1.GetSize());
+	for (SizeType i = 0; i < cv.GetSize(); i++)
+		ASSERT_EQ(cv[i], v1[i]);
+
+	Vector<int> v2 = CastToVector(Transform(MakeSequence(0, 1, 10)) | FilterTransform<int, StdAllocator>([](const int& i) -> bool { return i % 2 == 1; }) | ReverseTransform<StdAllocator>());
+	ASSERT_EQ(cv.GetSize(), v2.GetSize());
+	for (SizeType i = 0; i < cv.GetSize(); i++)
+		ASSERT_EQ(cv[i], v2[i]);
+}

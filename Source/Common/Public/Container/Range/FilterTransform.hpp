@@ -19,6 +19,7 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "TransformCore.hpp"
 #include "Function.hpp"
+#include "ReverseTransform.hpp"
 
 namespace SpaceGameEngine
 {
@@ -45,7 +46,7 @@ namespace SpaceGameEngine
 		*/
 		inline void MakeValidBack()
 		{
-			while ((!reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_FilterFunction(*(reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator))) && reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_Begin - 1 != reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator)
+			while ((!reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_FilterFunction(*(reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator))) && ((reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_pRangeInformation->m_Begin - 1) != (reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator)))
 				reinterpret_cast<FilterIterator<IteratorType, SentinelType>*>(this)->m_Iterator -= 1;
 		}
 
@@ -84,6 +85,11 @@ namespace SpaceGameEngine
 
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
 		friend Transform<FilterIterator<_IteratorType, _SentinelType>, FilterSentinel<_IteratorType, _SentinelType>> MakeFilterTransform(const Transform<_IteratorType, _SentinelType>& transform, const Function<bool(const typename _IteratorType::ValueType&)>& filter_func);
+
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend struct CustomReverseFunctor;
+
+		friend class ReverseSentinel<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>;
 
 		using ValueType = typename IteratorType::ValueType;
 
@@ -193,7 +199,7 @@ namespace SpaceGameEngine
 		}
 
 	private:
-		FilterSentinel(typename FilterIterator<IteratorType, SentinelType>::RangeInformation& range_info)
+		inline FilterSentinel(typename FilterIterator<IteratorType, SentinelType>::RangeInformation& range_info)
 			: m_pRangeInformation(&range_info)
 		{
 		}
@@ -241,6 +247,48 @@ namespace SpaceGameEngine
 	{
 		return MakeFilterTransform(transform, filter_transform.m_FilterFunction);
 	}
+
+	template<typename IteratorType, typename SentinelType>
+	class ReverseSentinel<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>
+	{
+	public:
+		static_assert((IsRangeBidirectionalIterator<IteratorType>::Result), "the IteratorType is not a Bidirectional RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+
+		template<typename _IteratorType, typename _SentinelType, typename Allocator>
+		friend struct CustomReverseFunctor;
+
+		inline bool operator!=(const ReverseIterator<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>& iter) const
+		{
+			return m_pRangeInformation->m_Begin - 1 != iter.m_Iterator.m_Iterator;
+		}
+
+	private:
+		inline ReverseSentinel<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>(typename FilterIterator<IteratorType, SentinelType>::RangeInformation& range_info)
+			: m_pRangeInformation(&range_info)
+		{
+		}
+
+	private:
+		const typename FilterIterator<IteratorType, SentinelType>::RangeInformation* m_pRangeInformation;
+	};
+
+	template<typename IteratorType, typename SentinelType, typename Allocator>
+	struct CustomReverseFunctor<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>, Allocator>
+	{
+		inline Transform<ReverseIterator<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>, ReverseSentinel<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>> operator()(const Transform<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>& transform) const
+		{
+			static_assert((IsRangeBidirectionalIterator<IteratorType>::Result), "the IteratorType is not a Bidirectional RangeIterator");
+			static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+
+			return Transform<ReverseIterator<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>, ReverseSentinel<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>>([=](AutoReleaseBuffer& arbuff) {
+				auto range = transform.m_Function(arbuff);
+				typename FilterIterator<IteratorType, SentinelType>::RangeInformation* prange_info = const_cast<typename FilterIterator<IteratorType, SentinelType>::RangeInformation*>(range.GetBegin().m_pRangeInformation);
+				return Range(ReverseIterator<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>(FilterIterator<IteratorType, SentinelType>(prange_info->m_End - 1, *prange_info)), ReverseSentinel<FilterIterator<IteratorType, SentinelType>, FilterSentinel<IteratorType, SentinelType>>(*prange_info));
+			});
+		}
+	};
+
 	/*!
 	@}
 	*/
