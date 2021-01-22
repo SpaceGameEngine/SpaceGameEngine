@@ -24,6 +24,8 @@ limitations under the License.
 #include "Container/Range/Sequence.hpp"
 #include "Container/Range/TakeTransform.hpp"
 #include "Container/Range/ReverseTransform.hpp"
+#include "Container/Range/MapTransform.hpp"
+#include "Container/Range/ZipTransform.hpp"
 
 using namespace SpaceGameEngine;
 
