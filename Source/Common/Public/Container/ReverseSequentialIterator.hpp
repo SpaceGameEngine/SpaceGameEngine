@@ -38,7 +38,7 @@ namespace SpaceGameEngine
 	class ReverseSequentialIterator<IteratorImpl<T>>
 	{
 	public:
-		static_assert((IsBidirectionalSequentialIterator<IteratorImpl<T>>::Result), "only the bidirectional iterator type can be passed to get the reverse iterator.");
+		static_assert((IsBidirectionalSequentialIterator<IteratorImpl<T>>::Value), "only the bidirectional iterator type can be passed to get the reverse iterator.");
 
 		using ValueType = T;
 

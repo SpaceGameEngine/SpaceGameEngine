@@ -32,8 +32,8 @@ namespace SpaceGameEngine
 	class ReverseIterator
 	{
 	public:
-		static_assert((IsRangeBidirectionalIterator<IteratorType>::Result), "the IteratorType is not a Bidirectional RangeIterator");
-		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+		static_assert((IsRangeBidirectionalIterator<IteratorType>::Value), "the IteratorType is not a Bidirectional RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Value), "the SentinelType is not a RangeSentinel");
 
 		using ValueType = typename IteratorType::ValueType;
 
@@ -117,8 +117,8 @@ namespace SpaceGameEngine
 	class ReverseSentinel
 	{
 	public:
-		static_assert((IsRangeBidirectionalIterator<IteratorType>::Result), "the IteratorType is not a Bidirectional RangeIterator");
-		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+		static_assert((IsRangeBidirectionalIterator<IteratorType>::Value), "the IteratorType is not a Bidirectional RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Value), "the SentinelType is not a RangeSentinel");
 
 		template<typename _IteratorType, typename _SentinelType, typename Allocator>
 		friend Transform<ReverseIterator<_IteratorType, _SentinelType>, ReverseSentinel<_IteratorType, _SentinelType>> MakeReverseTransform(const Transform<_IteratorType, _SentinelType>& transform);
@@ -158,8 +158,8 @@ namespace SpaceGameEngine
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
 	inline Transform<ReverseIterator<IteratorType, SentinelType>, ReverseSentinel<IteratorType, SentinelType>> MakeReverseTransform(const Transform<IteratorType, SentinelType>& transform)
 	{
-		static_assert((IsRangeBidirectionalIterator<IteratorType>::Result), "the IteratorType is not a Bidirectional RangeIterator");
-		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+		static_assert((IsRangeBidirectionalIterator<IteratorType>::Value), "the IteratorType is not a Bidirectional RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Value), "the SentinelType is not a RangeSentinel");
 
 		if constexpr (std::is_same_v<IteratorType, SentinelType>)
 		{

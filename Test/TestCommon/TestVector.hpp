@@ -1224,15 +1224,15 @@ TEST(Vector, FindAllByFunctionTest)
 
 TEST(VectorIterator, IsVectorIteratorTest)
 {
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Result));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstIterator>::Result));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ReverseIterator>::Result));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Result));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<int>::Result == false));
-	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::Iterator>::Result));
-	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstIterator>::Result));
-	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ReverseIterator>::Result));
-	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Result));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Value));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstIterator>::Value));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ReverseIterator>::Value));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Value));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<int>::Value == false));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::Iterator>::Value));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstIterator>::Value));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ReverseIterator>::Value));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Value));
 }
 
 TEST(VectorIterator, GetBeginTest)

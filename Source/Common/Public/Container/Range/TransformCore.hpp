@@ -43,8 +43,8 @@ namespace SpaceGameEngine
 	class Transform
 	{
 	public:
-		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
-		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+		static_assert((IsRangeIterator<IteratorType>::Value), "the IteratorType is not a RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Value), "the SentinelType is not a RangeSentinel");
 
 		using ValueType = typename IteratorType::ValueType;
 		using BeginIteratorType = IteratorType;

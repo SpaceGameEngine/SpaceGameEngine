@@ -92,14 +92,14 @@ TEST(FilterTransform, FilterTransformTest)
 
 TEST(SequenceIterator, IsRangeIteratorTest)
 {
-	ASSERT_TRUE((IsRangeIterator<SequenceIterator<int, int>>::Result));
-	ASSERT_TRUE((IsRangeIterator<SequenceIterator<int, char>>::Result));
-	ASSERT_TRUE((IsRangeIterator<SequenceIterator<float, int>>::Result));
+	ASSERT_TRUE((IsRangeIterator<SequenceIterator<int, int>>::Value));
+	ASSERT_TRUE((IsRangeIterator<SequenceIterator<int, char>>::Value));
+	ASSERT_TRUE((IsRangeIterator<SequenceIterator<float, int>>::Value));
 }
 
 TEST(SequenceIterator, RangeConceptTest)
 {
-	ASSERT_TRUE((IsRangeBidirectionalIterator<SequenceIterator<int, int>>::Result));
+	ASSERT_TRUE((IsRangeBidirectionalIterator<SequenceIterator<int, int>>::Value));
 }
 
 TEST(SequenceIterator, MakeInfiniteSequenceTest)

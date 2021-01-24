@@ -29,8 +29,8 @@ namespace SpaceGameEngine
 	template<typename IteratorType, typename SentinelType = IteratorType, typename Allocator = DefaultAllocator>
 	inline Transform<typename Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>::Iterator, typename Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>::Iterator> MakeTakeTransform(const Transform<IteratorType, SentinelType>& transform, SizeType n)
 	{
-		static_assert((IsRangeIterator<IteratorType>::Result), "the IteratorType is not a RangeIterator");
-		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Result), "the SentinelType is not a RangeSentinel");
+		static_assert((IsRangeIterator<IteratorType>::Value), "the IteratorType is not a RangeIterator");
+		static_assert((IsRangeSentinel<SentinelType, IteratorType>::Value), "the SentinelType is not a RangeSentinel");
 
 		return Transform<typename Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>::Iterator, typename Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>::Iterator>([=](AutoReleaseBuffer& arbuff) {
 			auto pvec = arbuff.NewObject<Vector<std::remove_cv_t<typename IteratorType::ValueType>, Allocator>, Allocator>();

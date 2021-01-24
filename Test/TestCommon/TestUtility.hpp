@@ -36,10 +36,10 @@ bool operator==(const test_cmp2&, const test_cmp2&) = delete;
 
 TEST(Utility_IsComparable, BasicTest)
 {
-	ASSERT_TRUE((IsComparable<int>::Result));
-	ASSERT_TRUE((IsComparable<char>::Result));
-	ASSERT_FALSE((IsComparable<test_cmp>::Result));
-	ASSERT_FALSE((IsComparable<test_cmp2>::Result));
+	ASSERT_TRUE((IsComparable<int>::Value));
+	ASSERT_TRUE((IsComparable<char>::Value));
+	ASSERT_FALSE((IsComparable<test_cmp>::Value));
+	ASSERT_FALSE((IsComparable<test_cmp2>::Value));
 }
 
 struct test_controllable_object_class

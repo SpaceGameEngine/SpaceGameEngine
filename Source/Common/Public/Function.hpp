@@ -35,25 +35,25 @@ namespace SpaceGameEngine
 	template<typename T, typename Func>
 	struct IsCorrectFunction
 	{
-		inline static constexpr bool Result = false;
+		inline static constexpr bool Value = false;
 	};
 
 	template<typename Ret, typename... Args>
 	struct IsCorrectFunction<Ret (*)(Args...), Ret(Args...)>
 	{
-		inline static constexpr bool Result = true;
+		inline static constexpr bool Value = true;
 	};
 
 	template<typename Ret, typename Class, typename... Args>
 	struct IsCorrectFunction<Ret (Class::*)(Args...), Ret(Class*, Args...)>
 	{
-		inline static constexpr bool Result = true;
+		inline static constexpr bool Value = true;
 	};
 
 	template<typename Ret, typename Class, typename... Args>
 	struct IsCorrectFunction<Ret (Class::*)(Args...) const, Ret(const Class*, Args...)>
 	{
-		inline static constexpr bool Result = true;
+		inline static constexpr bool Value = true;
 	};
 
 	template<typename T, typename Ret, typename... Args>
@@ -72,7 +72,7 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr bool Result = Judge<T, Ret, Args...>(0);
+		inline static constexpr bool Value = Judge<T, Ret, Args...>(0);
 	};
 
 	/*!
@@ -90,12 +90,12 @@ namespace SpaceGameEngine
 		template<typename T>
 		struct IsFunction
 		{
-			inline static constexpr bool Result = false;
+			inline static constexpr bool Value = false;
 		};
 		template<typename _Allocator, typename _Ret, typename... _Args>
 		struct IsFunction<Function<_Ret(_Args...), _Allocator>>
 		{
-			inline static constexpr bool Result = true;
+			inline static constexpr bool Value = true;
 		};
 
 	public:
@@ -177,21 +177,21 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		template<typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Result == false, bool>>
+		template<typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>>
 		inline Function(T&& func)
 		{
-			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Result, "Function can only be constructed by callable object");
+			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
 			m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
 				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 			};
 			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
 		}
 		template<typename T,
-				 typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Result == false, bool>,
+				 typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>,
 				 typename = std::enable_if_t<std::is_same_v<std::decay_t<decltype(std::declval<ControllableObject<MetaObject<Allocator>, Allocator>>() = std::forward<T>(std::declval<T&&>()))>, ControllableObject<MetaObject<Allocator>, Allocator>>, bool>>
 		inline Function& operator=(T&& func)
 		{
-			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Result, "Function can only be constructed by callable object");
+			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
 			if (SpaceGameEngine::GetMetaData<std::decay_t<T>>() == m_Content.Get().GetMetaData())
 				m_Content = std::forward<T>(func);
 			else
@@ -205,10 +205,10 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		template<typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Result == false, bool>>
+		template<typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>>
 		inline Function& operator=(T&& func)
 		{
-			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Result, "Function can only be constructed by callable object");
+			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
 			m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
 				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 			};
