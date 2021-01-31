@@ -162,16 +162,6 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\StringImplement\StdTStringImplement.h" />
     <ClInclude Include="Public\Container\ContainerConcept.hpp" />
-    <ClInclude Include="Public\Container\Range\Cast.hpp" />
-    <ClInclude Include="Public\Container\Range\FilterTransform.hpp" />
-    <ClInclude Include="Public\Container\Range\InfiniteSentinel.hpp" />
-    <ClInclude Include="Public\Container\Range\MapTransform.hpp" />
-    <ClInclude Include="Public\Container\Range\RangeCore.hpp" />
-    <ClInclude Include="Public\Container\Range\ReverseTransform.hpp" />
-    <ClInclude Include="Public\Container\Range\Sequence.hpp" />
-    <ClInclude Include="Public\Container\Range\TakeTransform.hpp" />
-    <ClInclude Include="Public\Container\Range\TransformCore.hpp" />
-    <ClInclude Include="Public\Container\Range\ZipTransform.hpp" />
     <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />
     <ClInclude Include="Public\Error.h" />
