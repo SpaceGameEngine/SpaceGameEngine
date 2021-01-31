@@ -65,6 +65,19 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		inline ReverseSequentialIterator& operator++()
+		{
+			m_Content -= 1;
+			return *this;
+		}
+
+		inline const ReverseSequentialIterator operator++(int)
+		{
+			ReverseSequentialIterator re(*this);
+			m_Content -= 1;
+			return re;
+		}
+
 		inline ReverseSequentialIterator operator-(SizeType i) const
 		{
 			return ReverseSequentialIterator(m_Content + i);
@@ -74,6 +87,19 @@ namespace SpaceGameEngine
 		{
 			m_Content += i;
 			return *this;
+		}
+
+		inline ReverseSequentialIterator& operator--()
+		{
+			m_Content += 1;
+			return *this;
+		}
+
+		inline const ReverseSequentialIterator operator--(int)
+		{
+			ReverseSequentialIterator re(*this);
+			m_Content += 1;
+			return re;
 		}
 
 		inline SizeType operator-(const ReverseSequentialIterator& iter) const

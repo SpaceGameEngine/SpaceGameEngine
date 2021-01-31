@@ -142,8 +142,8 @@ namespace SpaceGameEngine
 				std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
 				std::is_same_v<decltype(std::declval<_U>() + std::declval<SizeType>()), _U> &&
 				std::is_same_v<decltype(std::declval<_U>() += std::declval<SizeType>()), _U&> &&
-				//std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
-				//std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
+				std::is_same_v<decltype(++std::declval<_U>()), _U&> &&
+				std::is_same_v<decltype(std::declval<_U>()++), const _U> &&
 				std::is_same_v<decltype(std::declval<_U>() - std::declval<_U>()), SizeType> &&
 				(std::is_same_v<decltype(std::declval<_U>().operator->()), typename _U::ValueType*>)&&(std::is_same_v<decltype(std::declval<_U>().operator*()), typename _U::ValueType&>)&&std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
 				std::is_same_v<decltype(std::declval<_U>() != std::declval<_U>()), bool>,
@@ -182,7 +182,9 @@ namespace SpaceGameEngine
 		inline static constexpr std::enable_if_t<
 			IsSequentialIterator<_U>::Value &&
 				std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
-				std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&>,
+				std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
+				std::is_same_v<decltype(--std::declval<_U>()), _U&> &&
+				std::is_same_v<decltype(std::declval<_U>()--), const _U>,
 			bool>
 		Check(int)
 		{

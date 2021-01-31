@@ -727,6 +727,19 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
+			inline IteratorImpl& operator++()
+			{
+				m_pContent += 1;
+				return *this;
+			}
+
+			inline const IteratorImpl operator++(int)
+			{
+				IteratorImpl re(*this);
+				m_pContent += 1;
+				return re;
+			}
+
 			inline IteratorImpl operator-(SizeType i) const
 			{
 				return IteratorImpl(m_pContent - i);
@@ -736,6 +749,19 @@ namespace SpaceGameEngine
 			{
 				m_pContent -= i;
 				return *this;
+			}
+
+			inline IteratorImpl& operator--()
+			{
+				m_pContent -= 1;
+				return *this;
+			}
+
+			inline const IteratorImpl operator--(int)
+			{
+				IteratorImpl re(*this);
+				m_pContent -= 1;
+				return re;
 			}
 
 			inline SizeType operator-(const IteratorImpl& iter) const
@@ -827,6 +853,17 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
+			inline VectorReverseIteratorImpl& operator++()
+			{
+				ReverseSequentialIterator<IteratorType>::operator++();
+				return *this;
+			}
+
+			inline const VectorReverseIteratorImpl operator++(int)
+			{
+				return ReverseSequentialIterator<IteratorType>::operator++(0);
+			}
+
 			inline VectorReverseIteratorImpl operator-(SizeType i) const
 			{
 				return ReverseSequentialIterator<IteratorType>::operator-(i);
@@ -836,6 +873,17 @@ namespace SpaceGameEngine
 			{
 				ReverseSequentialIterator<IteratorType>::operator-=(i);
 				return *this;
+			}
+
+			inline VectorReverseIteratorImpl& operator--()
+			{
+				ReverseSequentialIterator<IteratorType>::operator--();
+				return *this;
+			}
+
+			inline const VectorReverseIteratorImpl operator--(int)
+			{
+				return ReverseSequentialIterator<IteratorType>::operator--(0);
 			}
 
 			inline SizeType operator-(const VectorReverseIteratorImpl& iter) const
@@ -975,8 +1023,12 @@ namespace SpaceGameEngine
 					std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
 					std::is_same_v<decltype(std::declval<_U>() + std::declval<SizeType>()), _U> &&
 					std::is_same_v<decltype(std::declval<_U>() += std::declval<SizeType>()), _U&> &&
+					std::is_same_v<decltype(++std::declval<_U>()), _U&> &&
+					std::is_same_v<decltype(std::declval<_U>()++), const _U> &&
 					std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
 					std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
+					std::is_same_v<decltype(--std::declval<_U>()), _U&> &&
+					std::is_same_v<decltype(std::declval<_U>()--), const _U> &&
 					std::is_same_v<decltype(std::declval<_U>() - std::declval<_U>()), SizeType> &&
 					(std::is_same_v<decltype(std::declval<_U>().operator->()), T*> || std::is_same_v<decltype(std::declval<_U>().operator->()), const T*>)&&(std::is_same_v<decltype(std::declval<_U>().operator*()), T&> || std::is_same_v<decltype(std::declval<_U>().operator*()), const T&>)&&std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
 					std::is_same_v<decltype(std::declval<_U>() != std::declval<_U>()), bool>,

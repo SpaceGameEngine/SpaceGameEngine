@@ -108,30 +108,3 @@ TEST(ContainerConcept, IsBidirectionalSequentialIteratorTest)
 	ASSERT_TRUE((IsBidirectionalSequentialIterator<Vector<int>::ConstIterator>::Value));
 	ASSERT_FALSE((IsBidirectionalSequentialIterator<int>::Value));
 }
-
-TEST(ContainerConcept, IsRangeTest)
-{
-	ASSERT_TRUE((IsRange<Vector<int>>::Value));
-	ASSERT_FALSE((IsRange<int>::Value));
-}
-
-TEST(ContainerConcept, IsRangeIteratorTest)
-{
-	ASSERT_TRUE((IsRangeIterator<Vector<int>::Iterator>::Value));
-	ASSERT_TRUE((IsRangeIterator<Vector<int>::ConstIterator>::Value));
-	ASSERT_FALSE((IsRangeIterator<int>::Value));
-}
-
-TEST(ContainerConcept, IsRangeSentinelTest)
-{
-	ASSERT_TRUE((IsRangeSentinel<Vector<int>::Iterator, Vector<int>::Iterator>::Value));
-	ASSERT_TRUE((IsRangeSentinel<Vector<int>::ConstIterator, Vector<int>::ConstIterator>::Value));
-	ASSERT_FALSE((IsRangeSentinel<Vector<int>::Iterator, int>::Value));
-}
-
-TEST(ContainerConcept, IsRangeBidirectionalIteratorTest)
-{
-	ASSERT_TRUE((IsRangeBidirectionalIterator<Vector<int>::Iterator>::Value));
-	ASSERT_TRUE((IsRangeBidirectionalIterator<Vector<int>::ConstIterator>::Value));
-	ASSERT_FALSE((IsRangeBidirectionalIterator<int>::Value));
-}
