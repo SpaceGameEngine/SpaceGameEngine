@@ -99,6 +99,9 @@ namespace SpaceGameEngine
 		};
 
 	public:
+		template<typename _T, typename _Allocator>
+		friend class Function;
+
 		inline Function() = delete;
 		inline ~Function()
 		{
@@ -139,12 +142,12 @@ namespace SpaceGameEngine
 
 		template<typename OtherAllocator>
 		inline Function(const Function<Ret(Args...), OtherAllocator>& func)
-			: m_pInvoke(func.m_pInvoke), m_Content(func.m_Content)
+			: m_pInvoke((decltype(m_pInvoke))func.m_pInvoke), m_Content(func.m_Content)
 		{
 		}
 		template<typename OtherAllocator>
 		inline Function(Function<Ret(Args...), OtherAllocator>&& func)
-			: m_pInvoke(func.m_pInvoke), m_Content(std::move(func.m_Content))
+			: m_pInvoke((decltype(m_pInvoke))func.m_pInvoke), m_Content(std::move(func.m_Content))
 		{
 		}
 		template<typename OtherAllocator>
@@ -154,7 +157,7 @@ namespace SpaceGameEngine
 				m_Content = func.m_Content;
 			else
 			{
-				m_pInvoke = func.m_pInvoke;
+				m_pInvoke = (decltype(m_pInvoke))func.m_pInvoke;
 				m_Content.Release();
 				m_Content.Init(func.m_Content.Get());
 			}
@@ -167,7 +170,7 @@ namespace SpaceGameEngine
 				m_Content = std::move(func.m_Content);
 			else
 			{
-				m_pInvoke = func.m_pInvoke;
+				m_pInvoke = (decltype(m_pInvoke))func.m_pInvoke;
 				m_Content.Release();
 				m_Content.Init(std::move(func.m_Content.Get()));
 			}
@@ -178,12 +181,14 @@ namespace SpaceGameEngine
 		inline Function(T&& func)
 		{
 			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
-			m_pInvoke = [](MetaObject<Allocator>& obj, Args... args) -> Ret {
-				return std::invoke(obj.template Get<std::decay_t<T>>(), static_cast<Args>(args)...);
+			m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
+				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 			};
 			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
 		}
-		template<typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>>
+		template<typename T,
+				 typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>,
+				 typename = std::enable_if_t<std::is_same_v<std::decay_t<decltype(std::declval<ControllableObject<MetaObject<Allocator>, Allocator>>() = std::forward<T>(std::declval<T&&>()))>, ControllableObject<MetaObject<Allocator>, Allocator>>, bool>>
 		inline Function& operator=(T&& func)
 		{
 			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
@@ -191,12 +196,24 @@ namespace SpaceGameEngine
 				m_Content = std::forward<T>(func);
 			else
 			{
-				m_pInvoke = [](MetaObject<Allocator>& obj, Args... args) -> Ret {
-					return std::invoke(obj.template Get<std::decay_t<T>>(), static_cast<Args>(args)...);
+				m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
+					return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 				};
 				m_Content.Release();
 				m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
 			}
+			return *this;
+		}
+
+		template<typename T, typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>>
+		inline Function& operator=(T&& func)
+		{
+			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
+			m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
+				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
+			};
+			m_Content.Release();
+			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
 			return *this;
 		}
 
@@ -216,7 +233,7 @@ namespace SpaceGameEngine
 			return m_Content.Get().GetMetaData();
 		}
 
-		Ret operator()(Args... args)
+		Ret operator()(Args... args) const
 		{
 			return m_pInvoke(m_Content.Get(), static_cast<Args>(args)...);
 		}
@@ -228,8 +245,8 @@ namespace SpaceGameEngine
 		}
 
 	private:
-		Ret (*m_pInvoke)(MetaObject<Allocator>&, Args...);
-		ControllableObject<MetaObject<Allocator>> m_Content;
+		Ret (*m_pInvoke)(const MetaObject<Allocator>&, Args...);
+		ControllableObject<MetaObject<Allocator>, Allocator> m_Content;
 	};
 
 	/*!

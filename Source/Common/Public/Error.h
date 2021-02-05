@@ -18,6 +18,7 @@ limitations under the License.
 #include "SGEString.h"
 #include "Platform.hpp"
 #include "Utility/Utility.hpp"
+#include <type_traits>
 
 namespace SpaceGameEngine
 {
@@ -52,9 +53,32 @@ namespace SpaceGameEngine
 	void ThrowError(const TChar* error_msg, DebugInformation debug_info);
 
 	/*!
-	@file
-	@todo add Error as a concept when c++20 can be used
+	@brief Can check whether a type is a error type or not.But need to specify the Judge function's arguments' types.
+	@todo use concept when c++20 can be used
 	*/
+	template<typename T, typename... Args>
+	struct IsError
+	{
+	private:
+		template<typename _T, typename... _Args>
+		inline static constexpr std::enable_if_t<
+			std::is_same_v<decltype(static_cast<const TChar*>(_T::sm_pContent)), const TChar*> &&
+				std::is_same_v<decltype(_T::Judge(std::declval<_Args>()...)), bool>,
+			bool>
+		Check(int)
+		{
+			return true;
+		}
+
+		template<typename _T, typename... _Args>
+		inline static constexpr bool Check(...)
+		{
+			return false;
+		}
+
+	public:
+		inline static constexpr const bool Value = Check<std::remove_cv_t<T>, Args...>(0);
+	};
 
 	struct NullPointerError
 	{

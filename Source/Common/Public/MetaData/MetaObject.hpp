@@ -49,6 +49,9 @@ namespace SpaceGameEngine
 		};
 
 	public:
+		template<typename _Allocator>
+		friend class MetaObject;
+
 		inline MetaObject() = delete;
 		inline ~MetaObject()
 		{

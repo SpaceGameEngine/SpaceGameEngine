@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "Utility/ControllableObject.hpp"
 #include "Utility/Utility.hpp"
+#include "Utility/AutoReleaseBuffer.h"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
@@ -74,6 +75,21 @@ struct test_controllable_object_class
 	int i;
 };
 
+struct test_auto_release_buffer_class
+{
+	test_auto_release_buffer_class(const Function<void()> func)
+		: m_Function(func)
+	{
+	}
+
+	~test_auto_release_buffer_class()
+	{
+		m_Function();
+	}
+
+	Function<void()> m_Function;
+};
+
 TEST(Utility_ControllableObject, InstanceTest)
 {
 	ControllableObject<int> test;
@@ -112,6 +128,12 @@ TEST(Utility_ControllableObject, CopyTest)
 	ASSERT_EQ(test8.Get().i, 4);
 	test8 = std::move(_test2);
 	ASSERT_EQ(test8.Get().i, 5);
+
+	ControllableObject<int, StdAllocator> test9(9);
+	ControllableObject<int, MemoryManagerAllocator> test10(10);
+	test10 = test9;
+	ASSERT_EQ(test9, test10);
+	ASSERT_EQ(test10.Get(), 9);
 }
 
 TEST(Utility_ControllableObject, ComparasionTest)
@@ -125,4 +147,20 @@ TEST(Utility_ControllableObject, ComparasionTest)
 	ASSERT_FALSE(test4 == test);
 	ASSERT_TRUE(test4 == test5);
 	ASSERT_FALSE(test4 == 0);
+}
+
+TEST(Utility_AutoReleaseBuffer, InstanceAndNewObjectTest)
+{
+	AutoReleaseBuffer* arbuf = DefaultAllocator::New<AutoReleaseBuffer>();
+	int* pi = arbuf->NewObject<int>();
+	*pi = 10;
+	ASSERT_EQ(*pi, 10);
+	int flag = 0;
+	test_auto_release_buffer_class* pc = arbuf->NewObject<test_auto_release_buffer_class>(
+		[&]() {
+			flag = 1;
+		});
+	ASSERT_EQ(flag, 0);
+	DefaultAllocator::Delete(arbuf);
+	ASSERT_EQ(flag, 1);
 }
