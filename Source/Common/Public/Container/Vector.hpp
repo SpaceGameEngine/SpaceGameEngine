@@ -156,6 +156,7 @@ namespace SpaceGameEngine
 		*/
 		inline Vector& operator=(const Vector& v)
 		{
+			SGE_ASSERT(SelfAssignmentError, this, &v);
 			if (m_Size >= v.m_Size)
 			{
 				if constexpr (IsTrivial<T>::Value)
@@ -712,6 +713,7 @@ namespace SpaceGameEngine
 
 			inline IteratorImpl& operator=(const IteratorImpl& iter)
 			{
+				SGE_ASSERT(SelfAssignmentError, this, &iter);
 				m_pContent = iter.m_pContent;
 				return *this;
 			}
@@ -838,6 +840,7 @@ namespace SpaceGameEngine
 
 			inline VectorReverseIteratorImpl& operator=(const VectorReverseIteratorImpl& iter)
 			{
+				SGE_ASSERT(SelfAssignmentError, this, &iter);
 				ReverseSequentialIterator<IteratorType>::operator=(iter);
 				return *this;
 			}

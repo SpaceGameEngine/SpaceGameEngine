@@ -25,6 +25,8 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	struct SelfAssignmentError;
+
 	struct Uncopyable
 	{
 		Uncopyable() = default;
@@ -73,6 +75,7 @@ namespace SpaceGameEngine
 		}
 		Pair<T, U>& operator=(const Pair<T, U>& c)
 		{
+			SGE_ASSERT(SelfAssignmentError, this, &c);
 			m_First = c.m_First;
 			m_Second = c.m_Second;
 			return *this;

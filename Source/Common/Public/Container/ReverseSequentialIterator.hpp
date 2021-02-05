@@ -50,6 +50,7 @@ namespace SpaceGameEngine
 
 		inline ReverseSequentialIterator& operator=(const ReverseSequentialIterator& iter)
 		{
+			SGE_ASSERT(SelfAssignmentError, this, &iter);
 			m_Content = iter.m_Content;
 			return *this;
 		}

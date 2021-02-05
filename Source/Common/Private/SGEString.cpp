@@ -46,6 +46,7 @@ SpaceGameEngine::String::String(String&& str)
 
 SpaceGameEngine::String& SpaceGameEngine::String::operator=(const String& str)
 {
+	SGE_ASSERT(SelfAssignmentError, this, &str);
 	*m_pImplement = *str.m_pImplement;
 	return *this;
 }

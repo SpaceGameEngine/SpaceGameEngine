@@ -43,6 +43,7 @@ SpaceGameEngine::StdTStringImplement::StdTStringImplement(StdTStringImplement&& 
 
 SpaceGameEngine::StdTStringImplement& SpaceGameEngine::StdTStringImplement::operator=(const StdTStringImplement& str)
 {
+	SGE_ASSERT(SelfAssignmentError, this, &str);
 	m_Content = str.m_Content;
 	return *this;
 }

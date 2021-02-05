@@ -92,6 +92,16 @@ namespace SpaceGameEngine
 		static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
 	};
 
+	struct SelfAssignmentError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("a self assignment has occured");
+		template<typename T>
+		inline static bool Judge(const T* pthis, const T* ptr)
+		{
+			return pthis == ptr;
+		}
+	};
+
 	template<typename ErrorType>
 	struct Assert : public Uncopyable
 	{
