@@ -13,5 +13,6 @@
     <ClInclude Include="TestVector.hpp" />
     <ClInclude Include="TestContainerConcept.hpp" />
     <ClInclude Include="TestError.hpp" />
+    <ClInclude Include="TestRange.hpp" />
   </ItemGroup>
 </Project>

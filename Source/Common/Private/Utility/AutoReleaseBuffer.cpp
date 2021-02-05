@@ -13,20 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "gtest/gtest.h"
-#include "TestError.hpp"
-#include "TestString.hpp"
-#include "TestMemoryManager.hpp"
-#include "TestFunction.hpp"
-#include "TestMetaData.hpp"
-#include "TestUtility.hpp"
-#include "TestConcurrent.hpp"
-#include "TestVector.hpp"
-#include "TestContainerConcept.hpp"
-#include "TestRange.hpp"
+#include "Utility/AutoReleaseBuffer.h"
 
-int main(int argc, char** argv)
+SpaceGameEngine::AutoReleaseBuffer::AutoReleaseBuffer()
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+}
+
+SpaceGameEngine::AutoReleaseBuffer::~AutoReleaseBuffer()
+{
+	for (auto i = m_Functions.GetBegin(); i != m_Functions.GetEnd(); i += 1)
+		(*i)();
+}
+
+SpaceGameEngine::AutoReleaseBuffer::AutoReleaseBuffer(AutoReleaseBuffer&& a)
+	: m_Functions(std::move(a.m_Functions))
+{
+}
+
+SpaceGameEngine::AutoReleaseBuffer& SpaceGameEngine::AutoReleaseBuffer::operator=(AutoReleaseBuffer&& a)
+{
+	m_Functions = std::move(a.m_Functions);
+	return *this;
 }

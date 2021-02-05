@@ -52,21 +52,21 @@ struct test_func_class
 
 TEST(Function, IsCorrectFunctionTest)
 {
-	ASSERT_TRUE((IsCorrectFunction<decltype(func_), void(int)>::Result));
-	ASSERT_FALSE((IsCorrectFunction<decltype(func_2), void(int)>::Result));
-	ASSERT_TRUE((IsCorrectFunction<decltype(func_2), void(int, int)>::Result));
-	ASSERT_FALSE((IsCorrectFunction<decltype(func_3), void(int, int)>::Result));
-	ASSERT_TRUE((IsCorrectFunction<decltype(func_3), int(int, int)>::Result));
-	ASSERT_TRUE((IsCorrectFunction<functor, int(void)>::Result));
-	ASSERT_FALSE((IsCorrectFunction<int, void()>::Result));
-	ASSERT_TRUE((IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Result));
-	ASSERT_TRUE((IsCorrectFunction<decltype(&test_func_class::test2), int(const test_func_class*)>::Result));
+	ASSERT_TRUE((IsCorrectFunction<decltype(func_), void(int)>::Value));
+	ASSERT_FALSE((IsCorrectFunction<decltype(func_2), void(int)>::Value));
+	ASSERT_TRUE((IsCorrectFunction<decltype(func_2), void(int, int)>::Value));
+	ASSERT_FALSE((IsCorrectFunction<decltype(func_3), void(int, int)>::Value));
+	ASSERT_TRUE((IsCorrectFunction<decltype(func_3), int(int, int)>::Value));
+	ASSERT_TRUE((IsCorrectFunction<functor, int(void)>::Value));
+	ASSERT_FALSE((IsCorrectFunction<int, void()>::Value));
+	ASSERT_TRUE((IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value));
+	ASSERT_TRUE((IsCorrectFunction<decltype(&test_func_class::test2), int(const test_func_class*)>::Value));
 }
 TEST(Function, IsFunctionTest)
 {
 	Function<void()> func([]() {});
-	ASSERT_TRUE(Function<void()>::IsFunction<decltype(func)>::Result);
-	ASSERT_TRUE(!Function<void()>::IsFunction<int>::Result);
+	ASSERT_TRUE(Function<void()>::IsFunction<decltype(func)>::Value);
+	ASSERT_TRUE(!Function<void()>::IsFunction<int>::Value);
 }
 TEST(Function, ConstructionTest)
 {

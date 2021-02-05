@@ -1224,15 +1224,15 @@ TEST(Vector, FindAllByFunctionTest)
 
 TEST(VectorIterator, IsVectorIteratorTest)
 {
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Result));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstIterator>::Result));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ReverseIterator>::Result));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Result));
-	ASSERT_TRUE((Vector<int>::IsVectorIterator<int>::Result == false));
-	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::Iterator>::Result));
-	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstIterator>::Result));
-	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ReverseIterator>::Result));
-	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Result));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Value));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstIterator>::Value));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ReverseIterator>::Value));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Value));
+	ASSERT_TRUE((Vector<int>::IsVectorIterator<int>::Value == false));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::Iterator>::Value));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstIterator>::Value));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ReverseIterator>::Value));
+	ASSERT_FALSE((Vector<float>::IsVectorIterator<Vector<int>::ConstReverseIterator>::Value));
 }
 
 TEST(VectorIterator, GetBeginTest)
@@ -1724,4 +1724,46 @@ TEST(VectorIterator, ConstReverseIteratorTest)
 	ASSERT_EQ(v9[1], 1);
 	ASSERT_EQ(v9[2], 8);
 	ASSERT_EQ(v9[3], 9);
+}
+
+TEST(VectorIterator, SelfIncrementTest)
+{
+	Vector<int> v = {0, 1, 2, 3, 4};
+	auto iter1 = v.GetBegin();
+	auto iter2 = v.GetConstBegin();
+
+	for (; iter1 != v.GetEnd() && iter2 != v.GetConstEnd(); iter1++, ++iter2)
+		ASSERT_EQ(*iter1, *iter2);
+
+	ASSERT_EQ(iter1, v.GetEnd());
+	ASSERT_EQ(iter2, v.GetConstEnd());
+
+	auto riter1 = v.GetReverseBegin();
+	auto riter2 = v.GetConstReverseBegin();
+	for (; riter1 != v.GetReverseEnd() && riter2 != v.GetConstReverseEnd(); riter1++, ++riter2)
+		ASSERT_EQ(*riter1, *riter2);
+
+	ASSERT_EQ(riter1, v.GetReverseEnd());
+	ASSERT_EQ(riter2, v.GetConstReverseEnd());
+}
+
+TEST(VectorIterator, SelfDecrementTest)
+{
+	Vector<int> v = {0, 1, 2, 3, 4};
+	auto iter1 = v.GetEnd() - 1;
+	auto iter2 = v.GetConstEnd() - 1;
+
+	for (; iter1 != v.GetBegin() - 1 && iter2 != v.GetConstBegin() - 1; iter1--, --iter2)
+		ASSERT_EQ(*iter1, *iter2);
+
+	ASSERT_EQ(iter1, v.GetBegin() - 1);
+	ASSERT_EQ(iter2, v.GetConstBegin() - 1);
+
+	auto riter1 = v.GetReverseEnd() - 1;
+	auto riter2 = v.GetConstReverseEnd() - 1;
+	for (; riter1 != v.GetReverseBegin() - 1 && riter2 != v.GetConstReverseBegin() - 1; riter1--, --riter2)
+		ASSERT_EQ(*riter1, *riter2);
+
+	ASSERT_EQ(riter1, v.GetReverseBegin() - 1);
+	ASSERT_EQ(riter2, v.GetConstReverseBegin() - 1);
 }

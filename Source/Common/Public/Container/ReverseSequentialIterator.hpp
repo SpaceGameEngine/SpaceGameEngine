@@ -24,56 +24,85 @@ namespace SpaceGameEngine
 	@{
 	*/
 	/*!
-	@brief a adaptor for a bidirectional iterator type to get its reverse iterator type.
+	@brief a adaptor for a bidirectional sequential iterator type to get its reverse iterator type.
 	@note do not just use this type as the reverse iterator, you'd better make a new type derived
 	from this type and add some useful functions according to the concrete container.
 	@param T a bidirectional iterator type.
 	*/
 	template<typename T>
-	class ReverseIteratorImpl
+	class ReverseSequentialIterator
 	{
 	};
 
 	template<template<typename> class IteratorImpl, typename T>
-	class ReverseIteratorImpl<IteratorImpl<T>>
+	class ReverseSequentialIterator<IteratorImpl<T>>
 	{
-		static_assert((IsBidirectionalIterator<IteratorImpl<T>, T>::Result), "only the bidirectional iterator type can be passed to get the reverse iterator.");
+	public:
+		static_assert((IsBidirectionalSequentialIterator<IteratorImpl<T>>::Value), "only the bidirectional iterator type can be passed to get the reverse iterator.");
+
+		using ValueType = T;
 
 	public:
-		inline ReverseIteratorImpl(const ReverseIteratorImpl& iter)
+		inline ReverseSequentialIterator(const ReverseSequentialIterator& iter)
 			: m_Content(iter)
 		{
 		}
 
-		inline ReverseIteratorImpl& operator=(const ReverseIteratorImpl& iter)
+		inline ReverseSequentialIterator& operator=(const ReverseSequentialIterator& iter)
 		{
 			m_Content = iter.m_Content;
 			return *this;
 		}
 
-		inline ReverseIteratorImpl operator+(SizeType i) const
+		inline ReverseSequentialIterator operator+(SizeType i) const
 		{
-			return ReverseIteratorImpl(m_Content - i);
+			return ReverseSequentialIterator(m_Content - i);
 		}
 
-		inline ReverseIteratorImpl& operator+=(SizeType i)
+		inline ReverseSequentialIterator& operator+=(SizeType i)
 		{
 			m_Content -= i;
 			return *this;
 		}
 
-		inline ReverseIteratorImpl operator-(SizeType i) const
+		inline ReverseSequentialIterator& operator++()
 		{
-			return ReverseIteratorImpl(m_Content + i);
+			m_Content -= 1;
+			return *this;
 		}
 
-		inline ReverseIteratorImpl& operator-=(SizeType i)
+		inline const ReverseSequentialIterator operator++(int)
+		{
+			ReverseSequentialIterator re(*this);
+			m_Content -= 1;
+			return re;
+		}
+
+		inline ReverseSequentialIterator operator-(SizeType i) const
+		{
+			return ReverseSequentialIterator(m_Content + i);
+		}
+
+		inline ReverseSequentialIterator& operator-=(SizeType i)
 		{
 			m_Content += i;
 			return *this;
 		}
 
-		inline SizeType operator-(const ReverseIteratorImpl& iter) const
+		inline ReverseSequentialIterator& operator--()
+		{
+			m_Content += 1;
+			return *this;
+		}
+
+		inline const ReverseSequentialIterator operator--(int)
+		{
+			ReverseSequentialIterator re(*this);
+			m_Content += 1;
+			return re;
+		}
+
+		inline SizeType operator-(const ReverseSequentialIterator& iter) const
 		{
 			return iter.m_Content - m_Content;
 		}
@@ -88,12 +117,12 @@ namespace SpaceGameEngine
 			return m_Content.operator*();
 		}
 
-		inline bool operator==(const ReverseIteratorImpl& iter) const
+		inline bool operator==(const ReverseSequentialIterator& iter) const
 		{
 			return m_Content == iter.m_Content;
 		}
 
-		inline bool operator!=(const ReverseIteratorImpl& iter) const
+		inline bool operator!=(const ReverseSequentialIterator& iter) const
 		{
 			return m_Content != iter.m_Content;
 		}
@@ -105,7 +134,7 @@ namespace SpaceGameEngine
 
 	protected:
 		template<typename... Args>
-		inline explicit ReverseIteratorImpl(Args&&... args)
+		inline explicit ReverseSequentialIterator(Args&&... args)
 			: m_Content(std::forward<Args>(args)...)
 		{
 		}

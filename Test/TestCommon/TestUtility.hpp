@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "Utility/ControllableObject.hpp"
 #include "Utility/Utility.hpp"
+#include "Utility/AutoReleaseBuffer.h"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
@@ -35,10 +36,10 @@ bool operator==(const test_cmp2&, const test_cmp2&) = delete;
 
 TEST(Utility_IsComparable, BasicTest)
 {
-	ASSERT_TRUE((IsComparable<int>::Result));
-	ASSERT_TRUE((IsComparable<char>::Result));
-	ASSERT_FALSE((IsComparable<test_cmp>::Result));
-	ASSERT_FALSE((IsComparable<test_cmp2>::Result));
+	ASSERT_TRUE((IsComparable<int>::Value));
+	ASSERT_TRUE((IsComparable<char>::Value));
+	ASSERT_FALSE((IsComparable<test_cmp>::Value));
+	ASSERT_FALSE((IsComparable<test_cmp2>::Value));
 }
 
 struct test_controllable_object_class
@@ -72,6 +73,21 @@ struct test_controllable_object_class
 	}
 
 	int i;
+};
+
+struct test_auto_release_buffer_class
+{
+	test_auto_release_buffer_class(const Function<void()> func)
+		: m_Function(func)
+	{
+	}
+
+	~test_auto_release_buffer_class()
+	{
+		m_Function();
+	}
+
+	Function<void()> m_Function;
 };
 
 TEST(Utility_ControllableObject, InstanceTest)
@@ -131,4 +147,20 @@ TEST(Utility_ControllableObject, ComparasionTest)
 	ASSERT_FALSE(test4 == test);
 	ASSERT_TRUE(test4 == test5);
 	ASSERT_FALSE(test4 == 0);
+}
+
+TEST(Utility_AutoReleaseBuffer, InstanceAndNewObjectTest)
+{
+	AutoReleaseBuffer* arbuf = DefaultAllocator::New<AutoReleaseBuffer>();
+	int* pi = arbuf->NewObject<int>();
+	*pi = 10;
+	ASSERT_EQ(*pi, 10);
+	int flag = 0;
+	test_auto_release_buffer_class* pc = arbuf->NewObject<test_auto_release_buffer_class>(
+		[&]() {
+			flag = 1;
+		});
+	ASSERT_EQ(flag, 0);
+	DefaultAllocator::Delete(arbuf);
+	ASSERT_EQ(flag, 1);
 }

@@ -77,7 +77,7 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr const bool Result = Check<std::remove_cv_t<T>, Args...>(0);
+		inline static constexpr const bool Value = Check<std::remove_cv_t<T>, Args...>(0);
 	};
 
 	struct NullPointerError

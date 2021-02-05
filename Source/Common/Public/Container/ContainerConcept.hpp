@@ -31,43 +31,43 @@ namespace SpaceGameEngine
 	template<typename T>
 	struct IsDefaultConstructible
 	{
-		inline static constexpr const bool Result = std::is_default_constructible_v<T>;
+		inline static constexpr const bool Value = std::is_default_constructible_v<T>;
 	};
 
 	template<typename T>
 	struct IsCopyConstructible
 	{
-		inline static constexpr const bool Result = std::is_copy_constructible_v<T>;
+		inline static constexpr const bool Value = std::is_copy_constructible_v<T>;
 	};
 
 	template<typename T>
 	struct IsMoveConstructible
 	{
-		inline static constexpr const bool Result = std::is_move_constructible_v<T>;
+		inline static constexpr const bool Value = std::is_move_constructible_v<T>;
 	};
 
 	template<typename T>
 	struct IsCopyAssignable
 	{
-		inline static constexpr const bool Result = std::is_copy_assignable_v<T>;
+		inline static constexpr const bool Value = std::is_copy_assignable_v<T>;
 	};
 
 	template<typename T>
 	struct IsMoveAssignable
 	{
-		inline static constexpr const bool Result = std::is_move_assignable_v<T>;
+		inline static constexpr const bool Value = std::is_move_assignable_v<T>;
 	};
 
 	template<typename T>
 	struct IsMovable
 	{
-		inline static constexpr const bool Result = IsMoveConstructible<T>::Result && IsMoveAssignable<T>::Result;
+		inline static constexpr const bool Value = IsMoveConstructible<T>::Value && IsMoveAssignable<T>::Value;
 	};
 
 	template<typename T>
 	struct IsCopyable
 	{
-		inline static constexpr const bool Result = IsMovable<T>::Result && IsCopyConstructible<T>::Result && IsCopyAssignable<T>::Result;
+		inline static constexpr const bool Value = IsMovable<T>::Value && IsCopyConstructible<T>::Value && IsCopyAssignable<T>::Value;
 	};
 
 	template<typename T, typename U = T>
@@ -92,7 +92,7 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr const bool Result = Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
+		inline static constexpr const bool Value = Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
 	};
 
 	template<typename T, typename U = T>
@@ -121,32 +121,31 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr const bool Result = IsEqualityComparable<T, U>::Result && Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
+		inline static constexpr const bool Value = IsEqualityComparable<T, U>::Value && Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
 	};
 
 	/*!
 	@brief check the type to make sure that it is sequential Iterator Type.
 	@param U the type need to be checked.
-	@param T the type which the U can get.
 	@todo use concept.
 	*/
-	template<typename U, typename T>
+	template<typename U>
 	struct IsSequentialIterator
 	{
 	private:
 		template<typename _U>
 		inline static constexpr std::enable_if_t<
-			//IsError<typename _U::OutOfRangeError, const _U&, T*, T*>::Result &&
+			//IsError<typename _U::OutOfRangeError, const _U&, T*, T*>::Value &&
 			//	std::is_same_v<decltype(_U::GetBegin(*(new Vector))), _U> &&
 			//	std::is_same_v<decltype(_U::GetEnd(*(new Vector))), _U> &&
 			std::is_same_v<decltype(new _U(std::declval<_U>())), _U*> &&
 				std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
 				std::is_same_v<decltype(std::declval<_U>() + std::declval<SizeType>()), _U> &&
 				std::is_same_v<decltype(std::declval<_U>() += std::declval<SizeType>()), _U&> &&
-				//std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
-				//std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
+				std::is_same_v<decltype(++std::declval<_U>()), _U&> &&
+				std::is_same_v<decltype(std::declval<_U>()++), const _U> &&
 				std::is_same_v<decltype(std::declval<_U>() - std::declval<_U>()), SizeType> &&
-				(std::is_same_v<decltype(std::declval<_U>().operator->()), T*> /* || std::is_same_v<decltype(std::declval<_U>().operator->()), const T*>*/) && (std::is_same_v<decltype(std::declval<_U>().operator*()), T&> /* || std::is_same_v<decltype(std::declval<_U>().operator*()), const T&>*/) && std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
+				(std::is_same_v<decltype(std::declval<_U>().operator->()), typename _U::ValueType*>)&&(std::is_same_v<decltype(std::declval<_U>().operator*()), typename _U::ValueType&>)&&std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
 				std::is_same_v<decltype(std::declval<_U>() != std::declval<_U>()), bool>,
 			bool>
 		Check(int)
@@ -161,30 +160,31 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
+		inline static constexpr const bool Value = Check<std::remove_cv_t<U>>(0);
 	};
 
 	template<typename T>
 	struct IsTrivial
 	{
-		inline static constexpr const bool Result = std::is_trivial_v<T>;
+		inline static constexpr const bool Value = std::is_trivial_v<T>;
 	};
 
 	/*!
 	@brief check the type to make sure that it is bidirectional Iterator Type.
 	@param U the type need to be checked.
-	@param T the type which the U can get.
 	@todo use concept.
 	*/
-	template<typename U, typename T>
-	struct IsBidirectionalIterator
+	template<typename U>
+	struct IsBidirectionalSequentialIterator
 	{
 	private:
 		template<typename _U>
 		inline static constexpr std::enable_if_t<
-			IsSequentialIterator<_U, T>::Result &&
+			IsSequentialIterator<_U>::Value &&
 				std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
-				std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&>,
+				std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
+				std::is_same_v<decltype(--std::declval<_U>()), _U&> &&
+				std::is_same_v<decltype(std::declval<_U>()--), const _U>,
 			bool>
 		Check(int)
 		{
@@ -198,8 +198,9 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr const bool Result = Check<std::remove_cv_t<U>>(0);
+		inline static constexpr const bool Value = Check<std::remove_cv_t<U>>(0);
 	};
+
 	/*!
 	@}
 	*/
