@@ -17,7 +17,6 @@ limitations under the License.
 #include "ForwardDefinition.hpp"
 #include "Platform.hpp"
 #include <string>
-#include <cuchar>
 
 namespace SpaceGameEngine
 {
