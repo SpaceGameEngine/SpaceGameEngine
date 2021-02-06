@@ -80,8 +80,7 @@ namespace SpaceGameEngine
 
 #define SGE_STR(str) SGE_STR_(str)
 #ifndef SGE_WINDOWS
-#define __FILEW__ SGE_STR(__FILE__)
-#define __FUNCTIONW__ SGE_STR(__FUNCTION__)
+/*!@todo define __FILEW__ __FUNCTIONW__ macro for unix, need my own translate function*/
 #endif
 	/*!
 	@}
