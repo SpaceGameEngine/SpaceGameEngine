@@ -1,8 +1,6 @@
 add_library(Common
         Private/Error.cpp
         Private/MemoryManager.cpp
-        Private/SGEString.cpp
-        Private/StringImplement/StdTStringImplement.cpp
         Private/Concurrent/Thread.cpp
         Private/Concurrent/Lock.cpp
         Private/MetaData/MetaData.cpp
