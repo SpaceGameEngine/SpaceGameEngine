@@ -30,6 +30,8 @@ SpaceGameEngine::DebugInformation::DebugInformation(const Char* file_name, const
 
 void SpaceGameEngine::ThrowError(const Char* error_msg, DebugInformation debug_info)
 {
+/*!@todo add unix compitable verson*/
+#ifdef SGE_WINDOWS
 	StdString output_msg = SGE_STR("error happend in ");
 	output_msg += debug_info.m_pFileName;
 	output_msg += SGE_STR(" ");
@@ -40,6 +42,7 @@ void SpaceGameEngine::ThrowError(const Char* error_msg, DebugInformation debug_i
 	output_msg += error_msg;
 	/*!@todo use sge's output like log or messagebox*/
 	StdCout << output_msg << std::endl;
+#endif
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
 	DebugBreak();
 #endif

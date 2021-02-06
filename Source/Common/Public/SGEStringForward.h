@@ -66,9 +66,11 @@ namespace SpaceGameEngine
 	using Char = Char16;
 
 #define SGE_USE_WIDE_CHAR
+#ifdef SGE_WINDOWS
 #define StdCout std::wcout
 #define StdString std::wstring
 #define StdToString std::to_wstring
+#endif
 
 #ifdef SGE_WINDOWS
 #define SGE_STR_(str) L##str
