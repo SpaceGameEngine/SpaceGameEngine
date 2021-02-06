@@ -17,6 +17,9 @@ limitations under the License.
 #include "ForwardDefinition.hpp"
 #include "Platform.hpp"
 #include <string>
+#ifndef SGE_MACOS
+#include <cuchar>
+#endif
 
 namespace SpaceGameEngine
 {
@@ -58,7 +61,7 @@ namespace SpaceGameEngine
 #ifdef SGE_WINDOWS
 	using Char16 = wchar_t;
 #else
-	using Char16 = UInt16;
+	using Char16 = char16_t;
 #endif
 	using Char = Char16;
 
