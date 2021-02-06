@@ -71,11 +71,16 @@ namespace SpaceGameEngine
 #define StdToString std::to_wstring
 
 #ifdef SGE_WINDOWS
-#define SGE_STR(str) L##str
+#define SGE_STR_(str) L##str
 #else
-#define SGE_STR(str) u##str
+#define SGE_STR_(str) u##str
 #endif
 
+#define SGE_STR(str) SGE_STR_(str)
+#ifndef SGE_WINDOWS
+#define __FILEW__ SGE_STR(__FILE__)
+#define __FUNCTIONW__ SGE_STR(__FUNCTION__)
+#endif
 	/*!
 	@}
 	*/
