@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "ForwardDefinition.hpp"
-#include "SGEString.h"
+#include "SGEStringForward.h"
 #include "Platform.hpp"
 #include "Utility/Utility.hpp"
 #include <type_traits>
@@ -33,11 +33,11 @@ namespace SpaceGameEngine
 
 	struct DebugInformation
 	{
-		const TChar* m_pFileName;
-		const TChar* m_pFunctionName;
+		const Char* m_pFileName;
+		const Char* m_pFunctionName;
 		UInt32 m_LineNumber;
 
-		DebugInformation(const TChar* file_name, const TChar* func_name, UInt32 line_number);
+		DebugInformation(const Char* file_name, const Char* func_name, UInt32 line_number);
 	};
 
 #ifdef SGE_USE_WIDE_CHAR
@@ -50,7 +50,7 @@ namespace SpaceGameEngine
 #define SGE_LINE __LINE__
 #define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation(SGE_FILE, SGE_FUNCTION, SGE_LINE)
 
-	void ThrowError(const TChar* error_msg, DebugInformation debug_info);
+	void ThrowError(const Char* error_msg, DebugInformation debug_info);
 
 	/*!
 	@brief Can check whether a type is a error type or not.But need to specify the Judge function's arguments' types.
@@ -62,7 +62,7 @@ namespace SpaceGameEngine
 	private:
 		template<typename _T, typename... _Args>
 		inline static constexpr std::enable_if_t<
-			std::is_same_v<decltype(static_cast<const TChar*>(_T::sm_pContent)), const TChar*> &&
+			std::is_same_v<decltype(static_cast<const Char*>(_T::sm_pContent)), const Char*> &&
 				std::is_same_v<decltype(_T::Judge(std::declval<_Args>()...)), bool>,
 			bool>
 		Check(int)
@@ -82,19 +82,19 @@ namespace SpaceGameEngine
 
 	struct NullPointerError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
+		inline static const Char sm_pContent[] = SGE_STR("Pointer can not be null");
 		static bool Judge(const void* ptr);
 	};
 
 	struct InvalidSizeError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
+		inline static const Char sm_pContent[] = SGE_STR("The size is invalid");
 		static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
 	};
 
 	struct SelfAssignmentError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("a self assignment has occured");
+		inline static const Char sm_pContent[] = SGE_STR("a self assignment has occured");
 		template<typename T>
 		inline static bool Judge(const T* pthis, const T* ptr)
 		{

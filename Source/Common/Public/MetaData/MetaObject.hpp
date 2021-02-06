@@ -32,7 +32,7 @@ namespace SpaceGameEngine
 	public:
 		struct ImproperMetaDataError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The MetaData is improper for the MetaObject");
+			inline static const Char sm_pContent[] = SGE_STR("The MetaData is improper for the MetaObject");
 			inline static bool Judge(const MetaData& meta_data)
 			{
 				return !(meta_data.m_pName != nullptr && InvalidSizeError::Judge(meta_data.m_Size, 1, SGE_MAX_MEMORY_SIZE) == false && ((meta_data.m_Alignment & (meta_data.m_Alignment - 1)) == 0 && meta_data.m_Alignment != 0) && meta_data.m_pDestructor != nullptr);
@@ -41,7 +41,7 @@ namespace SpaceGameEngine
 
 		struct DifferentMetaDataError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The two MetaDatas are different");
+			inline static const Char sm_pContent[] = SGE_STR("The two MetaDatas are different");
 			inline static bool Judge(const MetaData& meta_data1, const MetaData& meta_data2)
 			{
 				return !(meta_data1 == meta_data2);

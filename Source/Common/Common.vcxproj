@@ -160,7 +160,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Private\DoxygenConfig.hpp" />
-    <ClInclude Include="Private\StringImplement\StdTStringImplement.h" />
     <ClInclude Include="Public\Container\ContainerConcept.hpp" />
     <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />
@@ -171,7 +170,8 @@
     <ClInclude Include="Public\MetaData\MetaData.h" />
     <ClInclude Include="Public\MetaData\MetaObject.hpp" />
     <ClInclude Include="Public\Platform.hpp" />
-    <ClInclude Include="Public\SGEString.h" />
+    <ClInclude Include="Public\SGEString.hpp" />
+    <ClInclude Include="Public\SGEStringForward.h" />
     <ClInclude Include="Public\TypeDefinition.hpp" />
     <ClInclude Include="Public\Concurrent\Thread.h" />
     <ClInclude Include="Public\Concurrent\Lock.h" />
@@ -183,8 +183,6 @@
     <ClCompile Include="Private\Error.cpp" />
     <ClCompile Include="Private\MemoryManager.cpp" />
     <ClCompile Include="Private\MetaData\MetaData.cpp" />
-    <ClCompile Include="Private\SGEString.cpp" />
-    <ClCompile Include="Private\StringImplement\StdTStringImplement.cpp" />
     <ClCompile Include="Private\Concurrent\Thread.cpp" />
     <ClCompile Include="Private\Concurrent\Lock.cpp" />
     <ClCompile Include="Private\Utility\AutoReleaseBuffer.cpp" />

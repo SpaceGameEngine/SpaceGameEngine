@@ -33,7 +33,7 @@ namespace SpaceGameEngine
 	public:
 		struct HasBeenInitializedError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The ControllableObject has been initialized");
+			inline static const Char sm_pContent[] = SGE_STR("The ControllableObject has been initialized");
 			inline static bool Judge(void* pcontent)
 			{
 				return pcontent;
@@ -41,7 +41,7 @@ namespace SpaceGameEngine
 		};
 		struct HasNotBeenInitializedError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The ControllableObject has not been initialized");
+			inline static const Char sm_pContent[] = SGE_STR("The ControllableObject has not been initialized");
 			inline static bool Judge(void* pcontent)
 			{
 				return !pcontent;
