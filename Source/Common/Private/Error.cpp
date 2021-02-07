@@ -21,28 +21,25 @@ limitations under the License.
 #include <Windows.h>
 #endif
 
-SpaceGameEngine::DebugInformation::DebugInformation(const Char* file_name, const Char* func_name, UInt32 line_number)
+SpaceGameEngine::DebugInformation::DebugInformation(const TChar* file_name, const TChar* func_name, UInt32 line_number)
 {
 	m_pFileName = file_name;
 	m_pFunctionName = func_name;
 	m_LineNumber = line_number;
 }
 
-void SpaceGameEngine::ThrowError(const Char* error_msg, DebugInformation debug_info)
+void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_info)
 {
-/*!@todo add unix compitable verson*/
-#ifdef SGE_WINDOWS
-	StdString output_msg = SGE_STR("error happend in ");
+	StdTString output_msg = SGE_TSTR("error happend in ");
 	output_msg += debug_info.m_pFileName;
-	output_msg += SGE_STR(" ");
+	output_msg += SGE_TSTR(" ");
 	output_msg += debug_info.m_pFunctionName;
-	output_msg += SGE_STR(" ");
-	output_msg += StdToString(debug_info.m_LineNumber);
-	output_msg += SGE_STR(" : ");
+	output_msg += SGE_TSTR(" ");
+	output_msg += StdToTString(debug_info.m_LineNumber);
+	output_msg += SGE_TSTR(" : ");
 	output_msg += error_msg;
 	/*!@todo use sge's output like log or messagebox*/
-	StdCout << output_msg << std::endl;
-#endif
+	StdTCout << output_msg << std::endl;
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
 	DebugBreak();
 #endif

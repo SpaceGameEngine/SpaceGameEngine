@@ -28,26 +28,28 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	//#if defined(SGE_WINDOWS) && defined(UNICODE)
-//#define SGE_USE_WIDE_CHAR
-//#endif
-//
-//#ifdef SGE_USE_WIDE_CHAR
-//	using StdString = std::wstring;
-//#define StdTCin std::wcin
-//#define StdTCout std::wcout
-//#define StdToString std::to_wstring
-//	using Char = wchar_t;
-//#define SGE_STR(str) L##str
-//#else
-//	using StdString = std::string;
-//#define StdTCin std::cin
-//#define StdTCout std::cout
-//#define StdToString std::to_string
-//	using Char = char;
-//#define SGE_STR(str) str
-//#endif
-//
+#if defined(SGE_WINDOWS) && defined(UNICODE)
+#define SGE_USE_WIDE_CHAR
+#endif
+
+#ifdef SGE_USE_WIDE_CHAR
+	using StdTString = std::wstring;
+#define StdTCin std::wcin
+#define StdTCout std::wcout
+#define StdToTString std::to_wstring
+	using TChar = wchar_t;
+#define SGE_TSTR_(str) L##str
+#else
+	using StdTString = std::string;
+#define StdTCin std::cin
+#define StdTCout std::cout
+#define StdToTString std::to_string
+	using TChar = char;
+#define SGE_TSTR_(str) str
+#endif
+
+#define SGE_TSTR(str) SGE_TSTR_(str)
+
 //#ifndef SGE_USE_WIDE_CHAR
 ///*!
 //@file
@@ -65,7 +67,6 @@ namespace SpaceGameEngine
 #endif
 	using Char = Char16;
 
-#define SGE_USE_WIDE_CHAR
 #ifdef SGE_WINDOWS
 #define StdCout std::wcout
 #define StdString std::wstring
@@ -79,9 +80,7 @@ namespace SpaceGameEngine
 #endif
 
 #define SGE_STR(str) SGE_STR_(str)
-#ifndef SGE_WINDOWS
-/*!@todo define __FILEW__ __FUNCTIONW__ macro for unix, need my own translate function*/
-#endif
+
 	/*!
 	@}
 	*/
