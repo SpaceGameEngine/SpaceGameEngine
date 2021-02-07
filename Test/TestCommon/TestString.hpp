@@ -28,7 +28,7 @@ TEST(StorageRef, InstanceTest)
 
 	const Char* pcstr = SGE_STR("这是测试");
 	Char* pstr2 = StringImplement<Char>::StorageRef::Create(pcstr, 5);
-	ASSERT_EQ(wcscmp(pstr2, pcstr), 0);
+	ASSERT_EQ(memcmp(pstr2, pcstr, 5 * sizeof(Char)), 0);
 	ASSERT_EQ(StringImplement<Char>::StorageRef::GetCount(pstr2), 1);
 	ASSERT_EQ(StringImplement<Char>::StorageRef::TryRelease(pstr2, 5), true);
 }
