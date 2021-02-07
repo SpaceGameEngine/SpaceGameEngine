@@ -62,7 +62,7 @@ namespace SpaceGameEngine
 	private:
 		template<typename _T, typename... _Args>
 		inline static constexpr std::enable_if_t<
-			std::is_same_v<decltype(static_cast<const Char*>(_T::sm_pContent)), const Char*> &&
+			std::is_same_v<decltype(static_cast<const TChar*>(_T::sm_pContent)), const TChar*> &&
 				std::is_same_v<decltype(_T::Judge(std::declval<_Args>()...)), bool>,
 			bool>
 		Check(int)
