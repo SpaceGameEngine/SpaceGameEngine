@@ -140,7 +140,7 @@ namespace SpaceGameEngine
 					SizeType m_Size;
 					T* m_pContent;
 				};
-				T m_Content[(sizeof(m_Size) + sizeof(m_pContent)) / sizeof(T)];
+				T m_Content[(sizeof(SizeType) + sizeof(T*)) / sizeof(T)];
 			};
 
 		public:
