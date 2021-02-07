@@ -27,7 +27,23 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T>
+	struct CharTrait
+	{
+		inline static constexpr const bool IsMultipleByte = false;
+	};
+
+	struct UCS2Trait
+	{
+		inline static constexpr const bool IsMultipleByte = false;
+	};
+
+	struct UTF8Trait
+	{
+		inline static constexpr const bool IsMultipleByte = true;
+	};
+
+	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
 	class StringImplement
 	{
 	public:
@@ -111,8 +127,12 @@ namespace SpaceGameEngine
 			}
 		};
 
-		struct Storage
+		/*!
+		@brief simple storage for the string, do not consider '\0'.
+		*/
+		class Storage
 		{
+		private:
 			SizeType m_RealSize;
 			union {
 				struct
@@ -123,9 +143,38 @@ namespace SpaceGameEngine
 				T m_Content[(sizeof(m_Size) + sizeof(m_pContent)) / sizeof(T)];
 			};
 
+		public:
 			inline Storage()
 				: m_RealSize(0)
 			{
+			}
+
+			inline explicit Storage(const SizeType size)
+				: m_RealSize(size), m_Size(size)
+			{
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					memset(m_Content, NULL, sizeof(m_Content));
+				}
+				else
+				{
+					m_pContent = StorageRef::Create(m_RealSize);
+				}
+			}
+
+			inline Storage(const T* ptr, const SizeType size)
+				: m_RealSize(size), m_Size(size)
+			{
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					memcpy(m_Content, ptr, size * sizeof(T));
+				}
+				else
+				{
+					m_pContent = StorageRef::Create(ptr, m_RealSize);
+				}
 			}
 
 			inline ~Storage()
@@ -135,6 +184,108 @@ namespace SpaceGameEngine
 					if (!StorageRef::TryRelease(m_pContent, m_RealSize))
 						StorageRef::CountDecrease(m_pContent);
 				}
+			}
+
+			inline Storage(const Storage& s)
+			{
+				m_RealSize = s.m_RealSize;
+				m_Size = s.m_Size;
+				auto category = GetStringCategoryByRealSize(s.m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
+				}
+				else if (category == StringCategory::Medium)
+				{
+					m_pContent = StorageRef::Create(s.m_pContent, m_RealSize);
+				}
+				else	//StringCategory::Large
+				{
+					StorageRef::CountIncrease(s.m_pContent);
+					m_pContent = s.m_pContent;
+				}
+			}
+
+			inline Storage(Storage&& s)
+			{
+				m_RealSize = s.m_RealSize;
+				m_Size = s.m_Size;
+				auto category = GetStringCategoryByRealSize(s.m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
+				}
+				else
+				{
+					m_pContent = s.m_pContent;
+					s.m_RealSize = 0;
+					s.m_Size = 0;
+					s.m_pContent = nullptr;
+				}
+			}
+
+			template<typename OtherAllocator = DefaultAllocator>
+			inline Storage(const typename StringImplement<T, Trait, OtherAllocator>::Storage& s)
+			{
+				m_RealSize = s.GetRealSize();
+				m_Size = s.GetSize();
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
+				}
+				else
+				{
+					m_pContent = StorageRef::Create(s.GetData(), m_RealSize);
+				}
+			}
+
+			template<typename OtherAllocator = DefaultAllocator>
+			inline Storage(typename StringImplement<T, Trait, OtherAllocator>::Storage&& s)
+			{
+				m_RealSize = s.GetRealSize();
+				m_Size = s.GetSize();
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
+				}
+				else
+				{
+					m_pContent = StorageRef::Create(s.GetData(), m_RealSize);
+				}
+			}
+
+			inline SizeType GetSize() const
+			{
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				if (category == StringCategory::Small)
+					return m_RealSize;
+				else
+					return m_Size;
+			}
+
+			inline SizeType GetRealSize() const
+			{
+				return m_RealSize;
+			}
+
+			inline T* GetData()
+			{
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				if (category == StringCategory::Small)
+					return m_Content;
+				else
+					return m_pContent;
+			}
+
+			inline const T* GetData() const
+			{
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				if (category == StringCategory::Small)
+					return m_Content;
+				else
+					return m_pContent;
 			}
 		};
 		inline static constexpr StringCategory GetStringCategoryByRealSize(const SizeType size)
@@ -148,7 +299,7 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		StringImplement();
+		/*StringImplement();
 		StringImplement(const StringImplement& str);
 		StringImplement(StringImplement&& str);
 
@@ -173,7 +324,7 @@ namespace SpaceGameEngine
 		StdString ToStdString() const;
 		const T* ToCString() const;
 		T* GetData();
-		SizeType GetSize();
+		SizeType GetSize();*/
 
 	private:
 	};
