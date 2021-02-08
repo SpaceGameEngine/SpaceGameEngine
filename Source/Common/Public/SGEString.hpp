@@ -47,6 +47,9 @@ namespace SpaceGameEngine
 	class StringImplement
 	{
 	public:
+		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
+		using ValueTrait = Trait;
+
 		enum class StringCategory : UInt8
 		{
 			Small = 0,
@@ -254,6 +257,84 @@ namespace SpaceGameEngine
 				{
 					m_pContent = StorageRef::Create(s.GetData(), m_RealSize);
 				}
+			}
+
+			inline Storage& operator=(const Storage& s)
+			{
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category_for_s = GetStringCategoryByRealSize(s.m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					m_RealSize = s.m_RealSize;
+					m_Size = s.m_Size;
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
+					}
+					else if (category_for_s == StringCategory::Medium)
+					{
+						m_pContent = StorageRef::Create(s.m_pContent, m_RealSize);
+					}
+					else
+					{
+						StorageRef::CountIncrease(s.m_pContent);
+						m_pContent = s.m_pContent;
+					}
+				}
+				else if (category == StringCategory::Medium)
+				{
+					if (category_for_s == StringCategory::Small)
+					{
+						StorageRef::TryRelease(m_pContent, m_RealSize);
+						m_RealSize = s.m_RealSize;
+						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
+					}
+					else if (category_for_s == StringCategory::Medium)
+					{
+						if (m_RealSize >= s.m_RealSize)
+						{
+							//no need for re-allocate
+							m_Size = s.m_Size;
+							memcpy(m_pContent, s.m_pContent, m_Size * sizeof(T));
+						}
+						else
+						{
+							StorageRef::TryRelease(m_pContent, m_RealSize);
+							m_RealSize = s.m_RealSize;
+							m_Size = s.m_Size;
+							m_pContent = StorageRef::Create(s.m_pContent, m_RealSize);
+						}
+					}
+					else
+					{
+						StorageRef::TryRelease(m_pContent, m_RealSize);
+						m_RealSize = s.m_RealSize;
+						m_Size = s.m_Size;
+						StorageRef::CountIncrease(s.m_pContent);
+						m_pContent = s.m_pContent;
+					}
+				}
+				else
+				{
+					if (!StorageRef::TryRelease(m_pContent, m_RealSize))
+						StorageRef::CountDecrease(m_pContent);
+					m_RealSize = s.m_RealSize;
+					m_Size = s.m_Size;
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
+					}
+					else if (category_for_s == StringCategory::Medium)
+					{
+						m_pContent = StorageRef::Create(s.m_pContent, m_RealSize);
+					}
+					else
+					{
+						StorageRef::CountIncrease(s.m_pContent);
+						m_pContent = s.m_pContent;
+					}
+				}
+				return *this;
 			}
 
 			inline SizeType GetSize() const
