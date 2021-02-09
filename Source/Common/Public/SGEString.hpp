@@ -43,13 +43,8 @@ namespace SpaceGameEngine
 		inline static constexpr const bool IsMultipleByte = true;
 	};
 
-	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
-	class StringImplement
+	namespace StringImplement
 	{
-	public:
-		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
-		using ValueTrait = Trait;
-
 		enum class StringCategory : UInt8
 		{
 			Small = 0,
@@ -57,6 +52,7 @@ namespace SpaceGameEngine
 			Large = 2
 		};
 
+		template<typename T, typename Allocator = DefaultAllocator>
 		struct StorageRef
 		{
 			std::atomic<SizeType> m_Count;
@@ -130,9 +126,13 @@ namespace SpaceGameEngine
 			}
 		};
 
+		template<typename T>
+		inline static constexpr StringCategory GetStringCategoryByRealSize(const SizeType size);
+
 		/*!
 		@brief simple storage for the string, do not consider '\0'.
 		*/
+		template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
 		class Storage
 		{
 		private:
@@ -155,37 +155,37 @@ namespace SpaceGameEngine
 			inline explicit Storage(const SizeType size)
 				: m_RealSize(size), m_Size(size)
 			{
-				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
 				{
 					memset(m_Content, NULL, sizeof(m_Content));
 				}
 				else
 				{
-					m_pContent = StorageRef::Create(m_RealSize);
+					m_pContent = StorageRef<T, Allocator>::Create(m_RealSize);
 				}
 			}
 
 			inline Storage(const T* ptr, const SizeType size)
 				: m_RealSize(size), m_Size(size)
 			{
-				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
 				{
 					memcpy(m_Content, ptr, size * sizeof(T));
 				}
 				else
 				{
-					m_pContent = StorageRef::Create(ptr, m_RealSize);
+					m_pContent = StorageRef<T, Allocator>::Create(ptr, m_RealSize);
 				}
 			}
 
 			inline ~Storage()
 			{
-				if (GetStringCategoryByRealSize(m_RealSize) != StringCategory::Small)
+				if (GetStringCategoryByRealSize<T>(m_RealSize) != StringCategory::Small)
 				{
-					if (!StorageRef::TryRelease(m_pContent, m_RealSize))
-						StorageRef::CountDecrease(m_pContent);
+					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
+						StorageRef<T, Allocator>::CountDecrease(m_pContent);
 				}
 			}
 
@@ -193,18 +193,18 @@ namespace SpaceGameEngine
 			{
 				m_RealSize = s.m_RealSize;
 				m_Size = s.m_Size;
-				auto category = GetStringCategoryByRealSize(s.m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(s.m_RealSize);
 				if (category == StringCategory::Small)
 				{
 					memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
 				}
 				else if (category == StringCategory::Medium)
 				{
-					m_pContent = StorageRef::Create(s.m_pContent, m_RealSize);
+					m_pContent = StorageRef<T, Allocator>::Create(s.m_pContent, m_RealSize);
 				}
 				else	//StringCategory::Large
 				{
-					StorageRef::CountIncrease(s.m_pContent);
+					StorageRef<T, Allocator>::CountIncrease(s.m_pContent);
 					m_pContent = s.m_pContent;
 				}
 			}
@@ -213,7 +213,7 @@ namespace SpaceGameEngine
 			{
 				m_RealSize = s.m_RealSize;
 				m_Size = s.m_Size;
-				auto category = GetStringCategoryByRealSize(s.m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(s.m_RealSize);
 				if (category == StringCategory::Small)
 				{
 					memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
@@ -227,42 +227,42 @@ namespace SpaceGameEngine
 				}
 			}
 
-			template<typename OtherAllocator = DefaultAllocator>
-			inline Storage(const typename StringImplement<T, Trait, OtherAllocator>::Storage& s)
+			template<typename OtherAllocator>
+			inline Storage(const Storage<T, Trait, OtherAllocator>& s)
 			{
 				m_RealSize = s.GetRealSize();
 				m_Size = s.GetSize();
-				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
 				{
 					memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
 				}
 				else
 				{
-					m_pContent = StorageRef::Create(s.GetData(), m_RealSize);
+					m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
 				}
 			}
 
-			template<typename OtherAllocator = DefaultAllocator>
-			inline Storage(typename StringImplement<T, Trait, OtherAllocator>::Storage&& s)
+			template<typename OtherAllocator>
+			inline Storage(Storage<T, Trait, OtherAllocator>&& s)
 			{
 				m_RealSize = s.GetRealSize();
 				m_Size = s.GetSize();
-				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
 				{
 					memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
 				}
 				else
 				{
-					m_pContent = StorageRef::Create(s.GetData(), m_RealSize);
+					m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
 				}
 			}
 
 			inline Storage& operator=(const Storage& s)
 			{
-				auto category = GetStringCategoryByRealSize(m_RealSize);
-				auto category_for_s = GetStringCategoryByRealSize(s.m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
+				auto category_for_s = GetStringCategoryByRealSize<T>(s.m_RealSize);
 				if (category == StringCategory::Small)
 				{
 					m_RealSize = s.m_RealSize;
@@ -273,11 +273,11 @@ namespace SpaceGameEngine
 					}
 					else if (category_for_s == StringCategory::Medium)
 					{
-						m_pContent = StorageRef::Create(s.m_pContent, m_RealSize);
+						m_pContent = StorageRef<T, Allocator>::Create(s.m_pContent, m_RealSize);
 					}
 					else
 					{
-						StorageRef::CountIncrease(s.m_pContent);
+						StorageRef<T, Allocator>::CountIncrease(s.m_pContent);
 						m_pContent = s.m_pContent;
 					}
 				}
@@ -285,7 +285,7 @@ namespace SpaceGameEngine
 				{
 					if (category_for_s == StringCategory::Small)
 					{
-						StorageRef::TryRelease(m_pContent, m_RealSize);
+						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
 						m_RealSize = s.m_RealSize;
 						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
 					}
@@ -299,25 +299,25 @@ namespace SpaceGameEngine
 						}
 						else
 						{
-							StorageRef::TryRelease(m_pContent, m_RealSize);
+							StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
 							m_RealSize = s.m_RealSize;
 							m_Size = s.m_Size;
-							m_pContent = StorageRef::Create(s.m_pContent, m_RealSize);
+							m_pContent = StorageRef<T, Allocator>::Create(s.m_pContent, m_RealSize);
 						}
 					}
 					else
 					{
-						StorageRef::TryRelease(m_pContent, m_RealSize);
+						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
 						m_RealSize = s.m_RealSize;
 						m_Size = s.m_Size;
-						StorageRef::CountIncrease(s.m_pContent);
+						StorageRef<T, Allocator>::CountIncrease(s.m_pContent);
 						m_pContent = s.m_pContent;
 					}
 				}
 				else
 				{
-					if (!StorageRef::TryRelease(m_pContent, m_RealSize))
-						StorageRef::CountDecrease(m_pContent);
+					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
+						StorageRef<T, Allocator>::CountDecrease(m_pContent);
 					m_RealSize = s.m_RealSize;
 					m_Size = s.m_Size;
 					if (category_for_s == StringCategory::Small)
@@ -326,11 +326,11 @@ namespace SpaceGameEngine
 					}
 					else if (category_for_s == StringCategory::Medium)
 					{
-						m_pContent = StorageRef::Create(s.m_pContent, m_RealSize);
+						m_pContent = StorageRef<T, Allocator>::Create(s.m_pContent, m_RealSize);
 					}
 					else
 					{
-						StorageRef::CountIncrease(s.m_pContent);
+						StorageRef<T, Allocator>::CountIncrease(s.m_pContent);
 						m_pContent = s.m_pContent;
 					}
 				}
@@ -339,8 +339,8 @@ namespace SpaceGameEngine
 
 			inline Storage& operator=(Storage&& s)
 			{
-				auto category = GetStringCategoryByRealSize(m_RealSize);
-				auto category_for_s = GetStringCategoryByRealSize(s.m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
+				auto category_for_s = GetStringCategoryByRealSize<T>(s.m_RealSize);
 				if (category == StringCategory::Small)
 				{
 					m_RealSize = s.m_RealSize;
@@ -359,7 +359,7 @@ namespace SpaceGameEngine
 				}
 				else if (category == StringCategory::Medium)
 				{
-					StorageRef::TryRelease(m_pContent, m_RealSize);
+					StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
 					m_RealSize = s.m_RealSize;
 					m_Size = s.m_Size;
 					if (category_for_s == StringCategory::Small)
@@ -376,8 +376,8 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					if (!StorageRef::TryRelease(m_pContent, m_RealSize))
-						StorageRef::CountDecrease(m_pContent);
+					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
+						StorageRef<T, Allocator>::CountDecrease(m_pContent);
 					m_RealSize = s.m_RealSize;
 					m_Size = s.m_Size;
 					if (category_for_s == StringCategory::Small)
@@ -395,9 +395,77 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
+			template<typename OtherAllocator>
+			inline Storage& operator=(const Storage<T, Trait, OtherAllocator>& s)
+			{
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
+				auto category_for_s = GetStringCategoryByRealSize<T>(s.GetRealSize());
+				if (category == StringCategory::Small)
+				{
+					m_RealSize = s.GetRealSize();
+					m_Size = s.GetSize();
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
+					}
+					else
+					{
+						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+					}
+				}
+				else if (category == StringCategory::Medium)
+				{
+					if (category_for_s == StringCategory::Small)
+					{
+						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+						m_RealSize = s.GetRealSize();
+						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
+					}
+					else if (category_for_s == StringCategory::Medium)
+					{
+						if (m_RealSize >= s.GetRealSize())
+						{
+							//no need for re-allocate
+							m_Size = s.GetSize();
+							memcpy(m_pContent, s.GetData(), m_Size * sizeof(T));
+						}
+						else
+						{
+							StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+							m_RealSize = s.GetRealSize();
+							m_Size = s.GetSize();
+							m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+						}
+					}
+					else
+					{
+						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+						m_RealSize = s.GetRealSize();
+						m_Size = s.GetSize();
+						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+					}
+				}
+				else
+				{
+					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
+						StorageRef<T, Allocator>::CountDecrease(m_pContent);
+					m_RealSize = s.GetRealSize();
+					m_Size = s.GetSize();
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
+					}
+					else
+					{
+						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+					}
+				}
+				return *this;
+			}
+
 			inline SizeType GetSize() const
 			{
-				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
 					return m_RealSize;
 				else
@@ -411,7 +479,7 @@ namespace SpaceGameEngine
 
 			inline T* GetData()
 			{
-				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
 					return m_Content;
 				else
@@ -420,22 +488,32 @@ namespace SpaceGameEngine
 
 			inline const T* GetData() const
 			{
-				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
 					return m_Content;
 				else
 					return m_pContent;
 			}
 		};
+
+		template<typename T>
 		inline static constexpr StringCategory GetStringCategoryByRealSize(const SizeType size)
 		{
 			if (size > 255)
 				return StringCategory::Large;
-			else if (size > ((sizeof(Storage) - sizeof(SizeType)) / sizeof(T)))
+			else if (size > ((sizeof(Storage<T>) - sizeof(SizeType)) / sizeof(T)))
 				return StringCategory::Medium;
 			else
 				return StringCategory::Small;
 		}
+	}
+
+	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
+	class String
+	{
+	public:
+		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
+		using ValueTrait = Trait;
 
 	public:
 		/*StringImplement();
