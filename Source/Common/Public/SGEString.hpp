@@ -337,6 +337,64 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
+			inline Storage& operator=(Storage&& s)
+			{
+				auto category = GetStringCategoryByRealSize(m_RealSize);
+				auto category_for_s = GetStringCategoryByRealSize(s.m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					m_RealSize = s.m_RealSize;
+					m_Size = s.m_Size;
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
+					}
+					else
+					{
+						m_pContent = s.m_pContent;
+						s.m_RealSize = 0;
+						s.m_Size = 0;
+						s.m_pContent = nullptr;
+					}
+				}
+				else if (category == StringCategory::Medium)
+				{
+					StorageRef::TryRelease(m_pContent, m_RealSize);
+					m_RealSize = s.m_RealSize;
+					m_Size = s.m_Size;
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
+					}
+					else
+					{
+						m_pContent = s.m_pContent;
+						s.m_RealSize = 0;
+						s.m_Size = 0;
+						s.m_pContent = nullptr;
+					}
+				}
+				else
+				{
+					if (!StorageRef::TryRelease(m_pContent, m_RealSize))
+						StorageRef::CountDecrease(m_pContent);
+					m_RealSize = s.m_RealSize;
+					m_Size = s.m_Size;
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
+					}
+					else
+					{
+						m_pContent = s.m_pContent;
+						s.m_RealSize = 0;
+						s.m_Size = 0;
+						s.m_pContent = nullptr;
+					}
+				}
+				return *this;
+			}
+
 			inline SizeType GetSize() const
 			{
 				auto category = GetStringCategoryByRealSize(m_RealSize);

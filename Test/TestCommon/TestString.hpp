@@ -297,3 +297,144 @@ TEST(Storage, CopyAssignmentTest)
 	ASSERT_EQ(memcmp(ll_s.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ll_s.GetRealSize()), StringImplement<Char>::StringCategory::Large);
 }
+
+TEST(Storage, MoveAssignmentTest)
+{
+	StringImplement<Char>::Storage s1;
+	ASSERT_EQ(s1.GetSize(), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(s1.GetRealSize()), StringImplement<Char>::StringCategory::Small);
+
+	const Char* pcstr1 = SGE_STR("测试\0");
+	StringImplement<Char>::Storage s2(SGE_STR("测试\0"), 3);
+	ASSERT_EQ(s2.GetSize(), 3);
+	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(s2.GetRealSize()), StringImplement<Char>::StringCategory::Small);
+
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	StringImplement<Char>::Storage s3(pcstr2, 31);
+	ASSERT_EQ(s3.GetRealSize(), 31);
+	ASSERT_EQ(s3.GetSize(), 31);
+	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 31), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(s3.GetRealSize()), StringImplement<Char>::StringCategory::Medium);
+
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	StringImplement<Char>::Storage s4(pcstr3, 401);
+	ASSERT_EQ(s4.GetRealSize(), 401);
+	ASSERT_EQ(s4.GetSize(), 401);
+	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(s4.GetRealSize()), StringImplement<Char>::StringCategory::Large);
+
+	const Char* pcstr_s = SGE_STR("S\0");
+	//63
+	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2\0");
+	//403
+	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+
+	StringImplement<Char>::Storage ss_s(pcstr_s, 2);
+	ASSERT_EQ(ss_s.GetRealSize(), 2);
+	ASSERT_EQ(ss_s.GetSize(), 2);
+	ASSERT_EQ(memcmp(ss_s.GetData(), pcstr_s, 2 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ss_s.GetRealSize()), StringImplement<Char>::StringCategory::Small);
+	ss_s = std::move(s2);
+	ASSERT_EQ(ss_s.GetSize(), 3);
+	ASSERT_EQ(memcmp(ss_s.GetData(), pcstr1, sizeof(Char) * 3), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ss_s.GetRealSize()), StringImplement<Char>::StringCategory::Small);
+
+	StringImplement<Char>::Storage sm_s(pcstr_s, 2);
+	ASSERT_EQ(sm_s.GetRealSize(), 2);
+	ASSERT_EQ(sm_s.GetSize(), 2);
+	ASSERT_EQ(memcmp(sm_s.GetData(), pcstr_s, 2 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(sm_s.GetRealSize()), StringImplement<Char>::StringCategory::Small);
+	sm_s = std::move(s3);
+	ASSERT_EQ(sm_s.GetRealSize(), 31);
+	ASSERT_EQ(sm_s.GetSize(), 31);
+	ASSERT_EQ(memcmp(sm_s.GetData(), pcstr2, sizeof(Char) * 31), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(sm_s.GetRealSize()), StringImplement<Char>::StringCategory::Medium);
+	ASSERT_EQ(s3.GetSize(), 0);
+	ASSERT_EQ(s3.GetRealSize(), 0);
+
+	StringImplement<Char>::Storage sl_s(pcstr_s, 2);
+	ASSERT_EQ(sl_s.GetRealSize(), 2);
+	ASSERT_EQ(sl_s.GetSize(), 2);
+	ASSERT_EQ(memcmp(sl_s.GetData(), pcstr_s, 2 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(sl_s.GetRealSize()), StringImplement<Char>::StringCategory::Small);
+	sl_s = std::move(s4);
+	ASSERT_EQ(sl_s.GetRealSize(), 401);
+	ASSERT_EQ(sl_s.GetSize(), 401);
+	ASSERT_EQ(memcmp(sl_s.GetData(), pcstr3, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(sl_s.GetRealSize()), StringImplement<Char>::StringCategory::Large);
+	ASSERT_EQ(s4.GetSize(), 0);
+	ASSERT_EQ(s4.GetRealSize(), 0);
+
+	StringImplement<Char>::Storage ms_s(pcstr_m, 63);
+	ASSERT_EQ(ms_s.GetRealSize(), 63);
+	ASSERT_EQ(ms_s.GetSize(), 63);
+	ASSERT_EQ(memcmp(ms_s.GetData(), pcstr_m, 63 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ms_s.GetRealSize()), StringImplement<Char>::StringCategory::Medium);
+	ms_s = std::move(ss_s);
+	ASSERT_EQ(ms_s.GetSize(), 3);
+	ASSERT_EQ(memcmp(ms_s.GetData(), pcstr1, sizeof(Char) * 3), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ms_s.GetRealSize()), StringImplement<Char>::StringCategory::Small);
+
+	StringImplement<Char>::Storage mm_s(pcstr_m, 63);
+	ASSERT_EQ(mm_s.GetRealSize(), 63);
+	ASSERT_EQ(mm_s.GetSize(), 63);
+	ASSERT_EQ(memcmp(mm_s.GetData(), pcstr_m, 63 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(mm_s.GetRealSize()), StringImplement<Char>::StringCategory::Medium);
+	mm_s = std::move(sm_s);
+	ASSERT_EQ(mm_s.GetRealSize(), 31);
+	ASSERT_EQ(mm_s.GetSize(), 31);
+	ASSERT_EQ(memcmp(mm_s.GetData(), pcstr2, sizeof(Char) * 31), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(mm_s.GetRealSize()), StringImplement<Char>::StringCategory::Medium);
+	ASSERT_EQ(sm_s.GetSize(), 0);
+	ASSERT_EQ(sm_s.GetRealSize(), 0);
+
+	StringImplement<Char>::Storage ml_s(pcstr_m, 63);
+	ASSERT_EQ(ml_s.GetRealSize(), 63);
+	ASSERT_EQ(ml_s.GetSize(), 63);
+	ASSERT_EQ(memcmp(ml_s.GetData(), pcstr_m, 63 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ml_s.GetRealSize()), StringImplement<Char>::StringCategory::Medium);
+	ml_s = std::move(sl_s);
+	ASSERT_EQ(ml_s.GetRealSize(), 401);
+	ASSERT_EQ(ml_s.GetSize(), 401);
+	ASSERT_EQ(memcmp(ml_s.GetData(), pcstr3, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ml_s.GetRealSize()), StringImplement<Char>::StringCategory::Large);
+	ASSERT_EQ(sl_s.GetSize(), 0);
+	ASSERT_EQ(sl_s.GetRealSize(), 0);
+
+	StringImplement<Char>::Storage ls_s(pcstr_l, 403);
+	ASSERT_EQ(ls_s.GetRealSize(), 403);
+	ASSERT_EQ(ls_s.GetSize(), 403);
+	ASSERT_EQ(memcmp(ls_s.GetData(), pcstr_l, 403 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ls_s.GetRealSize()), StringImplement<Char>::StringCategory::Large);
+	ls_s = std::move(ms_s);
+	ASSERT_EQ(ls_s.GetSize(), 3);
+	ASSERT_EQ(memcmp(ls_s.GetData(), pcstr1, sizeof(Char) * 3), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ls_s.GetRealSize()), StringImplement<Char>::StringCategory::Small);
+
+	StringImplement<Char>::Storage lm_s(pcstr_l, 403);
+	ASSERT_EQ(lm_s.GetRealSize(), 403);
+	ASSERT_EQ(lm_s.GetSize(), 403);
+	ASSERT_EQ(memcmp(lm_s.GetData(), pcstr_l, 403 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(lm_s.GetRealSize()), StringImplement<Char>::StringCategory::Large);
+	lm_s = std::move(mm_s);
+	ASSERT_EQ(lm_s.GetRealSize(), 31);
+	ASSERT_EQ(lm_s.GetSize(), 31);
+	ASSERT_EQ(memcmp(lm_s.GetData(), pcstr2, sizeof(Char) * 31), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(lm_s.GetRealSize()), StringImplement<Char>::StringCategory::Medium);
+	ASSERT_EQ(mm_s.GetSize(), 0);
+	ASSERT_EQ(mm_s.GetRealSize(), 0);
+
+	StringImplement<Char>::Storage ll_s(pcstr_l, 403);
+	ASSERT_EQ(ll_s.GetRealSize(), 403);
+	ASSERT_EQ(ll_s.GetSize(), 403);
+	ASSERT_EQ(memcmp(ll_s.GetData(), pcstr_l, 403 * sizeof(Char)), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ll_s.GetRealSize()), StringImplement<Char>::StringCategory::Large);
+	ll_s = std::move(ml_s);
+	ASSERT_EQ(ll_s.GetRealSize(), 401);
+	ASSERT_EQ(ll_s.GetSize(), 401);
+	ASSERT_EQ(memcmp(ll_s.GetData(), pcstr3, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement<Char>::GetStringCategoryByRealSize(ll_s.GetRealSize()), StringImplement<Char>::StringCategory::Large);
+	ASSERT_EQ(ml_s.GetSize(), 0);
+	ASSERT_EQ(ml_s.GetRealSize(), 0);
+}
