@@ -463,6 +463,74 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
+			template<typename OtherAllocator>
+			inline Storage& operator=(Storage<T, Trait, OtherAllocator>&& s)
+			{
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
+				auto category_for_s = GetStringCategoryByRealSize<T>(s.GetRealSize());
+				if (category == StringCategory::Small)
+				{
+					m_RealSize = s.GetRealSize();
+					m_Size = s.GetSize();
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
+					}
+					else
+					{
+						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+					}
+				}
+				else if (category == StringCategory::Medium)
+				{
+					if (category_for_s == StringCategory::Small)
+					{
+						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+						m_RealSize = s.GetRealSize();
+						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
+					}
+					else if (category_for_s == StringCategory::Medium)
+					{
+						if (m_RealSize >= s.GetRealSize())
+						{
+							//no need for re-allocate
+							m_Size = s.GetSize();
+							memcpy(m_pContent, s.GetData(), m_Size * sizeof(T));
+						}
+						else
+						{
+							StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+							m_RealSize = s.GetRealSize();
+							m_Size = s.GetSize();
+							m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+						}
+					}
+					else
+					{
+						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+						m_RealSize = s.GetRealSize();
+						m_Size = s.GetSize();
+						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+					}
+				}
+				else
+				{
+					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
+						StorageRef<T, Allocator>::CountDecrease(m_pContent);
+					m_RealSize = s.GetRealSize();
+					m_Size = s.GetSize();
+					if (category_for_s == StringCategory::Small)
+					{
+						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
+					}
+					else
+					{
+						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+					}
+				}
+				return *this;
+			}
+
 			inline SizeType GetSize() const
 			{
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
