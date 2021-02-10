@@ -531,6 +531,78 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
+			/*!
+			@brief set the real size for the storage.
+			@warning when the new size's category is StringCategory::Small and the previous Stroage's
+			category is not StringCategory::Small, not matter what new size is given, the final result
+			is that the new real size will be equal to the m_Size.
+			*/
+			inline void SetRealSize(const SizeType size)
+			{
+				SGE_ASSERT(InvalidSizeError, size, GetSize(), SGE_MAX_MEMORY_SIZE / sizeof(T));
+				if (m_RealSize == size)
+					return;
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
+				auto new_category = GetStringCategoryByRealSize<T>(size);
+				if (category == StringCategory::Small)
+				{
+					if (new_category == StringCategory::Small)
+					{
+						m_RealSize = size;
+					}
+					else
+					{
+						auto pbuf = StorageRef<T, Allocator>::Create(size);
+						memcpy(pbuf, m_Content, m_RealSize * sizeof(T));
+						m_pContent = pbuf;
+						m_Size = m_RealSize;
+						m_RealSize = size;
+					}
+				}
+				else if (category == StringCategory::Medium)
+				{
+					if (new_category == StringCategory::Small)
+					{
+						//see warning
+						auto pre_real_size = m_RealSize;
+						auto pre_p_content = m_pContent;
+						m_RealSize = m_Size;
+						memcpy(m_Content, pre_p_content, m_RealSize * sizeof(T));
+						StorageRef<T, Allocator>::TryRelease(pre_p_content, pre_real_size);
+					}
+					else
+					{
+						auto pbuf = StorageRef<T, Allocator>::Create(size);
+						memcpy(pbuf, m_pContent, m_Size * sizeof(T));
+						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+						m_pContent = pbuf;
+						m_RealSize = size;
+					}
+				}
+				else
+				{
+					if (new_category == StringCategory::Small)
+					{
+						//see warning
+						auto pre_real_size = m_RealSize;
+						auto pre_p_content = m_pContent;
+						m_RealSize = m_Size;
+						memcpy(m_Content, pre_p_content, m_RealSize * sizeof(T));
+						if (!StorageRef<T, Allocator>::TryRelease(pre_p_content, pre_real_size))
+							StorageRef<T, Allocator>::CountDecrease(pre_p_content);
+					}
+					else
+					{
+						auto pbuf = StorageRef<T, Allocator>::Create(size);
+						memcpy(pbuf, m_pContent, m_Size * sizeof(T));
+						if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
+							StorageRef<T, Allocator>::CountDecrease(m_pContent);
+						m_pContent = pbuf;
+						m_RealSize = size;
+					}
+				}
+			}
+
 			inline SizeType GetSize() const
 			{
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
