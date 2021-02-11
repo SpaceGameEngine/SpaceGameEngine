@@ -87,10 +87,10 @@ TEST(Storage, CopyConstructionTest)
 	StringImplement::Storage<Char> rs1(std::move(s1));
 	ASSERT_EQ(rs1.GetSize(), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(rs1.GetRealSize()), StringImplement::StringCategory::Small);
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> acs1(cs1);
+	StringImplement::Storage<Char, StdAllocator> acs1(cs1);
 	ASSERT_EQ(acs1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(acs1.GetRealSize())), (StringImplement::StringCategory::Small));
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> ars1(std::move(rs1));
+	StringImplement::Storage<Char, StdAllocator> ars1(std::move(rs1));
 	ASSERT_EQ(ars1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(ars1.GetRealSize())), (StringImplement::StringCategory::Small));
 
@@ -107,11 +107,11 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(rs2.GetSize(), 3);
 	ASSERT_EQ(memcmp(rs2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(rs2.GetRealSize()), StringImplement::StringCategory::Small);
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> acs2(cs2);
+	StringImplement::Storage<Char, StdAllocator> acs2(cs2);
 	ASSERT_EQ(acs2.GetSize(), 3);
 	ASSERT_EQ(memcmp(acs2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(acs2.GetRealSize())), (StringImplement::StringCategory::Small));
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> ars2(std::move(rs2));
+	StringImplement::Storage<Char, StdAllocator> ars2(std::move(rs2));
 	ASSERT_EQ(ars2.GetSize(), 3);
 	ASSERT_EQ(memcmp(ars2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(ars2.GetRealSize())), (StringImplement::StringCategory::Small));
@@ -132,12 +132,12 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(rs3.GetSize(), 32);
 	ASSERT_EQ(memcmp(rs3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(rs3.GetRealSize()), StringImplement::StringCategory::Medium);
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> acs3(cs3);
+	StringImplement::Storage<Char, StdAllocator> acs3(cs3);
 	ASSERT_EQ(acs3.GetRealSize(), 32);
 	ASSERT_EQ(acs3.GetSize(), 32);
 	ASSERT_EQ(memcmp(acs3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(acs3.GetRealSize())), (StringImplement::StringCategory::Medium));
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> ars3(std::move(rs3));
+	StringImplement::Storage<Char, StdAllocator> ars3(std::move(rs3));
 	ASSERT_EQ(ars3.GetRealSize(), 32);
 	ASSERT_EQ(ars3.GetSize(), 32);
 	ASSERT_EQ(memcmp(ars3.GetData(), pcstr2, sizeof(Char) * 32), 0);
@@ -159,12 +159,12 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(rs4.GetSize(), 401);
 	ASSERT_EQ(memcmp(rs4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(rs4.GetRealSize()), StringImplement::StringCategory::Large);
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> acs4(cs4);
+	StringImplement::Storage<Char, StdAllocator> acs4(cs4);
 	ASSERT_EQ(acs4.GetRealSize(), 401);
 	ASSERT_EQ(acs4.GetSize(), 401);
 	ASSERT_EQ(memcmp(acs4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(acs4.GetRealSize())), (StringImplement::StringCategory::Large));
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> ars4(std::move(rs4));
+	StringImplement::Storage<Char, StdAllocator> ars4(std::move(rs4));
 	ASSERT_EQ(ars4.GetRealSize(), 401);
 	ASSERT_EQ(ars4.GetSize(), 401);
 	ASSERT_EQ(memcmp(ars4.GetData(), pcstr3, sizeof(Char) * 401), 0);
@@ -442,25 +442,25 @@ TEST(Storage, MoveAssignmentTest)
 
 TEST(Storage, CopyAssignmentForAnotherAllocatorTest)
 {
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s1;
+	StringImplement::Storage<Char, StdAllocator> s1;
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize())), (StringImplement::StringCategory::Small));
 
 	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("测试\0"), 3);
+	StringImplement::Storage<Char, StdAllocator> s2(SGE_STR("测试\0"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize())), (StringImplement::StringCategory::Small));
 
 	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s3(pcstr2, 32);
+	StringImplement::Storage<Char, StdAllocator> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
 	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s4(pcstr3, 401);
+	StringImplement::Storage<Char, StdAllocator> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
@@ -570,59 +570,59 @@ TEST(Storage, CopyAssignmentForAnotherAllocatorTest)
 
 TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 {
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s1;
+	StringImplement::Storage<Char, StdAllocator> s1;
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize())), (StringImplement::StringCategory::Small));
 
 	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("测试\0"), 3);
+	StringImplement::Storage<Char, StdAllocator> s2(SGE_STR("测试\0"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s2_2(SGE_STR("测试\0"), 3);
+	StringImplement::Storage<Char, StdAllocator> s2_2(SGE_STR("测试\0"), 3);
 	ASSERT_EQ(s2_2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2_2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2_2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s2_3(SGE_STR("测试\0"), 3);
+	StringImplement::Storage<Char, StdAllocator> s2_3(SGE_STR("测试\0"), 3);
 	ASSERT_EQ(s2_3.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2_3.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2_3.GetRealSize())), (StringImplement::StringCategory::Small));
 
 	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s3(pcstr2, 32);
+	StringImplement::Storage<Char, StdAllocator> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s3_2(pcstr2, 32);
+	StringImplement::Storage<Char, StdAllocator> s3_2(pcstr2, 32);
 	ASSERT_EQ(s3_2.GetRealSize(), 32);
 	ASSERT_EQ(s3_2.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3_2.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s3_2.GetRealSize())), (StringImplement::StringCategory::Medium));
 
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s3_3(pcstr2, 32);
+	StringImplement::Storage<Char, StdAllocator> s3_3(pcstr2, 32);
 	ASSERT_EQ(s3_3.GetRealSize(), 32);
 	ASSERT_EQ(s3_3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3_3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s3_3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
 	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s4(pcstr3, 401);
+	StringImplement::Storage<Char, StdAllocator> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize())), (StringImplement::StringCategory::Large));
 
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s4_2(pcstr3, 401);
+	StringImplement::Storage<Char, StdAllocator> s4_2(pcstr3, 401);
 	ASSERT_EQ(s4_2.GetRealSize(), 401);
 	ASSERT_EQ(s4_2.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4_2.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s4_2.GetRealSize())), (StringImplement::StringCategory::Large));
 
-	StringImplement::Storage<Char, CharTrait<Char>, StdAllocator> s4_3(pcstr3, 401);
+	StringImplement::Storage<Char, StdAllocator> s4_3(pcstr3, 401);
 	ASSERT_EQ(s4_3.GetRealSize(), 401);
 	ASSERT_EQ(s4_3.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4_3.GetData(), pcstr3, sizeof(Char) * 401), 0);
@@ -817,4 +817,76 @@ TEST(Storage, SetRealSizeTest)
 	ASSERT_EQ(l_s3.GetRealSize(), 500);
 	ASSERT_EQ(l_s3.GetSize(), 401);
 	ASSERT_EQ(memcmp(l_s3.GetData(), pcstr3, 401 * sizeof(Char)), 0);
+}
+
+TEST(Storage, ClearTest)
+{
+	StringImplement::Storage<Char> s1;
+	ASSERT_EQ(s1.GetSize(), 0);
+	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Small);
+	s1.Clear();
+	ASSERT_EQ(s1.GetRealSize(), 0);
+
+	const Char* pcstr1 = SGE_STR("测试\0");
+	StringImplement::Storage<Char> s2(SGE_STR("测试\0"), 3);
+	ASSERT_EQ(s2.GetSize(), 3);
+	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
+	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
+	s2.Clear();
+	ASSERT_EQ(s2.GetRealSize(), 0);
+
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	StringImplement::Storage<Char> s3(pcstr2, 32);
+	ASSERT_EQ(s3.GetRealSize(), 32);
+	ASSERT_EQ(s3.GetSize(), 32);
+	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
+	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize()), StringImplement::StringCategory::Medium);
+	s3.Clear();
+	ASSERT_EQ(s3.GetRealSize(), 0);
+	ASSERT_EQ(s3.GetSize(), 0);
+
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	StringImplement::Storage<Char> s4(pcstr3, 401);
+	ASSERT_EQ(s4.GetRealSize(), 401);
+	ASSERT_EQ(s4.GetSize(), 401);
+	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize()), StringImplement::StringCategory::Large);
+	s4.Clear();
+	ASSERT_EQ(s4.GetRealSize(), 0);
+	ASSERT_EQ(s4.GetSize(), 0);
+}
+
+TEST(Storage, CopyOnWriteTest)
+{
+	const Char* pcstr = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+
+	StringImplement::Storage<Char> s1(pcstr, 401);
+	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(s1.GetData()), 1);
+	ASSERT_EQ(s1.GetRealSize(), 401);
+	ASSERT_EQ(s1.GetSize(), 401);
+	ASSERT_EQ(memcmp(s1.GetData(), pcstr, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Large);
+
+	StringImplement::Storage<Char> s2(s1);
+	ASSERT_EQ(s2.GetRealSize(), 401);
+	ASSERT_EQ(s2.GetSize(), 401);
+	ASSERT_EQ(memcmp(s2.GetData(), pcstr, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Large);
+
+	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(s1.GetData()), 2);
+	ASSERT_EQ(s1.GetData(), s2.GetData());
+
+	s1.CopyOnWrite();
+
+	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(s1.GetData()), 1);
+	ASSERT_EQ(s1.GetRealSize(), 401);
+	ASSERT_EQ(s1.GetSize(), 401);
+	ASSERT_EQ(memcmp(s1.GetData(), pcstr, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Large);
+
+	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(s2.GetData()), 1);
+	ASSERT_EQ(s2.GetRealSize(), 401);
+	ASSERT_EQ(s2.GetSize(), 401);
+	ASSERT_EQ(memcmp(s2.GetData(), pcstr, sizeof(Char) * 401), 0);
+	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Large);
 }

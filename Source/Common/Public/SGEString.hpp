@@ -132,7 +132,7 @@ namespace SpaceGameEngine
 		/*!
 		@brief simple storage for the string, do not consider '\0'.
 		*/
-		template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
+		template<typename T, typename Allocator = DefaultAllocator>
 		class Storage
 		{
 		private:
@@ -228,7 +228,7 @@ namespace SpaceGameEngine
 			}
 
 			template<typename OtherAllocator>
-			inline Storage(const Storage<T, Trait, OtherAllocator>& s)
+			inline Storage(const Storage<T, OtherAllocator>& s)
 			{
 				m_RealSize = s.GetRealSize();
 				m_Size = s.GetSize();
@@ -244,7 +244,7 @@ namespace SpaceGameEngine
 			}
 
 			template<typename OtherAllocator>
-			inline Storage(Storage<T, Trait, OtherAllocator>&& s)
+			inline Storage(Storage<T, OtherAllocator>&& s)
 			{
 				m_RealSize = s.GetRealSize();
 				m_Size = s.GetSize();
@@ -396,7 +396,7 @@ namespace SpaceGameEngine
 			}
 
 			template<typename OtherAllocator>
-			inline Storage& operator=(const Storage<T, Trait, OtherAllocator>& s)
+			inline Storage& operator=(const Storage<T, OtherAllocator>& s)
 			{
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				auto category_for_s = GetStringCategoryByRealSize<T>(s.GetRealSize());
@@ -464,7 +464,7 @@ namespace SpaceGameEngine
 			}
 
 			template<typename OtherAllocator>
-			inline Storage& operator=(Storage<T, Trait, OtherAllocator>&& s)
+			inline Storage& operator=(Storage<T, OtherAllocator>&& s)
 			{
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				auto category_for_s = GetStringCategoryByRealSize<T>(s.GetRealSize());
@@ -599,6 +599,37 @@ namespace SpaceGameEngine
 							StorageRef<T, Allocator>::CountDecrease(m_pContent);
 						m_pContent = pbuf;
 						m_RealSize = size;
+					}
+				}
+			}
+
+			inline void Clear()
+			{
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
+				if (category == StringCategory::Small)
+				{
+					m_RealSize = 0;
+				}
+				else
+				{
+					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
+						StorageRef<T, Allocator>::CountDecrease(m_pContent);
+					m_RealSize = 0;
+					m_Size = 0;
+					m_pContent = nullptr;
+				}
+			}
+
+			inline void CopyOnWrite()
+			{
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
+				if (category == StringCategory::Large)
+				{
+					if (StorageRef<T, Allocator>::GetCount(m_pContent) > 1)
+					{
+						auto ptr = StorageRef<T, Allocator>::Create(m_pContent, m_RealSize);
+						StorageRef<T, Allocator>::CountDecrease(m_pContent);
+						m_pContent = ptr;
 					}
 				}
 			}
