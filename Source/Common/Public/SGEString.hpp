@@ -688,6 +688,7 @@ namespace SpaceGameEngine
 		{
 			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
 			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
+			SGE_ASSERT(NullPointerError, ptr);
 			// need specialize for different situation
 			return ptr + 1;
 		}
@@ -695,6 +696,7 @@ namespace SpaceGameEngine
 		template<>
 		inline const char* GetNextMultipleByteChar<char, UTF8Trait>(const char* ptr)
 		{
+			SGE_ASSERT(NullPointerError, ptr);
 			if (static_cast<const UInt8>(*ptr) <= 0b01111111)
 				return ptr + 1;
 			else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
@@ -703,6 +705,27 @@ namespace SpaceGameEngine
 				return ptr + 3;
 			else if (static_cast<const UInt8>(*ptr) <= 0b11110111)
 				return ptr + 4;
+		}
+
+		template<typename T, typename Trait = CharTrait<T>>
+		inline const T* GetPreviousMultipleByteChar(const T* ptr)
+		{
+			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
+			SGE_ASSERT(NullPointerError, ptr);
+			// need specialize for different situation
+			return ptr - 1;
+		}
+
+		template<>
+		inline const char* GetPreviousMultipleByteChar<char, UTF8Trait>(const char* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			do
+			{
+				ptr -= 1;
+			} while ((static_cast<const UInt8>(*ptr) & 0b11000000) == 0b10000000);
+			return ptr;
 		}
 	}
 
@@ -786,41 +809,92 @@ namespace SpaceGameEngine
 		{
 		}
 
-		inline StringCore(const T* ptr)
+		inline explicit StringCore(const T* ptr)
 			: m_Storage(ptr, GetCStringNormalSize(ptr) + 1), m_Size(GetCStringSize(ptr))
 		{
+		}
+
+		inline StringCore& operator=(const StringCore& str)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &str);
+			m_Storage = str.m_Storage;
+			m_Size = str.m_Size;
+			return *this;
+		}
+
+		inline StringCore& operator=(StringCore&& str)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &str);
+			m_Storage = std::move(str.m_Storage);
+			m_Size = str.m_Size;
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline StringCore& operator=(const StringCore<T, Trait, OtherAllocator>& str)
+		{
+			m_Storage = str.m_Storage;
+			m_Size = str.m_Size;
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline StringCore& operator=(StringCore<T, Trait, OtherAllocator>&& str)
+		{
+			m_Storage = std::move(str.m_Storage);
+			m_Size = str.m_Size;
+			return *this;
+		}
+
+		inline StringCore& operator=(const T* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			SGE_ASSERT(SelfAssignmentError, GetData(), ptr);
+			m_Storage = std::move(StringImplement::Storage<T, Allocator>(ptr, GetCStringNormalSize(ptr) + 1));
+			m_Size = GetCStringSize(ptr);
+			return *this;
 		}
 
 		inline SizeType GetSize() const
 		{
 			return m_Size;
 		}
-		/*StringImplement();
-		StringImplement(const StringImplement& str);
-		StringImplement(StringImplement&& str);
 
-		StringImplement(const StdString& str);
-		StringImplement(const T* pstr);
+		inline T* GetData()
+		{
+			return m_Storage.GetData();
+		}
 
-		~StringImplement();
+		inline const T* GetData() const
+		{
+			return m_Storage.GetData();
+		}
 
-		StringImplement& operator=(const StringImplement& str);
-		StringImplement& operator=(StringImplement&& str);
+		/*inline bool operator==(const StringCore& str) const
+		{
+			if (m_Size != str.m_Size)
+				return false;
+			else
+				return memcmp(m_Storage.GetData(), str.m_Storage.GetData(), m_Size * sizeof(T)) == 0;
+		}
 
-		StringImplement& operator=(const StdString& str);
-		StringImplement& operator=(const T* pstr);
+		inline bool operator!=(const StringCore& str) const
+		{
+			if (m_Size != str.m_Size)
+				return true;
+			else
+				return memcmp(m_Storage.GetData(), str.m_Storage.GetData(), m_Size * sizeof(T)) != 0;
+		}
 
-		bool operator==(const StringImplement& str) const;
-		bool operator!=(const StringImplement& str) const;
-		bool operator==(const StdString& str) const;
-		bool operator!=(const StdString& str) const;
-		bool operator==(const T* pstr) const;
-		bool operator!=(const T* pstr) const;
+		inline bool operator==(const T* ptr) const
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+		}
 
-		StdString ToStdString() const;
-		const T* ToCString() const;
-		T* GetData();
-		SizeType GetSize();*/
+		inline bool operator!=(const T* ptr) const
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+		}*/
 
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;

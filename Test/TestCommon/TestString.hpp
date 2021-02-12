@@ -909,6 +909,19 @@ TEST(StringImplement, GetNextMultipleByteChar)
 	ASSERT_EQ(i, 12);
 }
 
+TEST(StringImplement, GetPreviousMultipleByteChar)
+{
+	const char* pcstr = u8"\0这是12345abcde";
+	auto p = pcstr + 16;
+	std::size_t i = 0;
+	while (*p != '\0')
+	{
+		i += 1;
+		p = StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(p);
+	}
+	ASSERT_EQ(i, 12);
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde\0";
@@ -929,27 +942,79 @@ TEST(StringCore, InstanceTest)
 	ASSERT_EQ(s2.GetSize(), 0);
 	StringCore<Char> s3(SGE_STR("这是12345abcde\0"));
 	ASSERT_EQ(s3.GetSize(), 12);
+	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("这是12345abcde\0"), s3.GetSize() * sizeof(Char)), 0);
 	StringCore<char, UTF8Trait, StdAllocator> s4(u8"这是12345abcde\0");
 	ASSERT_EQ(s4.GetSize(), 12);
+	ASSERT_EQ(memcmp(s4.GetData(), u8"这是12345abcde\0", s4.GetSize() * sizeof(char)), 0);
 }
 
 TEST(StringCore, CopyConstructionTest)
 {
 	StringCore<Char> s1(SGE_STR("这是12345abcde\0"));
 	ASSERT_EQ(s1.GetSize(), 12);
+	ASSERT_EQ(memcmp(s1.GetData(), SGE_STR("这是12345abcde\0"), s1.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("这是12345abcde\0"));
 	ASSERT_EQ(s2.GetSize(), 12);
+	ASSERT_EQ(memcmp(s2.GetData(), SGE_STR("这是12345abcde\0"), s2.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s3(s1);
 	ASSERT_EQ(s3.GetSize(), 12);
+	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("这是12345abcde\0"), s3.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s4(std::move(s3));
 	ASSERT_EQ(s4.GetSize(), 12);
+	ASSERT_EQ(memcmp(s4.GetData(), SGE_STR("这是12345abcde\0"), s4.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s5(s2);
 	ASSERT_EQ(s5.GetSize(), 12);
+	ASSERT_EQ(memcmp(s5.GetData(), SGE_STR("这是12345abcde\0"), s5.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char, CharTrait<Char>, StdAllocator> s6(std::move(s5));
 	ASSERT_EQ(s6.GetSize(), 12);
+	ASSERT_EQ(memcmp(s6.GetData(), SGE_STR("这是12345abcde\0"), s6.GetSize() * sizeof(Char)), 0);
+}
+
+TEST(StringCore, AssignmentTest)
+{
+	StringCore<Char> s(SGE_STR("test"));
+	ASSERT_EQ(s.GetSize(), 4);
+	ASSERT_EQ(memcmp(s.GetData(), SGE_STR("test"), sizeof(Char) * s.GetSize()), 0);
+
+	StringCore<Char> s2, s3;
+	ASSERT_EQ(s2.GetSize(), 0);
+
+	s2 = s;
+
+	ASSERT_EQ(s.GetSize(), 4);
+	ASSERT_EQ(memcmp(s.GetData(), SGE_STR("test"), sizeof(Char) * s.GetSize()), 0);
+	ASSERT_EQ(s2.GetSize(), 4);
+	ASSERT_EQ(memcmp(s2.GetData(), SGE_STR("test"), sizeof(Char) * s2.GetSize()), 0);
+
+	s3 = std::move(s2);
+
+	ASSERT_EQ(s3.GetSize(), 4);
+	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("test"), sizeof(Char) * s3.GetSize()), 0);
+
+	StringCore<Char, CharTrait<Char>, StdAllocator> s4, s5;
+	ASSERT_EQ(s4.GetSize(), 0);
+	ASSERT_EQ(s5.GetSize(), 0);
+
+	s4 = s3;
+
+	ASSERT_EQ(s4.GetSize(), 4);
+	ASSERT_EQ(memcmp(s4.GetData(), SGE_STR("test"), sizeof(Char) * s4.GetSize()), 0);
+
+	s5 = std::move(s3);
+
+	ASSERT_EQ(s5.GetSize(), 4);
+	ASSERT_EQ(memcmp(s5.GetData(), SGE_STR("test"), sizeof(Char) * s5.GetSize()), 0);
+
+	StringCore<Char> s6;
+	ASSERT_EQ(s6.GetSize(), 0);
+
+	s6 = SGE_STR("测试\0");
+
+	ASSERT_EQ(s6.GetSize(), 2);
+	ASSERT_EQ(memcmp(s6.GetData(), SGE_STR("测试\0"), sizeof(Char) * s6.GetSize()), 0);
 }
