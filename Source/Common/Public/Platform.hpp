@@ -48,17 +48,14 @@ limitations under the License.
 #ifdef _MSC_VER
 #define SGE_MSVC 1
 #define SGE_COMPILER SGE_MSVC
-#endif
-
-#ifdef __GNUC__
-#define SGE_GCC 2
+#elif defined(__clang__)
+#define SGE_CLANG 2
+#define SGE_COMPILER SGE_CLANG
+#elif defined(__GNUC__)
+#define SGE_GCC 3
 #define SGE_COMPILER SGE_GCC
 #endif
 
-#ifdef __clang__
-#define SGE_CLANG 3
-#define SGE_COMPILER SGE_CLANG
-#endif
 /*!
 @file
 @todo check these platform macros.

@@ -713,7 +713,7 @@ namespace SpaceGameEngine
 		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
 		using ValueTrait = Trait;
 
-		static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 
 		template<typename _T, typename _Trait, typename _Allocator>
 		friend class StringCore;
