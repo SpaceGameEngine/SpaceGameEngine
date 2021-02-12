@@ -135,6 +135,15 @@ TEST(Vector, SizeConstructionTest)
 	}
 }
 
+TEST(Vector, IteratorPairConstructionTest)
+{
+	Vector<int> v1 = {2, 3, 5, 7, 9};
+	Vector<int, StdAllocator> v2(v1.GetReverseBegin(), v1.GetReverseBegin() + 3);
+	ASSERT_EQ(v2.GetSize(), 3);
+	for (int i = 0; i < 3; i++)
+		ASSERT_EQ(v1[4 - i], v2[i]);
+}
+
 TEST(Vector, CopyConstructionTest)
 {
 	Vector<test_vector_class, MemoryManagerAllocator> v1{0, 1, 2};

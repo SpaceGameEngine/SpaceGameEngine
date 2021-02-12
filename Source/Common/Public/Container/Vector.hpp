@@ -492,16 +492,18 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			if constexpr (std::is_same_v<std::decay_t<STLContainer>, STLContainer>)
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				auto iter = stl_container.begin();
+				for (SizeType i = 0; i < m_Size && iter != stl_container.end(); i++, iter++)
 				{
-					new (&GetObject(i)) T(std::move(*(stl_container.begin() + i)));
+					new (&GetObject(i)) T(std::move(*iter));
 				}
 			}
 			else
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				auto iter = stl_container.begin();
+				for (SizeType i = 0; i < m_Size && iter != stl_container.end(); i++, iter++)
 				{
-					new (&GetObject(i)) T(*(stl_container.begin() + i));
+					new (&GetObject(i)) T(*iter);
 				}
 			}
 		}
@@ -515,6 +517,21 @@ namespace SpaceGameEngine
 			for (SizeType i = 0; i < m_Size; i++)
 			{
 				new (&GetObject(i)) T(val);
+			}
+		}
+
+		template<typename IteratorType, typename = std::enable_if_t<IsSequentialIterator<IteratorType>::Value, void>>
+		inline Vector(const IteratorType& begin, const IteratorType& end)
+		{
+			SizeType size = end - begin;
+			SGE_ASSERT(InvalidSizeError, size, 0, sm_MaxSize);
+			m_Size = size;
+			m_RealSize = size * 2;
+			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+			auto iter = begin;
+			for (SizeType i = 0; i < m_Size && iter != end; i++, iter++)
+			{
+				new (&GetObject(i)) T(*iter);
 			}
 		}
 
