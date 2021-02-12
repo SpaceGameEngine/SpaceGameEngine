@@ -30,16 +30,19 @@ namespace SpaceGameEngine
 	template<typename T>
 	struct CharTrait
 	{
+		using ValueType = T;
 		inline static constexpr const bool IsMultipleByte = false;
 	};
 
 	struct UCS2Trait
 	{
+		using ValueType = Char16;
 		inline static constexpr const bool IsMultipleByte = false;
 	};
 
 	struct UTF8Trait
 	{
+		using ValueType = char;
 		inline static constexpr const bool IsMultipleByte = true;
 	};
 
@@ -261,6 +264,7 @@ namespace SpaceGameEngine
 
 			inline Storage& operator=(const Storage& s)
 			{
+				SGE_ASSERT(SelfAssignmentError, this, &s);
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				auto category_for_s = GetStringCategoryByRealSize<T>(s.m_RealSize);
 				if (category == StringCategory::Small)
@@ -339,6 +343,7 @@ namespace SpaceGameEngine
 
 			inline Storage& operator=(Storage&& s)
 			{
+				SGE_ASSERT(SelfAssignmentError, this, &s);
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				auto category_for_s = GetStringCategoryByRealSize<T>(s.m_RealSize);
 				if (category == StringCategory::Small)
@@ -668,7 +673,7 @@ namespace SpaceGameEngine
 		};
 
 		template<typename T>
-		inline static constexpr StringCategory GetStringCategoryByRealSize(const SizeType size)
+		inline constexpr StringCategory GetStringCategoryByRealSize(const SizeType size)
 		{
 			if (size > 255)
 				return StringCategory::Large;
@@ -677,16 +682,119 @@ namespace SpaceGameEngine
 			else
 				return StringCategory::Small;
 		}
+
+		template<typename T, typename Trait = CharTrait<T>>
+		inline const T* GetNextMultipleByteChar(const T* ptr)
+		{
+			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
+			// need specialize for different situation
+			return ptr + 1;
+		}
+
+		template<>
+		inline const char* GetNextMultipleByteChar<char, UTF8Trait>(const char* ptr)
+		{
+			if (static_cast<const UInt8>(*ptr) <= 0b01111111)
+				return ptr + 1;
+			else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
+				return ptr + 2;
+			else if (static_cast<const UInt8>(*ptr) <= 0b11101111)
+				return ptr + 3;
+			else if (static_cast<const UInt8>(*ptr) <= 0b11110111)
+				return ptr + 4;
+		}
 	}
 
 	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
-	class String
+	class StringCore
 	{
 	public:
 		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
 		using ValueTrait = Trait;
 
-	public:
+		static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+
+		template<typename _T, typename _Trait, typename _Allocator>
+		friend class StringCore;
+
+		/*!
+		@brief Get c-style string 's size, and do not consider the \0 in the result.
+		*/
+		inline static SizeType GetCStringSize(const T* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			SizeType re = 0;
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				while ((*ptr) != static_cast<T>(0))
+				{
+					re += 1;
+					ptr += 1;
+				}
+			}
+			else
+			{
+				while ((*ptr) != static_cast<T>(0))
+				{
+					re += 1;
+					ptr = StringImplement::GetNextMultipleByteChar<T, Trait>(ptr);
+				}
+			}
+			return re;
+		}
+
+		/*!
+		@brief Get c-style string 's size, and do not consider the multi-byte and \0 in the result.
+		*/
+		inline static SizeType GetCStringNormalSize(const T* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			SizeType re = 0;
+			while ((*ptr) != static_cast<T>(0))
+			{
+				re += 1;
+				ptr += 1;
+			}
+			return re;
+		}
+
+		inline StringCore()
+			: m_Storage(1), m_Size(0)
+		{
+		}
+
+		inline StringCore(const StringCore& str)
+			: m_Storage(str.m_Storage), m_Size(str.m_Size)
+		{
+		}
+
+		inline StringCore(StringCore&& str)
+			: m_Storage(std::move(str.m_Storage)), m_Size(str.m_Size)
+		{
+		}
+
+		template<typename OtherAllocator>
+		inline StringCore(const StringCore<T, Trait, OtherAllocator>& str)
+			: m_Storage(str.m_Storage), m_Size(str.m_Size)
+		{
+		}
+
+		template<typename OtherAllocator>
+		inline StringCore(StringCore<T, Trait, OtherAllocator>&& str)
+			: m_Storage(std::move(str.m_Storage)), m_Size(str.m_Size)
+		{
+		}
+
+		inline StringCore(const T* ptr)
+			: m_Storage(ptr, GetCStringNormalSize(ptr) + 1), m_Size(GetCStringSize(ptr))
+		{
+		}
+
+		inline SizeType GetSize() const
+		{
+			return m_Size;
+		}
 		/*StringImplement();
 		StringImplement(const StringImplement& str);
 		StringImplement(StringImplement&& str);
@@ -715,6 +823,8 @@ namespace SpaceGameEngine
 		SizeType GetSize();*/
 
 	private:
+		StringImplement::Storage<T, Allocator> m_Storage;
+		SizeType m_Size;
 	};
 
 	/*!

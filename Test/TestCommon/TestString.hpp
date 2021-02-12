@@ -890,3 +890,66 @@ TEST(Storage, CopyOnWriteTest)
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr, sizeof(Char) * 401), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Large);
 }
+
+TEST(StringImplement, GetNextMultipleByteChar)
+{
+	//"这是12345abcde\0";
+	/*
+	8FD9 1000111111011001 => 11101000 10111111 10011001 => 232 191 153
+	662F 110011000101111  => 11100110 10011000 10101111 => 230 152 175
+	*/
+	const char* pcstr = u8"这是12345abcde\0";
+	auto p = pcstr;
+	std::size_t i = 0;
+	while (*p != '\0')
+	{
+		i += 1;
+		p = StringImplement::GetNextMultipleByteChar<char, UTF8Trait>(p);
+	}
+	ASSERT_EQ(i, 12);
+}
+
+TEST(StringCore, GetCStringSize)
+{
+	const char* pcstr = u8"这是12345abcde\0";
+	ASSERT_EQ((StringCore<char, UTF8Trait>::GetCStringSize(pcstr)), 12);
+}
+
+TEST(StringCore, GetCStringNormalSize)
+{
+	const char* pcstr = u8"这是12345abcde\0";
+	ASSERT_EQ((StringCore<char, UTF8Trait>::GetCStringNormalSize(pcstr)), 16);
+}
+
+TEST(StringCore, InstanceTest)
+{
+	StringCore<Char> s1;
+	ASSERT_EQ(s1.GetSize(), 0);
+	StringCore<Char, CharTrait<Char>, StdAllocator> s2;
+	ASSERT_EQ(s2.GetSize(), 0);
+	StringCore<Char> s3(SGE_STR("这是12345abcde\0"));
+	ASSERT_EQ(s3.GetSize(), 12);
+	StringCore<char, UTF8Trait, StdAllocator> s4(u8"这是12345abcde\0");
+	ASSERT_EQ(s4.GetSize(), 12);
+}
+
+TEST(StringCore, CopyConstructionTest)
+{
+	StringCore<Char> s1(SGE_STR("这是12345abcde\0"));
+	ASSERT_EQ(s1.GetSize(), 12);
+
+	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("这是12345abcde\0"));
+	ASSERT_EQ(s2.GetSize(), 12);
+
+	StringCore<Char> s3(s1);
+	ASSERT_EQ(s3.GetSize(), 12);
+
+	StringCore<Char> s4(std::move(s3));
+	ASSERT_EQ(s4.GetSize(), 12);
+
+	StringCore<Char> s5(s2);
+	ASSERT_EQ(s5.GetSize(), 12);
+
+	StringCore<Char, CharTrait<Char>, StdAllocator> s6(std::move(s5));
+	ASSERT_EQ(s6.GetSize(), 12);
+}

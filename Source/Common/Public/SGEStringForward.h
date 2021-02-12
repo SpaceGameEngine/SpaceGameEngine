@@ -76,6 +76,15 @@ namespace SpaceGameEngine
 #define SGE_STR(str) SGE_STR_(str)
 
 	/*!
+	@file
+	@todo use project manager to define these compile option to set runtime character environment as utf8.
+	*/
+	//set runtime character set, the gcc and linux's setting is writing in the CMakeLists.txt
+#if defined(SGE_MSVC)
+#pragma execution_character_set("utf-8")	//set the runtime character set to utf-8
+#endif
+
+	/*!
 	@}
 	*/
 }
