@@ -870,31 +870,59 @@ namespace SpaceGameEngine
 			return m_Storage.GetData();
 		}
 
-		/*inline bool operator==(const StringCore& str) const
+		inline bool operator==(const StringCore& str) const
 		{
-			if (m_Size != str.m_Size)
+			if (m_Storage.GetSize() != str.m_Storage.GetSize())
 				return false;
 			else
-				return memcmp(m_Storage.GetData(), str.m_Storage.GetData(), m_Size * sizeof(T)) == 0;
+				return memcmp(m_Storage.GetData(), str.m_Storage.GetData(), m_Storage.GetSize() * sizeof(T)) == 0;
 		}
 
 		inline bool operator!=(const StringCore& str) const
 		{
-			if (m_Size != str.m_Size)
+			if (m_Storage.GetSize() != str.m_Storage.GetSize())
 				return true;
 			else
-				return memcmp(m_Storage.GetData(), str.m_Storage.GetData(), m_Size * sizeof(T)) != 0;
+				return memcmp(m_Storage.GetData(), str.m_Storage.GetData(), m_Storage.GetSize() * sizeof(T)) != 0;
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator==(const StringCore<T, Trait, OtherAllocator>& str) const
+		{
+			if (m_Storage.GetSize() != str.m_Storage.GetSize())
+				return false;
+			else
+				return memcmp(m_Storage.GetData(), str.m_Storage.GetData(), m_Storage.GetSize() * sizeof(T)) == 0;
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator!=(const StringCore<T, Trait, OtherAllocator>& str) const
+		{
+			if (m_Storage.GetSize() != str.m_Storage.GetSize())
+				return true;
+			else
+				return memcmp(m_Storage.GetData(), str.m_Storage.GetData(), m_Storage.GetSize() * sizeof(T)) != 0;
 		}
 
 		inline bool operator==(const T* ptr) const
 		{
 			SGE_ASSERT(NullPointerError, ptr);
+			auto size = GetCStringNormalSize(ptr) + 1;
+			if (m_Storage.GetSize() != size)
+				return false;
+			else
+				return memcmp(m_Storage.GetData(), ptr, m_Storage.GetSize() * sizeof(T)) == 0;
 		}
 
 		inline bool operator!=(const T* ptr) const
 		{
 			SGE_ASSERT(NullPointerError, ptr);
-		}*/
+			auto size = GetCStringNormalSize(ptr) + 1;
+			if (m_Storage.GetSize() != size)
+				return true;
+			else
+				return memcmp(m_Storage.GetData(), ptr, m_Storage.GetSize() * sizeof(T)) != 0;
+		}
 
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;

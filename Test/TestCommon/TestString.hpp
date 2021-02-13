@@ -55,20 +55,20 @@ TEST(Storage, InstanceTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char> s2(SGE_STR("测试\0"), 3);
+	const Char* pcstr1 = SGE_STR("测试");
+	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize()), StringImplement::StringCategory::Medium);
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
@@ -94,8 +94,8 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(ars1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(ars1.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char> s2(SGE_STR("测试\0"), 3);
+	const Char* pcstr1 = SGE_STR("测试");
+	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
@@ -116,7 +116,7 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(memcmp(ars2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(ars2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
@@ -143,7 +143,7 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(memcmp(ars3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(ars3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
@@ -177,31 +177,31 @@ TEST(Storage, CopyAssignmentTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char> s2(SGE_STR("测试\0"), 3);
+	const Char* pcstr1 = SGE_STR("测试");
+	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize()), StringImplement::StringCategory::Medium);
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize()), StringImplement::StringCategory::Large);
 
-	const Char* pcstr_s = SGE_STR("S\0");
+	const Char* pcstr_s = SGE_STR("S");
 	//63
-	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2\0");
+	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
 	//403
-	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
 	ASSERT_EQ(ss_s.GetRealSize(), 2);
@@ -305,31 +305,31 @@ TEST(Storage, MoveAssignmentTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char> s2(SGE_STR("测试\0"), 3);
+	const Char* pcstr1 = SGE_STR("测试");
+	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize()), StringImplement::StringCategory::Medium);
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize()), StringImplement::StringCategory::Large);
 
-	const Char* pcstr_s = SGE_STR("S\0");
+	const Char* pcstr_s = SGE_STR("S");
 	//63
-	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2\0");
+	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
 	//403
-	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
 	ASSERT_EQ(ss_s.GetRealSize(), 2);
@@ -446,31 +446,31 @@ TEST(Storage, CopyAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char, StdAllocator> s2(SGE_STR("测试\0"), 3);
+	const Char* pcstr1 = SGE_STR("测试");
+	StringImplement::Storage<Char, StdAllocator> s2(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char, StdAllocator> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char, StdAllocator> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize())), (StringImplement::StringCategory::Large));
 
-	const Char* pcstr_s = SGE_STR("S\0");
+	const Char* pcstr_s = SGE_STR("S");
 	//63
-	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2\0");
+	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
 	//403
-	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
 	ASSERT_EQ(ss_s.GetRealSize(), 2);
@@ -574,23 +574,23 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char, StdAllocator> s2(SGE_STR("测试\0"), 3);
+	const Char* pcstr1 = SGE_STR("测试");
+	StringImplement::Storage<Char, StdAllocator> s2(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	StringImplement::Storage<Char, StdAllocator> s2_2(SGE_STR("测试\0"), 3);
+	StringImplement::Storage<Char, StdAllocator> s2_2(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2_2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2_2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2_2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	StringImplement::Storage<Char, StdAllocator> s2_3(SGE_STR("测试\0"), 3);
+	StringImplement::Storage<Char, StdAllocator> s2_3(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2_3.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2_3.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2_3.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char, StdAllocator> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
@@ -609,7 +609,7 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ(memcmp(s3_3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s3_3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char, StdAllocator> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
@@ -628,11 +628,11 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ(memcmp(s4_3.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s4_3.GetRealSize())), (StringImplement::StringCategory::Large));
 
-	const Char* pcstr_s = SGE_STR("S\0");
+	const Char* pcstr_s = SGE_STR("S");
 	//63
-	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2\0");
+	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
 	//403
-	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
 	ASSERT_EQ(ss_s.GetRealSize(), 2);
@@ -745,9 +745,9 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 
 TEST(Storage, SetRealSizeTest)
 {
-	const Char* pcstr1 = SGE_STR("测试\0");
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr1 = SGE_STR("测试");
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> s_s1(pcstr1, 3);
 	ASSERT_EQ(s_s1.GetRealSize(), 3);
@@ -827,15 +827,15 @@ TEST(Storage, ClearTest)
 	s1.Clear();
 	ASSERT_EQ(s1.GetRealSize(), 0);
 
-	const Char* pcstr1 = SGE_STR("测试\0");
-	StringImplement::Storage<Char> s2(SGE_STR("测试\0"), 3);
+	const Char* pcstr1 = SGE_STR("测试");
+	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
 	s2.Clear();
 	ASSERT_EQ(s2.GetRealSize(), 0);
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2\0");
+	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
@@ -845,7 +845,7 @@ TEST(Storage, ClearTest)
 	ASSERT_EQ(s3.GetRealSize(), 0);
 	ASSERT_EQ(s3.GetSize(), 0);
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
@@ -858,7 +858,7 @@ TEST(Storage, ClearTest)
 
 TEST(Storage, CopyOnWriteTest)
 {
-	const Char* pcstr = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890\0");
+	const Char* pcstr = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> s1(pcstr, 401);
 	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(s1.GetData()), 1);
@@ -893,12 +893,12 @@ TEST(Storage, CopyOnWriteTest)
 
 TEST(StringImplement, GetNextMultipleByteChar)
 {
-	//"这是12345abcde\0";
+	//"这是12345abcde";
 	/*
 	8FD9 1000111111011001 => 11101000 10111111 10011001 => 232 191 153
 	662F 110011000101111  => 11100110 10011000 10101111 => 230 152 175
 	*/
-	const char* pcstr = u8"这是12345abcde\0";
+	const char* pcstr = u8"这是12345abcde";
 	auto p = pcstr;
 	std::size_t i = 0;
 	while (*p != '\0')
@@ -924,13 +924,13 @@ TEST(StringImplement, GetPreviousMultipleByteChar)
 
 TEST(StringCore, GetCStringSize)
 {
-	const char* pcstr = u8"这是12345abcde\0";
+	const char* pcstr = u8"这是12345abcde";
 	ASSERT_EQ((StringCore<char, UTF8Trait>::GetCStringSize(pcstr)), 12);
 }
 
 TEST(StringCore, GetCStringNormalSize)
 {
-	const char* pcstr = u8"这是12345abcde\0";
+	const char* pcstr = u8"这是12345abcde";
 	ASSERT_EQ((StringCore<char, UTF8Trait>::GetCStringNormalSize(pcstr)), 16);
 }
 
@@ -940,39 +940,39 @@ TEST(StringCore, InstanceTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	StringCore<Char, CharTrait<Char>, StdAllocator> s2;
 	ASSERT_EQ(s2.GetSize(), 0);
-	StringCore<Char> s3(SGE_STR("这是12345abcde\0"));
+	StringCore<Char> s3(SGE_STR("这是12345abcde"));
 	ASSERT_EQ(s3.GetSize(), 12);
-	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("这是12345abcde\0"), s3.GetSize() * sizeof(Char)), 0);
-	StringCore<char, UTF8Trait, StdAllocator> s4(u8"这是12345abcde\0");
+	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("这是12345abcde"), s3.GetSize() * sizeof(Char)), 0);
+	StringCore<char, UTF8Trait, StdAllocator> s4(u8"这是12345abcde");
 	ASSERT_EQ(s4.GetSize(), 12);
-	ASSERT_EQ(memcmp(s4.GetData(), u8"这是12345abcde\0", s4.GetSize() * sizeof(char)), 0);
+	ASSERT_EQ(memcmp(s4.GetData(), u8"这是12345abcde", s4.GetSize() * sizeof(char)), 0);
 }
 
 TEST(StringCore, CopyConstructionTest)
 {
-	StringCore<Char> s1(SGE_STR("这是12345abcde\0"));
+	StringCore<Char> s1(SGE_STR("这是12345abcde"));
 	ASSERT_EQ(s1.GetSize(), 12);
-	ASSERT_EQ(memcmp(s1.GetData(), SGE_STR("这是12345abcde\0"), s1.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s1.GetData(), SGE_STR("这是12345abcde"), s1.GetSize() * sizeof(Char)), 0);
 
-	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("这是12345abcde\0"));
+	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("这是12345abcde"));
 	ASSERT_EQ(s2.GetSize(), 12);
-	ASSERT_EQ(memcmp(s2.GetData(), SGE_STR("这是12345abcde\0"), s2.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s2.GetData(), SGE_STR("这是12345abcde"), s2.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s3(s1);
 	ASSERT_EQ(s3.GetSize(), 12);
-	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("这是12345abcde\0"), s3.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("这是12345abcde"), s3.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s4(std::move(s3));
 	ASSERT_EQ(s4.GetSize(), 12);
-	ASSERT_EQ(memcmp(s4.GetData(), SGE_STR("这是12345abcde\0"), s4.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s4.GetData(), SGE_STR("这是12345abcde"), s4.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s5(s2);
 	ASSERT_EQ(s5.GetSize(), 12);
-	ASSERT_EQ(memcmp(s5.GetData(), SGE_STR("这是12345abcde\0"), s5.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s5.GetData(), SGE_STR("这是12345abcde"), s5.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char, CharTrait<Char>, StdAllocator> s6(std::move(s5));
 	ASSERT_EQ(s6.GetSize(), 12);
-	ASSERT_EQ(memcmp(s6.GetData(), SGE_STR("这是12345abcde\0"), s6.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s6.GetData(), SGE_STR("这是12345abcde"), s6.GetSize() * sizeof(Char)), 0);
 }
 
 TEST(StringCore, AssignmentTest)
@@ -1013,8 +1013,23 @@ TEST(StringCore, AssignmentTest)
 	StringCore<Char> s6;
 	ASSERT_EQ(s6.GetSize(), 0);
 
-	s6 = SGE_STR("测试\0");
+	s6 = SGE_STR("测试");
 
 	ASSERT_EQ(s6.GetSize(), 2);
-	ASSERT_EQ(memcmp(s6.GetData(), SGE_STR("测试\0"), sizeof(Char) * s6.GetSize()), 0);
+	ASSERT_EQ(memcmp(s6.GetData(), SGE_STR("测试"), sizeof(Char) * s6.GetSize()), 0);
+}
+
+TEST(StringCore, EqualOperatorTest)
+{
+	StringCore<Char> s1(SGE_STR("这是个测试"));
+	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("这是个测试"));
+	StringCore<Char> s3(SGE_STR("test"));
+
+	ASSERT_EQ(s1 == s2, true);
+	ASSERT_EQ(s1 != s2, false);
+	ASSERT_EQ(s1 == s3, false);
+	ASSERT_EQ(s2 == s3, false);
+	ASSERT_EQ(s1 == SGE_STR("这是个测试"), true);
+	ASSERT_EQ(s2 == SGE_STR("test"), false);
+	ASSERT_EQ(s3 == SGE_STR("test"), true);
 }
