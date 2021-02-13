@@ -736,6 +736,8 @@ namespace SpaceGameEngine
 		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
 		using ValueTrait = Trait;
 
+		inline static const constexpr SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(T);
+
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 
 		template<typename _T, typename _Trait, typename _Allocator>
@@ -922,6 +924,38 @@ namespace SpaceGameEngine
 				return true;
 			else
 				return memcmp(m_Storage.GetData(), ptr, m_Storage.GetSize() * sizeof(T)) != 0;
+		}
+
+		inline void Clear()
+		{
+			m_Storage = std::move(StringImplement::Storage<T, Allocator>(1));
+			m_Size = 0;
+		}
+
+		/*!
+		@brief Return the m_Storage's size which not consider the multi-byte and the \0.
+		*/
+		inline SizeType GetNormalSize() const
+		{
+			return m_Storage.GetSize() - 1;
+		}
+
+		/*!
+		@brief Return the m_Storage's real size which not consider the multi-byte and the \0.
+		*/
+		inline SizeType GetRealSize() const
+		{
+			return m_Storage.GetRealSize() - 1;
+		}
+
+		/*!
+		@brief Set the m_Storage's real size.
+		@warning The parameter size should not consider the multi-byte and \0.
+		*/
+		inline void SetRealSize(const SizeType size)
+		{
+			SGE_ASSERT(InvalidSizeError, size, GetNormalSize(), sm_MaxSize);
+			m_Storage.SetRealSize(size + 1);
 		}
 
 	private:

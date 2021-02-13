@@ -1033,3 +1033,62 @@ TEST(StringCore, EqualOperatorTest)
 	ASSERT_EQ(s2 == SGE_STR("test"), false);
 	ASSERT_EQ(s3 == SGE_STR("test"), true);
 }
+
+TEST(StringCore, ClearTest)
+{
+	StringCore<Char> s(SGE_STR("test"));
+	ASSERT_EQ(s, SGE_STR("test"));
+	ASSERT_EQ(s.GetSize(), 4);
+	s.Clear();
+	ASSERT_EQ(s != SGE_STR("test"), true);
+	ASSERT_EQ(s.GetSize(), 0);
+}
+
+TEST(StringCore, GetNormalSizeTest)
+{
+	StringCore<Char> s1(SGE_STR("这是"));
+	ASSERT_EQ(s1, SGE_STR("这是"));
+	ASSERT_EQ(s1.GetSize(), 2);
+	ASSERT_EQ(s1.GetNormalSize(), 2);
+
+	StringCore<char, UTF8Trait> s2(u8"这是");
+	ASSERT_EQ(s2, u8"这是");
+	ASSERT_EQ(s2.GetSize(), 2);
+	ASSERT_EQ(s2.GetNormalSize(), 6);
+}
+
+TEST(StringCore, GetRealSizeTest)
+{
+	StringCore<Char> s1(SGE_STR("这是"));
+	ASSERT_EQ(s1, SGE_STR("这是"));
+	ASSERT_EQ(s1.GetSize(), 2);
+	ASSERT_EQ(s1.GetRealSize(), 2);
+
+	StringCore<char, UTF8Trait> s2(u8"这是");
+	ASSERT_EQ(s2, u8"这是");
+	ASSERT_EQ(s2.GetSize(), 2);
+	ASSERT_EQ(s2.GetRealSize(), 6);
+}
+
+TEST(StringCore, SetRealSizeTest)
+{
+	StringCore<Char> s1(SGE_STR("这是"));
+	ASSERT_EQ(s1, SGE_STR("这是"));
+	ASSERT_EQ(s1.GetSize(), 2);
+	ASSERT_EQ(s1.GetRealSize(), 2);
+	s1.SetRealSize(100);
+	ASSERT_EQ(s1, SGE_STR("这是"));
+	ASSERT_EQ(s1.GetSize(), 2);
+	ASSERT_EQ(s1.GetRealSize(), 100);
+	ASSERT_EQ(s1.GetNormalSize(), 2);
+
+	StringCore<char, UTF8Trait> s2(u8"这是");
+	ASSERT_EQ(s2, u8"这是");
+	ASSERT_EQ(s2.GetSize(), 2);
+	ASSERT_EQ(s2.GetRealSize(), 6);
+	s2.SetRealSize(300);
+	ASSERT_EQ(s2, u8"这是");
+	ASSERT_EQ(s2.GetSize(), 2);
+	ASSERT_EQ(s2.GetRealSize(), 300);
+	ASSERT_EQ(s2.GetNormalSize(), 6);
+}
