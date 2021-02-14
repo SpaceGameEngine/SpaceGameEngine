@@ -727,6 +727,33 @@ namespace SpaceGameEngine
 			} while ((static_cast<const UInt8>(*ptr) & 0b11000000) == 0b10000000);
 			return ptr;
 		}
+
+		/*!
+		@brief Get the multi-byte char's size(not the real memory size).
+		*/
+		template<typename T, typename Trait = CharTrait<T>>
+		inline SizeType GetMultipleByteCharSize(const T* ptr)
+		{
+			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
+			SGE_ASSERT(NullPointerError, ptr);
+			// need specialize for different situation
+			return 1;
+		}
+
+		template<>
+		inline SizeType GetMultipleByteCharSize<char, UTF8Trait>(const char* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			if (static_cast<const UInt8>(*ptr) <= 0b01111111)
+				return 1;
+			else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
+				return 2;
+			else if (static_cast<const UInt8>(*ptr) <= 0b11101111)
+				return 3;
+			else if (static_cast<const UInt8>(*ptr) <= 0b11110111)
+				return 4;
+		}
 	}
 
 	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
@@ -736,7 +763,7 @@ namespace SpaceGameEngine
 		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
 		using ValueTrait = Trait;
 
-		inline static const constexpr SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(T);
+		inline static const constexpr SizeType sm_MaxSize = (SGE_MAX_MEMORY_SIZE / sizeof(T)) - 1;
 
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 
@@ -958,11 +985,248 @@ namespace SpaceGameEngine
 			m_Storage.SetRealSize(size + 1);
 		}
 
+		template<typename _T>
+		class IteratorImpl
+		{
+		public:
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const IteratorImpl& iter, _T* begin, _T* end)
+				{
+					SGE_ASSERT(NullPointerError, begin);
+					SGE_ASSERT(NullPointerError, end);
+					return !(iter.m_pContent >= begin && iter.m_pContent <= end);
+				}
+			};
+
+			using ValueType = std::conditional_t<Trait::IsMultipleByte, _T*, _T>;
+
+		public:
+			friend OutOfRangeError;
+			friend StringCore;
+
+			inline static IteratorImpl GetBegin(std::conditional_t<std::is_same_v<_T, std::remove_const_t<_T>>, StringCore, const StringCore>& str)
+			{
+				return IteratorImpl(reinterpret_cast<_T*>(str.GetData()));
+			}
+
+			inline static IteratorImpl GetEnd(std::conditional_t<std::is_same_v<_T, std::remove_const_t<_T>>, StringCore, const StringCore>& str)
+			{
+				return IteratorImpl(reinterpret_cast<_T*>(str.GetData()) + str.GetNormalSize());
+			}
+
+			inline IteratorImpl(const IteratorImpl& iter)
+			{
+				m_pContent = iter.m_pContent;
+			}
+
+			inline IteratorImpl& operator=(const IteratorImpl& iter)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &iter);
+				m_pContent = iter.m_pContent;
+				return *this;
+			}
+
+			inline IteratorImpl operator+(SizeType i) const
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					return IteratorImpl(m_pContent + i);
+				}
+				else
+				{
+					auto ptr = m_pContent;
+					while (i--)
+					{
+						ptr = (decltype(ptr))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(ptr);
+					}
+					return IteratorImpl(ptr);
+				}
+			}
+
+			inline IteratorImpl& operator+=(SizeType i)
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent += i;
+				}
+				else
+				{
+					while (i--)
+					{
+						m_pContent = (decltype(m_pContent))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+					}
+				}
+				return *this;
+			}
+
+			inline IteratorImpl& operator++()
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent += 1;
+				}
+				else
+				{
+					m_pContent = (decltype(m_pContent))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+				}
+				return *this;
+			}
+
+			inline const IteratorImpl operator++(int)
+			{
+				IteratorImpl re(*this);
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent += 1;
+				}
+				else
+				{
+					m_pContent = (decltype(m_pContent))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+				}
+				return re;
+			}
+
+			inline IteratorImpl operator-(SizeType i) const
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					return IteratorImpl(m_pContent - i);
+				}
+				else
+				{
+					auto ptr = m_pContent;
+					while (i--)
+					{
+						ptr = (decltype(ptr))StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(ptr);
+					}
+					return IteratorImpl(ptr);
+				}
+			}
+
+			inline IteratorImpl& operator-=(SizeType i)
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent -= i;
+				}
+				else
+				{
+					while (i--)
+					{
+						m_pContent = (decltype(m_pContent))StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<T>, Trait>(m_pContent);
+					}
+				}
+				return *this;
+			}
+
+			inline IteratorImpl& operator--()
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent -= 1;
+				}
+				else
+				{
+					m_pContent = (decltype(m_pContent))StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+				}
+				return *this;
+			}
+
+			inline const IteratorImpl operator--(int)
+			{
+				IteratorImpl re(*this);
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent -= 1;
+				}
+				else
+				{
+					m_pContent = (decltype(m_pContent))StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+				}
+				return re;
+			}
+
+			inline SizeType operator-(const IteratorImpl& iter) const
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					return ((AddressType)m_pContent - (AddressType)iter.m_pContent) / sizeof(_T);
+				}
+				else
+				{
+					SizeType re = 0;
+					auto ptr = iter.m_pContent;
+					while (ptr != m_pContent)
+					{
+						ptr = (decltype(ptr))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(ptr);
+						re += 1;
+					}
+					return re;
+				}
+			}
+
+			inline ValueType operator*() const
+			{
+				if constexpr (!Trait::IsMultipleByte)
+					return *m_pContent;
+				else
+					return m_pContent;
+			}
+
+			inline bool operator==(const IteratorImpl& iter) const
+			{
+				return m_pContent == iter.m_pContent;
+			}
+
+			inline bool operator!=(const IteratorImpl& iter) const
+			{
+				return m_pContent != iter.m_pContent;
+			}
+
+		private:
+			inline explicit IteratorImpl(_T* ptr)
+			{
+				SGE_ASSERT(NullPointerError, ptr);
+				m_pContent = ptr;
+			}
+
+		private:
+			_T* m_pContent;
+		};
+
+		using Iterator = IteratorImpl<T>;
+		using ConstIterator = IteratorImpl<const T>;
+
+		inline Iterator GetBegin()
+		{
+			return Iterator::GetBegin(*this);
+		}
+
+		inline Iterator GetEnd()
+		{
+			return Iterator::GetEnd(*this);
+		}
+
+		inline ConstIterator GetConstBegin() const
+		{
+			return ConstIterator::GetBegin(*this);
+		}
+
+		inline ConstIterator GetConstEnd() const
+		{
+			return ConstIterator::GetEnd(*this);
+		}
+
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;
 		SizeType m_Size;
 	};
 
+	using UCS2String = StringCore<Char16, UCS2Trait, DefaultAllocator>;
+	using UTF8String = StringCore<char, UTF8Trait, DefaultAllocator>;
+	using String = UCS2String;
 	/*!
 	@}
 	*/

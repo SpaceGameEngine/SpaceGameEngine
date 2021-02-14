@@ -1030,42 +1030,10 @@ namespace SpaceGameEngine
 		@brief check the type to make sure that it is one of the Vector's Iterator Types.
 		@todo use concept
 		*/
-		template<typename U>
+		template<typename IteratorType>
 		struct IsVectorIterator
 		{
-		private:
-			template<typename _U>
-			inline static constexpr std::enable_if_t<
-				IsError<typename _U::OutOfRangeError, const _U&, T*, T*>::Value &&
-					(std::is_same_v<typename _U::ValueType, T> || std::is_same_v<typename _U::ValueType, const T>)&&std::is_same_v<decltype(_U::GetBegin(*(new Vector))), _U> &&
-					std::is_same_v<decltype(_U::GetEnd(*(new Vector))), _U> &&
-					std::is_same_v<decltype(new _U(std::declval<_U>())), _U*> &&
-					std::is_same_v<decltype(std::declval<_U>() = std::declval<_U>()), _U&> &&
-					std::is_same_v<decltype(std::declval<_U>() + std::declval<SizeType>()), _U> &&
-					std::is_same_v<decltype(std::declval<_U>() += std::declval<SizeType>()), _U&> &&
-					std::is_same_v<decltype(++std::declval<_U>()), _U&> &&
-					std::is_same_v<decltype(std::declval<_U>()++), const _U> &&
-					std::is_same_v<decltype(std::declval<_U>() - std::declval<SizeType>()), _U> &&
-					std::is_same_v<decltype(std::declval<_U>() -= std::declval<SizeType>()), _U&> &&
-					std::is_same_v<decltype(--std::declval<_U>()), _U&> &&
-					std::is_same_v<decltype(std::declval<_U>()--), const _U> &&
-					std::is_same_v<decltype(std::declval<_U>() - std::declval<_U>()), SizeType> &&
-					(std::is_same_v<decltype(std::declval<_U>().operator->()), T*> || std::is_same_v<decltype(std::declval<_U>().operator->()), const T*>)&&(std::is_same_v<decltype(std::declval<_U>().operator*()), T&> || std::is_same_v<decltype(std::declval<_U>().operator*()), const T&>)&&std::is_same_v<decltype(std::declval<_U>() == std::declval<_U>()), bool> &&
-					std::is_same_v<decltype(std::declval<_U>() != std::declval<_U>()), bool>,
-				bool>
-			Check(int)
-			{
-				return true;
-			}
-
-			template<typename _U>
-			inline static constexpr bool Check(...)
-			{
-				return false;
-			}
-
-		public:
-			inline static constexpr const bool Value = Check<std::remove_cv_t<U>>(0);
+			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
 		};
 
 		/*!
@@ -1074,7 +1042,7 @@ namespace SpaceGameEngine
 		@warning only support sequential iterator.
 		@return Iterator pointing to the inserted value.
 		*/
-		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, const T& val)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -1125,7 +1093,7 @@ namespace SpaceGameEngine
 		@warning only support sequential iterator.
 		@return Iterator pointing to the inserted value.
 		*/
-		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, T&& val)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -1177,7 +1145,7 @@ namespace SpaceGameEngine
 		@warning the size can not be zero.
 		@return Iterator pointing to the first inserted value.
 		*/
-		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, SizeType size, const T& val)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -1288,7 +1256,7 @@ namespace SpaceGameEngine
 		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
-		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Value, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -1409,7 +1377,7 @@ namespace SpaceGameEngine
 		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
-		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, std::initializer_list<T> ilist)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -1540,7 +1508,7 @@ namespace SpaceGameEngine
 		@warning only support sequential iterator.
 		@return the iterator which points to the next element after the removing has been done.
 		*/
-		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
 		inline IteratorType Remove(const IteratorType& iter)
 		{
 			SGE_ASSERT(EmptyVectorError, m_Size);
@@ -1580,7 +1548,7 @@ namespace SpaceGameEngine
 		@warning the begin&end's Container must be current Vector.
 		@return the iterator which points to the next element after the removing has been done.
 		*/
-		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>, bool>>
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
 		inline IteratorType Remove(const IteratorType& begin, const IteratorType& end)
 		{
 			SGE_ASSERT(EmptyVectorError, m_Size);

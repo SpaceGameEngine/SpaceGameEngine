@@ -20,6 +20,16 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+bool IsUTF8CharSame(const char* p1, const char* p2)
+{
+	auto size1 = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(p1);
+	auto size2 = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(p2);
+	if (size1 != size2)
+		return false;
+	else
+		return memcmp(p1, p2, sizeof(char) * size1) == 0;
+}
+
 TEST(StorageRef, InstanceTest)
 {
 	Char* pstr1 = StringImplement::StorageRef<Char>::Create(4);
@@ -891,7 +901,7 @@ TEST(Storage, CopyOnWriteTest)
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Large);
 }
 
-TEST(StringImplement, GetNextMultipleByteChar)
+TEST(StringImplement, GetNextMultipleByteCharTest)
 {
 	//"这是12345abcde";
 	/*
@@ -909,7 +919,7 @@ TEST(StringImplement, GetNextMultipleByteChar)
 	ASSERT_EQ(i, 12);
 }
 
-TEST(StringImplement, GetPreviousMultipleByteChar)
+TEST(StringImplement, GetPreviousMultipleByteCharTest)
 {
 	const char* pcstr = u8"\0这是12345abcde";
 	auto p = pcstr + 16;
@@ -920,6 +930,14 @@ TEST(StringImplement, GetPreviousMultipleByteChar)
 		p = StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(p);
 	}
 	ASSERT_EQ(i, 12);
+}
+
+TEST(StringImplement, GetMultipleByteCharSizeTest)
+{
+	ASSERT_EQ((StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"这")), 3);
+	ASSERT_EQ((StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"是")), 3);
+	ASSERT_EQ((StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"a")), 1);
+	ASSERT_EQ((StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"1")), 1);
 }
 
 TEST(StringCore, GetCStringSize)
@@ -1091,4 +1109,136 @@ TEST(StringCore, SetRealSizeTest)
 	ASSERT_EQ(s2.GetSize(), 2);
 	ASSERT_EQ(s2.GetRealSize(), 300);
 	ASSERT_EQ(s2.GetNormalSize(), 6);
+}
+
+TEST(StringCoreIterator, GetBeginTest)
+{
+	UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetBegin();
+	ASSERT_EQ(*iter1, SGE_STR('这'));
+
+	UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetBegin();
+	ASSERT_EQ(memcmp(*iter2, u8"这", sizeof(char) * StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"这")), 0);
+}
+
+TEST(StringCoreIterator, GetEndTest)
+{
+	UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetEnd();
+	ASSERT_EQ(*iter1, SGE_STR('\0'));
+
+	UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetEnd();
+	ASSERT_EQ(memcmp(*iter2, u8"\0", sizeof(char) * StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"\0")), 0);
+}
+
+TEST(StringCoreIterator, GetConstBeginTest)
+{
+	const UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetConstBegin();
+	ASSERT_EQ(*iter1, SGE_STR('这'));
+
+	const UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetConstBegin();
+	ASSERT_EQ(memcmp(*iter2, u8"这", sizeof(char) * StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"这")), 0);
+}
+
+TEST(StringCoreIterator, GetConstEndTest)
+{
+	const UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetConstEnd();
+	ASSERT_EQ(*iter1, SGE_STR('\0'));
+
+	const UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetConstEnd();
+	ASSERT_EQ(memcmp(*iter2, u8"\0", sizeof(char) * StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"\0")), 0);
+}
+
+TEST(StringCoreIterator, CopyTest)
+{
+	UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetBegin();
+	ASSERT_EQ(*iter1, SGE_STR('这'));
+	auto iter2 = iter1;
+	ASSERT_EQ(*iter1, SGE_STR('这'));
+	ASSERT_EQ(*iter2, SGE_STR('这'));
+	iter2 = s1.GetEnd();
+	ASSERT_EQ(*iter2, SGE_STR('\0'));
+
+	UTF8String s2(u8"这是测试");
+	auto iter3 = s2.GetBegin();
+	ASSERT_TRUE(IsUTF8CharSame(*iter3, u8"这"));
+	auto iter4 = iter3;
+	ASSERT_TRUE(IsUTF8CharSame(*iter3, u8"这"));
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"这"));
+	iter4 = s2.GetEnd();
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"\0"));
+}
+
+TEST(StringCoreIterator, CalculationOperatorTest)
+{
+	UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetBegin();
+	ASSERT_EQ(*iter1, SGE_STR('这'));
+	iter1++;
+	ASSERT_EQ(*iter1, SGE_STR('是'));
+	++iter1;
+	ASSERT_EQ(*iter1, SGE_STR('测'));
+	iter1 += 1;
+	ASSERT_EQ(*iter1, SGE_STR('试'));
+	iter1 = iter1 + 1;
+	ASSERT_EQ(*iter1, SGE_STR('\0'));
+	iter1--;
+	ASSERT_EQ(*iter1, SGE_STR('试'));
+	--iter1;
+	ASSERT_EQ(*iter1, SGE_STR('测'));
+	iter1 -= 1;
+	ASSERT_EQ(*iter1, SGE_STR('是'));
+	iter1 = iter1 - 1;
+	ASSERT_EQ(*iter1, SGE_STR('这'));
+
+	UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetBegin();
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"这"));
+	iter2++;
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"是"));
+	++iter2;
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"测"));
+	iter2 += 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"试"));
+	iter2 = iter2 + 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"\0"));
+	iter2--;
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"试"));
+	--iter2;
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"测"));
+	iter2 -= 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"是"));
+	iter2 = iter2 - 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"这"));
+}
+
+TEST(StringCoreIterator, DistanceTest)
+{
+	UCS2String s1(SGE_STR("这是测试"));
+	ASSERT_EQ(s1.GetEnd() - s1.GetBegin(), 4);
+
+	UTF8String s2(u8"这是测试");
+	ASSERT_EQ(s2.GetEnd() - s2.GetBegin(), 4);
+}
+
+TEST(StringCoreIterator, OutOfRangeTest)
+{
+	UCS2String s1(SGE_STR("这是测试"));
+	ASSERT_FALSE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetBegin(), s1.GetData(), s1.GetData() + s1.GetNormalSize()));
+	ASSERT_FALSE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetEnd(), s1.GetData(), s1.GetData() + s1.GetNormalSize()));
+	ASSERT_TRUE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetEnd() + 1, s1.GetData(), s1.GetData() + s1.GetNormalSize()));
+	ASSERT_TRUE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetBegin() - 1, s1.GetData(), s1.GetData() + s1.GetNormalSize()));
+
+	UTF8String s2(u8"这是测试");
+	ASSERT_FALSE(UTF8String::Iterator::OutOfRangeError::Judge(s2.GetBegin(), s2.GetData(), s2.GetData() + s2.GetNormalSize()));
+	ASSERT_FALSE(UTF8String::Iterator::OutOfRangeError::Judge(s2.GetEnd(), s2.GetData(), s2.GetData() + s2.GetNormalSize()));
+	ASSERT_TRUE(UTF8String::Iterator::OutOfRangeError::Judge(s2.GetBegin() - 1, s2.GetData(), s2.GetData() + s2.GetNormalSize()));
+	ASSERT_TRUE(UTF8String::Iterator::OutOfRangeError::Judge(s2.GetEnd() + 1, s2.GetData(), s2.GetData() + s2.GetNormalSize()));
 }
