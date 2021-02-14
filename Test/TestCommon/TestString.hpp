@@ -1163,7 +1163,7 @@ TEST(StringCoreIterator, GetReverseBeginTest)
 
 	UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetReverseBegin();
-	ASSERT_TRUE(*iter2, u8"试");
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"试"));
 }
 
 TEST(StringCoreIterator, GetReverseEndTest)
@@ -1174,7 +1174,7 @@ TEST(StringCoreIterator, GetReverseEndTest)
 
 	UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetReverseEnd();
-	ASSERT_TRUE(*(iter2 - 1), u8"这");
+	ASSERT_TRUE(IsUTF8CharSame(*(iter2 - 1), u8"这"));
 }
 
 TEST(StringCoreIterator, GetConstReverseBeginTest)
@@ -1185,7 +1185,7 @@ TEST(StringCoreIterator, GetConstReverseBeginTest)
 
 	const UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetConstReverseBegin();
-	ASSERT_TRUE(*iter2, u8"试");
+	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"试"));
 }
 
 TEST(StringCoreIterator, GetConstReverseEndTest)
@@ -1196,7 +1196,7 @@ TEST(StringCoreIterator, GetConstReverseEndTest)
 
 	const UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetConstReverseEnd();
-	ASSERT_TRUE(*(iter2 - 1), u8"这");
+	ASSERT_TRUE(IsUTF8CharSame(*(iter2 - 1), u8"这"));
 }
 
 TEST(StringCoreIterator, CopyTest)
