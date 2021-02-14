@@ -1006,14 +1006,14 @@ namespace SpaceGameEngine
 			friend OutOfRangeError;
 			friend StringCore;
 
-			inline static IteratorImpl GetBegin(std::conditional_t<std::is_same_v<_T, std::remove_const_t<_T>>, StringCore, const StringCore>& str)
+			inline static IteratorImpl GetBegin(const StringCore& str)
 			{
-				return IteratorImpl(reinterpret_cast<_T*>(str.GetData()));
+				return IteratorImpl(const_cast<_T*>(str.GetData()));
 			}
 
-			inline static IteratorImpl GetEnd(std::conditional_t<std::is_same_v<_T, std::remove_const_t<_T>>, StringCore, const StringCore>& str)
+			inline static IteratorImpl GetEnd(const StringCore& str)
 			{
-				return IteratorImpl(reinterpret_cast<_T*>(str.GetData()) + str.GetNormalSize());
+				return IteratorImpl(const_cast<_T*>(str.GetData()) + str.GetNormalSize());
 			}
 
 			inline IteratorImpl(const IteratorImpl& iter)
@@ -1196,8 +1196,227 @@ namespace SpaceGameEngine
 			_T* m_pContent;
 		};
 
+		template<typename _T>
+		class ReverseIteratorImpl
+		{
+		public:
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const ReverseIteratorImpl& iter, _T* begin, _T* end)
+				{
+					SGE_ASSERT(NullPointerError, begin);
+					SGE_ASSERT(NullPointerError, end);
+					return !(iter.m_pContent >= begin && iter.m_pContent <= end);
+				}
+			};
+
+			using ValueType = std::conditional_t<Trait::IsMultipleByte, _T*, _T>;
+
+		public:
+			friend OutOfRangeError;
+			friend StringCore;
+
+			inline static ReverseIteratorImpl GetBegin(const StringCore& str)
+			{
+				if constexpr (!Trait::IsMultipleByte)
+					return ReverseIteratorImpl(const_cast<_T*>(str.GetData()) + str.GetNormalSize() - 1);
+				else
+					return ReverseIteratorImpl(const_cast<_T*>(StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(str.GetData() + str.GetNormalSize())));
+			}
+
+			inline static ReverseIteratorImpl GetEnd(const StringCore& str)
+			{
+				if constexpr (!Trait::IsMultipleByte)
+					return ReverseIteratorImpl(const_cast<_T*>(str.GetData()) - 1);
+				else
+					return ReverseIteratorImpl(const_cast<_T*>(StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(str.GetData())));
+			}
+
+			inline ReverseIteratorImpl(const ReverseIteratorImpl& iter)
+			{
+				m_pContent = iter.m_pContent;
+			}
+
+			inline ReverseIteratorImpl& operator=(const ReverseIteratorImpl& iter)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &iter);
+				m_pContent = iter.m_pContent;
+				return *this;
+			}
+
+			inline ReverseIteratorImpl operator+(SizeType i) const
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					return ReverseIteratorImpl(m_pContent - i);
+				}
+				else
+				{
+					auto ptr = m_pContent;
+					while (i--)
+					{
+						ptr = (decltype(ptr))StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(ptr);
+					}
+					return ReverseIteratorImpl(ptr);
+				}
+			}
+
+			inline ReverseIteratorImpl& operator+=(SizeType i)
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent -= i;
+				}
+				else
+				{
+					while (i--)
+					{
+						m_pContent = (decltype(m_pContent))StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+					}
+				}
+				return *this;
+			}
+
+			inline ReverseIteratorImpl& operator++()
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent -= 1;
+				}
+				else
+				{
+					m_pContent = (decltype(m_pContent))StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+				}
+				return *this;
+			}
+
+			inline const ReverseIteratorImpl operator++(int)
+			{
+				ReverseIteratorImpl re(*this);
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent -= 1;
+				}
+				else
+				{
+					m_pContent = (decltype(m_pContent))StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+				}
+				return re;
+			}
+
+			inline ReverseIteratorImpl operator-(SizeType i) const
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					return ReverseIteratorImpl(m_pContent + i);
+				}
+				else
+				{
+					auto ptr = m_pContent;
+					while (i--)
+					{
+						ptr = (decltype(ptr))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(ptr);
+					}
+					return ReverseIteratorImpl(ptr);
+				}
+			}
+
+			inline ReverseIteratorImpl& operator-=(SizeType i)
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent += i;
+				}
+				else
+				{
+					while (i--)
+					{
+						m_pContent = (decltype(m_pContent))StringImplement::GetNextMultipleByteChar<std::remove_const_t<T>, Trait>(m_pContent);
+					}
+				}
+				return *this;
+			}
+
+			inline ReverseIteratorImpl& operator--()
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent += 1;
+				}
+				else
+				{
+					m_pContent = (decltype(m_pContent))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+				}
+				return *this;
+			}
+
+			inline const ReverseIteratorImpl operator--(int)
+			{
+				ReverseIteratorImpl re(*this);
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					m_pContent += 1;
+				}
+				else
+				{
+					m_pContent = (decltype(m_pContent))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(m_pContent);
+				}
+				return re;
+			}
+
+			inline SizeType operator-(const ReverseIteratorImpl& iter) const
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					return ((AddressType)iter.m_pContent - (AddressType)m_pContent) / sizeof(_T);
+				}
+				else
+				{
+					SizeType re = 0;
+					auto ptr = m_pContent;
+					while (ptr != iter.m_pContent)
+					{
+						ptr = (decltype(ptr))StringImplement::GetNextMultipleByteChar<std::remove_const_t<_T>, Trait>(ptr);
+						re += 1;
+					}
+					return re;
+				}
+			}
+
+			inline ValueType operator*() const
+			{
+				if constexpr (!Trait::IsMultipleByte)
+					return *m_pContent;
+				else
+					return m_pContent;
+			}
+
+			inline bool operator==(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent == iter.m_pContent;
+			}
+
+			inline bool operator!=(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent != iter.m_pContent;
+			}
+
+		private:
+			inline explicit ReverseIteratorImpl(_T* ptr)
+			{
+				SGE_ASSERT(NullPointerError, ptr);
+				m_pContent = ptr;
+			}
+
+		private:
+			_T* m_pContent;
+		};
+
 		using Iterator = IteratorImpl<T>;
 		using ConstIterator = IteratorImpl<const T>;
+		using ReverseIterator = ReverseIteratorImpl<T>;
+		using ConstReverseIterator = ReverseIteratorImpl<const T>;
 
 		inline Iterator GetBegin()
 		{
@@ -1218,6 +1437,35 @@ namespace SpaceGameEngine
 		{
 			return ConstIterator::GetEnd(*this);
 		}
+
+		inline ReverseIterator GetReverseBegin()
+		{
+			return ReverseIterator::GetBegin(*this);
+		}
+
+		inline ReverseIterator GetReverseEnd()
+		{
+			return ReverseIterator::GetEnd(*this);
+		}
+
+		inline ConstReverseIterator GetConstReverseBegin() const
+		{
+			return ConstReverseIterator::GetBegin(*this);
+		}
+
+		inline ConstReverseIterator GetConstReverseEnd() const
+		{
+			return ConstReverseIterator::GetEnd(*this);
+		}
+
+		/*!
+		@brief check the type to make sure that it is one of the StringCore's Iterator Types.
+		*/
+		template<typename IteratorType>
+		struct IsStringCoreIterator
+		{
+			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
+		};
 
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;

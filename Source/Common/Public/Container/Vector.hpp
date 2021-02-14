@@ -1028,7 +1028,6 @@ namespace SpaceGameEngine
 		}
 		/*!
 		@brief check the type to make sure that it is one of the Vector's Iterator Types.
-		@todo use concept
 		*/
 		template<typename IteratorType>
 		struct IsVectorIterator

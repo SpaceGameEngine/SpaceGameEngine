@@ -1155,6 +1155,50 @@ TEST(StringCoreIterator, GetConstEndTest)
 	ASSERT_EQ(memcmp(*iter2, u8"\0", sizeof(char) * StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"\0")), 0);
 }
 
+TEST(StringCoreIterator, GetReverseBeginTest)
+{
+	UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetReverseBegin();
+	ASSERT_EQ(*iter1, SGE_STR('试'));
+
+	UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetReverseBegin();
+	ASSERT_TRUE(*iter2, u8"试");
+}
+
+TEST(StringCoreIterator, GetReverseEndTest)
+{
+	UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetReverseEnd();
+	ASSERT_EQ(*(iter1 - 1), SGE_STR('这'));
+
+	UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetReverseEnd();
+	ASSERT_TRUE(*(iter2 - 1), u8"这");
+}
+
+TEST(StringCoreIterator, GetConstReverseBeginTest)
+{
+	const UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetConstReverseBegin();
+	ASSERT_EQ(*iter1, SGE_STR('试'));
+
+	const UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetConstReverseBegin();
+	ASSERT_TRUE(*iter2, u8"试");
+}
+
+TEST(StringCoreIterator, GetConstReverseEndTest)
+{
+	const UCS2String s1(SGE_STR("这是测试"));
+	auto iter1 = s1.GetConstReverseEnd();
+	ASSERT_EQ(*(iter1 - 1), SGE_STR('这'));
+
+	const UTF8String s2(u8"这是测试");
+	auto iter2 = s2.GetConstReverseEnd();
+	ASSERT_TRUE(*(iter2 - 1), u8"这");
+}
+
 TEST(StringCoreIterator, CopyTest)
 {
 	UCS2String s1(SGE_STR("这是测试"));
@@ -1174,6 +1218,24 @@ TEST(StringCoreIterator, CopyTest)
 	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"这"));
 	iter4 = s2.GetEnd();
 	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"\0"));
+
+	UCS2String s3(SGE_STR("这是测试"));
+	auto iter5 = s3.GetReverseBegin();
+	ASSERT_EQ(*iter5, SGE_STR('试'));
+	auto iter6 = iter5;
+	ASSERT_EQ(*iter5, SGE_STR('试'));
+	ASSERT_EQ(*iter6, SGE_STR('试'));
+	iter6 = s3.GetReverseEnd() - 1;
+	ASSERT_EQ(*iter6, SGE_STR('这'));
+
+	const UTF8String s4(u8"这是测试");
+	auto iter7 = s4.GetConstReverseBegin();
+	ASSERT_TRUE(IsUTF8CharSame(*iter7, u8"试"));
+	auto iter8 = iter7;
+	ASSERT_TRUE(IsUTF8CharSame(*iter7, u8"试"));
+	ASSERT_TRUE(IsUTF8CharSame(*iter8, u8"试"));
+	iter8 = s4.GetConstReverseEnd() - 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter8, u8"这"));
 }
 
 TEST(StringCoreIterator, CalculationOperatorTest)
@@ -1217,15 +1279,57 @@ TEST(StringCoreIterator, CalculationOperatorTest)
 	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"是"));
 	iter2 = iter2 - 1;
 	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"这"));
+
+	const UCS2String s3(SGE_STR("这是测试"));
+	auto iter3 = s3.GetConstReverseBegin() - 1;
+	ASSERT_EQ(*iter3, SGE_STR('\0'));
+	iter3++;
+	ASSERT_EQ(*iter3, SGE_STR('试'));
+	++iter3;
+	ASSERT_EQ(*iter3, SGE_STR('测'));
+	iter3 += 1;
+	ASSERT_EQ(*iter3, SGE_STR('是'));
+	iter3 = iter3 + 1;
+	ASSERT_EQ(*iter3, SGE_STR('这'));
+	iter3--;
+	ASSERT_EQ(*iter3, SGE_STR('是'));
+	--iter3;
+	ASSERT_EQ(*iter3, SGE_STR('测'));
+	iter3 -= 1;
+	ASSERT_EQ(*iter3, SGE_STR('试'));
+	iter3 = iter3 - 1;
+	ASSERT_EQ(*iter3, SGE_STR('\0'));
+
+	UTF8String s4(u8"这是测试");
+	auto iter4 = s4.GetReverseBegin() - 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"\0"));
+	iter4++;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"试"));
+	++iter4;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"测"));
+	iter4 += 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"是"));
+	iter4 = iter4 + 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"这"));
+	iter4--;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"是"));
+	--iter4;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"测"));
+	iter4 -= 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"试"));
+	iter4 = iter4 - 1;
+	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"\0"));
 }
 
 TEST(StringCoreIterator, DistanceTest)
 {
 	UCS2String s1(SGE_STR("这是测试"));
 	ASSERT_EQ(s1.GetEnd() - s1.GetBegin(), 4);
+	ASSERT_EQ(s1.GetReverseEnd() - s1.GetReverseBegin(), 4);
 
 	UTF8String s2(u8"这是测试");
-	ASSERT_EQ(s2.GetEnd() - s2.GetBegin(), 4);
+	ASSERT_EQ(s2.GetConstEnd() - s2.GetConstBegin(), 4);
+	ASSERT_EQ(s2.GetConstReverseEnd() - s2.GetConstReverseBegin(), 4);
 }
 
 TEST(StringCoreIterator, OutOfRangeTest)
@@ -1236,9 +1340,38 @@ TEST(StringCoreIterator, OutOfRangeTest)
 	ASSERT_TRUE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetEnd() + 1, s1.GetData(), s1.GetData() + s1.GetNormalSize()));
 	ASSERT_TRUE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetBegin() - 1, s1.GetData(), s1.GetData() + s1.GetNormalSize()));
 
+	ASSERT_FALSE(UCS2String::ReverseIterator::OutOfRangeError::Judge(s1.GetReverseBegin(), s1.GetData() - 1, s1.GetData() + s1.GetNormalSize() - 1));
+	ASSERT_FALSE(UCS2String::ReverseIterator::OutOfRangeError::Judge(s1.GetReverseEnd(), s1.GetData() - 1, s1.GetData() + s1.GetNormalSize() - 1));
+	ASSERT_TRUE(UCS2String::ReverseIterator::OutOfRangeError::Judge(s1.GetReverseEnd() + 1, s1.GetData() - 1, s1.GetData() + s1.GetNormalSize() - 1));
+	ASSERT_TRUE(UCS2String::ReverseIterator::OutOfRangeError::Judge(s1.GetReverseBegin() - 1, s1.GetData() - 1, s1.GetData() + s1.GetNormalSize() - 1));
+
 	UTF8String s2(u8"这是测试");
 	ASSERT_FALSE(UTF8String::Iterator::OutOfRangeError::Judge(s2.GetBegin(), s2.GetData(), s2.GetData() + s2.GetNormalSize()));
 	ASSERT_FALSE(UTF8String::Iterator::OutOfRangeError::Judge(s2.GetEnd(), s2.GetData(), s2.GetData() + s2.GetNormalSize()));
 	ASSERT_TRUE(UTF8String::Iterator::OutOfRangeError::Judge(s2.GetBegin() - 1, s2.GetData(), s2.GetData() + s2.GetNormalSize()));
 	ASSERT_TRUE(UTF8String::Iterator::OutOfRangeError::Judge(s2.GetEnd() + 1, s2.GetData(), s2.GetData() + s2.GetNormalSize()));
+
+	ASSERT_FALSE(UTF8String::ConstReverseIterator::OutOfRangeError::Judge(s2.GetConstReverseBegin(), StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(s2.GetData()), StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(s2.GetData() + s2.GetNormalSize())));
+	ASSERT_FALSE(UTF8String::ConstReverseIterator::OutOfRangeError::Judge(s2.GetConstReverseEnd(), StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(s2.GetData()), StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(s2.GetData() + s2.GetNormalSize())));
+	ASSERT_TRUE(UTF8String::ConstReverseIterator::OutOfRangeError::Judge(s2.GetConstReverseEnd() + 1, StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(s2.GetData()), StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(s2.GetData() + s2.GetNormalSize())));
+	ASSERT_TRUE(UTF8String::ConstReverseIterator::OutOfRangeError::Judge(s2.GetConstReverseBegin() - 1, StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(s2.GetData()), StringImplement::GetPreviousMultipleByteChar<char, UTF8Trait>(s2.GetData() + s2.GetNormalSize())));
+}
+
+TEST(StringCoreIterator, IsStringCoreIteratorTest)
+{
+	ASSERT_TRUE((UCS2String::IsStringCoreIterator<UCS2String::Iterator>::Value));
+	ASSERT_TRUE((UCS2String::IsStringCoreIterator<UCS2String::ConstIterator>::Value));
+	ASSERT_TRUE((UCS2String::IsStringCoreIterator<UCS2String::ReverseIterator>::Value));
+	ASSERT_TRUE((UCS2String::IsStringCoreIterator<UCS2String::ConstReverseIterator>::Value));
+
+	ASSERT_FALSE((UCS2String::IsStringCoreIterator<int>::Value));
+	ASSERT_FALSE((UCS2String::IsStringCoreIterator<UTF8String::ReverseIterator>::Value));
+
+	ASSERT_TRUE((UTF8String::IsStringCoreIterator<UTF8String::Iterator>::Value));
+	ASSERT_TRUE((UTF8String::IsStringCoreIterator<UTF8String::ConstIterator>::Value));
+	ASSERT_TRUE((UTF8String::IsStringCoreIterator<UTF8String::ReverseIterator>::Value));
+	ASSERT_TRUE((UTF8String::IsStringCoreIterator<UTF8String::ConstReverseIterator>::Value));
+
+	ASSERT_FALSE((UTF8String::IsStringCoreIterator<int>::Value));
+	ASSERT_FALSE((UTF8String::IsStringCoreIterator<UCS2String::ReverseIterator>::Value));
 }
