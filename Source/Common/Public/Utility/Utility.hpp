@@ -85,25 +85,6 @@ namespace SpaceGameEngine
 		T m_First;
 		U m_Second;
 	};
-
-	template<typename T>
-	struct IsComparable
-	{
-	private:
-		template<typename U>
-		inline static constexpr std::enable_if_t<std::is_same_v<decltype(std::declval<U>() == std::declval<U>()), bool>, bool> Judge(int)
-		{
-			return true;
-		}
-		template<typename U>
-		inline static constexpr bool Judge(...)
-		{
-			return false;
-		}
-
-	public:
-		inline static constexpr bool Value = Judge<T>(0);
-	};
 	/*!
 	@}
 	*/

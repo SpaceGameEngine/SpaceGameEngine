@@ -20,7 +20,7 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-bool IsUTF8CharSame(const char* p1, const char* p2)
+inline bool IsUTF8CharSame(const char* p1, const char* p2)
 {
 	auto size1 = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(p1);
 	auto size2 = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(p2);

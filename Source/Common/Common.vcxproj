@@ -169,6 +169,8 @@
     <ClInclude Include="Public\MemoryManager.h" />
     <ClInclude Include="Public\MetaData\MetaData.h" />
     <ClInclude Include="Public\MetaData\MetaObject.hpp" />
+    <ClInclude Include="Public\Meta\Concept.hpp" />
+    <ClInclude Include="Public\Meta\Trait.hpp" />
     <ClInclude Include="Public\Platform.hpp" />
     <ClInclude Include="Public\SGEString.hpp" />
     <ClInclude Include="Public\SGEStringForward.h" />

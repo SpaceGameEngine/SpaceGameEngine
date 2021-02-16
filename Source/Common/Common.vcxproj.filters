@@ -31,6 +31,9 @@
     <Filter Include="Private\Utility">
       <UniqueIdentifier>{c29e37a6-b78b-451a-800c-e813bc85499c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Meta">
+      <UniqueIdentifier>{f6f2d596-3c8e-44db-aa9a-0e6291551d30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -89,6 +92,12 @@
     </ClInclude>
     <ClInclude Include="Public\SGEStringForward.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Meta\Trait.hpp">
+      <Filter>Public\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Meta\Concept.hpp">
+      <Filter>Public\Meta</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
