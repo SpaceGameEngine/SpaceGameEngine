@@ -45,21 +45,11 @@ namespace SpaceGameEngine
 #define StdTCout std::cout
 #define StdToTString std::to_string
 	using TChar = char;
-#define SGE_TSTR_(str) str
+#define SGE_TSTR_(str) u8##str
 #endif
 
 #define SGE_TSTR(str) SGE_TSTR_(str)
 
-//#ifndef SGE_USE_WIDE_CHAR
-///*!
-//@file
-//@todo check whether the other os's runtime character set is utf-8 or not.
-//If not, find a way to make it be the utf-8.
-//*/
-//#if defined(SGE_WINDOWS)
-//#pragma execution_character_set("utf-8")	//set the runtime character set to utf-8
-//#endif
-//#endif
 #ifdef SGE_WINDOWS
 	using Char16 = wchar_t;
 #else

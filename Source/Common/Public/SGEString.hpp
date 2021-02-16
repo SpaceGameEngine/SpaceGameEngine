@@ -1543,6 +1543,36 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		inline StringCore operator+(const StringCore& str) const
+		{
+			StringCore re(*this);
+			re += str;
+			return re;
+		}
+
+		template<typename OtherAllocator>
+		inline StringCore operator+(const StringCore<T, Trait, OtherAllocator>& str) const
+		{
+			StringCore re(*this);
+			re += str;
+			return re;
+		}
+
+		inline StringCore operator+(const T c) const
+		{
+			StringCore re(*this);
+			re += c;
+			return re;
+		}
+
+		inline StringCore operator+(const T* pstr) const
+		{
+			SGE_ASSERT(NullPointerError, pstr);
+			StringCore re(*this);
+			re += pstr;
+			return re;
+		}
+
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;
 		SizeType m_Size;
