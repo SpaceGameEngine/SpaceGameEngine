@@ -648,6 +648,16 @@ namespace SpaceGameEngine
 					return m_Size;
 			}
 
+			inline void SetSize(const SizeType size)
+			{
+				SGE_ASSERT(InvalidSizeError, size, 0, GetRealSize());
+				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
+				if (category == StringCategory::Small)
+					m_RealSize = size;
+				else
+					m_Size = size;
+			}
+
 			inline SizeType GetRealSize() const
 			{
 				return m_RealSize;
@@ -1466,6 +1476,72 @@ namespace SpaceGameEngine
 		{
 			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
 		};
+
+		inline StringCore& operator+=(const StringCore& str)
+		{
+			SizeType nsize = GetNormalSize() + str.GetNormalSize();
+			//normal size can be changed by setrealsize when the string is small string.
+			SizeType osize = GetNormalSize();
+			if (GetRealSize() < nsize)
+			{
+				SetRealSize(nsize);
+			}
+			m_Storage.CopyOnWrite();
+			memcpy(m_Storage.GetData() + osize, str.GetData(), (str.GetNormalSize() + 1) * sizeof(T));
+			m_Size += str.GetSize();
+			m_Storage.SetSize(nsize + 1);
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline StringCore& operator+=(const StringCore<T, Trait, OtherAllocator>& str)
+		{
+			SizeType nsize = GetNormalSize() + str.GetNormalSize();
+			//normal size can be changed by setrealsize when the string is small string.
+			SizeType osize = GetNormalSize();
+			if (GetRealSize() < nsize)
+			{
+				SetRealSize(2 * nsize);
+			}
+			m_Storage.CopyOnWrite();
+			memcpy(m_Storage.GetData() + osize, str.GetData(), (str.GetNormalSize() + 1) * sizeof(T));
+			m_Size += str.GetSize();
+			m_Storage.SetSize(nsize + 1);
+			return *this;
+		}
+
+		inline StringCore& operator+=(const T c)
+		{
+			SizeType nsize = GetNormalSize() + 1;
+			SizeType osize = GetNormalSize();
+			if (GetRealSize() < nsize)
+			{
+				SetRealSize(2 * nsize);
+			}
+			m_Storage.CopyOnWrite();
+			*(m_Storage.GetData() + osize) = c;
+			*(m_Storage.GetData() + nsize) = 0;
+			m_Size += 1;
+			m_Storage.SetSize(nsize + 1);
+			return *this;
+		}
+
+		inline StringCore& operator+=(const T* pstr)
+		{
+			SGE_ASSERT(NullPointerError, pstr);
+			SizeType size = GetCStringNormalSize(pstr);
+			SizeType nsize = GetNormalSize() + size;
+			SizeType osize = GetNormalSize();
+			if (GetRealSize() < nsize)
+			{
+				SetRealSize(2 * nsize);
+			}
+			m_Storage.CopyOnWrite();
+			memcpy(m_Storage.GetData() + osize, pstr, (size + 1) * sizeof(T));
+			m_Size += GetCStringSize(pstr);
+			m_Storage.SetSize(nsize + 1);
+			return *this;
+		}
 
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;
