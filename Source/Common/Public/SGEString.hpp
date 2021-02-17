@@ -883,6 +883,47 @@ namespace SpaceGameEngine
 			}
 		}
 
+		/*!
+		@brief Initialize the StringCore with the given iterator pair.
+		@warning When the StringCore is multi-byte, the given iterator's value type
+		must be the pointer to the StringCore's T(it means that the iterator's value type
+		must be equal to the StringCore's ValueType).
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsSequentialIterator<IteratorType>::Value, void>, typename = std::enable_if_t<std::is_same_v<decltype(new ValueType((ValueType)(IteratorValueType<IteratorType>())), true), bool>, void>>
+		inline StringCore(const IteratorType& begin, const IteratorType& end)
+			: m_Storage(1), m_Size(end - begin)
+		{
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				SizeType size = end - begin;
+				SetRealSize(size);
+				m_Storage.SetSize(size + 1);
+				*(GetData() + size) = 0;
+				auto iter = begin;
+				for (SizeType i = 0; i < size && iter != end; i++, ++iter)
+				{
+					*(GetData() + i) = *iter;
+				}
+			}
+			else
+			{
+				SizeType nsize = 0;
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					nsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+				}
+				SetRealSize(nsize);
+				m_Storage.SetSize(nsize + 1);
+				*(GetData() + nsize) = 0;
+				SizeType i = 0;
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					memcpy(GetData() + i, *iter, StringImplement::GetMultipleByteCharSize<T, Trait>(*iter) * sizeof(T));
+					i += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+				}
+			}
+		}
+
 		inline StringCore& operator=(const StringCore& str)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &str);

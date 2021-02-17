@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "SGEString.hpp"
+#include "Container/Vector.hpp"
 #include "gtest/gtest.h"
 #include <cstring>
 
@@ -1239,11 +1240,36 @@ TEST(StringCore, SizeValueConstructionTest)
 	ASSERT_EQ(s1.GetSize(), 10);
 	ASSERT_EQ(s1.GetNormalSize(), 10);
 	ASSERT_EQ(s1, SGE_STR("这这这这这这这这这这"));
+	ASSERT_EQ(*(s1.GetData() + 10), 0);
 
 	UTF8String s2(10, u8"这");
 	ASSERT_EQ(s2.GetSize(), 10);
 	ASSERT_EQ(s2.GetNormalSize(), 30);
 	ASSERT_EQ(s2, u8"这这这这这这这这这这");
+	ASSERT_EQ(*(s2.GetData() + 30), 0);
+}
+
+TEST(StringCore, IteratorPairConstructionTest)
+{
+	Vector<Char16> v1 = {SGE_STR('这'), SGE_STR('是'), SGE_STR('测'), SGE_STR('试')};
+
+	UCS2String s1(v1.GetBegin(), v1.GetEnd());
+	ASSERT_EQ(s1.GetSize(), 4);
+	ASSERT_EQ(s1.GetNormalSize(), 4);
+	ASSERT_EQ(s1, SGE_STR("这是测试"));
+	ASSERT_EQ(*(s1.GetData() + 4), 0);
+
+	const UTF8String s2_0(u8"12345这是个测试abcde");
+	ASSERT_EQ(s2_0.GetSize(), 15);
+	ASSERT_EQ(s2_0.GetNormalSize(), 25);
+	ASSERT_EQ(s2_0, u8"12345这是个测试abcde");
+	ASSERT_EQ(*(s2_0.GetData() + 25), 0);
+
+	UTF8String s2(s2_0.GetConstBegin(), s2_0.GetConstEnd());
+	ASSERT_EQ(s2.GetSize(), 15);
+	ASSERT_EQ(s2.GetNormalSize(), 25);
+	ASSERT_EQ(s2, u8"12345这是个测试abcde");
+	ASSERT_EQ(*(s2.GetData() + 25), 0);
 }
 
 TEST(StringCoreIterator, GetBeginTest)
