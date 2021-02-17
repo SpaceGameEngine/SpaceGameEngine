@@ -19,6 +19,7 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Concurrent/Thread.h"
 #include "Container/ContainerConcept.hpp"
+#include "Utility/Utility.hpp"
 #include <cstring>
 
 namespace SpaceGameEngine
@@ -764,6 +765,83 @@ namespace SpaceGameEngine
 				return 3;
 			else if (static_cast<const UInt8>(*ptr) <= 0b11110111)
 				return 4;
+		}
+
+		template<typename T, typename Trait = CharTrait<T>>
+		inline Int8 CompareMultipleByteChar(const T* ptr1, const T* ptr2)
+		{
+			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
+			SGE_ASSERT(NullPointerError, ptr1);
+			SGE_ASSERT(NullPointerError, ptr2);
+			return 0;
+		}
+
+		inline Char16 UTF8CharToUCS2Char(const char* ptr)
+		{
+			SGE_ASSERT(NullPointerError, ptr);
+			if (static_cast<const UInt8>(*ptr) <= 0b01111111)
+				return *ptr;
+			else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
+				return ((*(ptr + 1)) & 0b00111111) | (((*ptr) & 0b00011111) << 6);
+			else if (static_cast<const UInt8>(*ptr) <= 0b11101111)
+				return ((*(ptr + 2)) & 0b00111111) | (((*(ptr + 1)) & 0b00111111) << 6) | (((*ptr) & 0b00001111) << 12);
+			else if (static_cast<const UInt8>(*ptr) <= 0b11110111)
+				return ((*(ptr + 3)) & 0b00111111) | (((*(ptr + 2)) & 0b00111111) << 6) | (((*(ptr + 1)) & 0b00111111) << 12) | (((*ptr) & 0b00000111) << 18);	  //out of ucs2
+		}
+
+		inline SizeType GetUCS2CharToUTF8CharSize(const Char16 c)
+		{
+			if (c <= 0x7f)
+				return 1;
+			else if (c <= 0x7ff)
+				return 2;
+			else if (c <= 0xffff)
+				return 3;
+			else if (c <= 0x10ffff)	   //out of ucs2
+				return 4;
+		}
+
+		inline void UCS2CharToUTF8Char(const Char16 c, char* pdst)
+		{
+			SGE_ASSERT(NullPointerError, pdst);
+			if (c <= 0x7f)
+			{
+				*pdst = c;
+			}
+			else if (c <= 0x7ff)
+			{
+				*(pdst + 1) = 0b10000000 | (0b00111111 & c);
+				*pdst = 0b11000000 | ((c >> 6) & 0b00011111);
+			}
+			else if (c <= 0xffff)
+			{
+				*(pdst + 2) = 0b10000000 | (0b00111111 & c);
+				*(pdst + 1) = 0b10000000 | (0b00111111 & (c >> 6));
+				*pdst = 0b11100000 | ((c >> 12) & 0b00001111);
+			}
+			else if (c <= 0x10ffff)	   //out of ucs2
+			{
+				*(pdst + 3) = 0b10000000 | (0b00111111 & c);
+				*(pdst + 2) = 0b10000000 | (0b00111111 & (c >> 6));
+				*(pdst + 1) = 0b10000000 | (0b00111111 & (c >> 12));
+				*pdst = 0b11110000 | ((c >> 18) & 0b00000111);
+			}
+		}
+
+		template<>
+		inline Int8 CompareMultipleByteChar<char, UTF8Trait>(const char* ptr1, const char* ptr2)
+		{
+			SGE_ASSERT(NullPointerError, ptr1);
+			SGE_ASSERT(NullPointerError, ptr2);
+			Char16 c1 = UTF8CharToUCS2Char(ptr1);
+			Char16 c2 = UTF8CharToUCS2Char(ptr2);
+			if (c1 < c2)
+				return -1;
+			else if (c1 == c2)
+				return 0;
+			else if (c1 > c2)
+				return 1;
 		}
 	}
 
@@ -1643,6 +1721,268 @@ namespace SpaceGameEngine
 			StringCore re(*this);
 			re += pstr;
 			return re;
+		}
+
+		inline bool operator<(const StringCore& str) const
+		{
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				for (SizeType i = 0; i < Min(GetSize(), str.GetSize()); i += 1)
+				{
+					const T& c = *(GetData() + i);
+					const T& c2 = *(str.GetData() + i);
+					if (c < c2)
+						return true;
+					else if (c2 < c)
+						return false;
+				}
+				if (GetSize() < str.GetSize())
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				auto iter = GetConstBegin();
+				auto iter2 = str.GetConstBegin();
+				for (; iter != GetConstEnd() && iter2 != str.GetConstEnd(); ++iter, ++iter2)
+				{
+					Int8 res = StringImplement::CompareMultipleByteChar<T, Trait>(*iter, *iter2);
+					if (res < 0)
+						return true;
+					else if (res > 0)
+						return false;
+				}
+				if (GetSize() < str.GetSize())
+					return true;
+				else
+					return false;
+			}
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator<(const StringCore<T, Trait, OtherAllocator>& str) const
+		{
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				for (SizeType i = 0; i < Min(GetSize(), str.GetSize()); i += 1)
+				{
+					const T& c = *(GetData() + i);
+					const T& c2 = *(str.GetData() + i);
+					if (c < c2)
+						return true;
+					else if (c2 < c)
+						return false;
+				}
+				if (GetSize() < str.GetSize())
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				auto iter = GetConstBegin();
+				auto iter2 = str.GetConstBegin();
+				for (; iter != GetConstEnd() && iter2 != str.GetConstEnd(); ++iter, ++iter2)
+				{
+					Int8 res = StringImplement::CompareMultipleByteChar<T, Trait>(*iter, *iter2);
+					if (res < 0)
+						return true;
+					else if (res > 0)
+						return false;
+				}
+				if (GetSize() < str.GetSize())
+					return true;
+				else
+					return false;
+			}
+		}
+
+		inline bool operator<(const T* pstr) const
+		{
+			SGE_ASSERT(NullPointerError, pstr);
+
+			SizeType size = GetCStringSize(pstr);
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				for (SizeType i = 0; i < Min(GetSize(), size); i += 1)
+				{
+					const T& c = *(GetData() + i);
+					const T& c2 = *(pstr + i);
+					if (c < c2)
+						return true;
+					else if (c2 < c)
+						return false;
+				}
+				if (GetSize() < size)
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				auto iter = GetConstBegin();
+				auto ptr = pstr;
+				for (SizeType i = 0; i < Min(GetSize(), size); i += 1, ++iter, ptr = StringImplement::GetNextMultipleByteChar<T, Trait>(ptr))
+				{
+					Int8 res = StringImplement::CompareMultipleByteChar<T, Trait>(*iter, ptr);
+					if (res < 0)
+						return true;
+					else if (res > 0)
+						return false;
+				}
+				if (GetSize() < size)
+					return true;
+				else
+					return false;
+			}
+		}
+
+		inline bool operator>(const StringCore& str) const
+		{
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				for (SizeType i = 0; i < Min(GetSize(), str.GetSize()); i += 1)
+				{
+					const T& c = *(GetData() + i);
+					const T& c2 = *(str.GetData() + i);
+					if (c > c2)
+						return true;
+					else if (c2 > c)
+						return false;
+				}
+				if (GetSize() > str.GetSize())
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				auto iter = GetConstBegin();
+				auto iter2 = str.GetConstBegin();
+				for (; iter != GetConstEnd() && iter2 != str.GetConstEnd(); ++iter, ++iter2)
+				{
+					Int8 res = StringImplement::CompareMultipleByteChar<T, Trait>(*iter, *iter2);
+					if (res > 0)
+						return true;
+					else if (res < 0)
+						return false;
+				}
+				if (GetSize() > str.GetSize())
+					return true;
+				else
+					return false;
+			}
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator>(const StringCore<T, Trait, OtherAllocator>& str) const
+		{
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				for (SizeType i = 0; i < Min(GetSize(), str.GetSize()); i += 1)
+				{
+					const T& c = *(GetData() + i);
+					const T& c2 = *(str.GetData() + i);
+					if (c > c2)
+						return true;
+					else if (c2 > c)
+						return false;
+				}
+				if (GetSize() > str.GetSize())
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				auto iter = GetConstBegin();
+				auto iter2 = str.GetConstBegin();
+				for (; iter != GetConstEnd() && iter2 != str.GetConstEnd(); ++iter, ++iter2)
+				{
+					Int8 res = StringImplement::CompareMultipleByteChar<T, Trait>(*iter, *iter2);
+					if (res > 0)
+						return true;
+					else if (res < 0)
+						return false;
+				}
+				if (GetSize() > str.GetSize())
+					return true;
+				else
+					return false;
+			}
+		}
+
+		inline bool operator>(const T* pstr) const
+		{
+			SGE_ASSERT(NullPointerError, pstr);
+
+			SizeType size = GetCStringSize(pstr);
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				for (SizeType i = 0; i < Min(GetSize(), size); i += 1)
+				{
+					const T& c = *(GetData() + i);
+					const T& c2 = *(pstr + i);
+					if (c > c2)
+						return true;
+					else if (c2 > c)
+						return false;
+				}
+				if (GetSize() > size)
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				auto iter = GetConstBegin();
+				auto ptr = pstr;
+				for (SizeType i = 0; i < Min(GetSize(), size); i += 1, ++iter, ptr = StringImplement::GetNextMultipleByteChar<T, Trait>(ptr))
+				{
+					Int8 res = StringImplement::CompareMultipleByteChar<T, Trait>(*iter, ptr);
+					if (res > 0)
+						return true;
+					else if (res < 0)
+						return false;
+				}
+				if (GetSize() > size)
+					return true;
+				else
+					return false;
+			}
+		}
+
+		inline bool operator<=(const StringCore& str) const
+		{
+			return StringCore::operator<(str) || StringCore::operator==(str);
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator<=(const StringCore<T, Trait, OtherAllocator>& str) const
+		{
+			return StringCore::operator<(str) || StringCore::operator==(str);
+		}
+
+		inline bool operator<=(const T* pstr) const
+		{
+			return StringCore::operator<(pstr) || StringCore::operator==(pstr);
+		}
+
+		inline bool operator>=(const StringCore& str) const
+		{
+			return StringCore::operator>(str) || StringCore::operator==(str);
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator>=(const StringCore<T, Trait, OtherAllocator>& str) const
+		{
+			return StringCore::operator>(str) || StringCore::operator==(str);
+		}
+
+		inline bool operator>=(const T* pstr) const
+		{
+			return StringCore::operator>(pstr) || StringCore::operator==(pstr);
 		}
 
 	private:

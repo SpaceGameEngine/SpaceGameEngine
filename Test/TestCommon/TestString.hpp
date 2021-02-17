@@ -941,6 +941,38 @@ TEST(StringImplement, GetMultipleByteCharSizeTest)
 	ASSERT_EQ((StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(u8"1")), 1);
 }
 
+TEST(StringImplement, UTF8CharToUCS2CharTest)
+{
+	ASSERT_EQ(StringImplement::UTF8CharToUCS2Char(u8"严"), SGE_STR('严'));
+	ASSERT_EQ(StringImplement::UTF8CharToUCS2Char(u8"и"), SGE_STR('и'));
+}
+
+TEST(StringImplement, GetUCS2CharToUTF8CharSizeTest)
+{
+	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_STR('严')), 3);
+	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_STR('!')), 1);
+}
+
+TEST(StringImplement, UCS2CharToUTF8CharTest)
+{
+	char pbuf[4];
+	StringImplement::UCS2CharToUTF8Char(SGE_STR('这'), pbuf);
+	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"这"));
+	StringImplement::UCS2CharToUTF8Char(SGE_STR('и'), pbuf);
+	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"и"));
+	StringImplement::UCS2CharToUTF8Char(SGE_STR('1'), pbuf);
+	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"1"));
+}
+
+TEST(StringImplement, CompareMultipleByteCharTest)
+{
+	ASSERT_EQ((StringImplement::CompareMultipleByteChar<char, UTF8Trait>(u8"a", u8"b")), -1);
+	ASSERT_EQ((StringImplement::CompareMultipleByteChar<char, UTF8Trait>(u8"a", u8"这")), -1);
+	ASSERT_EQ((StringImplement::CompareMultipleByteChar<char, UTF8Trait>(u8"这", u8"a")), 1);
+	ASSERT_EQ((StringImplement::CompareMultipleByteChar<char, UTF8Trait>(u8"这", u8"这")), 0);
+	ASSERT_EQ((StringImplement::CompareMultipleByteChar<char, UTF8Trait>(u8"a", u8"a")), 0);
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";
@@ -1270,6 +1302,120 @@ TEST(StringCore, IteratorPairConstructionTest)
 	ASSERT_EQ(s2.GetNormalSize(), 25);
 	ASSERT_EQ(s2, u8"12345这是个测试abcde");
 	ASSERT_EQ(*(s2.GetData() + 25), 0);
+}
+
+TEST(StringCore, CompareLessTest)
+{
+	UCS2String s1_1(SGE_STR("abcde"));
+	UCS2String s1_2(SGE_STR("ab"));
+	UCS2String s1_3(SGE_STR("这是"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_STR("严格"));
+
+	ASSERT_TRUE(s1_2 < s1_1);
+	ASSERT_TRUE(s1_4 < s1_3);
+	ASSERT_TRUE(s1_1 < s1_3);
+	ASSERT_TRUE(s1_2 < s1_3);
+	ASSERT_TRUE(s1_2 < s1_4);
+	ASSERT_TRUE(s1_1 < s1_4);
+	ASSERT_TRUE(s1_1 < SGE_STR("b"));
+	ASSERT_TRUE(s1_3 < SGE_STR("这是测试"));
+
+	UTF8String s2_1(u8"abcde");
+	UTF8String s2_2(u8"ab");
+	UTF8String s2_3(u8"这是");
+	StringCore<char, UTF8Trait, StdAllocator> s2_4(u8"严格");
+
+	ASSERT_TRUE(s2_2 < s2_1);
+	ASSERT_TRUE(s2_4 < s2_3);
+	ASSERT_TRUE(s2_1 < s2_3);
+	ASSERT_TRUE(s2_2 < s2_3);
+	ASSERT_TRUE(s2_2 < s2_4);
+	ASSERT_TRUE(s2_1 < s2_4);
+	ASSERT_TRUE(s2_1 < u8"b");
+	ASSERT_TRUE(s2_3 < u8"这是测试");
+}
+
+TEST(StringCore, CompareLargeTest)
+{
+	UCS2String s1_1(SGE_STR("abcde"));
+	UCS2String s1_2(SGE_STR("ab"));
+	UCS2String s1_3(SGE_STR("这是"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_STR("严格"));
+
+	ASSERT_TRUE(s1_1 > s1_2);
+	ASSERT_TRUE(s1_3 > s1_4);
+	ASSERT_TRUE(s1_3 > s1_1);
+	ASSERT_TRUE(s1_3 > s1_2);
+	ASSERT_TRUE(s1_4 > s1_2);
+	ASSERT_TRUE(s1_4 > s1_1);
+	ASSERT_TRUE(s1_1 > SGE_STR("a"));
+	ASSERT_TRUE(s1_3 > SGE_STR("严1"));
+
+	UTF8String s2_1(u8"abcde");
+	UTF8String s2_2(u8"ab");
+	UTF8String s2_3(u8"这是");
+	StringCore<char, UTF8Trait, StdAllocator> s2_4(u8"严格");
+
+	ASSERT_TRUE(s2_1 > s2_2);
+	ASSERT_TRUE(s2_3 > s2_4);
+	ASSERT_TRUE(s2_3 > s2_1);
+	ASSERT_TRUE(s2_3 > s2_2);
+	ASSERT_TRUE(s2_4 > s2_2);
+	ASSERT_TRUE(s2_4 > s2_1);
+	ASSERT_TRUE(s2_1 > u8"a");
+	ASSERT_TRUE(s2_3 > u8"严1");
+}
+
+TEST(StringCore, CompareLessEqualTest)
+{
+	UCS2String s1_1(SGE_STR("abc"));
+	UCS2String s1_2(SGE_STR("a"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_3(SGE_STR("abc"));
+	ASSERT_TRUE(s1_2 <= s1_1);
+	ASSERT_TRUE(s1_1 <= s1_3);
+	ASSERT_TRUE(s1_3 <= s1_1);
+	ASSERT_FALSE(s1_1 <= s1_2);
+	ASSERT_FALSE(s1_1 <= SGE_STR("aaaaa测试"));
+	ASSERT_TRUE(s1_1 <= SGE_STR("测试"));
+
+	UTF8String s2_1(u8"abc");
+	UTF8String s2_2(u8"a");
+	StringCore<char, UTF8Trait, StdAllocator> s2_3(u8"abc");
+	ASSERT_TRUE(s2_2 <= s2_1);
+	ASSERT_TRUE(s2_1 <= s2_3);
+	ASSERT_TRUE(s2_3 <= s2_1);
+	ASSERT_FALSE(s2_1 <= s2_2);
+	ASSERT_FALSE(s2_1 <= u8"aaaaa测试");
+	ASSERT_TRUE(s2_1 <= u8"测试");
+}
+
+TEST(StringCore, CompareLargeEqualTest)
+{
+	UCS2String s1_1(SGE_STR("abc"));
+	UCS2String s1_2(SGE_STR("a"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_3(SGE_STR("abc"));
+	ASSERT_TRUE(s1_1 >= s1_2);
+	ASSERT_TRUE(s1_3 >= s1_1);
+	ASSERT_TRUE(s1_1 >= s1_3);
+	ASSERT_FALSE(s1_2 >= s1_1);
+	ASSERT_TRUE(s1_1 >= SGE_STR("aaaaa测试"));
+	ASSERT_FALSE(s1_1 >= SGE_STR("测试"));
+
+	UTF8String s2_1(u8"abc");
+	UTF8String s2_2(u8"a");
+	StringCore<char, UTF8Trait, StdAllocator> s2_3(u8"abc");
+	ASSERT_TRUE(s2_1 >= s2_2);
+	ASSERT_TRUE(s2_3 >= s2_1);
+	ASSERT_TRUE(s2_1 >= s2_3);
+	ASSERT_FALSE(s2_2 >= s2_1);
+	ASSERT_TRUE(s2_1 >= u8"aaaaa测试");
+	ASSERT_FALSE(s2_1 >= u8"测试");
+}
+
+TEST(StringCore, IsTotallyOrderedTest)
+{
+	ASSERT_TRUE(IsTotallyOrdered<UCS2String>::Value);
+	ASSERT_TRUE(IsTotallyOrdered<UTF8String>::Value);
 }
 
 TEST(StringCoreIterator, GetBeginTest)
