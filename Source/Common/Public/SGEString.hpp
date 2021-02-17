@@ -18,6 +18,7 @@ limitations under the License.
 #include "Error.h"
 #include "MemoryManager.h"
 #include "Concurrent/Thread.h"
+#include "Container/ContainerConcept.hpp"
 #include <cstring>
 
 namespace SpaceGameEngine
