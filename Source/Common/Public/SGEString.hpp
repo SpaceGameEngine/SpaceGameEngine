@@ -771,6 +771,7 @@ namespace SpaceGameEngine
 	{
 	public:
 		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
+		using ConstValueType = std::conditional_t<Trait::IsMultipleByte, const T*, const T>;
 		using ValueTrait = Trait;
 
 		inline static const constexpr SizeType sm_MaxSize = (SGE_MAX_MEMORY_SIZE / sizeof(T)) - 1;
@@ -851,6 +852,35 @@ namespace SpaceGameEngine
 		inline explicit StringCore(const T* ptr)
 			: m_Storage(ptr, GetCStringNormalSize(ptr) + 1), m_Size(GetCStringSize(ptr))
 		{
+		}
+
+		inline StringCore(const SizeType size, ConstValueType val)
+			: m_Storage(1), m_Size(size)
+		{
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				SetRealSize(size);
+				m_Storage.SetSize(size + 1);
+				*(GetData() + size) = 0;
+				SizeType i = size;
+				while (i--)
+				{
+					*(GetData() + i) = val;
+				}
+			}
+			else
+			{
+				SGE_ASSERT(NullPointerError, val);
+				auto csize = StringImplement::GetMultipleByteCharSize<T, Trait>(val);
+				SetRealSize(size * csize);
+				m_Storage.SetSize(size * csize + 1);
+				*(GetData() + size * csize) = 0;
+				SizeType i = size;
+				while (i--)
+				{
+					memcpy(GetData() + i * csize, val, csize * sizeof(T));
+				}
+			}
 		}
 
 		inline StringCore& operator=(const StringCore& str)

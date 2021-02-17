@@ -1233,6 +1233,19 @@ TEST(StringCore, OperatorPlusTest)
 	ASSERT_EQ(s2_4, pc_long_str_2);
 }
 
+TEST(StringCore, SizeValueConstructionTest)
+{
+	UCS2String s1(10, SGE_STR('这'));
+	ASSERT_EQ(s1.GetSize(), 10);
+	ASSERT_EQ(s1.GetNormalSize(), 10);
+	ASSERT_EQ(s1, SGE_STR("这这这这这这这这这这"));
+
+	UTF8String s2(10, u8"这");
+	ASSERT_EQ(s2.GetSize(), 10);
+	ASSERT_EQ(s2.GetNormalSize(), 30);
+	ASSERT_EQ(s2, u8"这这这这这这这这这这");
+}
+
 TEST(StringCoreIterator, GetBeginTest)
 {
 	UCS2String s1(SGE_STR("这是测试"));
