@@ -802,6 +802,10 @@ namespace SpaceGameEngine
 				return 4;
 		}
 
+		/*!
+		@brief Write the utf8 char to a existing memory according to the given ucs2 char.
+		@return The next utf8 char's address.
+		*/
 		inline char* UCS2CharToUTF8Char(const Char16 c, char* pdst)
 		{
 			SGE_ASSERT(NullPointerError, pdst);
