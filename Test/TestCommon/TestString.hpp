@@ -950,18 +950,24 @@ TEST(StringImplement, UTF8CharToUCS2CharTest)
 TEST(StringImplement, GetUCS2CharToUTF8CharSizeTest)
 {
 	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_STR('严')), 3);
+	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_STR('и')), 2);
 	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_STR('!')), 1);
 }
 
 TEST(StringImplement, UCS2CharToUTF8CharTest)
 {
 	char pbuf[4];
-	StringImplement::UCS2CharToUTF8Char(SGE_STR('这'), pbuf);
+	memset(pbuf, 0, sizeof(pbuf));
+	char* pre = nullptr;
+	pre = StringImplement::UCS2CharToUTF8Char(SGE_STR('这'), pbuf);
 	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"这"));
-	StringImplement::UCS2CharToUTF8Char(SGE_STR('и'), pbuf);
+	ASSERT_EQ(pre, pbuf + 3);
+	pre = StringImplement::UCS2CharToUTF8Char(SGE_STR('и'), pbuf);
 	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"и"));
-	StringImplement::UCS2CharToUTF8Char(SGE_STR('1'), pbuf);
+	ASSERT_EQ(pre, pbuf + 2);
+	pre = StringImplement::UCS2CharToUTF8Char(SGE_STR('1'), pbuf);
 	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"1"));
+	ASSERT_EQ(pre, pbuf + 1);
 }
 
 TEST(StringImplement, CompareMultipleByteCharTest)

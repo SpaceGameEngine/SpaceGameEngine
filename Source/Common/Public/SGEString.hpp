@@ -802,23 +802,26 @@ namespace SpaceGameEngine
 				return 4;
 		}
 
-		inline void UCS2CharToUTF8Char(const Char16 c, char* pdst)
+		inline char* UCS2CharToUTF8Char(const Char16 c, char* pdst)
 		{
 			SGE_ASSERT(NullPointerError, pdst);
 			if (c <= 0x7f)
 			{
 				*pdst = c;
+				return pdst + 1;
 			}
 			else if (c <= 0x7ff)
 			{
 				*(pdst + 1) = 0b10000000 | (0b00111111 & c);
 				*pdst = 0b11000000 | ((c >> 6) & 0b00011111);
+				return pdst + 2;
 			}
 			else if (c <= 0xffff)
 			{
 				*(pdst + 2) = 0b10000000 | (0b00111111 & c);
 				*(pdst + 1) = 0b10000000 | (0b00111111 & (c >> 6));
 				*pdst = 0b11100000 | ((c >> 12) & 0b00001111);
+				return pdst + 3;
 			}
 			else if (c <= 0x10ffff)	   //out of ucs2
 			{
@@ -826,6 +829,7 @@ namespace SpaceGameEngine
 				*(pdst + 2) = 0b10000000 | (0b00111111 & (c >> 6));
 				*(pdst + 1) = 0b10000000 | (0b00111111 & (c >> 12));
 				*pdst = 0b11110000 | ((c >> 18) & 0b00000111);
+				return pdst + 4;
 			}
 		}
 
