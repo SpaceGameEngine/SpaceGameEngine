@@ -65,6 +65,10 @@ namespace SpaceGameEngine
 
 #define SGE_STR(str) SGE_STR_(str)
 
+#define SGE_U8STR_(str) u8##str
+
+#define SGE_U8STR(str) SGE_U8STR_(str)
+
 	/*!
 	@file
 	@todo use project manager to define these compile option to set runtime character environment as utf8.

@@ -61,11 +61,13 @@ namespace SpaceGameEngine
 		struct StorageRef
 		{
 			std::atomic<SizeType> m_Count;
+			T m_Barrier;	//avoid reverse iterator for multi-byte char out of range
 			T m_pContent[1];
 
 			inline StorageRef()
 			{
 				m_Count.store(0, std::memory_order::memory_order_release);
+				m_Barrier = 0;
 				m_pContent[0] = NULL;
 			}
 
@@ -76,7 +78,7 @@ namespace SpaceGameEngine
 			inline static T* Create(const SizeType size)
 			{
 				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
-				StorageRef& re = *reinterpret_cast<StorageRef*>(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + size * sizeof(T), alignof(StorageRef))) StorageRef());
+				StorageRef& re = *reinterpret_cast<StorageRef*>(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
 				memset(re.m_pContent, NULL, size * sizeof(T));
 				re.m_Count.store(1, std::memory_order_release);
 				return re.m_pContent;
@@ -89,7 +91,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				SGE_ASSERT(NullPointerError, ptr);
-				StorageRef& re = *reinterpret_cast<StorageRef*>(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + size * sizeof(T), alignof(StorageRef))) StorageRef());
+				StorageRef& re = *reinterpret_cast<StorageRef*>(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
 				memcpy(re.m_pContent, ptr, size * sizeof(T));
 				re.m_Count.store(1, std::memory_order_release);
 				return re.m_pContent;
@@ -98,21 +100,21 @@ namespace SpaceGameEngine
 			inline static void CountIncrease(const T* ptr)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
-				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>));
+				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>) - sizeof(T));
 				pcount->fetch_add(1, std::memory_order_acq_rel);
 			}
 
 			inline static void CountDecrease(const T* ptr)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
-				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>));
+				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>) - sizeof(T));
 				pcount->fetch_sub(1, std::memory_order_acq_rel);
 			}
 
 			inline static SizeType GetCount(const T* ptr)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
-				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>));
+				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>) - sizeof(T));
 				return pcount->load(std::memory_order_acquire);
 			}
 
@@ -120,10 +122,10 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				SGE_ASSERT(NullPointerError, ptr);
-				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>));
+				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>) - sizeof(T));
 				if (pcount->load(std::memory_order_acquire) == 1)
 				{
-					Allocator::RawDelete(pcount, sizeof(std::atomic<SizeType>) + size * sizeof(T), alignof(StorageRef));
+					Allocator::RawDelete(pcount, sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef));
 					return true;
 				}
 				else
@@ -1154,6 +1156,9 @@ namespace SpaceGameEngine
 		}
 
 		template<typename _T>
+		class ReverseIteratorImpl;
+
+		template<typename _T>
 		class IteratorImpl
 		{
 		public:
@@ -1173,6 +1178,7 @@ namespace SpaceGameEngine
 		public:
 			friend OutOfRangeError;
 			friend StringCore;
+			friend ReverseIteratorImpl<_T>;
 
 			inline static IteratorImpl GetBegin(const StringCore& str)
 			{
@@ -1335,7 +1341,7 @@ namespace SpaceGameEngine
 				}
 			}
 
-			inline ValueType operator*() const
+			inline std::conditional_t<!Trait::IsMultipleByte, ValueType&, ValueType> operator*() const
 			{
 				if constexpr (!Trait::IsMultipleByte)
 					return *m_pContent;
@@ -1351,6 +1357,16 @@ namespace SpaceGameEngine
 			inline bool operator!=(const IteratorImpl& iter) const
 			{
 				return m_pContent != iter.m_pContent;
+			}
+
+			inline _T* GetData()
+			{
+				return m_pContent;
+			}
+
+			inline const std::remove_const_t<_T>* GetData() const
+			{
+				return m_pContent;
 			}
 
 		private:
@@ -1552,7 +1568,7 @@ namespace SpaceGameEngine
 				}
 			}
 
-			inline ValueType operator*() const
+			inline std::conditional_t<!Trait::IsMultipleByte, ValueType&, ValueType> operator*() const
 			{
 				if constexpr (!Trait::IsMultipleByte)
 					return *m_pContent;
@@ -1568,6 +1584,21 @@ namespace SpaceGameEngine
 			inline bool operator!=(const ReverseIteratorImpl& iter) const
 			{
 				return m_pContent != iter.m_pContent;
+			}
+
+			inline _T* GetData()
+			{
+				return m_pContent;
+			}
+
+			inline const std::remove_const_t<_T>* GetData() const
+			{
+				return m_pContent;
+			}
+
+			operator IteratorImpl<_T>() const
+			{
+				return IteratorImpl<_T>(m_pContent);
 			}
 
 		private:
@@ -1991,6 +2022,92 @@ namespace SpaceGameEngine
 		inline bool operator>=(const T* pstr) const
 		{
 			return StringCore::operator>(pstr) || StringCore::operator==(pstr);
+		}
+
+		/*!
+		@brief insert a StringCore to the StringCore before the iterator.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@return Iterator pointing to the inserted StringCore's first char.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>>
+		inline IteratorType Insert(const IteratorType& iter, const StringCore& str)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &str);
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (GetData()), (GetData()) + GetNormalSize());
+				SizeType osize = GetNormalSize();
+				if (iter == IteratorType::GetEnd(*this))
+				{
+					StringCore::operator+=(str);
+					return IteratorType(GetData() + osize);
+				}
+				SizeType nsize = osize + str.GetNormalSize();
+				SizeType index = ((AddressType)iter.GetData() - (AddressType)GetData()) / sizeof(T);
+				if (GetRealSize() < nsize)
+				{
+					SetRealSize(2 * nsize);
+				}
+				m_Storage.CopyOnWrite();
+				memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
+				memcpy(GetData() + index, str.GetData(), str.GetNormalSize() * sizeof(T));
+				m_Size += str.GetSize();
+				m_Storage.SetSize(nsize + 1);
+				return IteratorType(GetData() + index);
+			}
+			else	//reverse
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (GetData() - 1), (GetData()) + GetNormalSize() - 1);
+				}
+				else
+				{
+					SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData())), (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData() + GetNormalSize())));
+				}
+				SizeType osize = GetNormalSize();
+				SizeType nsize = osize + str.GetNormalSize();
+				SizeType index = ((AddressType)((iter - 1).GetData()) - (AddressType)GetData()) / sizeof(T);
+				if (GetRealSize() < nsize)
+				{
+					SetRealSize(2 * nsize);
+				}
+				m_Storage.CopyOnWrite();
+				if (index != osize)
+					memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
+
+				ReverseIterator i1(GetData() + index + str.GetNormalSize());
+				auto i2 = str.GetConstBegin();
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					i1 += 1;
+				}
+				else
+				{
+					i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+				}
+				while (i2 != str.GetConstEnd())
+				{
+					if constexpr (!Trait::IsMultipleByte)
+					{
+						*i1 = *i2;
+						++i1;
+						++i2;
+					}
+					else
+					{
+						memcpy(*i1, *i2, StringImplement::GetMultipleByteCharSize<T, Trait>(*i2) * sizeof(T));
+						++i2;
+						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+					}
+				}
+				m_Size += str.GetSize();
+				m_Storage.SetSize(nsize + 1);
+				IteratorType re(GetData() + index + str.GetNormalSize());
+				re += 1;
+				return re;
+			}
 		}
 
 	private:
