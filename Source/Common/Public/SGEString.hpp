@@ -1165,7 +1165,7 @@ namespace SpaceGameEngine
 			struct OutOfRangeError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
-				inline static bool Judge(const IteratorImpl& iter, _T* begin, _T* end)
+				inline static bool Judge(const IteratorImpl& iter, const std::remove_const_t<_T>* begin, const std::remove_const_t<_T>* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
 					SGE_ASSERT(NullPointerError, end);
@@ -1387,7 +1387,7 @@ namespace SpaceGameEngine
 			struct OutOfRangeError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
-				inline static bool Judge(const ReverseIteratorImpl& iter, _T* begin, _T* end)
+				inline static bool Judge(const ReverseIteratorImpl& iter, const std::remove_const_t<_T>* begin, const std::remove_const_t<_T>* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
 					SGE_ASSERT(NullPointerError, end);
@@ -2034,6 +2034,91 @@ namespace SpaceGameEngine
 		inline IteratorType Insert(const IteratorType& iter, const StringCore& str)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &str);
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (GetData()), (GetData()) + GetNormalSize());
+				SizeType osize = GetNormalSize();
+				if (iter == IteratorType::GetEnd(*this))
+				{
+					StringCore::operator+=(str);
+					return IteratorType(GetData() + osize);
+				}
+				SizeType nsize = osize + str.GetNormalSize();
+				SizeType index = ((AddressType)iter.GetData() - (AddressType)GetData()) / sizeof(T);
+				if (GetRealSize() < nsize)
+				{
+					SetRealSize(2 * nsize);
+				}
+				m_Storage.CopyOnWrite();
+				memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
+				memcpy(GetData() + index, str.GetData(), str.GetNormalSize() * sizeof(T));
+				m_Size += str.GetSize();
+				m_Storage.SetSize(nsize + 1);
+				return IteratorType(GetData() + index);
+			}
+			else	//reverse
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (GetData() - 1), (GetData()) + GetNormalSize() - 1);
+				}
+				else
+				{
+					SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData())), (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData() + GetNormalSize())));
+				}
+				SizeType osize = GetNormalSize();
+				SizeType nsize = osize + str.GetNormalSize();
+				SizeType index = ((AddressType)((iter - 1).GetData()) - (AddressType)GetData()) / sizeof(T);
+				if (GetRealSize() < nsize)
+				{
+					SetRealSize(2 * nsize);
+				}
+				m_Storage.CopyOnWrite();
+				if (index != osize)
+					memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
+
+				ReverseIterator i1(GetData() + index + str.GetNormalSize());
+				auto i2 = str.GetConstBegin();
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					i1 += 1;
+				}
+				else
+				{
+					i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+				}
+				while (i2 != str.GetConstEnd())
+				{
+					if constexpr (!Trait::IsMultipleByte)
+					{
+						*i1 = *i2;
+						++i1;
+						++i2;
+					}
+					else
+					{
+						memcpy(*i1, *i2, StringImplement::GetMultipleByteCharSize<T, Trait>(*i2) * sizeof(T));
+						++i2;
+						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+					}
+				}
+				m_Size += str.GetSize();
+				m_Storage.SetSize(nsize + 1);
+				IteratorType re(GetData() + index + str.GetNormalSize());
+				re += 1;
+				return re;
+			}
+		}
+
+		/*!
+		@brief insert a StringCore to the StringCore before the iterator.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@return Iterator pointing to the inserted StringCore's first char.
+		*/
+		template<typename IteratorType, typename OtherAllocator, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>>
+		inline IteratorType Insert(const IteratorType& iter, const StringCore<T, Trait, OtherAllocator>& str)
+		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (GetData()), (GetData()) + GetNormalSize());

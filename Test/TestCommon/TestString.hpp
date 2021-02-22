@@ -1432,6 +1432,8 @@ TEST(StringCore, InsertTest)
 	ASSERT_EQ(s1_2.GetSize(), 5);
 	UCS2String s1_3(s1_1);
 	ASSERT_EQ(s1_3.GetSize(), 5);
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_STR("Это тест"));
+	ASSERT_EQ(s1_4.GetSize(), 8);
 
 	auto iter1_1 = s1_1.Insert(s1_1.GetConstEnd(), s1_2);
 	ASSERT_EQ(s1_1.GetSize(), 10);
@@ -1443,12 +1445,19 @@ TEST(StringCore, InsertTest)
 	ASSERT_EQ(s1_3, SGE_STR("1这是个测试2345"));
 	ASSERT_EQ(*iter1_2, SGE_STR('这'));
 
+	auto iter1_3 = s1_1.Insert(s1_1.GetConstBegin() + 1, s1_4);
+	ASSERT_EQ(s1_1.GetSize(), 18);
+	ASSERT_EQ(s1_1, SGE_STR("1Это тест2345这是个测试"));
+	ASSERT_EQ(*iter1_3, SGE_STR('Э'));
+
 	UTF8String s2_1(u8"12345");
 	ASSERT_EQ(s2_1.GetSize(), 5);
 	const UTF8String s2_2(u8"这是个测试");
 	ASSERT_EQ(s2_2.GetSize(), 5);
 	UTF8String s2_3(s2_1);
 	ASSERT_EQ(s2_3.GetSize(), 5);
+	StringCore<char, UTF8Trait, StdAllocator> s2_4(SGE_U8STR("Это тест"));
+	ASSERT_EQ(s2_4.GetSize(), 8);
 
 	auto iter2_1 = s2_1.Insert(s2_1.GetConstEnd(), s2_2);
 	ASSERT_EQ(s2_1.GetSize(), 10);
@@ -1459,6 +1468,11 @@ TEST(StringCore, InsertTest)
 	ASSERT_EQ(s2_3.GetSize(), 10);
 	ASSERT_EQ(s2_3, SGE_U8STR("1这是个测试2345"));
 	ASSERT_TRUE(IsUTF8CharSame(*iter2_2, SGE_U8STR("这")));
+
+	auto iter2_3 = s2_1.Insert(s2_1.GetConstBegin() + 1, s2_4);
+	ASSERT_EQ(s2_1.GetSize(), 18);
+	ASSERT_EQ(s2_1, SGE_U8STR("1Это тест2345这是个测试"));
+	ASSERT_TRUE(IsUTF8CharSame(*iter2_3, SGE_U8STR("Э")));
 }
 
 TEST(StringCore, InsertReverseTest)
@@ -1471,6 +1485,8 @@ TEST(StringCore, InsertReverseTest)
 	ASSERT_EQ(s1_3.GetSize(), 5);
 	UCS2String s1_4(s1_1);
 	ASSERT_EQ(s1_4.GetSize(), 5);
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_5(SGE_STR("Это тест"));
+	ASSERT_EQ(s1_5.GetSize(), 8);
 
 	auto iter1_1 = s1_1.Insert(s1_1.GetConstReverseBegin(), s1_2);
 	ASSERT_EQ(s1_1.GetSize(), 10);
@@ -1487,6 +1503,11 @@ TEST(StringCore, InsertReverseTest)
 	ASSERT_EQ(s1_4, SGE_STR("1试测个是这2345"));
 	ASSERT_EQ(*iter1_3, SGE_STR('这'));
 
+	auto iter1_4 = s1_1.Insert(s1_1.GetReverseBegin() + 1, s1_5);
+	ASSERT_EQ(s1_1.GetSize(), 18);
+	ASSERT_EQ(s1_1, SGE_STR("12345试测个是тсет отЭ这"));
+	ASSERT_EQ(*iter1_4, SGE_STR('Э'));
+
 	UTF8String s2_1(SGE_U8STR("12345"));
 	ASSERT_EQ(s2_1.GetSize(), 5);
 	const UTF8String s2_2(SGE_U8STR("这是个测试"));
@@ -1495,6 +1516,8 @@ TEST(StringCore, InsertReverseTest)
 	ASSERT_EQ(s2_3.GetSize(), 5);
 	UTF8String s2_4(s2_1);
 	ASSERT_EQ(s2_4.GetSize(), 5);
+	StringCore<char, UTF8Trait, StdAllocator> s2_5(SGE_U8STR("Это тест"));
+	ASSERT_EQ(s2_5.GetSize(), 8);
 
 	auto iter2_1 = s2_1.Insert(s2_1.GetConstReverseBegin(), s2_2);
 	ASSERT_EQ(s2_1.GetSize(), 10);
@@ -1510,6 +1533,11 @@ TEST(StringCore, InsertReverseTest)
 	ASSERT_EQ(s2_4.GetSize(), 10);
 	ASSERT_EQ(s2_4, SGE_U8STR("1试测个是这2345"));
 	ASSERT_TRUE(IsUTF8CharSame(*iter2_3, SGE_U8STR("这")));
+
+	auto iter2_4 = s2_1.Insert(s2_1.GetReverseBegin() + 1, s2_5);
+	ASSERT_EQ(s2_1.GetSize(), 18);
+	ASSERT_EQ(s2_1, SGE_U8STR("12345试测个是тсет отЭ这"));
+	ASSERT_TRUE(IsUTF8CharSame(*iter2_4, SGE_U8STR("Э")));
 }
 
 TEST(StringCoreIterator, GetBeginTest)
