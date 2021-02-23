@@ -1450,6 +1450,11 @@ TEST(StringCore, InsertTest)
 	ASSERT_EQ(s1_1, SGE_STR("1Это тест2345这是个测试"));
 	ASSERT_EQ(*iter1_3, SGE_STR('Э'));
 
+	auto iter1_4 = s1_1.Insert(s1_1.GetConstEnd() - 1, SGE_STR("δοκιμή"));
+	ASSERT_EQ(s1_1.GetSize(), 24);
+	ASSERT_EQ(s1_1, SGE_STR("1Это тест2345这是个测δοκιμή试"));
+	ASSERT_EQ(*iter1_4, SGE_STR('δ'));
+
 	UTF8String s2_1(u8"12345");
 	ASSERT_EQ(s2_1.GetSize(), 5);
 	const UTF8String s2_2(u8"这是个测试");
@@ -1473,6 +1478,11 @@ TEST(StringCore, InsertTest)
 	ASSERT_EQ(s2_1.GetSize(), 18);
 	ASSERT_EQ(s2_1, SGE_U8STR("1Это тест2345这是个测试"));
 	ASSERT_TRUE(IsUTF8CharSame(*iter2_3, SGE_U8STR("Э")));
+
+	auto iter2_4 = s2_1.Insert(s2_1.GetConstEnd() - 1, SGE_U8STR("δοκιμή"));
+	ASSERT_EQ(s2_1.GetSize(), 24);
+	ASSERT_EQ(s2_1, SGE_U8STR("1Это тест2345这是个测δοκιμή试"));
+	ASSERT_TRUE(IsUTF8CharSame(*iter2_4, SGE_U8STR("δ")));
 }
 
 TEST(StringCore, InsertReverseTest)
@@ -1508,6 +1518,11 @@ TEST(StringCore, InsertReverseTest)
 	ASSERT_EQ(s1_1, SGE_STR("12345试测个是тсет отЭ这"));
 	ASSERT_EQ(*iter1_4, SGE_STR('Э'));
 
+	auto iter1_5 = s1_1.Insert(s1_1.GetConstReverseEnd() - 1, SGE_STR("δοκιμή"));
+	ASSERT_EQ(s1_1.GetSize(), 24);
+	ASSERT_EQ(s1_1, SGE_STR("1ήμικοδ2345试测个是тсет отЭ这"));
+	ASSERT_EQ(*iter1_5, SGE_STR('δ'));
+
 	UTF8String s2_1(SGE_U8STR("12345"));
 	ASSERT_EQ(s2_1.GetSize(), 5);
 	const UTF8String s2_2(SGE_U8STR("这是个测试"));
@@ -1538,6 +1553,11 @@ TEST(StringCore, InsertReverseTest)
 	ASSERT_EQ(s2_1.GetSize(), 18);
 	ASSERT_EQ(s2_1, SGE_U8STR("12345试测个是тсет отЭ这"));
 	ASSERT_TRUE(IsUTF8CharSame(*iter2_4, SGE_U8STR("Э")));
+
+	auto iter2_5 = s2_1.Insert(s2_1.GetConstReverseEnd() - 1, SGE_U8STR("δοκιμή"));
+	ASSERT_EQ(s2_1.GetSize(), 24);
+	ASSERT_EQ(s2_1, SGE_U8STR("1ήμικοδ2345试测个是тсет отЭ这"));
+	ASSERT_TRUE(IsUTF8CharSame(*iter2_5, SGE_U8STR("δ")));
 }
 
 TEST(StringCoreIterator, GetBeginTest)
