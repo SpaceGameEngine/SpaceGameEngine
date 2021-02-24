@@ -2199,7 +2199,7 @@ namespace SpaceGameEngine
 		@brief insert a CString to the StringCore before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
-		@return Iterator pointing to the inserted StringCore's first char.
+		@return Iterator pointing to the inserted CString's first char.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, const T* pstr)
@@ -2276,6 +2276,111 @@ namespace SpaceGameEngine
 					}
 				}
 				m_Size += GetCStringSize(pstr);
+				m_Storage.SetSize(nsize + 1);
+				IteratorType re(GetData() + index + snsize);
+				re += 1;
+				return re;
+			}
+		}
+
+		/*!
+		@brief insert the content between the given iterator pair to the StringCore before the iterator.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@return Iterator pointing to the inserted content's first char.
+		*/
+		template<typename IteratorType, typename OtherIteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<OtherIteratorType>::Value, void>>
+		inline IteratorType Insert(const IteratorType& iter, const OtherIteratorType& begin, const OtherIteratorType& end)
+		{
+			SizeType snsize = 0;
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				snsize = end - begin;
+			}
+			else
+			{
+				for (auto pbuf = begin; pbuf != end; ++pbuf)
+				{
+					snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*pbuf);
+				}
+			}
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (GetData()), (GetData()) + GetNormalSize());
+				SizeType osize = GetNormalSize();
+				SizeType nsize = osize + snsize;
+				SizeType index = ((AddressType)iter.GetData() - (AddressType)GetData()) / sizeof(T);
+				if (GetRealSize() < nsize)
+				{
+					SetRealSize(2 * nsize);
+				}
+				m_Storage.CopyOnWrite();
+				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
+				SizeType cnt = 0;
+				for (auto i = begin; i != end; ++i)
+				{
+					if constexpr (!Trait::IsMultipleByte)
+					{
+						*(GetData() + index + cnt) = *i;
+						++cnt;
+					}
+					else
+					{
+						memcpy(GetData() + index + cnt, *i, StringImplement::GetMultipleByteCharSize<T, Trait>(*i) * sizeof(T));
+						cnt += StringImplement::GetMultipleByteCharSize<T, Trait>(*i);
+					}
+				}
+				m_Size += (end - begin);
+				m_Storage.SetSize(nsize + 1);
+				return IteratorType(GetData() + index);
+			}
+			else	//reverse
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (GetData() - 1), (GetData()) + GetNormalSize() - 1);
+				}
+				else
+				{
+					SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData())), (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData() + GetNormalSize())));
+				}
+				SizeType osize = GetNormalSize();
+				SizeType nsize = osize + snsize;
+				SizeType index = ((AddressType)((iter - 1).GetData()) - (AddressType)GetData()) / sizeof(T);
+				if (GetRealSize() < nsize)
+				{
+					SetRealSize(2 * nsize);
+				}
+				m_Storage.CopyOnWrite();
+				if (index != osize)
+					memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
+
+				ReverseIterator i1(GetData() + index + snsize);
+				auto i2 = begin;
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					i1 += 1;
+				}
+				else
+				{
+					i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+				}
+				while (i2 != end)
+				{
+					if constexpr (!Trait::IsMultipleByte)
+					{
+						*i1 = *i2;
+						++i1;
+						++i2;
+					}
+					else
+					{
+						memcpy(*i1, *i2, StringImplement::GetMultipleByteCharSize<T, Trait>(*i2) * sizeof(T));
+						++i2;
+						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+					}
+				}
+				m_Size += (end - begin);
 				m_Storage.SetSize(nsize + 1);
 				IteratorType re(GetData() + index + snsize);
 				re += 1;
