@@ -1619,6 +1619,35 @@ TEST(StringCore, RemoveTest)
 	ASSERT_TRUE(IsUTF8CharSame(*iter2_2, SGE_U8STR("\0")));
 }
 
+TEST(StringCore, RemoveRangeTest)
+{
+	UCS2String s1_1(SGE_STR("这是一个测试"));
+	ASSERT_EQ(s1_1.GetSize(), 6);
+
+	auto iter1_1 = s1_1.Remove(s1_1.GetConstBegin(), s1_1.GetConstBegin() + 2);
+	ASSERT_EQ(s1_1.GetSize(), 4);
+	ASSERT_EQ(s1_1, SGE_STR("一个测试"));
+	ASSERT_EQ(*iter1_1, SGE_STR('一'));
+
+	auto iter1_2 = s1_1.Remove(s1_1.GetReverseBegin(), s1_1.GetReverseEnd() - 1);
+	ASSERT_EQ(s1_1.GetSize(), 1);
+	ASSERT_EQ(s1_1, SGE_STR("一"));
+	ASSERT_EQ(*iter1_2, SGE_STR('一'));
+
+	UTF8String s2_1(SGE_U8STR("这是一个测试"));
+	ASSERT_EQ(s2_1.GetSize(), 6);
+
+	auto iter2_1 = s2_1.Remove(s2_1.GetConstBegin(), s2_1.GetConstBegin() + 2);
+	ASSERT_EQ(s2_1.GetSize(), 4);
+	ASSERT_EQ(s2_1, SGE_U8STR("一个测试"));
+	ASSERT_TRUE(IsUTF8CharSame(*iter2_1, SGE_U8STR("一")));
+
+	auto iter2_2 = s2_1.Remove(s2_1.GetReverseBegin(), s2_1.GetReverseEnd() - 1);
+	ASSERT_EQ(s2_1.GetSize(), 1);
+	ASSERT_EQ(s2_1, SGE_U8STR("一"));
+	ASSERT_TRUE(IsUTF8CharSame(*iter2_2, SGE_U8STR("一")));
+}
+
 TEST(StringCoreIterator, GetBeginTest)
 {
 	UCS2String s1(SGE_STR("这是测试"));

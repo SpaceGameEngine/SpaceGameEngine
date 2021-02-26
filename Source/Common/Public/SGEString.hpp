@@ -2407,7 +2407,14 @@ namespace SpaceGameEngine
 		inline IteratorType Remove(const IteratorType& iter)
 		{
 			SGE_ASSERT(EmptyStringCoreError, m_Size);
-			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, GetData(), GetData() + GetNormalSize() - 1);
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, GetData(), GetData() + GetNormalSize() - 1);
+			}
+			else
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, GetData(), StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData() + GetNormalSize()));
+			}
 			SizeType nsize = GetNormalSize();
 			if constexpr (!Trait::IsMultipleByte)
 			{
@@ -2430,6 +2437,62 @@ namespace SpaceGameEngine
 			else	//reverse
 			{
 				return iter + 1;
+			}
+		}
+
+		/*!
+		@brief remove some elements in StringCore by giving the iterators.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@warning the begin&end's Container must be current StringCore.
+		@return the iterator which points to the next element after the removing has been done.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>>
+		inline IteratorType Remove(const IteratorType& begin, const IteratorType& end)
+		{
+			SGE_ASSERT(EmptyStringCoreError, m_Size);
+			SizeType size = end - begin;
+			SGE_ASSERT(InvalidSizeError, size, 1, m_Size);
+			SizeType nsize = GetNormalSize();
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize() - 1);
+				nsize -= size;
+			}
+			else
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, begin, GetData(), StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData() + GetNormalSize()));
+				for (auto i = begin; i != end; ++i)
+				{
+					nsize -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i);
+				}
+			}
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+				m_Storage.CopyOnWrite();
+				memcpy((void*)begin.GetData(), end.GetData(), (GetData() + GetNormalSize() - end.GetData() + 1) * sizeof(T));
+				m_Size -= size;
+				m_Storage.SetSize(nsize + 1);
+				return begin;
+			}
+			else	//reverse
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					SGE_ASSERT(typename IteratorType::OutOfRangeError, end, (GetData() - 1), (GetData()) + GetNormalSize() - 1);
+				}
+				else
+				{
+					SGE_ASSERT(typename IteratorType::OutOfRangeError, end, (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData())), (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData() + GetNormalSize())));
+				}
+				m_Storage.CopyOnWrite();
+				auto end2 = end - 1;
+				auto begin2 = begin - 1;
+				memcpy((void*)end2.GetData(), begin2.GetData(), (GetData() + GetNormalSize() - begin2.GetData() + 1) * sizeof(T));
+				m_Size -= size;
+				m_Storage.SetSize(nsize + 1);
+				return end;
 			}
 		}
 
