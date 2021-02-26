@@ -2496,6 +2496,32 @@ namespace SpaceGameEngine
 			}
 		}
 
+		inline std::conditional_t<!Trait::IsMultipleByte, T&, T*> operator[](const SizeType i)
+		{
+			SGE_ASSERT(InvalidSizeError, i, 0, m_Size - 1);
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				return *(GetData() + i);
+			}
+			else
+			{
+				return *(GetBegin() + i);
+			}
+		}
+
+		inline std::conditional_t<!Trait::IsMultipleByte, T, const T*> operator[](const SizeType i) const
+		{
+			SGE_ASSERT(InvalidSizeError, i, 0, m_Size - 1);
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				return *(GetData() + i);
+			}
+			else
+			{
+				return *(GetConstBegin() + i);
+			}
+		}
+
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;
 		SizeType m_Size;

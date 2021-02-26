@@ -1648,6 +1648,33 @@ TEST(StringCore, RemoveRangeTest)
 	ASSERT_TRUE(IsUTF8CharSame(*iter2_2, SGE_U8STR("一")));
 }
 
+TEST(StringCore, OperatorAtTest)
+{
+	UCS2String s1_1(SGE_STR("这是测试"));
+	const UCS2String s1_2(SGE_STR("这是测试"));
+	ASSERT_EQ(s1_1.GetSize(), 4);
+	ASSERT_EQ(s1_2.GetSize(), 4);
+	for (SizeType i = 0; i < 4; i++)
+		ASSERT_EQ(s1_1[i], s1_2[i]);
+
+	s1_1[1] = SGE_STR('i');
+
+	ASSERT_EQ(s1_1.GetSize(), 4);
+	ASSERT_EQ(s1_1, SGE_STR("这i测试"));
+
+	UTF8String s2_1(SGE_U8STR("这是测试"));
+	const UTF8String s2_2(SGE_U8STR("这是测试"));
+	ASSERT_EQ(s2_1.GetSize(), 4);
+	ASSERT_EQ(s2_2.GetSize(), 4);
+	for (SizeType i = 0; i < 4; i++)
+		ASSERT_TRUE(IsUTF8CharSame(s2_1[i], s2_2[i]));
+
+	memcpy(s2_1[1], SGE_U8STR("亦"), sizeof(char) * 3);
+
+	ASSERT_EQ(s2_1.GetSize(), 4);
+	ASSERT_EQ(s2_1, SGE_U8STR("这亦测试"));
+}
+
 TEST(StringCoreIterator, GetBeginTest)
 {
 	UCS2String s1(SGE_STR("这是测试"));
