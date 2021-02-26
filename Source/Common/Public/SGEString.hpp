@@ -870,6 +870,15 @@ namespace SpaceGameEngine
 		template<typename _T, typename _Trait, typename _Allocator>
 		friend class StringCore;
 
+		struct EmptyStringCoreError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The StringCore is empty");
+			inline static bool Judge(SizeType size)
+			{
+				return size == 0;
+			}
+		};
+
 		/*!
 		@brief Get c-style string 's size, and do not consider the \0 in the result.
 		*/
@@ -1364,7 +1373,7 @@ namespace SpaceGameEngine
 				return m_pContent;
 			}
 
-			inline const std::remove_const_t<_T>* GetData() const
+			inline _T* GetData() const
 			{
 				return m_pContent;
 			}
@@ -1591,7 +1600,7 @@ namespace SpaceGameEngine
 				return m_pContent;
 			}
 
-			inline const std::remove_const_t<_T>* GetData() const
+			inline _T* GetData() const
 			{
 				return m_pContent;
 			}
@@ -2385,6 +2394,42 @@ namespace SpaceGameEngine
 				IteratorType re(GetData() + index + snsize);
 				re += 1;
 				return re;
+			}
+		}
+
+		/*!
+		@brief remove a element in StringCore by giving a iterator.
+		@todo use concept instead of sfinae.
+		@warning only support sequential iterator.
+		@return the iterator which points to the next element after the removing has been done.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>>
+		inline IteratorType Remove(const IteratorType& iter)
+		{
+			SGE_ASSERT(EmptyStringCoreError, m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, GetData(), GetData() + GetNormalSize() - 1);
+			SizeType nsize = GetNormalSize();
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				nsize -= 1;
+			}
+			else
+			{
+				nsize -= StringImplement::GetMultipleByteCharSize<T, Trait>(iter.GetData());
+			}
+			Iterator ni((T*)iter.GetData());
+			ni += 1;
+			m_Storage.CopyOnWrite();
+			memmove((void*)iter.GetData(), ni.GetData(), (GetData() + GetNormalSize() - ni.GetData() + 1) * sizeof(T));
+			m_Size -= 1;
+			m_Storage.SetSize(nsize + 1);
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				return iter;
+			}
+			else	//reverse
+			{
+				return iter + 1;
 			}
 		}
 

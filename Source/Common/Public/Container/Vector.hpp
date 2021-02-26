@@ -1527,6 +1527,8 @@ namespace SpaceGameEngine
 				{
 					new (&const_cast<T&>(*i)) T(std::move(const_cast<T&>(*(i + 1))));
 				}
+				m_Size -= 1;
+				return iter;
 			}
 			else	//reverse
 			{
@@ -1534,10 +1536,9 @@ namespace SpaceGameEngine
 				{
 					new (&const_cast<T&>(*i)) T(std::move(const_cast<T&>(*(i - 1))));
 				}
+				m_Size -= 1;
+				return iter + 1;
 			}
-			m_Size -= 1;
-
-			return iter;
 		}
 
 		/*!

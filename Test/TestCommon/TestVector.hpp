@@ -1705,21 +1705,24 @@ TEST(VectorIterator, ConstReverseIteratorTest)
 
 	Vector<int> v8 = {0, 1, 2, 3, 4};
 	ASSERT_EQ(v8.GetSize(), 5);
-	v8.Remove(v8.GetConstReverseBegin());
+	auto iter14 = v8.Remove(v8.GetConstReverseBegin());
+	ASSERT_EQ(*iter14, 3);
 	ASSERT_EQ(v8.GetSize(), 4);
 	for (SizeType i = 0; i < 4; i++)
 	{
 		ASSERT_EQ(v8[i], i);
 	}
 
-	v8.Remove(v8.GetConstReverseEnd() - 1);
+	auto iter15 = v8.Remove(v8.GetConstReverseEnd() - 1);
+	ASSERT_EQ(iter15, v8.GetConstReverseEnd());
 	ASSERT_EQ(v8.GetSize(), 3);
 	for (SizeType i = 0; i < 3; i++)
 	{
 		ASSERT_EQ(v8[i], i + 1);
 	}
 
-	v8.Remove(v8.GetConstReverseBegin() + 1);
+	auto iter16 = v8.Remove(v8.GetConstReverseBegin() + 1);
+	ASSERT_EQ(*iter16, 1);
 	ASSERT_EQ(v8.GetSize(), 2);
 	ASSERT_EQ(v8[0], 1);
 	ASSERT_EQ(v8[1], 3);
@@ -1727,7 +1730,8 @@ TEST(VectorIterator, ConstReverseIteratorTest)
 	Vector<int> v9 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 	ASSERT_EQ(v9.GetSize(), 10);
-	v9.Remove(v9.GetConstReverseBegin() + 2, v9.GetConstReverseEnd() - 2);
+	auto iter17 = v9.Remove(v9.GetConstReverseBegin() + 2, v9.GetConstReverseEnd() - 2);
+	ASSERT_EQ(*iter17, 1);
 	ASSERT_EQ(v9.GetSize(), 4);
 	ASSERT_EQ(v9[0], 0);
 	ASSERT_EQ(v9[1], 1);
