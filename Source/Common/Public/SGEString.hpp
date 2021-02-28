@@ -2499,6 +2499,7 @@ namespace SpaceGameEngine
 		inline std::conditional_t<!Trait::IsMultipleByte, T&, T*> operator[](const SizeType i)
 		{
 			SGE_ASSERT(InvalidSizeError, i, 0, m_Size - 1);
+			m_Storage.CopyOnWrite();
 			if constexpr (!Trait::IsMultipleByte)
 			{
 				return *(GetData() + i);
