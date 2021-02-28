@@ -859,6 +859,18 @@ namespace SpaceGameEngine
 
 		namespace BoyerMooreSearch
 		{
+			template<typename T>
+			struct MakeCharTypeUnsigned
+			{
+				using Type = T;
+			};
+
+			template<>
+			struct MakeCharTypeUnsigned<char>
+			{
+				using Type = unsigned char;
+			};
+
 			template<typename T, typename Trait = CharTrait<T>>
 			inline void MakeBadCharTable(SizeType* pdst, const T* pstr, SizeType nsize)
 			{
@@ -869,7 +881,7 @@ namespace SpaceGameEngine
 				for (SizeType i = 0; i <= Trait::MaxValue; i++)
 					pdst[i] = nsize;
 				for (SizeType i = 0; i < nsize - 1; i++)
-					pdst[pstr[i]] = nsize - 1 - i;
+					pdst[(MakeCharTypeUnsigned<T>::Type)pstr[i]] = nsize - 1 - i;
 			}
 
 			template<typename T, typename Trait = CharTrait<T>>
