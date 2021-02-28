@@ -1021,6 +1021,74 @@ TEST(BoyerMooreSearch, MakeBadCharTableTest)
 	ASSERT_EQ(v2_1[(unsigned char)'2'], 3);
 }
 
+TEST(BoyerMooreSearch, MakeSuffixTest)
+{
+	UCS2String s1(SGE_STR("测一测12aba12"));
+	ASSERT_EQ(s1.GetNormalSize(), 10);
+	Vector<SizeType> v1(s1.GetNormalSize(), 0);
+
+	StringImplement::BoyerMooreSearch::MakeSuffix<Char16, UCS2Trait>(v1.GetData(), s1.GetData(), s1.GetNormalSize());
+	ASSERT_EQ(v1[9], 10);
+	ASSERT_EQ(v1[8], 0);
+	ASSERT_EQ(v1[7], 0);
+	ASSERT_EQ(v1[6], 0);
+	ASSERT_EQ(v1[5], 0);
+	ASSERT_EQ(v1[4], 2);
+	ASSERT_EQ(v1[3], 0);
+	ASSERT_EQ(v1[2], 0);
+	ASSERT_EQ(v1[1], 0);
+	ASSERT_EQ(v1[0], 0);
+
+	UTF8String s2(SGE_U8STR("测试测试搞个ab12测试"));
+	ASSERT_EQ(s2.GetSize(), 12);
+	ASSERT_EQ(s2.GetNormalSize(), 28);
+	Vector<SizeType> v2(s2.GetNormalSize(), 0);
+
+	StringImplement::BoyerMooreSearch::MakeSuffix<char, UTF8Trait>(v2.GetData(), s2.GetData(), s2.GetNormalSize());
+	ASSERT_EQ(v2[27], 28);
+	ASSERT_EQ(v2[26], 0);
+	ASSERT_EQ(v2[25], 0);
+	ASSERT_EQ(v2[24], 0);
+	ASSERT_EQ(v2[23], 0);
+	ASSERT_EQ(v2[22], 0);
+	ASSERT_EQ(v2[21], 0);
+	ASSERT_EQ(v2[20], 0);
+	ASSERT_EQ(v2[19], 0);
+	ASSERT_EQ(v2[18], 0);
+	ASSERT_EQ(v2[17], 0);
+	ASSERT_EQ(v2[16], 0);
+	ASSERT_EQ(v2[15], 0);
+	ASSERT_EQ(v2[14], 0);
+	ASSERT_EQ(v2[13], 0);
+	ASSERT_EQ(v2[12], 0);
+	ASSERT_EQ(v2[11], 6);
+	ASSERT_EQ(v2[10], 0);
+	ASSERT_EQ(v2[9], 0);
+	ASSERT_EQ(v2[8], 0);
+	ASSERT_EQ(v2[7], 0);
+	ASSERT_EQ(v2[6], 0);
+	ASSERT_EQ(v2[5], 6);
+	ASSERT_EQ(v2[4], 0);
+	ASSERT_EQ(v2[3], 0);
+	ASSERT_EQ(v2[2], 0);
+	ASSERT_EQ(v2[1], 0);
+	ASSERT_EQ(v2[0], 0);
+
+	UCS2String s3(SGE_STR("bcababab"));
+	ASSERT_EQ(s3.GetSize(), 8);
+	Vector<SizeType> v3(s3.GetNormalSize(), 0);
+
+	StringImplement::BoyerMooreSearch::MakeSuffix(v3.GetData(), s3.GetData(), s3.GetNormalSize());
+	ASSERT_EQ(v3[7], 8);
+	ASSERT_EQ(v3[6], 0);
+	ASSERT_EQ(v3[5], 4);
+	ASSERT_EQ(v3[4], 0);
+	ASSERT_EQ(v3[3], 2);
+	ASSERT_EQ(v3[2], 0);
+	ASSERT_EQ(v3[1], 0);
+	ASSERT_EQ(v3[0], 1);
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";
