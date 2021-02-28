@@ -979,6 +979,48 @@ TEST(StringImplement, CompareMultipleByteCharTest)
 	ASSERT_EQ((StringImplement::CompareMultipleByteChar<char, UTF8Trait>(u8"a", u8"a")), 0);
 }
 
+TEST(BoyerMooreSearch, MakeBadCharTableTest)
+{
+	UCS2String s1_1(SGE_STR("这是测试是个这isagoodthing"));
+	Vector<SizeType> v1_1(UCS2Trait::MaxValue + 1, 0);
+	ASSERT_EQ(s1_1.GetSize(), 19);
+	StringImplement::BoyerMooreSearch::MakeBadCharTable<Char16, UCS2Trait>(v1_1.GetData(), s1_1.GetData(), s1_1.GetNormalSize());
+	ASSERT_EQ(v1_1[SGE_STR('这')], 12);
+	ASSERT_EQ(v1_1[SGE_STR('是')], 14);
+	ASSERT_EQ(v1_1[SGE_STR('个')], 13);
+	ASSERT_EQ(v1_1[SGE_STR('测')], 16);
+	ASSERT_EQ(v1_1[SGE_STR('试')], 15);
+	ASSERT_EQ(v1_1[SGE_STR('i')], 2);
+	ASSERT_EQ(v1_1[SGE_STR('s')], 10);
+	ASSERT_EQ(v1_1[SGE_STR('a')], 9);
+	ASSERT_EQ(v1_1[SGE_STR('g')], 8);
+	ASSERT_EQ(v1_1[SGE_STR('o')], 6);
+	ASSERT_EQ(v1_1[SGE_STR('d')], 5);
+	ASSERT_EQ(v1_1[SGE_STR('t')], 4);
+	ASSERT_EQ(v1_1[SGE_STR('h')], 3);
+	ASSERT_EQ(v1_1[SGE_STR('n')], 1);
+	ASSERT_EQ(v1_1[0], 19);
+	ASSERT_EQ(v1_1[SGE_STR('b')], 19);
+	ASSERT_EQ(v1_1[SGE_STR('不')], 19);
+
+	UTF8String s2_1(SGE_U8STR("测一测1212aba"));
+	Vector<SizeType> v2_1(UTF8Trait::MaxValue + 1, 0);
+	ASSERT_EQ(s2_1.GetSize(), 10);
+	ASSERT_EQ(s2_1.GetNormalSize(), 16);
+	StringImplement::BoyerMooreSearch::MakeBadCharTable<char, UTF8Trait>(v2_1.GetData(), s2_1.GetData(), s2_1.GetNormalSize());
+	const char* pcstr2_1 = SGE_U8STR("测一");
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[0]], 9);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[1]], 8);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[2]], 7);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[3]], 12);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[4]], 11);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[5]], 10);
+	ASSERT_EQ(v2_1[(unsigned char)'a'], 2);
+	ASSERT_EQ(v2_1[(unsigned char)'b'], 1);
+	ASSERT_EQ(v2_1[(unsigned char)'1'], 4);
+	ASSERT_EQ(v2_1[(unsigned char)'2'], 3);
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";

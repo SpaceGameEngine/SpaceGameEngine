@@ -34,18 +34,21 @@ namespace SpaceGameEngine
 	{
 		using ValueType = T;
 		inline static constexpr const bool IsMultipleByte = false;
+		inline static constexpr const SizeType MaxValue = (1 << (sizeof(T) * 8)) - 1;
 	};
 
 	struct UCS2Trait
 	{
 		using ValueType = Char16;
 		inline static constexpr const bool IsMultipleByte = false;
+		inline static constexpr const SizeType MaxValue = (1 << (sizeof(Char16) * 8)) - 1;
 	};
 
 	struct UTF8Trait
 	{
 		using ValueType = char;
 		inline static constexpr const bool IsMultipleByte = true;
+		inline static constexpr const SizeType MaxValue = (1 << (sizeof(char) * 8)) - 1;
 	};
 
 	namespace StringImplement
@@ -852,6 +855,67 @@ namespace SpaceGameEngine
 				return 0;
 			else if (c1 > c2)
 				return 1;
+		}
+
+		namespace BoyerMooreSearch
+		{
+			template<typename T, typename Trait = CharTrait<T>>
+			inline void MakeBadCharTable(SizeType* pdst, const T* pstr, SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, pdst);
+				SGE_ASSERT(NullPointerError, pstr);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				for (SizeType i = 0; i <= Trait::MaxValue; i++)
+					pdst[i] = nsize;
+				for (SizeType i = 0; i < nsize - 1; i++)
+					pdst[pstr[i]] = nsize - 1 - i;
+			}
+
+			template<typename T, typename Trait = CharTrait<T>>
+			inline void MakeSuffix(SizeType* pdst, const T* pstr, SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, pdst);
+				SGE_ASSERT(NullPointerError, pstr);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				pdst[nsize - 1] = nsize;
+				SizeType last_end = nsize - 2;
+				SizeType last_begin = nsize - 1;
+				for (SizeType i = nsize - 2; i >= 0; --i)
+				{
+					if (i > last_end && pdst[i + nsize - 1 - last_begin] < i - last_end)
+						pdst[i] = pdst[i + nsize - 1 - last_begin];
+					else
+					{
+						if (i < last_end)
+							last_end = i;
+						last_begin = i;
+						bool is_zero_pass = false;
+						while (pstr[last_end] == pstr[last_end + nsize - 1 - last_begin])
+						{
+							if (last_end != 0)
+								last_end--;
+							else
+							{
+								is_zero_pass = true;
+								break;
+							}
+						}
+						pdst[i] = (last_begin - last_end) + (is_zero_pass ? 1 : 0);
+					}
+					if (i == 0)
+						break;
+				}
+			}
+
+			template<typename T, typename Trait = CharTrait<T>>
+			inline void MakeGoodSuffixTable(SizeType* pdst, const SizeType* psuff, const T* pstr, SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, pdst);
+				SGE_ASSERT(NullPointerError, psuff);
+				SGE_ASSERT(NullPointerError, pstr);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+			}
 		}
 	}
 
