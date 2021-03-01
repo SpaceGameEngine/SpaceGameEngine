@@ -881,7 +881,7 @@ namespace SpaceGameEngine
 				for (SizeType i = 0; i <= Trait::MaxValue; i++)
 					pdst[i] = nsize;
 				for (SizeType i = 0; i < nsize - 1; i++)
-					pdst[(MakeCharTypeUnsigned<T>::Type)pstr[i]] = nsize - 1 - i;
+					pdst[(typename MakeCharTypeUnsigned<T>::Type)pstr[i]] = nsize - 1 - i;
 			}
 
 			template<typename T, typename Trait = CharTrait<T>>
