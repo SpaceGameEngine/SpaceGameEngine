@@ -1027,7 +1027,7 @@ TEST(BoyerMooreSearch, MakeSuffixTest)
 	ASSERT_EQ(s1.GetNormalSize(), 10);
 	Vector<SizeType> v1(s1.GetNormalSize(), 0);
 
-	StringImplement::BoyerMooreSearch::MakeSuffix<Char16, UCS2Trait>(v1.GetData(), s1.GetData(), s1.GetNormalSize());
+	StringImplement::BoyerMooreSearch::MakeSuffix(v1.GetData(), s1.GetData(), s1.GetNormalSize());
 	ASSERT_EQ(v1[9], 10);
 	ASSERT_EQ(v1[8], 0);
 	ASSERT_EQ(v1[7], 0);
@@ -1044,7 +1044,7 @@ TEST(BoyerMooreSearch, MakeSuffixTest)
 	ASSERT_EQ(s2.GetNormalSize(), 28);
 	Vector<SizeType> v2(s2.GetNormalSize(), 0);
 
-	StringImplement::BoyerMooreSearch::MakeSuffix<char, UTF8Trait>(v2.GetData(), s2.GetData(), s2.GetNormalSize());
+	StringImplement::BoyerMooreSearch::MakeSuffix(v2.GetData(), s2.GetData(), s2.GetNormalSize());
 	ASSERT_EQ(v2[27], 28);
 	ASSERT_EQ(v2[26], 0);
 	ASSERT_EQ(v2[25], 0);
@@ -1087,6 +1087,77 @@ TEST(BoyerMooreSearch, MakeSuffixTest)
 	ASSERT_EQ(v3[2], 0);
 	ASSERT_EQ(v3[1], 0);
 	ASSERT_EQ(v3[0], 1);
+}
+
+TEST(BoyerMooreSearch, MakeGoodSuffixTableTest)
+{
+	UCS2String s1(SGE_STR("测一测12aba12"));
+	ASSERT_EQ(s1.GetNormalSize(), 10);
+	Vector<SizeType> v1(s1.GetNormalSize(), 0);
+	StringImplement::BoyerMooreSearch::MakeSuffix(v1.GetData(), s1.GetData(), s1.GetNormalSize());
+	Vector<SizeType> v1_2(s1.GetNormalSize(), 0);
+	StringImplement::BoyerMooreSearch::MakeGoodSuffixTable(v1_2.GetData(), v1.GetData(), s1.GetData(), s1.GetNormalSize());
+	ASSERT_EQ(v1_2[0], 10);
+	ASSERT_EQ(v1_2[1], 10);
+	ASSERT_EQ(v1_2[2], 10);
+	ASSERT_EQ(v1_2[3], 10);
+	ASSERT_EQ(v1_2[4], 10);
+	ASSERT_EQ(v1_2[5], 10);
+	ASSERT_EQ(v1_2[6], 10);
+	ASSERT_EQ(v1_2[7], 5);
+	ASSERT_EQ(v1_2[8], 10);
+	ASSERT_EQ(v1_2[9], 1);
+
+	UTF8String s2(SGE_U8STR("测试测试搞个ab12测试"));
+	ASSERT_EQ(s2.GetSize(), 12);
+	ASSERT_EQ(s2.GetNormalSize(), 28);
+	Vector<SizeType> v2(s2.GetNormalSize(), 0);
+	StringImplement::BoyerMooreSearch::MakeSuffix(v2.GetData(), s2.GetData(), s2.GetNormalSize());
+	Vector<SizeType> v2_2(s2.GetNormalSize(), 0);
+	StringImplement::BoyerMooreSearch::MakeGoodSuffixTable(v2_2.GetData(), v2.GetData(), s2.GetData(), s2.GetNormalSize());
+	ASSERT_EQ(v2_2[0], 22);
+	ASSERT_EQ(v2_2[1], 22);
+	ASSERT_EQ(v2_2[2], 22);
+	ASSERT_EQ(v2_2[3], 22);
+	ASSERT_EQ(v2_2[4], 22);
+	ASSERT_EQ(v2_2[5], 22);
+	ASSERT_EQ(v2_2[6], 22);
+	ASSERT_EQ(v2_2[7], 22);
+	ASSERT_EQ(v2_2[8], 22);
+	ASSERT_EQ(v2_2[9], 22);
+	ASSERT_EQ(v2_2[10], 22);
+	ASSERT_EQ(v2_2[11], 22);
+	ASSERT_EQ(v2_2[12], 22);
+	ASSERT_EQ(v2_2[13], 22);
+	ASSERT_EQ(v2_2[14], 22);
+	ASSERT_EQ(v2_2[15], 22);
+	ASSERT_EQ(v2_2[16], 22);
+	ASSERT_EQ(v2_2[17], 22);
+	ASSERT_EQ(v2_2[18], 22);
+	ASSERT_EQ(v2_2[19], 22);
+	ASSERT_EQ(v2_2[20], 22);
+	ASSERT_EQ(v2_2[21], 16);
+	ASSERT_EQ(v2_2[22], 28);
+	ASSERT_EQ(v2_2[23], 28);
+	ASSERT_EQ(v2_2[24], 28);
+	ASSERT_EQ(v2_2[25], 28);
+	ASSERT_EQ(v2_2[26], 28);
+	ASSERT_EQ(v2_2[27], 1);
+
+	UCS2String s3(SGE_STR("bcababab"));
+	ASSERT_EQ(s3.GetSize(), 8);
+	Vector<SizeType> v3(s3.GetNormalSize(), 0);
+	StringImplement::BoyerMooreSearch::MakeSuffix(v3.GetData(), s3.GetData(), s3.GetNormalSize());
+	Vector<SizeType> v3_2(s3.GetNormalSize(), 0);
+	StringImplement::BoyerMooreSearch::MakeGoodSuffixTable(v3_2.GetData(), v3.GetData(), s3.GetData(), s3.GetNormalSize());
+	ASSERT_EQ(v3_2[0], 7);
+	ASSERT_EQ(v3_2[1], 7);
+	ASSERT_EQ(v3_2[2], 7);
+	ASSERT_EQ(v3_2[3], 2);
+	ASSERT_EQ(v3_2[4], 7);
+	ASSERT_EQ(v3_2[5], 4);
+	ASSERT_EQ(v3_2[6], 7);
+	ASSERT_EQ(v3_2[7], 1);
 }
 
 TEST(StringCore, GetCStringSize)

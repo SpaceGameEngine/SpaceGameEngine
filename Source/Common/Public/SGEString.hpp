@@ -884,7 +884,7 @@ namespace SpaceGameEngine
 					pdst[(typename MakeCharTypeUnsigned<T>::Type)pstr[i]] = nsize - 1 - i;
 			}
 
-			template<typename T, typename Trait = CharTrait<T>>
+			template<typename T>
 			inline void MakeSuffix(SizeType* pdst, const T* pstr, SizeType nsize)
 			{
 				SGE_ASSERT(NullPointerError, pdst);
@@ -920,13 +920,35 @@ namespace SpaceGameEngine
 				}
 			}
 
-			template<typename T, typename Trait = CharTrait<T>>
+			template<typename T>
 			inline void MakeGoodSuffixTable(SizeType* pdst, const SizeType* psuff, const T* pstr, SizeType nsize)
 			{
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, psuff);
 				SGE_ASSERT(NullPointerError, pstr);
 				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				SizeType j = 0;
+				for (SizeType i = 0; i < nsize; i++)
+					pdst[i] = nsize;
+				for (SizeType i = nsize - 1; i >= 0; i--)
+				{
+					if (psuff[i] == i + 1)
+					{
+						for (; j < nsize - 1 - i; j++)
+						{
+							if (pdst[j] == nsize)
+								pdst[j] = nsize - 1 - i;
+						}
+					}
+					if (i == 0)
+						break;
+				}
+
+				for (SizeType i = 0; i < nsize - 1; i++)
+				{
+					pdst[nsize - 1 - psuff[i]] = nsize - 1 - i;
+				}
 			}
 		}
 	}
