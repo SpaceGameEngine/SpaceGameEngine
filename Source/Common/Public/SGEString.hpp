@@ -874,6 +874,7 @@ namespace SpaceGameEngine
 			template<typename T, typename Trait = CharTrait<T>>
 			inline void MakeBadCharTable(SizeType* pdst, const T* pstr, SizeType nsize)
 			{
+				static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, pstr);
 				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
