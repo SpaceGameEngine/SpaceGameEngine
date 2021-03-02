@@ -703,7 +703,7 @@ namespace SpaceGameEngine
 		template<typename T, typename Trait = CharTrait<T>>
 		inline const T* GetNextMultipleByteChar(const T* ptr)
 		{
-			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
 			SGE_ASSERT(NullPointerError, ptr);
 			// need specialize for different situation
@@ -727,7 +727,7 @@ namespace SpaceGameEngine
 		template<typename T, typename Trait = CharTrait<T>>
 		inline const T* GetPreviousMultipleByteChar(const T* ptr)
 		{
-			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
 			SGE_ASSERT(NullPointerError, ptr);
 			// need specialize for different situation
@@ -751,7 +751,7 @@ namespace SpaceGameEngine
 		template<typename T, typename Trait = CharTrait<T>>
 		inline SizeType GetMultipleByteCharSize(const T* ptr)
 		{
-			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
 			SGE_ASSERT(NullPointerError, ptr);
 			// need specialize for different situation
@@ -775,7 +775,7 @@ namespace SpaceGameEngine
 		template<typename T, typename Trait = CharTrait<T>>
 		inline Int8 CompareMultipleByteChar(const T* ptr1, const T* ptr2)
 		{
-			static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
 			SGE_ASSERT(NullPointerError, ptr1);
 			SGE_ASSERT(NullPointerError, ptr2);
@@ -874,7 +874,7 @@ namespace SpaceGameEngine
 			template<typename T, typename Trait = CharTrait<T>>
 			inline void MakeBadCharTable(SizeType* pdst, const T* pstr, SizeType nsize)
 			{
-				static_assert(std::is_same_v<T, Trait::ValueType>, "invalid trait : the value type is different");
+				static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, pstr);
 				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
