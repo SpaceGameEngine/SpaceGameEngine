@@ -857,7 +857,7 @@ namespace SpaceGameEngine
 				return 1;
 		}
 
-		namespace BoyerMooreSearch
+		namespace BoyerMooreSearchImplement
 		{
 			template<typename T>
 			struct MakeCharTypeUnsigned
@@ -872,7 +872,7 @@ namespace SpaceGameEngine
 			};
 
 			template<typename T, typename Trait = CharTrait<T>>
-			inline void MakeBadCharTable(SizeType* pdst, const T* pstr, SizeType nsize)
+			inline void MakeBadCharTable(SizeType* pdst, const T* pstr, const SizeType nsize)
 			{
 				static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 				SGE_ASSERT(NullPointerError, pdst);
@@ -886,7 +886,7 @@ namespace SpaceGameEngine
 			}
 
 			template<typename T>
-			inline void MakeSuffix(SizeType* pdst, const T* pstr, SizeType nsize)
+			inline void MakeSuffix(SizeType* pdst, const T* pstr, const SizeType nsize)
 			{
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, pstr);
@@ -922,7 +922,7 @@ namespace SpaceGameEngine
 			}
 
 			template<typename T>
-			inline void MakeGoodSuffixTable(SizeType* pdst, const SizeType* psuff, const T* pstr, SizeType nsize)
+			inline void MakeGoodSuffixTable(SizeType* pdst, const SizeType* psuff, const T* pstr, const SizeType nsize)
 			{
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, psuff);
@@ -949,6 +949,45 @@ namespace SpaceGameEngine
 				for (SizeType i = 0; i < nsize - 1; i++)
 				{
 					pdst[nsize - 1 - psuff[i]] = nsize - 1 - i;
+				}
+			}
+
+			template<typename T>
+			inline const T* BoyerMooreSearch(const T* ptext_begin, const T* ptext_end, const T* ppat, const SizeType* pbct, const SizeType* pgst, const SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, ptext_begin);
+				SGE_ASSERT(NullPointerError, ptext_end);
+				SGE_ASSERT(NullPointerError, ppat);
+				SGE_ASSERT(NullPointerError, pbct);
+				SGE_ASSERT(NullPointerError, pgst);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				SizeType tsize = ptext_end - ptext_begin;
+				SGE_ASSERT(InvalidSizeError, tsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				if (tsize < nsize)
+				{
+					return ptext_end;
+				}
+				else
+				{
+					SizeType i = 0;
+					SizeType j = 0;
+					while (j <= (tsize - nsize))
+					{
+						for (i = nsize - 1; i >= 0 && ppat[i] == ptext_begin[i + j]; --i)
+						{
+							if (i == 0)
+							{
+								return ptext_begin + j;
+							}
+						}
+						if (pbct[(typename MakeCharTypeUnsigned<T>::Type)ptext_begin[i + j]] > (nsize - 1 - i))
+							j += Max((pbct[(typename MakeCharTypeUnsigned<T>::Type)ptext_begin[i + j]] + 1 + i) - nsize, pgst[i]);
+						else
+							j += pgst[i];
+					}
+					return ptext_end;
 				}
 			}
 		}
