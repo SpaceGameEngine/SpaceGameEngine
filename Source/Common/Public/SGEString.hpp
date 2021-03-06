@@ -2713,6 +2713,60 @@ namespace SpaceGameEngine
 			return ConstIterator(res);
 		}
 
+		template<typename OtherAllocator>
+		inline Iterator Find(const StringCore<T,Trait,OtherAllocator>& str, const Iterator& begin, const Iterator& end)
+		{
+			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+
+			SizeType nsize = str.GetNormalSize();
+			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			const T* pstr = str.GetData();
+
+			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+			SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+
+			StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+			StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
+			StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
+			T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
+
+			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
+
+			return Iterator(res);
+		}
+
+		template<typename OtherAllocator>
+		inline ConstIterator Find(const StringCore<T, Trait, OtherAllocator>& str, const ConstIterator& begin, const ConstIterator& end) const
+		{
+			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+
+			SizeType nsize = str.GetNormalSize();
+			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			const T* pstr = str.GetData();
+
+			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+			SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+
+			StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+			StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
+			StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
+			const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
+
+			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
+
+			return ConstIterator(res);
+		}
+
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;
 		SizeType m_Size;
