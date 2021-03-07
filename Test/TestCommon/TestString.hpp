@@ -1953,6 +1953,13 @@ TEST(StringCore, FindTest)
 	auto res1_7 = s1.Find(p1_2, res1_6 + 1, s1.GetEnd());
 	ASSERT_EQ(res1_7, s1.GetEnd());
 
+	auto res1_8 = s1.Find(SGE_STR("一个测试是一个测试"), s1.GetBegin(), s1.GetEnd());
+	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 2);
+	auto res1_9 = s1.Find(SGE_STR("一个测试是一个测试"), res1_8 + 1, s1.GetEnd());
+	ASSERT_EQ(res1_9.GetData(), s1.GetData() + 7);
+	auto res1_10 = s1.Find(SGE_STR("一个测试是一个测试"), res1_9 + 1, s1.GetEnd());
+	ASSERT_EQ(res1_10, s1.GetEnd());
+
 	UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试是一个"));
 	UTF8String p2(SGE_U8STR("测试是一个测试"));
 	auto res2_1 = s2.Find(p2, s2.GetBegin(), s2.GetEnd());
@@ -1971,6 +1978,13 @@ TEST(StringCore, FindTest)
 	ASSERT_EQ(res2_6.GetData(), s2.GetData() + 36);
 	auto res2_7 = s2.Find(p2_2, res2_6 + 1, s2.GetEnd());
 	ASSERT_EQ(res2_7, s2.GetEnd());
+
+	auto res2_8 = s2.Find(SGE_U8STR("一个测试是一个测试"), s2.GetBegin(), s2.GetEnd());
+	ASSERT_EQ(res2_8.GetData(), s2.GetData() + 6);
+	auto res2_9 = s2.Find(SGE_U8STR("一个测试是一个测试"), res2_8 + 1, s2.GetEnd());
+	ASSERT_EQ(res2_9.GetData(), s2.GetData() + 21);
+	auto res2_10 = s2.Find(SGE_U8STR("一个测试是一个测试"), res2_9 + 1, s2.GetEnd());
+	ASSERT_EQ(res2_10, s2.GetEnd());
 }
 
 TEST(StringCore, ConstFindTest)
@@ -1994,6 +2008,13 @@ TEST(StringCore, ConstFindTest)
 	auto res1_7 = s1.Find(p1_2, res1_6 + 1, s1.GetConstEnd());
 	ASSERT_EQ(res1_7, s1.GetConstEnd());
 
+	auto res1_8 = s1.Find(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), s1.GetConstEnd());
+	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 2);
+	auto res1_9 = s1.Find(SGE_STR("一个测试是一个测试"), res1_8 + 1, s1.GetConstEnd());
+	ASSERT_EQ(res1_9.GetData(), s1.GetData() + 7);
+	auto res1_10 = s1.Find(SGE_STR("一个测试是一个测试"), res1_9 + 1, s1.GetConstEnd());
+	ASSERT_EQ(res1_10, s1.GetConstEnd());
+
 	const UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试是一个"));
 	const UTF8String p2(SGE_U8STR("测试是一个测试"));
 	auto res2_1 = s2.Find(p2, s2.GetConstBegin(), s2.GetConstEnd());
@@ -2012,6 +2033,13 @@ TEST(StringCore, ConstFindTest)
 	ASSERT_EQ(res2_6.GetData(), s2.GetData() + 36);
 	auto res2_7 = s2.Find(p2_2, res2_6 + 1, s2.GetConstEnd());
 	ASSERT_EQ(res2_7, s2.GetConstEnd());
+
+	auto res2_8 = s2.Find(SGE_U8STR("一个测试是一个测试"), s2.GetConstBegin(), s2.GetConstEnd());
+	ASSERT_EQ(res2_8.GetData(), s2.GetData() + 6);
+	auto res2_9 = s2.Find(SGE_U8STR("一个测试是一个测试"), res2_8 + 1, s2.GetConstEnd());
+	ASSERT_EQ(res2_9.GetData(), s2.GetData() + 21);
+	auto res2_10 = s2.Find(SGE_U8STR("一个测试是一个测试"), res2_9 + 1, s2.GetConstEnd());
+	ASSERT_EQ(res2_10, s2.GetConstEnd());
 }
 
 TEST(StringCoreIterator, GetBeginTest)
