@@ -1278,6 +1278,74 @@ TEST(ReverseBoyerMooreSearchImplement, MakeBadCharTableTest)
 	ASSERT_EQ(v2_1[(unsigned char)'2'], 10);
 }
 
+TEST(ReverseBoyerMooreSearchImplement, MakePrefixTest)
+{
+	UCS2String s1(SGE_STR("测一测12aba12"));
+	ASSERT_EQ(s1.GetNormalSize(), 10);
+	Vector<SizeType> v1(s1.GetNormalSize(), 0);
+
+	StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(v1.GetData(), s1.GetData(), s1.GetNormalSize());
+	ASSERT_EQ(v1[9], 0);
+	ASSERT_EQ(v1[8], 0);
+	ASSERT_EQ(v1[7], 0);
+	ASSERT_EQ(v1[6], 0);
+	ASSERT_EQ(v1[5], 0);
+	ASSERT_EQ(v1[4], 0);
+	ASSERT_EQ(v1[3], 0);
+	ASSERT_EQ(v1[2], 1);
+	ASSERT_EQ(v1[1], 0);
+	ASSERT_EQ(v1[0], 10);
+
+	UTF8String s2(SGE_U8STR("测试测试搞个ab12测试"));
+	ASSERT_EQ(s2.GetSize(), 12);
+	ASSERT_EQ(s2.GetNormalSize(), 28);
+	Vector<SizeType> v2(s2.GetNormalSize(), 0);
+
+	StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(v2.GetData(), s2.GetData(), s2.GetNormalSize());
+	ASSERT_EQ(v2[27], 0);
+	ASSERT_EQ(v2[26], 0);
+	ASSERT_EQ(v2[25], 0);
+	ASSERT_EQ(v2[24], 0);
+	ASSERT_EQ(v2[23], 0);
+	ASSERT_EQ(v2[22], 6);
+	ASSERT_EQ(v2[21], 0);
+	ASSERT_EQ(v2[20], 0);
+	ASSERT_EQ(v2[19], 0);
+	ASSERT_EQ(v2[18], 0);
+	ASSERT_EQ(v2[17], 0);
+	ASSERT_EQ(v2[16], 0);
+	ASSERT_EQ(v2[15], 0);
+	ASSERT_EQ(v2[14], 0);
+	ASSERT_EQ(v2[13], 0);
+	ASSERT_EQ(v2[12], 1);	 //"搞"'s first byte is E6 which is same as the "测"'s first byte
+	ASSERT_EQ(v2[11], 0);
+	ASSERT_EQ(v2[10], 0);
+	ASSERT_EQ(v2[9], 0);
+	ASSERT_EQ(v2[8], 0);
+	ASSERT_EQ(v2[7], 0);
+	ASSERT_EQ(v2[6], 7);	//same reason
+	ASSERT_EQ(v2[5], 0);
+	ASSERT_EQ(v2[4], 0);
+	ASSERT_EQ(v2[3], 0);
+	ASSERT_EQ(v2[2], 0);
+	ASSERT_EQ(v2[1], 0);
+	ASSERT_EQ(v2[0], 28);
+
+	UCS2String s3(SGE_STR("bcababab"));
+	ASSERT_EQ(s3.GetSize(), 8);
+	Vector<SizeType> v3(s3.GetNormalSize(), 0);
+
+	StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(v3.GetData(), s3.GetData(), s3.GetNormalSize());
+	ASSERT_EQ(v3[7], 1);
+	ASSERT_EQ(v3[6], 0);
+	ASSERT_EQ(v3[5], 1);
+	ASSERT_EQ(v3[4], 0);
+	ASSERT_EQ(v3[3], 1);
+	ASSERT_EQ(v3[2], 0);
+	ASSERT_EQ(v3[1], 0);
+	ASSERT_EQ(v3[0], 8);
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";

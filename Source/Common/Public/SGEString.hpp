@@ -1007,6 +1007,31 @@ namespace SpaceGameEngine
 				for (SizeType i = nsize - 1; i >= 1; i--)
 					pdst[(typename MakeCharTypeUnsigned<T>::Type)pstr[i]] = i;
 			}
+
+			template<typename T>
+			inline void MakePrefix(SizeType* pdst, const T* pstr, const SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, pdst);
+				SGE_ASSERT(NullPointerError, pstr);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				pdst[0] = nsize;
+				SizeType last_end = 0;
+				SizeType last_begin = 0;
+				for (SizeType i = 1; i < nsize; ++i)
+				{
+					if (i < last_end && pdst[i - last_begin] < last_end - i)
+						pdst[i] = pdst[i - last_begin];
+					else
+					{
+						if (i > last_end)
+							last_end = i;
+						last_begin = i;
+						while (last_end < nsize && pstr[last_end] == pstr[last_end - last_begin])
+							++last_end;
+						pdst[i] = last_end - last_begin;
+					}
+				}
+			}
 		}
 	}
 
