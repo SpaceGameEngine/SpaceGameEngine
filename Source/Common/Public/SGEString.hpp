@@ -932,6 +932,7 @@ namespace SpaceGameEngine
 				SizeType j = 0;
 				for (SizeType i = 0; i < nsize; i++)
 					pdst[i] = nsize;
+
 				for (SizeType i = nsize - 1; i >= 0; i--)
 				{
 					if (psuff[i] == i + 1)
@@ -1030,6 +1031,36 @@ namespace SpaceGameEngine
 							++last_end;
 						pdst[i] = last_end - last_begin;
 					}
+				}
+			}
+
+			template<typename T>
+			inline void MakeGoodPrefixTable(SizeType* pdst, const SizeType* ppref, const T* pstr, const SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, pdst);
+				SGE_ASSERT(NullPointerError, ppref);
+				SGE_ASSERT(NullPointerError, pstr);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				SizeType j = nsize - 1;
+				for (SizeType i = 0; i < nsize; i++)
+					pdst[i] = nsize;
+
+				for (SizeType i = 0; i < nsize; i++)
+				{
+					if (ppref[i] == nsize - i)
+					{
+						for (; j >= nsize - i; --j)
+						{
+							if (pdst[j] == nsize)
+								pdst[j] = i;
+						}
+					}
+				}
+
+				for (SizeType i = nsize - 1; i >= 1; i--)
+				{
+					pdst[ppref[i]] = i;
 				}
 			}
 		}

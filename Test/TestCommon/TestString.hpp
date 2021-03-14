@@ -1346,6 +1346,77 @@ TEST(ReverseBoyerMooreSearchImplement, MakePrefixTest)
 	ASSERT_EQ(v3[0], 8);
 }
 
+TEST(ReverseBoyerMooreSearchImplement, MakeGoodPrefixTableTest)
+{
+	UCS2String s1(SGE_STR("测一测12aba12"));
+	ASSERT_EQ(s1.GetNormalSize(), 10);
+	Vector<SizeType> v1(s1.GetNormalSize(), 0);
+	StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(v1.GetData(), s1.GetData(), s1.GetNormalSize());
+	Vector<SizeType> v1_2(s1.GetNormalSize(), 0);
+	StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(v1_2.GetData(), v1.GetData(), s1.GetData(), s1.GetNormalSize());
+	ASSERT_EQ(v1_2[0], 1);
+	ASSERT_EQ(v1_2[1], 2);
+	ASSERT_EQ(v1_2[2], 10);
+	ASSERT_EQ(v1_2[3], 10);
+	ASSERT_EQ(v1_2[4], 10);
+	ASSERT_EQ(v1_2[5], 10);
+	ASSERT_EQ(v1_2[6], 10);
+	ASSERT_EQ(v1_2[7], 10);
+	ASSERT_EQ(v1_2[8], 10);
+	ASSERT_EQ(v1_2[9], 10);
+
+	UTF8String s2(SGE_U8STR("测试测试搞个ab12测试"));
+	ASSERT_EQ(s2.GetSize(), 12);
+	ASSERT_EQ(s2.GetNormalSize(), 28);
+	Vector<SizeType> v2(s2.GetNormalSize(), 0);
+	StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(v2.GetData(), s2.GetData(), s2.GetNormalSize());
+	Vector<SizeType> v2_2(s2.GetNormalSize(), 0);
+	StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(v2_2.GetData(), v2.GetData(), s2.GetData(), s2.GetNormalSize());
+	ASSERT_EQ(v2_2[0], 1);
+	ASSERT_EQ(v2_2[1], 12);
+	ASSERT_EQ(v2_2[2], 28);
+	ASSERT_EQ(v2_2[3], 28);
+	ASSERT_EQ(v2_2[4], 28);
+	ASSERT_EQ(v2_2[5], 28);
+	ASSERT_EQ(v2_2[6], 22);
+	ASSERT_EQ(v2_2[7], 6);
+	ASSERT_EQ(v2_2[8], 22);
+	ASSERT_EQ(v2_2[9], 22);
+	ASSERT_EQ(v2_2[10], 22);
+	ASSERT_EQ(v2_2[11], 22);
+	ASSERT_EQ(v2_2[12], 22);
+	ASSERT_EQ(v2_2[13], 22);
+	ASSERT_EQ(v2_2[14], 22);
+	ASSERT_EQ(v2_2[15], 22);
+	ASSERT_EQ(v2_2[16], 22);
+	ASSERT_EQ(v2_2[17], 22);
+	ASSERT_EQ(v2_2[18], 22);
+	ASSERT_EQ(v2_2[19], 22);
+	ASSERT_EQ(v2_2[20], 22);
+	ASSERT_EQ(v2_2[21], 22);
+	ASSERT_EQ(v2_2[22], 22);
+	ASSERT_EQ(v2_2[23], 22);
+	ASSERT_EQ(v2_2[24], 22);
+	ASSERT_EQ(v2_2[25], 22);
+	ASSERT_EQ(v2_2[26], 22);
+	ASSERT_EQ(v2_2[27], 22);
+
+	UCS2String s3(SGE_STR("bcababab"));
+	ASSERT_EQ(s3.GetSize(), 8);
+	Vector<SizeType> v3(s3.GetNormalSize(), 0);
+	StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(v3.GetData(), s3.GetData(), s3.GetNormalSize());
+	Vector<SizeType> v3_2(s3.GetNormalSize(), 0);
+	StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(v3_2.GetData(), v3.GetData(), s3.GetData(), s3.GetNormalSize());
+	ASSERT_EQ(v3_2[0], 1);
+	ASSERT_EQ(v3_2[1], 3);
+	ASSERT_EQ(v3_2[2], 7);
+	ASSERT_EQ(v3_2[3], 7);
+	ASSERT_EQ(v3_2[4], 7);
+	ASSERT_EQ(v3_2[5], 7);
+	ASSERT_EQ(v3_2[6], 7);
+	ASSERT_EQ(v3_2[7], 7);
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";
