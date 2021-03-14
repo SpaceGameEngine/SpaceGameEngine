@@ -1236,6 +1236,48 @@ TEST(BoyerMooreSearchImplement, BoyerMooreSearchTest)
 	ASSERT_EQ(res5_1, s5.GetData() + s5.GetNormalSize());
 }
 
+TEST(ReverseBoyerMooreSearchImplement, MakeBadCharTableTest)
+{
+	UCS2String s1_1(SGE_STR("这是测试是个这isagoodthing"));
+	Vector<SizeType> v1_1(UCS2Trait::MaxValue + 1, 0);
+	ASSERT_EQ(s1_1.GetSize(), 19);
+	StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<Char16, UCS2Trait>(v1_1.GetData(), s1_1.GetData(), s1_1.GetNormalSize());
+	ASSERT_EQ(v1_1[SGE_STR('这')], 6);
+	ASSERT_EQ(v1_1[SGE_STR('是')], 1);
+	ASSERT_EQ(v1_1[SGE_STR('个')], 5);
+	ASSERT_EQ(v1_1[SGE_STR('测')], 2);
+	ASSERT_EQ(v1_1[SGE_STR('试')], 3);
+	ASSERT_EQ(v1_1[SGE_STR('i')], 7);
+	ASSERT_EQ(v1_1[SGE_STR('s')], 8);
+	ASSERT_EQ(v1_1[SGE_STR('a')], 9);
+	ASSERT_EQ(v1_1[SGE_STR('g')], 10);
+	ASSERT_EQ(v1_1[SGE_STR('o')], 11);
+	ASSERT_EQ(v1_1[SGE_STR('d')], 13);
+	ASSERT_EQ(v1_1[SGE_STR('t')], 14);
+	ASSERT_EQ(v1_1[SGE_STR('h')], 15);
+	ASSERT_EQ(v1_1[SGE_STR('n')], 17);
+	ASSERT_EQ(v1_1[0], 19);
+	ASSERT_EQ(v1_1[SGE_STR('b')], 19);
+	ASSERT_EQ(v1_1[SGE_STR('不')], 19);
+
+	UTF8String s2_1(SGE_U8STR("测一测1212aba"));
+	Vector<SizeType> v2_1(UTF8Trait::MaxValue + 1, 0);
+	ASSERT_EQ(s2_1.GetSize(), 10);
+	ASSERT_EQ(s2_1.GetNormalSize(), 16);
+	StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<char, UTF8Trait>(v2_1.GetData(), s2_1.GetData(), s2_1.GetNormalSize());
+	const char* pcstr2_1 = SGE_U8STR("测一");
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[0]], 6);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[1]], 1);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[2]], 2);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[3]], 3);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[4]], 4);
+	ASSERT_EQ(v2_1[(unsigned char)pcstr2_1[5]], 5);
+	ASSERT_EQ(v2_1[(unsigned char)'a'], 13);
+	ASSERT_EQ(v2_1[(unsigned char)'b'], 14);
+	ASSERT_EQ(v2_1[(unsigned char)'1'], 9);
+	ASSERT_EQ(v2_1[(unsigned char)'2'], 10);
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";

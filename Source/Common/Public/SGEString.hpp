@@ -991,6 +991,23 @@ namespace SpaceGameEngine
 				}
 			}
 		}
+
+		namespace ReverseBoyerMooreSearchImplement
+		{
+			template<typename T, typename Trait = CharTrait<T>>
+			inline void MakeBadCharTable(SizeType* pdst, const T* pstr, const SizeType nsize)
+			{
+				static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+				SGE_ASSERT(NullPointerError, pdst);
+				SGE_ASSERT(NullPointerError, pstr);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				for (SizeType i = 0; i <= Trait::MaxValue; i++)
+					pdst[i] = nsize;
+				for (SizeType i = nsize - 1; i >= 1; i--)
+					pdst[(typename MakeCharTypeUnsigned<T>::Type)pstr[i]] = i;
+			}
+		}
 	}
 
 	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
