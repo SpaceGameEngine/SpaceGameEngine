@@ -2368,12 +2368,12 @@ TEST(StringCore, ConstReverseFindTest)
 	const StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_STR("一个测试"));
 	auto res1_4 = s1.ReverseFind(p1_2, s1.GetConstBegin(), s1.GetConstEnd());
 	ASSERT_EQ(res1_4.GetData(), s1.GetData() + 12);
-	auto res1_5 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_4 + 2);
+	auto res1_5 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_4);
 	ASSERT_EQ(res1_5.GetData(), s1.GetData() + 7);
-	auto res1_6 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_5 + 2);
+	auto res1_6 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_5);
 	ASSERT_EQ(res1_6.GetData(), s1.GetData() + 2);
-	auto res1_7 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_6 + 2);
-	ASSERT_EQ(res1_7, res1_6 + 2);
+	auto res1_7 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_6);
+	ASSERT_EQ(res1_7, res1_6);
 
 	auto res1_8 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), s1.GetConstEnd());
 	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 7);
