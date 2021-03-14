@@ -1063,6 +1063,51 @@ namespace SpaceGameEngine
 					pdst[ppref[i]] = i;
 				}
 			}
+
+			template<typename T>
+			inline const T* ReverseBoyerMooreSearch(const T* ptext_begin, const T* ptext_end, const T* ppat, const SizeType* pbct, const SizeType* pgpt, const SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, ptext_begin);
+				SGE_ASSERT(NullPointerError, ptext_end);
+				SGE_ASSERT(NullPointerError, ppat);
+				SGE_ASSERT(NullPointerError, pbct);
+				SGE_ASSERT(NullPointerError, pgpt);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				SizeType tsize = ptext_end - ptext_begin;
+				SGE_ASSERT(InvalidSizeError, tsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				if (tsize < nsize)
+				{
+					return ptext_end;
+				}
+				else
+				{
+					SizeType i = 0;
+					SizeType j = tsize - nsize;
+					while (j >= 0)
+					{
+						for (i = 0; i < nsize && ppat[i] == ptext_begin[i + j]; ++i)
+						{
+							if (i == nsize - 1)
+							{
+								return ptext_begin + j;
+							}
+						}
+						SizeType modify = 0;
+						if (pbct[(typename MakeCharTypeUnsigned<T>::Type)ptext_begin[i + j]] < i)
+							modify = Max(i - pbct[(typename MakeCharTypeUnsigned<T>::Type)ptext_begin[i + j]], pgpt[i]);
+						else
+							modify = pgpt[i];
+
+						if (modify > j)
+							return ptext_end;
+						else
+							j -= modify;
+					}
+					return ptext_end;
+				}
+			}
 		}
 	}
 

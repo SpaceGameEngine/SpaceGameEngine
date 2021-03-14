@@ -1417,6 +1417,82 @@ TEST(ReverseBoyerMooreSearchImplement, MakeGoodPrefixTableTest)
 	ASSERT_EQ(v3_2[7], 7);
 }
 
+TEST(ReverseBoyerMooreSearchImplement, ReverseBoyerMooreSearchTest)
+{
+	using namespace StringImplement::ReverseBoyerMooreSearchImplement;
+
+	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试"));
+	UCS2String s1_p(SGE_STR("测试是一个测试"));
+	Vector<SizeType> v1_bct(UCS2Trait::MaxValue + 1, 0);
+	Vector<SizeType> v1_suff(s1_p.GetNormalSize(), 0);
+	Vector<SizeType> v1_gpt(s1_p.GetNormalSize(), 0);
+	MakeBadCharTable<Char16, UCS2Trait>(v1_bct.GetData(), s1_p.GetData(), s1_p.GetNormalSize());
+	MakePrefix(v1_suff.GetData(), s1_p.GetData(), s1_p.GetNormalSize());
+	MakeGoodPrefixTable(v1_gpt.GetData(), v1_suff.GetData(), s1_p.GetData(), s1_p.GetNormalSize());
+	auto res1_1 = ReverseBoyerMooreSearch(s1.GetData(), s1.GetData() + s1.GetNormalSize(), s1_p.GetData(), v1_bct.GetData(), v1_gpt.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_1 - s1.GetData(), 9);
+	auto res1_2 = ReverseBoyerMooreSearch(s1.GetData(), res1_1 + 2, s1_p.GetData(), v1_bct.GetData(), v1_gpt.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_2 - s1.GetData(), 4);
+	auto res1_3 = ReverseBoyerMooreSearch(s1.GetData(), res1_2 + 2, s1_p.GetData(), v1_bct.GetData(), v1_gpt.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_3, res1_2 + 2);
+
+	UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试"));
+	UTF8String s2_p(SGE_U8STR("测试是一个测试"));
+	Vector<SizeType> v2_bct(UTF8Trait::MaxValue + 1, 0);
+	Vector<SizeType> v2_suff(s2_p.GetNormalSize(), 0);
+	Vector<SizeType> v2_gpt(s2_p.GetNormalSize(), 0);
+
+	MakeBadCharTable<char, UTF8Trait>(v2_bct.GetData(), s2_p.GetData(), s2_p.GetNormalSize());
+	MakePrefix(v2_suff.GetData(), s2_p.GetData(), s2_p.GetNormalSize());
+	MakeGoodPrefixTable(v2_gpt.GetData(), v2_suff.GetData(), s2_p.GetData(), s2_p.GetNormalSize());
+	auto res2_1 = ReverseBoyerMooreSearch(s2.GetData(), s2.GetData() + s2.GetNormalSize(), s2_p.GetData(), v2_bct.GetData(), v2_gpt.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_1 - s2.GetData(), 27);
+	auto res2_2 = ReverseBoyerMooreSearch(s2.GetData(), res2_1 + 6, s2_p.GetData(), v2_bct.GetData(), v2_gpt.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_2 - s2.GetData(), 12);
+	auto res2_3 = ReverseBoyerMooreSearch(s2.GetData(), res2_2 + 6, s2_p.GetData(), v2_bct.GetData(), v2_gpt.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_3, res2_2 + 6);
+
+	UTF8String s3(SGE_U8STR("abbadcababacab"));
+	UTF8String s3_p(SGE_U8STR("babac"));
+	Vector<SizeType> v3_bct(UTF8Trait::MaxValue + 1, 0);
+	Vector<SizeType> v3_suff(s3_p.GetNormalSize(), 0);
+	Vector<SizeType> v3_gpt(s3_p.GetNormalSize(), 0);
+
+	MakeBadCharTable<char, UTF8Trait>(v3_bct.GetData(), s3_p.GetData(), s3_p.GetNormalSize());
+	MakePrefix(v3_suff.GetData(), s3_p.GetData(), s3_p.GetNormalSize());
+	MakeGoodPrefixTable(v3_gpt.GetData(), v3_suff.GetData(), s3_p.GetData(), s3_p.GetNormalSize());
+	auto res3_1 = ReverseBoyerMooreSearch(s3.GetData(), s3.GetData() + s3.GetNormalSize(), s3_p.GetData(), v3_bct.GetData(), v3_gpt.GetData(), s3_p.GetNormalSize());
+	ASSERT_EQ(res3_1 - s3.GetData(), 7);
+	auto res3_2 = ReverseBoyerMooreSearch(s3.GetData(), res3_1, s3_p.GetData(), v3_bct.GetData(), v3_gpt.GetData(), s3_p.GetNormalSize());
+	ASSERT_EQ(res3_2, res3_1);
+
+	UCS2String s4(SGE_STR("bcabcdababcabaabcbcabababacbacabeeacda"));
+	UCS2String s4_p(SGE_STR("bcababa"));
+	Vector<SizeType> v4_bct(UCS2Trait::MaxValue + 1, 0);
+	Vector<SizeType> v4_suff(s4_p.GetNormalSize(), 0);
+	Vector<SizeType> v4_gpt(s4_p.GetNormalSize(), 0);
+
+	MakeBadCharTable<Char16, UCS2Trait>(v4_bct.GetData(), s4_p.GetData(), s4_p.GetNormalSize());
+	MakePrefix(v4_suff.GetData(), s4_p.GetData(), s4_p.GetNormalSize());
+	MakeGoodPrefixTable(v4_gpt.GetData(), v4_suff.GetData(), s4_p.GetData(), s4_p.GetNormalSize());
+	auto res4_1 = ReverseBoyerMooreSearch(s4.GetData(), s4.GetData() + s4.GetNormalSize(), s4_p.GetData(), v4_bct.GetData(), v4_gpt.GetData(), s4_p.GetNormalSize());
+	ASSERT_EQ(res4_1 - s4.GetData(), 17);
+	auto res4_2 = ReverseBoyerMooreSearch(s4.GetData(), res4_1, s4_p.GetData(), v4_bct.GetData(), v4_gpt.GetData(), s4_p.GetNormalSize());
+	ASSERT_EQ(res4_2, res4_1);
+
+	UTF8String s5(SGE_U8STR("dieiahgjkriabddioababa"));
+	UTF8String s5_p(SGE_U8STR("eigha"));
+	Vector<SizeType> v5_bct(UTF8Trait::MaxValue + 1, 0);
+	Vector<SizeType> v5_suff(s5_p.GetNormalSize(), 0);
+	Vector<SizeType> v5_gpt(s5_p.GetNormalSize(), 0);
+
+	MakeBadCharTable<char, UTF8Trait>(v5_bct.GetData(), s5_p.GetData(), s5_p.GetNormalSize());
+	MakePrefix(v5_suff.GetData(), s5_p.GetData(), s5_p.GetNormalSize());
+	MakeGoodPrefixTable(v5_gpt.GetData(), v5_suff.GetData(), s5_p.GetData(), s5_p.GetNormalSize());
+	auto res5_1 = ReverseBoyerMooreSearch(s5.GetData(), s5.GetData() + s5.GetNormalSize(), s5_p.GetData(), v5_bct.GetData(), v5_gpt.GetData(), s5_p.GetNormalSize());
+	ASSERT_EQ(res5_1, s5.GetData() + s5.GetNormalSize());
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";
