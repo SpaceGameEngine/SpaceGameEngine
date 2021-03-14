@@ -2299,6 +2299,116 @@ TEST(StringCore, ConstFindTest)
 	ASSERT_EQ(res2_10, s2.GetConstEnd());
 }
 
+TEST(StringCore, ReverseFindTest)
+{
+	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试是一个"));
+	UCS2String p1(SGE_STR("测试是一个测试"));
+	auto res1_1 = s1.ReverseFind(p1, s1.GetBegin(), s1.GetEnd());
+	ASSERT_EQ(res1_1.GetData(), s1.GetData() + 9);
+	auto res1_2 = s1.ReverseFind(p1, s1.GetBegin(), res1_1 + 2);
+	ASSERT_EQ(res1_2.GetData(), s1.GetData() + 4);
+	auto res1_3 = s1.ReverseFind(p1, s1.GetBegin(), res1_2 + 2);
+	ASSERT_EQ(res1_3, res1_2 + 2);
+
+	StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_STR("一个测试"));
+	auto res1_4 = s1.ReverseFind(p1_2, s1.GetBegin(), s1.GetEnd());
+	ASSERT_EQ(res1_4.GetData(), s1.GetData() + 12);
+	auto res1_5 = s1.ReverseFind(p1_2, s1.GetBegin(), res1_4);
+	ASSERT_EQ(res1_5.GetData(), s1.GetData() + 7);
+	auto res1_6 = s1.ReverseFind(p1_2, s1.GetBegin(), res1_5);
+	ASSERT_EQ(res1_6.GetData(), s1.GetData() + 2);
+	auto res1_7 = s1.ReverseFind(p1_2, s1.GetBegin(), res1_6);
+	ASSERT_EQ(res1_7, res1_6);
+
+	auto res1_8 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetBegin(), s1.GetEnd());
+	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 7);
+	auto res1_9 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetBegin(), res1_8 + 4);
+	ASSERT_EQ(res1_9.GetData(), s1.GetData() + 2);
+	auto res1_10 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetBegin(), res1_9 + 4);
+	ASSERT_EQ(res1_10, res1_9 + 4);
+
+	UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试是一个"));
+	UTF8String p2(SGE_U8STR("测试是一个测试"));
+	auto res2_1 = s2.ReverseFind(p2, s2.GetBegin(), s2.GetEnd());
+	ASSERT_EQ(res2_1.GetData(), s2.GetData() + 27);
+	auto res2_2 = s2.ReverseFind(p2, s2.GetBegin(), res2_1 + 2);
+	ASSERT_EQ(res2_2.GetData(), s2.GetData() + 12);
+	auto res2_3 = s2.ReverseFind(p2, s2.GetBegin(), res2_2 + 2);
+	ASSERT_EQ(res2_3, res2_2 + 2);
+
+	StringCore<char, UTF8Trait, StdAllocator> p2_2(SGE_U8STR("一个测试"));
+	auto res2_4 = s2.ReverseFind(p2_2, s2.GetBegin(), s2.GetEnd());
+	ASSERT_EQ(res2_4.GetData(), s2.GetData() + 36);
+	auto res2_5 = s2.ReverseFind(p2_2, s2.GetBegin(), res2_4);
+	ASSERT_EQ(res2_5.GetData(), s2.GetData() + 21);
+	auto res2_6 = s2.ReverseFind(p2_2, s2.GetBegin(), res2_5);
+	ASSERT_EQ(res2_6.GetData(), s2.GetData() + 6);
+	auto res2_7 = s2.ReverseFind(p2_2, s2.GetBegin(), res2_6);
+	ASSERT_EQ(res2_7, res2_6);
+
+	auto res2_8 = s2.ReverseFind(SGE_U8STR("一个测试是一个测试"), s2.GetBegin(), s2.GetEnd());
+	ASSERT_EQ(res2_8.GetData(), s2.GetData() + 21);
+	auto res2_9 = s2.ReverseFind(SGE_U8STR("一个测试是一个测试"), s2.GetBegin(), res2_8 + 4);
+	ASSERT_EQ(res2_9.GetData(), s2.GetData() + 6);
+	auto res2_10 = s2.ReverseFind(SGE_U8STR("一个测试是一个测试"), s2.GetBegin(), res2_9 + 4);
+	ASSERT_EQ(res2_10, res2_9 + 4);
+}
+
+TEST(StringCore, ConstReverseFindTest)
+{
+	const UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试是一个"));
+	const UCS2String p1(SGE_STR("测试是一个测试"));
+	auto res1_1 = s1.ReverseFind(p1, s1.GetConstBegin(), s1.GetConstEnd());
+	ASSERT_EQ(res1_1.GetData(), s1.GetData() + 9);
+	auto res1_2 = s1.ReverseFind(p1, s1.GetConstBegin(), res1_1 + 2);
+	ASSERT_EQ(res1_2.GetData(), s1.GetData() + 4);
+	auto res1_3 = s1.ReverseFind(p1, s1.GetConstBegin(), res1_2 + 2);
+	ASSERT_EQ(res1_3, res1_2 + 2);
+
+	const StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_STR("一个测试"));
+	auto res1_4 = s1.ReverseFind(p1_2, s1.GetConstBegin(), s1.GetConstEnd());
+	ASSERT_EQ(res1_4.GetData(), s1.GetData() + 12);
+	auto res1_5 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_4 + 2);
+	ASSERT_EQ(res1_5.GetData(), s1.GetData() + 7);
+	auto res1_6 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_5 + 2);
+	ASSERT_EQ(res1_6.GetData(), s1.GetData() + 2);
+	auto res1_7 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_6 + 2);
+	ASSERT_EQ(res1_7, res1_6 + 2);
+
+	auto res1_8 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), s1.GetConstEnd());
+	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 7);
+	auto res1_9 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), res1_8 + 4);
+	ASSERT_EQ(res1_9.GetData(), s1.GetData() + 2);
+	auto res1_10 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), res1_9 + 4);
+	ASSERT_EQ(res1_10, res1_9 + 4);
+
+	const UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试是一个"));
+	const UTF8String p2(SGE_U8STR("测试是一个测试"));
+	auto res2_1 = s2.ReverseFind(p2, s2.GetConstBegin(), s2.GetConstEnd());
+	ASSERT_EQ(res2_1.GetData(), s2.GetData() + 27);
+	auto res2_2 = s2.ReverseFind(p2, s2.GetConstBegin(), res2_1 + 2);
+	ASSERT_EQ(res2_2.GetData(), s2.GetData() + 12);
+	auto res2_3 = s2.ReverseFind(p2, s2.GetConstBegin(), res2_2 + 2);
+	ASSERT_EQ(res2_3, res2_2 + 2);
+
+	const StringCore<char, UTF8Trait, StdAllocator> p2_2(SGE_U8STR("一个测试"));
+	auto res2_4 = s2.ReverseFind(p2_2, s2.GetConstBegin(), s2.GetConstEnd());
+	ASSERT_EQ(res2_4.GetData(), s2.GetData() + 36);
+	auto res2_5 = s2.ReverseFind(p2_2, s2.GetConstBegin(), res2_4);
+	ASSERT_EQ(res2_5.GetData(), s2.GetData() + 21);
+	auto res2_6 = s2.ReverseFind(p2_2, s2.GetConstBegin(), res2_5);
+	ASSERT_EQ(res2_6.GetData(), s2.GetData() + 6);
+	auto res2_7 = s2.ReverseFind(p2_2, s2.GetConstBegin(), res2_6);
+	ASSERT_EQ(res2_7, res2_6);
+
+	auto res2_8 = s2.ReverseFind(SGE_U8STR("一个测试是一个测试"), s2.GetConstBegin(), s2.GetConstEnd());
+	ASSERT_EQ(res2_8.GetData(), s2.GetData() + 21);
+	auto res2_9 = s2.ReverseFind(SGE_U8STR("一个测试是一个测试"), s2.GetConstBegin(), res2_8 + 4);
+	ASSERT_EQ(res2_9.GetData(), s2.GetData() + 6);
+	auto res2_10 = s2.ReverseFind(SGE_U8STR("一个测试是一个测试"), s2.GetConstBegin(), res2_9 + 4);
+	ASSERT_EQ(res2_10, res2_9 + 4);
+}
+
 TEST(StringCoreIterator, GetBeginTest)
 {
 	UCS2String s1(SGE_STR("这是测试"));

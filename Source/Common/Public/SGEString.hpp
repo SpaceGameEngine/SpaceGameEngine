@@ -2937,6 +2937,164 @@ namespace SpaceGameEngine
 			return ConstIterator(res);
 		}
 
+		inline Iterator ReverseFind(const StringCore& str, const Iterator& begin, const Iterator& end)
+		{
+			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+
+			SizeType nsize = str.GetNormalSize();
+			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			const T* pstr = str.GetData();
+
+			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+			T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
+
+			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+
+			return Iterator(res);
+		}
+
+		inline ConstIterator ReverseFind(const StringCore& str, const ConstIterator& begin, const ConstIterator& end) const
+		{
+			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+
+			SizeType nsize = str.GetNormalSize();
+			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			const T* pstr = str.GetData();
+
+			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+			const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
+
+			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+
+			return ConstIterator(res);
+		}
+
+		template<typename OtherAllocator>
+		inline Iterator ReverseFind(const StringCore<T, Trait, OtherAllocator>& str, const Iterator& begin, const Iterator& end)
+		{
+			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+
+			SizeType nsize = str.GetNormalSize();
+			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			const T* pstr = str.GetData();
+
+			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+			T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
+
+			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+
+			return Iterator(res);
+		}
+
+		template<typename OtherAllocator>
+		inline ConstIterator ReverseFind(const StringCore<T, Trait, OtherAllocator>& str, const ConstIterator& begin, const ConstIterator& end) const
+		{
+			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+
+			SizeType nsize = str.GetNormalSize();
+			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			const T* pstr = str.GetData();
+
+			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+			const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
+
+			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+
+			return ConstIterator(res);
+		}
+
+		inline Iterator ReverseFind(const T* pstr, const Iterator& begin, const Iterator& end)
+		{
+			SGE_ASSERT(NullPointerError, pstr);
+			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+
+			SizeType nsize = GetCStringNormalSize(pstr);
+			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+
+			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+			T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
+
+			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+
+			return Iterator(res);
+		}
+
+		inline ConstIterator ReverseFind(const T* pstr, const ConstIterator& begin, const ConstIterator& end) const
+		{
+			SGE_ASSERT(NullPointerError, pstr);
+			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
+			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+
+			SizeType nsize = GetCStringNormalSize(pstr);
+			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+
+			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+			const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
+
+			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+
+			return ConstIterator(res);
+		}
+
 	private:
 		StringImplement::Storage<T, Allocator> m_Storage;
 		SizeType m_Size;
