@@ -81,7 +81,7 @@ namespace SpaceGameEngine
 			inline static T* Create(const SizeType size)
 			{
 				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
-				StorageRef& re = *reinterpret_cast<StorageRef*>(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
+				StorageRef& re = *(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
 				memset(re.m_pContent, NULL, size * sizeof(T));
 				re.m_Count.store(1, std::memory_order_release);
 				return re.m_pContent;
@@ -94,7 +94,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				SGE_ASSERT(NullPointerError, ptr);
-				StorageRef& re = *reinterpret_cast<StorageRef*>(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
+				StorageRef& re = *(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
 				memcpy(re.m_pContent, ptr, size * sizeof(T));
 				re.m_Count.store(1, std::memory_order_release);
 				return re.m_pContent;
