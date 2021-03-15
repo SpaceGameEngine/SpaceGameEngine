@@ -2673,3 +2673,69 @@ TEST(StringCoreIterator, IsStringCoreIteratorTest)
 	ASSERT_FALSE((UTF8String::IsStringCoreIterator<int>::Value));
 	ASSERT_FALSE((UTF8String::IsStringCoreIterator<UCS2String::ReverseIterator>::Value));
 }
+
+TEST(StringConvert, UTF8StringToUCS2StringTest)
+{
+	UTF8String s1_1(SGE_U8STR("这是个测试test123"));
+	ASSERT_EQ(s1_1.GetSize(), 12);
+	ASSERT_EQ(s1_1, SGE_U8STR("这是个测试test123"));
+
+	auto s1_1r = UTF8StringToUCS2String(s1_1);
+	ASSERT_TRUE((std::is_same_v<decltype(s1_1r), UCS2String>));
+	ASSERT_EQ(s1_1r.GetSize(), 12);
+	ASSERT_EQ(s1_1r, SGE_STR("这是个测试test123"));
+
+	StringCore<char, UTF8Trait, StdAllocator> s1_2(SGE_U8STR("这是个测试test123"));
+	ASSERT_EQ(s1_2.GetSize(), 12);
+	ASSERT_EQ(s1_2, SGE_U8STR("这是个测试test123"));
+
+	auto s1_2r = UTF8StringToUCS2String(s1_2);
+	ASSERT_TRUE((std::is_same_v<decltype(s1_2r), StringCore<Char16, UCS2Trait, StdAllocator>>));
+	ASSERT_EQ(s1_2r.GetSize(), 12);
+	ASSERT_EQ(s1_2r, SGE_STR("这是个测试test123"));
+
+	auto s2_1r = UTF8StringToUCS2String(SGE_U8STR("test测试"));
+	ASSERT_TRUE((std::is_same_v<decltype(s2_1r), UCS2String>));
+	ASSERT_EQ(s2_1r.GetSize(), 6);
+	ASSERT_EQ(s2_1r, SGE_STR("test测试"));
+
+	auto s2_2r = UTF8StringToUCS2String<StdAllocator>(SGE_U8STR("test测试"));
+	ASSERT_TRUE((std::is_same_v<decltype(s2_2r), StringCore<Char16, UCS2Trait, StdAllocator>>));
+	ASSERT_EQ(s2_2r.GetSize(), 6);
+	ASSERT_EQ(s2_2r, SGE_STR("test测试"));
+}
+
+TEST(StringConvert, UCS2StringToUTF8StringTest)
+{
+	UCS2String s1_1(SGE_STR("这是个测试test123"));
+	ASSERT_EQ(s1_1.GetSize(), 12);
+	ASSERT_EQ(s1_1, SGE_STR("这是个测试test123"));
+
+	auto s1_1r = UCS2StringToUTF8String(s1_1);
+	ASSERT_TRUE((std::is_same_v<decltype(s1_1r), UTF8String>));
+	ASSERT_EQ(s1_1r.GetSize(), 12);
+	ASSERT_EQ(s1_1r, SGE_U8STR("这是个测试test123"));
+	ASSERT_EQ(s1_1r.GetNormalSize(), 22);
+
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_2(SGE_STR("这是个测试test123"));
+	ASSERT_EQ(s1_2.GetSize(), 12);
+	ASSERT_EQ(s1_2, SGE_STR("这是个测试test123"));
+
+	auto s1_2r = UCS2StringToUTF8String(s1_2);
+	ASSERT_TRUE((std::is_same_v<decltype(s1_2r), StringCore<char, UTF8Trait, StdAllocator>>));
+	ASSERT_EQ(s1_2r.GetSize(), 12);
+	ASSERT_EQ(s1_2r, SGE_U8STR("这是个测试test123"));
+	ASSERT_EQ(s1_2r.GetNormalSize(), 22);
+
+	auto s2_1r = UCS2StringToUTF8String(SGE_STR("test测试"));
+	ASSERT_TRUE((std::is_same_v<decltype(s2_1r), UTF8String>));
+	ASSERT_EQ(s2_1r.GetSize(), 6);
+	ASSERT_EQ(s2_1r, SGE_U8STR("test测试"));
+	ASSERT_EQ(s2_1r.GetNormalSize(), 10);
+
+	auto s2_2r = UCS2StringToUTF8String<StdAllocator>(SGE_STR("test测试"));
+	ASSERT_TRUE((std::is_same_v<decltype(s2_2r), StringCore<char, UTF8Trait, StdAllocator>>));
+	ASSERT_EQ(s2_2r.GetSize(), 6);
+	ASSERT_EQ(s2_2r, SGE_U8STR("test测试"));
+	ASSERT_EQ(s2_2r.GetNormalSize(), 10);
+}

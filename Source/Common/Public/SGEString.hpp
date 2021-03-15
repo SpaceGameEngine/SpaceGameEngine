@@ -1126,6 +1126,12 @@ namespace SpaceGameEngine
 		template<typename _T, typename _Trait, typename _Allocator>
 		friend class StringCore;
 
+		template<typename _Allocator>
+		friend inline StringCore<char, UTF8Trait, _Allocator> UCS2StringToUTF8String(const StringCore<Char16, UCS2Trait, _Allocator>& str);
+
+		template<typename _Allocator>
+		friend inline StringCore<char, UTF8Trait, _Allocator> UCS2StringToUTF8String(const Char16* pstr);
+
 		struct EmptyStringCoreError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The StringCore is empty");
@@ -3103,6 +3109,86 @@ namespace SpaceGameEngine
 	using UCS2String = StringCore<Char16, UCS2Trait, DefaultAllocator>;
 	using UTF8String = StringCore<char, UTF8Trait, DefaultAllocator>;
 	using String = UCS2String;
+
+	template<typename Allocator>
+	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const StringCore<char, UTF8Trait, Allocator>& str)
+	{
+		SizeType size = str.GetSize();
+		StringCore<Char16, UCS2Trait, Allocator> re(size, 0);
+		auto pdst = re.GetData();
+		auto psrc = str.GetData();
+		for (SizeType i = 0; i < size; i++)
+		{
+			*pdst = StringImplement::UTF8CharToUCS2Char(psrc);
+			pdst += 1;
+			psrc = StringImplement::GetNextMultipleByteChar<char, UTF8Trait>(psrc);
+		}
+		return re;
+	}
+
+	template<typename Allocator = DefaultAllocator>
+	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const char* pstr)
+	{
+		SGE_ASSERT(NullPointerError, pstr);
+		SizeType size = StringCore<char, UTF8Trait, Allocator>::GetCStringSize(pstr);
+		StringCore<Char16, UCS2Trait, Allocator> re(size, 0);
+		auto pdst = re.GetData();
+		auto psrc = pstr;
+		for (SizeType i = 0; i < size; i++)
+		{
+			*pdst = StringImplement::UTF8CharToUCS2Char(psrc);
+			pdst += 1;
+			psrc = StringImplement::GetNextMultipleByteChar<char, UTF8Trait>(psrc);
+		}
+		return re;
+	}
+
+	template<typename Allocator>
+	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const StringCore<Char16, UCS2Trait, Allocator>& str)
+	{
+		SizeType nsize = 0;
+		SizeType size = str.GetSize();
+		auto psrc = str.GetData();
+		for (SizeType i = 0; i < size; i++)
+		{
+			nsize += StringImplement::GetUCS2CharToUTF8CharSize(*psrc);
+			psrc += 1;
+		}
+		StringCore<char, UTF8Trait, Allocator> re(nsize, " ");
+		auto pdst = re.GetData();
+		psrc = str.GetData();
+		for (SizeType i = 0; i < size; i++)
+		{
+			pdst = StringImplement::UCS2CharToUTF8Char(*psrc, pdst);
+			psrc += 1;
+		}
+		re.m_Size = size;
+		return re;
+	}
+
+	template<typename Allocator = DefaultAllocator>
+	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr)
+	{
+		SGE_ASSERT(NullPointerError, pstr);
+		SizeType nsize = 0;
+		SizeType size = StringCore<Char16, UCS2Trait, Allocator>::GetCStringSize(pstr);
+		auto psrc = pstr;
+		for (SizeType i = 0; i < size; i++)
+		{
+			nsize += StringImplement::GetUCS2CharToUTF8CharSize(*psrc);
+			psrc += 1;
+		}
+		StringCore<char, UTF8Trait, Allocator> re(nsize, " ");
+		auto pdst = re.GetData();
+		psrc = pstr;
+		for (SizeType i = 0; i < size; i++)
+		{
+			pdst = StringImplement::UCS2CharToUTF8Char(*psrc, pdst);
+			psrc += 1;
+		}
+		re.m_Size = size;
+		return re;
+	}
 	/*!
 	@}
 	*/
