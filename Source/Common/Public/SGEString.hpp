@@ -3189,6 +3189,20 @@ namespace SpaceGameEngine
 		re.m_Size = size;
 		return re;
 	}
+
+#ifdef SGE_USE_WIDE_CHAR
+	template<typename Allocator = DefaultAllocator>
+	using TString = StringCore<Char16, UCS2Trait, Allocator>;
+
+#define SGE_UCS2_TO_TSTR(str) str
+#define SGE_UTF8_TO_TSTR(str) SpaceGameEngine::UTF8StringToUCS2String(str)
+#else
+	template<typename Allocator = DefaultAllocator>
+	using TString = StringCore<char, UTF8Trait, Allocator>;
+
+#define SGE_UCS2_TO_TSTR(str) SpaceGameEngine::UCS2StringToUTF8String(str)
+#define SGE_UTF8_TO_TSTR(str) str
+#endif
 	/*!
 	@}
 	*/
