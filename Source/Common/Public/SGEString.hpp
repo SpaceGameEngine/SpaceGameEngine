@@ -3196,12 +3196,18 @@ namespace SpaceGameEngine
 
 #define SGE_UCS2_TO_TSTR(str) str
 #define SGE_UTF8_TO_TSTR(str) SpaceGameEngine::UTF8StringToUCS2String(str)
+
+#define SGE_TSTR_TO_UCS2(str) str
+#define SGE_TSTR_TO_UTF8(str) SpaceGameEngine::UCS2StringToUTF8String(str)
 #else
 	template<typename Allocator = DefaultAllocator>
 	using TString = StringCore<char, UTF8Trait, Allocator>;
 
 #define SGE_UCS2_TO_TSTR(str) SpaceGameEngine::UCS2StringToUTF8String(str)
 #define SGE_UTF8_TO_TSTR(str) str
+
+#define SGE_TSTR_TO_UCS2(str) SpaceGameEngine::UTF8StringToUCS2String(str)
+#define SGE_TSTR_TO_UTF8(str) str
 #endif
 	/*!
 	@}
