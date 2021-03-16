@@ -1493,6 +1493,53 @@ TEST(ReverseBoyerMooreSearchImplement, ReverseBoyerMooreSearchTest)
 	ASSERT_EQ(res5_1, s5.GetData() + s5.GetNormalSize());
 }
 
+TEST(SimpleSearchImplement, SimpleSearchTest)
+{
+	using namespace SpaceGameEngine::StringImplement::SimpleSearchImplement;
+
+	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试"));
+	UCS2String s1_p(SGE_STR("测试是一个测试"));
+
+	auto res1_1 = SimpleSearch(s1.GetData(), s1.GetData() + s1.GetNormalSize(), s1_p.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_1 - s1.GetData(), 4);
+	auto res1_2 = SimpleSearch(res1_1 + 1, s1.GetData() + s1.GetNormalSize(), s1_p.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_2 - s1.GetData(), 9);
+	auto res1_3 = SimpleSearch(res1_2 + 1, s1.GetData() + s1.GetNormalSize(), s1_p.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_3, s1.GetData() + s1.GetNormalSize());
+
+	UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试"));
+	UTF8String s2_p(SGE_U8STR("测试是一个测试"));
+
+	auto res2_1 = SimpleSearch(s2.GetData(), s2.GetData() + s2.GetNormalSize(), s2_p.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_1 - s2.GetData(), 12);
+	auto res2_2 = SimpleSearch(res2_1 + 1, s2.GetData() + s2.GetNormalSize(), s2_p.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_2 - s2.GetData(), 27);
+	auto res2_3 = SimpleSearch(res2_2 + 1, s2.GetData() + s2.GetNormalSize(), s2_p.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_3, s2.GetData() + s2.GetNormalSize());
+
+	UTF8String s3(SGE_U8STR("abbadcababacab"));
+	UTF8String s3_p(SGE_U8STR("babac"));
+
+	auto res3_1 = SimpleSearch(s3.GetData(), s3.GetData() + s3.GetNormalSize(), s3_p.GetData(), s3_p.GetNormalSize());
+	ASSERT_EQ(res3_1 - s3.GetData(), 7);
+	auto res3_2 = SimpleSearch(res3_1 + 1, s3.GetData() + s3.GetNormalSize(), s3_p.GetData(), s3_p.GetNormalSize());
+	ASSERT_EQ(res3_2, s3.GetData() + s3.GetNormalSize());
+
+	UCS2String s4(SGE_STR("bcabcdababcabaabcbcabababacbacabeeacda"));
+	UCS2String s4_p(SGE_STR("bcababa"));
+
+	auto res4_1 = SimpleSearch(s4.GetData(), s4.GetData() + s4.GetNormalSize(), s4_p.GetData(), s4_p.GetNormalSize());
+	ASSERT_EQ(res4_1 - s4.GetData(), 17);
+	auto res4_2 = SimpleSearch(res4_1 + 1, s4.GetData() + s4.GetNormalSize(), s4_p.GetData(), s4_p.GetNormalSize());
+	ASSERT_EQ(res4_2, s4.GetData() + s4.GetNormalSize());
+
+	UTF8String s5(SGE_U8STR("dieiahgjkriabddioababa"));
+	UTF8String s5_p(SGE_U8STR("eigha"));
+
+	auto res5_1 = SimpleSearch(s5.GetData(), s5.GetData() + s5.GetNormalSize(), s5_p.GetData(), s5_p.GetNormalSize());
+	ASSERT_EQ(res5_1, s5.GetData() + s5.GetNormalSize());
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";

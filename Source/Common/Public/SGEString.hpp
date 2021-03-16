@@ -1109,6 +1109,65 @@ namespace SpaceGameEngine
 				}
 			}
 		}
+
+		namespace SimpleSearchImplement
+		{
+			template<typename T>
+			inline const T* SimpleSearch(const T* ptext_begin, const T* ptext_end, const T* ppat, const SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, ptext_begin);
+				SGE_ASSERT(NullPointerError, ptext_end);
+				SGE_ASSERT(NullPointerError, ppat);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				SizeType tsize = ptext_end - ptext_begin;
+				SGE_ASSERT(InvalidSizeError, tsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				if (tsize < nsize)
+				{
+					return ptext_end;
+				}
+				else
+				{
+					const SizeType nsize_1 = nsize - 1;
+					const T last_char = ppat[nsize_1];
+					SizeType skip = 0;
+
+					const T* pi = ptext_begin;
+					const T* piend = ptext_end - nsize_1;
+
+					while (pi < piend)
+					{
+						while (pi[nsize_1] != last_char)
+						{
+							if (++pi == piend)
+								return ptext_end;
+						}
+
+						for (SizeType j = 0;;)
+						{
+							if (pi[j] != ppat[j])
+							{
+								if (skip == 0)
+								{
+									skip = 1;
+									while (skip <= nsize_1 && ppat[nsize_1 - skip] != last_char)
+										++skip;
+								}
+								pi += skip;
+								break;
+							}
+							if (++j == nsize)
+							{
+								return pi;
+							}
+						}
+					}
+					return ptext_end;
+				}
+			}
+
+		}
 	}
 
 	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
