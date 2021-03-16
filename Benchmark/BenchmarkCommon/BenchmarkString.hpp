@@ -94,6 +94,27 @@ void BM_SgeStringCreateLarge(benchmark::State& state)
 BENCHMARK(BM_StdStringCreateLarge)->Iterations(1000000);
 BENCHMARK(BM_SgeStringCreateLarge)->Iterations(1000000);
 
+void BM_StdStringGetData(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		const std::string str("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+		auto ptr = str.data();
+	}
+}
+
+void BM_SgeStringGetData(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		const SpaceGameEngine::String str(SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890"));
+		auto ptr = str.GetData();
+	}
+}
+
+BENCHMARK(BM_StdStringGetData)->Iterations(1000000);
+BENCHMARK(BM_SgeStringGetData)->Iterations(1000000);
+
 void BM_StdStringRead(benchmark::State& state)
 {
 	for (auto _ : state)
@@ -191,11 +212,34 @@ void BM_SgeStringFind(benchmark::State& state)
 {
 	for (auto _ : state)
 	{
-		SpaceGameEngine::String str(SGE_STR("abcdabcdabccdacdasdfabdbacbasdacasdfsacsdcdddcasddscsabbbdscavbasdfasdfasdfasdfscsdfasseerrrwqezxcaawaabcarabcaba"));
-		SpaceGameEngine::String pat(SGE_STR("abcda"));
+		SpaceGameEngine::UTF8String str(SGE_U8STR("abcdabcdabccdacdasdfabdbacbasdacasdfsacsdcdddcasddscsabbbdscavbasdfasdfasdfasdfscsdfasseerrrwqezxcaawaabcarabcaba"));
+		SpaceGameEngine::UTF8String pat(SGE_U8STR("abcda"));
 		auto re = str.Find(pat, str.GetConstBegin(), str.GetConstEnd());
 	}
 }
 
 BENCHMARK(BM_StdStringFind)->Iterations(1000000);
 BENCHMARK(BM_SgeStringFind)->Iterations(1000000);
+
+void BM_StdStringFind2(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		std::wstring str(L"abcdabcdabccdacdasdfabdbacbasdacasdfsacsdcdddcasddscsabbbdscavbasdfasdfasdfasdfscsdfasseerrrwqezxcaawaabcarabcaba");
+		std::wstring pat(L"abcda");
+		auto re = str.find(pat);
+	}
+}
+
+void BM_SgeStringFind2(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		SpaceGameEngine::UCS2String str(SGE_STR("abcdabcdabccdacdasdfabdbacbasdacasdfsacsdcdddcasddscsabbbdscavbasdfasdfasdfasdfscsdfasseerrrwqezxcaawaabcarabcaba"));
+		SpaceGameEngine::UCS2String pat(SGE_STR("abcda"));
+		auto re = str.Find(pat, str.GetConstBegin(), str.GetConstEnd());
+	}
+}
+
+BENCHMARK(BM_StdStringFind2)->Iterations(1000000);
+BENCHMARK(BM_SgeStringFind2)->Iterations(1000000);
