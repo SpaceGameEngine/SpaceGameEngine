@@ -218,8 +218,8 @@ void BM_SgeStringFind(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_StdStringFind)->Iterations(1000000);
-BENCHMARK(BM_SgeStringFind)->Iterations(1000000);
+BENCHMARK(BM_StdStringFind)->Iterations(1000);
+BENCHMARK(BM_SgeStringFind)->Iterations(1000);
 
 void BM_StdStringFind2(benchmark::State& state)
 {
@@ -241,5 +241,5 @@ void BM_SgeStringFind2(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_StdStringFind2)->Iterations(1000000);
-BENCHMARK(BM_SgeStringFind2)->Iterations(1000000);
+BENCHMARK(BM_StdStringFind2)->Iterations(1000);
+BENCHMARK(BM_SgeStringFind2)->Iterations(1000);
