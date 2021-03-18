@@ -1540,6 +1540,48 @@ TEST(SimpleSearchImplement, SimpleSearchTest)
 	ASSERT_EQ(res5_1, s5.GetData() + s5.GetNormalSize());
 }
 
+TEST(SimpleSearchImplement, ReverseSimpleSearchTest)
+{
+	using namespace StringImplement::SimpleSearchImplement;
+
+	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试"));
+	UCS2String s1_p(SGE_STR("测试是一个测试"));
+	auto res1_1 = ReverseSimpleSearch(s1.GetData(), s1.GetData() + s1.GetNormalSize(), s1_p.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_1 - s1.GetData(), 9);
+	auto res1_2 = ReverseSimpleSearch(s1.GetData(), res1_1 + 2, s1_p.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_2 - s1.GetData(), 4);
+	auto res1_3 = ReverseSimpleSearch(s1.GetData(), res1_2 + 2, s1_p.GetData(), s1_p.GetNormalSize());
+	ASSERT_EQ(res1_3, res1_2 + 2);
+
+	UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试"));
+	UTF8String s2_p(SGE_U8STR("测试是一个测试"));
+	auto res2_1 = ReverseSimpleSearch(s2.GetData(), s2.GetData() + s2.GetNormalSize(), s2_p.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_1 - s2.GetData(), 27);
+	auto res2_2 = ReverseSimpleSearch(s2.GetData(), res2_1 + 6, s2_p.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_2 - s2.GetData(), 12);
+	auto res2_3 = ReverseSimpleSearch(s2.GetData(), res2_2 + 6, s2_p.GetData(), s2_p.GetNormalSize());
+	ASSERT_EQ(res2_3, res2_2 + 6);
+
+	UTF8String s3(SGE_U8STR("abbadcababacab"));
+	UTF8String s3_p(SGE_U8STR("babac"));
+	auto res3_1 = ReverseSimpleSearch(s3.GetData(), s3.GetData() + s3.GetNormalSize(), s3_p.GetData(), s3_p.GetNormalSize());
+	ASSERT_EQ(res3_1 - s3.GetData(), 7);
+	auto res3_2 = ReverseSimpleSearch(s3.GetData(), res3_1, s3_p.GetData(), s3_p.GetNormalSize());
+	ASSERT_EQ(res3_2, res3_1);
+
+	UCS2String s4(SGE_STR("bcabcdababcabaabcbcabababacbacabeeacda"));
+	UCS2String s4_p(SGE_STR("bcababa"));
+	auto res4_1 = ReverseSimpleSearch(s4.GetData(), s4.GetData() + s4.GetNormalSize(), s4_p.GetData(), s4_p.GetNormalSize());
+	ASSERT_EQ(res4_1 - s4.GetData(), 17);
+	auto res4_2 = ReverseSimpleSearch(s4.GetData(), res4_1, s4_p.GetData(), s4_p.GetNormalSize());
+	ASSERT_EQ(res4_2, res4_1);
+
+	UTF8String s5(SGE_U8STR("dieiahgjkriabddioababa"));
+	UTF8String s5_p(SGE_U8STR("eigha"));
+	auto res5_1 = ReverseSimpleSearch(s5.GetData(), s5.GetData() + s5.GetNormalSize(), s5_p.GetData(), s5_p.GetNormalSize());
+	ASSERT_EQ(res5_1, s5.GetData() + s5.GetNormalSize());
+}
+
 TEST(StringCore, GetCStringSize)
 {
 	const char* pcstr = u8"这是12345abcde";

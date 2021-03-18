@@ -1167,6 +1167,60 @@ namespace SpaceGameEngine
 				}
 			}
 
+			template<typename T>
+			inline const T* ReverseSimpleSearch(const T* ptext_begin, const T* ptext_end, const T* ppat, const SizeType nsize)
+			{
+				SGE_ASSERT(NullPointerError, ptext_begin);
+				SGE_ASSERT(NullPointerError, ptext_end);
+				SGE_ASSERT(NullPointerError, ppat);
+				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				SizeType tsize = ptext_end - ptext_begin;
+				SGE_ASSERT(InvalidSizeError, tsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				if (tsize < nsize)
+				{
+					return ptext_end;
+				}
+				else
+				{
+					const T first_char = ppat[0];
+					SizeType skip = 0;
+					const T* pi = ptext_end - nsize;
+					const T* piend = ptext_begin - 1;
+					while (pi > piend)
+					{
+						while (*pi != first_char)
+						{
+							if (--pi == piend)
+								return ptext_end;
+						}
+
+						for (SizeType j = 0;;)
+						{
+							if (pi[j] != ppat[j])
+							{
+								if (skip == 0)
+								{
+									skip = 1;
+									while (skip < nsize && ppat[skip] != first_char)
+										++skip;
+								}
+								if (piend + skip >= pi)
+									return ptext_end;
+								pi -= skip;
+								break;
+							}
+							if (++j == nsize)
+							{
+								return pi;
+							}
+						}
+					}
+					return ptext_end;
+				}
+			}
+
 		}
 	}
 
