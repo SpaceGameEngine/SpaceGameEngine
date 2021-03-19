@@ -1780,3 +1780,28 @@ TEST(VectorIterator, SelfDecrementTest)
 	ASSERT_EQ(riter1, v.GetReverseBegin() - 1);
 	ASSERT_EQ(riter2, v.GetConstReverseBegin() - 1);
 }
+
+TEST(VectorIterator, ConvertTest)
+{
+	Vector<int> v1 = {0, 1, 2, 3, 4, 5};
+
+	Vector<int>::Iterator i1_1 = v1.GetReverseBegin();
+	ASSERT_EQ(*i1_1, 5);
+
+	Vector<int>::ConstIterator i1_2 = v1.GetBegin();
+	ASSERT_EQ(*i1_2, 0);
+	Vector<int>::ConstIterator i1_3 = v1.GetReverseBegin();
+	ASSERT_EQ(*i1_3, 5);
+	Vector<int>::ConstIterator i1_4 = v1.GetConstReverseBegin();
+	ASSERT_EQ(*i1_4, 5);
+
+	Vector<int>::ReverseIterator i1_5 = v1.GetBegin();
+	ASSERT_EQ(*i1_5, 0);
+
+	Vector<int>::ConstReverseIterator i1_6 = v1.GetReverseBegin();
+	ASSERT_EQ(*i1_6, 5);
+	Vector<int>::ConstReverseIterator i1_7 = v1.GetBegin();
+	ASSERT_EQ(*i1_7, 0);
+	Vector<int>::ConstReverseIterator i1_8 = v1.GetConstBegin();
+	ASSERT_EQ(*i1_8, 0);
+}

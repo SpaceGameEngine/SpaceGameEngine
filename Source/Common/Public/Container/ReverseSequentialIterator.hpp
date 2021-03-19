@@ -128,11 +128,28 @@ namespace SpaceGameEngine
 			return m_Content;
 		}
 
+		inline ValueType* GetData()
+		{
+			return m_Content.GetData();
+		}
+
+		inline const ValueType* GetData() const
+		{
+			return m_Content.GetData();
+		}
+
 	protected:
 		template<typename... Args>
 		inline explicit ReverseSequentialIterator(Args&&... args)
 			: m_Content(std::forward<Args>(args)...)
 		{
+		}
+
+		template<typename... Args>
+		inline ReverseSequentialIterator& operator=(Args&&... args)
+		{
+			m_Content.operator=(std::forward<Args>(args)...);
+			return *this;
 		}
 
 	private:

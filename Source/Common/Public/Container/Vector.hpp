@@ -735,6 +735,19 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline IteratorImpl(const IteratorType& iter)
+			{
+				m_pContent = (_T*)iter.GetData();
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline IteratorImpl& operator=(const IteratorType& iter)
+			{
+				m_pContent = (_T*)iter.GetData();
+				return *this;
+			}
+
 			inline IteratorImpl operator+(SizeType i) const
 			{
 				return IteratorImpl(m_pContent + i);
@@ -808,6 +821,16 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent;
 			}
 
+			inline ValueType* GetData()
+			{
+				return m_pContent;
+			}
+
+			inline const ValueType* GetData() const
+			{
+				return m_pContent;
+			}
+
 		private:
 			inline explicit IteratorImpl(_T* ptr)
 			{
@@ -858,6 +881,19 @@ namespace SpaceGameEngine
 			inline VectorReverseIteratorImpl& operator=(const VectorReverseIteratorImpl& iter)
 			{
 				SGE_ASSERT(SelfAssignmentError, this, &iter);
+				ReverseSequentialIterator<IteratorType>::operator=(iter);
+				return *this;
+			}
+
+			template<typename _IteratorType, typename = std::enable_if_t<IsVectorIterator<_IteratorType>::Value && (std::is_same_v<typename _IteratorType::ValueType, ValueType> || std::is_same_v<typename _IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline VectorReverseIteratorImpl(const _IteratorType& iter)
+				: ReverseSequentialIterator<IteratorType>(iter)
+			{
+			}
+
+			template<typename _IteratorType, typename = std::enable_if_t<IsVectorIterator<_IteratorType>::Value && (std::is_same_v<typename _IteratorType::ValueType, ValueType> || std::is_same_v<typename _IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline VectorReverseIteratorImpl& operator=(const _IteratorType& iter)
+			{
 				ReverseSequentialIterator<IteratorType>::operator=(iter);
 				return *this;
 			}
