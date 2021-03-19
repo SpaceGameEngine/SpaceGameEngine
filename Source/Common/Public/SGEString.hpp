@@ -1551,6 +1551,9 @@ namespace SpaceGameEngine
 			m_Storage.SetRealSize(size + 1);
 		}
 
+		template<typename IteratorType>
+		struct IsStringCoreIterator;
+
 		template<typename _T>
 		class ReverseIteratorImpl;
 

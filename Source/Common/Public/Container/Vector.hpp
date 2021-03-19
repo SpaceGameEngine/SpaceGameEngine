@@ -691,6 +691,9 @@ namespace SpaceGameEngine
 			return GetObject(index);
 		}
 
+		template<typename IteratorType>
+		struct IsVectorIterator;
+
 		template<typename _T>
 		class IteratorImpl
 		{
