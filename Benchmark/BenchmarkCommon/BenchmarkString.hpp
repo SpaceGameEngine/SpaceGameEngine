@@ -168,8 +168,8 @@ void BM_SgeStringAppend(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_StdStringAppend)->Iterations(1000000);
-BENCHMARK(BM_SgeStringAppend)->Iterations(1000000);
+BENCHMARK(BM_StdStringAppend)->Iterations(1000);
+BENCHMARK(BM_SgeStringAppend)->Iterations(1000);
 
 void BM_StdStringInsert(benchmark::State& state)
 {
@@ -195,8 +195,8 @@ void BM_SgeStringInsert(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_StdStringInsert)->Iterations(1000000);
-BENCHMARK(BM_SgeStringInsert)->Iterations(1000000);
+BENCHMARK(BM_StdStringInsert)->Iterations(1000);
+BENCHMARK(BM_SgeStringInsert)->Iterations(1000);
 
 void BM_StdStringFind(benchmark::State& state)
 {

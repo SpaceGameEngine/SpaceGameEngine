@@ -1570,6 +1570,7 @@ namespace SpaceGameEngine
 			};
 
 			using ValueType = std::conditional_t<Trait::IsMultipleByte, _T*, _T>;
+			using NonConstValueType = std::conditional_t<Trait::IsMultipleByte, std::remove_const_t<_T>*, std::remove_const_t<_T>>;
 
 		public:
 			friend OutOfRangeError;
@@ -1594,6 +1595,19 @@ namespace SpaceGameEngine
 			inline IteratorImpl& operator=(const IteratorImpl& iter)
 			{
 				SGE_ASSERT(SelfAssignmentError, this, &iter);
+				m_pContent = iter.m_pContent;
+				return *this;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			inline IteratorImpl(const IteratorType& iter)
+			{
+				m_pContent = iter.m_pContent;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			inline IteratorImpl& operator=(const IteratorType& iter)
+			{
 				m_pContent = iter.m_pContent;
 				return *this;
 			}
@@ -1792,6 +1806,7 @@ namespace SpaceGameEngine
 			};
 
 			using ValueType = std::conditional_t<Trait::IsMultipleByte, _T*, _T>;
+			using NonConstValueType = std::conditional_t<Trait::IsMultipleByte, std::remove_const_t<_T>*, std::remove_const_t<_T>>;
 
 		public:
 			friend OutOfRangeError;
@@ -1821,6 +1836,19 @@ namespace SpaceGameEngine
 			inline ReverseIteratorImpl& operator=(const ReverseIteratorImpl& iter)
 			{
 				SGE_ASSERT(SelfAssignmentError, this, &iter);
+				m_pContent = iter.m_pContent;
+				return *this;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			inline ReverseIteratorImpl(const IteratorType& iter)
+			{
+				m_pContent = iter.m_pContent;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			inline ReverseIteratorImpl& operator=(const IteratorType& iter)
+			{
 				m_pContent = iter.m_pContent;
 				return *this;
 			}

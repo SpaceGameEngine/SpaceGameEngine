@@ -2763,6 +2763,53 @@ TEST(StringCoreIterator, IsStringCoreIteratorTest)
 	ASSERT_FALSE((UTF8String::IsStringCoreIterator<UCS2String::ReverseIterator>::Value));
 }
 
+TEST(StringCoreIterator, ConvertTest)
+{
+	UCS2String s1(SGE_STR("测试一下test"));
+
+	UCS2String::Iterator i1_1(s1.GetReverseBegin());
+	ASSERT_EQ(*i1_1, SGE_STR('t'));
+
+	UCS2String::ConstIterator i1_2(s1.GetBegin());
+	ASSERT_EQ(*i1_2, SGE_STR('测'));
+	UCS2String::ConstIterator i1_3(s1.GetReverseBegin());
+	ASSERT_EQ(*i1_3, SGE_STR('t'));
+	UCS2String::ConstIterator i1_4(s1.GetConstReverseBegin());
+	ASSERT_EQ(*i1_4, SGE_STR('t'));
+
+	UCS2String::ReverseIterator i1_5(s1.GetBegin());
+	ASSERT_EQ(*i1_5, SGE_STR('测'));
+
+	UCS2String::ConstReverseIterator i1_6(s1.GetReverseBegin());
+	ASSERT_EQ(*i1_6, SGE_STR('t'));
+	UCS2String::ConstReverseIterator i1_7(s1.GetBegin());
+	ASSERT_EQ(*i1_7, SGE_STR('测'));
+	UCS2String::ConstReverseIterator i1_8(s1.GetConstBegin());
+	ASSERT_EQ(*i1_8, SGE_STR('测'));
+
+	UTF8String s2(SGE_U8STR("这是测试test!"));
+
+	UTF8String::Iterator i2_1(s2.GetReverseBegin());
+	ASSERT_TRUE(IsUTF8CharSame(*i2_1, SGE_U8STR("!")));
+
+	UTF8String::ConstIterator i2_2(s2.GetBegin());
+	ASSERT_TRUE(IsUTF8CharSame(*i2_2, SGE_U8STR("这")));
+	UTF8String::ConstIterator i2_3(s2.GetReverseBegin());
+	ASSERT_TRUE(IsUTF8CharSame(*i2_3, SGE_U8STR("!")));
+	UTF8String::ConstIterator i2_4(s2.GetConstReverseBegin());
+	ASSERT_TRUE(IsUTF8CharSame(*i2_4, SGE_U8STR("!")));
+
+	UTF8String::ReverseIterator i2_5(s2.GetBegin());
+	ASSERT_TRUE(IsUTF8CharSame(*i2_5, SGE_U8STR("这")));
+
+	UTF8String::ConstReverseIterator i2_6(s2.GetReverseBegin());
+	ASSERT_TRUE(IsUTF8CharSame(*i2_6, SGE_U8STR("!")));
+	UTF8String::ConstReverseIterator i2_7(s2.GetBegin());
+	ASSERT_TRUE(IsUTF8CharSame(*i2_7, SGE_U8STR("这")));
+	UTF8String::ConstReverseIterator i2_8(s2.GetConstBegin());
+	ASSERT_TRUE(IsUTF8CharSame(*i2_8, SGE_U8STR("这")));
+}
+
 TEST(StringConvert, UTF8StringToUCS2StringTest)
 {
 	UTF8String s1_1(SGE_U8STR("这是个测试test123"));
