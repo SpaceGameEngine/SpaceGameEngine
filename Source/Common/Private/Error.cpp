@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "Error.h"
+#include "SGEString.hpp"
 #include <iostream>
 
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
@@ -34,7 +35,7 @@ void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_
 	output_msg += SGE_TSTR(" ");
 	output_msg += debug_info.m_pFunctionName;
 	output_msg += SGE_TSTR(" ");
-	output_msg += StdToString(debug_info.m_LineNumber);
+	output_msg += StdToTString(debug_info.m_LineNumber);
 	output_msg += SGE_TSTR(" : ");
 	output_msg += error_msg;
 	/*!@todo use sge's output like log or messagebox*/

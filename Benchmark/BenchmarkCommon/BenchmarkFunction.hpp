@@ -113,10 +113,8 @@ SpaceGameEngine::Function<void(bm_func_class*, int, int)> sgeFunc2 = &bm_func_cl
 
 void BM_SgeFunction2(benchmark::State& state)
 {
-	bm_func_class t;
 	for (auto _ : state)
 	{
-
 		sgeFunc2(&bm_test_obj, 1, 2);
 	}
 }

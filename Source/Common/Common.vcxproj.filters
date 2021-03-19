@@ -7,9 +7,6 @@
     <Filter Include="Private">
       <UniqueIdentifier>{46edc6b4-1141-4dfe-80ba-d5860cb09029}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\StringImplement">
-      <UniqueIdentifier>{a3e6f398-c1b5-4cf7-a89e-7453cdd0fd92}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Public\Concurrent">
       <UniqueIdentifier>{66f612dd-14d1-41be-af45-3a59be642d58}</UniqueIdentifier>
     </Filter>
@@ -34,6 +31,9 @@
     <Filter Include="Private\Utility">
       <UniqueIdentifier>{c29e37a6-b78b-451a-800c-e813bc85499c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Meta">
+      <UniqueIdentifier>{f6f2d596-3c8e-44db-aa9a-0e6291551d30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -44,12 +44,6 @@
     </ClInclude>
     <ClInclude Include="Private\DoxygenConfig.hpp">
       <Filter>Private</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\StringImplement\StdTStringImplement.h">
-      <Filter>Private\StringImplement</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\SGEString.h">
-      <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\Platform.hpp">
       <Filter>Public</Filter>
@@ -93,18 +87,24 @@
     <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SGEString.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SGEStringForward.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Meta\Trait.hpp">
+      <Filter>Public\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Meta\Concept.hpp">
+      <Filter>Public\Meta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\MemoryManager.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\StringImplement\StdTStringImplement.cpp">
-      <Filter>Private\StringImplement</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\SGEString.cpp">
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\Concurrent\Thread.cpp">

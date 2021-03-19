@@ -135,6 +135,15 @@ TEST(Vector, SizeConstructionTest)
 	}
 }
 
+TEST(Vector, IteratorPairConstructionTest)
+{
+	Vector<int> v1 = {2, 3, 5, 7, 9};
+	Vector<int, StdAllocator> v2(v1.GetReverseBegin(), v1.GetReverseBegin() + 3);
+	ASSERT_EQ(v2.GetSize(), 3);
+	for (int i = 0; i < 3; i++)
+		ASSERT_EQ(v1[4 - i], v2[i]);
+}
+
 TEST(Vector, CopyConstructionTest)
 {
 	Vector<test_vector_class, MemoryManagerAllocator> v1{0, 1, 2};
@@ -1696,21 +1705,24 @@ TEST(VectorIterator, ConstReverseIteratorTest)
 
 	Vector<int> v8 = {0, 1, 2, 3, 4};
 	ASSERT_EQ(v8.GetSize(), 5);
-	v8.Remove(v8.GetConstReverseBegin());
+	auto iter14 = v8.Remove(v8.GetConstReverseBegin());
+	ASSERT_EQ(*iter14, 3);
 	ASSERT_EQ(v8.GetSize(), 4);
 	for (SizeType i = 0; i < 4; i++)
 	{
 		ASSERT_EQ(v8[i], i);
 	}
 
-	v8.Remove(v8.GetConstReverseEnd() - 1);
+	auto iter15 = v8.Remove(v8.GetConstReverseEnd() - 1);
+	ASSERT_EQ(iter15, v8.GetConstReverseEnd());
 	ASSERT_EQ(v8.GetSize(), 3);
 	for (SizeType i = 0; i < 3; i++)
 	{
 		ASSERT_EQ(v8[i], i + 1);
 	}
 
-	v8.Remove(v8.GetConstReverseBegin() + 1);
+	auto iter16 = v8.Remove(v8.GetConstReverseBegin() + 1);
+	ASSERT_EQ(*iter16, 1);
 	ASSERT_EQ(v8.GetSize(), 2);
 	ASSERT_EQ(v8[0], 1);
 	ASSERT_EQ(v8[1], 3);
@@ -1718,7 +1730,8 @@ TEST(VectorIterator, ConstReverseIteratorTest)
 	Vector<int> v9 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 	ASSERT_EQ(v9.GetSize(), 10);
-	v9.Remove(v9.GetConstReverseBegin() + 2, v9.GetConstReverseEnd() - 2);
+	auto iter17 = v9.Remove(v9.GetConstReverseBegin() + 2, v9.GetConstReverseEnd() - 2);
+	ASSERT_EQ(*iter17, 1);
 	ASSERT_EQ(v9.GetSize(), 4);
 	ASSERT_EQ(v9[0], 0);
 	ASSERT_EQ(v9[1], 1);
@@ -1766,4 +1779,29 @@ TEST(VectorIterator, SelfDecrementTest)
 
 	ASSERT_EQ(riter1, v.GetReverseBegin() - 1);
 	ASSERT_EQ(riter2, v.GetConstReverseBegin() - 1);
+}
+
+TEST(VectorIterator, ConvertTest)
+{
+	Vector<int> v1 = {0, 1, 2, 3, 4, 5};
+
+	Vector<int>::Iterator i1_1 = v1.GetReverseBegin();
+	ASSERT_EQ(*i1_1, 5);
+
+	Vector<int>::ConstIterator i1_2 = v1.GetBegin();
+	ASSERT_EQ(*i1_2, 0);
+	Vector<int>::ConstIterator i1_3 = v1.GetReverseBegin();
+	ASSERT_EQ(*i1_3, 5);
+	Vector<int>::ConstIterator i1_4 = v1.GetConstReverseBegin();
+	ASSERT_EQ(*i1_4, 5);
+
+	Vector<int>::ReverseIterator i1_5 = v1.GetBegin();
+	ASSERT_EQ(*i1_5, 0);
+
+	Vector<int>::ConstReverseIterator i1_6 = v1.GetReverseBegin();
+	ASSERT_EQ(*i1_6, 5);
+	Vector<int>::ConstReverseIterator i1_7 = v1.GetBegin();
+	ASSERT_EQ(*i1_7, 0);
+	Vector<int>::ConstReverseIterator i1_8 = v1.GetConstBegin();
+	ASSERT_EQ(*i1_8, 0);
 }

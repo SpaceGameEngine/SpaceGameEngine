@@ -15,7 +15,6 @@ limitations under the License.
 */
 #pragma once
 #include "ForwardDefinition.hpp"
-#include "SGEString.h"
 #include <utility>
 
 namespace SpaceGameEngine
@@ -24,8 +23,6 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
-
-	struct SelfAssignmentError;
 
 	struct Uncopyable
 	{
@@ -75,7 +72,6 @@ namespace SpaceGameEngine
 		}
 		Pair<T, U>& operator=(const Pair<T, U>& c)
 		{
-			SGE_ASSERT(SelfAssignmentError, this, &c);
 			m_First = c.m_First;
 			m_Second = c.m_Second;
 			return *this;
@@ -91,23 +87,16 @@ namespace SpaceGameEngine
 	};
 
 	template<typename T>
-	struct IsComparable
+	inline T Min(const T& a, const T& b)
 	{
-	private:
-		template<typename U>
-		inline static constexpr std::enable_if_t<std::is_same_v<decltype(std::declval<U>() == std::declval<U>()), bool>, bool> Judge(int)
-		{
-			return true;
-		}
-		template<typename U>
-		inline static constexpr bool Judge(...)
-		{
-			return false;
-		}
+		return (a < b ? a : b);
+	}
 
-	public:
-		inline static constexpr bool Value = Judge<T>(0);
-	};
+	template<typename T>
+	inline T Max(const T& a, const T& b)
+	{
+		return (a > b ? a : b);
+	}
 	/*!
 	@}
 	*/

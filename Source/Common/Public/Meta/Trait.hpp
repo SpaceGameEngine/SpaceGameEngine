@@ -13,21 +13,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "gtest/gtest.h"
-#include "TestError.hpp"
-#include "TestString.hpp"
-#include "TestMemoryManager.hpp"
-#include "TestFunction.hpp"
-#include "TestMetaData.hpp"
-#include "TestUtility.hpp"
-#include "TestConcurrent.hpp"
-#include "TestVector.hpp"
-#include "TestContainerConcept.hpp"
-#include "TestRange.hpp"
-#include "TestMeta.hpp"
+#pragma once
+#include <type_traits>
 
-int main(int argc, char** argv)
+namespace SpaceGameEngine
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	/*!
+	@ingroup Common
+	@{
+	*/
+
+	template<typename T>
+	struct RemoveCVRef
+	{
+		using Type = std::remove_cv_t<std::remove_reference_t<T>>;
+	};
+
+	template<typename T>
+	using RemoveCVRefType = typename RemoveCVRef<T>::Type;
+
+	template<typename T>
+	struct TypeWrapper
+	{
+		using Type = T;
+	};
+
+	/*!
+	@}
+	*/
 }

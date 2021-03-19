@@ -15,8 +15,9 @@ limitations under the License.
 */
 #pragma once
 #include "ForwardDefinition.hpp"
-#include "SGEString.h"
+#include "SGEStringForward.h"
 #include "Platform.hpp"
+#include "Meta/Trait.hpp"
 #include "Utility/Utility.hpp"
 #include <type_traits>
 
@@ -77,7 +78,7 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr const bool Value = Check<std::remove_cv_t<T>, Args...>(0);
+		inline static constexpr const bool Value = Check<RemoveCVRefType<T>, Args...>(0);
 	};
 
 	struct NullPointerError

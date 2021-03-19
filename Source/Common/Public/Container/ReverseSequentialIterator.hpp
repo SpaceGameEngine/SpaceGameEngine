@@ -29,18 +29,13 @@ namespace SpaceGameEngine
 	from this type and add some useful functions according to the concrete container.
 	@param T a bidirectional iterator type.
 	*/
-	template<typename T>
+	template<typename IteratorType>
 	class ReverseSequentialIterator
 	{
-	};
-
-	template<template<typename> class IteratorImpl, typename T>
-	class ReverseSequentialIterator<IteratorImpl<T>>
-	{
 	public:
-		static_assert((IsBidirectionalSequentialIterator<IteratorImpl<T>>::Value), "only the bidirectional iterator type can be passed to get the reverse iterator.");
+		static_assert((IsBidirectionalSequentialIterator<IteratorType>::Value), "only the bidirectional iterator type can be passed to get the reverse iterator.");
 
-		using ValueType = T;
+		using ValueType = typename IteratorType::ValueType;
 
 	public:
 		inline ReverseSequentialIterator(const ReverseSequentialIterator& iter)
@@ -108,12 +103,12 @@ namespace SpaceGameEngine
 			return iter.m_Content - m_Content;
 		}
 
-		inline T* operator->() const
+		inline ValueType* operator->() const
 		{
 			return m_Content.operator->();
 		}
 
-		inline T& operator*() const
+		inline ValueType& operator*() const
 		{
 			return m_Content.operator*();
 		}
@@ -128,9 +123,19 @@ namespace SpaceGameEngine
 			return m_Content != iter.m_Content;
 		}
 
-		inline operator IteratorImpl<T>() const
+		inline operator IteratorType() const
 		{
 			return m_Content;
+		}
+
+		inline ValueType* GetData()
+		{
+			return m_Content.GetData();
+		}
+
+		inline const ValueType* GetData() const
+		{
+			return m_Content.GetData();
 		}
 
 	protected:
@@ -140,8 +145,15 @@ namespace SpaceGameEngine
 		{
 		}
 
+		template<typename... Args>
+		inline ReverseSequentialIterator& operator=(Args&&... args)
+		{
+			m_Content.operator=(std::forward<Args>(args)...);
+			return *this;
+		}
+
 	private:
-		IteratorImpl<T> m_Content;
+		IteratorType m_Content;
 	};
 	/*!
 	@}

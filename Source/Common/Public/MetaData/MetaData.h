@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "SGEString.h"
+#include "SGEString.hpp"
 #include "Error.h"
-#include "Utility/Utility.hpp"
+#include "Meta/Concept.hpp"
 #include <type_traits>
 #include <utility>
 #include <new>
@@ -132,7 +132,7 @@ namespace SpaceGameEngine
 	template<typename T>
 	inline bool (*QueryComparison())(const void*, const void*)
 	{
-		if constexpr (IsComparable<T>::Value)
+		if constexpr (IsWeakEqualityComparable<T>::Value)
 			return [](const void* arg1, const void* arg2) -> bool {
 				SGE_ASSERT(NullPointerError, arg1);
 				SGE_ASSERT(NullPointerError, arg2);
