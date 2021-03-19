@@ -1222,6 +1222,18 @@ namespace SpaceGameEngine
 			}
 
 		}
+
+		struct SearchStrategy
+		{
+		};
+
+		struct BoyerMooreSearchStrategy : public SearchStrategy
+		{
+		};
+
+		struct SimpleSearchStrategy : public SearchStrategy
+		{
+		};
 	}
 
 	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
@@ -2898,6 +2910,7 @@ namespace SpaceGameEngine
 			}
 		}
 
+		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline Iterator Find(const StringCore& str, const Iterator& begin, const Iterator& end)
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
@@ -2907,23 +2920,31 @@ namespace SpaceGameEngine
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
+				T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
 
-			StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
-			T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return Iterator(res);
+				return Iterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				T* res = (T*)(StringImplement::SimpleSearchImplement::SimpleSearch(begin.GetData(), end.GetData(), pstr, nsize));
+				return Iterator(res);
+			}
 		}
 
+		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline ConstIterator Find(const StringCore& str, const ConstIterator& begin, const ConstIterator& end) const
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
@@ -2933,24 +2954,31 @@ namespace SpaceGameEngine
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
+				const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
 
-			StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
-			const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return ConstIterator(res);
+				return ConstIterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				const T* res = StringImplement::SimpleSearchImplement::SimpleSearch(begin.GetData(), end.GetData(), pstr, nsize);
+				return ConstIterator(res);
+			}
 		}
 
-		template<typename OtherAllocator>
+		template<typename OtherAllocator, typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline Iterator Find(const StringCore<T, Trait, OtherAllocator>& str, const Iterator& begin, const Iterator& end)
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
@@ -2960,24 +2988,31 @@ namespace SpaceGameEngine
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
+				T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
 
-			StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
-			T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return Iterator(res);
+				return Iterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				T* res = (T*)(StringImplement::SimpleSearchImplement::SimpleSearch(begin.GetData(), end.GetData(), pstr, nsize));
+				return Iterator(res);
+			}
 		}
 
-		template<typename OtherAllocator>
+		template<typename OtherAllocator, typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline ConstIterator Find(const StringCore<T, Trait, OtherAllocator>& str, const ConstIterator& begin, const ConstIterator& end) const
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
@@ -2987,23 +3022,31 @@ namespace SpaceGameEngine
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
+				const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
 
-			StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
-			const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return ConstIterator(res);
+				return ConstIterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				const T* res = StringImplement::SimpleSearchImplement::SimpleSearch(begin.GetData(), end.GetData(), pstr, nsize);
+				return ConstIterator(res);
+			}
 		}
 
+		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline Iterator Find(const T* pstr, const Iterator& begin, const Iterator& end)
 		{
 			SGE_ASSERT(NullPointerError, pstr);
@@ -3013,23 +3056,31 @@ namespace SpaceGameEngine
 
 			SizeType nsize = GetCStringNormalSize(pstr);
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
+				T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
 
-			StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
-			T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return Iterator(res);
+				return Iterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				T* res = (T*)(StringImplement::SimpleSearchImplement::SimpleSearch(begin.GetData(), end.GetData(), pstr, nsize));
+				return Iterator(res);
+			}
 		}
 
+		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline ConstIterator Find(const T* pstr, const ConstIterator& begin, const ConstIterator& end) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
@@ -3039,23 +3090,31 @@ namespace SpaceGameEngine
 
 			SizeType nsize = GetCStringNormalSize(pstr);
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgst = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
+				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
+				const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
 
-			StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeSuffix(psuff, pstr, nsize);
-			StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
-			const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return ConstIterator(res);
+				return ConstIterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				const T* res = StringImplement::SimpleSearchImplement::SimpleSearch(begin.GetData(), end.GetData(), pstr, nsize);
+				return ConstIterator(res);
+			}
 		}
 
+		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline Iterator ReverseFind(const StringCore& str, const Iterator& begin, const Iterator& end)
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
@@ -3065,23 +3124,31 @@ namespace SpaceGameEngine
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+				T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
 
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
-			T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return Iterator(res);
+				return Iterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				T* res = (T*)(StringImplement::SimpleSearchImplement::ReverseSimpleSearch(begin.GetData(), end.GetData(), pstr, nsize));
+				return Iterator(res);
+			}
 		}
 
+		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline ConstIterator ReverseFind(const StringCore& str, const ConstIterator& begin, const ConstIterator& end) const
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
@@ -3091,24 +3158,31 @@ namespace SpaceGameEngine
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+				const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
 
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
-			const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return ConstIterator(res);
+				return ConstIterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				const T* res = StringImplement::SimpleSearchImplement::ReverseSimpleSearch(begin.GetData(), end.GetData(), pstr, nsize);
+				return ConstIterator(res);
+			}
 		}
 
-		template<typename OtherAllocator>
+		template<typename OtherAllocator, typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline Iterator ReverseFind(const StringCore<T, Trait, OtherAllocator>& str, const Iterator& begin, const Iterator& end)
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
@@ -3118,24 +3192,31 @@ namespace SpaceGameEngine
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+				T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
 
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
-			T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return Iterator(res);
+				return Iterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				T* res = (T*)(StringImplement::SimpleSearchImplement::ReverseSimpleSearch(begin.GetData(), end.GetData(), pstr, nsize));
+				return Iterator(res);
+			}
 		}
 
-		template<typename OtherAllocator>
+		template<typename OtherAllocator, typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline ConstIterator ReverseFind(const StringCore<T, Trait, OtherAllocator>& str, const ConstIterator& begin, const ConstIterator& end) const
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
@@ -3145,23 +3226,31 @@ namespace SpaceGameEngine
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+				const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
 
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
-			const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return ConstIterator(res);
+				return ConstIterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				const T* res = StringImplement::SimpleSearchImplement::ReverseSimpleSearch(begin.GetData(), end.GetData(), pstr, nsize);
+				return ConstIterator(res);
+			}
 		}
 
+		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline Iterator ReverseFind(const T* pstr, const Iterator& begin, const Iterator& end)
 		{
 			SGE_ASSERT(NullPointerError, pstr);
@@ -3171,23 +3260,31 @@ namespace SpaceGameEngine
 
 			SizeType nsize = GetCStringNormalSize(pstr);
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+				T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
 
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
-			T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return Iterator(res);
+				return Iterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				T* res = (T*)(StringImplement::SimpleSearchImplement::ReverseSimpleSearch(begin.GetData(), end.GetData(), pstr, nsize));
+				return Iterator(res);
+			}
 		}
 
+		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
 		inline ConstIterator ReverseFind(const T* pstr, const ConstIterator& begin, const ConstIterator& end) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
@@ -3197,21 +3294,28 @@ namespace SpaceGameEngine
 
 			SizeType nsize = GetCStringNormalSize(pstr);
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
+			{
+				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
 
-			SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			SizeType* psuff = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
-			SizeType* pgpt = (SizeType*)Allocator::RawNew(nsize * sizeof(SizeType), alignof(SizeType));
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
+				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
+				const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
 
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<T, Trait>(pbct, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(psuff, pstr, nsize);
-			StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
-			const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
+				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
 
-			Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-			Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
-
-			return ConstIterator(res);
+				return ConstIterator(res);
+			}
+			else if constexpr (std::is_same_v<SearchStrategy, StringImplement::SimpleSearchStrategy>)
+			{
+				const T* res = StringImplement::SimpleSearchImplement::ReverseSimpleSearch(begin.GetData(), end.GetData(), pstr, nsize);
+				return ConstIterator(res);
+			}
 		}
 
 	private:
