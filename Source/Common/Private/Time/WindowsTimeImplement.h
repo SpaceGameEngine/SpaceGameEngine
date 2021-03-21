@@ -50,6 +50,11 @@ namespace SpaceGameEngine
 
 			TimeType GetQPCCounter();
 		}
+
+		/*!
+		@brief return the now time represented by microsecond.
+		*/
+		TimeType GetNowTime();
 #endif
 	}
 

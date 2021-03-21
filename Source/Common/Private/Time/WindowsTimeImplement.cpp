@@ -49,4 +49,10 @@ TimeType SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCCounter()
 	SGE_CHECK(GetQPCCounterFailedError, QueryPerformanceCounter(&li_buf));
 	return li_buf.QuadPart;
 }
+
+TimeType SpaceGameEngine::TimeImplement::GetNowTime()
+{
+	return (TimeImplement::WindowsTimeImplement::GetQPCCounter() * 1000000) / TimeImplement::WindowsTimeImplement::GetQPCFrequency();
+}
+
 #endif

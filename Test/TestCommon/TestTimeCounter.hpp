@@ -18,6 +18,7 @@ limitations under the License.
 
 #ifdef SGE_WINDOWS
 #include "Time/../../Private/Time/WindowsTimeImplement.h"
+#include <Windows.h>
 
 TEST(WindowsTimeImplement, GetQPCFrequencyTest)
 {
@@ -37,5 +38,22 @@ TEST(WindowsTimeImplement, GetQPCCounterTest)
 	ASSERT_GT(t2, 0);
 
 	ASSERT_GE(t2, t1);
+}
+
+TEST(TimeImplement, GetNowTimeTest)
+{
+	TimeType t1 = SpaceGameEngine::TimeImplement::GetNowTime();
+	Sleep(1);
+	TimeType t2 = SpaceGameEngine::TimeImplement::GetNowTime();
+
+	ASSERT_GT(t2, t1);
+	ASSERT_GE(t2 - t1, 1000);
+
+	TimeType t3 = SpaceGameEngine::TimeImplement::GetNowTime();
+	Sleep(10);
+	TimeType t4 = SpaceGameEngine::TimeImplement::GetNowTime();
+
+	ASSERT_GT(t4, t3);
+	ASSERT_GE(t4 - t3, 10000);
 }
 #endif
