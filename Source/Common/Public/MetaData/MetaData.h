@@ -32,7 +32,7 @@ namespace SpaceGameEngine
 	@todo add other member functions' information.
 	@todo add more essential information.
 	@todo support custom constructor.
-	@todo use String instead of const char *.
+	@todo use String instead of const char *(only can be implemented by using project manager to parse the meta data).
 	*/
 	struct MetaData
 	{

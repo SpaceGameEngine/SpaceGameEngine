@@ -23,11 +23,6 @@ limitations under the License.
 #include <mm_malloc.h>
 #endif
 
-/*!
-@file
-@todo think about other os's _mm_malloc/_mm_free location.
-*/
-
 void* SpaceGameEngine::StdAllocator::RawNew(SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
