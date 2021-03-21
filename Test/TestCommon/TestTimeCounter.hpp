@@ -21,9 +21,9 @@ limitations under the License.
 
 TEST(WindowsTimeImplement, GetQPCFrequencyTest)
 {
-	SizeType fre1 = SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCFrequency();
+	TimeType fre1 = SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCFrequency();
 	ASSERT_GT(fre1, 0);
-	SizeType fre2 = SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCFrequency();
+	TimeType fre2 = SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCFrequency();
 	ASSERT_GT(fre2, 0);
 
 	ASSERT_EQ(fre1, fre2);
@@ -31,9 +31,9 @@ TEST(WindowsTimeImplement, GetQPCFrequencyTest)
 
 TEST(WindowsTimeImplement, GetQPCCounterTest)
 {
-	SizeType t1 = SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCCounter();
+	TimeType t1 = SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCCounter();
 	ASSERT_GT(t1, 0);
-	SizeType t2 = SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCCounter();
+	TimeType t2 = SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCCounter();
 	ASSERT_GT(t2, 0);
 
 	ASSERT_GE(t2, t1);

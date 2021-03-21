@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "TypeDefinition.hpp"
+#include "Time/TimeCounter.h"
 #include "Platform.hpp"
 #include "Error.h"
 
@@ -40,7 +40,7 @@ namespace SpaceGameEngine
 				static bool Judge(BOOL re_code);
 			};
 
-			SizeType GetQPCFrequency();
+			TimeType GetQPCFrequency();
 
 			struct GetQPCCounterFailedError
 			{
@@ -48,7 +48,7 @@ namespace SpaceGameEngine
 				static bool Judge(BOOL re_code);
 			};
 
-			SizeType GetQPCCounter();
+			TimeType GetQPCCounter();
 		}
 #endif
 	}
