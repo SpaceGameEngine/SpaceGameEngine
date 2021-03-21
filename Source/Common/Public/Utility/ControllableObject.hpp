@@ -48,6 +48,9 @@ namespace SpaceGameEngine
 			}
 		};
 
+		using ValueType = T;
+		using AllocatorType = Allocator;
+
 	public:
 		template<typename _T, typename _Allocator>
 		friend class ControllableObject;

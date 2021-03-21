@@ -67,6 +67,8 @@ namespace SpaceGameEngine
 			T m_Barrier;	//avoid reverse iterator for multi-byte char out of range
 			T m_pContent[1];
 
+			using AllocatorType = Allocator;
+
 			inline StorageRef()
 			{
 				m_Count.store(0, std::memory_order::memory_order_release);
@@ -157,6 +159,9 @@ namespace SpaceGameEngine
 			};
 
 		public:
+			using AllocatorType = Allocator;
+			using ValueType = T;
+
 			inline Storage()
 				: m_RealSize(0)
 			{
@@ -1243,6 +1248,7 @@ namespace SpaceGameEngine
 		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
 		using ConstValueType = std::conditional_t<Trait::IsMultipleByte, const T*, const T>;
 		using ValueTrait = Trait;
+		using AllocatorType = Allocator;
 
 		inline static const constexpr SizeType sm_MaxSize = (SGE_MAX_MEMORY_SIZE / sizeof(T)) - 1;
 

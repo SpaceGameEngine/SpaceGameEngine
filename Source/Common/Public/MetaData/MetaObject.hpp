@@ -48,6 +48,8 @@ namespace SpaceGameEngine
 			}
 		};
 
+		using AllocatorType = Allocator;
+
 	public:
 		template<typename _Allocator>
 		friend class MetaObject;

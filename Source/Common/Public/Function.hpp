@@ -98,6 +98,9 @@ namespace SpaceGameEngine
 			inline static constexpr bool Value = true;
 		};
 
+		using AllocatorType = Allocator;
+		using FunctionType = Ret(Args...);
+
 	public:
 		template<typename _T, typename _Allocator>
 		friend class Function;
