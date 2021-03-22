@@ -14,3 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "Time/TimeCounter.h"
+#include <thread>
+#include <chrono>
+
+using namespace SpaceGameEngine;
+
+#ifdef SGE_WINDOWS
+#include "WindowsTimeImplement.h"
+#elif defined(SGE_UNIX)
+#include "UnixTimeImplement.h"
+#endif
+
+TimeType SpaceGameEngine::GetNowTime()
+{
+	return TimeImplement::GetNowTime();
+}
+
+void SpaceGameEngine::SleepFor(TimeType microsecond)
+{
+	std::this_thread::sleep_for(std::chrono::microseconds(microsecond));
+}

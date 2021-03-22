@@ -15,7 +15,6 @@ limitations under the License.
 */
 #pragma once
 #include "Time/TimeCounter.h"
-#include "Platform.hpp"
 #include "Error.h"
 
 #ifdef SGE_WINDOWS

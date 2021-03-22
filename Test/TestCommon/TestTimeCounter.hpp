@@ -43,14 +43,14 @@ TEST(WindowsTimeImplement, GetQPCCounterTest)
 TEST(TimeImplement, GetNowTimeTest)
 {
 	TimeType t1 = SpaceGameEngine::TimeImplement::GetNowTime();
-	Sleep(1);
+	SleepFor(1000);
 	TimeType t2 = SpaceGameEngine::TimeImplement::GetNowTime();
 
 	ASSERT_GT(t2, t1);
 	ASSERT_GE(t2 - t1, 1000);
 
 	TimeType t3 = SpaceGameEngine::TimeImplement::GetNowTime();
-	Sleep(10);
+	SleepFor(10000);
 	TimeType t4 = SpaceGameEngine::TimeImplement::GetNowTime();
 
 	ASSERT_GT(t4, t3);
@@ -64,17 +64,28 @@ TEST(TimeImplement, GetNowTimeTest)
 TEST(TimeImplement, GetNowTimeTest)
 {
 	TimeType t1 = SpaceGameEngine::TimeImplement::GetNowTime();
-	usleep(1000);
+	SleepFor(1000);
 	TimeType t2 = SpaceGameEngine::TimeImplement::GetNowTime();
 
 	ASSERT_GT(t2, t1);
 	ASSERT_GE(t2 - t1, 1000);
 
 	TimeType t3 = SpaceGameEngine::TimeImplement::GetNowTime();
-	usleep(10000);
+	SleepFor(10000);
 	TimeType t4 = SpaceGameEngine::TimeImplement::GetNowTime();
 
 	ASSERT_GT(t4, t3);
 	ASSERT_GE(t4 - t3, 10000);
 }
 #endif
+
+TEST(TimeCounter, GetNowTimeTest)
+{
+	TimeType t1 = SpaceGameEngine::GetNowTime();
+	SleepFor(1000000);
+	TimeType t2 = SpaceGameEngine::GetNowTime();
+
+	ASSERT_GT(t2, t1);
+	ASSERT_GE(t2 - t1, 1000000);
+	ASSERT_LT(t2 - t1, 1500000);
+}

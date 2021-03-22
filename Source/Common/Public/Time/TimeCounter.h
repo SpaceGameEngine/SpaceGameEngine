@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include "Platform.hpp"
 #include "TypeDefinition.hpp"
 
 namespace SpaceGameEngine
@@ -24,6 +25,16 @@ namespace SpaceGameEngine
 	*/
 
 	using TimeType = UInt64;
+
+	/*!
+	@brief return the now time represented by microsecond.
+	*/
+	TimeType GetNowTime();
+
+	/*!
+	@brief sleep for the time represented by microsecond.
+	*/
+	void SleepFor(TimeType microsecond);
 
 	/*!
 	@}
