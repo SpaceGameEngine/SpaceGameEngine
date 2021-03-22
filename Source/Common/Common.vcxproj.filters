@@ -111,6 +111,9 @@
     <ClInclude Include="Private\Time\WindowsTimeImplement.h">
       <Filter>Private\Time</Filter>
     </ClInclude>
+    <ClInclude Include="Private\Time\UnixTimeImplement.h">
+      <Filter>Private\Time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -135,6 +138,9 @@
       <Filter>Private\Time</Filter>
     </ClCompile>
     <ClCompile Include="Private\Time\WindowsTimeImplement.cpp">
+      <Filter>Private\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Time\UnixTimeImplement.cpp">
       <Filter>Private\Time</Filter>
     </ClCompile>
   </ItemGroup>

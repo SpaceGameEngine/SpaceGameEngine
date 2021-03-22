@@ -57,3 +57,24 @@ TEST(TimeImplement, GetNowTimeTest)
 	ASSERT_GE(t4 - t3, 10000);
 }
 #endif
+
+#ifdef SGE_UNIX
+#include "Time/../../Private/Time/UnixTimeImplement.h"
+
+TEST(TimeImplement, GetNowTimeTest)
+{
+	TimeType t1 = SpaceGameEngine::TimeImplement::GetNowTime();
+	usleep(1000);
+	TimeType t2 = SpaceGameEngine::TimeImplement::GetNowTime();
+
+	ASSERT_GT(t2, t1);
+	ASSERT_GE(t2 - t1, 1000);
+
+	TimeType t3 = SpaceGameEngine::TimeImplement::GetNowTime();
+	usleep(10000);
+	TimeType t4 = SpaceGameEngine::TimeImplement::GetNowTime();
+
+	ASSERT_GT(t4, t3);
+	ASSERT_GE(t4 - t3, 10000);
+}
+#endif
