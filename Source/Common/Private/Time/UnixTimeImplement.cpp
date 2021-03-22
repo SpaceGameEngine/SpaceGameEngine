@@ -17,6 +17,8 @@ limitations under the License.
 
 #ifdef SGE_UNIX
 
+using namespace SpaceGameEngine;
+
 TimeType SpaceGameEngine::TimeImplement::GetNowTime()
 {
 	static timeval t;
