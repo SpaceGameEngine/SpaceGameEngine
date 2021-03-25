@@ -89,3 +89,75 @@ TEST(TimeCounter, GetNowTimeTest)
 	ASSERT_GE(t2 - t1, 1000000);
 	ASSERT_LT(t2 - t1, 1500000);
 }
+
+TEST(TimeStamp, InstanceAndConvertTest)
+{
+	TimeStamp<Second> t1;
+	ASSERT_EQ(t1.m_Value, 0);
+
+	TimeStamp<Second, double> t2(2500000);
+	ASSERT_EQ(t2.m_Value, 2.5);
+
+	ASSERT_EQ(t2.operator TimeType(), 2500000);
+}
+
+TEST(TimeStamp, GetNowTimeStampTest)
+{
+	auto t1 = GetNowTimeStamp<Second, double>();
+
+	SleepFor(1500000);
+
+	auto t2 = GetNowTimeStamp<Second, double>();
+
+	ASSERT_GT(t2.m_Value, t1.m_Value);
+	ASSERT_GE(t2.m_Value - t1.m_Value, 1.5);
+}
+
+TEST(TimeStamp, MinusTest)
+{
+	auto t1 = GetNowTimeStamp<Second, double>();
+
+	SleepFor(1500000);
+
+	auto t2 = GetNowTimeStamp<Second, double>();
+
+	auto td1 = t2 - t1;
+	ASSERT_TRUE((std::is_same_v<decltype(td1), TimeDuration<Second, double>>));
+	ASSERT_GE(td1.m_Value, 1.5);
+	ASSERT_LT(td1.m_Value, 100);
+}
+
+TEST(TimeDuration, InstanceTest)
+{
+	TimeDuration<Second, double> t1;
+	ASSERT_EQ(t1.m_Value, 0.0);
+
+	TimeDuration<Second, TimeType> t2(1);
+	ASSERT_EQ(t2.m_Value, 1);
+}
+
+TEST(TimeDuration, MinusTest)
+{
+	TimeDuration<Second, TimeType> t1;
+	ASSERT_EQ(t1.m_Value, 0);
+
+	TimeDuration<Second, TimeType> t2(1);
+	ASSERT_EQ(t2.m_Value, 1);
+
+	auto td1 = t2 - t1;
+
+	ASSERT_TRUE((std::is_same_v<decltype(td1), TimeDuration<Second, TimeType>>));
+	ASSERT_EQ(td1.m_Value, 1);
+}
+
+TEST(TimeDuration, SleepForTest)
+{
+	TimeDuration<Second, double> td1(1.5);
+	TimeStamp<Microsecond, TimeType> t1 = GetNowTimeStamp<Microsecond, TimeType>();
+	SleepFor(td1);
+	TimeStamp<Microsecond, TimeType> t2 = GetNowTimeStamp<Microsecond, TimeType>();
+
+	ASSERT_GT(t2.m_Value, t1.m_Value);
+	ASSERT_GE(t2.m_Value - t1.m_Value, 1500000);
+	ASSERT_LT(t2.m_Value - t1.m_Value, 100000000);
+}
