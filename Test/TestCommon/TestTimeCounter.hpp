@@ -150,6 +150,46 @@ TEST(TimeDuration, MinusTest)
 	ASSERT_EQ(td1.m_Value, 1);
 }
 
+TEST(TimeDuration, SelfMinusTest)
+{
+	TimeDuration<Second, TimeType> t1;
+	ASSERT_EQ(t1.m_Value, 0);
+
+	TimeDuration<Second, TimeType> t2(1);
+	ASSERT_EQ(t2.m_Value, 1);
+
+	t2 -= t1;
+
+	ASSERT_EQ(t2.m_Value, 1);
+}
+
+TEST(TimeDuration, AddTest)
+{
+	TimeDuration<Second, TimeType> t1;
+	ASSERT_EQ(t1.m_Value, 0);
+
+	TimeDuration<Second, TimeType> t2(1);
+	ASSERT_EQ(t2.m_Value, 1);
+
+	auto td1 = t2 + t1;
+
+	ASSERT_TRUE((std::is_same_v<decltype(td1), TimeDuration<Second, TimeType>>));
+	ASSERT_EQ(td1.m_Value, 1);
+}
+
+TEST(TimeDuration, SelfAddTest)
+{
+	TimeDuration<Second, TimeType> t1;
+	ASSERT_EQ(t1.m_Value, 0);
+
+	TimeDuration<Second, TimeType> t2(1);
+	ASSERT_EQ(t2.m_Value, 1);
+
+	t1 += t2;
+
+	ASSERT_EQ(t1.m_Value, 1);
+}
+
 TEST(TimeDuration, SleepForTest)
 {
 	TimeDuration<Second, double> td1(1.5);
@@ -160,4 +200,18 @@ TEST(TimeDuration, SleepForTest)
 	ASSERT_GT(t2.m_Value, t1.m_Value);
 	ASSERT_GE(t2.m_Value - t1.m_Value, 1500000);
 	ASSERT_LT(t2.m_Value - t1.m_Value, 100000000);
+}
+
+TEST(TimeCounter, AllTest)
+{
+	TimeCounter<Second, float> tc;
+	tc.Start();
+	for (int i = 0; i < 10; i++)
+	{
+		SleepFor(TimeDuration<Second, float>(0.5f));
+		tc.Tick();
+		auto dt = tc.GetDeltaTime();
+		ASSERT_GE(dt, 0.5f);
+		ASSERT_LT(dt, 10.0f);
+	}
 }

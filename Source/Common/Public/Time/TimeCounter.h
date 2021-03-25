@@ -49,36 +49,42 @@ namespace SpaceGameEngine
 	@brief The TimeStamp is used to mark the time point.
 	@warning can not use the TimeStamp to get the current time information(such as the current year).
 	*/
-	template<UInt64 TimeUnitType, typename T = TimeType>
+	template<UInt64 TimeUnit, typename T = TimeType>
 	struct TimeStamp
 	{
+		inline static constexpr const UInt64 TimeUnitValue = TimeUnit;
+		using ValueType = T;
+
 		inline TimeStamp()
 			: m_Value(0)
 		{
 		}
 
 		inline TimeStamp(const TimeType t)
-			: m_Value(((T)t) / ((T)TimeUnitType))
+			: m_Value(((T)t) / ((T)TimeUnit))
 		{
 		}
 
 		inline operator TimeType()
 		{
-			return (TimeType)(m_Value * TimeUnitType);
+			return (TimeType)(m_Value * TimeUnit);
 		}
 
 		T m_Value;
 	};
 
-	template<UInt64 TimeUnitType, typename T = TimeType>
-	inline TimeStamp<TimeUnitType, T> GetNowTimeStamp()
+	template<UInt64 TimeUnit, typename T = TimeType>
+	inline TimeStamp<TimeUnit, T> GetNowTimeStamp()
 	{
-		return TimeStamp<TimeUnitType, T>(GetNowTime());
+		return TimeStamp<TimeUnit, T>(GetNowTime());
 	}
 
-	template<UInt64 TimeUnitType, typename T = TimeType>
+	template<UInt64 TimeUnit, typename T = TimeType>
 	struct TimeDuration
 	{
+		inline static constexpr const UInt64 TimeUnitValue = TimeUnit;
+		using ValueType = T;
+
 		inline TimeDuration()
 			: m_Value(0)
 		{
@@ -91,23 +97,79 @@ namespace SpaceGameEngine
 
 		inline operator TimeType()
 		{
-			return (TimeType)(m_Value * TimeUnitType);
+			return (TimeType)(m_Value * TimeUnit);
+		}
+
+		inline TimeDuration operator+(const TimeDuration& t) const
+		{
+			return TimeDuration(m_Value + t.m_Value);
+		}
+
+		inline TimeDuration& operator+=(const TimeDuration& t)
+		{
+			m_Value += t.m_Value;
+			return *this;
+		}
+
+		inline TimeDuration operator-(const TimeDuration& t) const
+		{
+			return TimeDuration(m_Value - t.m_Value);
+		}
+
+		inline TimeDuration& operator-=(const TimeDuration& t)
+		{
+			m_Value -= t.m_Value;
+			return *this;
 		}
 
 		T m_Value;
 	};
 
-	template<UInt64 TimeUnitType, typename T>
-	inline TimeDuration<TimeUnitType, T> operator-(const TimeStamp<TimeUnitType, T>& t1, const TimeStamp<TimeUnitType, T>& t2)
+	template<UInt64 TimeUnit, typename T>
+	inline TimeDuration<TimeUnit, T> operator-(const TimeStamp<TimeUnit, T>& t1, const TimeStamp<TimeUnit, T>& t2)
 	{
-		return TimeDuration<TimeUnitType, T>(t1.m_Value - t2.m_Value);
+		return TimeDuration<TimeUnit, T>(t1.m_Value - t2.m_Value);
 	}
 
-	template<UInt64 TimeUnitType, typename T>
-	inline TimeDuration<TimeUnitType, T> operator-(const TimeDuration<TimeUnitType, T>& t1, const TimeDuration<TimeUnitType, T>& t2)
+	template<UInt64 TimeUnit, typename T = TimeType>
+	class TimeCounter
 	{
-		return TimeDuration<TimeUnitType, T>(t1.m_Value - t2.m_Value);
-	}
+	public:
+		inline static constexpr const UInt64 TimeUnitValue = TimeUnit;
+		using ValueType = T;
+		using TimeStampType = TimeStamp<TimeUnit, T>;
+		using TimeDurationType = TimeDuration<TimeUnit, T>;
+
+		inline TimeCounter()
+		{
+		}
+
+		inline T GetDeltaTime() const
+		{
+			return m_DeltaTime.m_Value;
+		}
+
+		inline void Start()
+		{
+			m_CurrentTimeStamp = GetNowTimeStamp<TimeUnit, T>();
+			m_PreviousTimeStamp = m_CurrentTimeStamp;
+		}
+
+		/*!
+		@warning must call Tick() every frame.
+		*/
+		inline void Tick()
+		{
+			m_CurrentTimeStamp = GetNowTimeStamp<TimeUnit, T>();
+			m_DeltaTime = m_CurrentTimeStamp - m_PreviousTimeStamp;
+			m_PreviousTimeStamp = m_CurrentTimeStamp;
+		}
+
+	private:
+		TimeStampType m_CurrentTimeStamp;
+		TimeStampType m_PreviousTimeStamp;
+		TimeDurationType m_DeltaTime;
+	};
 
 	/*!
 	@}
