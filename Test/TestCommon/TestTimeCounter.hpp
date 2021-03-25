@@ -204,14 +204,14 @@ TEST(TimeDuration, SleepForTest)
 
 TEST(TimeCounter, AllTest)
 {
-	TimeCounter<Second, float> tc;
+	TimeCounter<Microsecond, TimeType> tc;
 	tc.Start();
 	for (int i = 0; i < 10; i++)
 	{
-		SleepFor(TimeDuration<Second, float>(0.5f));
+		SleepFor(TimeDuration<Microsecond, TimeType>(500000));
 		tc.Tick();
 		auto dt = tc.GetDeltaTime();
-		ASSERT_GE(dt, 0.5f);
-		ASSERT_LT(dt, 10.0f);
+		ASSERT_GE(dt, 500000);
+		ASSERT_LT(dt, 1000000);
 	}
 }
