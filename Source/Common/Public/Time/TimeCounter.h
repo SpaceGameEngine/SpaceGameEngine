@@ -52,24 +52,54 @@ namespace SpaceGameEngine
 	template<UInt64 TimeUnit, typename T = TimeType>
 	struct TimeStamp
 	{
+	public:
 		inline static constexpr const UInt64 TimeUnitValue = TimeUnit;
 		using ValueType = T;
 
 		inline TimeStamp()
-			: m_Value(0)
+			: m_Time(0), m_Value(0)
 		{
 		}
 
+		/*!
+		@brief construction of the TimeStamp.
+		@param t the time represented by the microsecond.
+		*/
 		inline TimeStamp(const TimeType t)
-			: m_Value(((T)t) / ((T)TimeUnit))
+			: m_Time(t), m_Value(((T)t) / ((T)TimeUnit))
 		{
 		}
 
-		inline operator TimeType()
+		inline operator TimeType() const
 		{
-			return (TimeType)(m_Value * TimeUnit);
+			return m_Time;
 		}
 
+		T GetValue() const
+		{
+			return m_Value;
+		}
+
+		/*!
+		@brief get the time represented by the microsecond.
+		*/
+		TimeType GetTime() const
+		{
+			return m_Time;
+		}
+
+		/*!
+		@brief set the timestamp's time.
+		@param t the time represented by the microsecond.
+		*/
+		void SetTime(const TimeType t)
+		{
+			m_Time = t;
+			m_Value = ((T)t) / ((T)TimeUnit);
+		}
+
+	private:
+		TimeType m_Time;
 		T m_Value;
 	};
 
@@ -82,53 +112,91 @@ namespace SpaceGameEngine
 	template<UInt64 TimeUnit, typename T = TimeType>
 	struct TimeDuration
 	{
+	public:
 		inline static constexpr const UInt64 TimeUnitValue = TimeUnit;
 		using ValueType = T;
 
 		inline TimeDuration()
-			: m_Value(0)
+			: m_Time(0), m_Value(0)
 		{
 		}
 
-		inline TimeDuration(const T t)
-			: m_Value(t)
+		/*!
+		@brief construction of the TimeDuration.
+		@param t the time represented by the microsecond.
+		*/
+		inline TimeDuration(const TimeType t)
+			: m_Time(t), m_Value(((T)t) / ((T)TimeUnit))
 		{
 		}
 
-		inline operator TimeType()
+		inline operator TimeType() const
 		{
-			return (TimeType)(m_Value * TimeUnit);
+			return m_Time;
 		}
 
 		inline TimeDuration operator+(const TimeDuration& t) const
 		{
-			return TimeDuration(m_Value + t.m_Value);
+			return TimeDuration(m_Time + t.m_Time);
 		}
 
 		inline TimeDuration& operator+=(const TimeDuration& t)
 		{
-			m_Value += t.m_Value;
+			m_Time += t.m_Time;
+			m_Value = ((T)m_Time) / ((T)TimeUnit);
 			return *this;
 		}
 
 		inline TimeDuration operator-(const TimeDuration& t) const
 		{
-			return TimeDuration(m_Value - t.m_Value);
+			return TimeDuration(m_Time - t.m_Time);
 		}
 
 		inline TimeDuration& operator-=(const TimeDuration& t)
 		{
-			m_Value -= t.m_Value;
+			m_Time -= t.m_Time;
+			m_Value = ((T)m_Time) / ((T)TimeUnit);
 			return *this;
 		}
 
+		T GetValue() const
+		{
+			return m_Value;
+		}
+
+		/*!
+		@brief get the time represented by the microsecond.
+		*/
+		TimeType GetTime() const
+		{
+			return m_Time;
+		}
+
+		/*!
+		@brief set the timestamp's time.
+		@param t the time represented by the microsecond.
+		*/
+		void SetTime(const TimeType t)
+		{
+			m_Time = t;
+			m_Value = ((T)t) / ((T)TimeUnit);
+		}
+
+	private:
 		T m_Value;
+		TimeType m_Time;
 	};
+
+	template<UInt64 TimeUnit, typename T = TimeType>
+	TimeDuration<TimeUnit, T> MakeTimeDuration(const T val)
+	{
+		return TimeDuration<TimeUnit, T>((TimeType)(val * TimeUnit));
+	}
 
 	template<UInt64 TimeUnit, typename T>
 	inline TimeDuration<TimeUnit, T> operator-(const TimeStamp<TimeUnit, T>& t1, const TimeStamp<TimeUnit, T>& t2)
 	{
-		return TimeDuration<TimeUnit, T>(t1.m_Value - t2.m_Value);
+		return TimeDuration<TimeUnit, T>(t1.GetTime() - t2.GetTime());
 	}
 
 	template<UInt64 TimeUnit, typename T = TimeType>
@@ -146,7 +214,7 @@ namespace SpaceGameEngine
 
 		inline T GetDeltaTime() const
 		{
-			return m_DeltaTime.m_Value;
+			return m_DeltaTime.GetValue();
 		}
 
 		inline void Start()
