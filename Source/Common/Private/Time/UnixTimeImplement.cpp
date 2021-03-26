@@ -13,22 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "gtest/gtest.h"
-#include "TestError.hpp"
-#include "TestString.hpp"
-#include "TestMemoryManager.hpp"
-#include "TestFunction.hpp"
-#include "TestMetaData.hpp"
-#include "TestUtility.hpp"
-#include "TestConcurrent.hpp"
-#include "TestVector.hpp"
-#include "TestContainerConcept.hpp"
-#include "TestRange.hpp"
-#include "TestMeta.hpp"
-#include "TestTimeCounter.hpp"
+#include "UnixTimeImplement.h"
 
-int main(int argc, char** argv)
+#ifdef SGE_UNIX
+
+using namespace SpaceGameEngine;
+
+TimeType SpaceGameEngine::TimeImplement::GetNowTime()
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	static timeval t;
+	gettimeofday(&t, NULL);
+	return t.tv_sec * 1000000 + t.tv_usec;
 }
+
+#endif

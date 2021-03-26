@@ -15,5 +15,6 @@
     <ClInclude Include="TestError.hpp" />
     <ClInclude Include="TestRange.hpp" />
     <ClInclude Include="TestMeta.hpp" />
+    <ClInclude Include="TestTimeCounter.hpp" />
   </ItemGroup>
 </Project>

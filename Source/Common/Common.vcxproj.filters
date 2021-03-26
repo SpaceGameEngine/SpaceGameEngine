@@ -34,6 +34,12 @@
     <Filter Include="Public\Meta">
       <UniqueIdentifier>{f6f2d596-3c8e-44db-aa9a-0e6291551d30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Time">
+      <UniqueIdentifier>{2b677cd1-8c63-4095-9cb2-7614dba7848e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Time">
+      <UniqueIdentifier>{f4f2e877-3dd8-470f-9a06-ffda4ce44565}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -99,6 +105,15 @@
     <ClInclude Include="Public\Meta\Concept.hpp">
       <Filter>Public\Meta</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Time\TimeCounter.h">
+      <Filter>Public\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Time\WindowsTimeImplement.h">
+      <Filter>Private\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Time\UnixTimeImplement.h">
+      <Filter>Private\Time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -118,6 +133,15 @@
     </ClCompile>
     <ClCompile Include="Private\Utility\AutoReleaseBuffer.cpp">
       <Filter>Private\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Time\TimeCounter.cpp">
+      <Filter>Private\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Time\WindowsTimeImplement.cpp">
+      <Filter>Private\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Time\UnixTimeImplement.cpp">
+      <Filter>Private\Time</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

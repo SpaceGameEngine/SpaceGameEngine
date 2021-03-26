@@ -160,6 +160,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Private\DoxygenConfig.hpp" />
+    <ClInclude Include="Private\Time\UnixTimeImplement.h" />
+    <ClInclude Include="Private\Time\WindowsTimeImplement.h" />
     <ClInclude Include="Public\Container\ContainerConcept.hpp" />
     <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />
@@ -174,6 +176,7 @@
     <ClInclude Include="Public\Platform.hpp" />
     <ClInclude Include="Public\SGEString.hpp" />
     <ClInclude Include="Public\SGEStringForward.h" />
+    <ClInclude Include="Public\Time\TimeCounter.h" />
     <ClInclude Include="Public\TypeDefinition.hpp" />
     <ClInclude Include="Public\Concurrent\Thread.h" />
     <ClInclude Include="Public\Concurrent\Lock.h" />
@@ -187,6 +190,9 @@
     <ClCompile Include="Private\MetaData\MetaData.cpp" />
     <ClCompile Include="Private\Concurrent\Thread.cpp" />
     <ClCompile Include="Private\Concurrent\Lock.cpp" />
+    <ClCompile Include="Private\Time\TimeCounter.cpp" />
+    <ClCompile Include="Private\Time\UnixTimeImplement.cpp" />
+    <ClCompile Include="Private\Time\WindowsTimeImplement.cpp" />
     <ClCompile Include="Private\Utility\AutoReleaseBuffer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

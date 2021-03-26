@@ -178,6 +178,7 @@
     <ClInclude Include="TestRange.hpp" />
     <ClInclude Include="TestString.hpp" />
     <ClInclude Include="TestFunction.hpp" />
+    <ClInclude Include="TestTimeCounter.hpp" />
     <ClInclude Include="TestUtility.hpp" />
     <ClInclude Include="TestConcurrent.hpp" />
     <ClInclude Include="TestVector.hpp" />

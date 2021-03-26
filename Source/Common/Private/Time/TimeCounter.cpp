@@ -13,22 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "gtest/gtest.h"
-#include "TestError.hpp"
-#include "TestString.hpp"
-#include "TestMemoryManager.hpp"
-#include "TestFunction.hpp"
-#include "TestMetaData.hpp"
-#include "TestUtility.hpp"
-#include "TestConcurrent.hpp"
-#include "TestVector.hpp"
-#include "TestContainerConcept.hpp"
-#include "TestRange.hpp"
-#include "TestMeta.hpp"
-#include "TestTimeCounter.hpp"
+#include "Time/TimeCounter.h"
+#include <thread>
+#include <chrono>
 
-int main(int argc, char** argv)
+using namespace SpaceGameEngine;
+
+#ifdef SGE_WINDOWS
+#include "WindowsTimeImplement.h"
+#elif defined(SGE_UNIX)
+#include "UnixTimeImplement.h"
+#endif
+
+TimeType SpaceGameEngine::GetNowTime()
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	return TimeImplement::GetNowTime();
+}
+
+void SpaceGameEngine::SleepFor(TimeType microsecond)
+{
+	std::this_thread::sleep_for(std::chrono::microseconds(microsecond));
 }
