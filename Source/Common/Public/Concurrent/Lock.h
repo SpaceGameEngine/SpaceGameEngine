@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #pragma once
+#include "Time/TimeCounter.h"
 
 #include <mutex>
 #include <functional>
@@ -27,6 +28,11 @@ namespace SpaceGameEngine
 	 * \ingroup Common
 	 * \{
 	 */
+
+	/*!
+	@file
+	@todo use our own locks instead of std's.
+	*/
 
 	/*!\brief Class SpaceGameEngine::Mutex is a wrapper of a std::recursive_timed_mutex
 	 *
@@ -81,13 +87,10 @@ namespace SpaceGameEngine
 
 		bool TryLock();
 
-		/*!
-		 * \todo use SGE's time utlity instead of <chrono>
-		 */
-		template<class Rep, class Period>
-		bool TryLock(const std::chrono::duration<Rep, Period>& timeout_duration)
+		template<UInt64 TimeUnit, typename T>
+		bool TryLock(const TimeDuration<TimeUnit, T>& timeout_duration)
 		{
-			return m_LockImpl.try_lock_for(timeout_duration);
+			return m_LockImpl.try_lock_for(std::chrono::microseconds(timeout_duration.GetTime()));
 		}
 
 		void Unlock();
@@ -122,29 +125,23 @@ namespace SpaceGameEngine
 
 		void Wait(RecursiveLock& lock);
 
-		/*!
-		 * \todo use SGE's function instead of std's
-		 */
-		void Wait(RecursiveLock& lock, std::function<bool()> pred);
-
-		/*!
-		 * \todo use SGE's time utlity instead of <chrono>
-		 */
-		template<class Rep, class Period>
-		bool WaitFor(RecursiveLock& lock, const std::chrono::duration<Rep, Period>& rel_time)
+		template<typename Callable>
+		inline void Wait(RecursiveLock& lock, Callable&& pred)
 		{
-			return m_ConditionImpl.wait_for(lock, rel_time) == std::cv_status::no_timeout;
+			m_ConditionImpl.wait(lock.m_LockImpl, std::forward<Callable>(pred));
 		}
 
-		/*!
-		 * \todo use SGE's time utlity instead of <chrono>
-		 * \todo use SGE's function instead of std's
-		 */
-		template<class Rep, class Period>
-		bool WaitFor(RecursiveLock& lock, const std::chrono::duration<Rep, Period>& rel_time,
-					 std::function<bool()> pred)
+		template<UInt64 TimeUnit, typename T>
+		bool WaitFor(RecursiveLock& lock, const TimeDuration<TimeUnit, T>& rel_time)
 		{
-			return m_ConditionImpl.wait_for(lock, rel_time, pred);
+			return m_ConditionImpl.wait_for(lock, std::chrono::microseconds(rel_time.GetTime())) == std::cv_status::no_timeout;
+		}
+
+		template<UInt64 TimeUnit, typename T, typename Callable>
+		bool WaitFor(RecursiveLock& lock, const TimeDuration<TimeUnit, T>& rel_time,
+					 Callable&& pred)
+		{
+			return m_ConditionImpl.wait_for(lock, std::chrono::microseconds(rel_time.GetTime()), std::forward<Callable>(pred));
 		}
 
 	private:
