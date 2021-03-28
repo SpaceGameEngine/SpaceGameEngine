@@ -192,9 +192,9 @@ namespace SpaceGameEngine
 	};
 
 	template<typename T>
-	using ChooseAtomicImplement = AtomicImplement<T, std::conditional_t<std::is_pointer_v<T>, AtomicForPointerTag,
-																		std::conditional_t<std::is_integral_v<T>, AtomicForIntegralTag,
-																						   std::conditional_t<std::is_floating_point_v<T>, AtomicForFloatingPointTag, void>>>>;
+	using Atomic = AtomicImplement<T, std::conditional_t<std::is_pointer_v<T>, AtomicForPointerTag,
+														 std::conditional_t<std::is_integral_v<T>, AtomicForIntegralTag,
+																			std::conditional_t<std::is_floating_point_v<T>, AtomicForFloatingPointTag, void>>>>;
 
 	template<typename T>
 	class AtomicImplement<T*, AtomicForPointerTag> : public AtomicBase<T*>
@@ -232,12 +232,12 @@ namespace SpaceGameEngine
 
 		inline T* operator++(int) noexcept
 		{
-			return std::atomic<T*>::operator++(int);
+			return std::atomic<T*>::operator++(0);
 		}
 
 		inline T* operator++(int) volatile noexcept
 		{
-			return std::atomic<T*>::operator++(int);
+			return std::atomic<T*>::operator++(0);
 		}
 
 		inline T* operator--() noexcept
@@ -252,12 +252,12 @@ namespace SpaceGameEngine
 
 		inline T* operator--(int) noexcept
 		{
-			return std::atomic<T*>::operator--(int);
+			return std::atomic<T*>::operator--(0);
 		}
 
 		inline T* operator--(int) volatile noexcept
 		{
-			return std::atomic<T*>::operator--(int);
+			return std::atomic<T*>::operator--(0);
 		}
 
 		inline T* operator+=(AddressType offset) noexcept
@@ -394,12 +394,12 @@ namespace SpaceGameEngine
 
 		inline T operator++(int) noexcept
 		{
-			return std::atomic<T>::operator++(int);
+			return std::atomic<T>::operator++(0);
 		}
 
 		inline T operator++(int) volatile noexcept
 		{
-			return std::atomic<T>::operator++(int);
+			return std::atomic<T>::operator++(0);
 		}
 
 		inline T operator--() noexcept
@@ -414,12 +414,12 @@ namespace SpaceGameEngine
 
 		inline T operator--(int) noexcept
 		{
-			return std::atomic<T>::operator--(int);
+			return std::atomic<T>::operator--(0);
 		}
 
 		inline T operator--(int) volatile noexcept
 		{
-			return std::atomic<T>::operator--(int);
+			return std::atomic<T>::operator--(0);
 		}
 
 		inline T operator+=(T val) noexcept
