@@ -162,6 +162,7 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Time\UnixTimeImplement.h" />
     <ClInclude Include="Private\Time\WindowsTimeImplement.h" />
+    <ClInclude Include="Public\Concurrent\Atomic.hpp" />
     <ClInclude Include="Public\Container\ContainerConcept.hpp" />
     <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />
