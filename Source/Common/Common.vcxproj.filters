@@ -114,6 +114,9 @@
     <ClInclude Include="Private\Time\UnixTimeImplement.h">
       <Filter>Private\Time</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Concurrent\Atomic.hpp">
+      <Filter>Public\Concurrent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

@@ -56,6 +56,16 @@ limitations under the License.
 #define SGE_COMPILER SGE_GCC
 #endif
 
+#ifdef SGE_MSVC
+#if _MSVC_LANG > 201703L
+#define SGE_CPP20
+#endif
+#else
+#if __cplusplus > 201703L
+#define SGE_CPP20
+#endif
+#endif
+
 /*!
 @file
 @todo check these platform macros.

@@ -20,6 +20,7 @@ limitations under the License.
 #include "Concurrent/Thread.h"
 #include "Container/ContainerConcept.hpp"
 #include "Utility/Utility.hpp"
+#include "Concurrent/Atomic.hpp"
 #include <cstring>
 
 namespace SpaceGameEngine
@@ -63,7 +64,7 @@ namespace SpaceGameEngine
 		template<typename T, typename Allocator = DefaultAllocator>
 		struct StorageRef
 		{
-			std::atomic<SizeType> m_Count;
+			Atomic<SizeType> m_Count;
 			T m_Barrier;	//avoid reverse iterator for multi-byte char out of range
 			T m_pContent[1];
 
@@ -71,7 +72,7 @@ namespace SpaceGameEngine
 
 			inline StorageRef()
 			{
-				m_Count.store(0, std::memory_order::memory_order_release);
+				m_Count.Store(0, MemoryOrderRelease);
 				m_Barrier = 0;
 				m_pContent[0] = NULL;
 			}
@@ -83,9 +84,9 @@ namespace SpaceGameEngine
 			inline static T* Create(const SizeType size)
 			{
 				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
-				StorageRef& re = *(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
+				StorageRef& re = *(new (Allocator::RawNew(sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
 				memset(re.m_pContent, NULL, size * sizeof(T));
-				re.m_Count.store(1, std::memory_order_release);
+				re.m_Count.Store(1, MemoryOrderRelease);
 				return re.m_pContent;
 			}
 
@@ -96,41 +97,41 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				SGE_ASSERT(NullPointerError, ptr);
-				StorageRef& re = *(new (Allocator::RawNew(sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
+				StorageRef& re = *(new (Allocator::RawNew(sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
 				memcpy(re.m_pContent, ptr, size * sizeof(T));
-				re.m_Count.store(1, std::memory_order_release);
+				re.m_Count.Store(1, MemoryOrderRelease);
 				return re.m_pContent;
 			}
 
 			inline static void CountIncrease(const T* ptr)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
-				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>) - sizeof(T));
-				pcount->fetch_add(1, std::memory_order_acq_rel);
+				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
+				pcount->FetchAdd(1, MemoryOrderAcquireRelease);
 			}
 
 			inline static void CountDecrease(const T* ptr)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
-				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>) - sizeof(T));
-				pcount->fetch_sub(1, std::memory_order_acq_rel);
+				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
+				pcount->FetchSub(1, MemoryOrderAcquireRelease);
 			}
 
 			inline static SizeType GetCount(const T* ptr)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
-				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>) - sizeof(T));
-				return pcount->load(std::memory_order_acquire);
+				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
+				return pcount->Load(MemoryOrderAcquire);
 			}
 
 			inline static bool TryRelease(const T* ptr, SizeType size)
 			{
 				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				SGE_ASSERT(NullPointerError, ptr);
-				std::atomic<SizeType>* pcount = reinterpret_cast<std::atomic<SizeType>*>((AddressType)(ptr) - sizeof(std::atomic<SizeType>) - sizeof(T));
-				if (pcount->load(std::memory_order_acquire) == 1)
+				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
+				if (pcount->Load(MemoryOrderAcquire) == 1)
 				{
-					Allocator::RawDelete(pcount, sizeof(std::atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef));
+					Allocator::RawDelete(pcount, sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef));
 					return true;
 				}
 				else

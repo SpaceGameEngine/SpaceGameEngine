@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "TypeDefinition.hpp"
+#include "Time/TimeCounter.h"
 
 #include <functional>
 #include <thread>
@@ -28,6 +29,11 @@ namespace SpaceGameEngine
 	 * \ingroup Common
 	 * \{
 	 */
+
+	/*!
+	@file
+	@todo use our own thread instead of std's.
+	*/
 
 	using ThreadID = std::thread::id;
 
@@ -84,13 +90,10 @@ namespace SpaceGameEngine
 
 		static ThreadID GetCurrentThreadId() noexcept;
 
-		/*!
-		 * \todo use SGE's time utlity instead of <chrono>
-		 */
-		template<class Rep, class Period>
-		static void Sleep(const std::chrono::duration<Rep, Period>& sleep_duration)
+		template<UInt64 TimeUnit, typename T>
+		static void Sleep(const TimeDuration<TimeUnit, T>& sleep_duration)
 		{
-			std::this_thread::sleep_for(sleep_duration);
+			SleepFor(sleep_duration);
 		}
 
 	private:

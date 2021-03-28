@@ -34,7 +34,7 @@ std::atomic_flag flag1 = ATOMIC_FLAG_INIT;
 
 void foo1()
 {
-	Thread::Sleep(2s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(2));
 	flag1.test_and_set();
 	LOG("foo1() is running in thread " << Thread::GetCurrentThreadId());
 }
@@ -51,7 +51,7 @@ TEST(Concurrent, BasicThreadTest)
 	ASSERT_FALSE(flag1.test_and_set());
 	flag1.clear();
 
-	Thread::Sleep(4s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(4));
 
 	ASSERT_TRUE(flag1.test_and_set());
 }
@@ -69,7 +69,7 @@ void foo2(Mutex& mutex, bool& run_flag)
 	run_flag = true;
 	ASSERT_TRUE((flag2_1 != flag2_2));
 
-	Thread::Sleep(1s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(1));
 
 	run_flag = false;
 	ASSERT_TRUE((!flag2_1 && !flag2_2));
@@ -94,7 +94,7 @@ void foo3_lock(Mutex& mutex)
 	lock.Lock();
 	LOG("foo3_lock thread " << Thread::GetCurrentThreadId());
 	ASSERT_FALSE(flag3);
-	Thread::Sleep(1s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(1));
 	flag3 = true;
 	lock.Unlock();
 }
@@ -102,9 +102,9 @@ void foo3_lock(Mutex& mutex)
 void foo3_trylock(Mutex& mutex)
 {
 	RecursiveLock lock(mutex);
-	Thread::Sleep(.5s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_FALSE(lock.TryLock());
-	ASSERT_TRUE(lock.TryLock(1s));
+	ASSERT_TRUE(lock.TryLock(MakeTimeDuration<Second, double>(1)));
 	LOG("foo3_trylock thread " << Thread::GetCurrentThreadId());
 	ASSERT_TRUE(flag3);
 	lock.Unlock();
@@ -130,7 +130,7 @@ void foo4(Mutex& m1, Mutex& m2, Mutex& m3)
 	ASSERT_FALSE(flag4);
 	flag4 = true;
 
-	Thread::Sleep(.1s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(0.1));
 
 	ASSERT_TRUE(flag4);
 	flag4 = false;
@@ -181,29 +181,29 @@ TEST(Concurrent, ConditionTest)
 		return need == count;
 	};
 
-	Thread::Sleep(.5s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(0)));
 
 	condition.NodifyOne();
-	Thread::Sleep(.5s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(0)));
 
 	condition.NodifyAll();
-	Thread::Sleep(.5s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(0)));
 
 	flag = true;
 
 	condition.NodifyOne();
-	Thread::Sleep(.5s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(1)));
 
 	condition.NodifyOne();
-	Thread::Sleep(.5s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(2)));
 
 	condition.NodifyAll();
-	Thread::Sleep(.5s);
+	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(10)));
 
 	for (Thread& thread : threads)
