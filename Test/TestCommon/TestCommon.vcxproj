@@ -172,6 +172,7 @@
   <ItemGroup>
     <ClInclude Include="TestContainerConcept.hpp" />
     <ClInclude Include="TestError.hpp" />
+    <ClInclude Include="TestMap.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
     <ClInclude Include="TestMeta.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
