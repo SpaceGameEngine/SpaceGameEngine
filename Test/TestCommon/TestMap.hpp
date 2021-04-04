@@ -16,3 +16,35 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "Container/Map.hpp"
+
+using namespace SpaceGameEngine;
+
+TEST(RedBlackTree, FindValueByKeyTest)
+{
+	MapImplement::RedBlackTree<int, double> rbt1;
+	ASSERT_EQ(rbt1.GetSize(), 0);
+	ASSERT_EQ(rbt1.FindValueByKey(0), nullptr);
+	ASSERT_EQ(rbt1.FindValueByKey(1), nullptr);
+
+	rbt1.Insert(1, 2.0);
+	ASSERT_EQ(*rbt1.FindValueByKey(1), 2.0);
+}
+
+TEST(RedBlackTree, InsertTest)
+{
+	MapImplement::RedBlackTree<int, double> rbt1;
+	rbt1.Insert(1, 1.0);
+	rbt1.Insert(0, 5.0);
+	ASSERT_EQ(rbt1.GetSize(), 2);
+	ASSERT_EQ(*rbt1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*rbt1.FindValueByKey(0), 5.0);
+
+	rbt1.Insert(0, 10.0);
+	ASSERT_EQ(rbt1.GetSize(), 2);
+	ASSERT_EQ(*rbt1.FindValueByKey(0), 10.0);
+
+	ASSERT_EQ(rbt1.FindValueByKey(-1), nullptr);
+	rbt1.Insert(-1, 3.0);
+	ASSERT_EQ(rbt1.GetSize(), 3);
+	ASSERT_EQ(*rbt1.FindValueByKey(-1), 3.0);
+}

@@ -97,6 +97,15 @@ namespace SpaceGameEngine
 	{
 		return (a > b ? a : b);
 	}
+
+	template<typename T>
+	struct Less
+	{
+		inline static constexpr bool IsLess(const T& lhs, const T& rhs)
+		{
+			return lhs < rhs;
+		}
+	};
 	/*!
 	@}
 	*/

@@ -14,12 +14,248 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include <MemoryManager.h>
+#include <Utility/Utility.hpp>
+
 namespace SpaceGameEngine
 {
 	/*!
 	@ingroup Common
 	@{
 	*/
+
+	namespace MapImplement
+	{
+		template<typename K, typename V, typename LessComparer = Less<K>, typename Allocator = DefaultAllocator>
+		class RedBlackTree
+		{
+		public:
+			using KeyType = K;
+			using ValueType = V;
+
+			struct Node
+			{
+				Node* m_pParent;
+				Node* m_pLeftChild;
+				Node* m_pRightChild;
+				Pair<K, V> m_KeyValuePair;
+				bool m_IsRed;
+
+				inline Node()
+					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(), m_IsRed(false)
+				{
+				}
+
+				inline Node(const K& key, const V& val)
+					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(key, val), m_IsRed(false)
+				{
+				}
+			};
+
+		public:
+			inline RedBlackTree()
+				: m_pRoot(&m_NilNode), m_Size(0)
+			{
+			}
+
+			inline ~RedBlackTree()
+			{
+				if (m_pRoot != &m_NilNode && m_pRoot)
+					ReleaseNode(m_pRoot);
+			}
+
+			inline SizeType GetSize() const
+			{
+				return m_Size;
+			}
+
+			inline V* FindValueByKey(const K& key)
+			{
+				Node* re = FindNodeByKey(key);
+				if (re != &m_NilNode)
+					return &re->m_KeyValuePair.m_Second;
+				else
+					return nullptr;
+			}
+
+			inline const V* FindValueByKey(const K& key) const
+			{
+				const Node* re = FindNodeByKey(key);
+				if (re != &m_NilNode)
+					return &re->m_KeyValuePair.m_Second;
+				else
+					return nullptr;
+			}
+
+			inline void Insert(const K& key, const V& val)
+			{
+				Node* py = &m_NilNode;
+				Node* px = m_pRoot;
+				while (px != &m_NilNode && px->m_KeyValuePair.m_First != key)
+				{
+					py = px;
+					if (key < px->m_KeyValuePair.m_First)
+						px = px->m_pLeftChild;
+					else
+						px = px->m_pRightChild;
+				}
+				if (px == &m_NilNode)
+				{
+					Node* pz = Allocator::template New<Node>(key, val);
+					m_Size += 1;
+
+					pz->m_pParent = py;
+					if (py == &m_NilNode)
+						m_pRoot = pz;
+					else if (pz->m_KeyValuePair.m_First < py->m_KeyValuePair.m_First)
+						py->m_pLeftChild = pz;
+					else
+						py->m_pRightChild = pz;
+					pz->m_pLeftChild = &m_NilNode;
+					pz->m_pRightChild = &m_NilNode;
+					pz->m_IsRed = true;
+					InsertFixUp(pz);
+				}
+				else
+				{
+					px->m_KeyValuePair.m_Second = val;
+				}
+			}
+
+		private:
+			inline void ReleaseNode(Node* p)
+			{
+				SGE_ASSERT(NullPointerError, p);
+				if (p->m_pLeftChild && p->m_pLeftChild != &m_NilNode)
+					ReleaseNode(p->m_pLeftChild);
+				if (p->m_pRightChild && p->m_pRightChild != &m_NilNode)
+					ReleaseNode(p->m_pRightChild);
+				Allocator::template Delete(p);
+			}
+
+			inline Node* FindNodeByKey(const K& key)
+			{
+				Node* p = m_pRoot;
+				while (p != &m_NilNode && p->m_KeyValuePair.m_First != key)
+				{
+					if (key < p->m_KeyValuePair.m_First)
+						p = p->m_pLeftChild;
+					else
+						p = p->m_pRightChild;
+				}
+				return p;
+			}
+
+			inline const Node* FindNodeByKey(const K& key) const
+			{
+				const Node* p = m_pRoot;
+				while (p != &m_NilNode && p->m_KeyValuePair.m_First != key)
+				{
+					if (key < p->m_KeyValuePair.m_First)
+						p = p->m_pLeftChild;
+					else
+						p = p->m_pRightChild;
+				}
+				return p;
+			}
+
+			inline void LeftRotate(Node* px)
+			{
+				SGE_ASSERT(NullPointerError, px);
+				SGE_ASSERT(NullPointerError, px->m_pRightChild);
+				auto py = px->m_pRightChild;
+				px->m_pRightChild = py->m_pLeftChild;
+				if (py->m_pLeftChild != &m_NilNode)
+					py->m_pLeftChild->m_pParent = px;
+				py->m_pParent = px->m_pParent;
+				if (px->m_pParent == &m_NilNode)
+					m_pRoot = py;
+				else if (px == px->m_pParent->m_pLeftChild)
+					px->m_pParent->m_pLeftChild = py;
+				else
+					px->m_pParent->m_pRightChild = py;
+				py->m_pLeftChild = px;
+				px->m_pParent = py;
+			}
+
+			inline void RightRotate(Node* px)
+			{
+				SGE_ASSERT(NullPointerError, px);
+				SGE_ASSERT(NullPointerError, px->m_pLeftChild);
+				auto py = px->m_pLeftChild;
+				px->m_pLeftChild = py->m_pRightChild;
+				if (py->m_pRightChild != &m_NilNode)
+					py->m_pRightChild->m_pParent = px;
+				py->m_pParent = px->m_pParent;
+				if (px->m_pParent == &m_NilNode)
+					m_pRoot = py;
+				else if (px == px->m_pParent->m_pLeftChild)
+					px->m_pParent->m_pLeftChild = py;
+				else
+					px->m_pParent->m_pRightChild = py;
+				py->m_pRightChild = px;
+				px->m_pParent = py;
+			}
+
+			inline void InsertFixUp(Node* pz)
+			{
+				SGE_ASSERT(NullPointerError, pz);
+				while (pz->m_pParent->m_IsRed)
+				{
+					if (pz->m_pParent == pz->m_pParent->m_pParent->m_pLeftChild)
+					{
+						auto py = pz->m_pParent->m_pParent->m_pRightChild;
+						if (py->m_IsRed)
+						{
+							pz->m_pParent->m_IsRed = false;
+							py->m_IsRed = false;
+							pz->m_pParent->m_pParent->m_IsRed = true;
+							pz = pz->m_pParent->m_pParent;
+						}
+						else
+						{
+							if (pz == pz->m_pParent->m_pRightChild)
+							{
+								pz = pz->m_pParent;
+								LeftRotate(pz);
+							}
+							pz->m_pParent->m_IsRed = false;
+							pz->m_pParent->m_pParent->m_IsRed = true;
+							RightRotate(pz->m_pParent->m_pParent);
+						}
+					}
+					else
+					{
+						auto py = pz->m_pParent->m_pParent->m_pLeftChild;
+						if (py->m_IsRed)
+						{
+							pz->m_pParent->m_IsRed = false;
+							py->m_IsRed = false;
+							pz->m_pParent->m_pParent->m_IsRed = true;
+							pz = pz->m_pParent->m_pParent;
+						}
+						else
+						{
+							if (pz == pz->m_pParent->m_pLeftChild)
+							{
+								pz = pz->m_pParent;
+								RightRotate(pz);
+							}
+							pz->m_pParent->m_IsRed = false;
+							pz->m_pParent->m_pParent->m_IsRed = true;
+							LeftRotate(pz->m_pParent->m_pParent);
+						}
+					}
+				}
+				m_pRoot->m_IsRed = false;
+			}
+
+		private:
+			Node m_NilNode;
+			Node* m_pRoot;
+			SizeType m_Size;
+		};
+	}
 
 	/*!
 	@}
