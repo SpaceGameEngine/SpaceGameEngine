@@ -52,6 +52,15 @@ namespace SpaceGameEngine
 				}
 			};
 
+			struct NilNodeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The node can not be nil node.");
+				inline static bool Judge(const Node* pn, const Node* pnil)
+				{
+					return pn == pnil;
+				}
+			};
+
 		public:
 			inline RedBlackTree()
 				: m_pRoot(&m_NilNode), m_Size(0)
@@ -73,7 +82,7 @@ namespace SpaceGameEngine
 			{
 				Node* re = FindNodeByKey(key);
 				if (re != &m_NilNode)
-					return &re->m_KeyValuePair.m_Second;
+					return &(re->m_KeyValuePair.m_Second);
 				else
 					return nullptr;
 			}
@@ -82,7 +91,7 @@ namespace SpaceGameEngine
 			{
 				const Node* re = FindNodeByKey(key);
 				if (re != &m_NilNode)
-					return &re->m_KeyValuePair.m_Second;
+					return &(re->m_KeyValuePair.m_Second);
 				else
 					return nullptr;
 			}
@@ -122,10 +131,23 @@ namespace SpaceGameEngine
 				}
 			}
 
+			inline bool RemoveByKey(const K& key)
+			{
+				auto pnode = FindNodeByKey(key);
+				if (pnode == &m_NilNode)
+					return false;
+				else
+				{
+					RemoveNode(pnode);
+					return true;
+				}
+			}
+
 		private:
 			inline void ReleaseNode(Node* p)
 			{
 				SGE_ASSERT(NullPointerError, p);
+				SGE_ASSERT(NilNodeError, p, &m_NilNode);
 				if (p->m_pLeftChild && p->m_pLeftChild != &m_NilNode)
 					ReleaseNode(p->m_pLeftChild);
 				if (p->m_pRightChild && p->m_pRightChild != &m_NilNode)
@@ -163,6 +185,8 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NullPointerError, px);
 				SGE_ASSERT(NullPointerError, px->m_pRightChild);
+				SGE_ASSERT(NilNodeError, px, &m_NilNode);
+				SGE_ASSERT(NilNodeError, px->m_pRightChild, &m_NilNode);
 				auto py = px->m_pRightChild;
 				px->m_pRightChild = py->m_pLeftChild;
 				if (py->m_pLeftChild != &m_NilNode)
@@ -182,6 +206,8 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NullPointerError, px);
 				SGE_ASSERT(NullPointerError, px->m_pLeftChild);
+				SGE_ASSERT(NilNodeError, px, &m_NilNode);
+				SGE_ASSERT(NilNodeError, px->m_pLeftChild, &m_NilNode);
 				auto py = px->m_pLeftChild;
 				px->m_pLeftChild = py->m_pRightChild;
 				if (py->m_pRightChild != &m_NilNode)
@@ -200,6 +226,7 @@ namespace SpaceGameEngine
 			inline void InsertFixUp(Node* pz)
 			{
 				SGE_ASSERT(NullPointerError, pz);
+				SGE_ASSERT(NilNodeError, pz, &m_NilNode);
 				while (pz->m_pParent->m_IsRed)
 				{
 					if (pz->m_pParent == pz->m_pParent->m_pParent->m_pLeftChild)
@@ -248,6 +275,147 @@ namespace SpaceGameEngine
 					}
 				}
 				m_pRoot->m_IsRed = false;
+			}
+
+			inline Node* GetMinimumNode(Node* p)
+			{
+				SGE_ASSERT(NullPointerError, p);
+				while (p->m_pLeftChild != &m_NilNode)
+				{
+					p = p->m_pLeftChild;
+				}
+				return p;
+			}
+
+			inline void Transplant(Node* pu, Node* pv)
+			{
+				SGE_ASSERT(NullPointerError, pu);
+				SGE_ASSERT(NullPointerError, pv);
+				SGE_ASSERT(NilNodeError, pu, &m_NilNode);
+				//even the pv is nil node, it also can be transplanted(see the Introduction to Algorithm).
+
+				if (pu->m_pParent == &m_NilNode)
+					m_pRoot = pv;
+				else if (pu == pu->m_pParent->m_pLeftChild)
+					pu->m_pParent->m_pLeftChild = pv;
+				else
+					pu->m_pParent->m_pRightChild = pv;
+				pv->m_pParent = pu->m_pParent;
+			}
+
+			inline void RemoveNode(Node* pz)
+			{
+				SGE_ASSERT(NullPointerError, pz);
+				SGE_ASSERT(NilNodeError, pz, &m_NilNode);
+				Node* py = pz;
+				Node* px = nullptr;
+				bool is_y_original_red = py->m_IsRed;
+				if (pz->m_pLeftChild == &m_NilNode)
+				{
+					px = pz->m_pRightChild;
+					Transplant(pz, pz->m_pRightChild);
+				}
+				else if (pz->m_pRightChild == &m_NilNode)
+				{
+					px = pz->m_pLeftChild;
+					Transplant(pz, pz->m_pLeftChild);
+				}
+				else
+				{
+					py = GetMinimumNode(pz->m_pRightChild);
+					is_y_original_red = py->m_IsRed;
+					px = py->m_pRightChild;
+					if (py->m_pParent == pz)
+					{
+						px->m_pParent = py;
+					}
+					else
+					{
+						Transplant(py, py->m_pRightChild);
+						py->m_pRightChild = pz->m_pRightChild;
+						py->m_pRightChild->m_pParent = py;
+					}
+					Transplant(pz, py);
+					py->m_pLeftChild = pz->m_pLeftChild;
+					py->m_pLeftChild->m_pParent = py;
+					py->m_IsRed = pz->m_IsRed;
+				}
+				if (is_y_original_red == false)
+					RemoveFixUp(px);
+				Allocator::template Delete(pz);
+				m_Size -= 1;
+			}
+
+			inline void RemoveFixUp(Node* px)
+			{
+				SGE_ASSERT(NullPointerError, px);
+				SGE_ASSERT(NilNodeError, px, &m_NilNode);
+				while (px != m_pRoot && px->m_IsRed == false)
+				{
+					if (px == px->m_pParent->m_pLeftChild)
+					{
+						auto pw = px->m_pParent->m_pRightChild;
+						if (pw->m_IsRed)
+						{
+							pw->m_IsRed = false;
+							px->m_pParent->m_IsRed = true;
+							LeftRotate(px->m_pParent);
+							pw = px->m_pParent->m_pRightChild;
+						}
+						if (pw->m_pLeftChild->m_IsRed == false && pw->m_pRightChild->m_IsRed == false)
+						{
+							pw->m_IsRed = true;
+							px = px->m_pParent;
+						}
+						else
+						{
+							if (pw->m_pRightChild->m_IsRed == false)
+							{
+								pw->m_pLeftChild->m_IsRed = false;
+								pw->m_IsRed = true;
+								RightRotate(pw);
+								pw = px->m_pParent->m_pRightChild;
+							}
+							pw->m_IsRed = px->m_pParent->m_IsRed;
+							px->m_pParent->m_IsRed = false;
+							pw->m_pRightChild->m_IsRed = false;
+							LeftRotate(px->m_pParent);
+							px = m_pRoot;
+						}
+					}
+					else
+					{
+						auto pw = px->m_pParent->m_pLeftChild;
+						if (pw->m_IsRed)
+						{
+							pw->m_IsRed = false;
+							px->m_pParent->m_IsRed = true;
+							RightRotate(px->m_pParent);
+							pw = px->m_pParent->m_pLeftChild;
+						}
+						if (pw->m_pRightChild->m_IsRed == false && pw->m_pLeftChild->m_IsRed == false)
+						{
+							pw->m_IsRed = true;
+							px = px->m_pParent;
+						}
+						else
+						{
+							if (pw->m_pLeftChild->m_IsRed == false)
+							{
+								pw->m_pRightChild->m_IsRed = false;
+								pw->m_IsRed = true;
+								LeftRotate(pw);
+								pw = px->m_pParent->m_pLeftChild;
+							}
+							pw->m_IsRed = px->m_pParent->m_IsRed;
+							px->m_pParent->m_IsRed = false;
+							pw->m_pLeftChild->m_IsRed = false;
+							RightRotate(px->m_pParent);
+							px = m_pRoot;
+						}
+					}
+				}
+				px->m_IsRed = false;
 			}
 
 		private:
