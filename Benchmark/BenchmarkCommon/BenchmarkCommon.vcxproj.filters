@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClInclude Include="BenchmarkFunction.hpp" />
     <ClInclude Include="BenchmarkString.hpp" />
+    <ClInclude Include="BenchmarkMap.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

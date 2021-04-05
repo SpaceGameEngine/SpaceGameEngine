@@ -30,7 +30,7 @@ namespace SpaceGameEngine
 		class RedBlackTree
 		{
 		public:
-			using KeyType = K;
+			using KeyType = const K;
 			using ValueType = V;
 
 			struct Node
@@ -38,11 +38,11 @@ namespace SpaceGameEngine
 				Node* m_pParent;
 				Node* m_pLeftChild;
 				Node* m_pRightChild;
-				Pair<K, V> m_KeyValuePair;
+				Pair<const K, V> m_KeyValuePair;
 				bool m_IsRed;
 
 				inline Node()
-					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(), m_IsRed(false)
+					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(K(), V()), m_IsRed(false)
 				{
 				}
 
@@ -96,7 +96,7 @@ namespace SpaceGameEngine
 					return nullptr;
 			}
 
-			inline void Insert(const K& key, const V& val)
+			inline Pair<Node*, bool> Insert(const K& key, const V& val)
 			{
 				Node* py = &m_NilNode;
 				Node* px = m_pRoot;
@@ -124,10 +124,12 @@ namespace SpaceGameEngine
 					pz->m_pRightChild = &m_NilNode;
 					pz->m_IsRed = true;
 					InsertFixUp(pz);
+					return Pair<Node*, bool>(pz, true);
 				}
 				else
 				{
 					px->m_KeyValuePair.m_Second = val;
+					return Pair<Node*, bool>(px, false);
 				}
 			}
 
