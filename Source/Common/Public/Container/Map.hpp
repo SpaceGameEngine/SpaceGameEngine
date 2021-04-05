@@ -353,7 +353,6 @@ namespace SpaceGameEngine
 			inline void RemoveFixUp(Node* px)
 			{
 				SGE_ASSERT(NullPointerError, px);
-				SGE_ASSERT(NilNodeError, px, &m_NilNode);
 				while (px != m_pRoot && px->m_IsRed == false)
 				{
 					if (px == px->m_pParent->m_pLeftChild)
