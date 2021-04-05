@@ -198,7 +198,7 @@ TEST(TimeDuration, SleepForTest)
 	TimeStamp<Microsecond, TimeType> t2 = GetNowTimeStamp<Microsecond, TimeType>();
 
 	ASSERT_GT(t2.GetValue(), t1.GetValue());
-	ASSERT_GE(t2.GetValue() - t1.GetValue(), 1500000);
+	ASSERT_GE(t2.GetValue() - t1.GetValue(), 1490000);
 	ASSERT_LT(t2.GetValue() - t1.GetValue(), 100000000);
 }
 
