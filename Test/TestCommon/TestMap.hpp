@@ -17,6 +17,7 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "Container/Map.hpp"
 #include <functional>
+#include <cstring>
 
 using namespace SpaceGameEngine;
 
@@ -27,15 +28,57 @@ struct test_map_object
 		: val(0), rel_func([](test_map_object&) {})
 	{
 	}
+	test_map_object(int v)
+		: val(v), rel_func([](test_map_object&) {})
+	{
+	}
 	test_map_object(int v, const std::function<void(test_map_object&)>& func)
 		: val(v), rel_func(func)
 	{
+	}
+	test_map_object(const test_map_object& o) noexcept
+		: val(o.val), rel_func(o.rel_func)
+	{
+	}
+	test_map_object(test_map_object&& o) noexcept
+		: val(o.val), rel_func(std::move(o.rel_func))
+	{
+		o.rel_func = [](test_map_object&) {};
 	}
 	~test_map_object()
 	{
 		rel_func(*this);
 	}
 	int val;
+
+	test_map_object& operator=(const test_map_object& o)
+	{
+		val = o.val;
+		rel_func = o.rel_func;
+		return *this;
+	}
+
+	test_map_object& operator=(test_map_object&& o)
+	{
+		val = o.val;
+		rel_func = std::move(o.rel_func);
+		return *this;
+	}
+
+	bool operator<(const test_map_object& o) const
+	{
+		return val < o.val;
+	}
+
+	bool operator==(const test_map_object& o) const
+	{
+		return val == o.val;
+	}
+
+	bool operator!=(const test_map_object& o) const
+	{
+		return val != o.val;
+	}
 };
 
 TEST(RedBlackTree, FindValueByKeyTest)
@@ -90,4 +133,35 @@ TEST(RedBlackTree, RemoveTest)
 	ASSERT_EQ(rbt1.GetSize(), 1);
 	ASSERT_EQ(rbt1.FindValueByKey(0), nullptr);
 	ASSERT_EQ(rbt1.FindValueByKey(1)->val, 1);
+}
+
+TEST(RedBlackTree, ReleaseTest)
+{
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* prbt = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		prbt->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(prbt->FindValueByKey(test_map_object(i))->val, i);
+	}
+	delete prbt;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 2);	  //because Insert make a temporary instance
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
