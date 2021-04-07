@@ -138,6 +138,58 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
+			template<typename OtherAllocator>
+			inline RedBlackTree(const RedBlackTree<K, V, LessComparer, OtherAllocator>& t)
+				: m_pRoot(&m_NilNode), m_Size(t.m_Size)
+			{
+				if (m_Size)
+				{
+					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
+					m_pRoot->m_pParent = &m_NilNode;
+					CopyNode<OtherAllocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
+				}
+			}
+
+			template<typename OtherAllocator>
+			inline RedBlackTree(RedBlackTree<K, V, LessComparer, OtherAllocator>&& t)
+				: m_pRoot(&m_NilNode), m_Size(t.m_Size)
+			{
+				if (m_Size)
+				{
+					m_pRoot = Allocator::template New<Node>(std::move(t.m_pRoot->m_KeyValuePair));
+					m_pRoot->m_pParent = &m_NilNode;
+					MoveNode<OtherAllocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
+				}
+			}
+
+			template<typename OtherAllocator>
+			inline RedBlackTree& operator=(const RedBlackTree<K, V, LessComparer, OtherAllocator>& t)
+			{
+				Clear();
+				m_Size = t.m_Size;
+				if (m_Size)
+				{
+					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
+					m_pRoot->m_pParent = &m_NilNode;
+					CopyNode<OtherAllocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
+				}
+				return *this;
+			}
+
+			template<typename OtherAllocator>
+			inline RedBlackTree& operator=(RedBlackTree<K, V, LessComparer, OtherAllocator>&& t)
+			{
+				Clear();
+				m_Size = t.m_Size;
+				if (m_Size)
+				{
+					m_pRoot = Allocator::template New<Node>(std::move(t.m_pRoot->m_KeyValuePair));
+					m_pRoot->m_pParent = &m_NilNode;
+					MoveNode<OtherAllocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
+				}
+				return *this;
+			}
+
 			inline void Clear()
 			{
 				SGE_ASSERT(NullPointerError, m_pRoot);
@@ -542,6 +594,37 @@ namespace SpaceGameEngine
 					pright->m_pParent = pnow;
 					pnow->m_pRightChild = pright;
 					CopyNode<OtherAllocator>(pright, pother->m_pRightChild, pother_nil);
+				}
+				else
+					pnow->m_pRightChild = &m_NilNode;
+			}
+
+			template<typename OtherAllocator>
+			inline void MoveNode(Node* pnow, const typename RedBlackTree<K, V, LessComparer, OtherAllocator>::Node* pother, const typename RedBlackTree<K, V, LessComparer, OtherAllocator>::Node* pother_nil)
+			{
+				SGE_ASSERT(NullPointerError, pnow);
+				SGE_ASSERT(NullPointerError, pother);
+				SGE_ASSERT(NullPointerError, pother_nil);
+				SGE_ASSERT(NilNodeError, pnow, &m_NilNode);
+				using AnotherNilNodeError = typename SpaceGameEngine::MapImplement::RedBlackTree<K, V, LessComparer, OtherAllocator>::NilNodeError;
+				SGE_ASSERT(AnotherNilNodeError, pother, pother_nil);
+
+				if (pother->m_pLeftChild != pother_nil)
+				{
+					Node* pleft = Allocator::template New<Node>(std::move(pother->m_pLeftChild->m_KeyValuePair));
+					pleft->m_pParent = pnow;
+					pnow->m_pLeftChild = pleft;
+					MoveNode<OtherAllocator>(pleft, pother->m_pLeftChild, pother_nil);
+				}
+				else
+					pnow->m_pLeftChild = &m_NilNode;
+
+				if (pother->m_pRightChild != pother_nil)
+				{
+					Node* pright = Allocator::template New<Node>(std::move(pother->m_pRightChild->m_KeyValuePair));
+					pright->m_pParent = pnow;
+					pnow->m_pRightChild = pright;
+					MoveNode<OtherAllocator>(pright, pother->m_pRightChild, pother_nil);
 				}
 				else
 					pnow->m_pRightChild = &m_NilNode;

@@ -278,3 +278,93 @@ TEST(RedBlackTree, MoveAssignmentTest)
 	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
 	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
 }
+
+TEST(RedBlackTree, AnotherAllocatorCopyConstructionTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	m1.Insert(1, 1.0);
+	m1.Insert(2, 2.0);
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double, Less<int>, StdAllocator> m2(m1);
+
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	ASSERT_EQ(m2.GetSize(), 2);
+	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+}
+
+TEST(RedBlackTree, AnotherAllocatorMoveConstructionTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	m1.Insert(1, 1.0);
+	m1.Insert(2, 2.0);
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double, Less<int>, StdAllocator> m2(std::move(m1));
+
+	ASSERT_EQ(m1.GetSize(), 2);
+	//ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	//ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	ASSERT_EQ(m2.GetSize(), 2);
+	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+}
+
+TEST(RedBlackTree, AnotherAllocatorCopyAssignmentTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double, Less<int>, StdAllocator> m2;
+
+	m1.Insert(1, 1.0);
+	m1.Insert(2, 2.0);
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(m2.GetSize(), 0);
+	ASSERT_EQ(m2.FindValueByKey(1), nullptr);
+	ASSERT_EQ(m2.FindValueByKey(2), nullptr);
+
+	m2 = m1;
+
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	ASSERT_EQ(m2.GetSize(), 2);
+	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+}
+
+TEST(RedBlackTree, AnotherAllocatorMoveAssignmentTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double, Less<int>, StdAllocator> m2;
+
+	m1.Insert(1, 1.0);
+	m1.Insert(2, 2.0);
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(m2.GetSize(), 0);
+	ASSERT_EQ(m2.FindValueByKey(1), nullptr);
+	ASSERT_EQ(m2.FindValueByKey(2), nullptr);
+
+	m2 = std::move(m1);
+
+	ASSERT_EQ(m1.GetSize(), 2);
+	//ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	//ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	ASSERT_EQ(m2.GetSize(), 2);
+	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+}
