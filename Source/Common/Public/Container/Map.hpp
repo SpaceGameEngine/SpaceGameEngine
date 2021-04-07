@@ -32,6 +32,8 @@ namespace SpaceGameEngine
 		public:
 			using KeyType = const K;
 			using ValueType = V;
+			using AllocatorType = Allocator;
+			using LessComparerType = LessComparer;
 
 			struct Node
 			{
@@ -51,6 +53,12 @@ namespace SpaceGameEngine
 					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(std::forward<K2>(key), std::forward<V2>(val)), m_IsRed(false)
 				{
 				}
+
+				template<typename P>
+				inline explicit Node(P&& p)
+					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(std::forward<P>(p)), m_IsRed(false)
+				{
+				}
 			};
 
 			struct NilNodeError
@@ -61,6 +69,9 @@ namespace SpaceGameEngine
 					return pn == pnil;
 				}
 			};
+
+			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
+			friend class RedBlackTree;
 
 		public:
 			inline RedBlackTree()
@@ -73,6 +84,58 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, m_pRoot);
 				if (m_pRoot != &m_NilNode)
 					ReleaseNode(m_pRoot);
+			}
+
+			inline RedBlackTree(const RedBlackTree& t)
+				: m_pRoot(&m_NilNode), m_Size(t.m_Size)
+			{
+				if (m_Size)
+				{
+					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
+					m_pRoot->m_pParent = &m_NilNode;
+					CopyNode<Allocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
+				}
+			}
+
+			inline RedBlackTree(RedBlackTree&& t)
+				: m_pRoot(&m_NilNode), m_Size(t.m_Size)
+			{
+				if (m_Size)
+				{
+					m_pRoot = t.m_pRoot;
+					m_pRoot->m_pParent = &m_NilNode;
+					ChangeNilNodeLeaf(m_pRoot, &(t.m_NilNode));
+					t.m_pRoot = &(t.m_NilNode);
+					t.m_Size = 0;
+				}
+			}
+
+			inline RedBlackTree& operator=(const RedBlackTree& t)
+			{
+				Clear();
+				m_Size = t.m_Size;
+				if (m_Size)
+				{
+					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
+					m_pRoot->m_pParent = &m_NilNode;
+					CopyNode<Allocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
+				}
+				return *this;
+			}
+
+			inline RedBlackTree& operator=(RedBlackTree&& t)
+			{
+				Clear();
+				m_Size = t.m_Size;
+				if (m_Size)
+				{
+					m_pRoot = t.m_pRoot;
+					m_pRoot->m_pParent = &m_NilNode;
+					ChangeNilNodeLeaf(m_pRoot, &(t.m_NilNode));
+					t.m_pRoot = &(t.m_NilNode);
+					t.m_Size = 0;
+				}
+				return *this;
 			}
 
 			inline void Clear()
@@ -436,6 +499,52 @@ namespace SpaceGameEngine
 					}
 				}
 				px->m_IsRed = false;
+			}
+
+			inline void ChangeNilNodeLeaf(Node* p, Node* pother_nil)
+			{
+				SGE_ASSERT(NullPointerError, p);
+				SGE_ASSERT(NullPointerError, pother_nil);
+				if (p->m_pLeftChild == pother_nil)
+					p->m_pLeftChild = &m_NilNode;
+				else
+					ChangeNilNodeLeaf(p->m_pLeftChild, pother_nil);
+
+				if (p->m_pRightChild == pother_nil)
+					p->m_pRightChild = &m_NilNode;
+				else
+					ChangeNilNodeLeaf(p->m_pRightChild, pother_nil);
+			}
+
+			template<typename OtherAllocator>
+			inline void CopyNode(Node* pnow, const typename RedBlackTree<K, V, LessComparer, OtherAllocator>::Node* pother, const typename RedBlackTree<K, V, LessComparer, OtherAllocator>::Node* pother_nil)
+			{
+				SGE_ASSERT(NullPointerError, pnow);
+				SGE_ASSERT(NullPointerError, pother);
+				SGE_ASSERT(NullPointerError, pother_nil);
+				SGE_ASSERT(NilNodeError, pnow, &m_NilNode);
+				using AnotherNilNodeError = typename SpaceGameEngine::MapImplement::RedBlackTree<K, V, LessComparer, OtherAllocator>::NilNodeError;
+				SGE_ASSERT(AnotherNilNodeError, pother, pother_nil);
+
+				if (pother->m_pLeftChild != pother_nil)
+				{
+					Node* pleft = Allocator::template New<Node>(pother->m_pLeftChild->m_KeyValuePair);
+					pleft->m_pParent = pnow;
+					pnow->m_pLeftChild = pleft;
+					CopyNode<OtherAllocator>(pleft, pother->m_pLeftChild, pother_nil);
+				}
+				else
+					pnow->m_pLeftChild = &m_NilNode;
+
+				if (pother->m_pRightChild != pother_nil)
+				{
+					Node* pright = Allocator::template New<Node>(pother->m_pRightChild->m_KeyValuePair);
+					pright->m_pParent = pnow;
+					pnow->m_pRightChild = pright;
+					CopyNode<OtherAllocator>(pright, pother->m_pRightChild, pother_nil);
+				}
+				else
+					pnow->m_pRightChild = &m_NilNode;
 			}
 
 		private:

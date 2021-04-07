@@ -188,3 +188,93 @@ TEST(RedBlackTree, ClearTest)
 	ASSERT_EQ(m.FindValueByKey(2), nullptr);
 	ASSERT_EQ(*m.FindValueByKey(3), 3.0);
 }
+
+TEST(RedBlackTree, CopyConstructionTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	m1.Insert(1, 1.0);
+	m1.Insert(2, 2.0);
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2(m1);
+
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	ASSERT_EQ(m2.GetSize(), 2);
+	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+}
+
+TEST(RedBlackTree, MoveConstructionTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	m1.Insert(1, 1.0);
+	m1.Insert(2, 2.0);
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2(std::move(m1));
+
+	ASSERT_EQ(m1.GetSize(), 0);
+	ASSERT_EQ(m1.FindValueByKey(1), nullptr);
+	ASSERT_EQ(m1.FindValueByKey(2), nullptr);
+
+	ASSERT_EQ(m2.GetSize(), 2);
+	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+}
+
+TEST(RedBlackTree, CopyAssignmentTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2;
+
+	m1.Insert(1, 1.0);
+	m1.Insert(2, 2.0);
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(m2.GetSize(), 0);
+	ASSERT_EQ(m2.FindValueByKey(1), nullptr);
+	ASSERT_EQ(m2.FindValueByKey(2), nullptr);
+
+	m2 = m1;
+
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+
+	ASSERT_EQ(m2.GetSize(), 2);
+	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+}
+
+TEST(RedBlackTree, MoveAssignmentTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2;
+
+	m1.Insert(1, 1.0);
+	m1.Insert(2, 2.0);
+	ASSERT_EQ(m1.GetSize(), 2);
+	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(m2.GetSize(), 0);
+	ASSERT_EQ(m2.FindValueByKey(1), nullptr);
+	ASSERT_EQ(m2.FindValueByKey(2), nullptr);
+
+	m2 = std::move(m1);
+
+	ASSERT_EQ(m1.GetSize(), 0);
+	ASSERT_EQ(m1.FindValueByKey(1), nullptr);
+	ASSERT_EQ(m1.FindValueByKey(2), nullptr);
+
+	ASSERT_EQ(m2.GetSize(), 2);
+	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+}
