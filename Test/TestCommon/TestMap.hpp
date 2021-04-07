@@ -165,3 +165,26 @@ TEST(RedBlackTree, ReleaseTest)
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
+
+TEST(RedBlackTree, ClearTest)
+{
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m;
+	m.Insert(1, 1.0);
+	m.Insert(2, 2.0);
+	ASSERT_EQ(m.GetSize(), 2);
+	ASSERT_EQ(*m.FindValueByKey(1), 1.0);
+	ASSERT_EQ(*m.FindValueByKey(2), 2.0);
+
+	m.Clear();
+
+	ASSERT_EQ(m.GetSize(), 0);
+	ASSERT_EQ(m.FindValueByKey(1), nullptr);
+	ASSERT_EQ(m.FindValueByKey(2), nullptr);
+
+	m.Insert(3, 3.0);
+
+	ASSERT_EQ(m.GetSize(), 1);
+	ASSERT_EQ(m.FindValueByKey(1), nullptr);
+	ASSERT_EQ(m.FindValueByKey(2), nullptr);
+	ASSERT_EQ(*m.FindValueByKey(3), 3.0);
+}

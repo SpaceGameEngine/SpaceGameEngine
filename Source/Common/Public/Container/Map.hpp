@@ -70,8 +70,18 @@ namespace SpaceGameEngine
 
 			inline ~RedBlackTree()
 			{
-				if (m_pRoot != &m_NilNode && m_pRoot)
+				SGE_ASSERT(NullPointerError, m_pRoot);
+				if (m_pRoot != &m_NilNode)
 					ReleaseNode(m_pRoot);
+			}
+
+			inline void Clear()
+			{
+				SGE_ASSERT(NullPointerError, m_pRoot);
+				if (m_pRoot != &m_NilNode)
+					ReleaseNode(m_pRoot);
+				m_pRoot = &m_NilNode;
+				m_Size = 0;
 			}
 
 			inline SizeType GetSize() const
