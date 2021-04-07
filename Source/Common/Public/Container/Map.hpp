@@ -107,42 +107,11 @@ namespace SpaceGameEngine
 					return nullptr;
 			}
 
-			template<typename V2>
-			inline Pair<Node*, bool> Insert(const K& key, V2&& val)
+			template<typename K2, typename V2>
+			inline Pair<Pair<const K, V>*, bool> Insert(K2&& key, V2&& val)
 			{
-				Node* py = &m_NilNode;
-				Node* px = m_pRoot;
-				while (px != &m_NilNode && px->m_KeyValuePair.m_First != key)
-				{
-					py = px;
-					if (LessComparer::IsLess(key, px->m_KeyValuePair.m_First))
-						px = px->m_pLeftChild;
-					else
-						px = px->m_pRightChild;
-				}
-				if (px == &m_NilNode)
-				{
-					Node* pz = Allocator::template New<Node>(key, std::forward<V2>(val));
-					m_Size += 1;
-
-					pz->m_pParent = py;
-					if (py == &m_NilNode)
-						m_pRoot = pz;
-					else if (LessComparer::IsLess(pz->m_KeyValuePair.m_First, py->m_KeyValuePair.m_First))
-						py->m_pLeftChild = pz;
-					else
-						py->m_pRightChild = pz;
-					pz->m_pLeftChild = &m_NilNode;
-					pz->m_pRightChild = &m_NilNode;
-					pz->m_IsRed = true;
-					InsertFixUp(pz);
-					return Pair<Node*, bool>(pz, true);
-				}
-				else
-				{
-					px->m_KeyValuePair.m_Second = std::forward<V2>(val);
-					return Pair<Node*, bool>(px, false);
-				}
+				auto re = InternalInsert(std::forward<K2>(key), std::forward<V2>(val));
+				return Pair<Pair<const K, V>*, bool>(&(re.m_First->m_KeyValuePair), re.m_Second);
 			}
 
 			inline bool RemoveByKey(const K& key)
@@ -235,6 +204,44 @@ namespace SpaceGameEngine
 					px->m_pParent->m_pRightChild = py;
 				py->m_pRightChild = px;
 				px->m_pParent = py;
+			}
+
+			template<typename V2>
+			inline Pair<Node*, bool> InternalInsert(const K& key, V2&& val)
+			{
+				Node* py = &m_NilNode;
+				Node* px = m_pRoot;
+				while (px != &m_NilNode && px->m_KeyValuePair.m_First != key)
+				{
+					py = px;
+					if (LessComparer::IsLess(key, px->m_KeyValuePair.m_First))
+						px = px->m_pLeftChild;
+					else
+						px = px->m_pRightChild;
+				}
+				if (px == &m_NilNode)
+				{
+					Node* pz = Allocator::template New<Node>(key, std::forward<V2>(val));
+					m_Size += 1;
+
+					pz->m_pParent = py;
+					if (py == &m_NilNode)
+						m_pRoot = pz;
+					else if (LessComparer::IsLess(pz->m_KeyValuePair.m_First, py->m_KeyValuePair.m_First))
+						py->m_pLeftChild = pz;
+					else
+						py->m_pRightChild = pz;
+					pz->m_pLeftChild = &m_NilNode;
+					pz->m_pRightChild = &m_NilNode;
+					pz->m_IsRed = true;
+					InsertFixUp(pz);
+					return Pair<Node*, bool>(pz, true);
+				}
+				else
+				{
+					px->m_KeyValuePair.m_Second = std::forward<V2>(val);
+					return Pair<Node*, bool>(px, false);
+				}
 			}
 
 			inline void InsertFixUp(Node* pz)
