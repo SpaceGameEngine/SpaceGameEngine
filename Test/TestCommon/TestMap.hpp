@@ -62,6 +62,7 @@ struct test_map_object
 	{
 		val = o.val;
 		rel_func = std::move(o.rel_func);
+		o.rel_func = [](test_map_object&) {};
 		return *this;
 	}
 
@@ -191,180 +192,388 @@ TEST(RedBlackTree, ClearTest)
 
 TEST(RedBlackTree, CopyConstructionTest)
 {
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
-	m1.Insert(1, 1.0);
-	m1.Insert(2, 2.0);
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2(m1);
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>(*pm1);
 
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m2.GetSize(), 2);
-	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValueByKey(test_map_object(i))->val, i);
+	}
+
+	delete pm1;
+	delete pm2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance
+		ASSERT_EQ(val_pool[i], 2);
+	}
 }
 
 TEST(RedBlackTree, MoveConstructionTest)
 {
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
-	m1.Insert(1, 1.0);
-	m1.Insert(2, 2.0);
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2(std::move(m1));
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>(std::move(*pm1));
 
-	ASSERT_EQ(m1.GetSize(), 0);
-	ASSERT_EQ(m1.FindValueByKey(1), nullptr);
-	ASSERT_EQ(m1.FindValueByKey(2), nullptr);
+	ASSERT_EQ(pm1->GetSize(), 0);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i)), nullptr);
+	}
 
-	ASSERT_EQ(m2.GetSize(), 2);
-	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValueByKey(test_map_object(i))->val, i);
+	}
+
+	delete pm1;
+	delete pm2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 2);	  //because Insert make a temporary instance
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(RedBlackTree, CopyAssignmentTest)
 {
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2;
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	m1.Insert(1, 1.0);
-	m1.Insert(2, 2.0);
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
-	ASSERT_EQ(m2.GetSize(), 0);
-	ASSERT_EQ(m2.FindValueByKey(1), nullptr);
-	ASSERT_EQ(m2.FindValueByKey(2), nullptr);
+	*pm2 = *pm1;
 
-	m2 = m1;
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m2.GetSize(), 2);
-	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+	delete pm1;
+	delete pm2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance
+		ASSERT_EQ(val_pool[i], 2);
+	}
 }
 
 TEST(RedBlackTree, MoveAssignmentTest)
 {
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2;
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	m1.Insert(1, 1.0);
-	m1.Insert(2, 2.0);
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
-	ASSERT_EQ(m2.GetSize(), 0);
-	ASSERT_EQ(m2.FindValueByKey(1), nullptr);
-	ASSERT_EQ(m2.FindValueByKey(2), nullptr);
+	*pm2 = std::move(*pm1);
 
-	m2 = std::move(m1);
+	ASSERT_EQ(pm1->GetSize(), 0);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i)), nullptr);
+	}
 
-	ASSERT_EQ(m1.GetSize(), 0);
-	ASSERT_EQ(m1.FindValueByKey(1), nullptr);
-	ASSERT_EQ(m1.FindValueByKey(2), nullptr);
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m2.GetSize(), 2);
-	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+	delete pm1;
+	delete pm2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 2);	  //because Insert make a temporary instance
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(RedBlackTree, AnotherAllocatorCopyConstructionTest)
 {
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
-	m1.Insert(1, 1.0);
-	m1.Insert(2, 2.0);
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double, Less<int>, StdAllocator> m2(m1);
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>(*pm1);
 
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m2.GetSize(), 2);
-	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValueByKey(test_map_object(i))->val, i);
+	}
+
+	delete pm1;
+	delete pm2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance
+		ASSERT_EQ(val_pool[i], 2);
+	}
 }
 
 TEST(RedBlackTree, AnotherAllocatorMoveConstructionTest)
 {
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
-	m1.Insert(1, 1.0);
-	m1.Insert(2, 2.0);
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double, Less<int>, StdAllocator> m2(std::move(m1));
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>(std::move(*pm1));
 
-	ASSERT_EQ(m1.GetSize(), 2);
-	//ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	//ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m2.GetSize(), 2);
-	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValueByKey(test_map_object(i))->val, i);
+	}
+
+	delete pm1;
+	delete pm2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance and const key can not be moved
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(RedBlackTree, AnotherAllocatorCopyAssignmentTest)
 {
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double, Less<int>, StdAllocator> m2;
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	m1.Insert(1, 1.0);
-	m1.Insert(2, 2.0);
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
-	ASSERT_EQ(m2.GetSize(), 0);
-	ASSERT_EQ(m2.FindValueByKey(1), nullptr);
-	ASSERT_EQ(m2.FindValueByKey(2), nullptr);
+	*pm2 = *pm1;
 
-	m2 = m1;
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m2.GetSize(), 2);
-	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+	delete pm1;
+	delete pm2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance
+		ASSERT_EQ(val_pool[i], 2);
+	}
 }
 
 TEST(RedBlackTree, AnotherAllocatorMoveAssignmentTest)
 {
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double, Less<int>, StdAllocator> m2;
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	m1.Insert(1, 1.0);
-	m1.Insert(2, 2.0);
-	ASSERT_EQ(m1.GetSize(), 2);
-	ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
-	ASSERT_EQ(m2.GetSize(), 0);
-	ASSERT_EQ(m2.FindValueByKey(1), nullptr);
-	ASSERT_EQ(m2.FindValueByKey(2), nullptr);
+	*pm2 = std::move(*pm1);
 
-	m2 = std::move(m1);
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m1.GetSize(), 2);
-	//ASSERT_EQ(*m1.FindValueByKey(1), 1.0);
-	//ASSERT_EQ(*m1.FindValueByKey(2), 2.0);
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValueByKey(test_map_object(i))->val, i);
+	}
 
-	ASSERT_EQ(m2.GetSize(), 2);
-	ASSERT_EQ(*m2.FindValueByKey(1), 1.0);
-	ASSERT_EQ(*m2.FindValueByKey(2), 2.0);
+	delete pm1;
+	delete pm2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance and const key can not be moved
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
