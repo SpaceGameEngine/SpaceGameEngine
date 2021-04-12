@@ -26,15 +26,11 @@ bool SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCFrequencyFailed
 
 TimeType SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCFrequency()
 {
-	static bool is_first_time = true;
-	static TimeType re = 0;
-	if (is_first_time)
-	{
+	static TimeType re = []() -> TimeType {
 		LARGE_INTEGER Frequency;
 		SGE_CHECK(GetQPCFrequencyFailedError, QueryPerformanceFrequency(&Frequency));
-		re = Frequency.QuadPart;
-		is_first_time = false;
-	}
+		return Frequency.QuadPart;
+	}();
 	return re;
 }
 
@@ -45,7 +41,7 @@ bool SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCCounterFailedEr
 
 TimeType SpaceGameEngine::TimeImplement::WindowsTimeImplement::GetQPCCounter()
 {
-	static LARGE_INTEGER li_buf;
+	LARGE_INTEGER li_buf;
 	SGE_CHECK(GetQPCCounterFailedError, QueryPerformanceCounter(&li_buf));
 	return li_buf.QuadPart;
 }

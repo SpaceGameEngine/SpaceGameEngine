@@ -26,9 +26,9 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 	/*!
-	 * \ingroup Common
-	 * \{
-	 */
+	@ingroup Common
+	@{
+	*/
 
 	/*!
 	@file
@@ -101,9 +101,8 @@ namespace SpaceGameEngine
 	};
 
 	/*!
-	 * \}
-	 */
-
+	@}
+	*/
 }
 
 void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept;

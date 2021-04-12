@@ -19,10 +19,15 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+bool SpaceGameEngine::TimeImplement::UnixTimeImplement::GetTimeOfDayFailedError::Judge(int re_code)
+{
+	return re_code != 0;
+}
+
 TimeType SpaceGameEngine::TimeImplement::GetNowTime()
 {
-	static timeval t;
-	gettimeofday(&t, NULL);
+	timeval t;
+	SGE_CHECK(UnixTimeImplement::GetTimeOfDayFailedError, gettimeofday(&t, NULL));
 	return t.tv_sec * 1000000 + t.tv_usec;
 }
 

@@ -25,9 +25,9 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 	/*!
-	 * \ingroup Common
-	 * \{
-	 */
+	@ingroup Common
+	@{
+	*/
 
 	/*!
 	@file
@@ -175,4 +175,16 @@ namespace SpaceGameEngine
 	private:
 		std::scoped_lock<decltype(std::declval<MutexType>().m_MutexImpl)...> m_LockImpl;
 	};
+
+	using OnceFlag = std::once_flag;
+
+	template<typename Callable, typename... Args>
+	inline void CallOnce(OnceFlag& flag, Callable&& f, Args&&... args)
+	{
+		std::call_once(flag, std::forward<Callable>(f), std::forward<Args>(args)...);
+	}
+
+	/*!
+	@}
+	*/
 }
