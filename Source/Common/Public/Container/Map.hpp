@@ -241,6 +241,34 @@ namespace SpaceGameEngine
 				}
 			}
 
+			template<typename Callable>
+			inline void ForEach(Callable&& func)
+			{
+				if (m_pRoot != &m_NilNode)
+				{
+					Node* p = GetMinimumNode(m_pRoot);
+					while (p != &m_NilNode)
+					{
+						func(p->m_KeyValuePair);
+						p = GetNextNode(p);
+					}
+				}
+			}
+
+			template<typename Callable>
+			inline void ForEach(Callable&& func) const
+			{
+				if (m_pRoot != &m_NilNode)
+				{
+					const Node* p = GetMinimumNode(m_pRoot);
+					while (p != &m_NilNode)
+					{
+						func(p->m_KeyValuePair);
+						p = GetNextNode(p);
+					}
+				}
+			}
+
 		private:
 			inline void ReleaseNode(Node* p)
 			{
@@ -419,6 +447,36 @@ namespace SpaceGameEngine
 				while (p->m_pLeftChild != &m_NilNode)
 				{
 					p = p->m_pLeftChild;
+				}
+				return p;
+			}
+
+			inline const Node* GetMinimumNode(const Node* p) const
+			{
+				SGE_ASSERT(NullPointerError, p);
+				while (p->m_pLeftChild != &m_NilNode)
+				{
+					p = p->m_pLeftChild;
+				}
+				return p;
+			}
+
+			inline Node* GetMaximumNode(Node* p)
+			{
+				SGE_ASSERT(NullPointerError, p);
+				while (p->m_pRightChild != &m_NilNode)
+				{
+					p = p->m_pRightChild;
+				}
+				return p;
+			}
+
+			inline const Node* GetMaximumNode(const Node* p) const
+			{
+				SGE_ASSERT(NullPointerError, p);
+				while (p->m_pRightChild != &m_NilNode)
+				{
+					p = p->m_pRightChild;
 				}
 				return p;
 			}
@@ -628,6 +686,48 @@ namespace SpaceGameEngine
 				}
 				else
 					pnow->m_pRightChild = &m_NilNode;
+			}
+
+			inline Node* GetNextNode(Node* p)
+			{
+				SGE_ASSERT(NullPointerError, p);
+				SGE_ASSERT(NilNodeError, p, &m_NilNode);
+				if (p->m_pRightChild != &m_NilNode)
+				{
+					return GetMinimumNode(p->m_pRightChild);
+				}
+				else
+				{
+					while (p->m_pParent != &m_NilNode)
+					{
+						if (p == p->m_pParent->m_pLeftChild)
+							return p->m_pParent;
+						else
+							p = p->m_pParent;
+					}
+					return &m_NilNode;
+				}
+			}
+
+			inline const Node* GetNextNode(const Node* p) const
+			{
+				SGE_ASSERT(NullPointerError, p);
+				SGE_ASSERT(NilNodeError, p, &m_NilNode);
+				if (p->m_pRightChild != &m_NilNode)
+				{
+					return GetMinimumNode(p->m_pRightChild);
+				}
+				else
+				{
+					while (p->m_pParent != &m_NilNode)
+					{
+						if (p == p->m_pParent->m_pLeftChild)
+							return p->m_pParent;
+						else
+							p = p->m_pParent;
+					}
+					return &m_NilNode;
+				}
 			}
 
 		private:
