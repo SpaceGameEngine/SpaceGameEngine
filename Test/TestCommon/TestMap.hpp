@@ -627,3 +627,53 @@ TEST(RedBlackTree, ForEachTest)
 		ASSERT_EQ(test_cnt[i], 1);
 	}
 }
+
+TEST(RedBlackTree, ReverseForEachTest)
+{
+	const int test_size = 1000;
+	double test_cnt[test_size];
+	for (int i = 0; i < test_size; i++)
+	{
+		test_cnt[i] = 0;
+	}
+	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m1;
+	ASSERT_EQ(m1.GetSize(), 0);
+	for (int i = 0; i < test_size; i++)
+	{
+		m1.Insert(i, 1);
+	}
+	ASSERT_EQ(m1.GetSize(), test_size);
+
+	m1.ReverseForEach([](Pair<const int, double>& d) {
+		d.m_Second = d.m_First;
+	});
+
+	ASSERT_EQ(m1.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(*m1.FindValueByKey(i), (double)i);
+	}
+
+	const SpaceGameEngine::MapImplement::RedBlackTree<int, double> m2(m1);
+	ASSERT_EQ(m2.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(*m2.FindValueByKey(i), (double)i);
+	}
+
+	m2.ReverseForEach([&](const Pair<const int, double>& d) {
+		ASSERT_EQ(d.m_First, d.m_Second);
+		test_cnt[d.m_First] += 1;
+	});
+
+	ASSERT_EQ(m2.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(*m2.FindValueByKey(i), (double)i);
+	}
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(test_cnt[i], 1);
+	}
+}

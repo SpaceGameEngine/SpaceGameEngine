@@ -269,6 +269,34 @@ namespace SpaceGameEngine
 				}
 			}
 
+			template<typename Callable>
+			inline void ReverseForEach(Callable&& func)
+			{
+				if (m_pRoot != &m_NilNode)
+				{
+					Node* p = GetMaximumNode(m_pRoot);
+					while (p != &m_NilNode)
+					{
+						func(p->m_KeyValuePair);
+						p = GetPreviousNode(p);
+					}
+				}
+			}
+
+			template<typename Callable>
+			inline void ReverseForEach(Callable&& func) const
+			{
+				if (m_pRoot != &m_NilNode)
+				{
+					const Node* p = GetMaximumNode(m_pRoot);
+					while (p != &m_NilNode)
+					{
+						func(p->m_KeyValuePair);
+						p = GetPreviousNode(p);
+					}
+				}
+			}
+
 		private:
 			inline void ReleaseNode(Node* p)
 			{
@@ -722,6 +750,48 @@ namespace SpaceGameEngine
 					while (p->m_pParent != &m_NilNode)
 					{
 						if (p == p->m_pParent->m_pLeftChild)
+							return p->m_pParent;
+						else
+							p = p->m_pParent;
+					}
+					return &m_NilNode;
+				}
+			}
+
+			inline Node* GetPreviousNode(Node* p)
+			{
+				SGE_ASSERT(NullPointerError, p);
+				SGE_ASSERT(NilNodeError, p, &m_NilNode);
+				if (p->m_pLeftChild != &m_NilNode)
+				{
+					return GetMaximumNode(p->m_pLeftChild);
+				}
+				else
+				{
+					while (p->m_pParent != &m_NilNode)
+					{
+						if (p == p->m_pParent->m_pRightChild)
+							return p->m_pParent;
+						else
+							p = p->m_pParent;
+					}
+					return &m_NilNode;
+				}
+			}
+
+			inline const Node* GetPreviousNode(const Node* p) const
+			{
+				SGE_ASSERT(NullPointerError, p);
+				SGE_ASSERT(NilNodeError, p, &m_NilNode);
+				if (p->m_pLeftChild != &m_NilNode)
+				{
+					return GetMaximumNode(p->m_pLeftChild);
+				}
+				else
+				{
+					while (p->m_pParent != &m_NilNode)
+					{
+						if (p == p->m_pParent->m_pRightChild)
 							return p->m_pParent;
 						else
 							p = p->m_pParent;
