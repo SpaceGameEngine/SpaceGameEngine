@@ -876,6 +876,16 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		inline void Clear()
+		{
+			m_Tree.Clear();
+		}
+
+		inline SizeType GetSize() const
+		{
+			return m_Tree.GetSize();
+		}
+
 	private:
 		MapImplement::RedBlackTree<K, V, LessComparer, Allocator> m_Tree;
 	};
