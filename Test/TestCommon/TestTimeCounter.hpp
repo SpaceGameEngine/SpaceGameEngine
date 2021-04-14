@@ -222,7 +222,7 @@ TEST(TimeCounter, AllTest)
 		SleepFor(MakeTimeDuration<Second, float>(0.5f));
 		tc.Tick();
 		auto dt = tc.GetDeltaTime();
-		ASSERT_GE(dt, 0.5f);
+		ASSERT_GE(dt, 0.45f);
 		ASSERT_LT(dt, 1.0f);
 	}
 }

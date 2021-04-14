@@ -807,6 +807,78 @@ namespace SpaceGameEngine
 		};
 	}
 
+	template<typename K, typename V, typename LessComparer = Less<K>, typename Allocator = DefaultAllocator>
+	class Map
+	{
+	public:
+		using KeyType = const K;
+		using ValueType = V;
+		using AllocatorType = Allocator;
+		using LessComparerType = LessComparer;
+
+		template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
+		friend class Map;
+
+		inline Map()
+			: m_Tree()
+		{
+		}
+
+		inline ~Map()
+		{
+		}
+
+		inline Map(const Map& m)
+			: m_Tree(m.m_Tree)
+		{
+		}
+
+		inline Map(Map&& m)
+			: m_Tree(std::move(m.m_Tree))
+		{
+		}
+
+		inline Map& operator=(const Map& m)
+		{
+			m_Tree = m.m_Tree;
+			return *this;
+		}
+
+		inline Map& operator=(Map&& m)
+		{
+			m_Tree = std::move(m.m_Tree);
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline Map(const Map<K, V, LessComparer, OtherAllocator>& m)
+			: m_Tree(m.m_Tree)
+		{
+		}
+
+		template<typename OtherAllocator>
+		inline Map(Map<K, V, LessComparer, OtherAllocator>&& m)
+			: m_Tree(std::move(m.m_Tree))
+		{
+		}
+
+		template<typename OtherAllocator>
+		inline Map& operator=(const Map<K, V, LessComparer, OtherAllocator>& m)
+		{
+			m_Tree = m.m_Tree;
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline Map& operator=(Map<K, V, LessComparer, OtherAllocator>&& m)
+		{
+			m_Tree = std::move(m.m_Tree);
+			return *this;
+		}
+
+	private:
+		MapImplement::RedBlackTree<K, V, LessComparer, Allocator> m_Tree;
+	};
 	/*!
 	@}
 	*/
