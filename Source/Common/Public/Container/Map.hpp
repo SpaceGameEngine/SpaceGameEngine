@@ -377,8 +377,8 @@ namespace SpaceGameEngine
 				px->m_pParent = py;
 			}
 
-			template<typename V2>
-			inline Pair<Node*, bool> InternalInsert(const K& key, V2&& val)
+			template<typename K2, typename V2>
+			inline Pair<Node*, bool> InternalInsert(K2&& key, V2&& val)
 			{
 				Node* py = &m_NilNode;
 				Node* px = m_pRoot;
@@ -392,7 +392,7 @@ namespace SpaceGameEngine
 				}
 				if (px == &m_NilNode)
 				{
-					Node* pz = Allocator::template New<Node>(key, std::forward<V2>(val));
+					Node* pz = Allocator::template New<Node>(std::forward<K2>(key), std::forward<V2>(val));
 					m_Size += 1;
 
 					pz->m_pParent = py;

@@ -162,7 +162,7 @@ TEST(RedBlackTree, ReleaseTest)
 	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);	  //because Insert make a temporary instance
+		ASSERT_EQ(key_pool[i], 1);
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
@@ -233,7 +233,7 @@ TEST(RedBlackTree, CopyConstructionTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance
+		ASSERT_EQ(key_pool[i], 2);
 		ASSERT_EQ(val_pool[i], 2);
 	}
 }
@@ -281,7 +281,7 @@ TEST(RedBlackTree, MoveConstructionTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);	  //because Insert make a temporary instance
+		ASSERT_EQ(key_pool[i], 1);
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
@@ -330,7 +330,7 @@ TEST(RedBlackTree, CopyAssignmentTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance
+		ASSERT_EQ(key_pool[i], 2);
 		ASSERT_EQ(val_pool[i], 2);
 	}
 }
@@ -379,7 +379,7 @@ TEST(RedBlackTree, MoveAssignmentTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);	  //because Insert make a temporary instance
+		ASSERT_EQ(key_pool[i], 1);
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
@@ -427,7 +427,7 @@ TEST(RedBlackTree, AnotherAllocatorCopyConstructionTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance
+		ASSERT_EQ(key_pool[i], 2);
 		ASSERT_EQ(val_pool[i], 2);
 	}
 }
@@ -475,7 +475,7 @@ TEST(RedBlackTree, AnotherAllocatorMoveConstructionTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance and const key can not be moved
+		ASSERT_EQ(key_pool[i], 2);	  //because const key can not be moved
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
@@ -524,7 +524,7 @@ TEST(RedBlackTree, AnotherAllocatorCopyAssignmentTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance
+		ASSERT_EQ(key_pool[i], 2);
 		ASSERT_EQ(val_pool[i], 2);
 	}
 }
@@ -573,7 +573,7 @@ TEST(RedBlackTree, AnotherAllocatorMoveAssignmentTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 3);	  //because Insert make a temporary instance and const key can not be moved
+		ASSERT_EQ(key_pool[i], 2);	  //because const key can not be moved
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
