@@ -715,12 +715,12 @@ namespace SpaceGameEngine
 			friend Vector;
 			friend ReverseSequentialIterator<IteratorImpl<_T>>;
 
-			inline static IteratorImpl GetBegin(const Vector& v)
+			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
 				return IteratorImpl(reinterpret_cast<_T*>(v.m_pContent));
 			}
 
-			inline static IteratorImpl GetEnd(const Vector& v)
+			inline static IteratorImpl GetEnd(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
 				return IteratorImpl(reinterpret_cast<_T*>(v.m_pContent) + v.m_Size);
 			}
@@ -865,12 +865,12 @@ namespace SpaceGameEngine
 			friend OutOfRangeError;
 			friend Vector;
 
-			inline static VectorReverseIteratorImpl GetBegin(const Vector& v)
+			inline static VectorReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<ValueType>, const Vector&, Vector&> v)
 			{
 				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) + v.m_Size - 1);
 			}
 
-			inline static VectorReverseIteratorImpl GetEnd(const Vector& v)
+			inline static VectorReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<ValueType>, const Vector&, Vector&> v)
 			{
 				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) - 1);
 			}

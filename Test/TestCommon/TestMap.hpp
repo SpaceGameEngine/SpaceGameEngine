@@ -685,3 +685,103 @@ TEST(Map, InitializerListConstructionTest)
 						{3, 3.0}});
 	ASSERT_EQ(m.GetSize(), 3);
 }
+
+TEST(MapIterator, GetBeginTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+	auto iter = m.GetBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Map<int, double>::Iterator>));
+	ASSERT_EQ(iter->m_First, 1);
+	ASSERT_EQ(iter->m_Second, 1.0);
+}
+
+TEST(MapIterator, GetEndTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+	auto iter = m.GetEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Map<int, double>::Iterator>));
+	--iter;
+	ASSERT_EQ(iter->m_First, 3);
+	ASSERT_EQ(iter->m_Second, 3.0);
+}
+
+TEST(MapIterator, GetConstBeginTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+	auto iter = m.GetConstBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Map<int, double>::ConstIterator>));
+	ASSERT_EQ(iter->m_First, 1);
+	ASSERT_EQ(iter->m_Second, 1.0);
+}
+
+TEST(MapIterator, GetConstEndTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+	auto iter = m.GetConstEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Map<int, double>::ConstIterator>));
+	--iter;
+	ASSERT_EQ(iter->m_First, 3);
+	ASSERT_EQ(iter->m_Second, 3.0);
+}
+
+TEST(MapIterator, GetReverseBeginTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+	auto iter = m.GetReverseBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Map<int, double>::ReverseIterator>));
+	ASSERT_EQ(iter->m_First, 3);
+	ASSERT_EQ(iter->m_Second, 3.0);
+}
+
+TEST(MapIterator, GetReverseEndTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+	auto iter = m.GetReverseEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Map<int, double>::ReverseIterator>));
+	--iter;
+	ASSERT_EQ(iter->m_First, 1);
+	ASSERT_EQ(iter->m_Second, 1.0);
+}
+
+TEST(MapIterator, GetConstReverseBeginTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+	auto iter = m.GetConstReverseBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Map<int, double>::ConstReverseIterator>));
+	ASSERT_EQ(iter->m_First, 3);
+	ASSERT_EQ(iter->m_Second, 3.0);
+}
+
+TEST(MapIterator, GetConstReverseEndTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+	auto iter = m.GetConstReverseEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Map<int, double>::ConstReverseIterator>));
+	--iter;
+	ASSERT_EQ(iter->m_First, 1);
+	ASSERT_EQ(iter->m_Second, 1.0);
+}
