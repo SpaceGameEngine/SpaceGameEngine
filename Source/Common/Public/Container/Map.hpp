@@ -14,8 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include <MemoryManager.h>
-#include <Utility/Utility.hpp>
+#include <initializer_list>
+#include "MemoryManager.h"
+#include "Utility/Utility.hpp"
 
 namespace SpaceGameEngine
 {
@@ -874,6 +875,14 @@ namespace SpaceGameEngine
 		{
 			m_Tree = std::move(m.m_Tree);
 			return *this;
+		}
+
+		inline Map(std::initializer_list<Pair<const K, V>> ilist)
+		{
+			for (auto i = ilist.begin(); i != ilist.end(); ++i)
+			{
+				m_Tree.Insert(std::move(i->m_First), std::move(i->m_Second));
+			}
 		}
 
 		inline void Clear()

@@ -677,3 +677,11 @@ TEST(RedBlackTree, ReverseForEachTest)
 		ASSERT_EQ(test_cnt[i], 1);
 	}
 }
+
+TEST(Map, InitializerListConstructionTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+}
