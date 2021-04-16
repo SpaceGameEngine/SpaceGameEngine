@@ -785,3 +785,181 @@ TEST(MapIterator, GetConstReverseEndTest)
 	ASSERT_EQ(iter->m_First, 1);
 	ASSERT_EQ(iter->m_Second, 1.0);
 }
+
+TEST(MapIterator, IteratorTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0},
+						{4, 4.0},
+						{5, 5.0},
+						{6, 6.0},
+						{7, 7.0},
+						{8, 8.0},
+						{9, 9.0},
+						{10, 10.0}});
+	ASSERT_EQ(m.GetSize(), 10);
+
+	int cnt = 1;
+	for (auto i = m.GetBegin(); i != m.GetEnd(); ++i)
+	{
+		ASSERT_EQ(cnt, i->m_First);
+		(*i).m_Second = 0;
+		cnt++;
+	}
+
+	auto iter = m.GetBegin();
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		++iter;
+	}
+	--iter;
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		--iter;
+	}
+	++iter;
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		++iter;
+	}
+}
+
+TEST(MapIterator, ConstIteratorTest)
+{
+	const Map<int, double> m({{1, 1.0},
+							  {2, 2.0},
+							  {3, 3.0},
+							  {4, 4.0},
+							  {5, 5.0},
+							  {6, 6.0},
+							  {7, 7.0},
+							  {8, 8.0},
+							  {9, 9.0},
+							  {10, 10.0}});
+	ASSERT_EQ(m.GetSize(), 10);
+
+	int cnt = 1;
+	for (auto i = m.GetConstBegin(); i != m.GetConstEnd(); ++i)
+	{
+		ASSERT_EQ(cnt, i->m_First);
+		cnt++;
+	}
+
+	auto iter = m.GetConstBegin();
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		++iter;
+	}
+	--iter;
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		--iter;
+	}
+	++iter;
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		++iter;
+	}
+}
+
+TEST(MapIterator, ReverseIteratorTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0},
+						{4, 4.0},
+						{5, 5.0},
+						{6, 6.0},
+						{7, 7.0},
+						{8, 8.0},
+						{9, 9.0},
+						{10, 10.0}});
+	ASSERT_EQ(m.GetSize(), 10);
+
+	int cnt = 10;
+	for (auto i = m.GetReverseBegin(); i != m.GetReverseEnd(); ++i)
+	{
+		ASSERT_EQ(cnt, i->m_First);
+		(*i).m_Second = 0;
+		cnt--;
+	}
+
+	auto iter = m.GetReverseBegin();
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		++iter;
+	}
+	--iter;
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		--iter;
+	}
+	++iter;
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		++iter;
+	}
+}
+
+TEST(MapIterator, ConstReverseIteratorTest)
+{
+	const Map<int, double> m({{1, 1.0},
+							  {2, 2.0},
+							  {3, 3.0},
+							  {4, 4.0},
+							  {5, 5.0},
+							  {6, 6.0},
+							  {7, 7.0},
+							  {8, 8.0},
+							  {9, 9.0},
+							  {10, 10.0}});
+	ASSERT_EQ(m.GetSize(), 10);
+
+	int cnt = 10;
+	for (auto i = m.GetConstReverseBegin(); i != m.GetConstReverseEnd(); ++i)
+	{
+		ASSERT_EQ(cnt, i->m_First);
+		cnt--;
+	}
+
+	auto iter = m.GetConstReverseBegin();
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		++iter;
+	}
+	--iter;
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		--iter;
+	}
+	++iter;
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		++iter;
+	}
+}
