@@ -825,8 +825,8 @@ TEST(MapIterator, IteratorTest)
 	++iter;
 	for (int i = 1; i <= 10; i++)
 	{
-		ASSERT_EQ(iter->m_First, i);
-		ASSERT_EQ((*iter).m_Second, 0);
+		ASSERT_EQ(iter.GetData()->m_First, i);
+		ASSERT_EQ(iter.GetData()->m_Second, 0);
 		++iter;
 	}
 }
@@ -869,8 +869,8 @@ TEST(MapIterator, ConstIteratorTest)
 	++iter;
 	for (int i = 1; i <= 10; i++)
 	{
-		ASSERT_EQ(iter->m_First, i);
-		ASSERT_EQ((*iter).m_Second, (double)i);
+		ASSERT_EQ(iter.GetData()->m_First, i);
+		ASSERT_EQ(iter.GetData()->m_Second, (double)i);
 		++iter;
 	}
 }
@@ -914,8 +914,8 @@ TEST(MapIterator, ReverseIteratorTest)
 	++iter;
 	for (int i = 10; i > 0; i--)
 	{
-		ASSERT_EQ(iter->m_First, i);
-		ASSERT_EQ((*iter).m_Second, 0);
+		ASSERT_EQ(iter.GetData()->m_First, i);
+		ASSERT_EQ(iter.GetData()->m_Second, 0);
 		++iter;
 	}
 }
@@ -958,8 +958,8 @@ TEST(MapIterator, ConstReverseIteratorTest)
 	++iter;
 	for (int i = 10; i > 0; i--)
 	{
-		ASSERT_EQ(iter->m_First, i);
-		ASSERT_EQ((*iter).m_Second, (double)i);
+		ASSERT_EQ(iter.GetData()->m_First, i);
+		ASSERT_EQ(iter.GetData()->m_Second, (double)i);
 		++iter;
 	}
 }
