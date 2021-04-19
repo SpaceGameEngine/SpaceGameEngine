@@ -890,7 +890,7 @@ namespace SpaceGameEngine
 		{
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
-				m_Tree.Insert(std::move(i->m_First), std::move(i->m_Second));
+				m_Tree.InternalInsert(std::move(i->m_First), std::move(i->m_Second));
 			}
 		}
 
@@ -1250,6 +1250,21 @@ namespace SpaceGameEngine
 		inline ConstReverseIterator GetConstReverseEnd() const
 		{
 			return ConstReverseIterator::GetEnd(*this);
+		}
+
+		template<typename K2, typename V2>
+		inline Pair<Iterator, bool> Insert(K2&& key, V2&& val)
+		{
+			auto re = m_Tree.InternalInsert(std::forward<K2>(key), std::forward<V2>(val));
+			return Pair<Iterator, bool>(Iterator(re.m_First, &m_Tree), re.m_Second);
+		}
+
+		inline void Insert(std::initializer_list<Pair<const K, V>> ilist)
+		{
+			for (auto i = ilist.begin(); i != ilist.end(); ++i)
+			{
+				m_Tree.InternalInsert(std::move(i->m_First), std::move(i->m_Second));
+			}
 		}
 
 	private:
