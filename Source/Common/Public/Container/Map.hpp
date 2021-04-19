@@ -1223,6 +1223,17 @@ namespace SpaceGameEngine
 			}
 		};
 
+		struct KeyNotFoundError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The key can not be found in this Map.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const IteratorType& end)
+			{
+				return iter == end;
+			}
+		};
+
 		inline Iterator GetBegin()
 		{
 			return Iterator::GetBegin(*this);
@@ -1301,6 +1312,20 @@ namespace SpaceGameEngine
 		inline ConstIterator Find(const K& key) const
 		{
 			return ConstIterator(m_Tree.FindNode(key), &m_Tree);
+		}
+
+		inline V& Get(const K& key)
+		{
+			Iterator iter = Find(key);
+			SGE_CHECK(KeyNotFoundError, iter, GetEnd());
+			return iter->m_Second;
+		}
+
+		inline const V& Get(const K& key) const
+		{
+			ConstIterator iter = Find(key);
+			SGE_CHECK(KeyNotFoundError, iter, GetConstEnd());
+			return iter->m_Second;
 		}
 
 	private:
