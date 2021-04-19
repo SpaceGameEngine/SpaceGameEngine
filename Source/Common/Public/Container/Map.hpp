@@ -1288,6 +1288,11 @@ namespace SpaceGameEngine
 			return re;
 		}
 
+		inline bool RemoveByKey(const K& key)
+		{
+			return m_Tree.RemoveByKey(key);
+		}
+
 	private:
 		MapImplement::RedBlackTree<K, V, LessComparer, Allocator> m_Tree;
 	};

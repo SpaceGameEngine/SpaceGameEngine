@@ -816,6 +816,38 @@ TEST(Map, RemoveTest)
 	}
 }
 
+TEST(Map, RemoveByKeyTest)
+{
+	Map<int, double> m({{1, 1.0},
+						{2, 2.0},
+						{3, 3.0}});
+	ASSERT_EQ(m.GetSize(), 3);
+
+	ASSERT_TRUE(m.RemoveByKey(2));
+
+	ASSERT_EQ(m.GetSize(), 2);
+	auto iter1 = m.GetBegin();
+	ASSERT_EQ(iter1->m_First, 1);
+	ASSERT_EQ(iter1->m_Second, 1.0);
+	++iter1;
+	ASSERT_EQ(iter1->m_First, 3);
+	ASSERT_EQ(iter1->m_Second, 3.0);
+	++iter1;
+	ASSERT_EQ(iter1, m.GetEnd());
+
+	ASSERT_FALSE(m.RemoveByKey(0));
+
+	ASSERT_EQ(m.GetSize(), 2);
+	auto iter2 = m.GetBegin();
+	ASSERT_EQ(iter2->m_First, 1);
+	ASSERT_EQ(iter2->m_Second, 1.0);
+	++iter2;
+	ASSERT_EQ(iter2->m_First, 3);
+	ASSERT_EQ(iter2->m_Second, 3.0);
+	++iter2;
+	ASSERT_EQ(iter2, m.GetEnd());
+}
+
 TEST(MapIterator, GetBeginTest)
 {
 	Map<int, double> m({{1, 1.0},
