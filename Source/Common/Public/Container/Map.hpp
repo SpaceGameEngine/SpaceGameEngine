@@ -947,15 +947,15 @@ namespace SpaceGameEngine
 			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
 			inline IteratorImpl(const IteratorType& iter)
 			{
-				m_pContent = (InternalPointerType*)iter.m_pContent;
-				m_pTree = (InternalRedBlackTreePointerType*)iter.m_pTree;
+				m_pContent = (InternalPointerType)iter.m_pContent;
+				m_pTree = (InternalRedBlackTreePointerType)iter.m_pTree;
 			}
 
 			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
 			inline IteratorImpl& operator=(const IteratorType& iter)
 			{
-				m_pContent = (InternalPointerType*)iter.m_pContent;
-				m_pTree = (InternalRedBlackTreePointerType*)iter.m_pTree;
+				m_pContent = (InternalPointerType)iter.m_pContent;
+				m_pTree = (InternalRedBlackTreePointerType)iter.m_pTree;
 				return *this;
 			}
 
@@ -1093,15 +1093,15 @@ namespace SpaceGameEngine
 			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
 			inline ReverseIteratorImpl(const IteratorType& iter)
 			{
-				m_pContent = (InternalPointerType*)iter.m_pContent;
-				m_pTree = (InternalRedBlackTreePointerType*)iter.m_pTree;
+				m_pContent = (InternalPointerType)iter.m_pContent;
+				m_pTree = (InternalRedBlackTreePointerType)iter.m_pTree;
 			}
 
 			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
 			inline ReverseIteratorImpl& operator=(const IteratorType& iter)
 			{
-				m_pContent = (InternalPointerType*)iter.m_pContent;
-				m_pTree = (InternalRedBlackTreePointerType*)iter.m_pTree;
+				m_pContent = (InternalPointerType)iter.m_pContent;
+				m_pTree = (InternalRedBlackTreePointerType)iter.m_pTree;
 				return *this;
 			}
 
@@ -1212,6 +1212,17 @@ namespace SpaceGameEngine
 			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
 		};
 
+		struct ExternalIteratorError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator does not belong to this Map.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const Map& m)
+			{
+				return iter.m_pTree != &(m.m_Tree);
+			}
+		};
+
 		inline Iterator GetBegin()
 		{
 			return Iterator::GetBegin(*this);
@@ -1265,6 +1276,16 @@ namespace SpaceGameEngine
 			{
 				m_Tree.InternalInsert(std::move(i->m_First), std::move(i->m_Second));
 			}
+		}
+
+		template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
+		inline IteratorType Remove(const IteratorType& iter)
+		{
+			SGE_ASSERT(ExternalIteratorError, iter, *this);
+			IteratorType re = iter;
+			++re;
+			m_Tree.RemoveNode((typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*)iter.m_pContent);
+			return re;
 		}
 
 	private:

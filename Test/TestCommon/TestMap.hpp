@@ -18,6 +18,7 @@ limitations under the License.
 #include "Container/Map.hpp"
 #include <functional>
 #include <cstring>
+#include <vector>
 
 using namespace SpaceGameEngine;
 
@@ -752,6 +753,67 @@ TEST(Map, InsertListTest)
 	ASSERT_EQ(iter->m_Second, 3.0);
 	++iter;
 	ASSERT_EQ(iter, m.GetConstEnd());
+}
+
+TEST(Map, RemoveTest)
+{
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	std::vector<Map<test_map_object, test_map_object>::Iterator> iter_buf;
+	for (int i = 0; i < test_size; i++)
+	{
+		auto re = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(re.m_First->m_First.val, i);
+		ASSERT_EQ(re.m_First->m_Second.val, i);
+		ASSERT_TRUE(re.m_Second);
+		if (i >= 4 && i < 8)
+			iter_buf.push_back(re.m_First);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+
+	ASSERT_EQ(iter_buf.size(), 4);
+
+	auto iter1 = pm->Remove(Map<test_map_object, test_map_object>::Iterator(iter_buf[0]));
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), Map<test_map_object, test_map_object>::Iterator>));
+	ASSERT_EQ(iter1->m_First.val, 5);
+	ASSERT_EQ(iter1->m_Second.val, 5);
+	ASSERT_EQ(pm->GetSize(), test_size - 1);
+
+	auto iter2 = pm->Remove(Map<test_map_object, test_map_object>::ConstIterator(iter_buf[1]));
+	ASSERT_TRUE((std::is_same_v<decltype(iter2), Map<test_map_object, test_map_object>::ConstIterator>));
+	ASSERT_EQ(iter2->m_First.val, 6);
+	ASSERT_EQ(iter2->m_Second.val, 6);
+	ASSERT_EQ(pm->GetSize(), test_size - 2);
+
+	auto iter3 = pm->Remove(Map<test_map_object, test_map_object>::ReverseIterator(iter_buf[2]));
+	ASSERT_TRUE((std::is_same_v<decltype(iter3), Map<test_map_object, test_map_object>::ReverseIterator>));
+	ASSERT_EQ(iter3->m_First.val, 3);
+	ASSERT_EQ(iter3->m_Second.val, 3);
+	ASSERT_EQ(pm->GetSize(), test_size - 3);
+
+	auto iter4 = pm->Remove(Map<test_map_object, test_map_object>::ConstReverseIterator(iter_buf[3]));
+	ASSERT_TRUE((std::is_same_v<decltype(iter4), Map<test_map_object, test_map_object>::ConstReverseIterator>));
+	ASSERT_EQ(iter4->m_First.val, 3);
+	ASSERT_EQ(iter4->m_Second.val, 3);
+	ASSERT_EQ(pm->GetSize(), test_size - 4);
+
+	delete pm;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(MapIterator, GetBeginTest)
