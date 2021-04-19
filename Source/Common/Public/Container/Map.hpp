@@ -212,18 +212,18 @@ namespace SpaceGameEngine
 				return m_Size;
 			}
 
-			inline V* FindValueByKey(const K& key)
+			inline V* FindValue(const K& key)
 			{
-				Node* re = FindNodeByKey(key);
+				Node* re = FindNode(key);
 				if (re != &m_NilNode)
 					return &(re->m_KeyValuePair.m_Second);
 				else
 					return nullptr;
 			}
 
-			inline const V* FindValueByKey(const K& key) const
+			inline const V* FindValue(const K& key) const
 			{
-				const Node* re = FindNodeByKey(key);
+				const Node* re = FindNode(key);
 				if (re != &m_NilNode)
 					return &(re->m_KeyValuePair.m_Second);
 				else
@@ -239,7 +239,7 @@ namespace SpaceGameEngine
 
 			inline bool RemoveByKey(const K& key)
 			{
-				auto pnode = FindNodeByKey(key);
+				auto pnode = FindNode(key);
 				if (pnode == &m_NilNode)
 					return false;
 				else
@@ -317,7 +317,7 @@ namespace SpaceGameEngine
 				Allocator::template Delete(p);
 			}
 
-			inline Node* FindNodeByKey(const K& key)
+			inline Node* FindNode(const K& key)
 			{
 				Node* p = m_pRoot;
 				while (p != &m_NilNode && p->m_KeyValuePair.m_First != key)
@@ -330,7 +330,7 @@ namespace SpaceGameEngine
 				return p;
 			}
 
-			inline const Node* FindNodeByKey(const K& key) const
+			inline const Node* FindNode(const K& key) const
 			{
 				const Node* p = m_pRoot;
 				while (p != &m_NilNode && p->m_KeyValuePair.m_First != key)
@@ -1291,6 +1291,16 @@ namespace SpaceGameEngine
 		inline bool RemoveByKey(const K& key)
 		{
 			return m_Tree.RemoveByKey(key);
+		}
+
+		inline Iterator Find(const K& key)
+		{
+			return Iterator(m_Tree.FindNode(key), &m_Tree);
+		}
+
+		inline ConstIterator Find(const K& key) const
+		{
+			return ConstIterator(m_Tree.FindNode(key), &m_Tree);
 		}
 
 	private:

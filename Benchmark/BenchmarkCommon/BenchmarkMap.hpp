@@ -96,7 +96,7 @@ void BM_SgeRedBlackTreeFind(benchmark::State& state)
 	{
 		for (int i = 0; i < bm_map_seq_size; i++)
 		{
-			auto re = m.FindValueByKey(bm_map_seq[i]);
+			auto re = m.FindValue(bm_map_seq[i]);
 			assert(*re == (double)bm_map_seq[i]);
 		}
 	}
