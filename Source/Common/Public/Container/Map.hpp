@@ -913,8 +913,7 @@ namespace SpaceGameEngine
 		public:
 			using ValueType = T;
 
-			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
-			friend class Map;
+			friend class Map<K, V, LessComparer, Allocator>;
 
 		public:
 			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const Map&, Map&> m)
@@ -1060,7 +1059,8 @@ namespace SpaceGameEngine
 		{
 		public:
 			using ValueType = T;
-			friend Map;
+
+			friend class Map<K, V, LessComparer, Allocator>;
 
 		public:
 			inline static ReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const Map&, Map&> m)
