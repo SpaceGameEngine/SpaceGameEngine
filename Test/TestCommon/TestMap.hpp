@@ -1262,3 +1262,111 @@ TEST(MapIterator, ConstReverseIteratorTest)
 		++iter;
 	}
 }
+
+TEST(MapIterator, PlusTest)
+{
+	Map<int, int> m = {
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 4}};
+	auto iter1_1 = m.GetBegin() + 1;
+	ASSERT_EQ(iter1_1->m_First, 1);
+	ASSERT_EQ(iter1_1->m_Second, 1);
+	auto iter1_2 = m.GetBegin() + 2;
+	ASSERT_EQ(iter1_2->m_First, 2);
+	ASSERT_EQ(iter1_2->m_Second, 2);
+
+	const Map<int, int>& cm = m;
+	auto iter2_1 = cm.GetConstBegin() + 1;
+	ASSERT_EQ(iter2_1->m_First, 1);
+	ASSERT_EQ(iter2_1->m_Second, 1);
+	auto iter2_2 = cm.GetConstBegin() + 2;
+	ASSERT_EQ(iter2_2->m_First, 2);
+	ASSERT_EQ(iter2_2->m_Second, 2);
+}
+
+TEST(MapIterator, SubtractTest)
+{
+	Map<int, int> m = {
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 4}};
+	auto iter1_1 = m.GetEnd() - 1;
+	ASSERT_EQ(iter1_1->m_First, 4);
+	ASSERT_EQ(iter1_1->m_Second, 4);
+	auto iter1_2 = m.GetEnd() - 2;
+	ASSERT_EQ(iter1_2->m_First, 3);
+	ASSERT_EQ(iter1_2->m_Second, 3);
+
+	const Map<int, int>& cm = m;
+	auto iter2_1 = cm.GetConstEnd() - 1;
+	ASSERT_EQ(iter2_1->m_First, 4);
+	ASSERT_EQ(iter2_1->m_Second, 4);
+	auto iter2_2 = cm.GetConstEnd() - 2;
+	ASSERT_EQ(iter2_2->m_First, 3);
+	ASSERT_EQ(iter2_2->m_Second, 3);
+}
+
+TEST(MapIterator, SelfIncreaseTest)
+{
+	Map<int, int> m = {
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 4}};
+	auto iter1 = m.GetBegin();
+	ASSERT_EQ(iter1->m_First, 0);
+	ASSERT_EQ(iter1->m_Second, 0);
+	iter1 += 2;
+	ASSERT_EQ(iter1->m_First, 2);
+	ASSERT_EQ(iter1->m_Second, 2);
+
+	const Map<int, int>& cm = m;
+	auto iter2 = cm.GetConstBegin();
+	ASSERT_EQ(iter2->m_First, 0);
+	ASSERT_EQ(iter2->m_Second, 0);
+	iter2 += 2;
+	ASSERT_EQ(iter2->m_First, 2);
+	ASSERT_EQ(iter2->m_Second, 2);
+}
+
+TEST(MapIterator, SelfDecreaseTest)
+{
+	Map<int, int> m = {
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 4}};
+	auto iter1 = m.GetEnd();
+	iter1 -= 2;
+	ASSERT_EQ(iter1->m_First, 3);
+	ASSERT_EQ(iter1->m_Second, 3);
+
+	const Map<int, int>& cm = m;
+	auto iter2 = cm.GetConstEnd();
+	iter2 -= 2;
+	ASSERT_EQ(iter2->m_First, 3);
+	ASSERT_EQ(iter2->m_Second, 3);
+}
+
+TEST(MapIterator, DistanceTest)
+{
+	Map<int, int> m = {
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 4}};
+	ASSERT_EQ(m.GetSize(), 5);
+	ASSERT_EQ(m.GetEnd() - m.GetBegin(), 5);
+
+	const Map<int, int>& cm = m;
+	ASSERT_EQ(cm.GetSize(), 5);
+	ASSERT_EQ(cm.GetConstEnd() - cm.GetConstBegin(), 5);
+}

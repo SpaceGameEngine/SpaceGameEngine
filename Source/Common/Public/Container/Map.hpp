@@ -983,6 +983,22 @@ namespace SpaceGameEngine
 				return re;
 			}
 
+			inline IteratorImpl& operator+=(SizeType i)
+			{
+				for (SizeType j = 0; j < i; ++j)
+				{
+					operator++();
+				}
+				return *this;
+			}
+
+			inline IteratorImpl operator+(SizeType i) const
+			{
+				IteratorImpl re(*this);
+				re += i;
+				return re;
+			}
+
 			inline IteratorImpl& operator--()
 			{
 				if (m_pContent != &(m_pTree->m_NilNode))
@@ -1004,6 +1020,34 @@ namespace SpaceGameEngine
 				{
 					if (m_pTree->m_Size)
 						m_pContent = m_pTree->GetMaximumNode(m_pTree->m_pRoot);
+				}
+				return re;
+			}
+
+			inline IteratorImpl& operator-=(SizeType i)
+			{
+				for (SizeType j = 0; j < i; ++j)
+				{
+					operator--();
+				}
+				return *this;
+			}
+
+			inline IteratorImpl operator-(SizeType i) const
+			{
+				IteratorImpl re(*this);
+				re -= i;
+				return re;
+			}
+
+			inline SizeType operator-(const IteratorImpl& iter) const
+			{
+				SizeType re = 0;
+				IteratorImpl i = iter;
+				while (i != *this)
+				{
+					++i;
+					re += 1;
 				}
 				return re;
 			}
