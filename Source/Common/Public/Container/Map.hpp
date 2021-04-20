@@ -1328,6 +1328,15 @@ namespace SpaceGameEngine
 			return iter->m_Second;
 		}
 
+		template<typename K2>
+		inline V& operator[](K2&& key)
+		{
+			Iterator iter = Find(key);
+			if (iter == GetEnd())
+				iter = Insert(std::forward<K2>(key), V()).m_First;
+			return iter->m_Second;
+		}
+
 	private:
 		MapImplement::RedBlackTree<K, V, LessComparer, Allocator> m_Tree;
 	};
