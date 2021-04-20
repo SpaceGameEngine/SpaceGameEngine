@@ -1234,6 +1234,17 @@ namespace SpaceGameEngine
 			}
 		};
 
+		struct NilNodeIteratorError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator which pointing to the nil node is invalid.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const IteratorType& end)
+			{
+				return iter == end;
+			}
+		};
+
 		inline Iterator GetBegin()
 		{
 			return Iterator::GetBegin(*this);
@@ -1293,6 +1304,7 @@ namespace SpaceGameEngine
 		inline IteratorType Remove(const IteratorType& iter)
 		{
 			SGE_ASSERT(ExternalIteratorError, iter, *this);
+			SGE_ASSERT(NilNodeIteratorError, iter, IteratorType::GetEnd(*this));
 			IteratorType re = iter;
 			++re;
 			m_Tree.RemoveNode((typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*)iter.m_pContent);
