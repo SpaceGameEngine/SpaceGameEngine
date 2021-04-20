@@ -35,8 +35,17 @@ void BM_SgeRedBlackTreeCreate(benchmark::State& state)
 	}
 }
 
+void BM_SgeMapCreate(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		SpaceGameEngine::Map<int, double> m;
+	}
+}
+
 BENCHMARK(BM_StdMapCreate)->Iterations(1000000);
 BENCHMARK(BM_SgeRedBlackTreeCreate)->Iterations(1000000);
+BENCHMARK(BM_SgeMapCreate)->Iterations(1000000);
 
 int bm_map_seq[] = {63, 82, 17, 99, 3, 26, 31, 59, 74, 23, 6, 94, 38, 36, 23, 19, 5, 64, 52, 17, 53, 21, 78, 2, 95};
 constexpr const int bm_map_seq_size = sizeof(bm_map_seq) / sizeof(int);
@@ -65,8 +74,21 @@ void BM_SgeRedBlackTreeInsert(benchmark::State& state)
 	}
 }
 
+void BM_SgeMapInsert(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		SpaceGameEngine::Map<int, double> m;
+		for (int i = 0; i < bm_map_seq_size; i++)
+		{
+			m.Insert(bm_map_seq[i], (double)bm_map_seq[i]);
+		}
+	}
+}
+
 BENCHMARK(BM_StdMapInsert)->Iterations(1000000);
 BENCHMARK(BM_SgeRedBlackTreeInsert)->Iterations(1000000);
+BENCHMARK(BM_SgeMapInsert)->Iterations(1000000);
 
 void BM_StdMapFind(benchmark::State& state)
 {
@@ -102,8 +124,26 @@ void BM_SgeRedBlackTreeFind(benchmark::State& state)
 	}
 }
 
+void BM_SgeMapFind(benchmark::State& state)
+{
+	SpaceGameEngine::Map<int, double> m;
+	for (int i = 0; i < bm_map_seq_size; i++)
+	{
+		m.Insert(bm_map_seq[i], (double)bm_map_seq[i]);
+	}
+	for (auto _ : state)
+	{
+		for (int i = 0; i < bm_map_seq_size; i++)
+		{
+			auto re = m.Find(bm_map_seq[i]);
+			assert(re->m_Second == (double)bm_map_seq[i]);
+		}
+	}
+}
+
 BENCHMARK(BM_StdMapFind)->Iterations(1000000);
 BENCHMARK(BM_SgeRedBlackTreeFind)->Iterations(1000000);
+BENCHMARK(BM_SgeMapFind)->Iterations(1000000);
 
 void BM_StdMapRemove(benchmark::State& state)
 {
@@ -137,5 +177,22 @@ void BM_SgeRedBlackTreeRemove(benchmark::State& state)
 	}
 }
 
+void BM_SgeMapRemove(benchmark::State& state)
+{
+	SpaceGameEngine::Map<int, double> m;
+	for (int i = 0; i < bm_map_seq_size; i++)
+	{
+		m.Insert(bm_map_seq[i], (double)bm_map_seq[i]);
+	}
+	for (auto _ : state)
+	{
+		for (int i = 0; i < bm_map_seq_size; i++)
+		{
+			m.RemoveByKey(bm_map_seq[i]);
+		}
+	}
+}
+
 BENCHMARK(BM_StdMapRemove)->Iterations(1000000);
 BENCHMARK(BM_SgeRedBlackTreeRemove)->Iterations(1000000);
+BENCHMARK(BM_SgeMapRemove)->Iterations(1000000);
