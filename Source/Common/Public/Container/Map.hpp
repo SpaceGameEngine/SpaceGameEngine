@@ -1174,6 +1174,22 @@ namespace SpaceGameEngine
 				return re;
 			}
 
+			inline ReverseIteratorImpl& operator+=(SizeType i)
+			{
+				for (SizeType j = 0; j < i; ++j)
+				{
+					operator++();
+				}
+				return *this;
+			}
+
+			inline ReverseIteratorImpl operator+(SizeType i) const
+			{
+				ReverseIteratorImpl re(*this);
+				re += i;
+				return re;
+			}
+
 			inline ReverseIteratorImpl& operator--()
 			{
 				if (m_pContent != &(m_pTree->m_NilNode))
@@ -1195,6 +1211,34 @@ namespace SpaceGameEngine
 				{
 					if (m_pTree->m_Size)
 						m_pContent = m_pTree->GetMinimumNode(m_pTree->m_pRoot);
+				}
+				return re;
+			}
+
+			inline ReverseIteratorImpl& operator-=(SizeType i)
+			{
+				for (SizeType j = 0; j < i; ++j)
+				{
+					operator--();
+				}
+				return *this;
+			}
+
+			inline ReverseIteratorImpl operator-(SizeType i) const
+			{
+				ReverseIteratorImpl re(*this);
+				re -= i;
+				return re;
+			}
+
+			inline SizeType operator-(const ReverseIteratorImpl& iter) const
+			{
+				SizeType re = 0;
+				ReverseIteratorImpl i = iter;
+				while (i != *this)
+				{
+					++i;
+					re += 1;
 				}
 				return re;
 			}

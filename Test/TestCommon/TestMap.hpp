@@ -1278,6 +1278,13 @@ TEST(MapIterator, PlusTest)
 	ASSERT_EQ(iter1_2->m_First, 2);
 	ASSERT_EQ(iter1_2->m_Second, 2);
 
+	auto iter3_1 = m.GetReverseBegin() + 1;
+	ASSERT_EQ(iter3_1->m_First, 3);
+	ASSERT_EQ(iter3_1->m_Second, 3);
+	auto iter3_2 = m.GetReverseBegin() + 2;
+	ASSERT_EQ(iter3_2->m_First, 2);
+	ASSERT_EQ(iter3_2->m_Second, 2);
+
 	const Map<int, int>& cm = m;
 	auto iter2_1 = cm.GetConstBegin() + 1;
 	ASSERT_EQ(iter2_1->m_First, 1);
@@ -1285,6 +1292,13 @@ TEST(MapIterator, PlusTest)
 	auto iter2_2 = cm.GetConstBegin() + 2;
 	ASSERT_EQ(iter2_2->m_First, 2);
 	ASSERT_EQ(iter2_2->m_Second, 2);
+
+	auto iter4_1 = cm.GetConstReverseBegin() + 1;
+	ASSERT_EQ(iter4_1->m_First, 3);
+	ASSERT_EQ(iter4_1->m_Second, 3);
+	auto iter4_2 = cm.GetConstReverseBegin() + 2;
+	ASSERT_EQ(iter4_2->m_First, 2);
+	ASSERT_EQ(iter4_2->m_Second, 2);
 }
 
 TEST(MapIterator, SubtractTest)
@@ -1302,6 +1316,13 @@ TEST(MapIterator, SubtractTest)
 	ASSERT_EQ(iter1_2->m_First, 3);
 	ASSERT_EQ(iter1_2->m_Second, 3);
 
+	auto iter3_1 = m.GetReverseEnd() - 1;
+	ASSERT_EQ(iter3_1->m_First, 0);
+	ASSERT_EQ(iter3_1->m_Second, 0);
+	auto iter3_2 = m.GetReverseEnd() - 2;
+	ASSERT_EQ(iter3_2->m_First, 1);
+	ASSERT_EQ(iter3_2->m_Second, 1);
+
 	const Map<int, int>& cm = m;
 	auto iter2_1 = cm.GetConstEnd() - 1;
 	ASSERT_EQ(iter2_1->m_First, 4);
@@ -1309,6 +1330,13 @@ TEST(MapIterator, SubtractTest)
 	auto iter2_2 = cm.GetConstEnd() - 2;
 	ASSERT_EQ(iter2_2->m_First, 3);
 	ASSERT_EQ(iter2_2->m_Second, 3);
+
+	auto iter4_1 = cm.GetConstReverseEnd() - 1;
+	ASSERT_EQ(iter4_1->m_First, 0);
+	ASSERT_EQ(iter4_1->m_Second, 0);
+	auto iter4_2 = cm.GetConstReverseEnd() - 2;
+	ASSERT_EQ(iter4_2->m_First, 1);
+	ASSERT_EQ(iter4_2->m_Second, 1);
 }
 
 TEST(MapIterator, SelfIncreaseTest)
@@ -1326,6 +1354,13 @@ TEST(MapIterator, SelfIncreaseTest)
 	ASSERT_EQ(iter1->m_First, 2);
 	ASSERT_EQ(iter1->m_Second, 2);
 
+	auto iter3 = m.GetReverseBegin();
+	ASSERT_EQ(iter3->m_First, 4);
+	ASSERT_EQ(iter3->m_Second, 4);
+	iter3 += 2;
+	ASSERT_EQ(iter3->m_First, 2);
+	ASSERT_EQ(iter3->m_Second, 2);
+
 	const Map<int, int>& cm = m;
 	auto iter2 = cm.GetConstBegin();
 	ASSERT_EQ(iter2->m_First, 0);
@@ -1333,6 +1368,13 @@ TEST(MapIterator, SelfIncreaseTest)
 	iter2 += 2;
 	ASSERT_EQ(iter2->m_First, 2);
 	ASSERT_EQ(iter2->m_Second, 2);
+
+	auto iter4 = cm.GetConstReverseBegin();
+	ASSERT_EQ(iter4->m_First, 4);
+	ASSERT_EQ(iter4->m_Second, 4);
+	iter4 += 2;
+	ASSERT_EQ(iter4->m_First, 2);
+	ASSERT_EQ(iter4->m_Second, 2);
 }
 
 TEST(MapIterator, SelfDecreaseTest)
@@ -1348,11 +1390,21 @@ TEST(MapIterator, SelfDecreaseTest)
 	ASSERT_EQ(iter1->m_First, 3);
 	ASSERT_EQ(iter1->m_Second, 3);
 
+	auto iter3 = m.GetReverseEnd();
+	iter3 -= 2;
+	ASSERT_EQ(iter3->m_First, 1);
+	ASSERT_EQ(iter3->m_Second, 1);
+
 	const Map<int, int>& cm = m;
 	auto iter2 = cm.GetConstEnd();
 	iter2 -= 2;
 	ASSERT_EQ(iter2->m_First, 3);
 	ASSERT_EQ(iter2->m_Second, 3);
+
+	auto iter4 = cm.GetConstReverseEnd();
+	iter4 -= 2;
+	ASSERT_EQ(iter4->m_First, 1);
+	ASSERT_EQ(iter4->m_Second, 1);
 }
 
 TEST(MapIterator, DistanceTest)
@@ -1365,8 +1417,10 @@ TEST(MapIterator, DistanceTest)
 		{4, 4}};
 	ASSERT_EQ(m.GetSize(), 5);
 	ASSERT_EQ(m.GetEnd() - m.GetBegin(), 5);
+	ASSERT_EQ(m.GetReverseEnd() - m.GetReverseBegin(), 5);
 
 	const Map<int, int>& cm = m;
 	ASSERT_EQ(cm.GetSize(), 5);
 	ASSERT_EQ(cm.GetConstEnd() - cm.GetConstBegin(), 5);
+	ASSERT_EQ(cm.GetConstReverseEnd() - cm.GetConstReverseBegin(), 5);
 }
