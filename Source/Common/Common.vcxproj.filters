@@ -117,6 +117,9 @@
     <ClInclude Include="Public\Concurrent\Atomic.hpp">
       <Filter>Public\Concurrent</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\Map.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

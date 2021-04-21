@@ -1587,12 +1587,12 @@ namespace SpaceGameEngine
 			friend StringCore;
 			friend ReverseIteratorImpl<_T>;
 
-			inline static IteratorImpl GetBegin(const StringCore& str)
+			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const StringCore&, StringCore&> str)
 			{
 				return IteratorImpl(const_cast<_T*>(str.GetData()));
 			}
 
-			inline static IteratorImpl GetEnd(const StringCore& str)
+			inline static IteratorImpl GetEnd(std::conditional_t<std::is_const_v<_T>, const StringCore&, StringCore&> str)
 			{
 				return IteratorImpl(const_cast<_T*>(str.GetData()) + str.GetNormalSize());
 			}
@@ -1822,7 +1822,7 @@ namespace SpaceGameEngine
 			friend OutOfRangeError;
 			friend StringCore;
 
-			inline static ReverseIteratorImpl GetBegin(const StringCore& str)
+			inline static ReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const StringCore&, StringCore&> str)
 			{
 				if constexpr (!Trait::IsMultipleByte)
 					return ReverseIteratorImpl(const_cast<_T*>(str.GetData()) + str.GetNormalSize() - 1);
@@ -1830,7 +1830,7 @@ namespace SpaceGameEngine
 					return ReverseIteratorImpl(const_cast<_T*>(StringImplement::GetPreviousMultipleByteChar<std::remove_const_t<_T>, Trait>(str.GetData() + str.GetNormalSize())));
 			}
 
-			inline static ReverseIteratorImpl GetEnd(const StringCore& str)
+			inline static ReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<_T>, const StringCore&, StringCore&> str)
 			{
 				if constexpr (!Trait::IsMultipleByte)
 					return ReverseIteratorImpl(const_cast<_T*>(str.GetData()) - 1);

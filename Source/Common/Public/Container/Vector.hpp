@@ -20,7 +20,6 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Error.h"
 #include "ContainerConcept.hpp"
-#include "Function.hpp"
 #include "ReverseSequentialIterator.hpp"
 
 namespace SpaceGameEngine
@@ -716,12 +715,12 @@ namespace SpaceGameEngine
 			friend Vector;
 			friend ReverseSequentialIterator<IteratorImpl<_T>>;
 
-			inline static IteratorImpl GetBegin(const Vector& v)
+			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
 				return IteratorImpl(reinterpret_cast<_T*>(v.m_pContent));
 			}
 
-			inline static IteratorImpl GetEnd(const Vector& v)
+			inline static IteratorImpl GetEnd(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
 				return IteratorImpl(reinterpret_cast<_T*>(v.m_pContent) + v.m_Size);
 			}
@@ -866,12 +865,12 @@ namespace SpaceGameEngine
 			friend OutOfRangeError;
 			friend Vector;
 
-			inline static VectorReverseIteratorImpl GetBegin(const Vector& v)
+			inline static VectorReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<ValueType>, const Vector&, Vector&> v)
 			{
 				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) + v.m_Size - 1);
 			}
 
-			inline static VectorReverseIteratorImpl GetEnd(const Vector& v)
+			inline static VectorReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<ValueType>, const Vector&, Vector&> v)
 			{
 				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) - 1);
 			}
@@ -1674,8 +1673,8 @@ namespace SpaceGameEngine
 		@note use normal O(n) algorithm.
 		@return the iterator which points to the first matching element, return end iterator if no matching.
 		*/
-		template<typename FunctionAllocator>
-		inline Iterator FindByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func)
+		template<typename Callable>
+		inline Iterator FindByFunction(Callable&& judge_func)
 		{
 			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
 			{
@@ -1692,8 +1691,8 @@ namespace SpaceGameEngine
 		@note use normal O(n) algorithm.
 		@return the iterator which points to the first matching element, return end iterator if no matching.
 		*/
-		template<typename FunctionAllocator>
-		inline ConstIterator FindByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func) const
+		template<typename Callable>
+		inline ConstIterator FindByFunction(Callable&& judge_func) const
 		{
 			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
 			{
@@ -1709,8 +1708,8 @@ namespace SpaceGameEngine
 		@brief find elements in this Vector which their value are equal to the given value and invoke the processing function with the each element as the argument.
 		@note use normal O(n) algorithm.
 		*/
-		template<typename FunctionAllocator>
-		inline void FindAll(const T& val, const Function<void(T&), FunctionAllocator>& process_func)
+		template<typename Callable>
+		inline void FindAll(const T& val, Callable&& process_func)
 		{
 			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
 			{
@@ -1725,8 +1724,8 @@ namespace SpaceGameEngine
 		@brief find elements in this Vector which their value are equal to the given value and invoke the processing function with the each element as the argument.
 		@note use normal O(n) algorithm.
 		*/
-		template<typename FunctionAllocator>
-		inline void FindAll(const T& val, const Function<void(const T&), FunctionAllocator>& process_func) const
+		template<typename Callable>
+		inline void FindAll(const T& val, Callable&& process_func) const
 		{
 			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
 			{
@@ -1741,8 +1740,8 @@ namespace SpaceGameEngine
 		@brief find elements in this Vector when invoking the given judge function by using them as the argument can get result true and then invoke the processing function with the each element as the argument.
 		@note use normal O(n) algorithm.
 		*/
-		template<typename FunctionAllocator, typename AnotherFunctionAllocator>
-		inline void FindAllByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func, const Function<void(T&), AnotherFunctionAllocator>& process_func)
+		template<typename Callable1, typename Callable2>
+		inline void FindAllByFunction(Callable1&& judge_func, Callable2&& process_func)
 		{
 			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
 			{
@@ -1757,8 +1756,8 @@ namespace SpaceGameEngine
 		@brief find elements in this Vector when invoking the given judge function by using them as the argument can get result true and then invoke the processing function with the each element as the argument.
 		@note use normal O(n) algorithm.
 		*/
-		template<typename FunctionAllocator, typename AnotherFunctionAllocator>
-		inline void FindAllByFunction(const Function<bool(const T&), FunctionAllocator>& judge_func, const Function<void(const T&), AnotherFunctionAllocator>& process_func) const
+		template<typename Callable1, typename Callable2>
+		inline void FindAllByFunction(Callable1&& judge_func, Callable2&& process_func) const
 		{
 			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
 			{

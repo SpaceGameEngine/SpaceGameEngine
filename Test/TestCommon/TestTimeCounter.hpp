@@ -47,14 +47,14 @@ TEST(TimeImplement, GetNowTimeTest)
 	TimeType t2 = SpaceGameEngine::TimeImplement::GetNowTime();
 
 	ASSERT_GT(t2, t1);
-	ASSERT_GE(t2 - t1, 1000);
+	ASSERT_GE(t2 - t1, 900);
 
 	TimeType t3 = SpaceGameEngine::TimeImplement::GetNowTime();
 	SleepFor(10000);
 	TimeType t4 = SpaceGameEngine::TimeImplement::GetNowTime();
 
 	ASSERT_GT(t4, t3);
-	ASSERT_GE(t4 - t3, 10000);
+	ASSERT_GE(t4 - t3, 9000);
 }
 #endif
 
@@ -68,14 +68,14 @@ TEST(TimeImplement, GetNowTimeTest)
 	TimeType t2 = SpaceGameEngine::TimeImplement::GetNowTime();
 
 	ASSERT_GT(t2, t1);
-	ASSERT_GE(t2 - t1, 1000);
+	ASSERT_GE(t2 - t1, 900);
 
 	TimeType t3 = SpaceGameEngine::TimeImplement::GetNowTime();
 	SleepFor(10000);
 	TimeType t4 = SpaceGameEngine::TimeImplement::GetNowTime();
 
 	ASSERT_GT(t4, t3);
-	ASSERT_GE(t4 - t3, 10000);
+	ASSERT_GE(t4 - t3, 9000);
 }
 #endif
 
@@ -86,7 +86,7 @@ TEST(TimeCounter, GetNowTimeTest)
 	TimeType t2 = SpaceGameEngine::GetNowTime();
 
 	ASSERT_GT(t2, t1);
-	ASSERT_GE(t2 - t1, 1000000);
+	ASSERT_GE(t2 - t1, 950000);
 	ASSERT_LT(t2 - t1, 1500000);
 }
 
@@ -110,7 +110,7 @@ TEST(TimeStamp, GetNowTimeStampTest)
 	auto t2 = GetNowTimeStamp<Second, double>();
 
 	ASSERT_GT(t2.GetValue(), t1.GetValue());
-	ASSERT_GE(t2.GetValue() - t1.GetValue(), 1.5);
+	ASSERT_GE(t2.GetValue() - t1.GetValue(), 1.4);
 }
 
 TEST(TimeStamp, MinusTest)
@@ -123,7 +123,7 @@ TEST(TimeStamp, MinusTest)
 
 	auto td1 = t2 - t1;
 	ASSERT_TRUE((std::is_same_v<decltype(td1), TimeDuration<Second, double>>));
-	ASSERT_GE(td1.GetValue(), 1.5);
+	ASSERT_GE(td1.GetValue(), 1.4);
 	ASSERT_LT(td1.GetValue(), 100);
 }
 
@@ -198,7 +198,7 @@ TEST(TimeDuration, SleepForTest)
 	TimeStamp<Microsecond, TimeType> t2 = GetNowTimeStamp<Microsecond, TimeType>();
 
 	ASSERT_GT(t2.GetValue(), t1.GetValue());
-	ASSERT_GE(t2.GetValue() - t1.GetValue(), 1500000);
+	ASSERT_GE(t2.GetValue() - t1.GetValue(), 1490000);
 	ASSERT_LT(t2.GetValue() - t1.GetValue(), 100000000);
 }
 
@@ -222,7 +222,7 @@ TEST(TimeCounter, AllTest)
 		SleepFor(MakeTimeDuration<Second, float>(0.5f));
 		tc.Tick();
 		auto dt = tc.GetDeltaTime();
-		ASSERT_GE(dt, 0.5f);
+		ASSERT_GE(dt, 0.45f);
 		ASSERT_LT(dt, 1.0f);
 	}
 }

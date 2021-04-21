@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "ForwardDefinition.hpp"
+#include "Meta/Trait.hpp"
 #include <utility>
 
 namespace SpaceGameEngine
@@ -26,11 +27,11 @@ namespace SpaceGameEngine
 
 	struct Uncopyable
 	{
-		Uncopyable() = default;
-		Uncopyable(const Uncopyable&) = delete;
-		Uncopyable(Uncopyable&&) = delete;
-		Uncopyable& operator=(const Uncopyable&) = delete;
-		Uncopyable& operator=(Uncopyable&&) = delete;
+		inline Uncopyable() = default;
+		inline Uncopyable(const Uncopyable&) = delete;
+		inline Uncopyable(Uncopyable&&) = delete;
+		inline Uncopyable& operator=(const Uncopyable&) = delete;
+		inline Uncopyable& operator=(Uncopyable&&) = delete;
 	};
 
 	/*!
@@ -53,30 +54,27 @@ namespace SpaceGameEngine
 	template<typename T, typename U>
 	struct Pair
 	{
-		Pair() = default;
-		explicit Pair(const T& t, const U& u)
-			: m_First(t), m_Second(u)
+		inline Pair() = default;
+		template<typename T2, typename U2>
+		inline Pair(T2&& t, U2&& u)
+			: m_First(std::forward<T2>(t)), m_Second(std::forward<U2>(u))
 		{
 		}
-		explicit Pair(T&& t, U&& u)
-			: m_First(t), m_Second(u)
-		{
-		}
-		Pair(const Pair<T, U>& c)
+		inline Pair(const Pair<T, U>& c)
 			: Pair(c.m_First, c.m_Second)
 		{
 		}
-		Pair(Pair<T, U>&& c)
+		inline Pair(Pair<T, U>&& c)
 			: Pair(std::move(c.m_First), std::move(c.m_Second))
 		{
 		}
-		Pair<T, U>& operator=(const Pair<T, U>& c)
+		inline Pair<T, U>& operator=(const Pair<T, U>& c)
 		{
 			m_First = c.m_First;
 			m_Second = c.m_Second;
 			return *this;
 		}
-		Pair<T, U>& operator=(Pair<T, U>&& c)
+		inline Pair<T, U>& operator=(Pair<T, U>&& c)
 		{
 			m_First = std::move(c.m_First);
 			m_Second = std::move(c.m_Second);
@@ -97,6 +95,15 @@ namespace SpaceGameEngine
 	{
 		return (a > b ? a : b);
 	}
+
+	template<typename T>
+	struct Less
+	{
+		inline static constexpr bool IsLess(const T& lhs, const T& rhs)
+		{
+			return lhs < rhs;
+		}
+	};
 	/*!
 	@}
 	*/

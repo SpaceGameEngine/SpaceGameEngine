@@ -26,6 +26,7 @@ limitations under the License.
 #include "TestRange.hpp"
 #include "TestMeta.hpp"
 #include "TestTimeCounter.hpp"
+#include "TestMap.hpp"
 
 int main(int argc, char** argv)
 {
