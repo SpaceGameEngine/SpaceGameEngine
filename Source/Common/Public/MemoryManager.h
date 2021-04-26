@@ -18,6 +18,7 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "Error.h"
 #include "Platform.hpp"
+#include "Concurrent/Lock.h"
 
 namespace SpaceGameEngine
 {
@@ -155,6 +156,8 @@ namespace SpaceGameEngine
 			SizeType m_MemoryBlockSize;
 			SizeType m_MemoryPageSize;
 			SizeType m_Alignment;
+
+			Mutex m_Mutex;
 		};
 
 	public:

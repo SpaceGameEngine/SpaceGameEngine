@@ -104,7 +104,8 @@ namespace SpaceGameEngine
 	/*!\brief Class SpaceGameEngine::Condition is a wrapper of a std::condition_variable_any
 	 *
 	 * SGE::Condition's Wait/WaitFor functions only accept SGE::RecursiveLock instead of any Lockable
-	 * object in std::condition_variable_any's corresponding functions.
+	 * object in std::condition_variable_any's corresponding functions. You need to lock the RecursiveLock
+	 * before you use it as a argument to call the Wait/WaitFor functions.
 	 *
 	 * Checkout c++ reference for more details.
 	 */
@@ -123,25 +124,37 @@ namespace SpaceGameEngine
 
 		void NodifyAll();
 
+		/*!
+		@warning The lock need to be locked before invoking the function.
+		*/
 		void Wait(RecursiveLock& lock);
 
+		/*!
+		@warning The lock need to be locked before invoking the function.
+		*/
 		template<typename Callable>
 		inline void Wait(RecursiveLock& lock, Callable&& pred)
 		{
 			m_ConditionImpl.wait(lock.m_LockImpl, std::forward<Callable>(pred));
 		}
 
+		/*!
+		@warning The lock need to be locked before invoking the function.
+		*/
 		template<UInt64 TimeUnit, typename T>
 		bool WaitFor(RecursiveLock& lock, const TimeDuration<TimeUnit, T>& rel_time)
 		{
-			return m_ConditionImpl.wait_for(lock, std::chrono::microseconds(rel_time.GetTime())) == std::cv_status::no_timeout;
+			return m_ConditionImpl.wait_for(lock.m_LockImpl, std::chrono::microseconds(rel_time.GetTime())) == std::cv_status::no_timeout;
 		}
 
+		/*!
+		@warning The lock need to be locked before invoking the function.
+		*/
 		template<UInt64 TimeUnit, typename T, typename Callable>
 		bool WaitFor(RecursiveLock& lock, const TimeDuration<TimeUnit, T>& rel_time,
 					 Callable&& pred)
 		{
-			return m_ConditionImpl.wait_for(lock, std::chrono::microseconds(rel_time.GetTime()), std::forward<Callable>(pred));
+			return m_ConditionImpl.wait_for(lock.m_LockImpl, std::chrono::microseconds(rel_time.GetTime()), std::forward<Callable>(pred));
 		}
 
 	private:
