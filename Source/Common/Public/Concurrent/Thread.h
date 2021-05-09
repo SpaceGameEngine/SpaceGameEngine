@@ -84,7 +84,10 @@ namespace SpaceGameEngine
 
 		ThreadID GetThreadID() const noexcept;
 
-		static UInt32 HardwareConcurrency() noexcept;
+		/*!
+		@brief Query the hardware concurrency of the machine, may return 0 if failed to get this value.
+		*/
+		static SizeType QueryHardwareConcurrency() noexcept;
 
 		static void YieldCurrentThread() noexcept;
 

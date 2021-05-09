@@ -25,13 +25,13 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	struct Uncopyable
+	struct UncopyableAndUnmovable
 	{
-		inline Uncopyable() = default;
-		inline Uncopyable(const Uncopyable&) = delete;
-		inline Uncopyable(Uncopyable&&) = delete;
-		inline Uncopyable& operator=(const Uncopyable&) = delete;
-		inline Uncopyable& operator=(Uncopyable&&) = delete;
+		inline UncopyableAndUnmovable() = default;
+		inline UncopyableAndUnmovable(const UncopyableAndUnmovable&) = delete;
+		inline UncopyableAndUnmovable(UncopyableAndUnmovable&&) = delete;
+		inline UncopyableAndUnmovable& operator=(const UncopyableAndUnmovable&) = delete;
+		inline UncopyableAndUnmovable& operator=(UncopyableAndUnmovable&&) = delete;
 	};
 
 	/*!

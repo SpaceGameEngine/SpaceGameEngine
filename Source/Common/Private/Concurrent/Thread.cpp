@@ -68,7 +68,7 @@ SpaceGameEngine::ThreadID SpaceGameEngine::Thread::GetThreadID() const noexcept
 	return m_ThreadImpl.get_id();
 }
 
-SpaceGameEngine::UInt32 SpaceGameEngine::Thread::HardwareConcurrency() noexcept
+SpaceGameEngine::SizeType SpaceGameEngine::Thread::QueryHardwareConcurrency() noexcept
 {
 	return std::thread::hardware_concurrency();
 }

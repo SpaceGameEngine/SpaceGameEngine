@@ -104,7 +104,7 @@ namespace SpaceGameEngine
 	};
 
 	template<typename ErrorType>
-	struct Assert : public Uncopyable
+	struct Assert : public UncopyableAndUnmovable
 	{
 	public:
 		inline Assert() = delete;
@@ -143,7 +143,7 @@ namespace SpaceGameEngine
 	};
 
 	template<typename ErrorType>
-	struct Check : public Uncopyable
+	struct Check : public UncopyableAndUnmovable
 	{
 	public:
 		inline Check() = delete;

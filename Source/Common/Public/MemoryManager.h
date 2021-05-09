@@ -18,7 +18,9 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "Error.h"
 #include "Platform.hpp"
+#include "Concurrent/Thread.h"
 #include "Concurrent/Lock.h"
+#include "Concurrent/Atomic.hpp"
 
 namespace SpaceGameEngine
 {
@@ -86,7 +88,7 @@ namespace SpaceGameEngine
 	on the current condition.
 	@todo add mutexs for fixedsizeallocators
 	*/
-	class MemoryManager : public Uncopyable, public Singleton<MemoryManager>
+	class MemoryManager : public UncopyableAndUnmovable, public Singleton<MemoryManager>
 	{
 	public:
 		/*!
@@ -127,13 +129,13 @@ namespace SpaceGameEngine
 		can allocate must be set by calling FixedSizeAllocator::Init method
 		@attention must call FixedSizeAllocator::Init method after instancing before using
 		*/
-		class FixedSizeAllocator : public Uncopyable
+		class FixedSizeAllocator : public UncopyableAndUnmovable
 		{
 		public:
 			/*!
 			@attention the alignment argument can not be 0.
 			*/
-			explicit FixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
+			FixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
 			~FixedSizeAllocator();
 
 			void* Allocate();
@@ -158,6 +160,24 @@ namespace SpaceGameEngine
 			SizeType m_Alignment;
 
 			Mutex m_Mutex;
+		};
+
+		class MultiThreadBufferedFixedSizeAllocator : public FixedSizeAllocator
+		{
+		public:
+			MultiThreadBufferedFixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
+			~MultiThreadBufferedFixedSizeAllocator();
+
+			void* Allocate();
+			void Free(void* ptr);
+
+		private:
+			inline static const SizeType sm_PreAllocationBufferQuantity = 2 * (Thread::QueryHardwareConcurrency() != 0 ? Thread::QueryHardwareConcurrency() : 1);
+			inline static const SizeType sm_FreeBufferQuantity = 8 * (Thread::QueryHardwareConcurrency() != 0 ? Thread::QueryHardwareConcurrency() : 1);
+
+			OnceFlag m_OnceFlag;
+			Atomic<void*>* m_pPreAllocationBuffer;
+			Atomic<void*>* m_pFreeBuffer;
 		};
 
 	public:
