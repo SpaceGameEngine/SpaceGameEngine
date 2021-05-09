@@ -112,7 +112,7 @@ TEST(MemoryManager, FixedSizeAllocatorMultiThreadTest)
 {
 	MemoryManager::FixedSizeAllocator test(4, 0xffff, 4);
 
-	const int test_size = 128;
+	const int test_size = 64;
 	Thread ts[test_size];
 	Mutex mutex[test_size];
 	AddressType res[test_size];
@@ -158,7 +158,7 @@ TEST(MemoryManager, MultiThreadBufferedFixedSizeAllocatorMultiThreadTest)
 {
 	MemoryManager::MultiThreadBufferedFixedSizeAllocator test(4, 0xffff, 4);
 
-	const int test_size = 128;
+	const int test_size = 64;
 	Thread ts[test_size];
 	Mutex mutex[test_size];
 	AddressType res[test_size];
