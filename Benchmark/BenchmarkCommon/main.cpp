@@ -6,5 +6,6 @@
 #include "BenchmarkFunction.hpp"
 #include "BenchmarkString.hpp"
 #include "BenchmarkMap.hpp"
+#include "BenchmarkAllocator.hpp"
 
 BENCHMARK_MAIN();
