@@ -224,7 +224,7 @@ namespace SpaceGameEngine
 		*/
 		inline static const SizeType sm_MaxFixedSizeAllocatorQuantity = 262273;
 		inline static const SizeType sm_MaxMemoryBlockSize = 1024;
-		inline static const SizeType sm_MemoryPageSize = 8192;
+		inline static const SizeType sm_MemoryPageSize = 65536;
 
 		FixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
 	};
