@@ -15,7 +15,10 @@ limitations under the License.
 */
 #pragma once
 #include "MemoryManager.h"
+#include "Concurrent/Thread.h"
+#include "Concurrent/Lock.h"
 #include "gtest/gtest.h"
+#include <unordered_map>
 
 using namespace SpaceGameEngine;
 
@@ -103,6 +106,98 @@ TEST(MemoryManager, FixedSizeAllocatorTest)
 	Int32* pint2 = (Int32*)test.Allocate();
 	ASSERT_EQ(pint, pint2);
 	test.Free(pint2);
+}
+
+TEST(MemoryManager, FixedSizeAllocatorMultiThreadTest)
+{
+	MemoryManager::FixedSizeAllocator test(4, 0xffff, 4);
+
+	const int test_size = 64;
+	Thread ts[test_size];
+	Mutex mutex[test_size];
+	AddressType res[test_size];
+	memset(res, 0, sizeof(res));
+	Condition start_c;
+	bool is_start = false;
+	for (int i = 0; i < test_size; i++)
+	{
+		ts[i] = std::move(Thread(
+			[&](int idx) {
+				RecursiveLock lock(mutex[idx]);
+				lock.Lock();
+				start_c.Wait(lock, [&]() { return is_start; });
+				res[idx] = (AddressType)test.Allocate();
+				*((Int32*)res[idx]) = idx;
+			},
+			i));
+	}
+	is_start = true;
+	start_c.NodifyAll();
+	for (int i = 0; i < test_size; i++)
+	{
+		ts[i].Join();
+	}
+	std::unordered_map<AddressType, int> cnt;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_TRUE(res[i] != 0);
+		ASSERT_EQ(*((Int32*)res[i]), i);
+		cnt[res[i]] += 1;
+	}
+	for (const auto& i : cnt)
+	{
+		ASSERT_TRUE(i.second == 1);
+	}
+	for (int i = 0; i < test_size; i++)
+	{
+		test.Free((void*)res[i]);
+	}
+}
+
+TEST(MemoryManager, MultiThreadBufferedFixedSizeAllocatorMultiThreadTest)
+{
+	MemoryManager::MultiThreadBufferedFixedSizeAllocator test(4, 0xffff, 4);
+
+	const int test_size = 64;
+	Thread ts[test_size];
+	Mutex mutex[test_size];
+	AddressType res[test_size];
+	memset(res, 0, sizeof(res));
+	Condition start_c;
+	bool is_start = false;
+	for (int i = 0; i < test_size; i++)
+	{
+		ts[i] = std::move(Thread(
+			[&](int idx) {
+				RecursiveLock lock(mutex[idx]);
+				lock.Lock();
+				start_c.Wait(lock, [&]() { return is_start; });
+				res[idx] = (AddressType)test.Allocate();
+				*((Int32*)res[idx]) = idx;
+			},
+			i));
+	}
+	is_start = true;
+	start_c.NodifyAll();
+	for (int i = 0; i < test_size; i++)
+	{
+		ts[i].Join();
+	}
+	std::unordered_map<AddressType, int> cnt;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_TRUE(res[i] != 0);
+		ASSERT_EQ(*((Int32*)res[i]), i);
+		cnt[res[i]] += 1;
+	}
+	for (const auto& i : cnt)
+	{
+		ASSERT_TRUE(i.second == 1);
+	}
+	for (int i = 0; i < test_size; i++)
+	{
+		test.Free((void*)res[i]);
+	}
 }
 
 TEST(MemoryManager, IndexConvertTest)

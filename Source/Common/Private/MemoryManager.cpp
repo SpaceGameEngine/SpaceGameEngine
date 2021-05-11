@@ -78,6 +78,8 @@ SpaceGameEngine::MemoryManager::FixedSizeAllocator::~FixedSizeAllocator()
 
 void* SpaceGameEngine::MemoryManager::FixedSizeAllocator::Allocate()
 {
+	RecursiveLock lock(m_Mutex);
+	lock.Lock();
 	if (!m_pFreeMemoryBlocks)
 	{
 		MemoryPageHeader* pNewPage = reinterpret_cast<MemoryPageHeader*>(new Byte[m_MemoryPageSize]);
@@ -108,6 +110,8 @@ void* SpaceGameEngine::MemoryManager::FixedSizeAllocator::Allocate()
 
 void SpaceGameEngine::MemoryManager::FixedSizeAllocator::Free(void* ptr)
 {
+	RecursiveLock lock(m_Mutex);
+	lock.Lock();
 	SGE_ASSERT(NullPointerError, ptr);
 	MemoryBlockHeader* pBlock = reinterpret_cast<MemoryBlockHeader*>(ptr);
 	pBlock->m_pNext = m_pFreeMemoryBlocks;
@@ -216,4 +220,64 @@ void SpaceGameEngine::MemoryManagerAllocator::RawDelete(void* ptr, SizeType size
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
 	MemoryManager::GetSingleton().Free(ptr, size, alignment == 0 ? GetDefaultAlignment(size) : alignment);
+}
+
+SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::MultiThreadBufferedFixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment)
+	: FixedSizeAllocator(alloc_mem_size, page_mem_size, alignment), m_pPreAllocationBuffer(new Atomic<void*>[sm_PreAllocationBufferQuantity]), m_pFreeBuffer(new Atomic<void*>[sm_FreeBufferQuantity])
+{
+	for (SizeType i = 0; i < sm_FreeBufferQuantity; ++i)
+		m_pFreeBuffer[i].Store(nullptr, MemoryOrder::Release);
+}
+
+SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::~MultiThreadBufferedFixedSizeAllocator()
+{
+	//Do not need to free the pre-allocated result in buffer.
+	//The FixedSizeAllocator will release them by releasing the whole Memory Pages.
+
+	delete[] m_pPreAllocationBuffer;
+	delete[] m_pFreeBuffer;
+}
+
+void* SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::Allocate()
+{
+	CallOnce(m_OnceFlag, [this]() {
+		for (SizeType i = 0; i < sm_PreAllocationBufferQuantity; ++i)
+			m_pPreAllocationBuffer[i].Store(FixedSizeAllocator::Allocate(), MemoryOrder::Release);
+	});
+
+	void* re = nullptr;
+	SizeType idx = 0;
+	while ((re = m_pPreAllocationBuffer[(idx = (idx + 1) % sm_PreAllocationBufferQuantity)].Exchange(nullptr, MemoryOrder::AcquireRelease)) == nullptr)
+	{
+		Thread::YieldCurrentThread();
+	}
+	Thread t(
+		[this, idx]() {
+			void* buf = nullptr;
+			for (SizeType i = 0; i < sm_FreeBufferQuantity; ++i)
+			{
+				buf = m_pFreeBuffer[i].Exchange(nullptr, MemoryOrder::AcquireRelease);
+				if (buf != nullptr)
+				{
+					m_pPreAllocationBuffer[idx].Store(buf, MemoryOrder::Release);
+					return;
+				}
+			}
+			m_pPreAllocationBuffer[idx].Store(FixedSizeAllocator::Allocate(), MemoryOrder::Release);
+		});
+	t.Detach();
+	return re;
+}
+
+void SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::Free(void* ptr)
+{
+	SGE_ASSERT(NullPointerError, ptr);
+	void* buf = ptr;
+	for (SizeType i = 0; i < sm_FreeBufferQuantity; ++i)
+	{
+		buf = m_pFreeBuffer[i].Exchange(buf, MemoryOrder::AcquireRelease);
+		if (buf == nullptr)
+			return;
+	}
+	FixedSizeAllocator::Free(buf);
 }

@@ -166,11 +166,9 @@
     <ProjectReference Include="..\..\ThirdParty\GoogleBenchmark\GoogleBenchmark.vcxproj">
       <Project>{d8691b82-5bb1-4351-81a5-7a2cb374fd6e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\ThirdParty\GoogleTest\GoogleTest.vcxproj">
-      <Project>{d7662b21-f269-400c-95c2-3b498e34de38}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BenchmarkAllocator.hpp" />
     <ClInclude Include="BenchmarkFunction.hpp" />
     <ClInclude Include="BenchmarkMap.hpp" />
     <ClInclude Include="BenchmarkString.hpp" />
