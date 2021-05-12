@@ -25,6 +25,15 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	template<typename T>
+	struct Hash
+	{
+		inline static SizeType GetHash(const T& val)
+		{
+			return std::hash<T>()(val);
+		}
+	};
+
 	/*!
 	@}
 	*/
