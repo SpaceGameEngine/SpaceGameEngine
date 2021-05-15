@@ -17,6 +17,7 @@ limitations under the License.
 #include <initializer_list>
 #include "MemoryManager.h"
 #include "Utility/Utility.hpp"
+#include "Map.hpp"
 
 namespace SpaceGameEngine
 {
@@ -32,6 +33,44 @@ namespace SpaceGameEngine
 		{
 			return std::hash<T>()(val);
 		}
+	};
+
+	template<typename K, typename V, typename Hasher = Hash<K>, typename LessComparer = Less<K>, typename Allocator = DefaultAllocator>
+	class HashMap
+	{
+	public:
+		using KeyType = const K;
+		using ValueType = V;
+		using AllocatorType = Allocator;
+		using HasherType = Hasher;
+		using LessComparerType = LessComparer;
+
+		inline static constexpr const float sm_DefaultLoadFactor = 1.0f;
+		inline static constexpr const SizeType sm_DefaultArraySize = 16;
+		inline static constexpr const SizeType sm_RedBlackTreeListSizeBound = 8;
+		inline static constexpr const SizeType sm_RedBlackTreeArraySizeBound = 64;
+
+	private:
+		struct Bucket
+		{
+		};
+
+	public:
+		inline HashMap()
+			: m_LoadFactor(sm_DefaultLoadFactor), m_ArraySize(sm_DefaultArraySize), m_pContent(Allocator::RawNew(m_ArraySize * sizeof(Bucket), alignof(Bucket))), m_Size(0)
+		{
+		}
+
+		inline ~HashMap()
+		{
+			Allocator::RawDelete(m_pContent, m_ArraySize * sizeof(Bucket), alignof(Bucket));
+		}
+
+	private:
+		float m_LoadFactor;
+		SizeType m_ArraySize;
+		Bucket m_pContent;
+		SizeType m_Size;
 	};
 
 	/*!
