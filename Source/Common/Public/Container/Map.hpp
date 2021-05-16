@@ -39,6 +39,12 @@ namespace SpaceGameEngine
 			using AllocatorType = Allocator;
 			using LessComparerType = LessComparer;
 
+			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
+			friend class RedBlackTree;
+
+			friend class Map<K, V, LessComparer, Allocator>;
+
+		private:
 			struct Node
 			{
 				Node* m_pParent;
@@ -73,11 +79,6 @@ namespace SpaceGameEngine
 					return pn == pnil;
 				}
 			};
-
-			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
-			friend class RedBlackTree;
-
-			friend class Map<K, V, LessComparer, Allocator>;
 
 		public:
 			inline RedBlackTree()

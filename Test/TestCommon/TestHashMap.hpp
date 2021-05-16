@@ -19,7 +19,12 @@ limitations under the License.
 
 TEST(Hash, HashTest)
 {
-	SizeType std_hash_re = std::hash<int>()(12345);
-	SizeType sge_hash_re = SpaceGameEngine::Hash<int>::GetHash(12345);
+	HashType std_hash_re = std::hash<int>()(12345);
+	HashType sge_hash_re = SpaceGameEngine::Hash<int>::GetHash(12345);
 	ASSERT_EQ(std_hash_re, sge_hash_re);
+}
+
+TEST(HashMap, InstanceTest)
+{
+	HashMap<int, int> hm1;
 }
