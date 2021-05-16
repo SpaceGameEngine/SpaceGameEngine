@@ -58,20 +58,21 @@ namespace SpaceGameEngine
 				HashType m_HashValue;
 				Pair<const K, V> m_KeyValuePair;
 				Node* m_pNext;
+				Node* m_pPrevious;
 
 				inline Node()
-					: m_HashValue(0), m_KeyValuePair(K(), V()), m_pNext(nullptr)
+					: m_HashValue(0), m_KeyValuePair(K(), V()), m_pNext(nullptr), m_pPrevious(nullptr)
 				{
 				}
 				template<typename K2, typename V2>
 				inline Node(K2&& key, V2&& val)
-					: m_HashValue(0), m_KeyValuePair(std::forward<K2>(key), std::forward<V2>(val)), m_pNext(nullptr)
+					: m_HashValue(0), m_KeyValuePair(std::forward<K2>(key), std::forward<V2>(val)), m_pNext(nullptr), m_pPrevious(nullptr)
 				{
 				}
 
 				template<typename P>
 				inline explicit Node(P&& p)
-					: m_HashValue(0), m_KeyValuePair(std::forward<P>(p)), m_pNext(nullptr)
+					: m_HashValue(0), m_KeyValuePair(std::forward<P>(p)), m_pNext(nullptr), m_pPrevious(nullptr)
 				{
 				}
 			};
@@ -93,7 +94,7 @@ namespace SpaceGameEngine
 				}
 			}
 
-			inline Node* Find(HashType hash_value, const K& key)
+			inline Node* FindNode(HashType hash_value, const K& key)
 			{
 				Node* pnow = m_pHead;
 				while (pnow != nullptr)
@@ -105,7 +106,7 @@ namespace SpaceGameEngine
 				return nullptr;
 			}
 
-			inline Node* Find(HashType hash_value, const K& key) const
+			inline Node* FindNode(HashType hash_value, const K& key) const
 			{
 				const Node* pnow = m_pHead;
 				while (pnow != nullptr)
@@ -133,8 +134,72 @@ namespace SpaceGameEngine
 				p = Allocator::template New(std::forward<K2>(key), std::forward<V2>(val));
 				p->m_HashValue = hash_value;
 				p->m_pNext = m_pHead;
+				m_pHead->m_pPrevious = p;
 				m_pHead = p;
 				return Pair<Node*, bool>(p, true);
+			}
+
+			inline void RemoveNode(Node* p)
+			{
+				SGE_ASSERT(NullPointerError, p);
+				if (p->m_pPrevious == nullptr)
+				{
+					m_pHead = p->m_pNext;
+					if (m_pHead)
+					{
+						m_pHead->m_pPrevious = nullptr;
+					}
+				}
+				else if (p->m_pNext == nullptr)
+				{
+					p->m_pPrevious->m_pNext = nullptr;
+				}
+				else
+				{
+					p->m_pPrevious->m_pNext = p->m_pNext;
+					p->m_pNext->m_pPrevious = p->m_pPrevious;
+				}
+				Allocator::Delete(p);
+			}
+
+			inline bool RemoveByKey(HashType hash_value, const K& key)
+			{
+				Node* p = FindNode(hash_value, key);
+				if (p != nullptr)
+				{
+					RemoveNode(p);
+					return true;
+				}
+				else
+					return false;
+			}
+
+			inline void Rehash(Bucket* nbs, SizeType nbs_size)
+			{
+				SGE_ASSERT(NullPointerError, nbs);
+				SGE_ASSERT(InvalidSizeError, nbs_size, 1, SGE_MAX_MEMORY_SIZE / sizeof(Bucket));
+				Node* pnow = m_pHead;
+				while (pnow != nullptr)
+				{
+					SizeType nidx = pnow->m_HashValue & (nbs_size - 1);
+					Node* pb = pnow;
+					pnow = pnow->m_pNext;
+
+					if (nbs[nidx].m_pHead == nullptr)
+					{
+						nbs[nidx].m_pHead = pb;
+						pb->m_pPrevious = nullptr;
+						pb->m_pNext = nullptr;
+					}
+					else
+					{
+						pb->m_pNext = nbs[nidx].m_pHead;
+						nbs[nidx].m_pHead->m_pPrevious = pb;
+						pb->m_pPrevious = nullptr;
+						nbs[nidx].m_pHead = pb;
+					}
+				}
+				m_pHead = nullptr;
 			}
 
 		private:
