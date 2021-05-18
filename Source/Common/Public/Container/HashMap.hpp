@@ -94,6 +94,164 @@ namespace SpaceGameEngine
 				}
 			}
 
+			inline void Clear()
+			{
+				Node* pnow = m_pHead;
+				while (pnow != nullptr)
+				{
+					Node* pb = pnow;
+					pnow = pnow->m_pNext;
+					Allocator::template Delete(pb);
+				}
+				m_pHead = nullptr;
+			}
+
+			inline Bucket(const Bucket& b)
+			{
+				const Node* pn = b.m_pHead;
+				if (pn != nullptr)
+				{
+					m_pHead = Allocator::template New<Node>(pn->m_KeyValuePair);
+					m_pHead->m_HashValue = pn->m_HashValue;
+					pn = pn->m_pNext;
+					while (pn != nullptr)
+					{
+						Node* pb = Allocator::template New<Node>(pn->m_KeyValuePair);
+						pb->m_HashValue = pn->m_HashValue;
+						pb->m_pNext = m_pHead;
+						m_pHead->m_pPrevious = pb;
+						m_pHead = pb;
+						pn = pn->m_pNext;
+					}
+				}
+			}
+
+			inline Bucket(Bucket&& b)
+				: m_pHead(b.m_pHead)
+			{
+				b.m_pHead = nullptr;
+			}
+
+			inline Bucket& operator=(const Bucket& b)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &b);
+				Clear();
+				const Node* pn = b.m_pHead;
+				if (pn != nullptr)
+				{
+					m_pHead = Allocator::template New<Node>(pn->m_KeyValuePair);
+					m_pHead->m_HashValue = pn->m_HashValue;
+					pn = pn->m_pNext;
+					while (pn != nullptr)
+					{
+						Node* pb = Allocator::template New<Node>(pn->m_KeyValuePair);
+						pb->m_HashValue = pn->m_HashValue;
+						pb->m_pNext = m_pHead;
+						m_pHead->m_pPrevious = pb;
+						m_pHead = pb;
+						pn = pn->m_pNext;
+					}
+				}
+				return *this;
+			}
+
+			inline Bucket& operator=(Bucket&& b)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &b);
+				Clear();
+				m_pHead = b.m_pHead;
+				b.m_pHead = nullptr;
+				return *this;
+			}
+
+			template<typename OtherAllocator>
+			inline Bucket(const typename HashMap<K, V, Hasher, OtherAllocator>::Bucket& b)
+			{
+				const typename HashMap<K, V, Hasher, OtherAllocator>::Bucket::Node* pn = b.m_pHead;
+				if (pn != nullptr)
+				{
+					m_pHead = Allocator::template New<Node>(pn->m_KeyValuePair);
+					m_pHead->m_HashValue = pn->m_HashValue;
+					pn = pn->m_pNext;
+					while (pn != nullptr)
+					{
+						Node* pb = Allocator::template New<Node>(pn->m_KeyValuePair);
+						pb->m_HashValue = pn->m_HashValue;
+						pb->m_pNext = m_pHead;
+						m_pHead->m_pPrevious = pb;
+						m_pHead = pb;
+						pn = pn->m_pNext;
+					}
+				}
+			}
+
+			template<typename OtherAllocator>
+			inline Bucket(typename HashMap<K, V, Hasher, OtherAllocator>::Bucket&& b)
+			{
+				typename HashMap<K, V, Hasher, OtherAllocator>::Bucket::Node* pn = b.m_pHead;
+				if (pn != nullptr)
+				{
+					m_pHead = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
+					m_pHead->m_HashValue = pn->m_HashValue;
+					pn = pn->m_pNext;
+					while (pn != nullptr)
+					{
+						Node* pb = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
+						pb->m_HashValue = pn->m_HashValue;
+						pb->m_pNext = m_pHead;
+						m_pHead->m_pPrevious = pb;
+						m_pHead = pb;
+						pn = pn->m_pNext;
+					}
+				}
+			}
+
+			template<typename OtherAllocator>
+			inline Bucket& operator=(const typename HashMap<K, V, Hasher, OtherAllocator>::Bucket& b)
+			{
+				Clear();
+				const typename HashMap<K, V, Hasher, OtherAllocator>::Bucket::Node* pn = b.m_pHead;
+				if (pn != nullptr)
+				{
+					m_pHead = Allocator::template New<Node>(pn->m_KeyValuePair);
+					m_pHead->m_HashValue = pn->m_HashValue;
+					pn = pn->m_pNext;
+					while (pn != nullptr)
+					{
+						Node* pb = Allocator::template New<Node>(pn->m_KeyValuePair);
+						pb->m_HashValue = pn->m_HashValue;
+						pb->m_pNext = m_pHead;
+						m_pHead->m_pPrevious = pb;
+						m_pHead = pb;
+						pn = pn->m_pNext;
+					}
+				}
+				return *this;
+			}
+
+			template<typename OtherAllocator>
+			inline Bucket& operator=(typename HashMap<K, V, Hasher, OtherAllocator>::Bucket&& b)
+			{
+				Clear();
+				typename HashMap<K, V, Hasher, OtherAllocator>::Bucket::Node* pn = b.m_pHead;
+				if (pn != nullptr)
+				{
+					m_pHead = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
+					m_pHead->m_HashValue = pn->m_HashValue;
+					pn = pn->m_pNext;
+					while (pn != nullptr)
+					{
+						Node* pb = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
+						pb->m_HashValue = pn->m_HashValue;
+						pb->m_pNext = m_pHead;
+						m_pHead->m_pPrevious = pb;
+						m_pHead = pb;
+						pn = pn->m_pNext;
+					}
+				}
+				return *this;
+			}
+
 			inline Node* FindNode(HashType hash_value, const K& key)
 			{
 				Node* pnow = m_pHead;
