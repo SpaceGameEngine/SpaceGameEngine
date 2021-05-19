@@ -364,6 +364,16 @@ namespace SpaceGameEngine
 			Node* m_pHead;
 		};
 
+		struct ZeroLoadFactorError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The load factor can not be zero.");
+
+			inline static bool Judge(float load_factor)
+			{
+				return load_factor == 0;
+			}
+		};
+
 	public:
 		inline HashMap()
 			: m_LoadFactor(sm_DefaultLoadFactor), m_BucketQuantity(sm_DefaultBucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(0)
@@ -374,10 +384,130 @@ namespace SpaceGameEngine
 
 		inline ~HashMap()
 		{
-			for (SizeType i = 0; i < m_BucketQuantity; ++i)
-				m_pContent[i].~Bucket();
+			if (m_pContent)
+			{
+				for (SizeType i = 0; i < m_BucketQuantity; ++i)
+					m_pContent[i].~Bucket();
 
-			Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			}
+		}
+
+		inline void Clear()
+		{
+			if (m_pContent)
+			{
+				for (SizeType i = 0; i < m_BucketQuantity; ++i)
+					m_pContent[i].~Bucket();
+
+				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			}
+			m_pContent = nullptr;
+			m_BucketQuantity = 0;
+			m_Size = 0;
+		}
+
+		inline HashMap(float load_factor)
+			: HashMap()
+		{
+			SGE_ASSERT(ZeroLoadFactorError, load_factor);
+			m_LoadFactor = load_factor;
+		}
+
+		inline HashMap(const HashMap& hm)
+			: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(hm.m_Size)
+		{
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				new (m_pContent + i) Bucket(*(hm.m_pContent + i));
+		}
+
+		inline HashMap(HashMap&& hm)
+			: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent(hm.m_pContent), m_Size(hm.m_Size)
+		{
+			hm.m_pContent = nullptr;
+			hm.m_BucketQuantity = 0;
+			hm.m_Size = 0;
+		}
+
+		inline HashMap& operator=(const HashMap& hm)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &hm);
+			Clear();
+
+			m_LoadFactor = hm.m_LoadFactor;
+			m_BucketQuantity = hm.m_BucketQuantity;
+			m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			m_Size = hm.m_Size;
+
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				new (m_pContent + i) Bucket(*(hm.m_pContent + i));
+
+			return *this;
+		}
+
+		inline HashMap& operator=(HashMap&& hm)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &hm);
+			Clear();
+
+			m_LoadFactor = hm.m_LoadFactor;
+			m_BucketQuantity = hm.m_BucketQuantity;
+			m_pContent = hm.m_pContent;
+			m_Size = hm.m_Size;
+
+			hm.m_pContent = nullptr;
+			hm.m_BucketQuantity = 0;
+			hm.m_Size = 0;
+
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline HashMap(const HashMap<K, V, Hasher, OtherAllocator>& hm)
+			: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(hm.m_Size)
+		{
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				new (m_pContent + i) Bucket(*(hm.m_pContent + i));
+		}
+
+		template<typename OtherAllocator>
+		inline HashMap(HashMap<K, V, Hasher, OtherAllocator>&& hm)
+			: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(hm.m_Size)
+		{
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				new (m_pContent + i) Bucket(std::move(*(hm.m_pContent + i)));
+		}
+
+		template<typename OtherAllocator>
+		inline HashMap& operator=(const HashMap<K, V, Hasher, OtherAllocator>& hm)
+		{
+			Clear();
+
+			m_LoadFactor = hm.m_LoadFactor;
+			m_BucketQuantity = hm.m_BucketQuantity;
+			m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			m_Size = hm.m_Size;
+
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				new (m_pContent + i) Bucket(*(hm.m_pContent + i));
+
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline HashMap& operator=(HashMap<K, V, Hasher, OtherAllocator>&& hm)
+		{
+			Clear();
+
+			m_LoadFactor = hm.m_LoadFactor;
+			m_BucketQuantity = hm.m_BucketQuantity;
+			m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			m_Size = hm.m_Size;
+
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				new (m_pContent + i) Bucket(std::move(*(hm.m_pContent + i)));
+
+			return *this;
 		}
 
 	private:
