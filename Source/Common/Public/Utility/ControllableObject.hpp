@@ -82,6 +82,7 @@ namespace SpaceGameEngine
 		}
 		inline ControllableObject& operator=(ControllableObject&& obj)
 		{
+			SGE_ASSERT(SelfAssignmentError, this, &obj);
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
 			*m_pContent = std::move(obj.Get());
 			return *this;

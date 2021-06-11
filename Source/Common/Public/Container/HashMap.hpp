@@ -264,7 +264,7 @@ namespace SpaceGameEngine
 				return nullptr;
 			}
 
-			inline Node* FindNode(HashType hash_value, const K& key) const
+			inline const Node* FindNode(HashType hash_value, const K& key) const
 			{
 				const Node* pnow = m_pHead;
 				while (pnow != nullptr)

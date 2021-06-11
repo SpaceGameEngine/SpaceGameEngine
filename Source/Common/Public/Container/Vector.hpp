@@ -233,6 +233,7 @@ namespace SpaceGameEngine
 		*/
 		inline Vector& operator=(Vector&& v)
 		{
+			SGE_ASSERT(SelfAssignmentError, this, &v);
 			if constexpr (IsTrivial<T>::Value)
 			{
 			}

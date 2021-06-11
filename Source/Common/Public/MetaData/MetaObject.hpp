@@ -85,6 +85,7 @@ namespace SpaceGameEngine
 		}
 		inline MetaObject& operator=(MetaObject&& obj)
 		{
+			SGE_ASSERT(SelfAssignmentError, this, &obj);
 			SGE_ASSERT(NullPointerError, obj.m_pMetaData->m_pMoveAssignment);
 			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, *obj.m_pMetaData);
 			m_pMetaData->m_pMoveAssignment(m_pContent, obj.m_pContent);
