@@ -394,6 +394,25 @@ namespace SpaceGameEngine
 			}
 		}
 
+		inline void Clear(float load_factor = sm_DefaultLoadFactor)
+		{
+			if (m_pContent)
+			{
+				for (SizeType i = 0; i < m_BucketQuantity; ++i)
+					m_pContent[i].~Bucket();
+
+				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			}
+
+			m_LoadFactor = load_factor;
+			m_BucketQuantity = sm_DefaultBucketQuantity;
+			m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			m_Size = 0;
+
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				new (m_pContent + i) Bucket();
+		}
+
 		inline HashMap(float load_factor)
 			: HashMap()
 		{
