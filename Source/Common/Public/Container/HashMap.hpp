@@ -289,10 +289,11 @@ namespace SpaceGameEngine
 					}
 					p = p->m_pNext;
 				}
-				p = Allocator::template New(std::forward<K2>(key), std::forward<V2>(val));
+				p = Allocator::template New<Node>(std::forward<K2>(key), std::forward<V2>(val));
 				p->m_HashValue = hash_value;
 				p->m_pNext = m_pHead;
-				m_pHead->m_pPrevious = p;
+				if (m_pHead)
+					m_pHead->m_pPrevious = p;
 				m_pHead = p;
 				return Pair<Node*, bool>(p, true);
 			}
