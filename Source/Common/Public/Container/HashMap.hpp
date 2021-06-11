@@ -394,20 +394,6 @@ namespace SpaceGameEngine
 			}
 		}
 
-		inline void Clear()
-		{
-			if (m_pContent)
-			{
-				for (SizeType i = 0; i < m_BucketQuantity; ++i)
-					m_pContent[i].~Bucket();
-
-				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
-			}
-			m_pContent = nullptr;
-			m_BucketQuantity = 0;
-			m_Size = 0;
-		}
-
 		inline HashMap(float load_factor)
 			: HashMap()
 		{
@@ -433,7 +419,7 @@ namespace SpaceGameEngine
 		inline HashMap& operator=(const HashMap& hm)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &hm);
-			Clear();
+			RawClear();
 
 			m_LoadFactor = hm.m_LoadFactor;
 			m_BucketQuantity = hm.m_BucketQuantity;
@@ -449,7 +435,7 @@ namespace SpaceGameEngine
 		inline HashMap& operator=(HashMap&& hm)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &hm);
-			Clear();
+			RawClear();
 
 			m_LoadFactor = hm.m_LoadFactor;
 			m_BucketQuantity = hm.m_BucketQuantity;
@@ -482,7 +468,7 @@ namespace SpaceGameEngine
 		template<typename OtherAllocator>
 		inline HashMap& operator=(const HashMap<K, V, Hasher, OtherAllocator>& hm)
 		{
-			Clear();
+			RawClear();
 
 			m_LoadFactor = hm.m_LoadFactor;
 			m_BucketQuantity = hm.m_BucketQuantity;
@@ -498,7 +484,7 @@ namespace SpaceGameEngine
 		template<typename OtherAllocator>
 		inline HashMap& operator=(HashMap<K, V, Hasher, OtherAllocator>&& hm)
 		{
-			Clear();
+			RawClear();
 
 			m_LoadFactor = hm.m_LoadFactor;
 			m_BucketQuantity = hm.m_BucketQuantity;
@@ -509,6 +495,21 @@ namespace SpaceGameEngine
 				new (m_pContent + i) Bucket(std::move(*(hm.m_pContent + i)));
 
 			return *this;
+		}
+
+	private:
+		inline void RawClear()
+		{
+			if (m_pContent)
+			{
+				for (SizeType i = 0; i < m_BucketQuantity; ++i)
+					m_pContent[i].~Bucket();
+
+				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			}
+			m_pContent = nullptr;
+			m_BucketQuantity = 0;
+			m_Size = 0;
 		}
 
 	private:
