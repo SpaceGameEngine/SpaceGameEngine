@@ -628,11 +628,13 @@ namespace SpaceGameEngine
 
 			inline T* operator->() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return &(m_pNode->m_KeyValuePair);
 			}
 
 			inline T& operator*() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return m_pNode->m_KeyValuePair;
 			}
 

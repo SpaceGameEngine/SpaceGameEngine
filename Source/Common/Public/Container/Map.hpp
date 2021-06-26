@@ -916,6 +916,15 @@ namespace SpaceGameEngine
 
 			friend class Map<K, V, LessComparer, Allocator>;
 
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const IteratorImpl& iter)
+				{
+					return iter.m_pContent == &(iter.m_pTree->m_NilNode);
+				}
+			};
+
 		public:
 			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const Map&, Map&> m)
 			{
@@ -1055,11 +1064,13 @@ namespace SpaceGameEngine
 
 			inline T* operator->() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return &(m_pContent->m_KeyValuePair);
 			}
 
 			inline T& operator*() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return m_pContent->m_KeyValuePair;
 			}
 
@@ -1101,6 +1112,15 @@ namespace SpaceGameEngine
 			using ValueType = T;
 
 			friend class Map<K, V, LessComparer, Allocator>;
+
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const ReverseIteratorImpl& iter)
+				{
+					return iter.m_pContent == &(iter.m_pTree->m_NilNode);
+				}
+			};
 
 		public:
 			inline static ReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const Map&, Map&> m)
@@ -1241,11 +1261,13 @@ namespace SpaceGameEngine
 
 			inline T* operator->() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return &(m_pContent->m_KeyValuePair);
 			}
 
 			inline T& operator*() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return m_pContent->m_KeyValuePair;
 			}
 
