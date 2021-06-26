@@ -539,8 +539,15 @@ namespace SpaceGameEngine
 			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const HashMap&, HashMap&> hm)
 			{
 				IteratorImpl re(hm.m_pContent, hm.m_pContent->m_pHead, hm.m_pContent + hm.m_BucketQuantity);
-				if (re.m_pNode == nullptr)
-					re.MoveForward();
+
+				while (re.m_pNode == nullptr && re.m_pBucket != re.m_pBucketEnd)
+				{
+					re.m_pBucket += 1;
+					re.m_pNode = re.m_pBucket->m_pHead;
+				}
+				if (re.m_pBucket == re.m_pBucketEnd)
+					re.m_pNode = nullptr;
+
 				return re;
 			}
 
@@ -665,7 +672,7 @@ namespace SpaceGameEngine
 					while (m_pNode == nullptr && m_pBucket != m_pBucketEnd)
 					{
 						m_pBucket += 1;
-						m_pNode = m_pBucket.m_pHead;
+						m_pNode = m_pBucket->m_pHead;
 					}
 					if (m_pBucket == m_pBucketEnd)
 						m_pNode = nullptr;
@@ -677,6 +684,35 @@ namespace SpaceGameEngine
 			NodePointerType m_pNode;
 			BucketPointerType m_pBucketEnd;
 		};
+
+		using Iterator = IteratorImpl<Pair<const K, V>>;
+		using ConstIterator = IteratorImpl<const Pair<const K, V>>;
+
+		template<typename IteratorType>
+		struct IsHashMapIterator
+		{
+			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>;
+		};
+
+		inline Iterator GetBegin()
+		{
+			return Iterator::GetBegin(*this);
+		}
+
+		inline Iterator GetEnd()
+		{
+			return Iterator::GetEnd(*this);
+		}
+
+		inline ConstIterator GetConstBegin() const
+		{
+			return ConstIterator::GetBegin(*this);
+		}
+
+		inline ConstIterator GetConstEnd() const
+		{
+			return ConstIterator::GetEnd(*this);
+		}
 
 	private:
 		inline void RawClear()

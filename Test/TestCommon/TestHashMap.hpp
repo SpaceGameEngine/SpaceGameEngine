@@ -28,3 +28,37 @@ TEST(HashMap, InstanceTest)
 {
 	HashMap<int, int> hm1;
 }
+
+TEST(HashMapIterator, GetBeginTest)
+{
+	HashMap<int, int> hm1;
+	auto iter1 = hm1.GetBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), HashMap<int, int>::Iterator>));
+	//todo : change a test instance
+}
+
+TEST(HashMapIterator, GetEndTest)
+{
+	HashMap<int, int> hm1;
+	auto iter1 = hm1.GetEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), HashMap<int, int>::Iterator>));
+	//todo : change a test instance
+	ASSERT_EQ(hm1.GetBegin(), iter1);
+}
+
+TEST(HashMapIterator, GetConstBeginTest)
+{
+	HashMap<int, int> hm1;
+	auto iter1 = hm1.GetConstBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), HashMap<int, int>::ConstIterator>));
+	//todo : change a test instance
+}
+
+TEST(HashMapIterator, GetConstEndTest)
+{
+	HashMap<int, int> hm1;
+	auto iter1 = hm1.GetConstEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), HashMap<int, int>::ConstIterator>));
+	//todo : change a test instance
+	ASSERT_EQ(hm1.GetConstBegin(), iter1);
+}

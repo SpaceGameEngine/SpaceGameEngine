@@ -154,6 +154,7 @@ TEST(MemoryManager, FixedSizeAllocatorMultiThreadTest)
 	}
 }
 
+/*
 TEST(MemoryManager, MultiThreadBufferedFixedSizeAllocatorMultiThreadTest)
 {
 	MemoryManager::MultiThreadBufferedFixedSizeAllocator test(4, 0xffff, 4);
@@ -199,6 +200,7 @@ TEST(MemoryManager, MultiThreadBufferedFixedSizeAllocatorMultiThreadTest)
 		test.Free((void*)res[i]);
 	}
 }
+*/
 
 TEST(MemoryManager, IndexConvertTest)
 {
