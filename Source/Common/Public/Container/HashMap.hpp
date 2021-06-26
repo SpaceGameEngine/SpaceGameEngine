@@ -80,6 +80,8 @@ namespace SpaceGameEngine
 			template<typename T>
 			friend class IteratorImpl;
 
+			friend class HashMap;
+
 		public:
 			inline Bucket()
 				: m_pHead(nullptr)
