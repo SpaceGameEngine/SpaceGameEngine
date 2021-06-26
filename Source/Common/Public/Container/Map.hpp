@@ -1073,12 +1073,7 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
 			}
 
-			inline T* GetData()
-			{
-				return &(m_pContent->m_KeyValuePair);
-			}
-
-			inline const T* GetData() const
+			inline T* GetData() const
 			{
 				return &(m_pContent->m_KeyValuePair);
 			}
@@ -1264,12 +1259,7 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
 			}
 
-			inline T* GetData()
-			{
-				return &(m_pContent->m_KeyValuePair);
-			}
-
-			inline const T* GetData() const
+			inline T* GetData() const
 			{
 				return &(m_pContent->m_KeyValuePair);
 			}
