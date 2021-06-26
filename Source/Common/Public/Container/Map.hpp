@@ -1086,7 +1086,7 @@ namespace SpaceGameEngine
 		private:
 			using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*, typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*>;
 			using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const MapImplement::RedBlackTree<K, V, LessComparer, Allocator>*, MapImplement::RedBlackTree<K, V, LessComparer, Allocator>*>;
-			inline explicit IteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
+			inline IteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
 				SGE_ASSERT(NullPointerError, ptree);
@@ -1277,7 +1277,7 @@ namespace SpaceGameEngine
 		private:
 			using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*, typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*>;
 			using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const MapImplement::RedBlackTree<K, V, LessComparer, Allocator>*, MapImplement::RedBlackTree<K, V, LessComparer, Allocator>*>;
-			inline explicit ReverseIteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
+			inline ReverseIteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
 				SGE_ASSERT(NullPointerError, ptree);
