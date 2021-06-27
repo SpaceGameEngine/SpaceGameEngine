@@ -402,9 +402,8 @@ namespace SpaceGameEngine
 			}
 		}
 
-		inline void Clear(double load_factor = m_LoadFactor)
+		inline void Clear()
 		{
-			SGE_ASSERT(ZeroLoadFactorError, load_factor);
 			if (m_pContent)
 			{
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
@@ -413,7 +412,7 @@ namespace SpaceGameEngine
 				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
 			}
 
-			m_LoadFactor = load_factor;
+			m_LoadFactor = sm_DefaultLoadFactor;
 			m_BucketQuantity = sm_DefaultBucketQuantity;
 			m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
 			m_Size = 0;
