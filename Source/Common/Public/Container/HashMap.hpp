@@ -751,7 +751,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(ZeroLoadFactorError, load_factor);
 			m_LoadFactor = load_factor;
-			//todo : re hash
+			Rehash(GetCorrectBucketQuantity(m_LoadFactor, m_Size));
 		}
 
 	private:
@@ -771,6 +771,20 @@ namespace SpaceGameEngine
 
 		inline void Rehash(SizeType new_bucket_quantity)
 		{
+			Bucket* pbuf = (Bucket*)Allocator::RawNew(new_bucket_quantity * sizeof(Bucket), alignof(Bucket));
+			for (SizeType i = 0; i < new_bucket_quantity; ++i)
+				new (pbuf + i) Bucket();
+
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				m_pContent[i].Rehash(pbuf, new_bucket_quantity);
+
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				m_pContent[i].~Bucket();
+
+			Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+
+			m_pContent = pbuf;
+			m_BucketQuantity = new_bucket_quantity;
 		}
 
 	private:
