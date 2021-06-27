@@ -17,6 +17,8 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "Container/HashMap.hpp"
 
+using namespace SpaceGameEngine;
+
 TEST(Hash, HashTest)
 {
 	HashType std_hash_re = std::hash<int>()(12345);
@@ -27,6 +29,70 @@ TEST(Hash, HashTest)
 TEST(HashMap, InstanceTest)
 {
 	HashMap<int, int> hm1;
+}
+
+TEST(HashMap, GetLoadFactorTest)
+{
+	HashMap<int, int> hm1;
+	ASSERT_EQ(hm1.GetLoadFactor(), hm1.sm_DefaultLoadFactor);
+}
+
+TEST(HashMap, GetCorrectBucketQuantityTest)
+{
+	using hm = HashMap<int, int>;
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 0), 1);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 1), 1);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 2), 2);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 3), 4);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 4), 4);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 5), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 6), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 7), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 8), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 9), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 10), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 11), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 12), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 13), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 14), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 15), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(1.0, 16), 16);
+
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 0), 1);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 1), 2);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 2), 4);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 3), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 4), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 5), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 6), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 7), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 8), 16);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 9), 32);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 10), 32);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 11), 32);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 12), 32);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 13), 32);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 14), 32);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 15), 32);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(0.5, 16), 32);
+
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 0), 1);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 1), 1);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 2), 1);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 3), 2);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 4), 2);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 5), 4);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 6), 4);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 7), 4);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 8), 4);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 9), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 10), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 11), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 12), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 13), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 14), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 15), 8);
+	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 16), 8);
 }
 
 TEST(HashMapIterator, GetBeginTest)

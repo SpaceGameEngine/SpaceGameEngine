@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include <initializer_list>
+#include <cmath>
 #include "MemoryManager.h"
 #include "Utility/Utility.hpp"
 #include "Map.hpp"
@@ -46,7 +47,7 @@ namespace SpaceGameEngine
 		using HasherType = Hasher;
 		using AllocatorType = Allocator;
 
-		inline static constexpr const float sm_DefaultLoadFactor = 1.0f;
+		inline static constexpr const double sm_DefaultLoadFactor = 1.0;
 		inline static constexpr const SizeType sm_DefaultBucketQuantity = 16;
 
 	private:
@@ -370,11 +371,13 @@ namespace SpaceGameEngine
 			Node* m_pHead;
 		};
 
+		inline static constexpr const SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(Bucket::Node);
+
 		struct ZeroLoadFactorError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The load factor can not be zero.");
 
-			inline static bool Judge(float load_factor)
+			inline static bool Judge(double load_factor)
 			{
 				return load_factor == 0;
 			}
@@ -399,8 +402,9 @@ namespace SpaceGameEngine
 			}
 		}
 
-		inline void Clear(float load_factor = sm_DefaultLoadFactor)
+		inline void Clear(double load_factor = m_LoadFactor)
 		{
+			SGE_ASSERT(ZeroLoadFactorError, load_factor);
 			if (m_pContent)
 			{
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
@@ -418,7 +422,7 @@ namespace SpaceGameEngine
 				new (m_pContent + i) Bucket();
 		}
 
-		inline HashMap(float load_factor)
+		inline HashMap(double load_factor)
 			: HashMap()
 		{
 			SGE_ASSERT(ZeroLoadFactorError, load_factor);
@@ -718,6 +722,38 @@ namespace SpaceGameEngine
 			return ConstIterator::GetEnd(*this);
 		}
 
+		inline static SizeType GetCorrectBucketQuantity(double load_factor, SizeType size)
+		{
+			SGE_ASSERT(ZeroLoadFactorError, load_factor);
+			SGE_ASSERT(InvalidSizeError, size, 0, sm_MaxSize);
+			SizeType buf = (SizeType)std::round((double)size / load_factor);
+			if (buf <= 1)
+				return 1;
+			else
+			{
+				SizeType re = 1;
+				SizeType buf2 = (buf << 1) - 1;
+				while (buf2 != 1)
+				{
+					buf2 >>= 1;
+					re <<= 1;
+				}
+				return re;
+			}
+		}
+
+		inline double GetLoadFactor() const
+		{
+			return m_LoadFactor;
+		}
+
+		inline void SetLoadFactor(double load_factor)
+		{
+			SGE_ASSERT(ZeroLoadFactorError, load_factor);
+			m_LoadFactor = load_factor;
+			//todo : re hash
+		}
+
 	private:
 		inline void RawClear()
 		{
@@ -733,8 +769,12 @@ namespace SpaceGameEngine
 			m_Size = 0;
 		}
 
+		inline void Rehash(SizeType new_bucket_quantity)
+		{
+		}
+
 	private:
-		float m_LoadFactor;
+		double m_LoadFactor;
 		SizeType m_BucketQuantity;
 		Bucket* m_pContent;
 		SizeType m_Size;
