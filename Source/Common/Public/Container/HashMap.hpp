@@ -371,7 +371,7 @@ namespace SpaceGameEngine
 			Node* m_pHead;
 		};
 
-		inline static constexpr const SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(Bucket::Node);
+		inline static constexpr const SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(typename Bucket::Node);
 
 		struct ZeroLoadFactorError
 		{
