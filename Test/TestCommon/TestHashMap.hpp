@@ -19,6 +19,76 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+struct test_hashmap_object
+{
+	std::function<void(test_hashmap_object&)> rel_func;
+	test_hashmap_object()
+		: val(0), rel_func([](test_hashmap_object&) {})
+	{
+	}
+	test_hashmap_object(int v)
+		: val(v), rel_func([](test_hashmap_object&) {})
+	{
+	}
+	test_hashmap_object(int v, const std::function<void(test_hashmap_object&)>& func)
+		: val(v), rel_func(func)
+	{
+	}
+	test_hashmap_object(const test_hashmap_object& o) noexcept
+		: val(o.val), rel_func(o.rel_func)
+	{
+	}
+	test_hashmap_object(test_hashmap_object&& o) noexcept
+		: val(o.val), rel_func(std::move(o.rel_func))
+	{
+		o.rel_func = [](test_hashmap_object&) {};
+	}
+	~test_hashmap_object()
+	{
+		rel_func(*this);
+	}
+	int val;
+
+	test_hashmap_object& operator=(const test_hashmap_object& o)
+	{
+		val = o.val;
+		rel_func = o.rel_func;
+		return *this;
+	}
+
+	test_hashmap_object& operator=(test_hashmap_object&& o)
+	{
+		val = o.val;
+		rel_func = std::move(o.rel_func);
+		o.rel_func = [](test_hashmap_object&) {};
+		return *this;
+	}
+
+	bool operator<(const test_hashmap_object& o) const
+	{
+		return val < o.val;
+	}
+
+	bool operator==(const test_hashmap_object& o) const
+	{
+		return val == o.val;
+	}
+
+	bool operator!=(const test_hashmap_object& o) const
+	{
+		return val != o.val;
+	}
+};
+
+template<>
+struct Hash<test_hashmap_object>
+{
+	inline static HashType GetHash(const test_hashmap_object& t)
+	{
+		return std::hash<int>()(t.val);
+	}
+};
+
 TEST(Hash, HashTest)
 {
 	HashType std_hash_re = std::hash<int>()(12345);
@@ -93,6 +163,46 @@ TEST(HashMap, GetCorrectBucketQuantityTest)
 	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 14), 8);
 	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 15), 8);
 	ASSERT_EQ(hm::GetCorrectBucketQuantity(2.0, 16), 8);
+}
+
+TEST(HashMap, GetSizeTest)
+{
+	//todo : change a test instance
+	HashMap<int, int> hm1;
+	ASSERT_EQ(hm1.GetSize(), 0);
+
+	const HashMap<int, int> chm1;
+	ASSERT_EQ(chm1.GetSize(), 0);
+}
+
+TEST(HashMap, InsertTest)
+{
+	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_hashmap_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_hashmap_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = phm->Insert(test_hashmap_object(i, key_rel_func), test_hashmap_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(phm->GetSize(), test_size);
+	delete phm;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(HashMapIterator, GetBeginTest)

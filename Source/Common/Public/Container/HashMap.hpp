@@ -753,6 +753,24 @@ namespace SpaceGameEngine
 			Rehash(GetCorrectBucketQuantity(m_LoadFactor, m_Size));
 		}
 
+		inline SizeType GetSize() const
+		{
+			return m_Size;
+		}
+
+		template<typename K2, typename V2>
+		inline Pair<Iterator, bool> Insert(K2&& key, V2&& val)
+		{
+			SizeType new_bucket_size = GetCorrectBucketQuantity(m_LoadFactor, m_Size + 1);
+			if (m_BucketQuantity < new_bucket_size)
+				Rehash(new_bucket_size);
+
+			HashType hash = Hasher::GetHash(key);
+			auto re = m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::forward<K2>(key), std::forward<V2>(val));
+			m_Size += 1;
+			return Pair<Iterator, bool>(Iterator(m_pContent + (hash & (m_BucketQuantity - 1)), re.m_First, m_pContent + m_BucketQuantity), re.m_Second);
+		}
+
 	private:
 		inline void RawClear()
 		{
