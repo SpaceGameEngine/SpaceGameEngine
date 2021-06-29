@@ -81,7 +81,7 @@ struct test_hashmap_object
 };
 
 template<>
-struct Hash<test_hashmap_object>
+struct SpaceGameEngine::Hash<test_hashmap_object>
 {
 	inline static HashType GetHash(const test_hashmap_object& t)
 	{
