@@ -758,6 +758,11 @@ namespace SpaceGameEngine
 			return m_Size;
 		}
 
+		inline SizeType GetBucketQuantity() const
+		{
+			return m_BucketQuantity;
+		}
+
 		template<typename K2, typename V2>
 		inline Pair<Iterator, bool> Insert(K2&& key, V2&& val)
 		{

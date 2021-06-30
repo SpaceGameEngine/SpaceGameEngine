@@ -175,6 +175,16 @@ TEST(HashMap, GetSizeTest)
 	ASSERT_EQ(chm1.GetSize(), 0);
 }
 
+TEST(HashMap, GetBucketQuantityTest)
+{
+	//todo : change a test instance
+	HashMap<int, int> hm1;
+	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+
+	const HashMap<int, int> chm1;
+	ASSERT_EQ(chm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+}
+
 TEST(HashMap, InsertTest)
 {
 	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();
@@ -197,6 +207,7 @@ TEST(HashMap, InsertTest)
 		ASSERT_TRUE(iter.m_Second);
 	}
 	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
 	delete phm;
 	for (int i = 0; i < test_size; i++)
 	{
