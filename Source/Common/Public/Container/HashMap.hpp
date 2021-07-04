@@ -372,6 +372,7 @@ namespace SpaceGameEngine
 		};
 
 		inline static constexpr const SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(typename Bucket::Node);
+		inline static constexpr const SizeType sm_MaxBucketQuantity = SGE_MAX_MEMORY_SIZE / sizeof(Bucket);
 
 		struct ZeroLoadFactorError
 		{
@@ -859,23 +860,10 @@ namespace SpaceGameEngine
 			return iter->m_Second;
 		}
 
-	private:
-		inline void RawClear()
-		{
-			if (m_pContent)
-			{
-				for (SizeType i = 0; i < m_BucketQuantity; ++i)
-					m_pContent[i].~Bucket();
-
-				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
-			}
-			m_pContent = nullptr;
-			m_BucketQuantity = 0;
-			m_Size = 0;
-		}
-
 		inline void Rehash(SizeType new_bucket_quantity)
 		{
+			SGE_ASSERT(InvalidSizeError, new_bucket_quantity, 1, sm_MaxBucketQuantity);
+
 			Bucket* pbuf = (Bucket*)Allocator::RawNew(new_bucket_quantity * sizeof(Bucket), alignof(Bucket));
 			for (SizeType i = 0; i < new_bucket_quantity; ++i)
 				new (pbuf + i) Bucket();
@@ -890,6 +878,21 @@ namespace SpaceGameEngine
 
 			m_pContent = pbuf;
 			m_BucketQuantity = new_bucket_quantity;
+		}
+
+	private:
+		inline void RawClear()
+		{
+			if (m_pContent)
+			{
+				for (SizeType i = 0; i < m_BucketQuantity; ++i)
+					m_pContent[i].~Bucket();
+
+				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+			}
+			m_pContent = nullptr;
+			m_BucketQuantity = 0;
+			m_Size = 0;
 		}
 
 	private:

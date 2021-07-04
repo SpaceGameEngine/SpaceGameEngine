@@ -530,6 +530,44 @@ TEST(HashMap, OperatorTest)
 	}
 }
 
+TEST(HashMap, RehashTest)
+{
+	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_hashmap_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_hashmap_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = phm->Insert(test_hashmap_object(i, key_rel_func), test_hashmap_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+	phm->Rehash(1);
+	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetBucketQuantity(), 1);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
+	delete phm;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(HashMapIterator, GetBeginTest)
 {
 	HashMap<int, int> hm1;
