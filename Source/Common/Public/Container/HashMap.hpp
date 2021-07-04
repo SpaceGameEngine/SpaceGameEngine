@@ -429,6 +429,19 @@ namespace SpaceGameEngine
 			m_LoadFactor = load_factor;
 		}
 
+		inline HashMap(std::initializer_list<Pair<const K, V>> ilist)
+			: m_LoadFactor(sm_DefaultLoadFactor), m_BucketQuantity(GetCorrectBucketQuantity(m_LoadFactor, ilist.size())), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(ilist.size())
+		{
+			for (SizeType i = 0; i < m_BucketQuantity; ++i)
+				new (m_pContent + i) Bucket();
+
+			for (auto i = ilist.begin(); i != ilist.end(); ++i)
+			{
+				HashType hash = Hasher::GetHash(i->m_First);
+				m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::move(i->m_First), std::move(i->m_Second));
+			}
+		}
+
 		inline HashMap(const HashMap& hm)
 			: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(hm.m_Size)
 		{
