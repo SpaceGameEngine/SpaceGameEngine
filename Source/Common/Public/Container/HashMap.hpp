@@ -839,14 +839,14 @@ namespace SpaceGameEngine
 		inline V& Get(const K& key)
 		{
 			Iterator iter = Find(key);
-			SGE_CHECK(Iterator::OutOfRangeError, iter);
+			SGE_CHECK(typename Iterator::OutOfRangeError, iter);
 			return iter->m_Second;
 		}
 
 		inline const V& Get(const K& key) const
 		{
 			ConstIterator iter = Find(key);
-			SGE_CHECK(ConstIterator::OutOfRangeError, iter);
+			SGE_CHECK(typename ConstIterator::OutOfRangeError, iter);
 			return iter->m_Second;
 		}
 
