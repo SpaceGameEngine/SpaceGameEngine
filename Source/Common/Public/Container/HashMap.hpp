@@ -791,6 +791,17 @@ namespace SpaceGameEngine
 			m_Size += ilist.size();
 		}
 
+		template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value, void>>
+		inline IteratorType Remove(const IteratorType& iter)
+		{
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter);
+			IteratorType re = iter;
+			++re;
+			m_pContent[(iter.m_pNode->m_HashValue) & (m_BucketQuantity - 1)].RemoveNode(iter.m_pNode);
+			m_Size -= 1;
+			return re;
+		}
+
 	private:
 		inline void RawClear()
 		{
