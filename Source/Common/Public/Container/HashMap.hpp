@@ -802,6 +802,13 @@ namespace SpaceGameEngine
 			return re;
 		}
 
+		inline bool RemoveByKey(const K& key)
+		{
+			HashType hash = Hasher::GetHash(key);
+			m_Size -= 1;
+			return m_pContent[hash & (m_BucketQuantity - 1)].RemoveByKey(hash, key);
+		}
+
 	private:
 		inline void RawClear()
 		{
