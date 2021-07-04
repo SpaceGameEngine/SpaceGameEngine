@@ -776,6 +776,21 @@ namespace SpaceGameEngine
 			return Pair<Iterator, bool>(Iterator(m_pContent + (hash & (m_BucketQuantity - 1)), re.m_First, m_pContent + m_BucketQuantity), re.m_Second);
 		}
 
+		inline void Insert(std::initializer_list<Pair<const K, V>> ilist)
+		{
+			SizeType new_bucket_size = GetCorrectBucketQuantity(m_LoadFactor, m_Size + ilist.size());
+			if (m_BucketQuantity < new_bucket_size)
+				Rehash(new_bucket_size);
+
+			for (auto i = ilist.begin(); i != ilist.end(); ++i)
+			{
+				HashType hash = Hasher::GetHash(i->m_First);
+				m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::move(i->m_First), std::move(i->m_Second));
+			}
+
+			m_Size += ilist.size();
+		}
+
 	private:
 		inline void RawClear()
 		{
