@@ -809,6 +809,13 @@ namespace SpaceGameEngine
 			return m_pContent[hash & (m_BucketQuantity - 1)].RemoveByKey(hash, key);
 		}
 
+		inline void ShrinkToFit()
+		{
+			SizeType correct_bucket_quantity = GetCorrectBucketQuantity(m_LoadFactor, m_Size);
+			if (m_BucketQuantity > correct_bucket_quantity)
+				Rehash(correct_bucket_quantity);
+		}
+
 	private:
 		inline void RawClear()
 		{

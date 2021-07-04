@@ -335,6 +335,53 @@ TEST(HashMap, RemoveByKeyTest)
 	}
 }
 
+TEST(HashMap, ShrinkToFitTest)
+{
+	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_hashmap_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_hashmap_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = phm->Insert(test_hashmap_object(i, key_rel_func), test_hashmap_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(phm->GetSize(), test_size);
+	SizeType now_bucket_quantity = phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize());
+	ASSERT_EQ(phm->GetBucketQuantity(), now_bucket_quantity);
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_TRUE(phm->RemoveByKey(test_hashmap_object(i)));
+	}
+
+	ASSERT_EQ(phm->GetSize(), 0);
+	ASSERT_EQ(phm->GetBucketQuantity(), now_bucket_quantity);
+
+	phm->ShrinkToFit();
+
+	ASSERT_EQ(phm->GetSize(), 0);
+	ASSERT_TRUE(phm->GetBucketQuantity() != now_bucket_quantity);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+
+	delete phm;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(HashMapIterator, GetBeginTest)
 {
 	HashMap<int, int> hm1;
