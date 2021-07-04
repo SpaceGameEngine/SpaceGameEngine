@@ -816,6 +816,49 @@ namespace SpaceGameEngine
 				Rehash(correct_bucket_quantity);
 		}
 
+		inline Iterator Find(const K& key)
+		{
+			HashType hash = Hasher::GetHash(key);
+			auto pnode = m_pContent[hash & (m_BucketQuantity - 1)].FindNode(hash, key);
+			if (pnode)
+				return Iterator(m_pContent + (hash & (m_BucketQuantity - 1)), pnode, m_pContent + m_BucketQuantity);
+			else
+				return GetEnd();
+		}
+
+		inline ConstIterator Find(const K& key) const
+		{
+			HashType hash = Hasher::GetHash(key);
+			auto pnode = m_pContent[hash & (m_BucketQuantity - 1)].FindNode(hash, key);
+			if (pnode)
+				return ConstIterator(m_pContent + (hash & (m_BucketQuantity - 1)), pnode, m_pContent + m_BucketQuantity);
+			else
+				return GetConstEnd();
+		}
+
+		inline V& Get(const K& key)
+		{
+			Iterator iter = Find(key);
+			SGE_CHECK(Iterator::OutOfRangeError, iter);
+			return iter->m_Second;
+		}
+
+		inline const V& Get(const K& key) const
+		{
+			ConstIterator iter = Find(key);
+			SGE_CHECK(ConstIterator::OutOfRangeError, iter);
+			return iter->m_Second;
+		}
+
+		template<typename K2>
+		inline V& operator[](K2&& key)
+		{
+			Iterator iter = Find(key);
+			if (iter == GetEnd())
+				iter = Insert(std::forward<K2>(key), V()).m_First;
+			return iter->m_Second;
+		}
+
 	private:
 		inline void RawClear()
 		{
