@@ -99,6 +99,8 @@ TEST(Hash, HashTest)
 TEST(HashMap, InstanceTest)
 {
 	HashMap<int, int> hm1;
+	ASSERT_EQ(hm1.GetSize(), 0);
+	ASSERT_EQ(hm1.GetBucketQuantity(), hm1.sm_DefaultBucketQuantity);
 }
 
 TEST(HashMap, ListConstructionTest)
@@ -208,22 +210,43 @@ TEST(HashMap, GetCorrectBucketQuantityTest)
 
 TEST(HashMap, GetSizeTest)
 {
-	//todo : change a test instance
 	HashMap<int, int> hm1;
 	ASSERT_EQ(hm1.GetSize(), 0);
+	hm1.Insert(1, 1);
+	ASSERT_EQ(hm1.GetSize(), 1);
+	hm1.Insert(1, 2);
+	ASSERT_EQ(hm1.GetSize(), 1);
+	hm1.Insert(2, 2);
+	hm1.Insert(3, 3);
+	ASSERT_EQ(hm1.GetSize(), 3);
 
-	const HashMap<int, int> chm1;
-	ASSERT_EQ(chm1.GetSize(), 0);
+	const HashMap<int, int> chm1({Pair<const int, int>(1, 1),
+								  Pair<const int, int>(2, 2),
+								  Pair<const int, int>(3, 3),
+								  Pair<const int, int>(4, 4)});
+	ASSERT_EQ(chm1.GetSize(), 4);
 }
 
 TEST(HashMap, GetBucketQuantityTest)
 {
-	//todo : change a test instance
+	ASSERT_EQ((SpaceGameEngine::HashMap<int, int>::sm_DefaultLoadFactor), 1.0f);
+	ASSERT_EQ((SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity), 16);
+
 	HashMap<int, int> hm1;
 	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+	hm1.Insert(1, 1);
+	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+	hm1.Insert(1, 2);
+	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+	hm1.Insert(2, 2);
+	hm1.Insert(3, 3);
+	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
 
-	const HashMap<int, int> chm1;
-	ASSERT_EQ(chm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+	const HashMap<int, int> chm1({Pair<const int, int>(1, 1),
+								  Pair<const int, int>(2, 2),
+								  Pair<const int, int>(3, 3),
+								  Pair<const int, int>(4, 4)});
+	ASSERT_EQ(chm1.GetBucketQuantity(), 4);
 }
 
 TEST(HashMap, InsertTest)
@@ -249,6 +272,10 @@ TEST(HashMap, InsertTest)
 	}
 	ASSERT_EQ(phm->GetSize(), test_size);
 	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
 	delete phm;
 	for (int i = 0; i < test_size; i++)
 	{
@@ -272,8 +299,15 @@ TEST(HashMap, InsertListTest)
 		val_pool[o.val] += 1;
 	};
 
+	//test repeat insert
+	phm->Insert(test_hashmap_object(0, key_rel_func), test_hashmap_object(-1));
+	ASSERT_EQ(phm->GetSize(), 1);
+	ASSERT_EQ((*phm)[test_hashmap_object(0)].val, -1);
+
+	//have 11 elements, test repeat insert
 	phm->Insert({Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(0, key_rel_func), test_hashmap_object(0, val_rel_func)),
-				 Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(1, key_rel_func), test_hashmap_object(1, val_rel_func)),
+				 Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(1, key_rel_func), test_hashmap_object(0)),
+				 Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(1), test_hashmap_object(1, val_rel_func)),
 				 Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(2, key_rel_func), test_hashmap_object(2, val_rel_func)),
 				 Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(3, key_rel_func), test_hashmap_object(3, val_rel_func)),
 				 Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(4, key_rel_func), test_hashmap_object(4, val_rel_func)),
@@ -285,6 +319,10 @@ TEST(HashMap, InsertListTest)
 
 	ASSERT_EQ(phm->GetSize(), test_size);
 	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
 	delete phm;
 	for (int i = 0; i < test_size; i++)
 	{
@@ -318,6 +356,12 @@ TEST(HashMap, RemoveTest)
 	ASSERT_EQ(phm->GetSize(), test_size);
 	SizeType now_bucket_quantity = phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize());
 	ASSERT_EQ(phm->GetBucketQuantity(), now_bucket_quantity);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
+
 	int rm_cnt = 0;
 	auto iter = phm->GetBegin();
 	while (iter != phm->GetEnd())
@@ -361,6 +405,11 @@ TEST(HashMap, RemoveByKeyTest)
 	SizeType now_bucket_quantity = phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize());
 	ASSERT_EQ(phm->GetBucketQuantity(), now_bucket_quantity);
 
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
+
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_TRUE(phm->RemoveByKey(test_hashmap_object(i)));
@@ -400,6 +449,11 @@ TEST(HashMap, ShrinkToFitTest)
 	ASSERT_EQ(phm->GetSize(), test_size);
 	SizeType now_bucket_quantity = phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize());
 	ASSERT_EQ(phm->GetBucketQuantity(), now_bucket_quantity);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
 
 	for (int i = 0; i < test_size; i++)
 	{

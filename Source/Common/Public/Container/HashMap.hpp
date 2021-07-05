@@ -786,7 +786,8 @@ namespace SpaceGameEngine
 
 			HashType hash = Hasher::GetHash(key);
 			auto re = m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::forward<K2>(key), std::forward<V2>(val));
-			m_Size += 1;
+			if (re.m_Second)
+				m_Size += 1;
 			return Pair<Iterator, bool>(Iterator(m_pContent + (hash & (m_BucketQuantity - 1)), re.m_First, m_pContent + m_BucketQuantity), re.m_Second);
 		}
 
@@ -799,10 +800,9 @@ namespace SpaceGameEngine
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
 				HashType hash = Hasher::GetHash(i->m_First);
-				m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::move(i->m_First), std::move(i->m_Second));
+				if (m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::move(i->m_First), std::move(i->m_Second)).m_Second)
+					m_Size += 1;
 			}
-
-			m_Size += ilist.size();
 		}
 
 		template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value, void>>
