@@ -150,6 +150,47 @@ TEST(HashMap, GetLoadFactorTest)
 	ASSERT_EQ(hm1.GetLoadFactor(), hm1.sm_DefaultLoadFactor);
 }
 
+TEST(HashMap, SetLoadFactorTest)
+{
+	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_hashmap_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_hashmap_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = phm->Insert(test_hashmap_object(i, key_rel_func), test_hashmap_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+
+	phm->SetLoadFactor(0.75);
+
+	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetLoadFactor(), 0.75);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
+	delete phm;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(HashMap, GetCorrectBucketQuantityTest)
 {
 	using hm = HashMap<int, int>;
@@ -663,36 +704,108 @@ TEST(HashMap, RehashTest)
 	}
 }
 
-TEST(HashMapIterator, GetBeginTest)
+TEST(HashMapIterator, GetTest)
 {
-	HashMap<int, int> hm1;
-	auto iter1 = hm1.GetBegin();
-	ASSERT_TRUE((std::is_same_v<decltype(iter1), HashMap<int, int>::Iterator>));
-	//todo : change a test instance
+	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	int key_check_pool[test_size];
+	int val_check_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	memset(key_check_pool, 0, sizeof(key_check_pool));
+	memset(val_check_pool, 0, sizeof(val_check_pool));
+	auto key_rel_func = [&](test_hashmap_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_hashmap_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = phm->Insert(test_hashmap_object(i, key_rel_func), test_hashmap_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
+
+	for (HashMap<test_hashmap_object, test_hashmap_object>::Iterator i = phm->GetBegin(); i != phm->GetEnd(); ++i)
+	{
+		key_check_pool[i->m_First.val] += 1;
+		val_check_pool[i->m_Second.val] += 1;
+	}
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_check_pool[i], 1);
+		ASSERT_EQ(val_check_pool[i], 1);
+	}
+
+	delete phm;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
-TEST(HashMapIterator, GetEndTest)
+TEST(HashMapIterator, GetConstTest)
 {
-	HashMap<int, int> hm1;
-	auto iter1 = hm1.GetEnd();
-	ASSERT_TRUE((std::is_same_v<decltype(iter1), HashMap<int, int>::Iterator>));
-	//todo : change a test instance
-	ASSERT_EQ(hm1.GetBegin(), iter1);
-}
+	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	int key_check_pool[test_size];
+	int val_check_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	memset(key_check_pool, 0, sizeof(key_check_pool));
+	memset(val_check_pool, 0, sizeof(val_check_pool));
+	auto key_rel_func = [&](test_hashmap_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_hashmap_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = phm->Insert(test_hashmap_object(i, key_rel_func), test_hashmap_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
 
-TEST(HashMapIterator, GetConstBeginTest)
-{
-	HashMap<int, int> hm1;
-	auto iter1 = hm1.GetConstBegin();
-	ASSERT_TRUE((std::is_same_v<decltype(iter1), HashMap<int, int>::ConstIterator>));
-	//todo : change a test instance
-}
+	const HashMap<test_hashmap_object, test_hashmap_object>* pchm = phm;
 
-TEST(HashMapIterator, GetConstEndTest)
-{
-	HashMap<int, int> hm1;
-	auto iter1 = hm1.GetConstEnd();
-	ASSERT_TRUE((std::is_same_v<decltype(iter1), HashMap<int, int>::ConstIterator>));
-	//todo : change a test instance
-	ASSERT_EQ(hm1.GetConstBegin(), iter1);
+	for (HashMap<test_hashmap_object, test_hashmap_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); ++i)
+	{
+		key_check_pool[i->m_First.val] += 1;
+		val_check_pool[i->m_Second.val] += 1;
+	}
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_check_pool[i], 1);
+		ASSERT_EQ(val_check_pool[i], 1);
+	}
+
+	delete phm;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
