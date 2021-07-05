@@ -114,25 +114,18 @@ TEST(MemoryManager, FixedSizeAllocatorMultiThreadTest)
 
 	const int test_size = 64;
 	Thread ts[test_size];
-	Mutex mutex[test_size];
 	AddressType res[test_size];
 	memset(res, 0, sizeof(res));
-	Condition start_c;
-	bool is_start = false;
 	for (int i = 0; i < test_size; i++)
 	{
 		ts[i] = std::move(Thread(
 			[&](int idx) {
-				RecursiveLock lock(mutex[idx]);
-				lock.Lock();
-				start_c.Wait(lock, [&]() { return is_start; });
+				SleepFor(MakeTimeDuration<Second, TimeType>(1));
 				res[idx] = (AddressType)test.Allocate();
 				*((Int32*)res[idx]) = idx;
 			},
 			i));
 	}
-	is_start = true;
-	start_c.NodifyAll();
 	for (int i = 0; i < test_size; i++)
 	{
 		ts[i].Join();
