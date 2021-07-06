@@ -47,6 +47,9 @@ namespace SpaceGameEngine
 		using HasherType = Hasher;
 		using AllocatorType = Allocator;
 
+		template<typename _K, typename _V, typename _Hasher, typename _Allocator>
+		friend class HashMap;
+
 		inline static constexpr const double sm_DefaultLoadFactor = 1.0;
 		inline static constexpr const SizeType sm_DefaultBucketQuantity = 16;
 
@@ -81,6 +84,7 @@ namespace SpaceGameEngine
 			template<typename T>
 			friend class IteratorImpl;
 
+			template<typename _K, typename _V, typename _Hasher, typename _Allocator>
 			friend class HashMap;
 
 		public:
@@ -170,89 +174,89 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
-			template<typename OtherAllocator>
-			inline Bucket(const typename HashMap<K, V, Hasher, OtherAllocator>::Bucket& b)
+			template<typename OtherBucket>
+			inline Bucket(OtherBucket&& b)
 			{
-				const typename HashMap<K, V, Hasher, OtherAllocator>::Bucket::Node* pn = b.m_pHead;
-				if (pn != nullptr)
+				if constexpr (!std::is_same_v<std::remove_reference_t<OtherBucket>, OtherBucket>)
 				{
-					m_pHead = Allocator::template New<Node>(pn->m_KeyValuePair);
-					m_pHead->m_HashValue = pn->m_HashValue;
-					pn = pn->m_pNext;
-					while (pn != nullptr)
+					const typename RemoveCVRef<OtherBucket>::Type::Node* pn = b.m_pHead;
+					if (pn != nullptr)
 					{
-						Node* pb = Allocator::template New<Node>(pn->m_KeyValuePair);
-						pb->m_HashValue = pn->m_HashValue;
-						pb->m_pNext = m_pHead;
-						m_pHead->m_pPrevious = pb;
-						m_pHead = pb;
+						m_pHead = Allocator::template New<Node>(pn->m_KeyValuePair);
+						m_pHead->m_HashValue = pn->m_HashValue;
 						pn = pn->m_pNext;
+						while (pn != nullptr)
+						{
+							Node* pb = Allocator::template New<Node>(pn->m_KeyValuePair);
+							pb->m_HashValue = pn->m_HashValue;
+							pb->m_pNext = m_pHead;
+							m_pHead->m_pPrevious = pb;
+							m_pHead = pb;
+							pn = pn->m_pNext;
+						}
+					}
+				}
+				else
+				{
+					typename RemoveCVRef<OtherBucket>::Type::Node* pn = b.m_pHead;
+					if (pn != nullptr)
+					{
+						m_pHead = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
+						m_pHead->m_HashValue = pn->m_HashValue;
+						pn = pn->m_pNext;
+						while (pn != nullptr)
+						{
+							Node* pb = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
+							pb->m_HashValue = pn->m_HashValue;
+							pb->m_pNext = m_pHead;
+							m_pHead->m_pPrevious = pb;
+							m_pHead = pb;
+							pn = pn->m_pNext;
+						}
 					}
 				}
 			}
 
-			template<typename OtherAllocator>
-			inline Bucket(typename HashMap<K, V, Hasher, OtherAllocator>::Bucket&& b)
-			{
-				typename HashMap<K, V, Hasher, OtherAllocator>::Bucket::Node* pn = b.m_pHead;
-				if (pn != nullptr)
-				{
-					m_pHead = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
-					m_pHead->m_HashValue = pn->m_HashValue;
-					pn = pn->m_pNext;
-					while (pn != nullptr)
-					{
-						Node* pb = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
-						pb->m_HashValue = pn->m_HashValue;
-						pb->m_pNext = m_pHead;
-						m_pHead->m_pPrevious = pb;
-						m_pHead = pb;
-						pn = pn->m_pNext;
-					}
-				}
-			}
-
-			template<typename OtherAllocator>
-			inline Bucket& operator=(const typename HashMap<K, V, Hasher, OtherAllocator>::Bucket& b)
+			template<typename OtherBucket>
+			inline Bucket& operator=(OtherBucket&& b)
 			{
 				Clear();
-				const typename HashMap<K, V, Hasher, OtherAllocator>::Bucket::Node* pn = b.m_pHead;
-				if (pn != nullptr)
+				if constexpr (!std::is_same_v<std::remove_reference_t<OtherBucket>, OtherBucket>)
 				{
-					m_pHead = Allocator::template New<Node>(pn->m_KeyValuePair);
-					m_pHead->m_HashValue = pn->m_HashValue;
-					pn = pn->m_pNext;
-					while (pn != nullptr)
+					const typename RemoveCVRef<OtherBucket>::Type::Node* pn = b.m_pHead;
+					if (pn != nullptr)
 					{
-						Node* pb = Allocator::template New<Node>(pn->m_KeyValuePair);
-						pb->m_HashValue = pn->m_HashValue;
-						pb->m_pNext = m_pHead;
-						m_pHead->m_pPrevious = pb;
-						m_pHead = pb;
+						m_pHead = Allocator::template New<Node>(pn->m_KeyValuePair);
+						m_pHead->m_HashValue = pn->m_HashValue;
 						pn = pn->m_pNext;
+						while (pn != nullptr)
+						{
+							Node* pb = Allocator::template New<Node>(pn->m_KeyValuePair);
+							pb->m_HashValue = pn->m_HashValue;
+							pb->m_pNext = m_pHead;
+							m_pHead->m_pPrevious = pb;
+							m_pHead = pb;
+							pn = pn->m_pNext;
+						}
 					}
 				}
-				return *this;
-			}
-
-			template<typename OtherAllocator>
-			inline Bucket& operator=(typename HashMap<K, V, Hasher, OtherAllocator>::Bucket&& b)
-			{
-				Clear();
-				typename HashMap<K, V, Hasher, OtherAllocator>::Bucket::Node* pn = b.m_pHead;
-				if (pn != nullptr)
+				else
 				{
-					m_pHead = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
-					m_pHead->m_HashValue = pn->m_HashValue;
-					pn = pn->m_pNext;
-					while (pn != nullptr)
+					typename RemoveCVRef<OtherBucket>::Type::Node* pn = b.m_pHead;
+					if (pn != nullptr)
 					{
-						Node* pb = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
-						pb->m_HashValue = pn->m_HashValue;
-						pb->m_pNext = m_pHead;
-						m_pHead->m_pPrevious = pb;
-						m_pHead = pb;
+						m_pHead = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
+						m_pHead->m_HashValue = pn->m_HashValue;
 						pn = pn->m_pNext;
+						while (pn != nullptr)
+						{
+							Node* pb = Allocator::template New<Node>(std::move(pn->m_KeyValuePair));
+							pb->m_HashValue = pn->m_HashValue;
+							pb->m_pNext = m_pHead;
+							m_pHead->m_pPrevious = pb;
+							m_pHead = pb;
+							pn = pn->m_pNext;
+						}
 					}
 				}
 				return *this;
