@@ -913,9 +913,6 @@ namespace SpaceGameEngine
 
 				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
 			}
-			m_pContent = nullptr;
-			m_BucketQuantity = 0;
-			m_Size = 0;
 		}
 
 	private:
