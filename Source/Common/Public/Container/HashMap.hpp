@@ -134,6 +134,8 @@ namespace SpaceGameEngine
 						pn = pn->m_pNext;
 					}
 				}
+				else
+					m_pHead = nullptr;
 			}
 
 			inline Bucket(Bucket&& b)
@@ -195,6 +197,8 @@ namespace SpaceGameEngine
 							pn = pn->m_pNext;
 						}
 					}
+					else
+						m_pHead = nullptr;
 				}
 				else
 				{
@@ -214,6 +218,8 @@ namespace SpaceGameEngine
 							pn = pn->m_pNext;
 						}
 					}
+					else
+						m_pHead = nullptr;
 				}
 			}
 
