@@ -96,6 +96,24 @@ TEST(Hash, HashTest)
 	ASSERT_EQ(std_hash_re, sge_hash_re);
 }
 
+TEST(Hash, StringHashTest)
+{
+	ASSERT_EQ(Hash<UCS2String>::GetHash(UCS2String(SGE_STR(""))), 0);
+	ASSERT_EQ(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR(""))), 0);
+
+	ASSERT_TRUE(Hash<UCS2String>::GetHash(UCS2String(SGE_STR("this is a test"))) != 0);
+	ASSERT_TRUE(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("this is a test"))) != 0);
+
+	ASSERT_TRUE(Hash<UCS2String>::GetHash(UCS2String(SGE_STR("这是测试"))) != 0);
+	ASSERT_TRUE(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("这是测试"))) != 0);
+
+	ASSERT_EQ(Hash<UCS2String>::GetHash(UCS2String(SGE_STR("a"))), Hash<UCS2String>::GetHash(UCS2String(SGE_STR("a"))));
+	ASSERT_TRUE(Hash<UCS2String>::GetHash(UCS2String(SGE_STR("a"))) != Hash<UCS2String>::GetHash(UCS2String(SGE_STR("b"))));
+
+	ASSERT_EQ(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))), Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))));
+	ASSERT_TRUE(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))) != Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("b"))));
+}
+
 TEST(HashMap, InstanceTest)
 {
 	HashMap<int, int> hm1;
