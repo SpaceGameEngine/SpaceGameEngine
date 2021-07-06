@@ -5,6 +5,7 @@
     <ClInclude Include="BenchmarkString.hpp" />
     <ClInclude Include="BenchmarkMap.hpp" />
     <ClInclude Include="BenchmarkAllocator.hpp" />
+    <ClInclude Include="BenchmarkHashMap.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

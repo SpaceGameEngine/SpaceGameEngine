@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClInclude Include="BenchmarkAllocator.hpp" />
     <ClInclude Include="BenchmarkFunction.hpp" />
+    <ClInclude Include="BenchmarkHashMap.hpp" />
     <ClInclude Include="BenchmarkMap.hpp" />
     <ClInclude Include="BenchmarkString.hpp" />
   </ItemGroup>

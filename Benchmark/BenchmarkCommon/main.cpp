@@ -7,5 +7,6 @@
 #include "BenchmarkString.hpp"
 #include "BenchmarkMap.hpp"
 #include "BenchmarkAllocator.hpp"
+#include "BenchmarkHashMap.hpp"
 
 BENCHMARK_MAIN();
