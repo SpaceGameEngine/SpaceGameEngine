@@ -162,6 +162,7 @@ namespace SpaceGameEngine
 			Mutex m_Mutex;
 		};
 
+		/*
 		class MultiThreadBufferedFixedSizeAllocator : public FixedSizeAllocator
 		{
 		public:
@@ -179,6 +180,7 @@ namespace SpaceGameEngine
 			Atomic<void*>* m_pPreAllocationBuffer;
 			Atomic<void*>* m_pFreeBuffer;
 		};
+		*/
 
 	public:
 		friend Singleton<MemoryManager>;

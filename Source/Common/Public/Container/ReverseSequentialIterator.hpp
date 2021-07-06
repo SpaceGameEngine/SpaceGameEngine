@@ -128,12 +128,7 @@ namespace SpaceGameEngine
 			return m_Content;
 		}
 
-		inline ValueType* GetData()
-		{
-			return m_Content.GetData();
-		}
-
-		inline const ValueType* GetData() const
+		inline ValueType* GetData() const
 		{
 			return m_Content.GetData();
 		}

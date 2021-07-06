@@ -233,6 +233,7 @@ namespace SpaceGameEngine
 		*/
 		inline Vector& operator=(Vector&& v)
 		{
+			SGE_ASSERT(SelfAssignmentError, this, &v);
 			if constexpr (IsTrivial<T>::Value)
 			{
 			}
@@ -823,12 +824,7 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent;
 			}
 
-			inline ValueType* GetData()
-			{
-				return m_pContent;
-			}
-
-			inline const ValueType* GetData() const
+			inline ValueType* GetData() const
 			{
 				return m_pContent;
 			}

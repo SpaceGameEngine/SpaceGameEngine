@@ -27,6 +27,7 @@ limitations under the License.
 #include "TestMeta.hpp"
 #include "TestTimeCounter.hpp"
 #include "TestMap.hpp"
+#include "TestHashMap.hpp"
 
 int main(int argc, char** argv)
 {

@@ -222,6 +222,7 @@ void SpaceGameEngine::MemoryManagerAllocator::RawDelete(void* ptr, SizeType size
 	MemoryManager::GetSingleton().Free(ptr, size, alignment == 0 ? GetDefaultAlignment(size) : alignment);
 }
 
+/*
 SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::MultiThreadBufferedFixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment)
 	: FixedSizeAllocator(alloc_mem_size, page_mem_size, alignment), m_pPreAllocationBuffer(new Atomic<void*>[sm_PreAllocationBufferQuantity]), m_pFreeBuffer(new Atomic<void*>[sm_FreeBufferQuantity])
 {
@@ -281,3 +282,4 @@ void SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::Free
 	}
 	FixedSizeAllocator::Free(buf);
 }
+*/

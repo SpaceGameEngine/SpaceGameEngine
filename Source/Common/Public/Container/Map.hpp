@@ -39,6 +39,12 @@ namespace SpaceGameEngine
 			using AllocatorType = Allocator;
 			using LessComparerType = LessComparer;
 
+			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
+			friend class RedBlackTree;
+
+			friend class Map<K, V, LessComparer, Allocator>;
+
+		private:
 			struct Node
 			{
 				Node* m_pParent;
@@ -73,11 +79,6 @@ namespace SpaceGameEngine
 					return pn == pnil;
 				}
 			};
-
-			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
-			friend class RedBlackTree;
-
-			friend class Map<K, V, LessComparer, Allocator>;
 
 		public:
 			inline RedBlackTree()
@@ -915,6 +916,15 @@ namespace SpaceGameEngine
 
 			friend class Map<K, V, LessComparer, Allocator>;
 
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const IteratorImpl& iter)
+				{
+					return iter.m_pContent == &(iter.m_pTree->m_NilNode);
+				}
+			};
+
 		public:
 			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const Map&, Map&> m)
 			{
@@ -1054,11 +1064,13 @@ namespace SpaceGameEngine
 
 			inline T* operator->() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return &(m_pContent->m_KeyValuePair);
 			}
 
 			inline T& operator*() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return m_pContent->m_KeyValuePair;
 			}
 
@@ -1072,12 +1084,7 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
 			}
 
-			inline T* GetData()
-			{
-				return &(m_pContent->m_KeyValuePair);
-			}
-
-			inline const T* GetData() const
+			inline T* GetData() const
 			{
 				return &(m_pContent->m_KeyValuePair);
 			}
@@ -1085,7 +1092,7 @@ namespace SpaceGameEngine
 		private:
 			using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*, typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*>;
 			using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const MapImplement::RedBlackTree<K, V, LessComparer, Allocator>*, MapImplement::RedBlackTree<K, V, LessComparer, Allocator>*>;
-			inline explicit IteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
+			inline IteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
 				SGE_ASSERT(NullPointerError, ptree);
@@ -1105,6 +1112,15 @@ namespace SpaceGameEngine
 			using ValueType = T;
 
 			friend class Map<K, V, LessComparer, Allocator>;
+
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const ReverseIteratorImpl& iter)
+				{
+					return iter.m_pContent == &(iter.m_pTree->m_NilNode);
+				}
+			};
 
 		public:
 			inline static ReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const Map&, Map&> m)
@@ -1245,11 +1261,13 @@ namespace SpaceGameEngine
 
 			inline T* operator->() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return &(m_pContent->m_KeyValuePair);
 			}
 
 			inline T& operator*() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return m_pContent->m_KeyValuePair;
 			}
 
@@ -1263,12 +1281,7 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
 			}
 
-			inline T* GetData()
-			{
-				return &(m_pContent->m_KeyValuePair);
-			}
-
-			inline const T* GetData() const
+			inline T* GetData() const
 			{
 				return &(m_pContent->m_KeyValuePair);
 			}
@@ -1276,7 +1289,7 @@ namespace SpaceGameEngine
 		private:
 			using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*, typename MapImplement::RedBlackTree<K, V, LessComparer, Allocator>::Node*>;
 			using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const MapImplement::RedBlackTree<K, V, LessComparer, Allocator>*, MapImplement::RedBlackTree<K, V, LessComparer, Allocator>*>;
-			inline explicit ReverseIteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
+			inline ReverseIteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
 				SGE_ASSERT(NullPointerError, ptree);

@@ -133,6 +133,7 @@ namespace SpaceGameEngine
 		}
 		inline Function& operator=(Function&& func)
 		{
+			SGE_ASSERT(SelfAssignmentError, this, &func);
 			if (m_Content.Get().GetMetaData() == func.m_Content.Get().GetMetaData())
 				m_Content = std::move(func.m_Content);
 			else

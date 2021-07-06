@@ -1779,11 +1779,6 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent;
 			}
 
-			inline _T* GetData()
-			{
-				return m_pContent;
-			}
-
 			inline _T* GetData() const
 			{
 				return m_pContent;
@@ -2018,11 +2013,6 @@ namespace SpaceGameEngine
 			inline bool operator!=(const ReverseIteratorImpl& iter) const
 			{
 				return m_pContent != iter.m_pContent;
-			}
-
-			inline _T* GetData()
-			{
-				return m_pContent;
 			}
 
 			inline _T* GetData() const
