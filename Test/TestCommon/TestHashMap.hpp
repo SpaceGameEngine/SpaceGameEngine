@@ -954,12 +954,36 @@ TEST(HashMap, AnotherAllocatorCopyConstructionTest)
 		ASSERT_EQ((*phm2)[test_hashmap_object(i)].val, i);
 	}
 
+	HashMap<test_hashmap_object, test_hashmap_object>* phm3 = new HashMap<test_hashmap_object, test_hashmap_object>(*phm2);
+
+	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
+
+	ASSERT_EQ(phm2->GetSize(), test_size);
+	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm2)[test_hashmap_object(i)].val, i);
+	}
+
+	ASSERT_EQ(phm3->GetSize(), test_size);
+	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm3)[test_hashmap_object(i)].val, i);
+	}
+
 	delete phm;
 	delete phm2;
+	delete phm3;
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);
-		ASSERT_EQ(val_pool[i], 2);
+		ASSERT_EQ(key_pool[i], 3);
+		ASSERT_EQ(val_pool[i], 3);
 	}
 }
 
@@ -1000,11 +1024,21 @@ TEST(HashMap, AnotherAllocatorMoveConstructionTest)
 		ASSERT_EQ((*phm2)[test_hashmap_object(i)].val, i);
 	}
 
+	HashMap<test_hashmap_object, test_hashmap_object>* phm3 = new HashMap<test_hashmap_object, test_hashmap_object>(std::move(*phm2));
+
+	ASSERT_EQ(phm3->GetSize(), test_size);
+	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm3)[test_hashmap_object(i)].val, i);
+	}
+
 	delete phm;
 	delete phm2;
+	delete phm3;
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(key_pool[i], 3);
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
@@ -1057,12 +1091,40 @@ TEST(HashMap, AnotherAllocatorCopyAssignmentTest)
 		ASSERT_EQ((*phm2)[test_hashmap_object(i)].val, i);
 	}
 
+	HashMap<test_hashmap_object, test_hashmap_object>* phm3 = new HashMap<test_hashmap_object, test_hashmap_object>();
+
+	ASSERT_EQ(phm3->GetSize(), 0);
+
+	*phm3 = *phm2;
+
+	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(phm->GetBucketQuantity(), phm->GetCorrectBucketQuantity(phm->GetLoadFactor(), phm->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_hashmap_object(i)].val, i);
+	}
+
+	ASSERT_EQ(phm2->GetSize(), test_size);
+	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm2)[test_hashmap_object(i)].val, i);
+	}
+
+	ASSERT_EQ(phm3->GetSize(), test_size);
+	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm3)[test_hashmap_object(i)].val, i);
+	}
+
 	delete phm;
 	delete phm2;
+	delete phm3;
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);
-		ASSERT_EQ(val_pool[i], 2);
+		ASSERT_EQ(key_pool[i], 3);
+		ASSERT_EQ(val_pool[i], 3);
 	}
 }
 
@@ -1107,11 +1169,25 @@ TEST(HashMap, AnotherAllocatorMoveAssignmentTest)
 		ASSERT_EQ((*phm2)[test_hashmap_object(i)].val, i);
 	}
 
+	HashMap<test_hashmap_object, test_hashmap_object>* phm3 = new HashMap<test_hashmap_object, test_hashmap_object>();
+
+	ASSERT_EQ(phm3->GetSize(), 0);
+
+	*phm3 = std::move(*phm2);
+
+	ASSERT_EQ(phm3->GetSize(), test_size);
+	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm3)[test_hashmap_object(i)].val, i);
+	}
+
 	delete phm;
 	delete phm2;
+	delete phm3;
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(key_pool[i], 3);
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
