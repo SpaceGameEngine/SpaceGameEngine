@@ -16,3 +16,13 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "Container/List.hpp"
+
+using namespace SpaceGameEngine;
+
+TEST(List, InstanceTest)
+{
+	List<int> l;
+	ASSERT_TRUE((std::is_same_v<decltype(l)::ValueType, int>));
+	ASSERT_TRUE((std::is_same_v<decltype(l)::AllocatorType, DefaultAllocator>));
+	ASSERT_EQ(l.GetSize(), 0);
+}

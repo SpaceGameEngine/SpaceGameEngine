@@ -695,6 +695,7 @@ namespace SpaceGameEngine
 
 			inline T* GetData() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return &(m_pNode->m_KeyValuePair);
 			}
 
@@ -706,6 +707,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NullPointerError, pbucket);
 				//SGE_ASSERT(NullPointerError, pnode);	pnode can be nullptr as the end iterator
+				SGE_ASSERT(NullPointerError, pbucket_end);
 				m_pBucket = pbucket;
 				m_pNode = pnode;
 				m_pBucketEnd = pbucket_end;

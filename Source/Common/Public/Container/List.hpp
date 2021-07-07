@@ -14,8 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-
-//List
+#include <initializer_list>
+#include "TypeDefinition.hpp"
+#include "MemoryManager.h"
+#include "Error.h"
+#include "ReverseSequentialIterator.hpp"
 
 namespace SpaceGameEngine
 {
@@ -24,6 +27,228 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	template<typename T, typename Allocator = DefaultAllocator>
+	class List
+	{
+	public:
+		using ValueType = T;
+		using AllocatorType = Allocator;
+
+	private:
+		struct Node
+		{
+			T m_Content;
+			Node* m_pNext;
+			Node* m_pPrevious;
+
+			template<typename U>
+			inline Node(U&& content)
+				: m_Content(std::forward<U>(content)), m_pNext(nullptr), m_pPrevious(nullptr)
+			{
+			}
+		};
+
+	public:
+		inline List()
+			: m_pHead(nullptr), m_pTail(nullptr), m_Size(0)
+		{
+		}
+
+		inline SizeType GetSize() const
+		{
+			return m_Size;
+		}
+
+		template<typename IteratorType>
+		struct IsListIterator;
+
+		template<typename _T>
+		class IteratorImpl
+		{
+		public:
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const IteratorImpl& iter)
+				{
+				}
+			};
+
+			using ValueType = _T;
+
+			friend class List<T, Allocator>;
+
+		public:
+			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const List&, List&> l)
+			{
+				return IteratorImpl(l.m_pHead, l.m_pHead, l.m_pTail);
+			}
+
+			inline static IteratorImpl GetEnd(std::conditional_t<std::is_const_v<_T>, const List&, List&> l)
+			{
+				return IteratorImpl(nullptr, l.m_pHead, l.m_pTail);
+			}
+
+			inline IteratorImpl(const IteratorImpl& iter)
+				: m_pNode(iter.m_pNode), m_pHead(iter.m_pHead), m_pTail(iter.m_pTail)
+			{
+			}
+
+			inline IteratorImpl& operator=(const IteratorImpl& iter)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &iter);
+				m_pNode = iter.m_pNode;
+				m_pHead = iter.m_pHead;
+				m_pTail = iter.m_pTail;
+				return *this;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline IteratorImpl(const IteratorType& iter)
+				: m_pNode((NodePointerType)iter.m_pNode), m_pHead((NodePointerType)iter.m_pHead), m_pTail((NodePointerType)iter.m_pTail)
+			{
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline IteratorImpl& operator=(const IteratorType& iter)
+			{
+				m_pNode = (NodePointerType)iter.m_pNode;
+				m_pHead = (NodePointerType)iter.m_pHead;
+				m_pTail = (NodePointerType)iter.m_pTail;
+				return *this;
+			}
+
+			inline IteratorImpl operator+(SizeType i) const
+			{
+				IteratorImpl re(*this);
+				for (SizeType j = 0; j < i; ++j)
+					re.MoveForward();
+				return re;
+			}
+
+			inline IteratorImpl& operator+=(SizeType i)
+			{
+				for (SizeType j = 0; j < i; ++j)
+					MoveForward();
+				return *this;
+			}
+
+			inline IteratorImpl& operator++()
+			{
+				MoveForward();
+				return *this;
+			}
+
+			inline const IteratorImpl operator++(int)
+			{
+				IteratorImpl re(*this);
+				MoveForward();
+				return re;
+			}
+
+			inline IteratorImpl operator-(SizeType i) const
+			{
+				IteratorImpl re(*this);
+				for (SizeType j = 0; j < i; ++j)
+					re.MoveBack();
+				return re;
+			}
+
+			inline IteratorImpl& operator-=(SizeType i)
+			{
+				for (SizeType j = 0; j < i; ++j)
+					MoveBack();
+				return *this;
+			}
+
+			inline IteratorImpl& operator--()
+			{
+				MoveBack();
+				return *this;
+			}
+
+			inline const IteratorImpl operator--(int)
+			{
+				IteratorImpl re(*this);
+				MoveBack();
+				return re;
+			}
+
+			inline SizeType operator-(const IteratorImpl& iter) const
+			{
+				SizeType re = 0;
+				IteratorImpl i = iter;
+				while (i != *this)
+				{
+					i.MoveForward();
+					re += 1;
+				}
+				return re;
+			}
+
+			inline T* operator->() const
+			{
+				SGE_ASSERT(OutOfRangeError, *this);
+				return &(m_pNode->m_Content);
+			}
+
+			inline T& operator*() const
+			{
+				SGE_ASSERT(OutOfRangeError, *this);
+				return m_pNode->m_Content;
+			}
+
+			inline bool operator==(const IteratorImpl& iter) const
+			{
+				return m_pNode == iter.m_pNode && m_pHead == iter.m_pHead && m_pTail == iter.m_pTail;
+			}
+
+			inline bool operator!=(const IteratorImpl& iter) const
+			{
+				return m_pNode != iter.m_pNode || m_pHead != iter.m_pHead || m_pTail != iter.m_pTail;
+			}
+
+			inline T* GetData() const
+			{
+				SGE_ASSERT(OutOfRangeError, *this);
+				return &(m_pNode->m_Content);
+			}
+
+		private:
+			using NodePointerType = std::conditional_t<std::is_const_v<T>, const Node*, Node*>;
+
+			inline IteratorImpl(NodePointerType pnode, NodePointerType phead, NodePointerType ptail)
+				: m_pNode(pnode), m_pHead(phead), m_pTail(ptail)
+			{
+			}
+
+			inline void MoveForward()
+			{
+				if (m_pNode)
+					m_pNode = m_pNode->m_pNext;
+				else
+					m_pNode = m_pHead;
+			}
+
+			inline void MoveBack()
+			{
+				if (m_pNode)
+					m_pNode = m_pNode->m_pPrevious;
+				else
+					m_pNode = m_pTail;
+			}
+
+		private:
+			NodePointerType m_pNode;
+			NodePointerType m_pHead;
+			NodePointerType m_pTail;
+		};
+
+	private:
+		Node* m_pHead;
+		Node* m_pTail;
+		SizeType m_Size;
+	};
 	/*!
 	@}
 	*/
