@@ -133,6 +133,16 @@ namespace SpaceGameEngine
 			return m_Content.GetData();
 		}
 
+		inline IteratorType& GetContent()
+		{
+			return m_Content;
+		}
+
+		inline const IteratorType& GetContent() const
+		{
+			return m_Content;
+		}
+
 	protected:
 		template<typename... Args>
 		inline explicit ReverseSequentialIterator(Args&&... args)
@@ -145,16 +155,6 @@ namespace SpaceGameEngine
 		{
 			m_Content.operator=(std::forward<Args>(args)...);
 			return *this;
-		}
-
-		inline IteratorType& GetContent()
-		{
-			return m_Content;
-		}
-
-		inline const IteratorType& GetContent() const
-		{
-			return m_Content;
 		}
 
 	private:
