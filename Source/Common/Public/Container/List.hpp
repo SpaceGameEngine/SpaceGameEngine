@@ -80,6 +80,9 @@ namespace SpaceGameEngine
 			friend class List<T, Allocator>;
 
 			template<typename IteratorType>
+			friend class ReverseSequentialIterator;
+
+			template<typename IteratorType>
 			friend class ListReverseIteratorImpl;
 
 		public:
@@ -257,12 +260,165 @@ namespace SpaceGameEngine
 				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
 				inline static bool Judge(const ListReverseIteratorImpl& iter)
 				{
-					return iter.m_pNode == nullptr;
+					return iter.GetContent().m_pNode == nullptr;
 				}
 			};
 
 			using ValueType = typename IteratorType::ValueType;
+
+		public:
+			inline static ListReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<ValueType>, const List&, List&> l)
+			{
+				return ListReverseIteratorImpl(l.m_pTail, l.m_pHead, l.m_pTail);
+			}
+
+			inline static ListReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<ValueType>, const List&, List&> l)
+			{
+				return ListReverseIteratorImpl(nullptr, l.m_pHead, l.m_pTail);
+			}
+
+			inline ListReverseIteratorImpl(const ListReverseIteratorImpl& iter)
+				: ReverseSequentialIterator<IteratorType>(iter)
+			{
+			}
+
+			inline ListReverseIteratorImpl& operator=(const ListReverseIteratorImpl& iter)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &iter);
+				ReverseSequentialIterator<IteratorType>::operator=(iter);
+				return *this;
+			}
+
+			template<typename _IteratorType, typename = std::enable_if_t<IsListIterator<_IteratorType>::Value && (std::is_same_v<typename _IteratorType::ValueType, ValueType> || std::is_same_v<typename _IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline ListReverseIteratorImpl(const _IteratorType& iter)
+				: ReverseSequentialIterator<IteratorType>(iter)
+			{
+			}
+
+			template<typename _IteratorType, typename = std::enable_if_t<IsListIterator<_IteratorType>::Value && (std::is_same_v<typename _IteratorType::ValueType, ValueType> || std::is_same_v<typename _IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline ListReverseIteratorImpl& operator=(const _IteratorType& iter)
+			{
+				ReverseSequentialIterator<IteratorType>::operator=(iter);
+				return *this;
+			}
+
+			inline ListReverseIteratorImpl operator+(SizeType i) const
+			{
+				return ReverseSequentialIterator<IteratorType>::operator+(i);
+			}
+
+			inline ListReverseIteratorImpl& operator+=(SizeType i)
+			{
+				ReverseSequentialIterator<IteratorType>::operator+=(i);
+				return *this;
+			}
+
+			inline ListReverseIteratorImpl& operator++()
+			{
+				ReverseSequentialIterator<IteratorType>::operator++();
+				return *this;
+			}
+
+			inline const ListReverseIteratorImpl operator++(int)
+			{
+				return ReverseSequentialIterator<IteratorType>::operator++(0);
+			}
+
+			inline ListReverseIteratorImpl operator-(SizeType i) const
+			{
+				return ReverseSequentialIterator<IteratorType>::operator-(i);
+			}
+
+			inline ListReverseIteratorImpl& operator-=(SizeType i)
+			{
+				ReverseSequentialIterator<IteratorType>::operator-=(i);
+				return *this;
+			}
+
+			inline ListReverseIteratorImpl& operator--()
+			{
+				ReverseSequentialIterator<IteratorType>::operator--();
+				return *this;
+			}
+
+			inline const ListReverseIteratorImpl operator--(int)
+			{
+				return ReverseSequentialIterator<IteratorType>::operator--(0);
+			}
+
+			inline SizeType operator-(const ListReverseIteratorImpl& iter) const
+			{
+				return ReverseSequentialIterator<IteratorType>::operator-(iter);
+			}
+
+			inline bool operator==(const ListReverseIteratorImpl& iter) const
+			{
+				return ReverseSequentialIterator<IteratorType>::operator==(iter);
+			}
+
+			inline bool operator!=(const ListReverseIteratorImpl& iter) const
+			{
+				return ReverseSequentialIterator<IteratorType>::operator!=(iter);
+			}
+
+		private:
+			using NodePointerType = typename IteratorType::NodePointerType;
+
+			inline ListReverseIteratorImpl(NodePointerType pnode, NodePointerType phead, NodePointerType ptail)
+				: ReverseSequentialIterator<IteratorType>(pnode, phead, ptail)
+			{
+			}
+
+			inline ListReverseIteratorImpl(const ReverseSequentialIterator<IteratorType>& iter)
+				: ReverseSequentialIterator<IteratorType>(iter)
+			{
+			}
 		};
+
+		using Iterator = IteratorImpl<T>;
+		using ConstIterator = IteratorImpl<const T>;
+		using ReverseIterator = ListReverseIteratorImpl<IteratorImpl<T>>;
+		using ConstReverseIterator = ListReverseIteratorImpl<IteratorImpl<const T>>;
+
+		inline Iterator GetBegin()
+		{
+			return Iterator::GetBegin(*this);
+		}
+
+		inline Iterator GetEnd()
+		{
+			return Iterator::GetEnd(*this);
+		}
+
+		inline ConstIterator GetConstBegin() const
+		{
+			return ConstIterator::GetBegin(*this);
+		}
+
+		inline ConstIterator GetConstEnd() const
+		{
+			return ConstIterator::GetEnd(*this);
+		}
+
+		inline ReverseIterator GetReverseBegin()
+		{
+			return ReverseIterator::GetBegin(*this);
+		}
+
+		inline ReverseIterator GetReverseEnd()
+		{
+			return ReverseIterator::GetEnd(*this);
+		}
+
+		inline ConstReverseIterator GetConstReverseBegin() const
+		{
+			return ConstReverseIterator::GetBegin(*this);
+		}
+
+		inline ConstReverseIterator GetConstReverseEnd() const
+		{
+			return ConstReverseIterator::GetEnd(*this);
+		}
 
 	private:
 		Node* m_pHead;

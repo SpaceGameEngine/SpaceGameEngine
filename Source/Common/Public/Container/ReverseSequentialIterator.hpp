@@ -147,6 +147,16 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		inline IteratorType& GetContent()
+		{
+			return m_Content;
+		}
+
+		inline const IteratorType& GetContent() const
+		{
+			return m_Content;
+		}
+
 	private:
 		IteratorType m_Content;
 	};
