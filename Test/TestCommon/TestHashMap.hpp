@@ -1210,6 +1210,19 @@ TEST(HashMap, AnotherAllocatorMoveAssignmentTest)
 	}
 }
 
+TEST(HashMapIterator, OutOfRangeErrorTest)
+{
+	HashMap<int, int> hm1({{1, 1}, {2, 2}});
+	ASSERT_TRUE((HashMap<int, int>::Iterator::OutOfRangeError::Judge(hm1.GetEnd())));
+	ASSERT_TRUE((HashMap<int, int>::ConstIterator::OutOfRangeError::Judge(hm1.GetConstEnd())));
+
+	ASSERT_FALSE((HashMap<int, int>::Iterator::OutOfRangeError::Judge(hm1.GetBegin())));
+	ASSERT_FALSE((HashMap<int, int>::ConstIterator::OutOfRangeError::Judge(hm1.GetConstBegin())));
+
+	ASSERT_TRUE((HashMap<int, int>::Iterator::OutOfRangeError::Judge(hm1.GetBegin() + 2)));
+	ASSERT_TRUE((HashMap<int, int>::ConstIterator::OutOfRangeError::Judge(hm1.GetConstBegin() + 2)));
+}
+
 TEST(HashMapIterator, GetTest)
 {
 	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();

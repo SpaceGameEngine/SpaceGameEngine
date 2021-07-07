@@ -26,3 +26,9 @@ TEST(List, InstanceTest)
 	ASSERT_TRUE((std::is_same_v<decltype(l)::AllocatorType, DefaultAllocator>));
 	ASSERT_EQ(l.GetSize(), 0);
 }
+
+TEST(ListIterator, OutOfRangeErrorTest)
+{
+	//todo : make list more content, add the test
+	List<int> l;
+}

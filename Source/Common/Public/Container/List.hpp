@@ -71,12 +71,16 @@ namespace SpaceGameEngine
 				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
 				inline static bool Judge(const IteratorImpl& iter)
 				{
+					return iter.m_pNode == nullptr;
 				}
 			};
 
 			using ValueType = _T;
 
 			friend class List<T, Allocator>;
+
+			template<typename IteratorType>
+			friend class ListReverseIteratorImpl;
 
 		public:
 			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const List&, List&> l)
@@ -242,6 +246,22 @@ namespace SpaceGameEngine
 			NodePointerType m_pNode;
 			NodePointerType m_pHead;
 			NodePointerType m_pTail;
+		};
+
+		template<typename IteratorType>
+		class ListReverseIteratorImpl : public ReverseSequentialIterator<IteratorType>
+		{
+		public:
+			struct OutOfRangeError
+			{
+				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static bool Judge(const ListReverseIteratorImpl& iter)
+				{
+					return iter.m_pNode == nullptr;
+				}
+			};
+
+			using ValueType = typename IteratorType::ValueType;
 		};
 
 	private:
