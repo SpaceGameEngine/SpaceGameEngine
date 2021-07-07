@@ -54,6 +54,38 @@ namespace SpaceGameEngine
 		{
 		}
 
+		inline ~List()
+		{
+			if (m_Size)
+			{
+				Node* pn = m_pHead;
+				while (pn != nullptr)
+				{
+					Node* pb = pn;
+					pn = pn->m_pNext;
+					Allocator::template Delete(pb);
+				}
+			}
+		}
+
+		inline void Clear()
+		{
+			if (m_Size)
+			{
+				Node* pn = m_pHead;
+				while (pn != nullptr)
+				{
+					Node* pb = pn;
+					pn = pn->m_pNext;
+					Allocator::template Delete(pb);
+				}
+			}
+
+			m_Size = 0;
+			m_pHead = nullptr;
+			m_pTail = nullptr;
+		}
+
 		inline SizeType GetSize() const
 		{
 			return m_Size;
@@ -380,6 +412,12 @@ namespace SpaceGameEngine
 		using ReverseIterator = ListReverseIteratorImpl<IteratorImpl<T>>;
 		using ConstReverseIterator = ListReverseIteratorImpl<IteratorImpl<const T>>;
 
+		template<typename IteratorType>
+		struct IsListIterator
+		{
+			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
+		};
+
 		inline Iterator GetBegin()
 		{
 			return Iterator::GetBegin(*this);
@@ -418,6 +456,21 @@ namespace SpaceGameEngine
 		inline ConstReverseIterator GetConstReverseEnd() const
 		{
 			return ConstReverseIterator::GetEnd(*this);
+		}
+
+	private:
+		inline void RawClear()
+		{
+			if (m_Size)
+			{
+				Node* pn = m_pHead;
+				while (pn != nullptr)
+				{
+					Node* pb = pn;
+					pn = pn->m_pNext;
+					Allocator::template Delete(pb);
+				}
+			}
 		}
 
 	private:

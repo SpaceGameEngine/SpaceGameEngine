@@ -27,6 +27,14 @@ TEST(List, InstanceTest)
 	ASSERT_EQ(l.GetSize(), 0);
 }
 
+TEST(List, ClearTest)
+{
+	List<int> l;	//todo : add more content
+	ASSERT_EQ(l.GetSize(), 0);
+	l.Clear();
+	ASSERT_EQ(l.GetSize(), 0);
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
 	//todo : make list more content, add more test
