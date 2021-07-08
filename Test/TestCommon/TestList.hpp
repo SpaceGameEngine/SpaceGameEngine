@@ -272,6 +272,56 @@ TEST(List, InsertTest)
 	ASSERT_EQ(check_arr[6], 1);
 }
 
+TEST(List, EmplaceTest)
+{
+	const int test_size = 10;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pl->Emplace(pl->GetEnd(), i, val_rel_func);
+		ASSERT_EQ(iter->val, i);
+		ASSERT_EQ(iter, pl->GetReverseBegin());
+	}
+	ASSERT_EQ(pl->GetSize(), test_size);
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+
+	int check_arr[7];
+	memset(check_arr, 0, sizeof(check_arr));
+	List<int> l;
+	for (int i = 0; i < 5; i++)
+		l.Emplace(l.GetConstEnd(), i);
+
+	auto iter1 = l.Emplace(l.GetBegin() + 1, 5);
+	ASSERT_EQ(*iter1, 5);
+
+	for (auto i = iter1 - 1; i != l.GetEnd(); ++i)
+		check_arr[*i] += 1;
+
+	for (int i = 0; i < 6; i++)
+		ASSERT_EQ(check_arr[i], 1);
+
+	auto iter2 = l.Emplace(l.GetConstReverseBegin() + 1, 6);
+	ASSERT_EQ(*iter2, 6);
+
+	for (auto i = iter2 - 1; i != l.GetConstReverseEnd(); ++i)
+		check_arr[*i] += 1;
+
+	for (int i = 0; i < 6; i++)
+		ASSERT_EQ(check_arr[i], 2);
+
+	ASSERT_EQ(check_arr[6], 1);
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
 	//todo : make list more content, add more test

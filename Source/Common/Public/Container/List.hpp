@@ -700,6 +700,40 @@ namespace SpaceGameEngine
 			return IteratorType(pn, m_pHead, m_pTail);
 		}
 
+		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>, typename... Args>
+		inline IteratorType Emplace(const IteratorType& iter, Args&&... args)
+		{
+			Node* pn = Allocator::template New<Node>(std::forward<Args>(args)...);
+			m_Size += 1;
+			IteratorType biter = iter - 1;
+			Node* pfwd = nullptr;
+			Node* pbck = nullptr;
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				pfwd = (Node*)iter.m_pNode;
+				pbck = (Node*)biter.m_pNode;
+			}
+			else	//Reverse
+			{
+				pfwd = (Node*)biter.m_pNode;
+				pbck = (Node*)iter.m_pNode;
+			}
+			pn->m_pNext = pfwd;
+			pn->m_pPrevious = pbck;
+
+			if (pfwd)
+				pfwd->m_pPrevious = pn;
+			else
+				m_pTail = pn;
+
+			if (pbck)
+				pbck->m_pNext = pn;
+			else
+				m_pHead = pn;
+
+			return IteratorType(pn, m_pHead, m_pTail);
+		}
+
 	private:
 		inline void RawClear()
 		{
