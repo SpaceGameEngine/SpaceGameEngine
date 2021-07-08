@@ -19,6 +19,67 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+struct test_list_object
+{
+	std::function<void(test_list_object&)> rel_func;
+	test_list_object()
+		: val(0), rel_func([](test_list_object&) {})
+	{
+	}
+	test_list_object(int v)
+		: val(v), rel_func([](test_list_object&) {})
+	{
+	}
+	test_list_object(int v, const std::function<void(test_list_object&)>& func)
+		: val(v), rel_func(func)
+	{
+	}
+	test_list_object(const test_list_object& o) noexcept
+		: val(o.val), rel_func(o.rel_func)
+	{
+	}
+	test_list_object(test_list_object&& o) noexcept
+		: val(o.val), rel_func(std::move(o.rel_func))
+	{
+		o.rel_func = [](test_list_object&) {};
+	}
+	~test_list_object()
+	{
+		rel_func(*this);
+	}
+	int val;
+
+	test_list_object& operator=(const test_list_object& o)
+	{
+		val = o.val;
+		rel_func = o.rel_func;
+		return *this;
+	}
+
+	test_list_object& operator=(test_list_object&& o)
+	{
+		val = o.val;
+		rel_func = std::move(o.rel_func);
+		o.rel_func = [](test_list_object&) {};
+		return *this;
+	}
+
+	bool operator<(const test_list_object& o) const
+	{
+		return val < o.val;
+	}
+
+	bool operator==(const test_list_object& o) const
+	{
+		return val == o.val;
+	}
+
+	bool operator!=(const test_list_object& o) const
+	{
+		return val != o.val;
+	}
+};
+
 TEST(List, InstanceTest)
 {
 	List<int> l;
@@ -33,6 +94,74 @@ TEST(List, ClearTest)
 	ASSERT_EQ(l.GetSize(), 0);
 	l.Clear();
 	ASSERT_EQ(l.GetSize(), 0);
+}
+
+TEST(List, PushBackTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		test_list_object buf(i, val_rel_func);
+		ASSERT_EQ(pl->PushBack(buf).val, i);
+		auto iter = pl->GetEnd() - 1;
+		ASSERT_EQ(iter->val, i);
+	}
+	ASSERT_EQ(pl->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; i++)
+	{
+		test_list_object buf(i, val_rel_func);
+		ASSERT_EQ(pl->PushBack(std::move(buf)).val, i);
+		auto iter = pl->GetEnd() - 1;
+		ASSERT_EQ(iter->val, i);
+	}
+	ASSERT_EQ(pl->GetSize(), 2 * test_size);
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 3);
+	}
+}
+
+TEST(List, PushFrontTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		test_list_object buf(i, val_rel_func);
+		ASSERT_EQ(pl->PushFront(buf).val, i);
+		auto iter = pl->GetBegin();
+		ASSERT_EQ(iter->val, i);
+	}
+	ASSERT_EQ(pl->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; i++)
+	{
+		test_list_object buf(i, val_rel_func);
+		ASSERT_EQ(pl->PushFront(std::move(buf)).val, i);
+		auto iter = pl->GetBegin();
+		ASSERT_EQ(iter->val, i);
+	}
+	ASSERT_EQ(pl->GetSize(), 2 * test_size);
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 3);
+	}
 }
 
 TEST(ListIterator, OutOfRangeErrorTest)

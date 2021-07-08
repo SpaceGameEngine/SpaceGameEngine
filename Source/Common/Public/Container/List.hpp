@@ -458,6 +458,78 @@ namespace SpaceGameEngine
 			return ConstReverseIterator::GetEnd(*this);
 		}
 
+		inline T& PushBack(const T& t)
+		{
+			Node* pn = Allocator::template New<Node>(t);
+			if (m_Size)
+			{
+				pn->m_pPrevious = m_pTail;
+				m_pTail->m_pNext = pn;
+				m_pTail = pn;
+			}
+			else
+			{
+				m_pHead = pn;
+				m_pTail = pn;
+			}
+			m_Size += 1;
+			return pn->m_Content;
+		}
+
+		inline T& PushBack(T&& t)
+		{
+			Node* pn = Allocator::template New<Node>(std::move(t));
+			if (m_Size)
+			{
+				pn->m_pPrevious = m_pTail;
+				m_pTail->m_pNext = pn;
+				m_pTail = pn;
+			}
+			else
+			{
+				m_pHead = pn;
+				m_pTail = pn;
+			}
+			m_Size += 1;
+			return pn->m_Content;
+		}
+
+		inline T& PushFront(const T& t)
+		{
+			Node* pn = Allocator::template New<Node>(t);
+			if (m_Size)
+			{
+				pn->m_pNext = m_pHead;
+				m_pHead->m_pPrevious = pn;
+				m_pHead = pn;
+			}
+			else
+			{
+				m_pHead = pn;
+				m_pTail = pn;
+			}
+			m_Size += 1;
+			return pn->m_Content;
+		}
+
+		inline T& PushFront(T&& t)
+		{
+			Node* pn = Allocator::template New<Node>(std::move(t));
+			if (m_Size)
+			{
+				pn->m_pNext = m_pHead;
+				m_pHead->m_pPrevious = pn;
+				m_pHead = pn;
+			}
+			else
+			{
+				m_pHead = pn;
+				m_pTail = pn;
+			}
+			m_Size += 1;
+			return pn->m_Content;
+		}
+
 	private:
 		inline void RawClear()
 		{
