@@ -116,7 +116,7 @@ namespace SpaceGameEngine
 
 			friend class List<T, Allocator>;
 
-			template<typename IteratorType>
+			template<typename __T>
 			friend class ReverseIteratorImpl;
 
 		public:

@@ -20,7 +20,6 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Error.h"
 #include "ContainerConcept.hpp"
-#include "ReverseSequentialIterator.hpp"
 
 namespace SpaceGameEngine
 {
@@ -711,11 +710,12 @@ namespace SpaceGameEngine
 
 			using ValueType = _T;
 
-		public:
 			friend OutOfRangeError;
 			friend Vector;
-			friend ReverseSequentialIterator<IteratorImpl<_T>>;
+			template<typename __T>
+			friend class ReverseIteratorImpl;
 
+		public:
 			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
 				return IteratorImpl(reinterpret_cast<_T*>(v.m_pContent));
@@ -840,137 +840,157 @@ namespace SpaceGameEngine
 			_T* m_pContent;
 		};
 
-		template<typename IteratorType>
-		class VectorReverseIteratorImpl : public ReverseSequentialIterator<IteratorType>
+		template<typename _T>
+		class ReverseIteratorImpl
 		{
 		public:
 			struct OutOfRangeError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
-				inline static bool Judge(const VectorReverseIteratorImpl& iter, T* begin, T* end)
+				inline static bool Judge(const ReverseIteratorImpl& iter, _T* begin, _T* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
 					SGE_ASSERT(NullPointerError, end);
-					return !(iter.operator->() >= begin && iter.operator->() <= end);
+					return !(iter.m_pContent >= begin && iter.m_pContent <= end);
 				}
 			};
 
-			using ValueType = typename IteratorType::ValueType;
+			using ValueType = _T;
 
-		public:
 			friend OutOfRangeError;
 			friend Vector;
+			template<typename __T>
+			friend class IteratorImpl;
 
-			inline static VectorReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<ValueType>, const Vector&, Vector&> v)
+		public:
+			inline static ReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
-				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) + v.m_Size - 1);
+				return ReverseIteratorImpl(reinterpret_cast<_T*>(v.m_pContent) + v.m_Size - 1);
 			}
 
-			inline static VectorReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<ValueType>, const Vector&, Vector&> v)
+			inline static ReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
-				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) - 1);
+				return ReverseIteratorImpl(reinterpret_cast<_T*>(v.m_pContent) - 1);
 			}
 
-			inline VectorReverseIteratorImpl(const VectorReverseIteratorImpl& iter)
-				: ReverseSequentialIterator<IteratorType>(iter)
+			inline ReverseIteratorImpl(const ReverseIteratorImpl& iter)
 			{
+				m_pContent = iter.m_pContent;
 			}
 
-			inline VectorReverseIteratorImpl& operator=(const VectorReverseIteratorImpl& iter)
+			inline ReverseIteratorImpl& operator=(const ReverseIteratorImpl& iter)
 			{
 				SGE_ASSERT(SelfAssignmentError, this, &iter);
-				ReverseSequentialIterator<IteratorType>::operator=(iter);
+				m_pContent = iter.m_pContent;
 				return *this;
 			}
 
-			template<typename _IteratorType, typename = std::enable_if_t<IsVectorIterator<_IteratorType>::Value && (std::is_same_v<typename _IteratorType::ValueType, ValueType> || std::is_same_v<typename _IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
-			inline VectorReverseIteratorImpl(const _IteratorType& iter)
-				: ReverseSequentialIterator<IteratorType>(iter)
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline ReverseIteratorImpl(const IteratorType& iter)
 			{
+				m_pContent = (_T*)iter.GetData();
 			}
 
-			template<typename _IteratorType, typename = std::enable_if_t<IsVectorIterator<_IteratorType>::Value && (std::is_same_v<typename _IteratorType::ValueType, ValueType> || std::is_same_v<typename _IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
-			inline VectorReverseIteratorImpl& operator=(const _IteratorType& iter)
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline ReverseIteratorImpl& operator=(const IteratorType& iter)
 			{
-				ReverseSequentialIterator<IteratorType>::operator=(iter);
+				m_pContent = (_T*)iter.GetData();
 				return *this;
 			}
 
-			inline VectorReverseIteratorImpl operator+(SizeType i) const
+			inline ReverseIteratorImpl operator+(SizeType i) const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator+(i);
+				return ReverseIteratorImpl(m_pContent - i);
 			}
 
-			inline VectorReverseIteratorImpl& operator+=(SizeType i)
+			inline ReverseIteratorImpl& operator+=(SizeType i)
 			{
-				ReverseSequentialIterator<IteratorType>::operator+=(i);
+				m_pContent -= i;
 				return *this;
 			}
 
-			inline VectorReverseIteratorImpl& operator++()
+			inline ReverseIteratorImpl& operator++()
 			{
-				ReverseSequentialIterator<IteratorType>::operator++();
+				m_pContent -= 1;
 				return *this;
 			}
 
-			inline const VectorReverseIteratorImpl operator++(int)
+			inline const ReverseIteratorImpl operator++(int)
 			{
-				return ReverseSequentialIterator<IteratorType>::operator++(0);
+				ReverseIteratorImpl re(*this);
+				m_pContent -= 1;
+				return re;
 			}
 
-			inline VectorReverseIteratorImpl operator-(SizeType i) const
+			inline ReverseIteratorImpl operator-(SizeType i) const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator-(i);
+				return ReverseIteratorImpl(m_pContent + i);
 			}
 
-			inline VectorReverseIteratorImpl& operator-=(SizeType i)
+			inline ReverseIteratorImpl& operator-=(SizeType i)
 			{
-				ReverseSequentialIterator<IteratorType>::operator-=(i);
+				m_pContent += i;
 				return *this;
 			}
 
-			inline VectorReverseIteratorImpl& operator--()
+			inline ReverseIteratorImpl& operator--()
 			{
-				ReverseSequentialIterator<IteratorType>::operator--();
+				m_pContent += 1;
 				return *this;
 			}
 
-			inline const VectorReverseIteratorImpl operator--(int)
+			inline const ReverseIteratorImpl operator--(int)
 			{
-				return ReverseSequentialIterator<IteratorType>::operator--(0);
+				ReverseIteratorImpl re(*this);
+				m_pContent += 1;
+				return re;
 			}
 
-			inline SizeType operator-(const VectorReverseIteratorImpl& iter) const
+			inline SizeType operator-(const ReverseIteratorImpl& iter) const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator-(iter);
+				return ((AddressType)iter.m_pContent - (AddressType)m_pContent) / sizeof(_T);
 			}
 
-			inline bool operator==(const VectorReverseIteratorImpl& iter) const
+			inline _T* operator->() const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator==(iter);
+				return m_pContent;
 			}
 
-			inline bool operator!=(const VectorReverseIteratorImpl& iter) const
+			inline _T& operator*() const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator!=(iter);
+				return *m_pContent;
+			}
+
+			inline bool operator==(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent == iter.m_pContent;
+			}
+
+			inline bool operator!=(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent != iter.m_pContent;
+			}
+
+			inline ValueType* GetData() const
+			{
+				return m_pContent;
 			}
 
 		private:
-			inline VectorReverseIteratorImpl(T* ptr)
-				: ReverseSequentialIterator<IteratorType>(ptr)
+			inline explicit ReverseIteratorImpl(_T* ptr)
 			{
+				SGE_ASSERT(NullPointerError, ptr);
+				m_pContent = ptr;
 			}
 
-			inline VectorReverseIteratorImpl(const ReverseSequentialIterator<IteratorType>& iter)
-				: ReverseSequentialIterator<IteratorType>(iter)
-			{
-			}
+		private:
+			_T* m_pContent;
 		};
 
 		using Iterator = IteratorImpl<T>;
 		using ConstIterator = IteratorImpl<const T>;
-		using ReverseIterator = VectorReverseIteratorImpl<IteratorImpl<T>>;
-		using ConstReverseIterator = VectorReverseIteratorImpl<IteratorImpl<const T>>;
+		using ReverseIterator = ReverseIteratorImpl<T>;
+		using ConstReverseIterator = ReverseIteratorImpl<const T>;
 
 		inline Iterator GetBegin()
 		{
