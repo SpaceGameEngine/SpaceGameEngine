@@ -304,6 +304,8 @@ namespace SpaceGameEngine
 
 			using ValueType = typename IteratorType::ValueType;
 
+			friend class List<T, Allocator>;
+
 		public:
 			inline static ListReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<ValueType>, const List&, List&> l)
 			{
@@ -464,9 +466,9 @@ namespace SpaceGameEngine
 			return ConstReverseIterator::GetEnd(*this);
 		}
 
-		inline T& PushBack(const T& t)
+		inline T& PushBack(const T& val)
 		{
-			Node* pn = Allocator::template New<Node>(t);
+			Node* pn = Allocator::template New<Node>(val);
 			if (m_Size)
 			{
 				pn->m_pPrevious = m_pTail;
@@ -482,9 +484,9 @@ namespace SpaceGameEngine
 			return pn->m_Content;
 		}
 
-		inline T& PushBack(T&& t)
+		inline T& PushBack(T&& val)
 		{
-			Node* pn = Allocator::template New<Node>(std::move(t));
+			Node* pn = Allocator::template New<Node>(std::move(val));
 			if (m_Size)
 			{
 				pn->m_pPrevious = m_pTail;
@@ -519,9 +521,9 @@ namespace SpaceGameEngine
 			return pn->m_Content;
 		}
 
-		inline T& PushFront(const T& t)
+		inline T& PushFront(const T& val)
 		{
-			Node* pn = Allocator::template New<Node>(t);
+			Node* pn = Allocator::template New<Node>(val);
 			if (m_Size)
 			{
 				pn->m_pNext = m_pHead;
@@ -537,9 +539,9 @@ namespace SpaceGameEngine
 			return pn->m_Content;
 		}
 
-		inline T& PushFront(T&& t)
+		inline T& PushFront(T&& val)
 		{
-			Node* pn = Allocator::template New<Node>(std::move(t));
+			Node* pn = Allocator::template New<Node>(std::move(val));
 			if (m_Size)
 			{
 				pn->m_pNext = m_pHead;
@@ -572,6 +574,74 @@ namespace SpaceGameEngine
 			}
 			m_Size += 1;
 			return pn->m_Content;
+		}
+
+		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
+		inline IteratorType Insert(const IteratorType& iter, const T& val)
+		{
+			Node* pn = Allocator::template New<Node>(val);
+			m_Size += 1;
+			IteratorType biter = iter - 1;
+			Node* pfwd = nullptr;
+			Node* pbck = nullptr;
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				pfwd = iter.m_pNode;
+				pbck = biter.m_pNode;
+			}
+			else	//Reverse
+			{
+				pfwd = biter.GetContent().m_pNode;
+				pbck = iter.GetContent().m_pNode;
+			}
+			pn->m_pNext = pfwd;
+			pn->m_pPrevious = pbck;
+
+			if (pfwd)
+				pfwd->m_pPrevious = pn;
+			else
+				m_pTail = pn;
+
+			if (pbck)
+				pbck->m_pNext = pn;
+			else
+				m_pHead = pn;
+
+			return IteratorType(pn, m_pHead, m_pTail);
+		}
+
+		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
+		inline IteratorType Insert(const IteratorType& iter, T&& val)
+		{
+			Node* pn = Allocator::template New<Node>(std::move(val));
+			m_Size += 1;
+			IteratorType biter = iter - 1;
+			Node* pfwd = nullptr;
+			Node* pbck = nullptr;
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				pfwd = iter.m_pNode;
+				pbck = biter.m_pNode;
+			}
+			else	//Reverse
+			{
+				pfwd = biter.GetContent().m_pNode;
+				pbck = iter.GetContent().m_pNode;
+			}
+			pn->m_pNext = pfwd;
+			pn->m_pPrevious = pbck;
+
+			if (pfwd)
+				pfwd->m_pPrevious = pn;
+			else
+				m_pTail = pn;
+
+			if (pbck)
+				pbck->m_pNext = pn;
+			else
+				m_pHead = pn;
+
+			return IteratorType(pn, m_pHead, m_pTail);
 		}
 
 	private:
