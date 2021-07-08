@@ -130,6 +130,30 @@ TEST(List, PushBackTest)
 	}
 }
 
+TEST(List, EmplaceBackTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+		auto iter = pl->GetEnd() - 1;
+		ASSERT_EQ(iter->val, i);
+	}
+	ASSERT_EQ(pl->GetSize(), test_size);
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(List, PushFrontTest)
 {
 	const int test_size = 1000;
@@ -161,6 +185,30 @@ TEST(List, PushFrontTest)
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 3);
+	}
+}
+
+TEST(List, EmplaceFrontTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceFront(i, val_rel_func).val, i);
+		auto iter = pl->GetBegin();
+		ASSERT_EQ(iter->val, i);
+	}
+	ASSERT_EQ(pl->GetSize(), test_size);
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
 	}
 }
 

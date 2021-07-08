@@ -46,6 +46,12 @@ namespace SpaceGameEngine
 				: m_Content(std::forward<U>(content)), m_pNext(nullptr), m_pPrevious(nullptr)
 			{
 			}
+
+			template<typename... Args>
+			inline Node(Args&&... args)
+				: m_Content(std::forward<Args>(args)...), m_pNext(nullptr), m_pPrevious(nullptr)
+			{
+			}
 		};
 
 	public:
@@ -494,6 +500,25 @@ namespace SpaceGameEngine
 			return pn->m_Content;
 		}
 
+		template<typename... Args>
+		inline T& EmplaceBack(Args&&... args)
+		{
+			Node* pn = Allocator::template New<Node>(std::forward<Args>(args)...);
+			if (m_Size)
+			{
+				pn->m_pPrevious = m_pTail;
+				m_pTail->m_pNext = pn;
+				m_pTail = pn;
+			}
+			else
+			{
+				m_pHead = pn;
+				m_pTail = pn;
+			}
+			m_Size += 1;
+			return pn->m_Content;
+		}
+
 		inline T& PushFront(const T& t)
 		{
 			Node* pn = Allocator::template New<Node>(t);
@@ -515,6 +540,25 @@ namespace SpaceGameEngine
 		inline T& PushFront(T&& t)
 		{
 			Node* pn = Allocator::template New<Node>(std::move(t));
+			if (m_Size)
+			{
+				pn->m_pNext = m_pHead;
+				m_pHead->m_pPrevious = pn;
+				m_pHead = pn;
+			}
+			else
+			{
+				m_pHead = pn;
+				m_pTail = pn;
+			}
+			m_Size += 1;
+			return pn->m_Content;
+		}
+
+		template<typename... Args>
+		inline T& EmplaceFront(Args&&... args)
+		{
+			Node* pn = Allocator::template New<Node>(std::forward<Args>(args)...);
 			if (m_Size)
 			{
 				pn->m_pNext = m_pHead;
