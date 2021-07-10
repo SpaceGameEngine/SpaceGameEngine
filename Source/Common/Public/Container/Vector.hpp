@@ -598,6 +598,7 @@ namespace SpaceGameEngine
 		/*!
 		@brief set the Vector's size.
 		@param val the default value of the new elements.
+		@warning the value can not be one of the elements of this Vector.
 		@note There are three situations when the function is called.When
 		the size we set is less than the Vector's old size,the Vector
 		will release its spare elements.When the size we set is larger than
@@ -1032,6 +1033,9 @@ namespace SpaceGameEngine
 			return ConstReverseIterator::GetEnd(*this);
 		}
 
+		/*!
+		@warning the value can not be one of the elements of this Vector.
+		*/
 		inline T& PushBack(const T& val)
 		{
 			if (m_Size + 1 <= m_RealSize)
@@ -1048,6 +1052,9 @@ namespace SpaceGameEngine
 			return GetObject(m_Size - 1);
 		}
 
+		/*!
+		@warning the value can not be one of the elements of this Vector.
+		*/
 		inline T& PushBack(T&& val)
 		{
 			if (m_Size + 1 <= m_RealSize)
@@ -1064,6 +1071,9 @@ namespace SpaceGameEngine
 			return GetObject(m_Size - 1);
 		}
 
+		/*!
+		@warning the value can not be one of the elements of this Vector.
+		*/
 		template<typename... Args>
 		inline T& EmplaceBack(Args&&... args)
 		{
@@ -1093,6 +1103,7 @@ namespace SpaceGameEngine
 		@brief insert a value to the Vector before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
@@ -1109,7 +1120,8 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
 					for (SizeType i = m_Size - 2; i > index; i--)
 					{
 						GetObject(i) = std::move(GetObject(i - 1));
@@ -1129,7 +1141,8 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
 					for (SizeType i = 1; i < index; i++)
 					{
 						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
@@ -1144,6 +1157,7 @@ namespace SpaceGameEngine
 		@brief insert a value to the Vector before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
@@ -1160,7 +1174,8 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
 					for (SizeType i = m_Size - 2; i > index; i--)
 					{
 						GetObject(i) = std::move(GetObject(i - 1));
@@ -1180,7 +1195,8 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
 					for (SizeType i = 1; i < index; i++)
 					{
 						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
@@ -1191,6 +1207,9 @@ namespace SpaceGameEngine
 			}
 		}
 
+		/*!
+		@warning the value can not be one of the elements of this Vector.
+		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename... Args>
 		inline IteratorType Emplace(const IteratorType& iter, Args&&... args)
 		{
@@ -1205,7 +1224,8 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
 					for (SizeType i = m_Size - 2; i > index; i--)
 					{
 						GetObject(i) = std::move(GetObject(i - 1));
@@ -1225,7 +1245,8 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
 					for (SizeType i = 1; i < index; i++)
 					{
 						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
@@ -1241,6 +1262,7 @@ namespace SpaceGameEngine
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the size can not be zero.
+		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the first inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
@@ -1472,6 +1494,7 @@ namespace SpaceGameEngine
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the size of initializer_list can not be zero.
+		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
