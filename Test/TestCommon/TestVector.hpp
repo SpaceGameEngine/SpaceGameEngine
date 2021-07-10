@@ -789,7 +789,6 @@ TEST(Vector, InsertTest)
 
 TEST(Vector, EmplaceTest)
 {
-	//emplace resize cause bug : the last element move error
 	const int test_size = 10;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));

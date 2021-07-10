@@ -2097,7 +2097,7 @@ namespace SpaceGameEngine
 			SizeType osize = GetNormalSize();
 			if (GetRealSize() < nsize)
 			{
-				SetRealSize(nsize);
+				SetRealSize(2 * nsize);
 			}
 			m_Storage.CopyOnWrite();
 			memcpy(m_Storage.GetData() + osize, str.GetData(), (str.GetNormalSize() + 1) * sizeof(T));
@@ -2139,6 +2139,9 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		/*!
+		@warning the string which pstr pointing to can not be a part of this StringCore's content.
+		*/
 		inline StringCore& operator+=(const T* pstr)
 		{
 			SGE_ASSERT(NullPointerError, pstr);
@@ -2623,6 +2626,7 @@ namespace SpaceGameEngine
 		@brief insert a CString to the StringCore before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning the string which pstr pointing to can not be a part of this StringCore's content.
 		@return Iterator pointing to the inserted CString's first char.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>>
@@ -2711,6 +2715,7 @@ namespace SpaceGameEngine
 		@brief insert the content between the given iterator pair to the StringCore before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning the begin&end's Container can not be the current Vector.
 		@return Iterator pointing to the inserted content's first char.
 		*/
 		template<typename IteratorType, typename OtherIteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<OtherIteratorType>::Value, void>>
