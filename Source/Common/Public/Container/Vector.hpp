@@ -1191,6 +1191,51 @@ namespace SpaceGameEngine
 			}
 		}
 
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename... Args>
+		inline IteratorType Emplace(const IteratorType& iter, Args&&... args)
+		{
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == m_Size)
+				{
+					EmplaceBack(std::forward<Args>(args)...);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+				}
+				else
+				{
+					PushBack(std::move(GetObject(m_Size - 1)));
+					for (SizeType i = m_Size - 2; i > index; i--)
+					{
+						GetObject(i) = std::move(GetObject(i - 1));
+					}
+					GetObject(index) = T(std::forward<Args>(args)...);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
+			}
+			else	//reverse
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == 0)
+				{
+					EmplaceBack(std::forward<Args>(args)...);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+				}
+				else
+				{
+					PushBack(std::move(GetObject(m_Size - 1)));
+					for (SizeType i = 1; i < index; i++)
+					{
+						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+					}
+					GetObject(m_Size - 1 - index) = T(std::forward<Args>(args)...);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);
+				}
+			}
+		}
+
 		/*!
 		@brief insert some same values to the Vector before the iterator.
 		@todo use concept instead of sfinae.

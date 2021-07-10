@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include <type_traits>
+#include <functional>
 #include "gtest/gtest.h"
 #include "Container/Vector.hpp"
 
@@ -23,54 +24,49 @@ using namespace SpaceGameEngine;
 struct test_vector_class
 {
 	test_vector_class()
-		: destruction_hook([]() {})
+		: content(0), mi(0), destruction_hook([]() {})
 	{
-		content = 0;
-		mi = 0;
 	}
 	test_vector_class(int i)
-		: destruction_hook([]() {})
+		: content(i), mi(0), destruction_hook([]() {})
 	{
-		content = i;
-		mi = 0;
+	}
+	test_vector_class(int i, const std::function<void()>& func)
+		: content(i), mi(0), destruction_hook(func)
+	{
 	}
 	test_vector_class(const test_vector_class& t)
-		: destruction_hook([]() {})
+		: content(t.content), mi(1), destruction_hook(t.destruction_hook)
 	{
-		content = t.content;
-		mi = 1;
-		// std::cout << "copy construction" << std::endl;
 	}
 	test_vector_class& operator=(const test_vector_class& t)
 	{
 		content = t.content;
 		mi = 2;
-		// std::cout << "copy assignment" << std::endl;
+		destruction_hook = t.destruction_hook;
 		return *this;
 	}
 	test_vector_class(test_vector_class&& t)
-		: destruction_hook([]() {})
+		: content(t.content), mi(3), destruction_hook(std::move(t.destruction_hook))
 	{
-		content = t.content;
-		mi = 3;
-		// std::cout << "move construction" << std::endl;
+		t.destruction_hook = []() {};
 	}
 	test_vector_class& operator=(test_vector_class&& t)
 	{
 		content = t.content;
 		mi = 4;
-		// std::cout << "move assignment" << std::endl;
+		destruction_hook = std::move(t.destruction_hook);
+		t.destruction_hook = []() {};
 		return *this;
 	}
 	~test_vector_class()
 	{
 		mi = -1;
 		destruction_hook();
-		// std::cout << "destruction" << std::endl;
 	}
 	int mi;
 	int content;
-	Function<void()> destruction_hook;
+	std::function<void()> destruction_hook;
 };
 
 struct test_vector_class2
@@ -469,25 +465,26 @@ TEST(Vector, SetRealSizeTest)
 	ASSERT_TRUE(test.GetObject(0) == 0);
 	ASSERT_TRUE(test.GetObject(1) == 1);
 
-	Vector<test_vector_class> test2 = {1, 0};
-	ASSERT_TRUE(test2.GetObject(0).content == 1);
-	ASSERT_TRUE(test2.GetObject(1).content == 0);
-	ASSERT_TRUE(test2.GetSize() == 2);
-	ASSERT_TRUE(test2.GetRealSize() == 4);
+	Vector<test_vector_class>* ptest2 = new Vector<test_vector_class>({1, 0});
+	ASSERT_TRUE(ptest2->GetObject(0).content == 1);
+	ASSERT_TRUE(ptest2->GetObject(1).content == 0);
+	ASSERT_TRUE(ptest2->GetSize() == 2);
+	ASSERT_TRUE(ptest2->GetRealSize() == 4);
 	int des_cot = 0;
-	for (SizeType i = 0; i < test2.GetSize(); i++)
+	for (SizeType i = 0; i < ptest2->GetSize(); i++)
 	{
-		test2[i].destruction_hook = [&]() {
+		(*ptest2)[i].destruction_hook = [&]() {
 			des_cot += 1;
 		};
 	}
 	ASSERT_EQ(des_cot, 0);
-	test2.SetRealSize(2);
+	ptest2->SetRealSize(2);
+	ASSERT_TRUE(ptest2->GetSize() == 2);
+	ASSERT_TRUE(ptest2->GetRealSize() == 2);
+	ASSERT_TRUE(ptest2->GetObject(0).content == 1);
+	ASSERT_TRUE(ptest2->GetObject(1).content == 0);
+	delete ptest2;
 	ASSERT_EQ(des_cot, 2);
-	ASSERT_TRUE(test2.GetSize() == 2);
-	ASSERT_TRUE(test2.GetRealSize() == 2);
-	ASSERT_TRUE(test2.GetObject(0).content == 1);
-	ASSERT_TRUE(test2.GetObject(1).content == 0);
 }
 
 TEST(Vector, GetObjectTest)
@@ -788,6 +785,33 @@ TEST(Vector, InsertTest)
 	ASSERT_EQ(v4[4].content, 1);
 	for (int i = 5; i < 20; i++)
 		ASSERT_EQ(v4[i].content, i - 4);
+}
+
+TEST(Vector, EmplaceTest)
+{
+	//emplace resize cause bug : the last element move error
+	const int test_size = 10;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	Vector<test_vector_class>* pv = new Vector<test_vector_class>();
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pv->Emplace(pv->GetConstReverseEnd(), i, [&, i]() {
+			val_pool[i] += 1;
+		});
+		ASSERT_EQ(iter->content, i);
+	}
+	int cnt = 0;
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pv)[cnt++].content, i);
+	}
+
+	delete pv;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(Vector, PopBackTest)
