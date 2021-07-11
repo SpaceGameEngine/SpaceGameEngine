@@ -167,7 +167,6 @@
     <ClInclude Include="Public\Container\HashMap.hpp" />
     <ClInclude Include="Public\Container\List.hpp" />
     <ClInclude Include="Public\Container\Map.hpp" />
-    <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />
     <ClInclude Include="Public\Error.h" />
     <ClInclude Include="Public\ForwardDefinition.hpp" />
