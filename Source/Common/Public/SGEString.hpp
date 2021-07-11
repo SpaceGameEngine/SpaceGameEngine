@@ -2860,6 +2860,26 @@ namespace SpaceGameEngine
 			}
 		}
 
+		template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>>
+		inline StringCore Substring(const IteratorType& iter, SizeType size) const
+		{
+			SGE_ASSERT(EmptyStringCoreError, m_Size);
+			SGE_ASSERT(InvalidSizeError, size, 1, m_Size);
+			IteratorType eiter = iter + size;
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, GetData(), GetData() + GetNormalSize() - 1);
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, eiter, GetData() - 1, GetData() + GetNormalSize());
+			}
+			else
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, GetData(), StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData() + GetNormalSize()));
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, eiter, StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData()), GetData() + GetNormalSize());
+			}
+
+			return StringCore(iter, eiter);
+		}
+
 		/*!
 		@brief remove some elements in StringCore by giving the iterators.
 		@todo use concept instead of sfinae.
