@@ -2880,6 +2880,14 @@ namespace SpaceGameEngine
 			return StringCore(iter, eiter);
 		}
 
+		inline StringCore Reverse() const
+		{
+			if (m_Size > 0)
+				return StringCore(GetConstReverseBegin(), GetConstReverseEnd());
+			else
+				return StringCore();
+		}
+
 		/*!
 		@brief remove some elements in StringCore by giving the iterators.
 		@todo use concept instead of sfinae.

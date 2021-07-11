@@ -2252,6 +2252,49 @@ TEST(StringCore, SubstringTest)
 	ASSERT_EQ(ss_8, SGE_U8STR("试"));
 }
 
+TEST(StringCore, ReverseTest)
+{
+	UCS2String str1(SGE_STR("这是test测试"));
+	ASSERT_EQ(str1.GetSize(), 8);
+	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+
+	auto rs1 = str1.Reverse();
+	ASSERT_TRUE((std::is_same_v<decltype(rs1), UCS2String>));
+	ASSERT_EQ(rs1.GetSize(), 8);
+	ASSERT_EQ(rs1, SGE_STR("试测tset是这"));
+	ASSERT_EQ(str1.GetSize(), 8);
+	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+
+	const UCS2String str2;
+	ASSERT_EQ(str2.GetSize(), 0);
+	ASSERT_EQ(str2, SGE_STR(""));
+
+	auto rs2 = str2.Reverse();
+	ASSERT_TRUE((std::is_same_v<decltype(rs2), UCS2String>));
+	ASSERT_EQ(rs2.GetSize(), 0);
+	ASSERT_EQ(rs2, SGE_STR(""));
+
+	const UTF8String str3(SGE_U8STR("这是test测试"));
+	ASSERT_EQ(str3.GetSize(), 8);
+	ASSERT_EQ(str3, SGE_U8STR("这是test测试"));
+
+	auto rs3 = str3.Reverse();
+	ASSERT_TRUE((std::is_same_v<decltype(rs3), UTF8String>));
+	ASSERT_EQ(rs3.GetSize(), 8);
+	ASSERT_EQ(rs3, SGE_U8STR("试测tset是这"));
+
+	UTF8String str4;
+	ASSERT_EQ(str4.GetSize(), 0);
+	ASSERT_EQ(str4, SGE_U8STR(""));
+
+	auto rs4 = str4.Reverse();
+	ASSERT_TRUE((std::is_same_v<decltype(rs4), UTF8String>));
+	ASSERT_EQ(rs4.GetSize(), 0);
+	ASSERT_EQ(rs4, SGE_U8STR(""));
+	ASSERT_EQ(str4.GetSize(), 0);
+	ASSERT_EQ(str4, SGE_U8STR(""));
+}
+
 TEST(StringCore, RemoveTest)
 {
 	UCS2String s1_1(SGE_STR("这是测试"));
