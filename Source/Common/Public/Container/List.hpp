@@ -54,6 +54,9 @@ namespace SpaceGameEngine
 		};
 
 	public:
+		inline static const constexpr SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(Node);
+
+	public:
 		inline List()
 			: m_pHead(nullptr), m_pTail(nullptr), m_Size(0)
 		{
@@ -732,6 +735,54 @@ namespace SpaceGameEngine
 				m_pHead = pn;
 
 			return IteratorType(pn, m_pHead, m_pTail);
+		}
+
+		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
+		inline IteratorType Insert(const IteratorType& iter, SizeType size, const T& val)
+		{
+			SGE_ASSERT(InvalidSizeError, size, 1, sm_MaxSize);
+
+			Node* pnhead = Allocator::template New<Node>(val);
+			Node* pntail = pnhead;
+			for (SizeType i = 1; i < size; ++i)
+			{
+				Node* pnb = Allocator::template New<Node>(val);
+				pntail->m_pNext = pnb;
+				pnb->m_pPrevious = pntail;
+				pntail = pnb;
+			}
+
+			m_Size += size;
+			IteratorType biter = iter - 1;
+			Node* pfwd = nullptr;
+			Node* pbck = nullptr;
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				pfwd = (Node*)iter.m_pNode;
+				pbck = (Node*)biter.m_pNode;
+			}
+			else	//Reverse
+			{
+				pfwd = (Node*)biter.m_pNode;
+				pbck = (Node*)iter.m_pNode;
+			}
+			pntail->m_pNext = pfwd;
+			pnhead->m_pPrevious = pbck;
+
+			if (pfwd)
+				pfwd->m_pPrevious = pntail;
+			else
+				m_pTail = pntail;
+
+			if (pbck)
+				pbck->m_pNext = pnhead;
+			else
+				m_pHead = pnhead;
+
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+				return IteratorType(pnhead, m_pHead, m_pTail);
+			else	//reverse
+				return IteratorType(pntail, m_pHead, m_pTail);
 		}
 
 	private:

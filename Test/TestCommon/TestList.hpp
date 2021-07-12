@@ -80,6 +80,38 @@ struct test_list_object
 	}
 };
 
+template<typename Allocator>
+inline bool CheckListConnection(const List<test_list_object, Allocator>& l)
+{
+	int* pval = new int[l.GetSize()];
+	memset(pval, 0, sizeof(int) * l.GetSize());
+
+	int cnt = 0;
+	for (auto i = l.GetConstBegin(); i != l.GetConstEnd(); ++i, ++cnt)
+	{
+		pval[cnt] = i->val;
+	}
+
+	if (cnt != l.GetSize())
+		return false;
+
+	cnt -= 1;
+
+	for (auto i = l.GetConstReverseBegin(); i != l.GetConstReverseEnd(); ++i, --cnt)
+	{
+		if (pval[cnt] != i->val)
+			return false;
+	}
+
+	cnt += 1;
+
+	if (cnt != 0)
+		return false;
+
+	delete[] pval;
+	return true;
+}
+
 TEST(List, InstanceTest)
 {
 	List<int> l;
@@ -123,6 +155,8 @@ TEST(List, PushBackTest)
 	}
 	ASSERT_EQ(pl->GetSize(), 2 * test_size);
 
+	ASSERT_TRUE(CheckListConnection(*pl));
+
 	delete pl;
 	for (int i = 0; i < test_size; i++)
 	{
@@ -146,6 +180,8 @@ TEST(List, EmplaceBackTest)
 		ASSERT_EQ(iter->val, i);
 	}
 	ASSERT_EQ(pl->GetSize(), test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
 
 	delete pl;
 	for (int i = 0; i < test_size; i++)
@@ -181,6 +217,8 @@ TEST(List, PushFrontTest)
 	}
 	ASSERT_EQ(pl->GetSize(), 2 * test_size);
 
+	ASSERT_TRUE(CheckListConnection(*pl));
+
 	delete pl;
 	for (int i = 0; i < test_size; i++)
 	{
@@ -204,6 +242,8 @@ TEST(List, EmplaceFrontTest)
 		ASSERT_EQ(iter->val, i);
 	}
 	ASSERT_EQ(pl->GetSize(), test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
 
 	delete pl;
 	for (int i = 0; i < test_size; i++)
@@ -239,6 +279,8 @@ TEST(List, InsertTest)
 	}
 	ASSERT_EQ(pl->GetSize(), test_size * 2);
 
+	ASSERT_TRUE(CheckListConnection(*pl));
+
 	delete pl;
 	for (int i = 0; i < test_size; i++)
 	{
@@ -254,7 +296,7 @@ TEST(List, InsertTest)
 	auto iter1 = l.Insert(l.GetBegin() + 1, 5);
 	ASSERT_EQ(*iter1, 5);
 
-	for (auto i = iter1 - 1; i != l.GetEnd(); ++i)
+	for (auto i = l.GetBegin(); i != l.GetEnd(); ++i)
 		check_arr[*i] += 1;
 
 	for (int i = 0; i < 6; i++)
@@ -263,7 +305,7 @@ TEST(List, InsertTest)
 	auto iter2 = l.Insert(l.GetConstReverseBegin() + 1, 6);
 	ASSERT_EQ(*iter2, 6);
 
-	for (auto i = iter2 - 1; i != l.GetConstReverseEnd(); ++i)
+	for (auto i = l.GetConstReverseBegin(); i != l.GetConstReverseEnd(); ++i)
 		check_arr[*i] += 1;
 
 	for (int i = 0; i < 6; i++)
@@ -289,6 +331,8 @@ TEST(List, EmplaceTest)
 	}
 	ASSERT_EQ(pl->GetSize(), test_size);
 
+	ASSERT_TRUE(CheckListConnection(*pl));
+
 	delete pl;
 	for (int i = 0; i < test_size; i++)
 	{
@@ -304,7 +348,7 @@ TEST(List, EmplaceTest)
 	auto iter1 = l.Emplace(l.GetBegin() + 1, 5);
 	ASSERT_EQ(*iter1, 5);
 
-	for (auto i = iter1 - 1; i != l.GetEnd(); ++i)
+	for (auto i = l.GetBegin(); i != l.GetEnd(); ++i)
 		check_arr[*i] += 1;
 
 	for (int i = 0; i < 6; i++)
@@ -313,13 +357,104 @@ TEST(List, EmplaceTest)
 	auto iter2 = l.Emplace(l.GetConstReverseBegin() + 1, 6);
 	ASSERT_EQ(*iter2, 6);
 
-	for (auto i = iter2 - 1; i != l.GetConstReverseEnd(); ++i)
+	for (auto i = l.GetConstReverseBegin(); i != l.GetConstReverseEnd(); ++i)
 		check_arr[*i] += 1;
 
 	for (int i = 0; i < 6; i++)
 		ASSERT_EQ(check_arr[i], 2);
 
 	ASSERT_EQ(check_arr[6], 1);
+}
+
+TEST(List, InsertSizeTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		test_list_object buf(i, val_rel_func);
+		auto iter = pl->Insert(pl->GetConstBegin(), 1, buf);
+		ASSERT_EQ(iter->val, i);
+	}
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetReverseBegin(); i != pl->GetReverseEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+
+	memset(val_pool, 0, sizeof(val_pool));
+	pl = new List<test_list_object>();
+
+	{
+		test_list_object tbuf(1, val_rel_func);
+		auto iter = pl->Insert(pl->GetBegin(), test_size, tbuf);
+		ASSERT_EQ(pl->GetSize(), test_size);
+		ASSERT_EQ(iter->val, 1);
+		ASSERT_EQ(iter, pl->GetBegin());
+		for (auto i = iter; i != pl->GetEnd(); ++i)
+		{
+			ASSERT_EQ(i->val, 1);
+		}
+	}
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	delete pl;
+	ASSERT_EQ(val_pool[1], test_size + 1);
+
+	memset(val_pool, 0, sizeof(val_pool));
+	pl = new List<test_list_object>();
+
+	pl->PushBack(test_list_object(-2));
+	pl->PushFront(test_list_object(-1));
+	ASSERT_EQ(pl->GetSize(), 2);
+	ASSERT_EQ(pl->GetBegin()->val, -1);
+	ASSERT_EQ((pl->GetEnd() - 1)->val, -2);
+
+	{
+		test_list_object tbuf(2, val_rel_func);
+		auto iter = pl->Insert(pl->GetReverseBegin() + 1, test_size, tbuf);
+		ASSERT_EQ(pl->GetSize(), test_size + 2);
+		ASSERT_TRUE((std::is_same_v<decltype(iter), List<test_list_object>::ReverseIterator>));
+		ASSERT_EQ(iter->val, 2);
+		ASSERT_EQ(iter, pl->GetReverseBegin() + 1);
+		for (auto i = iter; i != pl->GetReverseEnd() - 1; ++i)
+		{
+			ASSERT_EQ(i->val, 2);
+		}
+	}
+
+	cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		if (cnt == 0)
+			ASSERT_EQ(i->val, -1);
+		else if (cnt == test_size + 1)
+			ASSERT_EQ(i->val, -2);
+		else
+			ASSERT_EQ(i->val, 2);
+	}
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	delete pl;
+	ASSERT_EQ(val_pool[2], test_size + 1);
 }
 
 TEST(ListIterator, OutOfRangeErrorTest)
