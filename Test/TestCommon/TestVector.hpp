@@ -597,6 +597,38 @@ TEST(Vector, SetSizeTest)
 	{
 		ASSERT_EQ(v2[i], 11);
 	}
+
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto gen_func = [&](int i) {
+		return [&, i]() {
+			val_pool[i] += 1;
+		};
+	};
+	Vector<test_vector_class>* pv = new Vector<test_vector_class>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		pv->SetSize(i + 1, test_vector_class(i, gen_func(i)));
+		ASSERT_EQ(pv->GetSize(), i + 1);
+		ASSERT_EQ((pv->GetEnd() - 1)->content, i);
+	}
+
+	for (int i = test_size - 1; i >= 0; --i)
+	{
+		ASSERT_EQ((*pv)[i].content, i);
+	}
+
+	pv->SetSize(0, test_vector_class(0));
+	ASSERT_EQ(pv->GetSize(), 0);
+	ASSERT_EQ(pv->GetBegin(), pv->GetEnd());
+
+	delete pv;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
 }
 
 TEST(Vector, GetObjectByOperatorTest)
@@ -631,6 +663,45 @@ TEST(Vector, PushBackTest)
 		ASSERT_TRUE(val_r3.content == i);
 		ASSERT_TRUE(val_r3.mi == 1);
 	}
+
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto gen_func = [&](int i) {
+		return [&, i]() {
+			val_pool[i] += 1;
+		};
+	};
+	Vector<test_vector_class>* pv = new Vector<test_vector_class>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		test_vector_class buf(i, gen_func(i));
+		ASSERT_EQ(pv->PushBack(buf).content, i);
+	}
+	ASSERT_EQ(pv->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; i++)
+	{
+		test_vector_class buf(i, gen_func(i));
+		ASSERT_EQ(pv->PushBack(std::move(buf)).content, i);
+	}
+	ASSERT_EQ(pv->GetSize(), 2 * test_size);
+
+	for (int i = test_size - 1; i >= 0; --i)
+	{
+		ASSERT_EQ((*pv)[i].content, i);
+	}
+	for (int i = 2 * test_size - 1; i >= test_size; --i)
+	{
+		ASSERT_EQ((*pv)[i].content, i - test_size);
+	}
+
+	delete pv;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 3);
+	}
 }
 
 TEST(Vector, EmplaceBackTest)
@@ -648,6 +719,33 @@ TEST(Vector, EmplaceBackTest)
 		ASSERT_TRUE(val_r2.content == i);
 		ASSERT_TRUE(v.GetSize() == 5 + i);
 		ASSERT_TRUE(val_r2.mi == 0);
+	}
+
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto gen_func = [&](int i) {
+		return [&, i]() {
+			val_pool[i] += 1;
+		};
+	};
+	Vector<test_vector_class>* pv = new Vector<test_vector_class>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pv->EmplaceBack(i, gen_func(i)).content, i);
+	}
+	ASSERT_EQ(pv->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; --i)
+	{
+		ASSERT_EQ((*pv)[i].content, i);
+	}
+
+	delete pv;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
 	}
 }
 
@@ -785,11 +883,139 @@ TEST(Vector, InsertTest)
 	ASSERT_EQ(v4[4].content, 1);
 	for (int i = 5; i < 20; i++)
 		ASSERT_EQ(v4[i].content, i - 4);
+
+	const int test_size = 1000;
+	int val_pool[test_size];
+	int val_check_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	memset(val_check_pool, 0, sizeof(val_check_pool));
+	auto gen_func = [&](int i) {
+		return [&, i]() {
+			val_pool[i] += 1;
+		};
+	};
+	Vector<test_vector_class>* pv = new Vector<test_vector_class>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		test_vector_class buf(i, gen_func(i));
+		auto iter = pv->Insert(pv->GetReverseBegin(), buf);
+	}
+	ASSERT_EQ(pv->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; i++)
+	{
+		val_check_pool[(*pv)[i].content] += 1;
+	}
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_check_pool[i], 1);
+	}
+
+	for (int i = 0; i < test_size; i++)
+	{
+		test_vector_class buf(i, gen_func(i));
+		auto iter = pv->Insert(pv->GetConstEnd() - 1, std::move(buf));
+	}
+	ASSERT_EQ(pv->GetSize(), 2 * test_size);
+
+	for (int i = 0; i < pv->GetSize(); i++)
+	{
+		val_check_pool[(*pv)[i].content] += 1;
+	}
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_check_pool[i], 3);
+	}
+
+	Vector<test_vector_class>* pv2 = new Vector<test_vector_class>();
+
+	for (int i = 0; i < test_size; ++i)
+		pv2->PushBack(test_vector_class(i, gen_func(i)));
+
+	ASSERT_EQ(pv2->GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ((*pv2)[i].content, i);
+	}
+
+	pv->Insert(pv->GetBegin() + 1, pv2->GetConstReverseBegin(), pv2->GetConstReverseEnd());
+
+	for (int i = 0; i < pv->GetSize(); i++)
+	{
+		val_check_pool[(*pv)[i].content] += 1;
+	}
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_check_pool[i], 6);
+	}
+
+	delete pv2;
+	delete pv;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 5);
+	}
+
+	memset(val_pool, 0, sizeof(val_pool));
+	memset(val_check_pool, 0, sizeof(val_check_pool));
+
+	pv = new Vector<test_vector_class>();
+
+	ASSERT_EQ(pv->GetSize(), 0);
+
+	{	 //to make tbuf release
+		test_vector_class tbuf(1, gen_func(1));
+		pv->Insert(pv->GetBegin(), test_size, tbuf);
+	}
+
+	ASSERT_EQ(pv->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ((*pv)[i].content, 1);
+	}
+
+	delete pv;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		if (i != 1)
+			ASSERT_EQ(val_pool[i], 0);
+	}
+	ASSERT_EQ(val_pool[1], test_size + 1);
+
+	memset(val_pool, 0, sizeof(val_pool));
+	memset(val_check_pool, 0, sizeof(val_check_pool));
+
+	pv = new Vector<test_vector_class>();
+
+	pv->Insert(pv->GetConstEnd(), {test_vector_class(0, gen_func(0)),
+								   test_vector_class(1, gen_func(1)),
+								   test_vector_class(2, gen_func(2)),
+								   test_vector_class(3, gen_func(3)),
+								   test_vector_class(4, gen_func(4))});
+
+	ASSERT_EQ(pv->GetSize(), 5);
+	for (int i = 0; i < 5; ++i)
+	{
+		ASSERT_EQ((*pv)[i].content, i);
+	}
+
+	delete pv;
+	for (int i = 0; i < 5; i++)
+	{
+		ASSERT_EQ(val_pool[i], 2);	  //initializer_list's element can not be moved
+	}
+	for (int i = 5; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 0);
+	}
 }
 
 TEST(Vector, EmplaceTest)
 {
-	const int test_size = 10;
+	const int test_size = 1000;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	Vector<test_vector_class>* pv = new Vector<test_vector_class>();
