@@ -547,6 +547,51 @@ TEST(List, InsertRangeTest)
 	}
 }
 
+TEST(List, InsertListTest)
+{
+	const int test_size = 5;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+
+	auto iter1 = pl->Insert(pl->GetConstEnd(), {test_list_object(0, val_rel_func),
+												test_list_object(1, val_rel_func),
+												test_list_object(2, val_rel_func)});
+
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), List<test_list_object>::ConstIterator>));
+	ASSERT_EQ(iter1->val, 0);
+
+	int cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, 3);
+
+	auto iter2 = pl->Insert(pl->GetReverseBegin(), {test_list_object(4, val_rel_func),
+													test_list_object(3, val_rel_func)});
+	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<test_list_object>::ReverseIterator>));
+	ASSERT_EQ(iter2->val, 4);
+
+	cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, 5);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
 	//todo : make list more content, add more test
