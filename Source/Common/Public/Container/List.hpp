@@ -79,6 +79,28 @@ namespace SpaceGameEngine
 			m_Size = size;
 		}
 
+		template<typename AnotherIteratorType, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Value, bool>>
+		inline List(const AnotherIteratorType& begin, const AnotherIteratorType& end)
+		{
+			SizeType size = end - begin;
+			SGE_ASSERT(InvalidSizeError, size, 1, sm_MaxSize);
+
+			auto aiter = begin;
+			m_pHead = Allocator::template New<Node>(*aiter);
+			m_pTail = m_pHead;
+			++aiter;
+
+			for (; aiter != end; ++aiter)
+			{
+				Node* pnb = Allocator::template New<Node>(*aiter);
+				m_pTail->m_pNext = pnb;
+				pnb->m_pPrevious = m_pTail;
+				m_pTail = pnb;
+			}
+
+			m_Size = size;
+		}
+
 		inline ~List()
 		{
 			if (m_Size)

@@ -151,6 +151,64 @@ TEST(List, SizeConstructorTest)
 	}
 }
 
+TEST(List, RangeConstructorTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	List<test_list_object>* pld = new List<test_list_object>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(pld->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pld->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pld->GetConstBegin(); i != pld->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+	ASSERT_TRUE(CheckListConnection(*pld));
+
+	List<test_list_object>* pl = new List<test_list_object>(pld->GetBegin(), pld->GetEnd());
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	cnt = 0;
+	for (auto i = pl->GetBegin(); i != pl->GetEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	List<test_list_object>* pl2 = new List<test_list_object>(pld->GetConstReverseBegin(), pld->GetConstReverseEnd());
+
+	ASSERT_EQ(pl2->GetSize(), test_size);
+	--cnt;
+	for (auto i = pl2->GetConstBegin(); i != pl2->GetConstEnd(); ++i, --cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	++cnt;
+	ASSERT_EQ(cnt, 0);
+	ASSERT_TRUE(CheckListConnection(*pl2));
+
+	delete pld;
+	delete pl;
+	delete pl2;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 3);
+	}
+}
+
 TEST(List, ClearTest)
 {
 	List<int> l;	//todo : add more content
