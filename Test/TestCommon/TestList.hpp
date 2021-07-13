@@ -209,6 +209,43 @@ TEST(List, RangeConstructorTest)
 	}
 }
 
+TEST(List, ListConstructorTest)
+{
+	const int test_size = 10;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	List<test_list_object>* pl = new List<test_list_object>({test_list_object(0, val_rel_func),
+															 test_list_object(1, val_rel_func),
+															 test_list_object(2, val_rel_func),
+															 test_list_object(3, val_rel_func),
+															 test_list_object(4, val_rel_func),
+															 test_list_object(5, val_rel_func),
+															 test_list_object(6, val_rel_func),
+															 test_list_object(7, val_rel_func),
+															 test_list_object(8, val_rel_func),
+															 test_list_object(9, val_rel_func)});
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetBegin(); i != pl->GetEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	delete pl;
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
 TEST(List, ClearTest)
 {
 	List<int> l;	//todo : add more content

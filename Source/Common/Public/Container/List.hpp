@@ -101,6 +101,26 @@ namespace SpaceGameEngine
 			m_Size = size;
 		}
 
+		inline List(std::initializer_list<T> ilist)
+		{
+			SGE_ASSERT(InvalidSizeError, ilist.size(), 1, sm_MaxSize);
+
+			auto aiter = ilist.begin();
+			m_pHead = Allocator::template New<Node>(*aiter);
+			m_pTail = m_pHead;
+			++aiter;
+
+			for (; aiter != ilist.end(); ++aiter)
+			{
+				Node* pnb = Allocator::template New<Node>(*aiter);
+				m_pTail->m_pNext = pnb;
+				pnb->m_pPrevious = m_pTail;
+				m_pTail = pnb;
+			}
+
+			m_Size = ilist.size();
+		}
+
 		inline ~List()
 		{
 			if (m_Size)
