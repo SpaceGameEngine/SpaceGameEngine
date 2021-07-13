@@ -457,6 +457,96 @@ TEST(List, InsertSizeTest)
 	ASSERT_EQ(val_pool[2], test_size + 1);
 }
 
+TEST(List, InsertRangeTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+	List<test_list_object>* pld = new List<test_list_object>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pld->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pld->GetSize(), test_size);
+
+	auto iter1 = pl->Insert(pl->GetEnd(), pld->GetConstBegin(), pld->GetConstEnd());
+	ASSERT_EQ(pl->GetSize(), test_size);
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), List<test_list_object>::Iterator>));
+	ASSERT_EQ(iter1, pl->GetBegin());
+	int cnt = 0;
+	for (; iter1 != pl->GetEnd(); ++iter1, ++cnt)
+	{
+		ASSERT_EQ(iter1->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	auto iter2 = pl->Insert(pl->GetReverseEnd() - 1, pld->GetBegin(), pld->GetEnd());
+	ASSERT_EQ(pl->GetSize(), 2 * test_size);
+	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<test_list_object>::ReverseIterator>));
+	ASSERT_EQ(iter2.GetData(), (pl->GetBegin() + test_size).GetData());
+	cnt = 0;
+	for (; iter2 != pl->GetReverseEnd() - 1; ++iter2, ++cnt)
+	{
+		ASSERT_EQ(iter2->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	--cnt;
+	for (auto i = pl->GetConstBegin() + 1; i != pl->GetConstBegin() + test_size + 1; ++i, --cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	++cnt;
+	ASSERT_EQ(cnt, 0);
+
+	auto iter3 = pl->Insert(pl->GetConstBegin(), pld->GetConstReverseBegin(), pld->GetConstReverseEnd());
+	ASSERT_EQ(pl->GetSize(), 3 * test_size);
+	ASSERT_TRUE((std::is_same_v<decltype(iter3), List<test_list_object>::ConstIterator>));
+	ASSERT_EQ(iter3, pl->GetConstBegin());
+
+	cnt = test_size - 1;
+	for (; iter3 != pl->GetConstBegin() + test_size; ++iter3, --cnt)
+	{
+		ASSERT_EQ(iter3->val, cnt);
+	}
+	++cnt;
+	ASSERT_EQ(cnt, 0);
+
+	auto iter4 = pl->Insert(pl->GetConstReverseBegin(), pld->GetReverseBegin(), pld->GetReverseEnd());
+	ASSERT_EQ(pl->GetSize(), 4 * test_size);
+	ASSERT_TRUE((std::is_same_v<decltype(iter4), List<test_list_object>::ConstReverseIterator>));
+	ASSERT_EQ(iter4.GetData(), (pl->GetEnd() - 1).GetData());
+	cnt = test_size - 1;
+	for (; iter4 != pl->GetReverseBegin() + test_size; ++iter4, --cnt)
+	{
+		ASSERT_EQ(iter4->val, cnt);
+	}
+	++cnt;
+	ASSERT_EQ(cnt, 0);
+
+	cnt = 0;
+	for (auto i = pl->GetConstBegin() + 3 * test_size; i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	delete pld;
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 5);
+	}
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
 	//todo : make list more content, add more test
