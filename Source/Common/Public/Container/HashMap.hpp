@@ -464,7 +464,7 @@ namespace SpaceGameEngine
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
 				HashType hash = Hasher::GetHash(i->m_First);
-				m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::move(i->m_First), std::move(i->m_Second));
+				m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, i->m_First, i->m_Second);
 			}
 		}
 
@@ -828,7 +828,7 @@ namespace SpaceGameEngine
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
 				HashType hash = Hasher::GetHash(i->m_First);
-				if (m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::move(i->m_First), std::move(i->m_Second)).m_Second)
+				if (m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, i->m_First, i->m_Second).m_Second)
 					m_Size += 1;
 			}
 		}

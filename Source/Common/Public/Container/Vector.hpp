@@ -462,20 +462,21 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		inline Vector(std::initializer_list<T> list)
+		inline Vector(std::initializer_list<T> ilist)
 		{
-			m_Size = list.size();
-			m_RealSize = list.size() * 2;
+			m_Size = ilist.size();
+			m_RealSize = ilist.size() * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			if constexpr (IsTrivial<T>::Value)
 			{
-				std::memcpy(m_pContent, list.begin(), m_Size * sizeof(T));
+				std::memcpy(m_pContent, ilist.begin(), m_Size * sizeof(T));
 			}
 			else
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				auto iter = ilist.begin();
+				for (SizeType i = 0; i < m_Size; i++, ++iter)
 				{
-					new (&GetObject(i)) T(*(list.begin() + i));
+					new (&GetObject(i)) T(*iter);
 				}
 			}
 		}
