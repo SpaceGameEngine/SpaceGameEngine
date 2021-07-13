@@ -93,6 +93,9 @@ TEST(Vector, InitializerListConstructionTest)
 	Vector<int> test({1, 2, 3});
 	ASSERT_TRUE(test.GetRealSize() == 6);
 	ASSERT_TRUE(test.GetSize() == 3);
+	ASSERT_EQ(test[0], 1);
+	ASSERT_EQ(test[1], 2);
+	ASSERT_EQ(test[2], 3);
 }
 
 TEST(Vector, STLContainerConstructionTest)

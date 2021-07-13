@@ -120,6 +120,37 @@ TEST(List, InstanceTest)
 	ASSERT_EQ(l.GetSize(), 0);
 }
 
+TEST(List, SizeConstructorTest)
+{
+	const int test_size = 10;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	{
+		test_list_object tbuf(1, val_rel_func);
+		List<test_list_object>* pl = new List<test_list_object>(10, tbuf);
+
+		ASSERT_EQ(pl->GetSize(), 10);
+
+		for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i)
+		{
+			ASSERT_EQ(i->val, 1);
+		}
+
+		ASSERT_TRUE(CheckListConnection(*pl));
+
+		delete pl;
+	}
+	ASSERT_EQ(val_pool[1], 11);
+	for (int i = 0; i < test_size; i++)
+	{
+		if (i != 1)
+			ASSERT_EQ(val_pool[i], 0);
+	}
+}
+
 TEST(List, ClearTest)
 {
 	List<int> l;	//todo : add more content

@@ -62,6 +62,23 @@ namespace SpaceGameEngine
 		{
 		}
 
+		inline List(SizeType size, const T& val)
+		{
+			SGE_ASSERT(InvalidSizeError, size, 1, sm_MaxSize);
+
+			m_pHead = Allocator::template New<Node>(val);
+			m_pTail = m_pHead;
+			for (SizeType i = 1; i < size; ++i)
+			{
+				Node* pnb = Allocator::template New<Node>(val);
+				m_pTail->m_pNext = pnb;
+				pnb->m_pPrevious = m_pTail;
+				m_pTail = pnb;
+			}
+
+			m_Size = size;
+		}
+
 		inline ~List()
 		{
 			if (m_Size)
