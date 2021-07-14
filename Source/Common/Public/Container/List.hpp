@@ -33,6 +33,15 @@ namespace SpaceGameEngine
 		using ValueType = T;
 		using AllocatorType = Allocator;
 
+		struct EmptyListError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The List is empty");
+			inline static bool Judge(SizeType size)
+			{
+				return size == 0;
+			}
+		};
+
 	private:
 		struct Node
 		{
@@ -971,6 +980,23 @@ namespace SpaceGameEngine
 				return IteratorType(pnhead, m_pHead, m_pTail);
 			else	//reverse
 				return IteratorType(pntail, m_pHead, m_pTail);
+		}
+
+		inline void PopBack()
+		{
+			SGE_ASSERT(EmptyListError, m_Size);
+
+			Node* pn = m_pTail;
+			Node* pbck = pn->m_pPrevious;
+
+			m_pTail = pbck;
+			if (pbck)
+				pbck->m_pNext = nullptr;
+			else
+				m_pHead = nullptr;
+
+			m_Size -= 1;
+			Allocator::template Delete(pn);
 		}
 
 	private:
