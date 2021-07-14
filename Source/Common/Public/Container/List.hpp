@@ -1016,6 +1016,35 @@ namespace SpaceGameEngine
 			Allocator::template Delete(pn);
 		}
 
+		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
+		inline IteratorType Remove(const IteratorType& iter)
+		{
+			SGE_ASSERT(EmptyListError, m_Size);
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter);
+
+			Node* pn = (Node*)iter.m_pNode;
+			Node* pbck = pn->m_pPrevious;
+			Node* pfwd = pn->m_pNext;
+
+			if (pbck)
+				pbck->m_pNext = pfwd;
+			else
+				m_pHead = pfwd;
+
+			if (pfwd)
+				pfwd->m_pPrevious = pbck;
+			else
+				m_pTail = pbck;
+
+			m_Size -= 1;
+			Allocator::template Delete(pn);
+
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+				return IteratorType(pfwd, m_pHead, m_pTail);
+			else	//reverse
+				return IteratorType(pbck, m_pHead, m_pTail);
+		}
+
 	private:
 		inline void RawClear()
 		{
