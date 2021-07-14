@@ -999,6 +999,23 @@ namespace SpaceGameEngine
 			Allocator::template Delete(pn);
 		}
 
+		inline void PopFront()
+		{
+			SGE_ASSERT(EmptyListError, m_Size);
+
+			Node* pn = m_pHead;
+			Node* pfwd = pn->m_pNext;
+
+			m_pHead = pfwd;
+			if (pfwd)
+				pfwd->m_pPrevious = nullptr;
+			else
+				m_pTail = nullptr;
+
+			m_Size -= 1;
+			Allocator::template Delete(pn);
+		}
+
 	private:
 		inline void RawClear()
 		{
