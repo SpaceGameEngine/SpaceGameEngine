@@ -1045,6 +1045,50 @@ namespace SpaceGameEngine
 				return IteratorType(pbck, m_pHead, m_pTail);
 		}
 
+		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
+		inline IteratorType Remove(const IteratorType& beg, const IteratorType& end)
+		{
+			SGE_ASSERT(typename IteratorType::OutOfRangeError, beg);
+			SGE_ASSERT(InvalidSizeError, end - beg, 1, m_Size);
+
+			Node* pbck = nullptr;
+			Node* pfwd = nullptr;
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				pbck = beg.m_pNode->m_pPrevious;
+				pfwd = (Node*)end.m_pNode;
+			}
+			else	//reverse
+			{
+				pbck = (Node*)end.m_pNode;
+				pfwd = beg.m_pNode->m_pNext;
+			}
+
+			if (pbck)
+				pbck->m_pNext = pfwd;
+			else
+				m_pHead = pfwd;
+
+			if (pfwd)
+				pfwd->m_pPrevious = pbck;
+			else
+				m_pTail = pbck;
+
+			auto iter = beg;
+			while (iter != end)
+			{
+				Node* pb = (Node*)iter.m_pNode;
+				++iter;
+				m_Size -= 1;
+				Allocator::template Delete(pb);
+			}
+
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+				return IteratorType(pfwd, m_pHead, m_pTail);
+			else	//reverse
+				return IteratorType(pbck, m_pHead, m_pTail);
+		}
+
 	private:
 		inline void RawClear()
 		{
