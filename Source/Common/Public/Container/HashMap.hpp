@@ -743,6 +743,17 @@ namespace SpaceGameEngine
 			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>;
 		};
 
+		struct ExternalIteratorError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator does not belong to this HashMap.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const HashMap& hm)
+			{
+				return iter.m_pBucketEnd != hm.m_pContent + hm.m_BucketQuantity;
+			}
+		};
+
 		inline Iterator GetBegin()
 		{
 			return Iterator::GetBegin(*this);
@@ -837,6 +848,7 @@ namespace SpaceGameEngine
 		inline IteratorType Remove(const IteratorType& iter)
 		{
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter);
+			SGE_ASSERT(ExternalIteratorError, iter, *this);
 			IteratorType re = iter;
 			++re;
 			m_pContent[(iter.m_pNode->m_HashValue) & (m_BucketQuantity - 1)].RemoveNode(iter.m_pNode);

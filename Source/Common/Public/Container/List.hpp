@@ -553,6 +553,17 @@ namespace SpaceGameEngine
 			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
 		};
 
+		struct ExternalIteratorError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator does not belong to this List.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const List& l)
+			{
+				return iter.m_pHead != l.m_pHead || iter.m_pTail != l.m_pTail;
+			}
+		};
+
 		inline Iterator GetBegin()
 		{
 			return Iterator::GetBegin(*this);
@@ -1021,6 +1032,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(EmptyListError, m_Size);
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter);
+			SGE_ASSERT(ExternalIteratorError, iter, *this);
 
 			Node* pn = (Node*)iter.m_pNode;
 			Node* pbck = pn->m_pPrevious;
@@ -1048,8 +1060,11 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
 		inline IteratorType Remove(const IteratorType& beg, const IteratorType& end)
 		{
+			SGE_ASSERT(EmptyListError, m_Size);
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, beg);
 			SGE_ASSERT(InvalidSizeError, end - beg, 1, m_Size);
+			SGE_ASSERT(ExternalIteratorError, beg, *this);
+			SGE_ASSERT(ExternalIteratorError, end, *this);
 
 			Node* pbck = nullptr;
 			Node* pfwd = nullptr;
