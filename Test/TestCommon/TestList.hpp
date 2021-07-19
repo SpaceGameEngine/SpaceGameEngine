@@ -1311,6 +1311,85 @@ TEST(List, RemoveRangeTest)
 	}
 }
 
+TEST(List, FindTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	List<test_list_object>* pl = new List<test_list_object>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	//-----------------------------------------------
+	auto iter1 = pl->Find(test_list_object(1));
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), List<test_list_object>::Iterator>));
+	ASSERT_EQ(iter1->val, 1);
+	ASSERT_EQ(iter1, pl->GetBegin() + 1);
+
+	auto iter2 = pl->FindByFunction([](const test_list_object& t) {
+		return t.val == 2;
+	});
+	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<test_list_object>::Iterator>));
+	ASSERT_EQ(iter2->val, 2);
+	ASSERT_EQ(iter2, pl->GetBegin() + 2);
+
+	int buf = 0;
+	pl->FindAll(test_list_object(5), [&](const test_list_object& i) {
+		buf = i.val;
+	});
+	ASSERT_EQ(buf, 5);
+
+	pl->FindAllByFunction([](const test_list_object& t) { return t.val == 10; }, [&](const test_list_object& i) { buf = i.val; });
+	ASSERT_EQ(buf, 10);
+	//-----------------------------------------------
+	const List<test_list_object>* pcl = pl;
+
+	auto iter3 = pcl->Find(test_list_object(1));
+	ASSERT_TRUE((std::is_same_v<decltype(iter3), List<test_list_object>::ConstIterator>));
+	ASSERT_EQ(iter3->val, 1);
+	ASSERT_EQ(iter3, pcl->GetConstBegin() + 1);
+
+	auto iter4 = pcl->FindByFunction([](const test_list_object& t) {
+		return t.val == 2;
+	});
+	ASSERT_TRUE((std::is_same_v<decltype(iter4), List<test_list_object>::ConstIterator>));
+	ASSERT_EQ(iter4->val, 2);
+	ASSERT_EQ(iter4, pcl->GetConstBegin() + 2);
+
+	buf = 0;
+	pcl->FindAll(test_list_object(5), [&](const test_list_object& i) {
+		buf = i.val;
+	});
+	ASSERT_EQ(buf, 5);
+
+	pcl->FindAllByFunction([](const test_list_object& t) { return t.val == 10; }, [&](const test_list_object& i) { buf = i.val; });
+	ASSERT_EQ(buf, 10);
+	//-----------------------------------------------
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
 	//todo : make list more content, add more test

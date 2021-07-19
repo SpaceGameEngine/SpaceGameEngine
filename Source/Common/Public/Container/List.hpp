@@ -1104,6 +1104,140 @@ namespace SpaceGameEngine
 				return IteratorType(pbck, m_pHead, m_pTail);
 		}
 
+		/*!
+		@brief find a element in this Vector which its value is equal to the given value.
+		@note use normal O(n) algorithm.
+		@return the iterator which points to the first matching element, return end iterator if no matching.
+		*/
+		inline Iterator Find(const T& val)
+		{
+			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
+			{
+				if (*iter == val)
+				{
+					return iter;
+				}
+			}
+			return GetEnd();
+		}
+
+		/*!
+		@brief find a element in this Vector which its value is equal to the given value.
+		@note use normal O(n) algorithm.
+		@return the iterator which points to the first matching element, return end iterator if no matching.
+		*/
+		inline ConstIterator Find(const T& val) const
+		{
+			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
+			{
+				if (*iter == val)
+				{
+					return iter;
+				}
+			}
+			return GetConstEnd();
+		}
+
+		/*!
+		@brief find a element in this Vector when invoking the given judge function by using it as the argument can get result true.
+		@note use normal O(n) algorithm.
+		@return the iterator which points to the first matching element, return end iterator if no matching.
+		*/
+		template<typename Callable>
+		inline Iterator FindByFunction(Callable&& judge_func)
+		{
+			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
+			{
+				if (judge_func(*iter))
+				{
+					return iter;
+				}
+			}
+			return GetEnd();
+		}
+
+		/*!
+		@brief find a element in this Vector when invoking the given judge function by using it as the argument can get result true.
+		@note use normal O(n) algorithm.
+		@return the iterator which points to the first matching element, return end iterator if no matching.
+		*/
+		template<typename Callable>
+		inline ConstIterator FindByFunction(Callable&& judge_func) const
+		{
+			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
+			{
+				if (judge_func(*iter))
+				{
+					return iter;
+				}
+			}
+			return GetConstEnd();
+		}
+
+		/*!
+		@brief find elements in this Vector which their value are equal to the given value and invoke the processing function with the each element as the argument.
+		@note use normal O(n) algorithm.
+		*/
+		template<typename Callable>
+		inline void FindAll(const T& val, Callable&& process_func)
+		{
+			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
+			{
+				if (*iter == val)
+				{
+					process_func(*iter);
+				}
+			}
+		}
+
+		/*!
+		@brief find elements in this Vector which their value are equal to the given value and invoke the processing function with the each element as the argument.
+		@note use normal O(n) algorithm.
+		*/
+		template<typename Callable>
+		inline void FindAll(const T& val, Callable&& process_func) const
+		{
+			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
+			{
+				if (*iter == val)
+				{
+					process_func(*iter);
+				}
+			}
+		}
+
+		/*!
+		@brief find elements in this Vector when invoking the given judge function by using them as the argument can get result true and then invoke the processing function with the each element as the argument.
+		@note use normal O(n) algorithm.
+		*/
+		template<typename Callable1, typename Callable2>
+		inline void FindAllByFunction(Callable1&& judge_func, Callable2&& process_func)
+		{
+			for (Iterator iter = GetBegin(); iter != GetEnd(); iter += 1)
+			{
+				if (judge_func(*iter))
+				{
+					process_func(*iter);
+				}
+			}
+		}
+
+		/*!
+		@brief find elements in this Vector when invoking the given judge function by using them as the argument can get result true and then invoke the processing function with the each element as the argument.
+		@note use normal O(n) algorithm.
+		*/
+		template<typename Callable1, typename Callable2>
+		inline void FindAllByFunction(Callable1&& judge_func, Callable2&& process_func) const
+		{
+			for (ConstIterator iter = GetConstBegin(); iter != GetConstEnd(); iter += 1)
+			{
+				if (judge_func(*iter))
+				{
+					process_func(*iter);
+				}
+			}
+		}
+
 	private:
 		inline void RawClear()
 		{
