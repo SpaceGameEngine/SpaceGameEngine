@@ -186,6 +186,19 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		inline List& operator=(List&& l)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &l);
+			RawClear();
+			m_pHead = l.m_pHead;
+			m_pTail = l.m_pTail;
+			m_Size = l.m_Size;
+			l.m_pHead = nullptr;
+			l.m_pTail = nullptr;
+			l.m_Size = 0;
+			return *this;
+		}
+
 		inline ~List()
 		{
 			if (m_Size)
