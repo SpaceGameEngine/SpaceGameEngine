@@ -158,6 +158,34 @@ namespace SpaceGameEngine
 			l.m_Size = 0;
 		}
 
+		inline List& operator=(const List& l)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &l);
+			RawClear();
+			m_Size = l.m_Size;
+			if (l.m_Size)
+			{
+				Node* p = l.m_pHead;
+				m_pHead = Allocator::template New<Node>(p->m_Content);
+				m_pTail = m_pHead;
+				p = p->m_pNext;
+				while (p != nullptr)
+				{
+					Node* pn = Allocator::template New<Node>(p->m_Content);
+					pn->m_pPrevious = m_pTail;
+					m_pTail->m_pNext = pn;
+					m_pTail = pn;
+					p = p->m_pNext;
+				}
+			}
+			else
+			{
+				m_pHead = nullptr;
+				m_pTail = nullptr;
+			}
+			return *this;
+		}
+
 		inline ~List()
 		{
 			if (m_Size)
