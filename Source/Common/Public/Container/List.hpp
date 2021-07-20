@@ -272,6 +272,34 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		template<typename OtherAllocator>
+		inline List& operator=(List<T, OtherAllocator>&& l)
+		{
+			RawClear();
+			m_Size = l.m_Size;
+			if (l.m_Size)
+			{
+				typename List<T, OtherAllocator>::Node* p = l.m_pHead;
+				m_pHead = Allocator::template New<Node>(std::move(p->m_Content));
+				m_pTail = m_pHead;
+				p = p->m_pNext;
+				while (p != nullptr)
+				{
+					Node* pn = Allocator::template New<Node>(std::move(p->m_Content));
+					pn->m_pPrevious = m_pTail;
+					m_pTail->m_pNext = pn;
+					m_pTail = pn;
+					p = p->m_pNext;
+				}
+			}
+			else
+			{
+				m_pHead = nullptr;
+				m_pTail = nullptr;
+			}
+			return *this;
+		}
+
 		inline ~List()
 		{
 			if (m_Size)
