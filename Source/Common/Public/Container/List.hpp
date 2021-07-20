@@ -42,6 +42,9 @@ namespace SpaceGameEngine
 			}
 		};
 
+		template<typename _T, typename _Allocator>
+		friend class List;
+
 	private:
 		struct Node
 		{
@@ -197,6 +200,27 @@ namespace SpaceGameEngine
 			l.m_pTail = nullptr;
 			l.m_Size = 0;
 			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline List(const List<T, OtherAllocator>& l)
+			: m_pHead(nullptr), m_pTail(nullptr), m_Size(l.m_Size)
+		{
+			if (l.m_Size)
+			{
+				typename List<T, OtherAllocator>::Node* p = l.m_pHead;
+				m_pHead = Allocator::template New<Node>(p->m_Content);
+				m_pTail = m_pHead;
+				p = p->m_pNext;
+				while (p != nullptr)
+				{
+					Node* pn = Allocator::template New<Node>(p->m_Content);
+					pn->m_pPrevious = m_pTail;
+					m_pTail->m_pNext = pn;
+					m_pTail = pn;
+					p = p->m_pNext;
+				}
+			}
 		}
 
 		inline ~List()
