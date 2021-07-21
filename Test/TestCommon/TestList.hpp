@@ -2011,3 +2011,133 @@ TEST(ListIterator, GetConstTest)
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
+
+TEST(ListIterator, CopyTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	List<test_list_object>* pl = new List<test_list_object>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	//----------------------------------------------
+	auto iter1 = pl->GetBegin() + 1;
+	ASSERT_EQ(iter1->val, 1);
+	List<test_list_object>::Iterator iter2(iter1);
+	ASSERT_EQ(iter1, iter2);
+	ASSERT_EQ(iter2->val, 1);
+	iter2 = pl->GetBegin() + 2;
+	ASSERT_EQ(iter2->val, 2);
+	List<test_list_object>::ConstReverseIterator iter3(iter1);
+	ASSERT_EQ(iter3->val, 1);
+	iter3 = iter2;
+	ASSERT_EQ(iter3->val, 2);
+	//----------------------------------------------
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(ListIterator, PlusAndSubtractTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	List<test_list_object>* pl = new List<test_list_object>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	//----------------------------------------------
+	auto iter1 = pl->GetBegin() + 1;
+	ASSERT_EQ(iter1->val, 1);
+	auto iter2 = iter1 + 1;
+	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<test_list_object>::Iterator>));
+	ASSERT_EQ(iter2->val, 2);
+	iter1 += 1;
+	ASSERT_EQ(iter1->val, 2);
+	ASSERT_EQ(iter1, iter2);
+	ASSERT_EQ((++iter1)->val, 3);
+	ASSERT_EQ(iter1->val, 3);
+	ASSERT_EQ((iter1++)->val, 3);
+	ASSERT_EQ(iter1->val, 4);
+
+	auto iter3 = iter1 - 1;
+	ASSERT_TRUE((std::is_same_v<decltype(iter3), List<test_list_object>::Iterator>));
+	ASSERT_EQ(iter3->val, 3);
+	iter1 -= 1;
+	ASSERT_EQ(iter1->val, 3);
+	ASSERT_EQ(iter1, iter3);
+	ASSERT_EQ((--iter1)->val, 2);
+	ASSERT_EQ(iter1->val, 2);
+	ASSERT_EQ((iter1--)->val, 2);
+	ASSERT_EQ(iter1->val, 1);
+
+	auto iter4 = pl->GetReverseBegin();
+	ASSERT_EQ(iter4->val, test_size - 1);
+	auto iter5 = iter4 + 1;
+	ASSERT_TRUE((std::is_same_v<decltype(iter5), List<test_list_object>::ReverseIterator>));
+	ASSERT_EQ(iter5->val, test_size - 2);
+	iter4 += 1;
+	ASSERT_EQ(iter4->val, test_size - 2);
+	ASSERT_EQ(iter4, iter5);
+	ASSERT_EQ((++iter4)->val, test_size - 3);
+	ASSERT_EQ(iter4->val, test_size - 3);
+	ASSERT_EQ((iter4++)->val, test_size - 3);
+	ASSERT_EQ(iter4->val, test_size - 4);
+
+	auto iter6 = iter4 - 1;
+	ASSERT_TRUE((std::is_same_v<decltype(iter6), List<test_list_object>::ReverseIterator>));
+	ASSERT_EQ(iter6->val, test_size - 3);
+	iter4 -= 1;
+	ASSERT_EQ(iter4->val, test_size - 3);
+	ASSERT_EQ(iter4, iter6);
+	ASSERT_EQ((--iter4)->val, test_size - 2);
+	ASSERT_EQ(iter4->val, test_size - 2);
+	ASSERT_EQ((iter4--)->val, test_size - 2);
+	ASSERT_EQ(iter4->val, test_size - 1);
+	//----------------------------------------------
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
