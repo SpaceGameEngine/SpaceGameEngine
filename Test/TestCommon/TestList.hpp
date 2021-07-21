@@ -248,10 +248,31 @@ TEST(List, ListConstructorTest)
 
 TEST(List, ClearTest)
 {
-	List<int> l;	//todo : add more content
-	ASSERT_EQ(l.GetSize(), 0);
-	l.Clear();
-	ASSERT_EQ(l.GetSize(), 0);
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+	List<test_list_object>* pl = new List<test_list_object>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+	}
+	ASSERT_EQ(pl->GetSize(), test_size);
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	pl->Clear();
+
+	ASSERT_EQ(pl->GetSize(), 0);
+	ASSERT_EQ(pl->GetBegin(), pl->GetEnd());
+
+	delete pl;
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(List, PushBackTest)
@@ -1863,56 +1884,130 @@ TEST(List, AnotherAllocatorMoveAssignmentTest)
 	}
 }
 
+TEST(List, ExternalIteratorErrorTest)
+{
+	List<int> l1;
+	List<int> l2({1, 2, 3});
+	ASSERT_FALSE(List<int>::ExternalIteratorError::Judge(l1.GetBegin(), l1));
+	ASSERT_FALSE(List<int>::ExternalIteratorError::Judge(l2.GetConstReverseEnd(), l2));
+	ASSERT_TRUE(List<int>::ExternalIteratorError::Judge(l1.GetEnd(), l2));
+	ASSERT_TRUE(List<int>::ExternalIteratorError::Judge(l2.GetConstReverseBegin(), l1));
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
-	//todo : make list more content, add more test
-	List<int> l;
+	List<int> l({0,
+				 1,
+				 2,
+				 3,
+				 4});
 	ASSERT_TRUE(List<int>::Iterator::OutOfRangeError::Judge(l.GetEnd()));
 	ASSERT_TRUE(List<int>::ConstIterator::OutOfRangeError::Judge(l.GetConstEnd()));
 	ASSERT_TRUE(List<int>::ReverseIterator::OutOfRangeError::Judge(l.GetReverseEnd()));
 	ASSERT_TRUE(List<int>::ConstReverseIterator::OutOfRangeError::Judge(l.GetConstReverseEnd()));
+
+	ASSERT_FALSE(List<int>::Iterator::OutOfRangeError::Judge(l.GetBegin()));
+	ASSERT_FALSE(List<int>::ConstIterator::OutOfRangeError::Judge(l.GetConstBegin()));
+	ASSERT_FALSE(List<int>::ReverseIterator::OutOfRangeError::Judge(l.GetReverseBegin()));
+	ASSERT_FALSE(List<int>::ConstReverseIterator::OutOfRangeError::Judge(l.GetConstReverseBegin()));
 }
 
 TEST(ListIterator, GetTest)
 {
-	//todo : make list more content
-	List<int> l;
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
 
-	auto iter1 = l.GetBegin();
-	ASSERT_TRUE((std::is_same_v<decltype(iter1), List<int>::Iterator>));
-	ASSERT_EQ(iter1, l.GetEnd());
+	List<test_list_object>* pl = new List<test_list_object>();
 
-	auto iter2 = l.GetEnd();
-	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<int>::Iterator>));
-	ASSERT_EQ(iter2, l.GetEnd());
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+	}
 
-	auto riter1 = l.GetReverseBegin();
-	ASSERT_TRUE((std::is_same_v<decltype(riter1), List<int>::ReverseIterator>));
-	ASSERT_EQ(riter1, l.GetReverseEnd());
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
 
-	auto riter2 = l.GetReverseEnd();
-	ASSERT_TRUE((std::is_same_v<decltype(riter2), List<int>::ReverseIterator>));
-	ASSERT_EQ(riter2, l.GetReverseEnd());
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	auto iter1 = pl->GetBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), List<test_list_object>::Iterator>));
+	ASSERT_EQ(iter1->val, 0);
+
+	auto iter2 = pl->GetEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<test_list_object>::Iterator>));
+	ASSERT_EQ((iter2 - 1)->val, test_size - 1);
+
+	auto riter1 = pl->GetReverseBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(riter1), List<test_list_object>::ReverseIterator>));
+	ASSERT_EQ(riter1->val, test_size - 1);
+
+	auto riter2 = pl->GetReverseEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(riter2), List<test_list_object>::ReverseIterator>));
+	ASSERT_EQ((riter2 - 1)->val, 0);
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(ListIterator, GetConstTest)
 {
-	//todo : make list more content
-	const List<int> l;
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
 
-	auto iter1 = l.GetConstBegin();
-	ASSERT_TRUE((std::is_same_v<decltype(iter1), List<int>::ConstIterator>));
-	ASSERT_EQ(iter1, l.GetConstEnd());
+	List<test_list_object>* pl = new List<test_list_object>();
 
-	auto iter2 = l.GetConstEnd();
-	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<int>::ConstIterator>));
-	ASSERT_EQ(iter2, l.GetConstEnd());
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+	}
 
-	auto riter1 = l.GetConstReverseBegin();
-	ASSERT_TRUE((std::is_same_v<decltype(riter1), List<int>::ConstReverseIterator>));
-	ASSERT_EQ(riter1, l.GetConstReverseEnd());
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
 
-	auto riter2 = l.GetConstReverseEnd();
-	ASSERT_TRUE((std::is_same_v<decltype(riter2), List<int>::ConstReverseIterator>));
-	ASSERT_EQ(riter2, l.GetConstReverseEnd());
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	const List<test_list_object>* pcl = pl;
+
+	auto iter1 = pcl->GetConstBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter1), List<test_list_object>::ConstIterator>));
+	ASSERT_EQ(iter1->val, 0);
+
+	auto iter2 = pcl->GetConstEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<test_list_object>::ConstIterator>));
+	ASSERT_EQ((iter2 - 1)->val, test_size - 1);
+
+	auto riter1 = pcl->GetConstReverseBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(riter1), List<test_list_object>::ConstReverseIterator>));
+	ASSERT_EQ(riter1->val, test_size - 1);
+
+	auto riter2 = pcl->GetConstReverseEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(riter2), List<test_list_object>::ConstReverseIterator>));
+	ASSERT_EQ((riter2 - 1)->val, 0);
+
+	delete pl;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
