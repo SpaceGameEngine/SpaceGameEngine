@@ -171,8 +171,10 @@
     <ClInclude Include="BenchmarkAllocator.hpp" />
     <ClInclude Include="BenchmarkFunction.hpp" />
     <ClInclude Include="BenchmarkHashMap.hpp" />
+    <ClInclude Include="BenchmarkList.hpp" />
     <ClInclude Include="BenchmarkMap.hpp" />
     <ClInclude Include="BenchmarkString.hpp" />
+    <ClInclude Include="BenchmarkVector.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
