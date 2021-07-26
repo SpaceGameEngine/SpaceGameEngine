@@ -1123,9 +1123,16 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					for (SizeType i = m_Size - 2; i > index; i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(i) = std::move(GetObject(i - 1));
+						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = m_Size - 2; i > index; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - 1));
+						}
 					}
 					GetObject(index) = val;
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
@@ -1144,9 +1151,16 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					for (SizeType i = 1; i < index; i++)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 1; i < index; i++)
+						{
+							GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						}
 					}
 					GetObject(m_Size - 1 - index) = val;
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);
@@ -1177,9 +1191,16 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					for (SizeType i = m_Size - 2; i > index; i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(i) = std::move(GetObject(i - 1));
+						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = m_Size - 2; i > index; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - 1));
+						}
 					}
 					GetObject(index) = std::move(val);
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
@@ -1198,9 +1219,16 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					for (SizeType i = 1; i < index; i++)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 1; i < index; i++)
+						{
+							GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						}
 					}
 					GetObject(m_Size - 1 - index) = std::move(val);
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);
@@ -1227,9 +1255,16 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					for (SizeType i = m_Size - 2; i > index; i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(i) = std::move(GetObject(i - 1));
+						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = m_Size - 2; i > index; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - 1));
+						}
 					}
 					GetObject(index) = T(std::forward<Args>(args)...);
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
@@ -1248,9 +1283,16 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					for (SizeType i = 1; i < index; i++)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 1; i < index; i++)
+						{
+							GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						}
 					}
 					GetObject(m_Size - 1 - index) = T(std::forward<Args>(args)...);
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);

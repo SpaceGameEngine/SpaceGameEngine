@@ -2057,3 +2057,77 @@ TEST(VectorIterator, ConvertTest)
 	Vector<int>::ConstReverseIterator i1_8 = v1.GetConstBegin();
 	ASSERT_EQ(*i1_8, 0);
 }
+
+TEST(Vector, TrivialInsertTest)
+{
+	Vector<int> v1{0, 2};
+	ASSERT_EQ(v1.GetSize(), 2);
+	ASSERT_TRUE((IsTrivial<int>::Value));
+
+	v1.Insert(v1.GetEnd() - 1, -1);
+	ASSERT_EQ(v1.GetSize(), 3);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], -1);
+	ASSERT_EQ(v1[2], 2);
+
+	v1.Insert(v1.GetBegin() + 1, 1);
+	ASSERT_EQ(v1.GetSize(), 4);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 2);
+
+	v1.Insert(v1.GetReverseBegin() + 1, 3);
+	ASSERT_EQ(v1.GetSize(), 5);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 3);
+	ASSERT_EQ(v1[4], 2);
+
+	v1.Insert(v1.GetReverseBegin() + 2, 4);
+	ASSERT_EQ(v1.GetSize(), 6);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 4);
+	ASSERT_EQ(v1[4], 3);
+	ASSERT_EQ(v1[5], 2);
+}
+
+TEST(Vector, TrivialEmplaceTest)
+{
+	Vector<int> v1{0, 2};
+	ASSERT_EQ(v1.GetSize(), 2);
+	ASSERT_TRUE((IsTrivial<int>::Value));
+
+	v1.Emplace(v1.GetEnd() - 1, -1);
+	ASSERT_EQ(v1.GetSize(), 3);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], -1);
+	ASSERT_EQ(v1[2], 2);
+
+	v1.Emplace(v1.GetBegin() + 1, 1);
+	ASSERT_EQ(v1.GetSize(), 4);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 2);
+
+	v1.Emplace(v1.GetReverseBegin() + 1, 3);
+	ASSERT_EQ(v1.GetSize(), 5);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 3);
+	ASSERT_EQ(v1[4], 2);
+
+	v1.Emplace(v1.GetReverseBegin() + 2, 4);
+	ASSERT_EQ(v1.GetSize(), 6);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 4);
+	ASSERT_EQ(v1[4], 3);
+	ASSERT_EQ(v1[5], 2);
+}
