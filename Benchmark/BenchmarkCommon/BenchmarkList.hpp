@@ -137,7 +137,7 @@ void BM_StdListIteration(benchmark::State& state)
 		int cnt = 0;
 		for (auto i = l.begin(); i != l.end(); ++i, ++cnt)
 		{
-			assert(*i, cnt);
+			assert(*i == cnt);
 		}
 	}
 }
@@ -150,7 +150,7 @@ void BM_SgeListIteration(benchmark::State& state)
 		int cnt = 0;
 		for (auto i = l.GetBegin(); i != l.GetEnd(); ++i, ++cnt)
 		{
-			assert(*i, cnt);
+			assert(*i == cnt);
 		}
 	}
 }

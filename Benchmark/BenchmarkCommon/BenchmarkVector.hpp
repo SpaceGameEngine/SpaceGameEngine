@@ -129,7 +129,7 @@ void BM_StdVectorIteration(benchmark::State& state)
 		int cnt = 0;
 		for (auto i = v.begin(); i != v.end(); ++i, ++cnt)
 		{
-			assert(*i, cnt);
+			assert(*i == cnt);
 		}
 	}
 }
@@ -142,7 +142,7 @@ void BM_SgeVectorIteration(benchmark::State& state)
 		int cnt = 0;
 		for (auto i = v.GetBegin(); i != v.GetEnd(); ++i, ++cnt)
 		{
-			assert(*i, cnt);
+			assert(*i == cnt);
 		}
 	}
 }
