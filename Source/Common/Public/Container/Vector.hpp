@@ -1339,13 +1339,20 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
 					}
-					for (SizeType i = m_Size - 1; i >= index + size; i--)
+					else
 					{
-						GetObject(i) = std::move(GetObject(i - size));
+						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						}
+						for (SizeType i = m_Size - 1; i >= index + size; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - size));
+						}
 					}
 					for (SizeType i = index; i < std::min(index + size, m_Size); i++)
 					{
@@ -1387,13 +1394,20 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
 					}
-					for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+					else
 					{
-						GetObject(i) = std::move(GetObject(i - size));
+						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						}
+						for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - size));
+						}
 					}
 					for (SizeType i = m_Size - index; i < std::min(m_Size - index + size, m_Size); i++)
 					{
