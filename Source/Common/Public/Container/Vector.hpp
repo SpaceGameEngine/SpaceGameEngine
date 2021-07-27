@@ -482,15 +482,15 @@ namespace SpaceGameEngine
 		}
 
 		template<typename STLContainer,
-				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<RemoveCVRef<STLContainer>::Type>().size()), typename RemoveCVRef<STLContainer>::Type::size_type>, bool>,
-				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<RemoveCVRef<STLContainer>::Type>().begin()), typename RemoveCVRef<STLContainer>::Type::iterator>, bool>,
-				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<typename RemoveCVRef<STLContainer>::Type::iterator>() + 1), typename RemoveCVRef<STLContainer>::Type::iterator>, bool>>
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<std::remove_cv_t<std::remove_reference_t<STLContainer>>>().size()), typename std::remove_cv_t<std::remove_reference_t<STLContainer>>::size_type>, bool>,
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<std::remove_cv_t<std::remove_reference_t<STLContainer>>>().begin()), typename std::remove_cv_t<std::remove_reference_t<STLContainer>>::iterator>, bool>,
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<typename std::remove_cv_t<std::remove_reference_t<STLContainer>>::iterator>() + 1), typename std::remove_cv_t<std::remove_reference_t<STLContainer>>::iterator>, bool>>
 		inline Vector(STLContainer&& stl_container)
 		{
 			m_Size = stl_container.size();
 			m_RealSize = stl_container.size() * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			if constexpr (std::is_same_v<RemoveCVRef<STLContainer>::Type, STLContainer>)
+			if constexpr (std::is_same_v<std::remove_cv_t<std::remove_reference_t<STLContainer>>, STLContainer>)
 			{
 				auto iter = stl_container.begin();
 				for (SizeType i = 0; i < m_Size && iter != stl_container.end(); i++, iter++)
