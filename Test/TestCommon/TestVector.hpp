@@ -1101,9 +1101,13 @@ TEST(Vector, RemoveTest)
 	ASSERT_EQ(itest1.GetSize(), 5);
 	ASSERT_EQ(itest1[0], 0);
 
-	for (int i = 1; i < 5; i++)
+	ASSERT_EQ(test1[1].mi, 3);
+	ASSERT_EQ(test1[1].content, 2);
+	ASSERT_EQ(itest1[1], 2);
+
+	for (int i = 2; i < 5; i++)
 	{
-		ASSERT_EQ(test1[i].mi, 3);
+		ASSERT_EQ(test1[i].mi, 4);
 		ASSERT_EQ(test1[i].content, i + 1);
 
 		ASSERT_EQ(itest1[i], i + 1);
@@ -1142,9 +1146,14 @@ TEST(Vector, RemoveTest)
 	ASSERT_EQ(test2.GetSize(), 5);
 	ASSERT_EQ(itest2.GetSize(), 5);
 
-	for (int i = 0; i < 5; i++)
+	ASSERT_EQ(test2[0].mi, 3);
+	ASSERT_EQ(test2[0].content, 1);
+
+	ASSERT_EQ(itest2[0], 1);
+
+	for (int i = 1; i < 5; i++)
 	{
-		ASSERT_EQ(test2[i].mi, 3);
+		ASSERT_EQ(test2[i].mi, 4);
 		ASSERT_EQ(test2[i].content, i + 1);
 
 		ASSERT_EQ(itest2[i], i + 1);
@@ -1224,9 +1233,14 @@ TEST(Vector, RemoveTest)
 	ASSERT_EQ(test4[0].content, 0);
 	ASSERT_EQ(itest4[0], 0);
 
-	for (int i = 1; i < 5; i++)
+	ASSERT_EQ(test4[1].mi, 3);
+	ASSERT_EQ(test4[1].content, 2);
+
+	ASSERT_EQ(itest4[1], 2);
+
+	for (int i = 2; i < 5; i++)
 	{
-		ASSERT_EQ(test4[i].mi, 3);
+		ASSERT_EQ(test4[i].mi, 4);
 		ASSERT_EQ(test4[i].content, i + 1);
 
 		ASSERT_EQ(itest4[i], i + 1);
@@ -1264,9 +1278,14 @@ TEST(Vector, RemoveTest)
 	ASSERT_EQ(test5.GetSize(), 5);
 	ASSERT_EQ(itest5.GetSize(), 5);
 
-	for (int i = 0; i < 5; i++)
+	ASSERT_EQ(test5[0].mi, 3);
+	ASSERT_EQ(test5[0].content, 1);
+
+	ASSERT_EQ(itest5[0], 1);
+
+	for (int i = 1; i < 5; i++)
 	{
-		ASSERT_EQ(test5[i].mi, 3);
+		ASSERT_EQ(test5[i].mi, 4);
 		ASSERT_EQ(test5[i].content, i + 1);
 
 		ASSERT_EQ(itest5[i], i + 1);
