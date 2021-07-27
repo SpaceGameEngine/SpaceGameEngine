@@ -1422,6 +1422,64 @@ TEST(Vector, RemoveTest)
 #endif
 }
 
+TEST(Vector, RemoveReverseTest)
+{
+	Vector<test_vector_class> v1 = {0, 1, 2, 3, 4, 5, 6};
+	Vector<int> iv1 = {0, 1, 2, 3, 4, 5, 6};
+
+	ASSERT_EQ(v1.GetSize(), 7);
+	ASSERT_EQ(iv1.GetSize(), 7);
+
+	int des_cot = 0;
+
+	for (int i = 0; i < 7; i++)
+	{
+		ASSERT_EQ(v1[i].content, i);
+		ASSERT_EQ(v1[i].mi, 1);
+		ASSERT_EQ(iv1[i], i);
+
+		v1[i].destruction_hook = [&]() {
+			des_cot += 1;
+		};
+	}
+
+	auto iter1 = v1.Remove(v1.GetConstReverseBegin() + 1);
+	auto iiter1 = iv1.Remove(iv1.GetConstReverseBegin() + 1);
+
+	ASSERT_EQ(iter1->mi, 1);
+	ASSERT_EQ(iter1->content, 4);
+	ASSERT_EQ(*iiter1, 4);
+
+	ASSERT_EQ(v1.GetSize(), 6);
+	ASSERT_EQ(iv1.GetSize(), 6);
+	ASSERT_EQ(v1[5].mi, 3);
+	ASSERT_EQ(v1[5].content, 6);
+	ASSERT_EQ(iv1[5], 6);
+
+	ASSERT_EQ(des_cot, 1);
+
+	auto iter2 = v1.Remove(v1.GetReverseBegin() + 3, v1.GetReverseEnd() - 1);
+	auto iiter2 = iv1.Remove(iv1.GetReverseBegin() + 3, iv1.GetReverseEnd() - 1);
+
+	ASSERT_EQ(iter2->mi, 1);
+	ASSERT_EQ(iter2->content, 0);
+	ASSERT_EQ(*iiter2, 0);
+
+	ASSERT_EQ(v1.GetSize(), 4);
+	ASSERT_EQ(iv1.GetSize(), 4);
+	ASSERT_EQ(v1[1].mi, 3);
+	ASSERT_EQ(v1[1].content, 3);
+	ASSERT_EQ(v1[2].mi, 3);
+	ASSERT_EQ(v1[2].content, 4);
+	ASSERT_EQ(v1[3].mi, 4);
+	ASSERT_EQ(v1[3].content, 6);
+	ASSERT_EQ(iv1[1], 3);
+	ASSERT_EQ(iv1[2], 4);
+	ASSERT_EQ(iv1[3], 6);
+
+	ASSERT_EQ(des_cot, 3);
+}
+
 TEST(Vector, FindTest)
 {
 	Vector<int> test1 = {0, 1, 2, 3, 4, 5, 6};
