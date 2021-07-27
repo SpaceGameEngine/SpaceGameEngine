@@ -123,7 +123,7 @@ namespace SpaceGameEngine
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(v.GetObject(i));
+					new ((T*)(m_pContent) + i) T(v.GetObject(i));
 				}
 			}
 		}
@@ -192,7 +192,7 @@ namespace SpaceGameEngine
 					m_Size = v.m_Size;
 					for (SizeType i = buffer; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(v.GetObject(i));
+						new ((T*)(m_pContent) + i) T(v.GetObject(i));
 					}
 				}
 			}
@@ -218,7 +218,7 @@ namespace SpaceGameEngine
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(v.GetObject(i));
+						new ((T*)(m_pContent) + i) T(v.GetObject(i));
 					}
 				}
 			}
@@ -271,7 +271,7 @@ namespace SpaceGameEngine
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(v.GetObject(i));
+					new ((T*)(m_pContent) + i) T(v.GetObject(i));
 				}
 			}
 		}
@@ -296,7 +296,7 @@ namespace SpaceGameEngine
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(std::move(v.GetObject(i)));
+					new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
 				}
 			}
 		}
@@ -344,7 +344,7 @@ namespace SpaceGameEngine
 					m_Size = v.GetSize();
 					for (SizeType i = buffer; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(v.GetObject(i));
+						new ((T*)(m_pContent) + i) T(v.GetObject(i));
 					}
 				}
 			}
@@ -370,7 +370,7 @@ namespace SpaceGameEngine
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(v.GetObject(i));
+						new ((T*)(m_pContent) + i) T(v.GetObject(i));
 					}
 				}
 			}
@@ -429,7 +429,7 @@ namespace SpaceGameEngine
 					m_Size = v.GetSize();
 					for (SizeType i = buffer; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(std::move(v.GetObject(i)));
+						new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
 					}
 				}
 			}
@@ -455,7 +455,7 @@ namespace SpaceGameEngine
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(std::move(v.GetObject(i)));
+						new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
 					}
 				}
 			}
@@ -476,7 +476,7 @@ namespace SpaceGameEngine
 				auto iter = ilist.begin();
 				for (SizeType i = 0; i < m_Size; i++, ++iter)
 				{
-					new (&GetObject(i)) T(*iter);
+					new ((T*)(m_pContent) + i) T(*iter);
 				}
 			}
 		}
@@ -495,7 +495,7 @@ namespace SpaceGameEngine
 				auto iter = stl_container.begin();
 				for (SizeType i = 0; i < m_Size && iter != stl_container.end(); i++, iter++)
 				{
-					new (&GetObject(i)) T(std::move(*iter));
+					new ((T*)(m_pContent) + i) T(std::move(*iter));
 				}
 			}
 			else
@@ -503,7 +503,7 @@ namespace SpaceGameEngine
 				auto iter = stl_container.begin();
 				for (SizeType i = 0; i < m_Size && iter != stl_container.end(); i++, iter++)
 				{
-					new (&GetObject(i)) T(*iter);
+					new ((T*)(m_pContent) + i) T(*iter);
 				}
 			}
 		}
@@ -516,7 +516,7 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				new (&GetObject(i)) T(val);
+				new ((T*)(m_pContent) + i) T(val);
 			}
 		}
 
@@ -531,7 +531,7 @@ namespace SpaceGameEngine
 			auto iter = begin;
 			for (SizeType i = 0; i < m_Size && iter != end; i++, iter++)
 			{
-				new (&GetObject(i)) T(*iter);
+				new ((T*)(m_pContent) + i) T(*iter);
 			}
 		}
 
@@ -561,7 +561,7 @@ namespace SpaceGameEngine
 				{
 					for (SizeType i = 0; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(std::move(*reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)));
+						new ((T*)(m_pContent) + i) T(std::move(*reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)));
 					}
 					for (SizeType i = 0; i < m_Size; i++)
 					{
@@ -634,7 +634,7 @@ namespace SpaceGameEngine
 				m_Size = size;
 				for (SizeType i = buffer; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(val);
+					new ((T*)(m_pContent) + i) T(val);
 				}
 			}
 			else
@@ -644,7 +644,7 @@ namespace SpaceGameEngine
 				m_Size = size;
 				for (SizeType i = buffer; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(val);
+					new ((T*)(m_pContent) + i) T(val);
 				}
 			}
 		}
@@ -1739,7 +1739,7 @@ namespace SpaceGameEngine
 				{
 					if (iter != IteratorType::GetEnd(*this) - 1)
 					{
-						new (&const_cast<T&>(*iter)) T(std::move(const_cast<T&>(*(iter + 1))));
+						new ((T*)(iter.GetData())) T(std::move(const_cast<T&>(*(iter + 1))));
 						for (auto i = iter + 1; i != IteratorType::GetEnd(*this) - 1; i += 1)
 						{
 							const_cast<T&>(*i) = std::move(const_cast<T&>(*(i + 1)));
@@ -1759,7 +1759,7 @@ namespace SpaceGameEngine
 				{
 					if (iter != IteratorType::GetBegin(*this))
 					{
-						new (&const_cast<T&>(*iter)) T(std::move(const_cast<T&>(*(iter - 1))));
+						new ((T*)(iter.GetData())) T(std::move(const_cast<T&>(*(iter - 1))));
 						for (auto i = iter - 1; i != IteratorType::GetBegin(*this); i -= 1)
 						{
 							const_cast<T&>(*i) = std::move(const_cast<T&>(*(i - 1)));
@@ -1817,7 +1817,7 @@ namespace SpaceGameEngine
 					auto iter = begin;
 					for (; iter != end && iter + size != IteratorType::GetEnd(*this); iter += 1)
 					{
-						new (&const_cast<T&>(*iter)) T(std::move(const_cast<T&>(*(iter + size))));
+						new ((T*)(iter.GetData())) T(std::move(const_cast<T&>(*(iter + size))));
 					}
 					if (iter + size != IteratorType::GetEnd(*this))
 					{
@@ -1841,7 +1841,7 @@ namespace SpaceGameEngine
 					auto iter = end - 1;
 					for (; iter != begin - 1 && iter - size != IteratorType::GetBegin(*this) - 1; iter -= 1)
 					{
-						new (&const_cast<T&>(*iter)) T(std::move(const_cast<T&>(*(iter - size))));
+						new ((T*)(iter.GetData())) T(std::move(const_cast<T&>(*(iter - size))));
 					}
 					if (iter - size != IteratorType::GetBegin(*this) - 1)
 					{
