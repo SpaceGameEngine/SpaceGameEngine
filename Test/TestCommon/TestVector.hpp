@@ -2158,6 +2158,32 @@ TEST(Vector, TrivialInsertTest)
 	ASSERT_EQ(v3[4], 2);
 	ASSERT_EQ(v3[5], 1);
 	ASSERT_EQ(v3[6], 4);
+
+	Vector<int> v4({0, 4});
+	Vector<int> vdat({1, 2, 3});
+	ASSERT_EQ(v4.GetSize(), 2);
+	ASSERT_EQ(vdat.GetSize(), 3);
+
+	v4.Insert(v4.GetBegin() + 1, vdat.GetReverseBegin(), vdat.GetReverseEnd());
+
+	ASSERT_EQ(v4.GetSize(), 5);
+	ASSERT_EQ(v4[0], 0);
+	ASSERT_EQ(v4[1], 3);
+	ASSERT_EQ(v4[2], 2);
+	ASSERT_EQ(v4[3], 1);
+	ASSERT_EQ(v4[4], 4);
+
+	v4.Insert(v4.GetReverseBegin() + 2, vdat.GetBegin(), vdat.GetEnd());
+
+	ASSERT_EQ(v4.GetSize(), 8);
+	ASSERT_EQ(v4[0], 0);
+	ASSERT_EQ(v4[1], 3);
+	ASSERT_EQ(v4[2], 2);
+	ASSERT_EQ(v4[3], 3);
+	ASSERT_EQ(v4[4], 2);
+	ASSERT_EQ(v4[5], 1);
+	ASSERT_EQ(v4[6], 1);
+	ASSERT_EQ(v4[7], 4);
 }
 
 TEST(Vector, TrivialEmplaceTest)
