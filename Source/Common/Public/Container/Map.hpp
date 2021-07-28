@@ -891,7 +891,7 @@ namespace SpaceGameEngine
 		{
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
-				m_Tree.InternalInsert(std::move(i->m_First), std::move(i->m_Second));
+				m_Tree.InternalInsert(i->m_First, i->m_Second);
 			}
 		}
 
@@ -1397,7 +1397,7 @@ namespace SpaceGameEngine
 		{
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
-				m_Tree.InternalInsert(std::move(i->m_First), std::move(i->m_Second));
+				m_Tree.InternalInsert(i->m_First, i->m_Second);
 			}
 		}
 

@@ -90,9 +90,6 @@
     <ClInclude Include="Public\Utility\AutoReleaseBuffer.h">
       <Filter>Public\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Container\ReverseSequentialIterator.hpp">
-      <Filter>Public\Container</Filter>
-    </ClInclude>
     <ClInclude Include="Public\SGEString.hpp">
       <Filter>Public</Filter>
     </ClInclude>
@@ -121,6 +118,9 @@
       <Filter>Public\Container</Filter>
     </ClInclude>
     <ClInclude Include="Public\Container\HashMap.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\List.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
   </ItemGroup>

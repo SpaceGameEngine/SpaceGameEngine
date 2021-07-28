@@ -464,7 +464,7 @@ namespace SpaceGameEngine
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
 				HashType hash = Hasher::GetHash(i->m_First);
-				m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::move(i->m_First), std::move(i->m_Second));
+				m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, i->m_First, i->m_Second);
 			}
 		}
 
@@ -695,6 +695,7 @@ namespace SpaceGameEngine
 
 			inline T* GetData() const
 			{
+				SGE_ASSERT(OutOfRangeError, *this);
 				return &(m_pNode->m_KeyValuePair);
 			}
 
@@ -706,6 +707,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NullPointerError, pbucket);
 				//SGE_ASSERT(NullPointerError, pnode);	pnode can be nullptr as the end iterator
+				SGE_ASSERT(NullPointerError, pbucket_end);
 				m_pBucket = pbucket;
 				m_pNode = pnode;
 				m_pBucketEnd = pbucket_end;
@@ -739,6 +741,17 @@ namespace SpaceGameEngine
 		struct IsHashMapIterator
 		{
 			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>;
+		};
+
+		struct ExternalIteratorError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator does not belong to this HashMap.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const HashMap& hm)
+			{
+				return iter.m_pBucketEnd != hm.m_pContent + hm.m_BucketQuantity;
+			}
 		};
 
 		inline Iterator GetBegin()
@@ -826,7 +839,7 @@ namespace SpaceGameEngine
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
 				HashType hash = Hasher::GetHash(i->m_First);
-				if (m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, std::move(i->m_First), std::move(i->m_Second)).m_Second)
+				if (m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, i->m_First, i->m_Second).m_Second)
 					m_Size += 1;
 			}
 		}
@@ -835,6 +848,7 @@ namespace SpaceGameEngine
 		inline IteratorType Remove(const IteratorType& iter)
 		{
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter);
+			SGE_ASSERT(ExternalIteratorError, iter, *this);
 			IteratorType re = iter;
 			++re;
 			m_pContent[(iter.m_pNode->m_HashValue) & (m_BucketQuantity - 1)].RemoveNode(iter.m_pNode);

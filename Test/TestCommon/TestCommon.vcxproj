@@ -173,6 +173,7 @@
     <ClInclude Include="TestContainerConcept.hpp" />
     <ClInclude Include="TestError.hpp" />
     <ClInclude Include="TestHashMap.hpp" />
+    <ClInclude Include="TestList.hpp" />
     <ClInclude Include="TestMap.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
     <ClInclude Include="TestMeta.hpp" />

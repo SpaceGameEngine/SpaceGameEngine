@@ -20,7 +20,6 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Error.h"
 #include "ContainerConcept.hpp"
-#include "ReverseSequentialIterator.hpp"
 
 namespace SpaceGameEngine
 {
@@ -124,7 +123,7 @@ namespace SpaceGameEngine
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(v.GetObject(i));
+					new ((T*)(m_pContent) + i) T(v.GetObject(i));
 				}
 			}
 		}
@@ -193,7 +192,7 @@ namespace SpaceGameEngine
 					m_Size = v.m_Size;
 					for (SizeType i = buffer; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(v.GetObject(i));
+						new ((T*)(m_pContent) + i) T(v.GetObject(i));
 					}
 				}
 			}
@@ -219,7 +218,7 @@ namespace SpaceGameEngine
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(v.GetObject(i));
+						new ((T*)(m_pContent) + i) T(v.GetObject(i));
 					}
 				}
 			}
@@ -272,7 +271,7 @@ namespace SpaceGameEngine
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(v.GetObject(i));
+					new ((T*)(m_pContent) + i) T(v.GetObject(i));
 				}
 			}
 		}
@@ -297,7 +296,7 @@ namespace SpaceGameEngine
 			{
 				for (SizeType i = 0; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(std::move(v.GetObject(i)));
+					new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
 				}
 			}
 		}
@@ -345,7 +344,7 @@ namespace SpaceGameEngine
 					m_Size = v.GetSize();
 					for (SizeType i = buffer; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(v.GetObject(i));
+						new ((T*)(m_pContent) + i) T(v.GetObject(i));
 					}
 				}
 			}
@@ -371,7 +370,7 @@ namespace SpaceGameEngine
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(v.GetObject(i));
+						new ((T*)(m_pContent) + i) T(v.GetObject(i));
 					}
 				}
 			}
@@ -430,7 +429,7 @@ namespace SpaceGameEngine
 					m_Size = v.GetSize();
 					for (SizeType i = buffer; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(std::move(v.GetObject(i)));
+						new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
 					}
 				}
 			}
@@ -456,46 +455,47 @@ namespace SpaceGameEngine
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(std::move(v.GetObject(i)));
+						new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
 					}
 				}
 			}
 			return *this;
 		}
 
-		inline Vector(std::initializer_list<T> list)
+		inline Vector(std::initializer_list<T> ilist)
 		{
-			m_Size = list.size();
-			m_RealSize = list.size() * 2;
+			m_Size = ilist.size();
+			m_RealSize = ilist.size() * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			if constexpr (IsTrivial<T>::Value)
 			{
-				std::memcpy(m_pContent, list.begin(), m_Size * sizeof(T));
+				std::memcpy(m_pContent, ilist.begin(), m_Size * sizeof(T));
 			}
 			else
 			{
-				for (SizeType i = 0; i < m_Size; i++)
+				auto iter = ilist.begin();
+				for (SizeType i = 0; i < m_Size; i++, ++iter)
 				{
-					new (&GetObject(i)) T(*(list.begin() + i));
+					new ((T*)(m_pContent) + i) T(*iter);
 				}
 			}
 		}
 
 		template<typename STLContainer,
-				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<std::decay_t<STLContainer>>().size()), typename std::decay_t<STLContainer>::size_type>, bool>,
-				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<std::decay_t<STLContainer>>().begin()), typename std::decay_t<STLContainer>::iterator>, bool>,
-				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<typename std::decay_t<STLContainer>::iterator>() + 1), typename std::decay_t<STLContainer>::iterator>, bool>>
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<std::remove_cv_t<std::remove_reference_t<STLContainer>>>().size()), typename std::remove_cv_t<std::remove_reference_t<STLContainer>>::size_type>, bool>,
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<std::remove_cv_t<std::remove_reference_t<STLContainer>>>().begin()), typename std::remove_cv_t<std::remove_reference_t<STLContainer>>::iterator>, bool>,
+				 typename = std::enable_if_t<std::is_same_v<decltype(std::declval<typename std::remove_cv_t<std::remove_reference_t<STLContainer>>::iterator>() + 1), typename std::remove_cv_t<std::remove_reference_t<STLContainer>>::iterator>, bool>>
 		inline Vector(STLContainer&& stl_container)
 		{
 			m_Size = stl_container.size();
 			m_RealSize = stl_container.size() * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			if constexpr (std::is_same_v<std::decay_t<STLContainer>, STLContainer>)
+			if constexpr (std::is_same_v<std::remove_cv_t<std::remove_reference_t<STLContainer>>, STLContainer>)
 			{
 				auto iter = stl_container.begin();
 				for (SizeType i = 0; i < m_Size && iter != stl_container.end(); i++, iter++)
 				{
-					new (&GetObject(i)) T(std::move(*iter));
+					new ((T*)(m_pContent) + i) T(std::move(*iter));
 				}
 			}
 			else
@@ -503,7 +503,7 @@ namespace SpaceGameEngine
 				auto iter = stl_container.begin();
 				for (SizeType i = 0; i < m_Size && iter != stl_container.end(); i++, iter++)
 				{
-					new (&GetObject(i)) T(*iter);
+					new ((T*)(m_pContent) + i) T(*iter);
 				}
 			}
 		}
@@ -516,7 +516,7 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			for (SizeType i = 0; i < m_Size; i++)
 			{
-				new (&GetObject(i)) T(val);
+				new ((T*)(m_pContent) + i) T(val);
 			}
 		}
 
@@ -531,7 +531,7 @@ namespace SpaceGameEngine
 			auto iter = begin;
 			for (SizeType i = 0; i < m_Size && iter != end; i++, iter++)
 			{
-				new (&GetObject(i)) T(*iter);
+				new ((T*)(m_pContent) + i) T(*iter);
 			}
 		}
 
@@ -561,7 +561,7 @@ namespace SpaceGameEngine
 				{
 					for (SizeType i = 0; i < m_Size; i++)
 					{
-						new (&GetObject(i)) T(std::move(*reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)));
+						new ((T*)(m_pContent) + i) T(std::move(*reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)));
 					}
 					for (SizeType i = 0; i < m_Size; i++)
 					{
@@ -599,6 +599,7 @@ namespace SpaceGameEngine
 		/*!
 		@brief set the Vector's size.
 		@param val the default value of the new elements.
+		@warning the value can not be one of the elements of this Vector.
 		@note There are three situations when the function is called.When
 		the size we set is less than the Vector's old size,the Vector
 		will release its spare elements.When the size we set is larger than
@@ -633,7 +634,7 @@ namespace SpaceGameEngine
 				m_Size = size;
 				for (SizeType i = buffer; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(val);
+					new ((T*)(m_pContent) + i) T(val);
 				}
 			}
 			else
@@ -643,7 +644,7 @@ namespace SpaceGameEngine
 				m_Size = size;
 				for (SizeType i = buffer; i < m_Size; i++)
 				{
-					new (&GetObject(i)) T(val);
+					new ((T*)(m_pContent) + i) T(val);
 				}
 			}
 		}
@@ -711,11 +712,12 @@ namespace SpaceGameEngine
 
 			using ValueType = _T;
 
-		public:
 			friend OutOfRangeError;
 			friend Vector;
-			friend ReverseSequentialIterator<IteratorImpl<_T>>;
+			template<typename __T>
+			friend class ReverseIteratorImpl;
 
+		public:
 			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
 				return IteratorImpl(reinterpret_cast<_T*>(v.m_pContent));
@@ -840,137 +842,157 @@ namespace SpaceGameEngine
 			_T* m_pContent;
 		};
 
-		template<typename IteratorType>
-		class VectorReverseIteratorImpl : public ReverseSequentialIterator<IteratorType>
+		template<typename _T>
+		class ReverseIteratorImpl
 		{
 		public:
 			struct OutOfRangeError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
-				inline static bool Judge(const VectorReverseIteratorImpl& iter, T* begin, T* end)
+				inline static bool Judge(const ReverseIteratorImpl& iter, _T* begin, _T* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
 					SGE_ASSERT(NullPointerError, end);
-					return !(iter.operator->() >= begin && iter.operator->() <= end);
+					return !(iter.m_pContent >= begin && iter.m_pContent <= end);
 				}
 			};
 
-			using ValueType = typename IteratorType::ValueType;
+			using ValueType = _T;
 
-		public:
 			friend OutOfRangeError;
 			friend Vector;
+			template<typename __T>
+			friend class IteratorImpl;
 
-			inline static VectorReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<ValueType>, const Vector&, Vector&> v)
+		public:
+			inline static ReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
-				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) + v.m_Size - 1);
+				return ReverseIteratorImpl(reinterpret_cast<_T*>(v.m_pContent) + v.m_Size - 1);
 			}
 
-			inline static VectorReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<ValueType>, const Vector&, Vector&> v)
+			inline static ReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<_T>, const Vector&, Vector&> v)
 			{
-				return VectorReverseIteratorImpl(reinterpret_cast<T*>(v.m_pContent) - 1);
+				return ReverseIteratorImpl(reinterpret_cast<_T*>(v.m_pContent) - 1);
 			}
 
-			inline VectorReverseIteratorImpl(const VectorReverseIteratorImpl& iter)
-				: ReverseSequentialIterator<IteratorType>(iter)
+			inline ReverseIteratorImpl(const ReverseIteratorImpl& iter)
 			{
+				m_pContent = iter.m_pContent;
 			}
 
-			inline VectorReverseIteratorImpl& operator=(const VectorReverseIteratorImpl& iter)
+			inline ReverseIteratorImpl& operator=(const ReverseIteratorImpl& iter)
 			{
 				SGE_ASSERT(SelfAssignmentError, this, &iter);
-				ReverseSequentialIterator<IteratorType>::operator=(iter);
+				m_pContent = iter.m_pContent;
 				return *this;
 			}
 
-			template<typename _IteratorType, typename = std::enable_if_t<IsVectorIterator<_IteratorType>::Value && (std::is_same_v<typename _IteratorType::ValueType, ValueType> || std::is_same_v<typename _IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
-			inline VectorReverseIteratorImpl(const _IteratorType& iter)
-				: ReverseSequentialIterator<IteratorType>(iter)
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline ReverseIteratorImpl(const IteratorType& iter)
 			{
+				m_pContent = (_T*)iter.GetData();
 			}
 
-			template<typename _IteratorType, typename = std::enable_if_t<IsVectorIterator<_IteratorType>::Value && (std::is_same_v<typename _IteratorType::ValueType, ValueType> || std::is_same_v<typename _IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
-			inline VectorReverseIteratorImpl& operator=(const _IteratorType& iter)
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline ReverseIteratorImpl& operator=(const IteratorType& iter)
 			{
-				ReverseSequentialIterator<IteratorType>::operator=(iter);
+				m_pContent = (_T*)iter.GetData();
 				return *this;
 			}
 
-			inline VectorReverseIteratorImpl operator+(SizeType i) const
+			inline ReverseIteratorImpl operator+(SizeType i) const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator+(i);
+				return ReverseIteratorImpl(m_pContent - i);
 			}
 
-			inline VectorReverseIteratorImpl& operator+=(SizeType i)
+			inline ReverseIteratorImpl& operator+=(SizeType i)
 			{
-				ReverseSequentialIterator<IteratorType>::operator+=(i);
+				m_pContent -= i;
 				return *this;
 			}
 
-			inline VectorReverseIteratorImpl& operator++()
+			inline ReverseIteratorImpl& operator++()
 			{
-				ReverseSequentialIterator<IteratorType>::operator++();
+				m_pContent -= 1;
 				return *this;
 			}
 
-			inline const VectorReverseIteratorImpl operator++(int)
+			inline const ReverseIteratorImpl operator++(int)
 			{
-				return ReverseSequentialIterator<IteratorType>::operator++(0);
+				ReverseIteratorImpl re(*this);
+				m_pContent -= 1;
+				return re;
 			}
 
-			inline VectorReverseIteratorImpl operator-(SizeType i) const
+			inline ReverseIteratorImpl operator-(SizeType i) const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator-(i);
+				return ReverseIteratorImpl(m_pContent + i);
 			}
 
-			inline VectorReverseIteratorImpl& operator-=(SizeType i)
+			inline ReverseIteratorImpl& operator-=(SizeType i)
 			{
-				ReverseSequentialIterator<IteratorType>::operator-=(i);
+				m_pContent += i;
 				return *this;
 			}
 
-			inline VectorReverseIteratorImpl& operator--()
+			inline ReverseIteratorImpl& operator--()
 			{
-				ReverseSequentialIterator<IteratorType>::operator--();
+				m_pContent += 1;
 				return *this;
 			}
 
-			inline const VectorReverseIteratorImpl operator--(int)
+			inline const ReverseIteratorImpl operator--(int)
 			{
-				return ReverseSequentialIterator<IteratorType>::operator--(0);
+				ReverseIteratorImpl re(*this);
+				m_pContent += 1;
+				return re;
 			}
 
-			inline SizeType operator-(const VectorReverseIteratorImpl& iter) const
+			inline SizeType operator-(const ReverseIteratorImpl& iter) const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator-(iter);
+				return ((AddressType)iter.m_pContent - (AddressType)m_pContent) / sizeof(_T);
 			}
 
-			inline bool operator==(const VectorReverseIteratorImpl& iter) const
+			inline _T* operator->() const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator==(iter);
+				return m_pContent;
 			}
 
-			inline bool operator!=(const VectorReverseIteratorImpl& iter) const
+			inline _T& operator*() const
 			{
-				return ReverseSequentialIterator<IteratorType>::operator!=(iter);
+				return *m_pContent;
+			}
+
+			inline bool operator==(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent == iter.m_pContent;
+			}
+
+			inline bool operator!=(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent != iter.m_pContent;
+			}
+
+			inline ValueType* GetData() const
+			{
+				return m_pContent;
 			}
 
 		private:
-			inline VectorReverseIteratorImpl(T* ptr)
-				: ReverseSequentialIterator<IteratorType>(ptr)
+			inline explicit ReverseIteratorImpl(_T* ptr)
 			{
+				SGE_ASSERT(NullPointerError, ptr);
+				m_pContent = ptr;
 			}
 
-			inline VectorReverseIteratorImpl(const ReverseSequentialIterator<IteratorType>& iter)
-				: ReverseSequentialIterator<IteratorType>(iter)
-			{
-			}
+		private:
+			_T* m_pContent;
 		};
 
 		using Iterator = IteratorImpl<T>;
 		using ConstIterator = IteratorImpl<const T>;
-		using ReverseIterator = VectorReverseIteratorImpl<IteratorImpl<T>>;
-		using ConstReverseIterator = VectorReverseIteratorImpl<IteratorImpl<const T>>;
+		using ReverseIterator = ReverseIteratorImpl<T>;
+		using ConstReverseIterator = ReverseIteratorImpl<const T>;
 
 		inline Iterator GetBegin()
 		{
@@ -1012,6 +1034,9 @@ namespace SpaceGameEngine
 			return ConstReverseIterator::GetEnd(*this);
 		}
 
+		/*!
+		@warning the value can not be one of the elements of this Vector.
+		*/
 		inline T& PushBack(const T& val)
 		{
 			if (m_Size + 1 <= m_RealSize)
@@ -1028,6 +1053,9 @@ namespace SpaceGameEngine
 			return GetObject(m_Size - 1);
 		}
 
+		/*!
+		@warning the value can not be one of the elements of this Vector.
+		*/
 		inline T& PushBack(T&& val)
 		{
 			if (m_Size + 1 <= m_RealSize)
@@ -1044,6 +1072,9 @@ namespace SpaceGameEngine
 			return GetObject(m_Size - 1);
 		}
 
+		/*!
+		@warning the value can not be one of the elements of this Vector.
+		*/
 		template<typename... Args>
 		inline T& EmplaceBack(Args&&... args)
 		{
@@ -1060,6 +1091,7 @@ namespace SpaceGameEngine
 			}
 			return GetObject(m_Size - 1);
 		}
+
 		/*!
 		@brief check the type to make sure that it is one of the Vector's Iterator Types.
 		*/
@@ -1073,6 +1105,7 @@ namespace SpaceGameEngine
 		@brief insert a value to the Vector before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
@@ -1089,10 +1122,18 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
-					for (SizeType i = m_Size - 2; i > index; i--)
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(i) = std::move(GetObject(i - 1));
+						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = m_Size - 2; i > index; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - 1));
+						}
 					}
 					GetObject(index) = val;
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
@@ -1109,10 +1150,18 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
-					for (SizeType i = 1; i < index; i++)
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 1; i < index; i++)
+						{
+							GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						}
 					}
 					GetObject(m_Size - 1 - index) = val;
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);
@@ -1124,6 +1173,7 @@ namespace SpaceGameEngine
 		@brief insert a value to the Vector before the iterator.
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
+		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
@@ -1140,10 +1190,18 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
-					for (SizeType i = m_Size - 2; i > index; i--)
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(i) = std::move(GetObject(i - 1));
+						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = m_Size - 2; i > index; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - 1));
+						}
 					}
 					GetObject(index) = std::move(val);
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
@@ -1160,12 +1218,84 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					PushBack(std::move(GetObject(m_Size - 1)));
-					for (SizeType i = 1; i < index; i++)
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 1; i < index; i++)
+						{
+							GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						}
 					}
 					GetObject(m_Size - 1 - index) = std::move(val);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);
+				}
+			}
+		}
+
+		/*!
+		@warning the value can not be one of the elements of this Vector.
+		*/
+		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename... Args>
+		inline IteratorType Emplace(const IteratorType& iter, Args&&... args)
+		{
+			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == m_Size)
+				{
+					EmplaceBack(std::forward<Args>(args)...);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+				}
+				else
+				{
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
+					if constexpr (IsTrivial<T>::Value)
+					{
+						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = m_Size - 2; i > index; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - 1));
+						}
+					}
+					GetObject(index) = T(std::forward<Args>(args)...);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+				}
+			}
+			else	//reverse
+			{
+				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+				SizeType index = iter - IteratorType::GetBegin(*this);
+				if (index == 0)
+				{
+					EmplaceBack(std::forward<Args>(args)...);
+					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
+				}
+				else
+				{
+					T tbuf(std::move(GetObject(m_Size - 1)));
+					PushBack(std::move(tbuf));
+					if constexpr (IsTrivial<T>::Value)
+					{
+						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 1; i < index; i++)
+						{
+							GetObject(m_Size - 1 - i) = std::move(GetObject(m_Size - 2 - i));
+						}
+					}
+					GetObject(m_Size - 1 - index) = T(std::forward<Args>(args)...);
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1 - index);
 				}
 			}
@@ -1176,6 +1306,7 @@ namespace SpaceGameEngine
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the size can not be zero.
+		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the first inserted value.
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
@@ -1208,13 +1339,20 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
 					}
-					for (SizeType i = m_Size - 1; i >= index + size; i--)
+					else
 					{
-						GetObject(i) = std::move(GetObject(i - size));
+						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						}
+						for (SizeType i = m_Size - 1; i >= index + size; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - size));
+						}
 					}
 					for (SizeType i = index; i < std::min(index + size, m_Size); i++)
 					{
@@ -1256,13 +1394,20 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
 					}
-					for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+					else
 					{
-						GetObject(i) = std::move(GetObject(i - size));
+						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						}
+						for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - size));
+						}
 					}
 					for (SizeType i = m_Size - index; i < std::min(m_Size - index + size, m_Size); i++)
 					{
@@ -1321,13 +1466,20 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
 					}
-					for (SizeType i = m_Size - 1; i >= index + size; i--)
+					else
 					{
-						GetObject(i) = std::move(GetObject(i - size));
+						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						}
+						for (SizeType i = m_Size - 1; i >= index + size; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - size));
+						}
 					}
 					auto aiter = begin;
 					for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
@@ -1374,13 +1526,20 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
 					}
-					for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+					else
 					{
-						GetObject(i) = std::move(GetObject(i - size));
+						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						}
+						for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - size));
+						}
 					}
 					auto aiter = begin;
 					for (SizeType i = m_Size - index + size - 1; i >= m_Size; i--, aiter += 1)
@@ -1407,6 +1566,7 @@ namespace SpaceGameEngine
 		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the size of initializer_list can not be zero.
+		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
@@ -1442,13 +1602,20 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
 					}
-					for (SizeType i = m_Size - 1; i >= index + size; i--)
+					else
 					{
-						GetObject(i) = std::move(GetObject(i - size));
+						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						}
+						for (SizeType i = m_Size - 1; i >= index + size; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - size));
+						}
 					}
 					auto aiter = ilist.begin();
 					for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
@@ -1495,13 +1662,20 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
 					}
-					for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+					else
 					{
-						GetObject(i) = std::move(GetObject(i - size));
+						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+						}
+						for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+						{
+							GetObject(i) = std::move(GetObject(i - size));
+						}
 					}
 					auto aiter = ilist.begin();
 					for (SizeType i = m_Size - index + size - 1; i >= m_Size; i--, aiter += 1)
@@ -1557,18 +1731,40 @@ namespace SpaceGameEngine
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
-				for (auto i = iter; i != IteratorType::GetEnd(*this) - 1; i += 1)
+				if constexpr (IsTrivial<T>::Value)
 				{
-					new (&const_cast<T&>(*i)) T(std::move(const_cast<T&>(*(i + 1))));
+					memmove((T*)(iter.GetData()), (T*)(iter.GetData()) + 1, ((IteratorType::GetEnd(*this) - iter) - 1) * sizeof(T));
+				}
+				else
+				{
+					if (iter != IteratorType::GetEnd(*this) - 1)
+					{
+						new ((T*)(iter.GetData())) T(std::move(const_cast<T&>(*(iter + 1))));
+						for (auto i = iter + 1; i != IteratorType::GetEnd(*this) - 1; i += 1)
+						{
+							const_cast<T&>(*i) = std::move(const_cast<T&>(*(i + 1)));
+						}
+					}
 				}
 				m_Size -= 1;
 				return iter;
 			}
 			else	//reverse
 			{
-				for (auto i = iter; i != IteratorType::GetBegin(*this); i -= 1)
+				if constexpr (IsTrivial<T>::Value)
 				{
-					new (&const_cast<T&>(*i)) T(std::move(const_cast<T&>(*(i - 1))));
+					memmove((T*)(iter.GetData()), (T*)(iter.GetData()) + 1, (iter - IteratorType::GetBegin(*this)) * sizeof(T));
+				}
+				else
+				{
+					if (iter != IteratorType::GetBegin(*this))
+					{
+						new ((T*)(iter.GetData())) T(std::move(const_cast<T&>(*(iter - 1))));
+						for (auto i = iter - 1; i != IteratorType::GetBegin(*this); i -= 1)
+						{
+							const_cast<T&>(*i) = std::move(const_cast<T&>(*(i - 1)));
+						}
+					}
 				}
 				m_Size -= 1;
 				return iter + 1;
@@ -1612,18 +1808,48 @@ namespace SpaceGameEngine
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
-				for (auto i = end; i != IteratorType::GetEnd(*this); i += 1)
+				if constexpr (IsTrivial<T>::Value)
 				{
-					new (&const_cast<T&>(*(i - size))) T(std::move(const_cast<T&>(*i)));
+					memmove((T*)(begin.GetData()), (T*)(end.GetData()), (IteratorType::GetEnd(*this) - end) * sizeof(T));
+				}
+				else
+				{
+					auto iter = begin;
+					for (; iter != end && iter + size != IteratorType::GetEnd(*this); iter += 1)
+					{
+						new ((T*)(iter.GetData())) T(std::move(const_cast<T&>(*(iter + size))));
+					}
+					if (iter + size != IteratorType::GetEnd(*this))
+					{
+						for (; iter + size != IteratorType::GetEnd(*this); iter += 1)
+						{
+							const_cast<T&>(*iter) = std::move(const_cast<T&>(*(iter + size)));
+						}
+					}
 				}
 				m_Size -= size;
 				return begin;
 			}
 			else	//reverse
 			{
-				for (auto i = begin - 1; i != IteratorType::GetBegin(*this) - 1; i -= 1)
+				if constexpr (IsTrivial<T>::Value)
 				{
-					new (&const_cast<T&>(*(i + size))) T(std::move(const_cast<T&>(*i)));
+					memmove((T*)(end.GetData()) + 1, (T*)(begin.GetData()) + 1, (begin - IteratorType::GetBegin(*this)) * sizeof(T));
+				}
+				else
+				{
+					auto iter = end - 1;
+					for (; iter != begin - 1 && iter - size != IteratorType::GetBegin(*this) - 1; iter -= 1)
+					{
+						new ((T*)(iter.GetData())) T(std::move(const_cast<T&>(*(iter - size))));
+					}
+					if (iter - size != IteratorType::GetBegin(*this) - 1)
+					{
+						for (; iter - size != IteratorType::GetBegin(*this) - 1; iter -= 1)
+						{
+							const_cast<T&>(*iter) = std::move(const_cast<T&>(*(iter - size)));
+						}
+					}
 				}
 				m_Size -= size;
 				return end;

@@ -38,8 +38,8 @@ void BM_SgeHashMapCreate(benchmark::State& state)
 BENCHMARK(BM_StdUnorderedMapCreate)->Iterations(1000000);
 BENCHMARK(BM_SgeHashMapCreate)->Iterations(1000000);
 
-int bm_hashmap_seq[] = {63, 82, 17, 99, 3, 26, 31, 59, 74, 23, 6, 94, 38, 36, 23, 19, 5, 64, 52, 17, 53, 21, 78, 2, 95};
-constexpr const int bm_hashmap_seq_size = sizeof(bm_hashmap_seq) / sizeof(int);
+inline int bm_hashmap_seq[] = {63, 82, 17, 99, 3, 26, 31, 59, 74, 23, 6, 94, 38, 36, 23, 19, 5, 64, 52, 17, 53, 21, 78, 2, 95};
+inline constexpr const int bm_hashmap_seq_size = sizeof(bm_hashmap_seq) / sizeof(int);
 
 void BM_StdUnorderedMapInsert(benchmark::State& state)
 {

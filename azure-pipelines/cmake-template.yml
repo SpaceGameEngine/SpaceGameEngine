@@ -13,10 +13,10 @@ steps:
     displayName: 'Test'
     inputs:
       filePath: 'azure-pipelines/run-tests.sh'
-  - task: Bash@3
-    displayName: 'Benchmark'
-    inputs:
-      filePath: 'azure-pipelines/run-benchmarks.sh'
+  # - task: Bash@3
+  #   displayName: 'Benchmark'
+  #   inputs:
+  #     filePath: 'azure-pipelines/run-benchmarks.sh'
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
