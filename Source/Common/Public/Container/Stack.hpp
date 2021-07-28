@@ -24,6 +24,167 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	template<typename T, typename Allocator = DefaultAllocator, template<typename, typename> class Implement = List>
+	class Stack
+	{
+	public:
+		using ValueType = T;
+		using AllocatorType = Allocator;
+		using ImplementType = Implement<T, Allocator>;
+
+		struct EmptyStackError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The Stack is empty");
+			inline static bool Judge(SizeType size)
+			{
+				return size == 0;
+			}
+		};
+
+		template<typename _T, typename _Allocator, template<typename, typename> class _Implement>
+		friend class Stack;
+
+	public:
+		inline Stack()
+			: m_Implement()
+		{
+		}
+
+		inline Stack(const Stack& s)
+			: m_Implement(s.m_Implement)
+		{
+		}
+
+		inline Stack(Stack&& s)
+			: m_Implement(std::move(s.m_Implement))
+		{
+		}
+
+		inline Stack& operator=(const Stack& s)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &s);
+			m_Implement = s.m_Implement;
+			return *this;
+		}
+
+		inline Stack& operator=(Stack&& s)
+		{
+			SGE_ASSERT(SelfAssignmentError, this, &s);
+			m_Implement = std::move(s.m_Implement);
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline Stack(const Stack<T, OtherAllocator, Implement>& s)
+			: m_Implement(s.m_Implement)
+		{
+		}
+
+		template<typename OtherAllocator>
+		inline Stack(Stack<T, OtherAllocator, Implement>&& s)
+			: m_Implement(std::move(s.m_Implement))
+		{
+		}
+
+		template<typename OtherAllocator>
+		inline Stack& operator=(const Stack<T, OtherAllocator, Implement>& s)
+		{
+			m_Implement = s.m_Implement;
+			return *this;
+		}
+
+		template<typename OtherAllocator>
+		inline Stack& operator=(Stack<T, OtherAllocator, Implement>&& s)
+		{
+			m_Implement = std::move(s.m_Implement);
+			return *this;
+		}
+
+		inline Stack(SizeType size, const T& val)
+			: m_Implement(size, val)
+		{
+		}
+
+		template<typename AnotherIteratorType, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Value, bool>>
+		inline Stack(const AnotherIteratorType& begin, const AnotherIteratorType& end)
+			: m_Implement(begin, end)
+		{
+		}
+
+		inline Stack(std::initializer_list<T> ilist)
+			: m_Implement(ilist)
+		{
+		}
+
+		inline Stack(const ImplementType& c)
+			: m_Implement(c)
+		{
+		}
+
+		inline Stack(ImplementType&& c)
+			: m_Implement(std::move(c))
+		{
+		}
+
+		template<typename OtherAllocator>
+		inline Stack(const Implement<T, OtherAllocator>& c)
+			: m_Implement(c)
+		{
+		}
+
+		template<typename OtherAllocator>
+		inline Stack(Implement<T, OtherAllocator>&& c)
+			: m_Implement(std::move(c))
+		{
+		}
+
+		inline SizeType GetSize() const
+		{
+			return m_Implement.GetSize();
+		}
+
+		inline ImplementType& GetImplement()
+		{
+			return m_Implement;
+		}
+
+		inline const ImplementType& GetImplement() const
+		{
+			return m_Implement;
+		}
+
+		inline void Push(const T& val)
+		{
+			m_Implement.PushBack(val);
+		}
+
+		inline void Push(T&& val)
+		{
+			m_Implement.PushBack(std::move(val));
+		}
+
+		inline void Pop()
+		{
+			SGE_ASSERT(EmptyStackError, m_Implement.GetSize());
+			m_Implement.PopBack();
+		}
+
+		inline T& GetTop()
+		{
+			SGE_ASSERT(EmptyStackError, m_Implement.GetSize());
+			return *(m_Implement.GetReverseBegin());
+		}
+
+		inline const T& GetTop() const
+		{
+			SGE_ASSERT(EmptyStackError, m_Implement.GetSize());
+			return *(m_Implement.GetConstReverseBegin());
+		}
+
+	private:
+		ImplementType m_Implement;
+	};
+
 	/*!
 	@}
 	*/
