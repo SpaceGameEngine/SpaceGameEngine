@@ -126,6 +126,9 @@
     <ClInclude Include="Public\Container\Stack.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\Queue.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
