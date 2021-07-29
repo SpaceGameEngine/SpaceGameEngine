@@ -179,6 +179,7 @@
     <ClInclude Include="TestMeta.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
     <ClInclude Include="TestRange.hpp" />
+    <ClInclude Include="TestStack.hpp" />
     <ClInclude Include="TestString.hpp" />
     <ClInclude Include="TestFunction.hpp" />
     <ClInclude Include="TestTimeCounter.hpp" />
