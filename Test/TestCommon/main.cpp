@@ -30,6 +30,7 @@ limitations under the License.
 #include "TestHashMap.hpp"
 #include "TestList.hpp"
 #include "TestStack.hpp"
+#include "TestQueue.hpp"
 
 int main(int argc, char** argv)
 {

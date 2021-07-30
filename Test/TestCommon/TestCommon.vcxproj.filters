@@ -20,5 +20,6 @@
     <ClInclude Include="TestHashMap.hpp" />
     <ClInclude Include="TestList.hpp" />
     <ClInclude Include="TestStack.hpp" />
+    <ClInclude Include="TestQueue.hpp" />
   </ItemGroup>
 </Project>

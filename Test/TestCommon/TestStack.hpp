@@ -112,6 +112,7 @@ TEST(Stack, PushAndPopTest)
 	};
 
 	Stack<test_stack_object>* ps = new Stack<test_stack_object>();
+	const Stack<test_stack_object>* pcs = ps;
 
 	for (int i = 0; i < test_size; ++i)
 	{
@@ -123,7 +124,7 @@ TEST(Stack, PushAndPopTest)
 
 	for (int i = test_size - 1; i >= 0; --i)
 	{
-		ASSERT_EQ(ps->GetTop().val, i);
+		ASSERT_EQ(pcs->GetTop().val, i);
 		ps->Pop();
 		ASSERT_EQ(ps->GetSize(), i);
 	}

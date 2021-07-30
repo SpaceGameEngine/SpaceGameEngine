@@ -178,6 +178,7 @@
     <ClInclude Include="TestMemoryManager.hpp" />
     <ClInclude Include="TestMeta.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
+    <ClInclude Include="TestQueue.hpp" />
     <ClInclude Include="TestRange.hpp" />
     <ClInclude Include="TestStack.hpp" />
     <ClInclude Include="TestString.hpp" />
