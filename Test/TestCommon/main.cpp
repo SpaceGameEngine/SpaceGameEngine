@@ -31,6 +31,7 @@ limitations under the License.
 #include "TestList.hpp"
 #include "TestStack.hpp"
 #include "TestQueue.hpp"
+#include "TestPriorityQueue.hpp"
 
 int main(int argc, char** argv)
 {
