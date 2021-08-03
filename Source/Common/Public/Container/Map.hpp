@@ -323,7 +323,7 @@ namespace SpaceGameEngine
 				Node* p = m_pRoot;
 				while (p != &m_NilNode && p->m_KeyValuePair.m_First != key)
 				{
-					if (LessComparer::IsLess(key, p->m_KeyValuePair.m_First))
+					if (LessComparer::Compare(key, p->m_KeyValuePair.m_First))
 						p = p->m_pLeftChild;
 					else
 						p = p->m_pRightChild;
@@ -336,7 +336,7 @@ namespace SpaceGameEngine
 				const Node* p = m_pRoot;
 				while (p != &m_NilNode && p->m_KeyValuePair.m_First != key)
 				{
-					if (LessComparer::IsLess(key, p->m_KeyValuePair.m_First))
+					if (LessComparer::Compare(key, p->m_KeyValuePair.m_First))
 						p = p->m_pLeftChild;
 					else
 						p = p->m_pRightChild;
@@ -394,7 +394,7 @@ namespace SpaceGameEngine
 				while (px != &m_NilNode && px->m_KeyValuePair.m_First != key)
 				{
 					py = px;
-					if (LessComparer::IsLess(key, px->m_KeyValuePair.m_First))
+					if (LessComparer::Compare(key, px->m_KeyValuePair.m_First))
 						px = px->m_pLeftChild;
 					else
 						px = px->m_pRightChild;
@@ -407,7 +407,7 @@ namespace SpaceGameEngine
 					pz->m_pParent = py;
 					if (py == &m_NilNode)
 						m_pRoot = pz;
-					else if (LessComparer::IsLess(pz->m_KeyValuePair.m_First, py->m_KeyValuePair.m_First))
+					else if (LessComparer::Compare(pz->m_KeyValuePair.m_First, py->m_KeyValuePair.m_First))
 						py->m_pLeftChild = pz;
 					else
 						py->m_pRightChild = pz;
