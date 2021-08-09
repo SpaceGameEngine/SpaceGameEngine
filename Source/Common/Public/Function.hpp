@@ -65,6 +65,7 @@ namespace SpaceGameEngine
 		{
 			return true;
 		}
+
 		template<typename _T, typename _Ret, typename... _Args>
 		inline static constexpr bool Judge(...)
 		{
@@ -92,6 +93,7 @@ namespace SpaceGameEngine
 		{
 			inline static constexpr const bool Value = false;
 		};
+
 		template<typename _Allocator, typename _Ret, typename... _Args>
 		struct IsFunction<Function<_Ret(_Args...), _Allocator>>
 		{
@@ -106,6 +108,7 @@ namespace SpaceGameEngine
 		friend class Function;
 
 		inline Function() = delete;
+
 		inline ~Function()
 		{
 		}
@@ -114,10 +117,12 @@ namespace SpaceGameEngine
 			: m_pInvoke(func.m_pInvoke), m_Content(func.m_Content)
 		{
 		}
+
 		inline Function(Function&& func)
 			: m_pInvoke(func.m_pInvoke), m_Content(std::move(func.m_Content))
 		{
 		}
+
 		inline Function& operator=(const Function& func)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &func);
@@ -131,6 +136,7 @@ namespace SpaceGameEngine
 			}
 			return *this;
 		}
+
 		inline Function& operator=(Function&& func)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &func);
