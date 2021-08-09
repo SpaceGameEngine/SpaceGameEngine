@@ -167,6 +167,7 @@
     <ClInclude Include="Public\Container\HashMap.hpp" />
     <ClInclude Include="Public\Container\List.hpp" />
     <ClInclude Include="Public\Container\Map.hpp" />
+    <ClInclude Include="Public\Container\PriorityQueue.hpp" />
     <ClInclude Include="Public\Container\Queue.hpp" />
     <ClInclude Include="Public\Container\Stack.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />

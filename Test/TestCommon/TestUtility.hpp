@@ -82,7 +82,7 @@ struct test_auto_release_buffer_class
 	Function<void()> m_Function;
 };
 
-TEST(Utility_ControllableObject, InstanceTest)
+TEST(ControllableObject, InstanceTest)
 {
 	ControllableObject<int> test;
 	test.Init(1);
@@ -92,7 +92,7 @@ TEST(Utility_ControllableObject, InstanceTest)
 	ASSERT_FALSE(test.IsInitialized());
 }
 
-TEST(Utility_ControllableObject, CopyTest)
+TEST(ControllableObject, CopyTest)
 {
 	ControllableObject<test_controllable_object_class> test;
 	test.Init();
@@ -128,7 +128,7 @@ TEST(Utility_ControllableObject, CopyTest)
 	ASSERT_EQ(test10.Get(), 9);
 }
 
-TEST(Utility_ControllableObject, ComparasionTest)
+TEST(ControllableObject, ComparasionTest)
 {
 	ControllableObject<int> test(1), test2(2), test3(1);
 	ASSERT_FALSE(test == test2);
@@ -141,7 +141,7 @@ TEST(Utility_ControllableObject, ComparasionTest)
 	ASSERT_FALSE(test4 == 0);
 }
 
-TEST(Utility_AutoReleaseBuffer, InstanceAndNewObjectTest)
+TEST(AutoReleaseBuffer, InstanceAndNewObjectTest)
 {
 	AutoReleaseBuffer* arbuf = DefaultAllocator::New<AutoReleaseBuffer>();
 	int* pi = arbuf->NewObject<int>();
@@ -155,4 +155,18 @@ TEST(Utility_AutoReleaseBuffer, InstanceAndNewObjectTest)
 	ASSERT_EQ(flag, 0);
 	DefaultAllocator::Delete(arbuf);
 	ASSERT_EQ(flag, 1);
+}
+
+TEST(Less, LessTest)
+{
+	ASSERT_TRUE(Less<int>::Compare(1, 2));
+	ASSERT_FALSE(Less<int>::Compare(1, 1));
+	ASSERT_FALSE(Less<int>::Compare(2, 1));
+}
+
+TEST(Greater, GreaterTest)
+{
+	ASSERT_TRUE(Greater<int>::Compare(2, 1));
+	ASSERT_FALSE(Greater<int>::Compare(1, 1));
+	ASSERT_FALSE(Greater<int>::Compare(1, 2));
 }
