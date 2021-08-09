@@ -154,3 +154,359 @@ TEST(PriorityQueue, PushAndPopTest)
 	for (int i = 0; i < test_up_bound; ++i)
 		ASSERT_EQ(val_cnt[i], 0);
 }
+
+TEST(PriorityQueue, CopyConstructionTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_priority_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	PriorityQueue<test_priority_queue_object>* ppq = new PriorityQueue<test_priority_queue_object>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ppq->Push(test_priority_queue_object(i, val_rel_func));
+		ASSERT_EQ(ppq->GetTop().val, 0);
+	}
+	ASSERT_EQ(ppq->GetSize(), test_size);
+
+	PriorityQueue<test_priority_queue_object>* ppq2 = new PriorityQueue<test_priority_queue_object>(*ppq);
+
+	ASSERT_EQ(ppq2->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq2->GetTop().val, i);
+		ppq2->Pop();
+		ASSERT_EQ(ppq2->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq->GetTop().val, i);
+		ppq->Pop();
+		ASSERT_EQ(ppq->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq->GetSize(), 0);
+
+	delete ppq;
+	delete ppq2;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(PriorityQueue, MoveConstructionTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_priority_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	PriorityQueue<test_priority_queue_object>* ppq = new PriorityQueue<test_priority_queue_object>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ppq->Push(test_priority_queue_object(i, val_rel_func));
+		ASSERT_EQ(ppq->GetTop().val, 0);
+	}
+	ASSERT_EQ(ppq->GetSize(), test_size);
+
+	PriorityQueue<test_priority_queue_object>* ppq2 = new PriorityQueue<test_priority_queue_object>(std::move(*ppq));
+
+	ASSERT_EQ(ppq2->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq2->GetTop().val, i);
+		ppq2->Pop();
+		ASSERT_EQ(ppq2->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	delete ppq;
+	delete ppq2;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(PriorityQueue, CopyAssignmentTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_priority_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	PriorityQueue<test_priority_queue_object>* ppq = new PriorityQueue<test_priority_queue_object>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ppq->Push(test_priority_queue_object(i, val_rel_func));
+		ASSERT_EQ(ppq->GetTop().val, 0);
+	}
+	ASSERT_EQ(ppq->GetSize(), test_size);
+
+	PriorityQueue<test_priority_queue_object>* ppq2 = new PriorityQueue<test_priority_queue_object>();
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	*ppq2 = *ppq;
+
+	ASSERT_EQ(ppq2->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq2->GetTop().val, i);
+		ppq2->Pop();
+		ASSERT_EQ(ppq2->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq->GetTop().val, i);
+		ppq->Pop();
+		ASSERT_EQ(ppq->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq->GetSize(), 0);
+
+	delete ppq;
+	delete ppq2;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(PriorityQueue, MoveAssignmentTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_priority_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	PriorityQueue<test_priority_queue_object>* ppq = new PriorityQueue<test_priority_queue_object>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ppq->Push(test_priority_queue_object(i, val_rel_func));
+		ASSERT_EQ(ppq->GetTop().val, 0);
+	}
+	ASSERT_EQ(ppq->GetSize(), test_size);
+
+	PriorityQueue<test_priority_queue_object>* ppq2 = new PriorityQueue<test_priority_queue_object>();
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	*ppq2 = std::move(*ppq);
+
+	ASSERT_EQ(ppq2->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq2->GetTop().val, i);
+		ppq2->Pop();
+		ASSERT_EQ(ppq2->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	delete ppq;
+	delete ppq2;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(PriorityQueue, AnotherAllocatorCopyConstructionTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_priority_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, StdAllocator>* ppq = new PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, StdAllocator>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ppq->Push(test_priority_queue_object(i, val_rel_func));
+		ASSERT_EQ(ppq->GetTop().val, 0);
+	}
+	ASSERT_EQ(ppq->GetSize(), test_size);
+
+	PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, MemoryManagerAllocator>* ppq2 = new PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, MemoryManagerAllocator>(*ppq);
+
+	ASSERT_EQ(ppq2->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq2->GetTop().val, i);
+		ppq2->Pop();
+		ASSERT_EQ(ppq2->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq->GetTop().val, i);
+		ppq->Pop();
+		ASSERT_EQ(ppq->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq->GetSize(), 0);
+
+	delete ppq;
+	delete ppq2;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(PriorityQueue, AnotherAllocatorMoveConstructionTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_priority_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, StdAllocator>* ppq = new PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, StdAllocator>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ppq->Push(test_priority_queue_object(i, val_rel_func));
+		ASSERT_EQ(ppq->GetTop().val, 0);
+	}
+	ASSERT_EQ(ppq->GetSize(), test_size);
+
+	PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, MemoryManagerAllocator>* ppq2 = new PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, MemoryManagerAllocator>(std::move(*ppq));
+
+	ASSERT_EQ(ppq2->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq2->GetTop().val, i);
+		ppq2->Pop();
+		ASSERT_EQ(ppq2->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	delete ppq;
+	delete ppq2;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(PriorityQueue, AnotherAllocatorCopyAssignmentTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_priority_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, StdAllocator>* ppq = new PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, StdAllocator>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ppq->Push(test_priority_queue_object(i, val_rel_func));
+		ASSERT_EQ(ppq->GetTop().val, 0);
+	}
+	ASSERT_EQ(ppq->GetSize(), test_size);
+
+	PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, MemoryManagerAllocator>* ppq2 = new PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, MemoryManagerAllocator>();
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	*ppq2 = *ppq;
+
+	ASSERT_EQ(ppq2->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq2->GetTop().val, i);
+		ppq2->Pop();
+		ASSERT_EQ(ppq2->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq->GetTop().val, i);
+		ppq->Pop();
+		ASSERT_EQ(ppq->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq->GetSize(), 0);
+
+	delete ppq;
+	delete ppq2;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(PriorityQueue, AnotherAllocatorMoveAssignmentTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_priority_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, StdAllocator>* ppq = new PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, StdAllocator>();
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ppq->Push(test_priority_queue_object(i, val_rel_func));
+		ASSERT_EQ(ppq->GetTop().val, 0);
+	}
+	ASSERT_EQ(ppq->GetSize(), test_size);
+
+	PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, MemoryManagerAllocator>* ppq2 = new PriorityQueue<test_priority_queue_object, Less<test_priority_queue_object>, MemoryManagerAllocator>();
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	*ppq2 = std::move(*ppq);
+
+	ASSERT_EQ(ppq2->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(ppq2->GetTop().val, i);
+		ppq2->Pop();
+		ASSERT_EQ(ppq2->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(ppq2->GetSize(), 0);
+
+	delete ppq;
+	delete ppq2;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
