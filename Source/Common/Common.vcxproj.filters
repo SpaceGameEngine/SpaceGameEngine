@@ -132,6 +132,9 @@
     <ClInclude Include="Public\Container\PriorityQueue.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
+    <ClInclude Include="Public\CommonAPI.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

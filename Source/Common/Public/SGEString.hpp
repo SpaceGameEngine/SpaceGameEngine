@@ -140,7 +140,7 @@ namespace SpaceGameEngine
 		};
 
 		template<typename T>
-		inline static constexpr StringCategory GetStringCategoryByRealSize(const SizeType size);
+		inline constexpr StringCategory GetStringCategoryByRealSize(const SizeType size);
 
 		/*!
 		@brief simple storage for the string, do not consider '\0'.

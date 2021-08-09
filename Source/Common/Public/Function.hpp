@@ -35,25 +35,25 @@ namespace SpaceGameEngine
 	template<typename T, typename Func>
 	struct IsCorrectFunction
 	{
-		inline static constexpr bool Value = false;
+		inline static constexpr const bool Value = false;
 	};
 
 	template<typename Ret, typename... Args>
 	struct IsCorrectFunction<Ret (*)(Args...), Ret(Args...)>
 	{
-		inline static constexpr bool Value = true;
+		inline static constexpr const bool Value = true;
 	};
 
 	template<typename Ret, typename Class, typename... Args>
 	struct IsCorrectFunction<Ret (Class::*)(Args...), Ret(Class*, Args...)>
 	{
-		inline static constexpr bool Value = true;
+		inline static constexpr const bool Value = true;
 	};
 
 	template<typename Ret, typename Class, typename... Args>
 	struct IsCorrectFunction<Ret (Class::*)(Args...) const, Ret(const Class*, Args...)>
 	{
-		inline static constexpr bool Value = true;
+		inline static constexpr const bool Value = true;
 	};
 
 	template<typename T, typename Ret, typename... Args>
@@ -72,7 +72,7 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr bool Value = Judge<T, Ret, Args...>(0);
+		inline static constexpr const bool Value = Judge<T, Ret, Args...>(0);
 	};
 
 	/*!
@@ -90,12 +90,12 @@ namespace SpaceGameEngine
 		template<typename T>
 		struct IsFunction
 		{
-			inline static constexpr bool Value = false;
+			inline static constexpr const bool Value = false;
 		};
 		template<typename _Allocator, typename _Ret, typename... _Args>
 		struct IsFunction<Function<_Ret(_Args...), _Allocator>>
 		{
-			inline static constexpr bool Value = true;
+			inline static constexpr const bool Value = true;
 		};
 
 		using AllocatorType = Allocator;
