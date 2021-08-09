@@ -144,6 +144,7 @@ namespace SpaceGameEngine
 
 	/*!
 	@todo remove this function,use parser to fill metadata instead of using compiler.
+	@warning because of the using of dll, never expect the results have the same address.
 	*/
 	template<typename T>
 	inline const MetaData& GetMetaData()
