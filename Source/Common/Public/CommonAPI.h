@@ -16,6 +16,9 @@ limitations under the License.
 #pragma once
 #include "Platform.hpp"
 
+#define SGE_USE_DLL
+
+#ifdef SGE_USE_DLL
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC)
 
 #define SGE_DLL_IMPORT __declspec(dllimport)
@@ -27,9 +30,17 @@ limitations under the License.
 #define SGE_DLL_EXPORT __attribute__((visibility("default")))
 
 #endif
+#else
+#define SGE_DLL_IMPORT
+#define SGE_DLL_EXPORT
+#endif
 
+#ifdef SGE_USE_DLL
 #ifdef COMMON_EXPORTS
 #define COMMON_API SGE_DLL_EXPORT
 #else
 #define COMMON_API SGE_DLL_IMPORT
+#endif
+#else
+#define COMMON_API
 #endif
