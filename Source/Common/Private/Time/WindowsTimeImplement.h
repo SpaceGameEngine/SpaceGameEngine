@@ -16,7 +16,7 @@ limitations under the License.
 #pragma once
 #include "Time/TimeCounter.h"
 #include "Error.h"
-
+#include "CommonAPI.h"
 #ifdef SGE_WINDOWS
 #include <Windows.h>
 #endif
@@ -33,27 +33,27 @@ namespace SpaceGameEngine
 #ifdef SGE_WINDOWS
 		namespace WindowsTimeImplement
 		{
-			struct GetQPCFrequencyFailedError
+			struct COMMON_API GetQPCFrequencyFailedError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("Can not get the qpc frequency");
 				static bool Judge(BOOL re_code);
 			};
 
-			TimeType GetQPCFrequency();
+			COMMON_API TimeType GetQPCFrequency();
 
-			struct GetQPCCounterFailedError
+			struct COMMON_API GetQPCCounterFailedError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("Can not get the qpc counter");
 				static bool Judge(BOOL re_code);
 			};
 
-			TimeType GetQPCCounter();
+			COMMON_API TimeType GetQPCCounter();
 		}
 
 		/*!
 		@brief return the now time represented by microsecond.
 		*/
-		TimeType GetNowTime();
+		COMMON_API TimeType GetNowTime();
 #endif
 	}
 

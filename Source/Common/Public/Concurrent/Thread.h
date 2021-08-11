@@ -18,10 +18,15 @@ limitations under the License.
 
 #include "TypeDefinition.hpp"
 #include "Time/TimeCounter.h"
-
+#include "CommonAPI.h"
 #include <functional>
 #include <thread>
 #include <atomic>
+
+namespace std	 //declaration for dll export
+{
+	class COMMON_API thread;
+}
 
 namespace SpaceGameEngine
 {
@@ -52,7 +57,7 @@ namespace SpaceGameEngine
 	 *
 	 * \todo Add interruption support
 	 */
-	class Thread
+	class COMMON_API Thread
 	{
 	public:
 		Thread();
@@ -108,4 +113,4 @@ namespace SpaceGameEngine
 	*/
 }
 
-void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept;
+COMMON_API void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept;

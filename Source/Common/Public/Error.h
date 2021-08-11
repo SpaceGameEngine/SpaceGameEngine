@@ -19,6 +19,7 @@ limitations under the License.
 #include "Platform.hpp"
 #include "Meta/Trait.hpp"
 #include "Utility/Utility.hpp"
+#include "CommonAPI.h"
 #include <type_traits>
 
 namespace SpaceGameEngine
@@ -32,7 +33,7 @@ namespace SpaceGameEngine
 #define SGE_DEBUG
 #endif
 
-	struct DebugInformation
+	struct COMMON_API DebugInformation
 	{
 		const TChar* m_pFileName;
 		const TChar* m_pFunctionName;
@@ -51,7 +52,7 @@ namespace SpaceGameEngine
 #define SGE_LINE __LINE__
 #define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation(SGE_FILE, SGE_FUNCTION, SGE_LINE)
 
-	void ThrowError(const TChar* error_msg, DebugInformation debug_info);
+	COMMON_API void ThrowError(const TChar* error_msg, DebugInformation debug_info);
 
 	/*!
 	@brief Can check whether a type is a error type or not.But need to specify the Judge function's arguments' types.
@@ -81,13 +82,13 @@ namespace SpaceGameEngine
 		inline static constexpr const bool Value = Check<RemoveCVRefType<T>, Args...>(0);
 	};
 
-	struct NullPointerError
+	struct COMMON_API NullPointerError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
 		static bool Judge(const void* ptr);
 	};
 
-	struct InvalidSizeError
+	struct COMMON_API InvalidSizeError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
 		static bool Judge(SizeType size, SizeType min_size, SizeType max_size);

@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "ForwardDefinition.hpp"
 #include "Meta/Trait.hpp"
+#include "CommonAPI.h"
 #include <utility>
 
 namespace SpaceGameEngine
@@ -25,7 +26,7 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	struct UncopyableAndUnmovable
+	struct COMMON_API UncopyableAndUnmovable
 	{
 		inline UncopyableAndUnmovable() = default;
 		inline UncopyableAndUnmovable(const UncopyableAndUnmovable&) = delete;

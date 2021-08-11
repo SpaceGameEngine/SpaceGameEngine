@@ -18,6 +18,7 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Container/Vector.hpp"
 #include "Function.hpp"
+#include "CommonAPI.h"
 
 namespace SpaceGameEngine
 {
@@ -26,11 +27,13 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	template class COMMON_API Vector<Function<void()>>;
+
 	/*!
 	@brief a buffer which can release the temporary objects created by it when
 	it is destructed.
 	*/
-	class AutoReleaseBuffer
+	class COMMON_API AutoReleaseBuffer
 	{
 	public:
 		AutoReleaseBuffer();

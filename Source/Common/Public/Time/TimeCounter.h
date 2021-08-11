@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "Platform.hpp"
 #include "TypeDefinition.hpp"
+#include "CommonAPI.h"
 
 namespace SpaceGameEngine
 {
@@ -29,12 +30,12 @@ namespace SpaceGameEngine
 	/*!
 	@brief return the now time represented by microsecond.
 	*/
-	TimeType GetNowTime();
+	COMMON_API TimeType GetNowTime();
 
 	/*!
 	@brief sleep for the time represented by microsecond.
 	*/
-	void SleepFor(TimeType microsecond);
+	COMMON_API void SleepFor(TimeType microsecond);
 
 	inline constexpr const UInt64 Microsecond = 1;
 	inline constexpr const UInt64 Millisecond = 1000;
