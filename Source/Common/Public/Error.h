@@ -78,16 +78,16 @@ namespace SpaceGameEngine
 		inline static constexpr const bool Value = Check<RemoveCVRefType<T>, Args...>(0);
 	};
 
-	struct COMMON_API NullPointerError
+	struct NullPointerError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
-		static bool Judge(const void* ptr);
+		static COMMON_API bool Judge(const void* ptr);
 	};
 
-	struct COMMON_API InvalidSizeError
+	struct InvalidSizeError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
-		static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
+		static COMMON_API bool Judge(SizeType size, SizeType min_size, SizeType max_size);
 	};
 
 	struct SelfAssignmentError

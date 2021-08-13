@@ -36,13 +36,13 @@ namespace SpaceGameEngine
 #define SGE_MAX_MEMORY_SIZE UINT64_MAX
 #endif
 
-	struct COMMON_API InvalidAlignmentError
+	struct InvalidAlignmentError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The alignment is invalid");
 		/*!
 		@note only the alignment which is 0 or 2^n can pass the judgment.
 		*/
-		static bool Judge(SizeType alignment);
+		static COMMON_API bool Judge(SizeType alignment);
 	};
 
 	/*!
