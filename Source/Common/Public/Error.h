@@ -29,10 +29,6 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-#if defined(DEBUG) || defined(_DEBUG)
-#define SGE_DEBUG
-#endif
-
 	struct COMMON_API DebugInformation
 	{
 		const TChar* m_pFileName;

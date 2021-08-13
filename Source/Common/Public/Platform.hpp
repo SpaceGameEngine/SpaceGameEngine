@@ -66,6 +66,10 @@ limitations under the License.
 #endif
 #endif
 
+#if defined(DEBUG) || defined(_DEBUG)
+#define SGE_DEBUG
+#endif
+
 /*!
 @file
 @todo check these platform macros.
