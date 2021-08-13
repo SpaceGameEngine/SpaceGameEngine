@@ -98,7 +98,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../ThirdParty/GoogleBenchmark/source/include;../../Source/Common/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../ThirdParty/GoogleBenchmark/source/include;../../Source/Common/Public;../../Source/Bootstrap/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -112,7 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../ThirdParty/GoogleBenchmark/source/include;../../Source/Common/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../ThirdParty/GoogleBenchmark/source/include;../../Source/Common/Public;../../Source/Bootstrap/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -128,7 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../ThirdParty/GoogleBenchmark/source/include;../../Source/Common/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../ThirdParty/GoogleBenchmark/source/include;../../Source/Common/Public;../../Source/Bootstrap/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -146,7 +146,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../ThirdParty/GoogleBenchmark/source/include;../../Source/Common/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../ThirdParty/GoogleBenchmark/source/include;../../Source/Common/Public;../../Source/Bootstrap/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -159,6 +159,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Source\Bootstrap\Bootstrap.vcxproj">
+      <Project>{84ade34b-02bd-4712-8fed-84b671ca59cd}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Source\Common\Common.vcxproj">
       <Project>{3d706382-4b3c-4ebc-ac11-ff05c091e4d4}</Project>
     </ProjectReference>
