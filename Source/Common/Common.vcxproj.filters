@@ -40,6 +40,12 @@
     <Filter Include="Private\Time">
       <UniqueIdentifier>{f4f2e877-3dd8-470f-9a06-ffda4ce44565}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\System">
+      <UniqueIdentifier>{30f6bdc3-83de-48e1-b2c0-a686556cc8d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\System">
+      <UniqueIdentifier>{650700f1-9473-40da-9d17-1201682012b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -135,6 +141,9 @@
     <ClInclude Include="Public\CommonAPI.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\System\DllLoader.h">
+      <Filter>Public\System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -163,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="Private\Time\UnixTimeImplement.cpp">
       <Filter>Private\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\System\DllLoader.cpp">
+      <Filter>Private\System</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

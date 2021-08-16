@@ -14,42 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Platform.hpp"
+#include "SGEString.hpp"
 
-/*!
-@ingroup Common
-@{
-*/
+namespace SpaceGameEngine
+{
+	/*!
+	@ingroup Common
+	@{
+	*/
 
-#define SGE_USE_DLL
-
-#ifdef SGE_USE_DLL
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
-
-#define SGE_DLL_IMPORT __declspec(dllimport)
-#define SGE_DLL_EXPORT __declspec(dllexport)
-
-#else
-
-#define SGE_DLL_IMPORT
-#define SGE_DLL_EXPORT __attribute__((visibility("default")))
-
-#endif
-#else
-#define SGE_DLL_IMPORT
-#define SGE_DLL_EXPORT
-#endif
-
-#ifdef SGE_USE_DLL
-#ifdef COMMON_EXPORTS
-#define COMMON_API SGE_DLL_EXPORT
-#else
-#define COMMON_API SGE_DLL_IMPORT
-#endif
-#else
-#define COMMON_API
-#endif
-
-/*!
-@}
-*/
+	/*!
+	@}
+	*/
+}
