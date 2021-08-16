@@ -38,5 +38,5 @@ SpaceGameEngine::MetaData::MetaData(const char* name, SizeType size, SizeType al
 
 bool SpaceGameEngine::operator==(const MetaData& meta_data1, const MetaData& meta_data2)
 {
-	return memcmp(&meta_data1, &meta_data2, sizeof(MetaData)) == 0;
+	return (strcmp(meta_data1.m_pName, meta_data2.m_pName) == 0) && (meta_data1.m_Size == meta_data2.m_Size) && (meta_data1.m_Alignment == meta_data2.m_Alignment);
 }
