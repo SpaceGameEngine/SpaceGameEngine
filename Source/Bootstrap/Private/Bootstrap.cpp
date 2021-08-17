@@ -40,7 +40,7 @@ SpaceGameEngine::Bootstrap::Bootstrap()
 	g_CommonModule = LoadLibrary(SGE_TSTR(".\\Binary\\Common\\x64\\Release\\Common.dll"));
 #endif
 #else
-	static_assert(false, "Platform macro error!");
+#error "Platform macro error!"
 #endif
 	if (g_CommonModule == 0)
 	{
