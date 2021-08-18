@@ -16,17 +16,18 @@ limitations under the License.
 #include "Bootstrap.h"
 #include "Platform.hpp"
 #include "SGEStringForward.h"
-#ifdef SGE_WINDOWS
+#include "CommonAPI.h"
+#if defined(SGE_WINDOWS) && defined(SGE_USE_DLL)
 #include <Windows.h>
 #endif
 
-#ifdef SGE_WINDOWS
+#if defined(SGE_WINDOWS) && defined(SGE_USE_DLL)
 static HMODULE g_CommonModule;
 #endif
 
 SpaceGameEngine::Bootstrap::Bootstrap()
 {
-#ifdef SGE_WINDOWS
+#if defined(SGE_WINDOWS) && defined(SGE_USE_DLL)
 #ifdef SGE_X86
 #ifdef SGE_DEBUG
 	g_CommonModule = LoadLibrary(SGE_TSTR(".\\Binary\\Common\\x86\\Debug\\Common.dll"));
@@ -52,7 +53,7 @@ SpaceGameEngine::Bootstrap::Bootstrap()
 
 SpaceGameEngine::Bootstrap::~Bootstrap()
 {
-#ifdef SGE_WINDOWS
+#if defined(SGE_WINDOWS) && defined(SGE_USE_DLL)
 	if (g_CommonModule == 0)
 	{
 		DebugBreak();
