@@ -22,5 +22,6 @@
     <ClInclude Include="TestStack.hpp" />
     <ClInclude Include="TestQueue.hpp" />
     <ClInclude Include="TestPriorityQueue.hpp" />
+    <ClInclude Include="TestDllLoader.hpp" />
   </ItemGroup>
 </Project>

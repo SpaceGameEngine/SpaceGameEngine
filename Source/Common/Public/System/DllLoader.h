@@ -81,6 +81,13 @@ namespace SpaceGameEngine
 	COMMON_API void UnloadDll(const DllHandle& handle);
 
 	/*!
+	@brief get the dll's relative path which conform with the project rule.
+	@todo use Path instead of String.
+	@param dll_name the name of the dll(without any prefix or suffix).
+	*/
+	COMMON_API String GetDllPath(const String& dll_name);
+
+	/*!
 	@}
 	*/
 }

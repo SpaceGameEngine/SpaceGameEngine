@@ -103,3 +103,33 @@ void SpaceGameEngine::UnloadDll(const DllHandle& handle)
 #error "this platform is not supported"
 #endif
 }
+
+SpaceGameEngine::String SpaceGameEngine::GetDllPath(const String& dll_name)
+{
+#ifdef SGE_WINDOWS
+	String dll_path(SGE_STR(".\\Binary\\"));
+	dll_path += dll_name;
+#ifdef SGE_X86
+	dll_path += SGE_STR("\\x86");
+#elif defined SGE_X64
+	dll_path += SGE_STR("\\x64");
+#else
+#error "Platform macro error!"
+#endif
+
+#ifdef SGE_DEBUG
+	dll_path += SGE_STR("\\Debug\\");
+#else
+	dll_path += SGE_STR("\\Release\\");
+#endif
+
+	dll_path += dll_name;
+	dll_path += SGE_STR(".dll");
+
+	return dll_path;
+#elif defined(SGE_UNIX)
+//todo
+#else
+#error "this platform is not supported"
+#endif
+}
