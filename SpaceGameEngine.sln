@@ -30,8 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{F9
 		Document\Document\CodeRule.md = Document\Document\CodeRule.md
 		Document\Document\DevelopmentPlan.md = Document\Document\DevelopmentPlan.md
 		Document\Document\DocumentRule.md = Document\Document\DocumentRule.md
+		Document\Document\PackagedStructure.md = Document\Document\PackagedStructure.md
 		Document\Document\ProjectRule.md = Document\Document\ProjectRule.md
-		Document\Document\ProjectStruction.md = Document\Document\ProjectStruction.md
+		Document\Document\ProjectStructure.md = Document\Document\ProjectStructure.md
 		Document\Document\WorkFlow.md = Document\Document\WorkFlow.md
 	EndProjectSection
 EndProject
