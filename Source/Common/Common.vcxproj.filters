@@ -46,6 +46,12 @@
     <Filter Include="Private\System">
       <UniqueIdentifier>{650700f1-9473-40da-9d17-1201682012b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Module">
+      <UniqueIdentifier>{a068b2a4-a529-4044-86e7-780f3ab9e560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Module">
+      <UniqueIdentifier>{b6e246fb-0db4-4c2b-bc21-bcffe85e889b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -144,6 +150,12 @@
     <ClInclude Include="Public\System\DllLoader.h">
       <Filter>Public\System</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Module\Module.h">
+      <Filter>Public\Module</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Module\ModuleManager.h">
+      <Filter>Public\Module</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -175,6 +187,12 @@
     </ClCompile>
     <ClCompile Include="Private\System\DllLoader.cpp">
       <Filter>Private\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Module\Module.cpp">
+      <Filter>Private\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Module\ModuleManager.cpp">
+      <Filter>Private\Module</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

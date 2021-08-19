@@ -9,6 +9,8 @@ add_library(Common
         Private/Time/WindowsTimeImplement.cpp
         Private/Time/UnixTimeImplement.cpp
         Private/System/DllLoader.cpp
+        Private/Module/Module.cpp
+        Private/Module/ModuleManager.cpp
         )
 target_include_directories(Common PUBLIC Public)
 target_link_libraries(Common PUBLIC ${THIRD_PARTY_LIBRARIES})

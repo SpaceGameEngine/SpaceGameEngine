@@ -34,6 +34,7 @@ limitations under the License.
 #include "TestQueue.hpp"
 #include "TestPriorityQueue.hpp"
 #include "TestDllLoader.hpp"
+#include "TestModule.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;
 

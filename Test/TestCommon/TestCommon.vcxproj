@@ -187,6 +187,7 @@
     <ClInclude Include="TestMeta.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
     <ClInclude Include="TestDllLoader.hpp" />
+    <ClInclude Include="TestModule.hpp" />
     <ClInclude Include="TestPriorityQueue.hpp" />
     <ClInclude Include="TestQueue.hpp" />
     <ClInclude Include="TestRange.hpp" />
