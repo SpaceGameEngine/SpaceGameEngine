@@ -58,7 +58,7 @@ namespace SpaceGameEngine
 		inline ~MetaObject()
 		{
 			m_pMetaData->m_pDestructor(m_pContent);
-			Allocator::RawDelete(m_pContent, m_pMetaData->m_Size, m_pMetaData->m_Alignment);
+			Allocator::RawDelete(m_pContent);
 		}
 
 		inline MetaObject(const MetaObject& obj)

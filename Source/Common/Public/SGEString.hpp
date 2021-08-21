@@ -131,7 +131,7 @@ namespace SpaceGameEngine
 				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
 				if (pcount->Load(MemoryOrderAcquire) == 1)
 				{
-					Allocator::RawDelete(pcount, sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef));
+					Allocator::RawDelete(pcount);
 					return true;
 				}
 				else

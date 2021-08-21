@@ -101,7 +101,7 @@ namespace SpaceGameEngine
 						GetObject(i).~T();
 					}
 				}
-				Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+				Allocator::RawDelete(m_pContent);
 			}
 		}
 
@@ -200,7 +200,7 @@ namespace SpaceGameEngine
 			{
 				if constexpr (IsTrivial<T>::Value)
 				{
-					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					Allocator::RawDelete(m_pContent);
 					m_RealSize = v.m_RealSize;
 					m_Size = v.m_Size;
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -212,7 +212,7 @@ namespace SpaceGameEngine
 					{
 						GetObject(i).~T();
 					}
-					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					Allocator::RawDelete(m_pContent);
 					m_RealSize = v.m_RealSize;
 					m_Size = v.m_Size;
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -244,7 +244,7 @@ namespace SpaceGameEngine
 				}
 			}
 
-			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+			Allocator::RawDelete(m_pContent);
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
 			m_pContent = v.m_pContent;
@@ -352,7 +352,7 @@ namespace SpaceGameEngine
 			{
 				if constexpr (IsTrivial<T>::Value)
 				{
-					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					Allocator::RawDelete(m_pContent);
 					m_RealSize = v.GetRealSize();
 					m_Size = v.GetSize();
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -364,7 +364,7 @@ namespace SpaceGameEngine
 					{
 						GetObject(i).~T();
 					}
-					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					Allocator::RawDelete(m_pContent);
 					m_RealSize = v.GetRealSize();
 					m_Size = v.GetSize();
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -437,7 +437,7 @@ namespace SpaceGameEngine
 			{
 				if constexpr (IsTrivial<T>::Value)
 				{
-					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					Allocator::RawDelete(m_pContent);
 					m_RealSize = v.GetRealSize();
 					m_Size = v.GetSize();
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -449,7 +449,7 @@ namespace SpaceGameEngine
 					{
 						GetObject(i).~T();
 					}
-					Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+					Allocator::RawDelete(m_pContent);
 					m_RealSize = v.GetRealSize();
 					m_Size = v.GetSize();
 					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -568,7 +568,7 @@ namespace SpaceGameEngine
 						reinterpret_cast<T*>((AddressType)(pbuffer) + sizeof(T) * i)->~T();
 					}
 				}
-				Allocator::RawDelete(pbuffer, m_RealSize * sizeof(T), alignof(T));
+				Allocator::RawDelete(pbuffer);
 				m_RealSize = size;
 			}
 		}
@@ -590,7 +590,7 @@ namespace SpaceGameEngine
 				}
 			}
 
-			Allocator::RawDelete(m_pContent, m_RealSize * sizeof(T), alignof(T));
+			Allocator::RawDelete(m_pContent);
 			m_Size = 0;
 			m_RealSize = 4;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));

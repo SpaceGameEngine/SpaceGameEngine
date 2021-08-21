@@ -60,7 +60,7 @@ namespace SpaceGameEngine
 	struct COMMON_API StdAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+		static void RawDelete(void* ptr);
 
 		template<typename T, typename... Args>
 		static T* New(Args&&... args)
@@ -73,7 +73,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			ptr->~T();
-			RawDelete(ptr, sizeof(T), alignof(T));
+			RawDelete(ptr);
 		}
 	};
 
@@ -235,7 +235,7 @@ namespace SpaceGameEngine
 	struct COMMON_API MemoryManagerAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+		static void RawDelete(void* ptr);
 
 		template<typename T, typename... Args>
 		static T* New(Args&&... args)
@@ -248,7 +248,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			ptr->~T();
-			RawDelete(ptr, sizeof(T), alignof(T));
+			RawDelete(ptr);
 		}
 	};
 
