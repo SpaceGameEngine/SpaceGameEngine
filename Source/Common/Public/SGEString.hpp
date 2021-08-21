@@ -1341,7 +1341,7 @@ namespace SpaceGameEngine
 		{
 		}
 
-		inline explicit StringCore(const T* ptr)
+		inline StringCore(const T* ptr)
 			: m_Storage(ptr, GetCStringNormalSize(ptr) + 1), m_Size(GetCStringSize(ptr))
 		{
 		}

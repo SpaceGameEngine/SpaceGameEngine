@@ -14,3 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "Module/Module.h"
+
+SpaceGameEngine::Module::Module(const String& name)
+	: m_Name(name)
+{
+}
+
+SpaceGameEngine::Module::~Module()
+{
+}
+
+const SpaceGameEngine::String& SpaceGameEngine::Module::GetName() const
+{
+	return m_Name;
+}
+
+void SpaceGameEngine::Module::OnLoad()
+{
+}
+
+void SpaceGameEngine::Module::OnUnload()
+{
+}

@@ -19,3 +19,48 @@ limitations under the License.
 #include "Module/ModuleManager.h"
 
 using namespace SpaceGameEngine;
+
+class test_module_1 : public Module
+{
+public:
+	inline static int sm_load_count = 0;
+	inline static int sm_instance_count = 0;
+
+	inline test_module_1()
+		: Module(SGE_STR("test_module_1"))
+	{
+		sm_instance_count += 1;
+	}
+
+	inline virtual ~test_module_1()
+	{
+		sm_instance_count -= 1;
+	}
+
+	inline virtual void OnLoad() override
+	{
+		sm_load_count += 1;
+	}
+
+	inline virtual void OnUnload() override
+	{
+		sm_load_count -= 1;
+	}
+};
+
+TEST(Module, InstanceTest)
+{
+	ASSERT_EQ(test_module_1::sm_instance_count, 0);
+	Module* pmod = DefaultAllocator::New<test_module_1>();
+	ASSERT_EQ(test_module_1::sm_instance_count, 1);
+
+	ASSERT_EQ(pmod->GetName(), SGE_STR("test_module_1"));
+	ASSERT_EQ(test_module_1::sm_load_count, 0);
+	pmod->OnLoad();
+	ASSERT_EQ(test_module_1::sm_load_count, 1);
+	pmod->OnUnload();
+	ASSERT_EQ(test_module_1::sm_load_count, 0);
+
+	DefaultAllocator::Delete(pmod);
+	ASSERT_EQ(test_module_1::sm_instance_count, 0);
+}

@@ -75,7 +75,7 @@ void BM_AllocatorAllocate(benchmark::State& state)
 		for (int i = 0; i < max_buffer_size; ++i)
 			buffer[i] = Allocator::RawNew(size, 4);
 		for (int i = 0; i < max_buffer_size; ++i)
-			Allocator::RawDelete(buffer[i], size, 4);
+			Allocator::RawDelete(buffer[i]);
 	}
 }
 

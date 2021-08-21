@@ -23,6 +23,21 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+	class COMMON_API Module
+	{
+	public:
+		Module(const String& name);
+		virtual ~Module();
+
+		const String& GetName() const;
+
+		virtual void OnLoad();
+		virtual void OnUnload();
+
+	private:
+		String m_Name;
+	};
+
 	/*!
 	@}
 	*/
