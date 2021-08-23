@@ -156,6 +156,9 @@
     <ClInclude Include="Public\Module\ModuleManager.h">
       <Filter>Public\Module</Filter>
     </ClInclude>
+    <ClInclude Include="Private\Module\CommonModule.h">
+      <Filter>Private\Module</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -192,6 +195,9 @@
       <Filter>Private\Module</Filter>
     </ClCompile>
     <ClCompile Include="Private\Module\ModuleManager.cpp">
+      <Filter>Private\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Module\CommonModule.cpp">
       <Filter>Private\Module</Filter>
     </ClCompile>
   </ItemGroup>

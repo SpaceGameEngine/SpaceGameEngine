@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "CommonAPI.h"
+#include "Module/Module.h"
 
 namespace SpaceGameEngine
 {
@@ -23,13 +23,11 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	class COMMON_API Module
+	class COMMON_API CommonModule : public Module
 	{
 	public:
-		virtual ~Module();
-
-		virtual void OnLoad();
-		virtual void OnUnload();
+		virtual void OnLoad() override;
+		virtual void OnUnload() override;
 	};
 
 	/*!

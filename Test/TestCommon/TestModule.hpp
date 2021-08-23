@@ -27,7 +27,6 @@ public:
 	inline static int sm_instance_count = 0;
 
 	inline test_module_1()
-		: Module(SGE_STR("test_module_1"))
 	{
 		sm_instance_count += 1;
 	}
@@ -54,7 +53,6 @@ TEST(Module, InstanceTest)
 	Module* pmod = DefaultAllocator::New<test_module_1>();
 	ASSERT_EQ(test_module_1::sm_instance_count, 1);
 
-	ASSERT_EQ(pmod->GetName(), SGE_STR("test_module_1"));
 	ASSERT_EQ(test_module_1::sm_load_count, 0);
 	pmod->OnLoad();
 	ASSERT_EQ(test_module_1::sm_load_count, 1);
