@@ -17,6 +17,7 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "Module/Module.h"
 #include "Module/ModuleManager.h"
+#include "TestModule.h"
 
 using namespace SpaceGameEngine;
 
@@ -76,4 +77,10 @@ TEST(ModuleManager, StaticModuleTest)
 	ModuleManager::GetSingleton().LoadModule(SGE_STR("Test1"));
 	ASSERT_EQ(Test1Module::sm_instance_count, 1);
 	ASSERT_EQ(Test1Module::sm_load_count, 1);
+}
+
+TEST(ModuleManager, DynamicModuleTest)
+{
+	ModuleManager::GetSingleton().LoadModule(SGE_STR("TestModule"));
+	ASSERT_EQ(GetTestModuleLoadCount(), 1);
 }

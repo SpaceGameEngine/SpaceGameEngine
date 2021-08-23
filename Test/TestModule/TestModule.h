@@ -34,3 +34,5 @@ this module is a test case for TestCommon module to test DllLoader and Module Sy
 extern "C" TEST_MODULE_API int APlusB(int a, int b);
 
 extern "C" TEST_MODULE_API SpaceGameEngine::MemoryManager* GetMemoryManagerAddress();
+
+TEST_MODULE_API int GetTestModuleLoadCount();
