@@ -20,18 +20,18 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-class test_module_1 : public Module
+class Test1Module : public Module
 {
 public:
 	inline static int sm_load_count = 0;
 	inline static int sm_instance_count = 0;
 
-	inline test_module_1()
+	inline Test1Module()
 	{
 		sm_instance_count += 1;
 	}
 
-	inline virtual ~test_module_1()
+	inline virtual ~Test1Module()
 	{
 		sm_instance_count -= 1;
 	}
@@ -49,16 +49,31 @@ public:
 
 TEST(Module, InstanceTest)
 {
-	ASSERT_EQ(test_module_1::sm_instance_count, 0);
-	Module* pmod = DefaultAllocator::New<test_module_1>();
-	ASSERT_EQ(test_module_1::sm_instance_count, 1);
+	ASSERT_EQ(Test1Module::sm_instance_count, 0);
+	Module* pmod = DefaultAllocator::New<Test1Module>();
+	ASSERT_EQ(Test1Module::sm_instance_count, 1);
 
-	ASSERT_EQ(test_module_1::sm_load_count, 0);
+	ASSERT_EQ(Test1Module::sm_load_count, 0);
 	pmod->OnLoad();
-	ASSERT_EQ(test_module_1::sm_load_count, 1);
+	ASSERT_EQ(Test1Module::sm_load_count, 1);
 	pmod->OnUnload();
-	ASSERT_EQ(test_module_1::sm_load_count, 0);
+	ASSERT_EQ(Test1Module::sm_load_count, 0);
 
 	DefaultAllocator::Delete(pmod);
-	ASSERT_EQ(test_module_1::sm_instance_count, 0);
+	ASSERT_EQ(Test1Module::sm_instance_count, 0);
+}
+
+//same as SGE_MODULE when SGE_USE_DLL is not defined.
+#define SGE_TEST_STATIC_MODULE(name) SGE_STATIC_MODULE(SGE_STR(#name), name##Module);
+
+TEST(ModuleManager, StaticModuleTest)
+{
+	SGE_TEST_STATIC_MODULE(Test1);
+	//SGE_STATIC_MODULE(SGE_STR("Test1"), Test1Module);
+
+	ASSERT_EQ(Test1Module::sm_instance_count, 1);
+	ASSERT_EQ(Test1Module::sm_load_count, 0);
+	ModuleManager::GetSingleton().LoadModule(SGE_STR("Test1"));
+	ASSERT_EQ(Test1Module::sm_instance_count, 1);
+	ASSERT_EQ(Test1Module::sm_load_count, 1);
 }

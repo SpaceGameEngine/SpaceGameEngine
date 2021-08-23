@@ -89,7 +89,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-#define SGE_STATIC_MODULE(module_name, module_class) SpaceGameEngine::StaticModule<module_class> g_Static##module_class(name);
+#define SGE_STATIC_MODULE(module_name, module_class) SpaceGameEngine::StaticModule<module_class> g_Static##module_class(module_name);
 #define SGE_DYNAMIC_MODULE(module_class)                           \
 	extern "C" SGE_DLL_EXPORT SpaceGameEngine::Module* GetModule() \
 	{                                                              \
@@ -99,7 +99,7 @@ namespace SpaceGameEngine
 #ifdef SGE_USE_DLL
 #define SGE_MODULE(name) SGE_DYNAMIC_MODULE(name##Module);
 #else
-#define SGE_MODULE(name) SGE_STATIC_MODULE(name, name##Module);
+#define SGE_MODULE(name) SGE_STATIC_MODULE(SGE_STR(#name), name##Module);
 #endif
 	/*!
 	@}
