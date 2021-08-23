@@ -47,6 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{6B44D9
 		Document\Document\Common\CharacterEncoding.md = Document\Document\Common\CharacterEncoding.md
 		Document\Document\Common\Error.md = Document\Document\Common\Error.md
 		Document\Document\Common\MemoryManager.md = Document\Document\Common\MemoryManager.md
+		Document\Document\Common\Module.md = Document\Document\Common\Module.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MetaData", "MetaData", "{72B7A1A0-121F-440A-BF23-A97448D223CD}"
