@@ -35,25 +35,25 @@ namespace SpaceGameEngine
 	template<typename T, typename Func>
 	struct IsCorrectFunction
 	{
-		inline static constexpr bool Value = false;
+		inline static constexpr const bool Value = false;
 	};
 
 	template<typename Ret, typename... Args>
 	struct IsCorrectFunction<Ret (*)(Args...), Ret(Args...)>
 	{
-		inline static constexpr bool Value = true;
+		inline static constexpr const bool Value = true;
 	};
 
 	template<typename Ret, typename Class, typename... Args>
 	struct IsCorrectFunction<Ret (Class::*)(Args...), Ret(Class*, Args...)>
 	{
-		inline static constexpr bool Value = true;
+		inline static constexpr const bool Value = true;
 	};
 
 	template<typename Ret, typename Class, typename... Args>
 	struct IsCorrectFunction<Ret (Class::*)(Args...) const, Ret(const Class*, Args...)>
 	{
-		inline static constexpr bool Value = true;
+		inline static constexpr const bool Value = true;
 	};
 
 	template<typename T, typename Ret, typename... Args>
@@ -65,6 +65,7 @@ namespace SpaceGameEngine
 		{
 			return true;
 		}
+
 		template<typename _T, typename _Ret, typename... _Args>
 		inline static constexpr bool Judge(...)
 		{
@@ -72,7 +73,7 @@ namespace SpaceGameEngine
 		}
 
 	public:
-		inline static constexpr bool Value = Judge<T, Ret, Args...>(0);
+		inline static constexpr const bool Value = Judge<T, Ret, Args...>(0);
 	};
 
 	/*!
@@ -90,12 +91,13 @@ namespace SpaceGameEngine
 		template<typename T>
 		struct IsFunction
 		{
-			inline static constexpr bool Value = false;
+			inline static constexpr const bool Value = false;
 		};
+
 		template<typename _Allocator, typename _Ret, typename... _Args>
 		struct IsFunction<Function<_Ret(_Args...), _Allocator>>
 		{
-			inline static constexpr bool Value = true;
+			inline static constexpr const bool Value = true;
 		};
 
 		using AllocatorType = Allocator;
@@ -106,6 +108,7 @@ namespace SpaceGameEngine
 		friend class Function;
 
 		inline Function() = delete;
+
 		inline ~Function()
 		{
 		}
@@ -114,10 +117,12 @@ namespace SpaceGameEngine
 			: m_pInvoke(func.m_pInvoke), m_Content(func.m_Content)
 		{
 		}
+
 		inline Function(Function&& func)
 			: m_pInvoke(func.m_pInvoke), m_Content(std::move(func.m_Content))
 		{
 		}
+
 		inline Function& operator=(const Function& func)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &func);
@@ -131,6 +136,7 @@ namespace SpaceGameEngine
 			}
 			return *this;
 		}
+
 		inline Function& operator=(Function&& func)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &func);
@@ -150,11 +156,13 @@ namespace SpaceGameEngine
 			: m_pInvoke((decltype(m_pInvoke))func.m_pInvoke), m_Content(func.m_Content)
 		{
 		}
+
 		template<typename OtherAllocator>
 		inline Function(Function<Ret(Args...), OtherAllocator>&& func)
 			: m_pInvoke((decltype(m_pInvoke))func.m_pInvoke), m_Content(std::move(func.m_Content))
 		{
 		}
+
 		template<typename OtherAllocator>
 		inline Function& operator=(const Function<Ret(Args...), OtherAllocator>& func)
 		{
@@ -168,6 +176,7 @@ namespace SpaceGameEngine
 			}
 			return *this;
 		}
+
 		template<typename OtherAllocator>
 		inline Function& operator=(Function<Ret(Args...), OtherAllocator>&& func)
 		{
@@ -191,6 +200,7 @@ namespace SpaceGameEngine
 			};
 			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
 		}
+
 		template<typename T,
 				 typename = std::enable_if_t<IsFunction<std::decay_t<T>>::Value == false, bool>,
 				 typename = std::enable_if_t<std::is_same_v<std::decay_t<decltype(std::declval<ControllableObject<MetaObject<Allocator>, Allocator>>() = std::forward<T>(std::declval<T&&>()))>, ControllableObject<MetaObject<Allocator>, Allocator>>, bool>>
@@ -223,28 +233,29 @@ namespace SpaceGameEngine
 		}
 
 		template<typename T>
-		T& Get()
-		{
-			return m_Content.Get().template Get<T>();
-		}
-		template<typename T>
-		const T& Get() const
+		inline T& Get()
 		{
 			return m_Content.Get().template Get<T>();
 		}
 
-		const MetaData& GetMetaData() const
+		template<typename T>
+		inline const T& Get() const
+		{
+			return m_Content.Get().template Get<T>();
+		}
+
+		inline const MetaData& GetMetaData() const
 		{
 			return m_Content.Get().GetMetaData();
 		}
 
-		Ret operator()(Args... args) const
+		inline Ret operator()(Args... args) const
 		{
 			return m_pInvoke(m_Content.Get(), static_cast<Args>(args)...);
 		}
 
 		template<typename OtherAllocator>
-		bool operator==(const Function<Ret(Args...), OtherAllocator>& func) const
+		inline bool operator==(const Function<Ret(Args...), OtherAllocator>& func) const
 		{
 			return m_Content == func.m_Content;
 		}

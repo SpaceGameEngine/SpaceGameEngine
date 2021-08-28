@@ -26,11 +26,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCpp", "ThirdParty\JsonC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{F93E7284-FB8F-468F-A220-8A4AA2AEC39F}"
 	ProjectSection(SolutionItems) = preProject
+		Document\Document\Bootstrap.md = Document\Document\Bootstrap.md
 		Document\Document\CodeRule.md = Document\Document\CodeRule.md
 		Document\Document\DevelopmentPlan.md = Document\Document\DevelopmentPlan.md
 		Document\Document\DocumentRule.md = Document\Document\DocumentRule.md
+		Document\Document\PackagedStructure.md = Document\Document\PackagedStructure.md
 		Document\Document\ProjectRule.md = Document\Document\ProjectRule.md
-		Document\Document\ProjectStruction.md = Document\Document\ProjectStruction.md
+		Document\Document\ProjectStructure.md = Document\Document\ProjectStructure.md
 		Document\Document\WorkFlow.md = Document\Document\WorkFlow.md
 	EndProjectSection
 EndProject
@@ -45,6 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{6B44D9
 		Document\Document\Common\CharacterEncoding.md = Document\Document\Common\CharacterEncoding.md
 		Document\Document\Common\Error.md = Document\Document\Common\Error.md
 		Document\Document\Common\MemoryManager.md = Document\Document\Common\MemoryManager.md
+		Document\Document\Common\Module.md = Document\Document\Common\Module.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MetaData", "MetaData", "{72B7A1A0-121F-440A-BF23-A97448D223CD}"
@@ -65,6 +68,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Container", "Container", "{
 		Document\Document\Common\Container\Container.md = Document\Document\Common\Container\Container.md
 		Document\Document\Common\Container\ContainerConcept.md = Document\Document\Common\Container\ContainerConcept.md
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bootstrap", "Source\Bootstrap\Bootstrap.vcxproj", "{84ADE34B-02BD-4712-8FED-84B671CA59CD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestModule", "Test\TestModule\TestModule.vcxproj", "{F39D2A87-13CE-4476-9308-E1D897D12BA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -130,6 +137,22 @@ Global
 		{E5EEFCBF-790E-4515-A13C-D90D0E5E1086}.Release|x64.Build.0 = Release|x64
 		{E5EEFCBF-790E-4515-A13C-D90D0E5E1086}.Release|x86.ActiveCfg = Release|Win32
 		{E5EEFCBF-790E-4515-A13C-D90D0E5E1086}.Release|x86.Build.0 = Release|Win32
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD}.Debug|x64.ActiveCfg = Debug|x64
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD}.Debug|x64.Build.0 = Debug|x64
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD}.Debug|x86.ActiveCfg = Debug|Win32
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD}.Debug|x86.Build.0 = Debug|Win32
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD}.Release|x64.ActiveCfg = Release|x64
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD}.Release|x64.Build.0 = Release|x64
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD}.Release|x86.ActiveCfg = Release|Win32
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD}.Release|x86.Build.0 = Release|Win32
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5}.Debug|x64.ActiveCfg = Debug|x64
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5}.Debug|x64.Build.0 = Debug|x64
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5}.Debug|x86.ActiveCfg = Debug|Win32
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5}.Debug|x86.Build.0 = Debug|Win32
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5}.Release|x64.ActiveCfg = Release|x64
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5}.Release|x64.Build.0 = Release|x64
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5}.Release|x86.ActiveCfg = Release|Win32
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +169,8 @@ Global
 		{D8691B82-5BB1-4351-81A5-7A2CB374FD6E} = {E6CDD526-7136-43BA-A1F6-F93333662CE5}
 		{E5EEFCBF-790E-4515-A13C-D90D0E5E1086} = {027AF1FE-F0B3-47B7-A781-7D7EF43D2ECF}
 		{5C7E3D68-FEBE-44E8-A289-63E01D984092} = {6B44D9C0-3589-476C-8789-6CC132708D99}
+		{84ADE34B-02BD-4712-8FED-84B671CA59CD} = {72DE90D1-ACF7-4F34-8E54-E28BFDE1018F}
+		{F39D2A87-13CE-4476-9308-E1D897D12BA5} = {E09406D8-3CBC-473A-8715-05471C55AAFA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}

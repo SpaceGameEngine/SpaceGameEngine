@@ -131,7 +131,7 @@ namespace SpaceGameEngine
 				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
 				if (pcount->Load(MemoryOrderAcquire) == 1)
 				{
-					Allocator::RawDelete(pcount, sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef));
+					Allocator::RawDelete(pcount);
 					return true;
 				}
 				else
@@ -140,7 +140,7 @@ namespace SpaceGameEngine
 		};
 
 		template<typename T>
-		inline static constexpr StringCategory GetStringCategoryByRealSize(const SizeType size);
+		inline constexpr StringCategory GetStringCategoryByRealSize(const SizeType size);
 
 		/*!
 		@brief simple storage for the string, do not consider '\0'.
@@ -1243,6 +1243,12 @@ namespace SpaceGameEngine
 	}
 
 	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
+	class StringCore;
+
+	template<typename Allocator = DefaultAllocator>
+	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr);
+
+	template<typename T, typename Trait, typename Allocator>
 	class StringCore
 	{
 	public:
@@ -1341,7 +1347,7 @@ namespace SpaceGameEngine
 		{
 		}
 
-		inline explicit StringCore(const T* ptr)
+		inline StringCore(const T* ptr)
 			: m_Storage(ptr, GetCStringNormalSize(ptr) + 1), m_Size(GetCStringSize(ptr))
 		{
 		}
@@ -3388,6 +3394,11 @@ namespace SpaceGameEngine
 	using UTF8String = StringCore<char, UTF8Trait, DefaultAllocator>;
 	using String = UCS2String;
 
+	template class COMMON_API StringImplement::Storage<Char16, DefaultAllocator>;
+	template class COMMON_API StringImplement::Storage<char, DefaultAllocator>;
+	template class COMMON_API StringCore<Char16, UCS2Trait, DefaultAllocator>;
+	template class COMMON_API StringCore<char, UTF8Trait, DefaultAllocator>;
+
 	template<typename Allocator>
 	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const StringCore<char, UTF8Trait, Allocator>& str)
 	{
@@ -3444,7 +3455,7 @@ namespace SpaceGameEngine
 		return re;
 	}
 
-	template<typename Allocator = DefaultAllocator>
+	template<typename Allocator>
 	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr)
 	{
 		SGE_ASSERT(NullPointerError, pstr);

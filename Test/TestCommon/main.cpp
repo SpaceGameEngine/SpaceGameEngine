@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "gtest/gtest.h"
+#include "Bootstrap.h"
 #include "TestError.hpp"
 #include "TestString.hpp"
 #include "TestMemoryManager.hpp"
@@ -32,6 +33,10 @@ limitations under the License.
 #include "TestStack.hpp"
 #include "TestQueue.hpp"
 #include "TestPriorityQueue.hpp"
+#include "TestDllLoader.hpp"
+#include "TestModule.hpp"
+
+SpaceGameEngine::Bootstrap bootstrap;
 
 int main(int argc, char** argv)
 {

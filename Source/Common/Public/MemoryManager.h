@@ -21,6 +21,7 @@ limitations under the License.
 #include "Concurrent/Thread.h"
 #include "Concurrent/Lock.h"
 #include "Concurrent/Atomic.hpp"
+#include "CommonAPI.h"
 
 namespace SpaceGameEngine
 {
@@ -41,7 +42,7 @@ namespace SpaceGameEngine
 		/*!
 		@note only the alignment which is 0 or 2^n can pass the judgment.
 		*/
-		static bool Judge(SizeType alignment);
+		static COMMON_API bool Judge(SizeType alignment);
 	};
 
 	/*!
@@ -49,17 +50,17 @@ namespace SpaceGameEngine
 	@note the default alignment depends on the allocated
 	memory size,when the size >= 16,the alignment is 16,or it will be 4.
 	*/
-	SizeType GetDefaultAlignment(SizeType size);
+	COMMON_API SizeType GetDefaultAlignment(SizeType size);
 
 	/*!
 	@file
 	@todo add Allocator as a concept when c++20 can be used
 	*/
 
-	struct StdAllocator
+	struct COMMON_API StdAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+		static void RawDelete(void* ptr);
 
 		template<typename T, typename... Args>
 		static T* New(Args&&... args)
@@ -72,7 +73,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			ptr->~T();
-			RawDelete(ptr, sizeof(T), alignof(T));
+			RawDelete(ptr);
 		}
 	};
 
@@ -88,7 +89,7 @@ namespace SpaceGameEngine
 	on the current condition.
 	@todo add mutexs for fixedsizeallocators
 	*/
-	class MemoryManager : public UncopyableAndUnmovable, public Singleton<MemoryManager>
+	class COMMON_API MemoryManager : public UncopyableAndUnmovable, public Singleton<MemoryManager>
 	{
 	public:
 		/*!
@@ -98,7 +99,7 @@ namespace SpaceGameEngine
 		be a part of the memory which is allocated.There is a formula of memory size which need to be allocated:
 		`ActualAlllocatedMemorySize=max(MemorySizeWhichUserNeed,sizeof(MemoryBlockHeader))`
 		*/
-		struct MemoryBlockHeader
+		struct COMMON_API MemoryBlockHeader
 		{
 			MemoryBlockHeader* m_pNext = nullptr;
 		};
@@ -109,7 +110,7 @@ namespace SpaceGameEngine
 		always the header of the memory page for the allocator to use it to manage the memory page.The
 		memory blocks will be made of the memory after the MemoryPageHeader.
 		*/
-		struct MemoryPageHeader
+		struct COMMON_API MemoryPageHeader
 		{
 			/*!
 			@brief get the memory address of the first memory block in the memory page whether there is
@@ -129,7 +130,7 @@ namespace SpaceGameEngine
 		can allocate must be set by calling FixedSizeAllocator::Init method
 		@attention must call FixedSizeAllocator::Init method after instancing before using
 		*/
-		class FixedSizeAllocator : public UncopyableAndUnmovable
+		class COMMON_API FixedSizeAllocator : public UncopyableAndUnmovable
 		{
 		public:
 			/*!
@@ -231,10 +232,10 @@ namespace SpaceGameEngine
 		FixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
 	};
 
-	struct MemoryManagerAllocator
+	struct COMMON_API MemoryManagerAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);
-		static void RawDelete(void* ptr, SizeType size, SizeType alignment = 0);
+		static void RawDelete(void* ptr);
 
 		template<typename T, typename... Args>
 		static T* New(Args&&... args)
@@ -247,7 +248,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			ptr->~T();
-			RawDelete(ptr, sizeof(T), alignof(T));
+			RawDelete(ptr);
 		}
 	};
 

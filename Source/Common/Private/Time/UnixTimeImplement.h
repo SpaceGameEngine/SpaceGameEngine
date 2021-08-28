@@ -16,7 +16,7 @@ limitations under the License.
 #pragma once
 #include "Time/TimeCounter.h"
 #include "Error.h"
-
+#include "CommonAPI.h"
 #ifdef SGE_UNIX
 #include <sys/time.h>
 #endif
@@ -33,7 +33,7 @@ namespace SpaceGameEngine
 #ifdef SGE_UNIX
 		namespace UnixTimeImplement
 		{
-			struct GetTimeOfDayFailedError
+			struct COMMON_API GetTimeOfDayFailedError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("Can not get the time of day");
 				static bool Judge(int re_code);
@@ -43,7 +43,7 @@ namespace SpaceGameEngine
 		/*!
 		@brief return the now time represented by microsecond.
 		*/
-		TimeType GetNowTime();
+		COMMON_API TimeType GetNowTime();
 #endif
 	}
 

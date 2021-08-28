@@ -54,20 +54,19 @@ void BM_DirectInvoke1(benchmark::State& state)
 	}
 }
 
-auto stdFunction1 = &bm_add;
-
 void BM_StdFunction1(benchmark::State& state)
 {
+	static auto stdFunction1 = &bm_add;
 	for (auto _ : state)
 	{
 		stdFunction1(1, 1);
 	}
 }
 
-SpaceGameEngine::Function<int(int, int)> sgeFunc1 = &bm_add;
-
 void BM_SgeFunction1(benchmark::State& state)
 {
+	static SpaceGameEngine::Function<int(int, int)> sgeFunc1 = &bm_add;
+
 	for (auto _ : state)
 	{
 		sgeFunc1(1, 2);
@@ -99,20 +98,20 @@ void BM_DirectInvoke2(benchmark::State& state)
 	}
 }
 
-std::function<void(bm_func_class*, int, int)> stdFunc2 = &bm_func_class::add;
-
 void BM_StdFunction2(benchmark::State& state)
 {
+	static std::function<void(bm_func_class*, int, int)> stdFunc2 = &bm_func_class::add;
+
 	for (auto _ : state)
 	{
 		stdFunc2(&bm_test_obj, 1, 2);
 	}
 }
 
-SpaceGameEngine::Function<void(bm_func_class*, int, int)> sgeFunc2 = &bm_func_class::add;
-
 void BM_SgeFunction2(benchmark::State& state)
 {
+	static SpaceGameEngine::Function<void(bm_func_class*, int, int)> sgeFunc2 = &bm_func_class::add;
+
 	for (auto _ : state)
 	{
 		sgeFunc2(&bm_test_obj, 1, 2);

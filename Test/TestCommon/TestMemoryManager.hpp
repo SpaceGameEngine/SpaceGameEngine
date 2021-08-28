@@ -34,7 +34,7 @@ TEST(MemoryManager, StdAllocatorRawNewDeleteTest)
 	Int32* pint = reinterpret_cast<Int32*>(StdAllocator::RawNew(sizeof(Int32)));
 	*pint = 3;
 	ASSERT_EQ(*pint, 3);
-	StdAllocator::RawDelete(pint, sizeof(Int32));
+	StdAllocator::RawDelete(pint);
 }
 
 TEST(MemoryManager, MemoryAlignMacroTest)
@@ -63,9 +63,7 @@ TEST(MemoryManager, MemoryPageTest)
 	ASSERT_EQ(ppageheader->m_Offset, 0);
 	ASSERT_EQ(reinterpret_cast<AddressType>(ppageheader->GetFirstMemoryBlock()),
 			  reinterpret_cast<AddressType>(ppageheader) + sizeof(MemoryManager::MemoryPageHeader));
-	StdAllocator::RawDelete(ppageheader,
-							(sizeof(MemoryManager::MemoryPageHeader) + sizeof(MemoryManager::MemoryBlockHeader)),
-							alignof(MemoryManager::MemoryPageHeader));
+	StdAllocator::RawDelete(ppageheader);
 }
 
 TEST(MemoryManager, InvalidAlignmentErrorTest)
@@ -224,5 +222,5 @@ TEST(MemoryManager, MMAllocatorRawNewDeleteTest)
 	Int32* pint = reinterpret_cast<Int32*>(MemoryManagerAllocator::RawNew(sizeof(Int32)));
 	*pint = 3;
 	ASSERT_EQ(*pint, 3);
-	MemoryManagerAllocator::RawDelete(pint, sizeof(Int32));
+	MemoryManagerAllocator::RawDelete(pint);
 }

@@ -17,6 +17,7 @@ limitations under the License.
 #include "SGEString.hpp"
 #include "Error.h"
 #include "Meta/Concept.hpp"
+#include "CommonAPI.h"
 #include <type_traits>
 #include <utility>
 #include <new>
@@ -34,7 +35,7 @@ namespace SpaceGameEngine
 	@todo support custom constructor.
 	@todo use String instead of const char *(only can be implemented by using project manager to parse the meta data).
 	*/
-	struct MetaData
+	struct COMMON_API MetaData
 	{
 		const char* m_pName;
 		SizeType m_Size;
@@ -51,7 +52,7 @@ namespace SpaceGameEngine
 		MetaData(const char* name, SizeType size, SizeType alignment, void (*default_constructor)(void*), void (*copy_constructor)(void*, const void*), void (*move_constructor)(void*, void*), void* (*copy_assignment)(void*, const void*), void* (*move_assignment)(void*, void*), void (*destructor)(void*), bool (*comparison)(const void*, const void*));
 	};
 
-	bool operator==(const MetaData& meta_data1, const MetaData& meta_data2);
+	COMMON_API bool operator==(const MetaData& meta_data1, const MetaData& meta_data2);
 
 	template<typename T>
 	inline void (*QueryDefaultConstructor())(void*)
@@ -144,6 +145,7 @@ namespace SpaceGameEngine
 
 	/*!
 	@todo remove this function,use parser to fill metadata instead of using compiler.
+	@warning because of the using of dll, never expect the results have the same address.
 	*/
 	template<typename T>
 	inline const MetaData& GetMetaData()

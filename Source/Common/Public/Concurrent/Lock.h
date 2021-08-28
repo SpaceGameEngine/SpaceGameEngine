@@ -16,11 +16,20 @@ limitations under the License.
 
 #pragma once
 #include "Time/TimeCounter.h"
-
+#include "CommonAPI.h"
 #include <mutex>
 #include <functional>
 #include <shared_mutex>
 #include <condition_variable>
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
+namespace std	 //declaration for dll export
+{
+	class COMMON_API recursive_timed_mutex;
+	template class COMMON_API unique_lock<recursive_timed_mutex>;
+	class COMMON_API condition_variable_any;
+}
+#endif
 
 namespace SpaceGameEngine
 {
@@ -41,7 +50,7 @@ namespace SpaceGameEngine
 	 *
 	 * Checkout c++ reference for more details.
 	 */
-	class Mutex
+	class COMMON_API Mutex
 	{
 	public:
 		Mutex();
@@ -68,7 +77,7 @@ namespace SpaceGameEngine
 	 *
 	 * Checkout c++ reference for more details.
 	 */
-	class RecursiveLock
+	class COMMON_API RecursiveLock
 	{
 	public:
 		RecursiveLock(const RecursiveLock&) = delete;
@@ -109,7 +118,7 @@ namespace SpaceGameEngine
 	 *
 	 * Checkout c++ reference for more details.
 	 */
-	class Condition
+	class COMMON_API Condition
 	{
 	public:
 		Condition();
