@@ -98,7 +98,7 @@ namespace SpaceGameEngine
 		return DefaultAllocator::New<module_class>();              \
 	}
 
-#ifdef SGE_USE_DLL
+#if defined(SGE_USE_DLL) && defined(SGE_WINDOWS)
 #define SGE_MODULE(name) SGE_DYNAMIC_MODULE(name##Module);
 #else
 #define SGE_MODULE(name) SGE_STATIC_MODULE(SGE_STR(#name), name##Module);

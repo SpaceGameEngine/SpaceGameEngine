@@ -21,7 +21,6 @@ using namespace SpaceGameEngine;
 
 TEST(DllLoader, InvokeTest)
 {
-#ifdef SGE_WINDOWS
 	DllHandle test_module_dll = LoadDll(GetDllPath(SGE_STR("TestModule")));
 	int (*apb)(int, int) = nullptr;
 	apb = (decltype(apb))GetAddressFromDll(test_module_dll, SGE_STR("APlusB"));
@@ -30,7 +29,4 @@ TEST(DllLoader, InvokeTest)
 	get_mm = (decltype(get_mm))GetAddressFromDll(test_module_dll, SGE_STR("GetMemoryManagerAddress"));
 	ASSERT_EQ(get_mm(), &MemoryManager::GetSingleton());
 	UnloadDll(test_module_dll);
-#elif defined(SGE_UNIX)
-	//todo
-#endif
 }

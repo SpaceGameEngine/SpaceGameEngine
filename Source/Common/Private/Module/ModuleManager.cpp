@@ -81,14 +81,12 @@ void SpaceGameEngine::ModuleManager::LoadModule(const String& name)
 		return;
 	}
 	//load from dynamic
-#ifdef SGE_WINDOWS
+#ifdef SGE_WINDOWS	  //unix platform do not use this solution
 	DllHandle dll = LoadDll(GetDllPath(name));
 	Module* (*pget_module)() = nullptr;
 	pget_module = decltype(pget_module)(GetAddressFromDll(dll, SGE_STR("GetModule")));
 	AddModule(name, pget_module());
 	m_DllHandles.Push(dll);
-#else
-	//todo
 #endif
 	//do not throw error here, because if the module can not be founded, the LoadDll will throw the error.
 }
