@@ -34,6 +34,20 @@ endif ()
 # Linux Thread Lib
 find_package(Threads REQUIRED)
 
+# Copy Shared Library
+function(CopySharedLibrary target)
+if(CMAKE_HOST_UNIX)
+if(CMAKE_HOST_APPLE)
+add_custom_command(TARGET ${target}
+                   COMMAND cp ./lib${target}.dylib ../../)
+else()
+add_custom_command(TARGET ${target}
+                   COMMAND cp ./lib${target}.so ../../)
+endif()
+endif()
+endfunction(CopySharedLibrary)
+
+
 # Third Party
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Enable testing of the benchmark library." FORCE)
 

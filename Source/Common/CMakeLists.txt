@@ -1,4 +1,4 @@
-add_library(Common
+add_library(Common SHARED
         Private/Error.cpp
         Private/MemoryManager.cpp
         Private/Concurrent/Thread.cpp
@@ -15,3 +15,4 @@ add_library(Common
         )
 target_include_directories(Common PUBLIC Public)
 target_link_libraries(Common PUBLIC ${THIRD_PARTY_LIBRARIES})
+CopySharedLibrary(Common)
