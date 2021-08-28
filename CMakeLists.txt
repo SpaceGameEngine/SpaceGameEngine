@@ -13,7 +13,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 add_compile_options(/utf-8)
 endif()
 
-cmake_policy(SET CMP0054 OLD)
+# cmake_policy(SET CMP0054 OLD)
 
 # Doxygen support
 if (ENABLE_DOXYGEN)
@@ -47,9 +47,11 @@ set(THIRD_PARTY_TEST_LIBRARIES gtest gmock benchmark)
 
 # Game Engine Modules
 add_subdirectory(Source/Common)
+add_subdirectory(Source/Bootstrap)
 
 # Tests
 add_subdirectory(Test/TestCommon)
+add_subdirectory(Test/TestModule)
 
 # Benchmarks
 add_subdirectory(Benchmark/BenchmarkCommon)

@@ -23,10 +23,12 @@ limitations under the License.
 #include <thread>
 #include <atomic>
 
+#ifdef SGE_WINDOWS
 namespace std	 //declaration for dll export
 {
 	class COMMON_API thread;
 }
+#endif
 
 namespace SpaceGameEngine
 {

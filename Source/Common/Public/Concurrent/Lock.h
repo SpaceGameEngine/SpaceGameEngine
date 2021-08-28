@@ -22,12 +22,14 @@ limitations under the License.
 #include <shared_mutex>
 #include <condition_variable>
 
+#ifdef SGE_WINDOWS
 namespace std	 //declaration for dll export
 {
 	class COMMON_API recursive_timed_mutex;
 	template class COMMON_API unique_lock<recursive_timed_mutex>;
 	class COMMON_API condition_variable_any;
 }
+#endif
 
 namespace SpaceGameEngine
 {
