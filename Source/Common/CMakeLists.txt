@@ -15,4 +15,7 @@ add_library(Common SHARED
         )
 target_include_directories(Common PUBLIC Public)
 target_link_libraries(Common PUBLIC ${THIRD_PARTY_LIBRARIES})
+if((CMAKE_HOST_UNIX) AND (NOT CMAKE_HOST_APPLE))
+target_link_libraries(Common PUBLIC ${CMAKE_DL_LIBS})
+endif()
 CopySharedLibrary(Common)
