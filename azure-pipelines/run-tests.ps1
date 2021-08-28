@@ -5,10 +5,11 @@ $config = $args[1]
 
 (Get-ChildItem -Directory) | foreach {
     $testName = $_.Name
-    cd $testName
-    Get-Location
-    #&"..\Binary\$testName\$arch\$config\$testName.exe" "--gtest_output=xml:$testName-REPORT.xml"
-    cd ..
+    if ($testName -ne "TestModule") {
+        cd $testName
+        &"..\..\Binary\$testName\$arch\$config\$testName.exe" "--gtest_output=xml:$testName-REPORT.xml"
+        cd ..
+    }
 }
 
 cd ..
