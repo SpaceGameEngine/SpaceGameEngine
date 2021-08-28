@@ -43,7 +43,7 @@ namespace SpaceGameEngine
 
 	template class COMMON_API List<Module*>;
 	template class COMMON_API Stack<Module*>;
-#ifdef SGE_WINDOWS
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
 	template struct COMMON_API MapImplement::RedBlackTree<String, Module*>::Node;
 #endif
 	template class COMMON_API MapImplement::RedBlackTree<String, Module*>;
