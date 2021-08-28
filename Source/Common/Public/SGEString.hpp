@@ -1243,6 +1243,12 @@ namespace SpaceGameEngine
 	}
 
 	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
+	class StringCore;
+
+	template<typename Allocator = DefaultAllocator>
+	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr);
+
+	template<typename T, typename Trait, typename Allocator>
 	class StringCore
 	{
 	public:
@@ -3449,7 +3455,7 @@ namespace SpaceGameEngine
 		return re;
 	}
 
-	template<typename Allocator = DefaultAllocator>
+	template<typename Allocator>
 	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr)
 	{
 		SGE_ASSERT(NullPointerError, pstr);
