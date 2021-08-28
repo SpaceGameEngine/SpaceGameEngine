@@ -23,7 +23,7 @@ limitations under the License.
 #include <thread>
 #include <atomic>
 
-#ifdef SGE_WINDOWS
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
 namespace std	 //declaration for dll export
 {
 	class COMMON_API thread;
