@@ -15,7 +15,6 @@ limitations under the License.
 */
 #pragma once
 #include "TypeDefinition.hpp"
-#include "Utility/Utility.hpp"
 #include "Error.h"
 #include "Platform.hpp"
 #include "Concurrent/Thread.h"
@@ -89,7 +88,7 @@ namespace SpaceGameEngine
 	on the current condition.
 	@todo add mutexs for fixedsizeallocators
 	*/
-	class COMMON_API MemoryManager : public UncopyableAndUnmovable, public Singleton<MemoryManager>
+	class COMMON_API MemoryManager : public UncopyableAndUnmovable
 	{
 	public:
 		/*!
@@ -184,9 +183,11 @@ namespace SpaceGameEngine
 		*/
 
 	public:
-		friend Singleton<MemoryManager>;
-
 		~MemoryManager();
+
+		friend struct StdAllocator;
+
+		static MemoryManager& GetSingleton();
 
 		/*!
 		@attention the alignment can not be larger than 128 or equal to 0.

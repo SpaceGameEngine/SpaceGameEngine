@@ -194,6 +194,7 @@
     <ClInclude Include="Public\Concurrent\Lock.h" />
     <ClInclude Include="Public\Utility\AutoReleaseBuffer.h" />
     <ClInclude Include="Public\Utility\ControllableObject.hpp" />
+    <ClInclude Include="Public\Utility\Singleton.hpp" />
     <ClInclude Include="Public\Utility\Utility.hpp" />
   </ItemGroup>
   <ItemGroup>

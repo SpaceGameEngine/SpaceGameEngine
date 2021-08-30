@@ -162,6 +162,9 @@
     <ClInclude Include="Public\GlobalVariable.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\Singleton.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

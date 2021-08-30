@@ -44,6 +44,9 @@ namespace SpaceGameEngine
 
 		static GlobalVariableManager& GetSingleton();
 
+		template<typename T, typename Allocator>
+		friend class GlobalVariable;
+
 	private:
 		GlobalVariableManager();
 		void Add(GlobalVariableCore* ptr);
