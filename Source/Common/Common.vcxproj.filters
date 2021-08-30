@@ -159,6 +159,9 @@
     <ClInclude Include="Private\Module\CommonModule.h">
       <Filter>Private\Module</Filter>
     </ClInclude>
+    <ClInclude Include="Public\GlobalVariable.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -199,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="Private\Module\CommonModule.cpp">
       <Filter>Private\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\GlobalVariable.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
