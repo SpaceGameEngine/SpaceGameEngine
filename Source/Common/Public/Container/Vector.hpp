@@ -155,67 +155,87 @@ namespace SpaceGameEngine
 		inline Vector& operator=(const Vector& v)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &v);
-			if (m_Size >= v.m_Size)
+			if (m_pContent)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if (m_Size >= v.m_Size)
 				{
-					m_Size = v.m_Size;
-					std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
+					if constexpr (IsTrivial<T>::Value)
+					{
+						m_Size = v.m_Size;
+						std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = v.m_Size; i < m_Size; i++)
+						{
+							GetObject(i).~T();
+						}
+						m_Size = v.m_Size;
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i) = v.GetObject(i);
+						}
+					}
+				}
+				else if (m_RealSize >= v.m_Size)
+				{
+					if constexpr (IsTrivial<T>::Value)
+					{
+						m_Size = v.m_Size;
+						std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i) = v.GetObject(i);
+						}
+						SizeType buffer = m_Size;
+						m_Size = v.m_Size;
+						for (SizeType i = buffer; i < m_Size; i++)
+						{
+							new ((T*)(m_pContent) + i) T(v.GetObject(i));
+						}
+					}
 				}
 				else
 				{
-					for (SizeType i = v.m_Size; i < m_Size; i++)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(i).~T();
+						Allocator::RawDelete(m_pContent);
+						m_RealSize = v.m_RealSize;
+						m_Size = v.m_Size;
+						m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+						std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
 					}
-					m_Size = v.m_Size;
-					for (SizeType i = 0; i < m_Size; i++)
+					else
 					{
-						GetObject(i) = v.GetObject(i);
-					}
-				}
-			}
-			else if (m_RealSize >= v.m_Size)
-			{
-				if constexpr (IsTrivial<T>::Value)
-				{
-					m_Size = v.m_Size;
-					std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
-				}
-				else
-				{
-					for (SizeType i = 0; i < m_Size; i++)
-					{
-						GetObject(i) = v.GetObject(i);
-					}
-					SizeType buffer = m_Size;
-					m_Size = v.m_Size;
-					for (SizeType i = buffer; i < m_Size; i++)
-					{
-						new ((T*)(m_pContent) + i) T(v.GetObject(i));
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i).~T();
+						}
+						Allocator::RawDelete(m_pContent);
+						m_RealSize = v.m_RealSize;
+						m_Size = v.m_Size;
+						m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							new ((T*)(m_pContent) + i) T(v.GetObject(i));
+						}
 					}
 				}
 			}
 			else
 			{
+				m_RealSize = v.m_RealSize;
+				m_Size = v.m_Size;
+				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 				if constexpr (IsTrivial<T>::Value)
 				{
-					Allocator::RawDelete(m_pContent);
-					m_RealSize = v.m_RealSize;
-					m_Size = v.m_Size;
-					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
 				}
 				else
 				{
-					for (SizeType i = 0; i < m_Size; i++)
-					{
-						GetObject(i).~T();
-					}
-					Allocator::RawDelete(m_pContent);
-					m_RealSize = v.m_RealSize;
-					m_Size = v.m_Size;
-					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
 						new ((T*)(m_pContent) + i) T(v.GetObject(i));
@@ -233,22 +253,27 @@ namespace SpaceGameEngine
 		inline Vector& operator=(Vector&& v)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &v);
-			if constexpr (IsTrivial<T>::Value)
+			if (m_pContent)
 			{
-			}
-			else
-			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Value)
 				{
-					GetObject(i).~T();
 				}
+				else
+				{
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
+				}
+
+				Allocator::RawDelete(m_pContent);
 			}
 
-			Allocator::RawDelete(m_pContent);
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
 			m_pContent = v.m_pContent;
 			v.m_pContent = nullptr;
+
 			return *this;
 		}
 
@@ -307,67 +332,88 @@ namespace SpaceGameEngine
 		template<typename OtherAllocator>
 		inline Vector& operator=(const Vector<T, OtherAllocator>& v)
 		{
-			if (m_Size >= v.GetSize())
+			if (m_pContent)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if (m_Size >= v.GetSize())
 				{
-					m_Size = v.GetSize();
-					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
+					if constexpr (IsTrivial<T>::Value)
+					{
+						m_Size = v.GetSize();
+						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = v.GetSize(); i < m_Size; i++)
+						{
+							GetObject(i).~T();
+						}
+						m_Size = v.GetSize();
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i) = v.GetObject(i);
+						}
+					}
+				}
+				else if (m_RealSize >= v.GetSize())
+				{
+					if constexpr (IsTrivial<T>::Value)
+					{
+						m_Size = v.GetSize();
+						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i) = v.GetObject(i);
+						}
+						SizeType buffer = m_Size;
+						m_Size = v.GetSize();
+						for (SizeType i = buffer; i < m_Size; i++)
+						{
+							new ((T*)(m_pContent) + i) T(v.GetObject(i));
+						}
+					}
 				}
 				else
 				{
-					for (SizeType i = v.GetSize(); i < m_Size; i++)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(i).~T();
+						Allocator::RawDelete(m_pContent);
+						m_RealSize = v.GetRealSize();
+						m_Size = v.GetSize();
+						m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 					}
-					m_Size = v.GetSize();
-					for (SizeType i = 0; i < m_Size; i++)
+					else
 					{
-						GetObject(i) = v.GetObject(i);
-					}
-				}
-			}
-			else if (m_RealSize >= v.GetSize())
-			{
-				if constexpr (IsTrivial<T>::Value)
-				{
-					m_Size = v.GetSize();
-					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
-				}
-				else
-				{
-					for (SizeType i = 0; i < m_Size; i++)
-					{
-						GetObject(i) = v.GetObject(i);
-					}
-					SizeType buffer = m_Size;
-					m_Size = v.GetSize();
-					for (SizeType i = buffer; i < m_Size; i++)
-					{
-						new ((T*)(m_pContent) + i) T(v.GetObject(i));
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i).~T();
+						}
+						Allocator::RawDelete(m_pContent);
+						m_RealSize = v.GetRealSize();
+						m_Size = v.GetSize();
+						m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							new ((T*)(m_pContent) + i) T(v.GetObject(i));
+						}
 					}
 				}
 			}
 			else
 			{
+				m_RealSize = v.GetRealSize();
+				m_Size = v.GetSize();
+				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+
 				if constexpr (IsTrivial<T>::Value)
 				{
-					Allocator::RawDelete(m_pContent);
-					m_RealSize = v.GetRealSize();
-					m_Size = v.GetSize();
-					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
 				else
 				{
-					for (SizeType i = 0; i < m_Size; i++)
-					{
-						GetObject(i).~T();
-					}
-					Allocator::RawDelete(m_pContent);
-					m_RealSize = v.GetRealSize();
-					m_Size = v.GetSize();
-					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
 						new ((T*)(m_pContent) + i) T(v.GetObject(i));
@@ -392,67 +438,88 @@ namespace SpaceGameEngine
 		template<typename OtherAllocator>
 		inline Vector& operator=(Vector<T, OtherAllocator>&& v)
 		{
-			if (m_Size >= v.GetSize())
+			if (m_pContent)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if (m_Size >= v.GetSize())
 				{
-					m_Size = v.GetSize();
-					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
+					if constexpr (IsTrivial<T>::Value)
+					{
+						m_Size = v.GetSize();
+						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = v.GetSize(); i < m_Size; i++)
+						{
+							GetObject(i).~T();
+						}
+						m_Size = v.GetSize();
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i) = std::move(v.GetObject(i));
+						}
+					}
+				}
+				else if (m_RealSize >= v.GetSize())
+				{
+					if constexpr (IsTrivial<T>::Value)
+					{
+						m_Size = v.GetSize();
+						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
+					}
+					else
+					{
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i) = std::move(v.GetObject(i));
+						}
+						SizeType buffer = m_Size;
+						m_Size = v.GetSize();
+						for (SizeType i = buffer; i < m_Size; i++)
+						{
+							new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
+						}
+					}
 				}
 				else
 				{
-					for (SizeType i = v.GetSize(); i < m_Size; i++)
+					if constexpr (IsTrivial<T>::Value)
 					{
-						GetObject(i).~T();
+						Allocator::RawDelete(m_pContent);
+						m_RealSize = v.GetRealSize();
+						m_Size = v.GetSize();
+						m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 					}
-					m_Size = v.GetSize();
-					for (SizeType i = 0; i < m_Size; i++)
+					else
 					{
-						GetObject(i) = std::move(v.GetObject(i));
-					}
-				}
-			}
-			else if (m_RealSize >= v.GetSize())
-			{
-				if constexpr (IsTrivial<T>::Value)
-				{
-					m_Size = v.GetSize();
-					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
-				}
-				else
-				{
-					for (SizeType i = 0; i < m_Size; i++)
-					{
-						GetObject(i) = std::move(v.GetObject(i));
-					}
-					SizeType buffer = m_Size;
-					m_Size = v.GetSize();
-					for (SizeType i = buffer; i < m_Size; i++)
-					{
-						new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							GetObject(i).~T();
+						}
+						Allocator::RawDelete(m_pContent);
+						m_RealSize = v.GetRealSize();
+						m_Size = v.GetSize();
+						m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+						for (SizeType i = 0; i < m_Size; i++)
+						{
+							new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
+						}
 					}
 				}
 			}
 			else
 			{
+				m_RealSize = v.GetRealSize();
+				m_Size = v.GetSize();
+				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+
 				if constexpr (IsTrivial<T>::Value)
 				{
-					Allocator::RawDelete(m_pContent);
-					m_RealSize = v.GetRealSize();
-					m_Size = v.GetSize();
-					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
 				else
 				{
-					for (SizeType i = 0; i < m_Size; i++)
-					{
-						GetObject(i).~T();
-					}
-					Allocator::RawDelete(m_pContent);
-					m_RealSize = v.GetRealSize();
-					m_Size = v.GetSize();
-					m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 					for (SizeType i = 0; i < m_Size; i++)
 					{
 						new ((T*)(m_pContent) + i) T(std::move(v.GetObject(i)));
@@ -579,18 +646,21 @@ namespace SpaceGameEngine
 		*/
 		inline void Clear()
 		{
-			if constexpr (IsTrivial<T>::Value)
+			if (m_pContent)
 			{
-			}
-			else
-			{
-				for (SizeType i = 0; i < m_Size; i++)
+				if constexpr (IsTrivial<T>::Value)
 				{
-					GetObject(i).~T();
 				}
+				else
+				{
+					for (SizeType i = 0; i < m_Size; i++)
+					{
+						GetObject(i).~T();
+					}
+				}
+				Allocator::RawDelete(m_pContent);
 			}
 
-			Allocator::RawDelete(m_pContent);
 			m_Size = 0;
 			m_RealSize = 4;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));

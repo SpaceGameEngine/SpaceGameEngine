@@ -15,6 +15,7 @@ limitations under the License.
 */
 #include "MemoryManager.h"
 #include "Error.h"
+#include "GlobalVariable.h"
 #include <algorithm>
 #include <cstring>
 #ifdef SGE_WINDOWS
@@ -144,6 +145,12 @@ SpaceGameEngine::MemoryManager::~MemoryManager()
 		if (m_FixedSizeAllocators[i])
 			delete m_FixedSizeAllocators[i];
 	}
+}
+
+SpaceGameEngine::MemoryManager& SpaceGameEngine::MemoryManager::GetSingleton()
+{
+	static GlobalVariable<MemoryManager, StdAllocator> g_MemoryManager;
+	return g_MemoryManager.Get();
 }
 
 void* SpaceGameEngine::MemoryManager::Allocate(SizeType size, SizeType alignment)

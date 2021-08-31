@@ -35,23 +35,6 @@ namespace SpaceGameEngine
 		inline UncopyableAndUnmovable& operator=(UncopyableAndUnmovable&&) = delete;
 	};
 
-	/*!
-	@attention inherit `Singleton<T>` to use it,and define it as a friend in the class and
-	define the class's constructor as a private function at the same time.
-	*/
-	template<typename T>
-	struct Singleton
-	{
-		/*!
-		@todo use global variable
-		*/
-		inline static T& GetSingleton()
-		{
-			static T g_Instance;
-			return g_Instance;
-		}
-	};
-
 	template<typename T, typename U>
 	struct Pair
 	{

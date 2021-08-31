@@ -21,6 +21,7 @@ limitations under the License.
 #include "Container/Stack.hpp"
 #include "Function.hpp"
 #include "System/DllLoader.h"
+#include "Utility/Singleton.hpp"
 
 namespace SpaceGameEngine
 {
@@ -54,7 +55,7 @@ namespace SpaceGameEngine
 	class COMMON_API ModuleManager : public UncopyableAndUnmovable, public Singleton<ModuleManager>
 	{
 	public:
-		friend struct Singleton<ModuleManager>;
+		friend DefaultAllocator;
 
 		template<typename T, typename>
 		friend class StaticModule;
