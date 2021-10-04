@@ -97,6 +97,33 @@ namespace SpaceGameEngine
 			return lhs > rhs;
 		}
 	};
+
+
+	inline UInt64 Digits10(UInt64 v)
+	{
+		UInt64 re = 1;
+		while (true)
+		{
+			if (v < 10)
+			{
+				return re;
+			}
+			if (v < 100)
+			{
+				return re + 1;
+			}
+			if (v < 1000)
+			{
+				return re + 2;
+			}
+			if (v < 10000)
+			{
+				return re + 3;
+			}
+			v /= 10000U;
+			re += 4;
+		}
+	}
 	/*!
 	@}
 	*/

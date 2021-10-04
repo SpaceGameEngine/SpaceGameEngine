@@ -1252,6 +1252,7 @@ namespace SpaceGameEngine
 	class StringCore
 	{
 	public:
+		using CharType = T;
 		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
 		using ConstValueType = std::conditional_t<Trait::IsMultipleByte, const T*, const T>;
 		using ValueTrait = Trait;
@@ -3498,6 +3499,309 @@ namespace SpaceGameEngine
 #define SGE_TSTR_TO_UCS2(str) SpaceGameEngine::UTF8StringToUCS2String(str)
 #define SGE_TSTR_TO_UTF8(str) str
 #endif
+
+	template<typename StringType, typename T>
+	struct ToStringCore
+	{
+		//Get
+	};
+
+	template<typename StringType, typename T>
+	inline StringType ToString(const T& value)
+	{
+		return ToStringCore<StringType, T>::Get(value);
+	}
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, UInt64>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(UInt64 value)
+		{
+			static const Char16 digits[201] =
+				SGE_STR("00010203040506070809")
+					SGE_STR("10111213141516171819")
+						SGE_STR("20212223242526272829")
+							SGE_STR("30313233343536373839")
+								SGE_STR("40414243444546474849")
+									SGE_STR("50515253545556575859")
+										SGE_STR("60616263646566676869")
+											SGE_STR("70717273747576777879")
+												SGE_STR("80818283848586878889")
+													SGE_STR("90919293949596979899");
+			const UInt64 length = Digits10(value);
+			UInt64 next = length - 1;
+			StringType re(length, SGE_STR(' '));
+			Char16* dst = re.GetData();
+			while (value >= 100)
+			{
+				UInt64 i = (value % 100) * 2;
+				value /= 100;
+				dst[next] = digits[i + 1];
+				dst[next - 1] = digits[i];
+				next -= 2;
+			}
+			if (value < 10)
+			{
+				dst[next] = SGE_STR('0') + UInt64(value);
+			}
+			else
+			{
+				auto i = UInt64(value) * 2;
+				dst[next] = digits[i + 1];
+				dst[next - 1] = digits[i];
+			}
+
+			return re;
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, Int64>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(Int64 value)
+		{
+			static const Char16 digits[201] =
+				SGE_STR("00010203040506070809")
+					SGE_STR("10111213141516171819")
+						SGE_STR("20212223242526272829")
+							SGE_STR("30313233343536373839")
+								SGE_STR("40414243444546474849")
+									SGE_STR("50515253545556575859")
+										SGE_STR("60616263646566676869")
+											SGE_STR("70717273747576777879")
+												SGE_STR("80818283848586878889")
+													SGE_STR("90919293949596979899");
+			if (value < 0)
+			{
+				value *= -1;
+				const UInt64 length = Digits10(value) + 1;
+				UInt64 next = length - 1;
+				StringType re(length, SGE_STR(' '));
+				Char16* dst = re.GetData();
+				dst[0] = SGE_STR('-');
+				while (value >= 100)
+				{
+					UInt64 i = (value % 100) * 2;
+					value /= 100;
+					dst[next] = digits[i + 1];
+					dst[next - 1] = digits[i];
+					next -= 2;
+				}
+				if (value < 10)
+				{
+					dst[next] = SGE_STR('0') + UInt64(value);
+				}
+				else
+				{
+					auto i = UInt64(value) * 2;
+					dst[next] = digits[i + 1];
+					dst[next - 1] = digits[i];
+				}
+
+				return re;
+			}
+			else
+			{
+				const UInt64 length = Digits10(value);
+				UInt64 next = length - 1;
+				StringType re(length, SGE_STR(' '));
+				Char16* dst = re.GetData();
+				while (value >= 100)
+				{
+					UInt64 i = (value % 100) * 2;
+					value /= 100;
+					dst[next] = digits[i + 1];
+					dst[next - 1] = digits[i];
+					next -= 2;
+				}
+				if (value < 10)
+				{
+					dst[next] = SGE_STR('0') + UInt64(value);
+				}
+				else
+				{
+					auto i = UInt64(value) * 2;
+					dst[next] = digits[i + 1];
+					dst[next - 1] = digits[i];
+				}
+
+				return re;
+			}
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, int>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(int value)
+		{
+			return ToStringCore<StringType, Int64>::Get(value);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, unsigned int>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(unsigned int value)
+		{
+			return ToStringCore<StringType, UInt64>::Get(value);
+		}
+	};
+
+	//------------------------------------------------------------------
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, UInt64>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(UInt64 value)
+		{
+			static const char digits[201] =
+				SGE_U8STR("00010203040506070809")
+					SGE_U8STR("10111213141516171819")
+						SGE_U8STR("20212223242526272829")
+							SGE_U8STR("30313233343536373839")
+								SGE_U8STR("40414243444546474849")
+									SGE_U8STR("50515253545556575859")
+										SGE_U8STR("60616263646566676869")
+											SGE_U8STR("70717273747576777879")
+												SGE_U8STR("80818283848586878889")
+													SGE_U8STR("90919293949596979899");
+			const UInt64 length = Digits10(value);
+			UInt64 next = length - 1;
+			StringType re(length, SGE_U8STR(" "));
+			char* dst = re.GetData();
+			while (value >= 100)
+			{
+				UInt64 i = (value % 100) * 2;
+				value /= 100;
+				dst[next] = digits[i + 1];
+				dst[next - 1] = digits[i];
+				next -= 2;
+			}
+			if (value < 10)
+			{
+				dst[next] = SGE_U8STR('0') + UInt64(value);
+			}
+			else
+			{
+				auto i = UInt64(value) * 2;
+				dst[next] = digits[i + 1];
+				dst[next - 1] = digits[i];
+			}
+
+			return re;
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, Int64>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(Int64 value)
+		{
+			static const char digits[201] =
+				SGE_U8STR("00010203040506070809")
+					SGE_U8STR("10111213141516171819")
+						SGE_U8STR("20212223242526272829")
+							SGE_U8STR("30313233343536373839")
+								SGE_U8STR("40414243444546474849")
+									SGE_U8STR("50515253545556575859")
+										SGE_U8STR("60616263646566676869")
+											SGE_U8STR("70717273747576777879")
+												SGE_U8STR("80818283848586878889")
+													SGE_U8STR("90919293949596979899");
+			if (value < 0)
+			{
+				value *= -1;
+				const UInt64 length = Digits10(value) + 1;
+				UInt64 next = length - 1;
+				StringType re(length, SGE_U8STR(" "));
+				char* dst = re.GetData();
+				dst[0] = SGE_U8STR('-');
+				while (value >= 100)
+				{
+					UInt64 i = (value % 100) * 2;
+					value /= 100;
+					dst[next] = digits[i + 1];
+					dst[next - 1] = digits[i];
+					next -= 2;
+				}
+				if (value < 10)
+				{
+					dst[next] = SGE_U8STR('0') + UInt64(value);
+				}
+				else
+				{
+					auto i = UInt64(value) * 2;
+					dst[next] = digits[i + 1];
+					dst[next - 1] = digits[i];
+				}
+
+				return re;
+			}
+			else
+			{
+				const UInt64 length = Digits10(value);
+				UInt64 next = length - 1;
+				StringType re(length, SGE_U8STR(" "));
+				char* dst = re.GetData();
+				while (value >= 100)
+				{
+					UInt64 i = (value % 100) * 2;
+					value /= 100;
+					dst[next] = digits[i + 1];
+					dst[next - 1] = digits[i];
+					next -= 2;
+				}
+				if (value < 10)
+				{
+					dst[next] = SGE_U8STR('0') + UInt64(value);
+				}
+				else
+				{
+					auto i = UInt64(value) * 2;
+					dst[next] = digits[i + 1];
+					dst[next - 1] = digits[i];
+				}
+
+				return re;
+			}
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, int>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(int value)
+		{
+			return ToStringCore<StringType, Int64>::Get(value);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, unsigned int>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(unsigned int value)
+		{
+			return ToStringCore<StringType, UInt64>::Get(value);
+		}
+	};
+
 	/*!
 	@}
 	*/

@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include <random>
+#include <cmath>
 #include "Utility/ControllableObject.hpp"
 #include "Utility/Utility.hpp"
 #include "Utility/AutoReleaseBuffer.h"
@@ -169,4 +171,14 @@ TEST(Greater, GreaterTest)
 	ASSERT_TRUE(Greater<int>::Compare(2, 1));
 	ASSERT_FALSE(Greater<int>::Compare(1, 1));
 	ASSERT_FALSE(Greater<int>::Compare(1, 2));
+}
+
+TEST(Digits10,CorrectnessTest)
+{
+	std::random_device rd;
+	for (int i=0;i<=10000;++i)
+	{
+		UInt64 num = rd() % UINT64_MAX;
+		ASSERT_EQ(Digits10(num), (UInt64)(std::log10(num)) + 1);
+	}
 }

@@ -3061,3 +3061,50 @@ TEST(TString, ConvertTest)
 	ASSERT_EQ(s2_5.GetSize(), 8);
 	ASSERT_EQ(s2_5, SGE_TSTR("这是一个test"));
 }
+
+TEST(ToString, InstanceTest)
+{
+	ASSERT_EQ(ToString<String>(1u), SGE_STR("1"));
+	ASSERT_EQ(ToString<String>(12u), SGE_STR("12"));
+	ASSERT_EQ(ToString<String>(123u), SGE_STR("123"));
+	ASSERT_EQ(ToString<String>(1234u), SGE_STR("1234"));
+	ASSERT_EQ(ToString<String>(12345u), SGE_STR("12345"));
+	ASSERT_EQ(ToString<String>(123456u), SGE_STR("123456"));
+	ASSERT_EQ(ToString<String>(1234567u), SGE_STR("1234567"));
+	ASSERT_EQ(ToString<String>(12345678u), SGE_STR("12345678"));
+	ASSERT_EQ(ToString<String>(123456789u), SGE_STR("123456789"));
+	ASSERT_EQ(ToString<String>(1234567890u), SGE_STR("1234567890"));
+	ASSERT_EQ(ToString<String>(0), SGE_STR("0"));
+	ASSERT_EQ(ToString<String>(-1), SGE_STR("-1"));
+	ASSERT_EQ(ToString<String>(-12), SGE_STR("-12"));
+	ASSERT_EQ(ToString<String>(-123), SGE_STR("-123"));
+	ASSERT_EQ(ToString<String>(-1234), SGE_STR("-1234"));
+	ASSERT_EQ(ToString<String>(-12345), SGE_STR("-12345"));
+	ASSERT_EQ(ToString<String>(-123456), SGE_STR("-123456"));
+	ASSERT_EQ(ToString<String>(-1234567), SGE_STR("-1234567"));
+	ASSERT_EQ(ToString<String>(-12345678), SGE_STR("-12345678"));
+	ASSERT_EQ(ToString<String>(-123456789), SGE_STR("-123456789"));
+	ASSERT_EQ(ToString<String>(-1234567890), SGE_STR("-1234567890"));
+
+	ASSERT_EQ(ToString<UTF8String>(1u), SGE_U8STR("1"));
+	ASSERT_EQ(ToString<UTF8String>(12u), SGE_U8STR("12"));
+	ASSERT_EQ(ToString<UTF8String>(123u), SGE_U8STR("123"));
+	ASSERT_EQ(ToString<UTF8String>(1234u), SGE_U8STR("1234"));
+	ASSERT_EQ(ToString<UTF8String>(12345u), SGE_U8STR("12345"));
+	ASSERT_EQ(ToString<UTF8String>(123456u), SGE_U8STR("123456"));
+	ASSERT_EQ(ToString<UTF8String>(1234567u), SGE_U8STR("1234567"));
+	ASSERT_EQ(ToString<UTF8String>(12345678u), SGE_U8STR("12345678"));
+	ASSERT_EQ(ToString<UTF8String>(123456789u), SGE_U8STR("123456789"));
+	ASSERT_EQ(ToString<UTF8String>(1234567890u), SGE_U8STR("1234567890"));
+	ASSERT_EQ(ToString<UTF8String>(0), SGE_U8STR("0"));
+	ASSERT_EQ(ToString<UTF8String>(-1), SGE_U8STR("-1"));
+	ASSERT_EQ(ToString<UTF8String>(-12), SGE_U8STR("-12"));
+	ASSERT_EQ(ToString<UTF8String>(-123), SGE_U8STR("-123"));
+	ASSERT_EQ(ToString<UTF8String>(-1234), SGE_U8STR("-1234"));
+	ASSERT_EQ(ToString<UTF8String>(-12345), SGE_U8STR("-12345"));
+	ASSERT_EQ(ToString<UTF8String>(-123456), SGE_U8STR("-123456"));
+	ASSERT_EQ(ToString<UTF8String>(-1234567), SGE_U8STR("-1234567"));
+	ASSERT_EQ(ToString<UTF8String>(-12345678), SGE_U8STR("-12345678"));
+	ASSERT_EQ(ToString<UTF8String>(-123456789), SGE_U8STR("-123456789"));
+	ASSERT_EQ(ToString<UTF8String>(-1234567890), SGE_U8STR("-1234567890"));
+}
