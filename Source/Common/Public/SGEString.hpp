@@ -22,6 +22,7 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "Concurrent/Atomic.hpp"
 #include <cstring>
+#include <cmath>
 
 namespace SpaceGameEngine
 {
@@ -3506,10 +3507,10 @@ namespace SpaceGameEngine
 		//Get
 	};
 
-	template<typename StringType, typename T>
-	inline StringType ToString(const T& value)
+	template<typename StringType, typename T, typename... Args>
+	inline StringType ToString(const T& value, Args&&... args)
 	{
-		return ToStringCore<StringType, T>::Get(value);
+		return ToStringCore<StringType, T>::Get(value, std::forward<Args>(args)...);
 	}
 
 	template<typename Allocator>
@@ -3631,6 +3632,64 @@ namespace SpaceGameEngine
 
 				return re;
 			}
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, float>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(float value, UInt64 precision = 4)
+		{
+			Int64 integer = (Int64)round(value);
+			StringType re = ToString<StringType, Int64>(integer);
+			if (precision != 0)
+			{
+				re += SGE_STR('.');
+				value -= (float)integer;
+				if (value < 0.0f)
+					value *= -1.0f;
+				for (SizeType i = 0; i < precision; ++i)
+				{
+					value *= 10.0f;
+				}
+				UInt64 decimal = round(value);
+				StringType decimal_str = ToString<StringType, UInt64>(decimal);
+				if (decimal_str.GetSize() < precision)
+					re += StringType(precision - decimal_str.GetSize(), SGE_STR('0'));
+				re += decimal_str;
+			}
+			return re;
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, double>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(double value, UInt64 precision = 6)
+		{
+			Int64 integer = (Int64)round(value);
+			StringType re = ToString<StringType, Int64>(integer);
+			if (precision != 0)
+			{
+				re += SGE_STR('.');
+				value -= (double)integer;
+				if (value < 0.0)
+					value *= -1.0;
+				for (SizeType i = 0; i < precision; ++i)
+				{
+					value *= 10.0;
+				}
+				UInt64 decimal = round(value);
+				StringType decimal_str = ToString<StringType, UInt64>(decimal);
+				if (decimal_str.GetSize() < precision)
+					re += StringType(precision - decimal_str.GetSize(), SGE_STR('0'));
+				re += decimal_str;
+			}
+			return re;
 		}
 	};
 
@@ -3777,6 +3836,64 @@ namespace SpaceGameEngine
 
 				return re;
 			}
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, float>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(float value, UInt64 precision = 4)
+		{
+			Int64 integer = (Int64)round(value);
+			StringType re = ToString<StringType, Int64>(integer);
+			if (precision != 0)
+			{
+				re += SGE_U8STR('.');
+				value -= (float)integer;
+				if (value < 0.0f)
+					value *= -1.0f;
+				for (SizeType i = 0; i < precision; ++i)
+				{
+					value *= 10.0f;
+				}
+				UInt64 decimal = round(value);
+				StringType decimal_str = ToString<StringType, UInt64>(decimal);
+				if (decimal_str.GetSize() < precision)
+					re += StringType(precision - decimal_str.GetSize(), SGE_U8STR("0"));
+				re += decimal_str;
+			}
+			return re;
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, double>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(double value, UInt64 precision = 6)
+		{
+			Int64 integer = (Int64)round(value);
+			StringType re = ToString<StringType, Int64>(integer);
+			if (precision != 0)
+			{
+				re += SGE_U8STR('.');
+				value -= (double)integer;
+				if (value < 0.0)
+					value *= -1.0;
+				for (SizeType i = 0; i < precision; ++i)
+				{
+					value *= 10.0;
+				}
+				UInt64 decimal = round(value);
+				StringType decimal_str = ToString<StringType, UInt64>(decimal);
+				if (decimal_str.GetSize() < precision)
+					re += StringType(precision - decimal_str.GetSize(), SGE_U8STR("0"));
+				re += decimal_str;
+			}
+			return re;
 		}
 	};
 

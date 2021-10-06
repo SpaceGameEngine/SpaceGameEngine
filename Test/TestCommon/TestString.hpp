@@ -3062,7 +3062,7 @@ TEST(TString, ConvertTest)
 	ASSERT_EQ(s2_5, SGE_TSTR("这是一个test"));
 }
 
-TEST(ToString, InstanceTest)
+TEST(ToString, IntTest)
 {
 	ASSERT_EQ(ToString<String>(1u), SGE_STR("1"));
 	ASSERT_EQ(ToString<String>(12u), SGE_STR("12"));
@@ -3107,4 +3107,54 @@ TEST(ToString, InstanceTest)
 	ASSERT_EQ(ToString<UTF8String>(-12345678), SGE_U8STR("-12345678"));
 	ASSERT_EQ(ToString<UTF8String>(-123456789), SGE_U8STR("-123456789"));
 	ASSERT_EQ(ToString<UTF8String>(-1234567890), SGE_U8STR("-1234567890"));
+}
+
+TEST(ToString, FloatTest)
+{
+	ASSERT_EQ(ToString<String>(0.0f), SGE_STR("0.0000"));
+	ASSERT_EQ(ToString<String>(0.0001f), SGE_STR("0.0001"));
+	ASSERT_EQ(ToString<String>(0.00015f), SGE_STR("0.0002"));
+	ASSERT_EQ(ToString<String>(0.00014f), SGE_STR("0.0001"));
+	ASSERT_EQ(ToString<String>(123.0045678f), SGE_STR("123.0046"));
+	ASSERT_EQ(ToString<String>(-123.0045678f), SGE_STR("-123.0046"));
+	ASSERT_EQ(ToString<String>(-123.0045678f, 2), SGE_STR("-123.00"));
+	ASSERT_EQ(ToString<String>(-123.0055678f, 2), SGE_STR("-123.01"));
+	ASSERT_EQ(ToString<String>(-123.0045678f, 0), SGE_STR("-123"));
+	ASSERT_EQ(ToString<String>(-123.5045678f, 0), SGE_STR("-124"));
+
+	ASSERT_EQ(ToString<UTF8String>(0.0f), SGE_U8STR("0.0000"));
+	ASSERT_EQ(ToString<UTF8String>(0.0001f), SGE_U8STR("0.0001"));
+	ASSERT_EQ(ToString<UTF8String>(0.00015f), SGE_U8STR("0.0002"));
+	ASSERT_EQ(ToString<UTF8String>(0.00014f), SGE_U8STR("0.0001"));
+	ASSERT_EQ(ToString<UTF8String>(123.0045678f), SGE_U8STR("123.0046"));
+	ASSERT_EQ(ToString<UTF8String>(-123.0045678f), SGE_U8STR("-123.0046"));
+	ASSERT_EQ(ToString<UTF8String>(-123.0045678f, 2), SGE_U8STR("-123.00"));
+	ASSERT_EQ(ToString<UTF8String>(-123.0055678f, 2), SGE_U8STR("-123.01"));
+	ASSERT_EQ(ToString<UTF8String>(-123.0045678f, 0), SGE_U8STR("-123"));
+	ASSERT_EQ(ToString<UTF8String>(-123.5045678f, 0), SGE_U8STR("-124"));
+}
+
+TEST(ToString, DoubleTest)
+{
+	ASSERT_EQ(ToString<String>(0.0), SGE_STR("0.000000"));
+	ASSERT_EQ(ToString<String>(0.000001), SGE_STR("0.000001"));
+	ASSERT_EQ(ToString<String>(0.0000015), SGE_STR("0.000002"));
+	ASSERT_EQ(ToString<String>(0.0000014), SGE_STR("0.000001"));
+	ASSERT_EQ(ToString<String>(123.0045678), SGE_STR("123.004568"));
+	ASSERT_EQ(ToString<String>(-123.0045678), SGE_STR("-123.004568"));
+	ASSERT_EQ(ToString<String>(-123.0045678, 2), SGE_STR("-123.00"));
+	ASSERT_EQ(ToString<String>(-123.0055678, 2), SGE_STR("-123.01"));
+	ASSERT_EQ(ToString<String>(-123.0045678, 0), SGE_STR("-123"));
+	ASSERT_EQ(ToString<String>(-123.5045678, 0), SGE_STR("-124"));
+
+	ASSERT_EQ(ToString<UTF8String>(0.0), SGE_U8STR("0.000000"));
+	ASSERT_EQ(ToString<UTF8String>(0.000001), SGE_U8STR("0.000001"));
+	ASSERT_EQ(ToString<UTF8String>(0.0000015), SGE_U8STR("0.000002"));
+	ASSERT_EQ(ToString<UTF8String>(0.0000014), SGE_U8STR("0.000001"));
+	ASSERT_EQ(ToString<UTF8String>(123.0045678), SGE_U8STR("123.004568"));
+	ASSERT_EQ(ToString<UTF8String>(-123.0045678), SGE_U8STR("-123.004568"));
+	ASSERT_EQ(ToString<UTF8String>(-123.0045678, 2), SGE_U8STR("-123.00"));
+	ASSERT_EQ(ToString<UTF8String>(-123.0055678, 2), SGE_U8STR("-123.01"));
+	ASSERT_EQ(ToString<UTF8String>(-123.0045678, 0), SGE_U8STR("-123"));
+	ASSERT_EQ(ToString<UTF8String>(-123.5045678, 0), SGE_U8STR("-124"));
 }
