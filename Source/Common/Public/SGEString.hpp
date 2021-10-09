@@ -3504,7 +3504,10 @@ namespace SpaceGameEngine
 	template<typename StringType, typename T>
 	struct ToStringCore
 	{
-		//Get
+		inline static StringType Get(const T& value)
+		{
+			return StringType(value);
+		}
 	};
 
 	template<typename StringType, typename T, typename... Args>
@@ -3916,6 +3919,188 @@ namespace SpaceGameEngine
 		inline static StringType Get(unsigned int value)
 		{
 			return ToStringCore<StringType, UInt64>::Get(value);
+		}
+	};
+
+	//------------------------------------------------------------------
+
+	template<typename T, typename Trait = CharTrait<T>>
+	struct NonNumericalCharacterError
+	{
+	};
+
+	template<>
+	struct NonNumericalCharacterError<Char16, UCS2Trait>
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The character is not numerical character.");
+		inline static bool Judge(Char16 c)
+		{
+			return !(c >= SGE_STR('0') && c <= SGE_STR('9'));
+		}
+	};
+
+	template<>
+	struct NonNumericalCharacterError<char, UTF8Trait>
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The character is not numerical character.");
+		inline static bool Judge(const char* pc)
+		{
+			SGE_ASSERT(NullPointerError, pc);
+			return !((*pc) >= SGE_U8STR('0') && (*pc) <= SGE_U8STR('9'));
+		}
+	};
+
+	template<typename StringType>
+	struct NonNumericalStringError
+	{
+	};
+
+	template<typename Allocator>
+	struct NonNumericalStringError<StringCore<Char16, UCS2Trait, Allocator>>
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not numerical string.");
+		inline static bool Judge(const StringCore<Char16, UCS2Trait, Allocator>& str)
+		{
+			if (str.GetSize() == 0)
+				return true;
+			else
+				return str[0] == SGE_STR('-') && str.GetSize() == 1;
+		}
+	};
+
+	template<typename Allocator>
+	struct NonNumericalStringError<StringCore<char, UTF8Trait, Allocator>>
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not numerical string.");
+		inline static bool Judge(const StringCore<char, UTF8Trait, Allocator>& str)
+		{
+			if (str.GetSize() == 0)
+				return true;
+			else
+				return (*str[0]) == SGE_U8STR('-') && str.GetSize() == 1;
+		}
+	};
+
+	struct NonUnsignedNumericalStringError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not unsigned numerical string.");
+		template<typename T, typename Trait, typename Allocator>
+		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
+		{
+			return str.GetSize() == 0;
+		}
+	};
+
+	template<typename StringType, typename T>
+	struct StringToCore
+	{
+		inline static T Get(const StringType& str)
+		{
+			return T(str);
+		}
+	};
+
+	template<typename StringType, typename T>
+	inline T StringTo(const StringType& str)
+	{
+		return StringToCore<StringType, T>::Get(str);
+	}
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, Int64>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
+
+		inline static Int64 Get(const StringType& str)
+		{
+			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			bool is_negative = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (*next == SGE_STR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			Int64 re = 0;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+				re *= 10;
+				re += (*next) - SGE_STR('0');
+			}
+			return (is_negative ? -1 * re : re);
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, UInt64>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
+
+		inline static UInt64 Get(const StringType& str)
+		{
+			SGE_ASSERT(NonUnsignedNumericalStringError, str);
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			UInt64 re = 0;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+				re *= 10;
+				re += (*next) - SGE_STR('0');
+			}
+			return re;
+		}
+	};
+
+	//------------------------------------------------------------------
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, Int64>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
+
+		inline static Int64 Get(const StringType& str)
+		{
+			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			bool is_negative = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (**next == SGE_U8STR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			Int64 re = 0;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+				re *= 10;
+				re += (**next) - SGE_U8STR('0');
+			}
+			return (is_negative ? -1 * re : re);
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, UInt64>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
+
+		inline static UInt64 Get(const StringType& str)
+		{
+			SGE_ASSERT(NonUnsignedNumericalStringError, str);
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			UInt64 re = 0;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+				re *= 10;
+				re += (**next) - SGE_U8STR('0');
+			}
+			return re;
 		}
 	};
 
