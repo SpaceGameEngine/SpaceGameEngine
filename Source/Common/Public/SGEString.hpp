@@ -3991,6 +3991,16 @@ namespace SpaceGameEngine
 		}
 	};
 
+	struct NonDecimalStringError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not decimal string.");
+		template<typename IteratorType>
+		inline static bool Judge(const IteratorType& point_iter, const IteratorType& end_iter)
+		{
+			return point_iter + 1 == end_iter;
+		}
+	};
+
 	template<typename StringType, typename T>
 	struct StringToCore
 	{
@@ -4054,6 +4064,92 @@ namespace SpaceGameEngine
 		}
 	};
 
+	template<typename Allocator>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, float>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
+
+		inline static float Get(const StringType& str)
+		{
+			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			bool is_negative = false;
+			bool is_after_point = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (*next == SGE_STR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			float re = 0.0f;
+			float decimal = 1.0f;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				if ((!is_after_point) && (*next) == SGE_STR('.'))
+				{
+					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
+					is_after_point = true;
+					continue;
+				}
+				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+				if (is_after_point)
+				{
+					decimal *= 0.1f;
+					re += decimal * ((float)((*next) - SGE_STR('0')));
+				}
+				else
+				{
+					re *= 10.0f;
+					re += (float)((*next) - SGE_STR('0'));
+				}
+			}
+			return (is_negative ? -1.0f * re : re);
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, double>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
+
+		inline static double Get(const StringType& str)
+		{
+			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			bool is_negative = false;
+			bool is_after_point = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (*next == SGE_STR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			double re = 0.0;
+			double decimal = 1.0;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				if ((!is_after_point) && (*next) == SGE_STR('.'))
+				{
+					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
+					is_after_point = true;
+					continue;
+				}
+				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+				if (is_after_point)
+				{
+					decimal *= 0.1;
+					re += decimal * ((double)((*next) - SGE_STR('0')));
+				}
+				else
+				{
+					re *= 10.0;
+					re += (double)((*next) - SGE_STR('0'));
+				}
+			}
+			return (is_negative ? -1.0 * re : re);
+		}
+	};
+
 	//------------------------------------------------------------------
 
 	template<typename Allocator>
@@ -4101,6 +4197,92 @@ namespace SpaceGameEngine
 				re += (**next) - SGE_U8STR('0');
 			}
 			return re;
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, float>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
+
+		inline static float Get(const StringType& str)
+		{
+			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			bool is_negative = false;
+			bool is_after_point = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (**next == SGE_U8STR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			float re = 0.0f;
+			float decimal = 1.0f;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				if ((!is_after_point) && (**next) == SGE_U8STR('.'))
+				{
+					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
+					is_after_point = true;
+					continue;
+				}
+				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+				if (is_after_point)
+				{
+					decimal *= 0.1f;
+					re += decimal * ((float)((**next) - SGE_U8STR('0')));
+				}
+				else
+				{
+					re *= 10.0f;
+					re += (float)((**next) - SGE_U8STR('0'));
+				}
+			}
+			return (is_negative ? -1.0f * re : re);
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, double>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
+
+		inline static double Get(const StringType& str)
+		{
+			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			bool is_negative = false;
+			bool is_after_point = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (**next == SGE_U8STR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			double re = 0.0;
+			double decimal = 1.0;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				if ((!is_after_point) && (**next) == SGE_U8STR('.'))
+				{
+					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
+					is_after_point = true;
+					continue;
+				}
+				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+				if (is_after_point)
+				{
+					decimal *= 0.1;
+					re += decimal * ((double)((**next) - SGE_U8STR('0')));
+				}
+				else
+				{
+					re *= 10.0;
+					re += (double)((**next) - SGE_U8STR('0'));
+				}
+			}
+			return (is_negative ? -1.0 * re : re);
 		}
 	};
 

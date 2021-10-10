@@ -3064,27 +3064,27 @@ TEST(TString, ConvertTest)
 
 TEST(ToString, IntTest)
 {
-	ASSERT_EQ(ToString<String>(1u), SGE_STR("1"));
-	ASSERT_EQ(ToString<String>(12u), SGE_STR("12"));
-	ASSERT_EQ(ToString<String>(123u), SGE_STR("123"));
-	ASSERT_EQ(ToString<String>(1234u), SGE_STR("1234"));
-	ASSERT_EQ(ToString<String>(12345u), SGE_STR("12345"));
-	ASSERT_EQ(ToString<String>(123456u), SGE_STR("123456"));
-	ASSERT_EQ(ToString<String>(1234567u), SGE_STR("1234567"));
-	ASSERT_EQ(ToString<String>(12345678u), SGE_STR("12345678"));
-	ASSERT_EQ(ToString<String>(123456789u), SGE_STR("123456789"));
-	ASSERT_EQ(ToString<String>(1234567890u), SGE_STR("1234567890"));
-	ASSERT_EQ(ToString<String>(0), SGE_STR("0"));
-	ASSERT_EQ(ToString<String>(-1), SGE_STR("-1"));
-	ASSERT_EQ(ToString<String>(-12), SGE_STR("-12"));
-	ASSERT_EQ(ToString<String>(-123), SGE_STR("-123"));
-	ASSERT_EQ(ToString<String>(-1234), SGE_STR("-1234"));
-	ASSERT_EQ(ToString<String>(-12345), SGE_STR("-12345"));
-	ASSERT_EQ(ToString<String>(-123456), SGE_STR("-123456"));
-	ASSERT_EQ(ToString<String>(-1234567), SGE_STR("-1234567"));
-	ASSERT_EQ(ToString<String>(-12345678), SGE_STR("-12345678"));
-	ASSERT_EQ(ToString<String>(-123456789), SGE_STR("-123456789"));
-	ASSERT_EQ(ToString<String>(-1234567890), SGE_STR("-1234567890"));
+	ASSERT_EQ(ToString<UCS2String>(1u), SGE_STR("1"));
+	ASSERT_EQ(ToString<UCS2String>(12u), SGE_STR("12"));
+	ASSERT_EQ(ToString<UCS2String>(123u), SGE_STR("123"));
+	ASSERT_EQ(ToString<UCS2String>(1234u), SGE_STR("1234"));
+	ASSERT_EQ(ToString<UCS2String>(12345u), SGE_STR("12345"));
+	ASSERT_EQ(ToString<UCS2String>(123456u), SGE_STR("123456"));
+	ASSERT_EQ(ToString<UCS2String>(1234567u), SGE_STR("1234567"));
+	ASSERT_EQ(ToString<UCS2String>(12345678u), SGE_STR("12345678"));
+	ASSERT_EQ(ToString<UCS2String>(123456789u), SGE_STR("123456789"));
+	ASSERT_EQ(ToString<UCS2String>(1234567890u), SGE_STR("1234567890"));
+	ASSERT_EQ(ToString<UCS2String>(0), SGE_STR("0"));
+	ASSERT_EQ(ToString<UCS2String>(-1), SGE_STR("-1"));
+	ASSERT_EQ(ToString<UCS2String>(-12), SGE_STR("-12"));
+	ASSERT_EQ(ToString<UCS2String>(-123), SGE_STR("-123"));
+	ASSERT_EQ(ToString<UCS2String>(-1234), SGE_STR("-1234"));
+	ASSERT_EQ(ToString<UCS2String>(-12345), SGE_STR("-12345"));
+	ASSERT_EQ(ToString<UCS2String>(-123456), SGE_STR("-123456"));
+	ASSERT_EQ(ToString<UCS2String>(-1234567), SGE_STR("-1234567"));
+	ASSERT_EQ(ToString<UCS2String>(-12345678), SGE_STR("-12345678"));
+	ASSERT_EQ(ToString<UCS2String>(-123456789), SGE_STR("-123456789"));
+	ASSERT_EQ(ToString<UCS2String>(-1234567890), SGE_STR("-1234567890"));
 
 	ASSERT_EQ(ToString<UTF8String>(1u), SGE_U8STR("1"));
 	ASSERT_EQ(ToString<UTF8String>(12u), SGE_U8STR("12"));
@@ -3111,16 +3111,16 @@ TEST(ToString, IntTest)
 
 TEST(ToString, FloatTest)
 {
-	ASSERT_EQ(ToString<String>(0.0f), SGE_STR("0.0000"));
-	ASSERT_EQ(ToString<String>(0.0001f), SGE_STR("0.0001"));
-	ASSERT_EQ(ToString<String>(0.00015f), SGE_STR("0.0002"));
-	ASSERT_EQ(ToString<String>(0.00014f), SGE_STR("0.0001"));
-	ASSERT_EQ(ToString<String>(123.0045678f), SGE_STR("123.0046"));
-	ASSERT_EQ(ToString<String>(-123.0045678f), SGE_STR("-123.0046"));
-	ASSERT_EQ(ToString<String>(-123.0045678f, 2), SGE_STR("-123.00"));
-	ASSERT_EQ(ToString<String>(-123.0055678f, 2), SGE_STR("-123.01"));
-	ASSERT_EQ(ToString<String>(-123.0045678f, 0), SGE_STR("-123"));
-	ASSERT_EQ(ToString<String>(-123.5045678f, 0), SGE_STR("-124"));
+	ASSERT_EQ(ToString<UCS2String>(0.0f), SGE_STR("0.0000"));
+	ASSERT_EQ(ToString<UCS2String>(0.0001f), SGE_STR("0.0001"));
+	ASSERT_EQ(ToString<UCS2String>(0.00015f), SGE_STR("0.0002"));
+	ASSERT_EQ(ToString<UCS2String>(0.00014f), SGE_STR("0.0001"));
+	ASSERT_EQ(ToString<UCS2String>(123.0045678f), SGE_STR("123.0046"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678f), SGE_STR("-123.0046"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678f, 2), SGE_STR("-123.00"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0055678f, 2), SGE_STR("-123.01"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678f, 0), SGE_STR("-123"));
+	ASSERT_EQ(ToString<UCS2String>(-123.5045678f, 0), SGE_STR("-124"));
 
 	ASSERT_EQ(ToString<UTF8String>(0.0f), SGE_U8STR("0.0000"));
 	ASSERT_EQ(ToString<UTF8String>(0.0001f), SGE_U8STR("0.0001"));
@@ -3136,16 +3136,16 @@ TEST(ToString, FloatTest)
 
 TEST(ToString, DoubleTest)
 {
-	ASSERT_EQ(ToString<String>(0.0), SGE_STR("0.000000"));
-	ASSERT_EQ(ToString<String>(0.000001), SGE_STR("0.000001"));
-	ASSERT_EQ(ToString<String>(0.0000015), SGE_STR("0.000002"));
-	ASSERT_EQ(ToString<String>(0.0000014), SGE_STR("0.000001"));
-	ASSERT_EQ(ToString<String>(123.0045678), SGE_STR("123.004568"));
-	ASSERT_EQ(ToString<String>(-123.0045678), SGE_STR("-123.004568"));
-	ASSERT_EQ(ToString<String>(-123.0045678, 2), SGE_STR("-123.00"));
-	ASSERT_EQ(ToString<String>(-123.0055678, 2), SGE_STR("-123.01"));
-	ASSERT_EQ(ToString<String>(-123.0045678, 0), SGE_STR("-123"));
-	ASSERT_EQ(ToString<String>(-123.5045678, 0), SGE_STR("-124"));
+	ASSERT_EQ(ToString<UCS2String>(0.0), SGE_STR("0.000000"));
+	ASSERT_EQ(ToString<UCS2String>(0.000001), SGE_STR("0.000001"));
+	ASSERT_EQ(ToString<UCS2String>(0.0000015), SGE_STR("0.000002"));
+	ASSERT_EQ(ToString<UCS2String>(0.0000014), SGE_STR("0.000001"));
+	ASSERT_EQ(ToString<UCS2String>(123.0045678), SGE_STR("123.004568"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678), SGE_STR("-123.004568"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678, 2), SGE_STR("-123.00"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0055678, 2), SGE_STR("-123.01"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678, 0), SGE_STR("-123"));
+	ASSERT_EQ(ToString<UCS2String>(-123.5045678, 0), SGE_STR("-124"));
 
 	ASSERT_EQ(ToString<UTF8String>(0.0), SGE_U8STR("0.000000"));
 	ASSERT_EQ(ToString<UTF8String>(0.000001), SGE_U8STR("0.000001"));
@@ -3161,38 +3161,38 @@ TEST(ToString, DoubleTest)
 
 TEST(StringTo, IntTest)
 {
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("0"))), 0);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("1"))), 1);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("12"))), 12);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("123"))), 123);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("1234"))), 1234);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("12345"))), 12345);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("123456"))), 123456);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("1234567"))), 1234567);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("12345678"))), 12345678);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("123456789"))), 123456789);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("1234567890"))), 1234567890);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-1"))), -1);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-12"))), -12);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-123"))), -123);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-1234"))), -1234);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-12345"))), -12345);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-123456"))), -123456);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-1234567"))), -1234567);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-12345678"))), -12345678);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-123456789"))), -123456789);
-	ASSERT_EQ((StringTo<String, Int64>(SGE_STR("-1234567890"))), -1234567890);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("0"))), 0);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("1"))), 1);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("12"))), 12);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("123"))), 123);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("1234"))), 1234);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("12345"))), 12345);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("123456"))), 123456);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("1234567"))), 1234567);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("12345678"))), 12345678);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("123456789"))), 123456789);
-	ASSERT_EQ((StringTo<String, UInt64>(SGE_STR("1234567890"))), 1234567890);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("0"))), 0);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("1"))), 1);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("12"))), 12);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("123"))), 123);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("1234"))), 1234);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("12345"))), 12345);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("123456"))), 123456);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("1234567"))), 1234567);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("12345678"))), 12345678);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("123456789"))), 123456789);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("1234567890"))), 1234567890);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-1"))), -1);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-12"))), -12);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-123"))), -123);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-1234"))), -1234);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-12345"))), -12345);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-123456"))), -123456);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-1234567"))), -1234567);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-12345678"))), -12345678);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-123456789"))), -123456789);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-1234567890"))), -1234567890);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("0"))), 0);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("1"))), 1);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("12"))), 12);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("123"))), 123);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("1234"))), 1234);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("12345"))), 12345);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("123456"))), 123456);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("1234567"))), 1234567);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("12345678"))), 12345678);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("123456789"))), 123456789);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("1234567890"))), 1234567890);
 
 	ASSERT_EQ((StringTo<UTF8String, Int64>(SGE_U8STR("0"))), 0);
 	ASSERT_EQ((StringTo<UTF8String, Int64>(SGE_U8STR("1"))), 1);
@@ -3226,4 +3226,42 @@ TEST(StringTo, IntTest)
 	ASSERT_EQ((StringTo<UTF8String, UInt64>(SGE_U8STR("12345678"))), 12345678);
 	ASSERT_EQ((StringTo<UTF8String, UInt64>(SGE_U8STR("123456789"))), 123456789);
 	ASSERT_EQ((StringTo<UTF8String, UInt64>(SGE_U8STR("1234567890"))), 1234567890);
+}
+
+TEST(StringTo, FloatTest)
+{
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("0"))), 0.0f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("0.0"))), 0.0f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("0.1"))), 0.1f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("1.1"))), 1.1f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("123.456"))), 123.456f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("123456"))), 123456.0f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("-123.456"))), -123.456f);
+
+	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("0"))), 0.0f);
+	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("0.0"))), 0.0f);
+	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("0.1"))), 0.1f);
+	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("1.1"))), 1.1f);
+	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("123.456"))), 123.456f);
+	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("123456"))), 123456.0f);
+	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("-123.456"))), -123.456f);
+}
+
+TEST(StringTo, DoubleTest)
+{
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("0"))), 0.0);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("0.0"))), 0.0);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("0.1"))), 0.1);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("1.1"))), 1.1);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("123.456"))), 123.456);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("123456"))), 123456.0);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("-123.456"))), -123.456);
+
+	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("0"))), 0.0);
+	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("0.0"))), 0.0);
+	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("0.1"))), 0.1);
+	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("1.1"))), 1.1);
+	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("123.456"))), 123.456);
+	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("123456"))), 123456.0);
+	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("-123.456"))), -123.456);
 }
