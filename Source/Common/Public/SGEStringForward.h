@@ -58,16 +58,18 @@ namespace SpaceGameEngine
 	using Char = Char16;
 
 #ifdef SGE_WINDOWS
-#define SGE_STR_(str) L##str
+#define SGE_WSTR_(str) L##str
 #else
-#define SGE_STR_(str) u##str
+#define SGE_WSTR_(str) u##str
 #endif
 
-#define SGE_STR(str) SGE_STR_(str)
+#define SGE_WSTR(str) SGE_WSTR_(str)
 
 #define SGE_U8STR_(str) u8##str
 
 #define SGE_U8STR(str) SGE_U8STR_(str)
+
+#define SGE_STR(str) SGE_WSTR(str)
 
 	/*!
 	@file

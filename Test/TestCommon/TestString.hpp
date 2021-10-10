@@ -37,7 +37,7 @@ TEST(StorageRef, InstanceTest)
 	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(pstr1), 1);
 	ASSERT_EQ(StringImplement::StorageRef<Char>::TryRelease(pstr1, 4), true);
 
-	const Char* pcstr = SGE_STR("这是测试");
+	const Char* pcstr = SGE_WSTR("这是测试");
 	Char* pstr2 = StringImplement::StorageRef<Char>::Create(pcstr, 5);
 	ASSERT_EQ(memcmp(pstr2, pcstr, 5 * sizeof(Char)), 0);
 	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(pstr2), 1);
@@ -46,7 +46,7 @@ TEST(StorageRef, InstanceTest)
 
 TEST(StorageRef, TryReleaseTest)
 {
-	const Char* pcstr = SGE_STR("这是测试");
+	const Char* pcstr = SGE_WSTR("这是测试");
 	Char* pstr1 = StringImplement::StorageRef<Char>::Create(pcstr, 5);
 	ASSERT_EQ(memcmp(pstr1, pcstr, sizeof(Char) * 5), 0);
 	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(pstr1), 1);
@@ -66,20 +66,20 @@ TEST(Storage, InstanceTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr1 = SGE_STR("测试");
-	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
+	const Char* pcstr1 = SGE_WSTR("测试");
+	StringImplement::Storage<Char> s2(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr2 = SGE_WSTR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize()), StringImplement::StringCategory::Medium);
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr3 = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
@@ -105,8 +105,8 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(ars1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(ars1.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr1 = SGE_STR("测试");
-	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
+	const Char* pcstr1 = SGE_WSTR("测试");
+	StringImplement::Storage<Char> s2(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
@@ -127,7 +127,7 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(memcmp(ars2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(ars2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr2 = SGE_WSTR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
@@ -154,7 +154,7 @@ TEST(Storage, CopyConstructionTest)
 	ASSERT_EQ(memcmp(ars3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(ars3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr3 = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
@@ -188,31 +188,31 @@ TEST(Storage, CopyAssignmentTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr1 = SGE_STR("测试");
-	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
+	const Char* pcstr1 = SGE_WSTR("测试");
+	StringImplement::Storage<Char> s2(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr2 = SGE_WSTR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize()), StringImplement::StringCategory::Medium);
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr3 = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize()), StringImplement::StringCategory::Large);
 
-	const Char* pcstr_s = SGE_STR("S");
+	const Char* pcstr_s = SGE_WSTR("S");
 	//63
-	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
+	const Char* pcstr_m = SGE_WSTR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
 	//403
-	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr_l = SGE_WSTR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
 	ASSERT_EQ(ss_s.GetRealSize(), 2);
@@ -316,31 +316,31 @@ TEST(Storage, MoveAssignmentTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr1 = SGE_STR("测试");
-	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
+	const Char* pcstr1 = SGE_WSTR("测试");
+	StringImplement::Storage<Char> s2(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr2 = SGE_WSTR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize()), StringImplement::StringCategory::Medium);
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr3 = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize()), StringImplement::StringCategory::Large);
 
-	const Char* pcstr_s = SGE_STR("S");
+	const Char* pcstr_s = SGE_WSTR("S");
 	//63
-	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
+	const Char* pcstr_m = SGE_WSTR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
 	//403
-	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr_l = SGE_WSTR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
 	ASSERT_EQ(ss_s.GetRealSize(), 2);
@@ -457,31 +457,31 @@ TEST(Storage, CopyAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr1 = SGE_STR("测试");
-	StringImplement::Storage<Char, StdAllocator> s2(SGE_STR("测试"), 3);
+	const Char* pcstr1 = SGE_WSTR("测试");
+	StringImplement::Storage<Char, StdAllocator> s2(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr2 = SGE_WSTR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char, StdAllocator> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
 	ASSERT_EQ(memcmp(s3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr3 = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char, StdAllocator> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
 	ASSERT_EQ(memcmp(s4.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize())), (StringImplement::StringCategory::Large));
 
-	const Char* pcstr_s = SGE_STR("S");
+	const Char* pcstr_s = SGE_WSTR("S");
 	//63
-	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
+	const Char* pcstr_m = SGE_WSTR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
 	//403
-	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr_l = SGE_WSTR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
 	ASSERT_EQ(ss_s.GetRealSize(), 2);
@@ -585,23 +585,23 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s1.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr1 = SGE_STR("测试");
-	StringImplement::Storage<Char, StdAllocator> s2(SGE_STR("测试"), 3);
+	const Char* pcstr1 = SGE_WSTR("测试");
+	StringImplement::Storage<Char, StdAllocator> s2(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	StringImplement::Storage<Char, StdAllocator> s2_2(SGE_STR("测试"), 3);
+	StringImplement::Storage<Char, StdAllocator> s2_2(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2_2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2_2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2_2.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	StringImplement::Storage<Char, StdAllocator> s2_3(SGE_STR("测试"), 3);
+	StringImplement::Storage<Char, StdAllocator> s2_3(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2_3.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2_3.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s2_3.GetRealSize())), (StringImplement::StringCategory::Small));
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr2 = SGE_WSTR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char, StdAllocator> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
@@ -620,7 +620,7 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ(memcmp(s3_3.GetData(), pcstr2, sizeof(Char) * 32), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s3_3.GetRealSize())), (StringImplement::StringCategory::Medium));
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr3 = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char, StdAllocator> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
@@ -639,11 +639,11 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ(memcmp(s4_3.GetData(), pcstr3, sizeof(Char) * 401), 0);
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s4_3.GetRealSize())), (StringImplement::StringCategory::Large));
 
-	const Char* pcstr_s = SGE_STR("S");
+	const Char* pcstr_s = SGE_WSTR("S");
 	//63
-	const Char* pcstr_m = SGE_STR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
+	const Char* pcstr_m = SGE_WSTR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
 	//403
-	const Char* pcstr_l = SGE_STR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr_l = SGE_WSTR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
 	ASSERT_EQ(ss_s.GetRealSize(), 2);
@@ -756,9 +756,9 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 
 TEST(Storage, SetRealSizeTest)
 {
-	const Char* pcstr1 = SGE_STR("测试");
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr1 = SGE_WSTR("测试");
+	const Char* pcstr2 = SGE_WSTR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr3 = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> s_s1(pcstr1, 3);
 	ASSERT_EQ(s_s1.GetRealSize(), 3);
@@ -838,15 +838,15 @@ TEST(Storage, ClearTest)
 	s1.Clear();
 	ASSERT_EQ(s1.GetRealSize(), 0);
 
-	const Char* pcstr1 = SGE_STR("测试");
-	StringImplement::Storage<Char> s2(SGE_STR("测试"), 3);
+	const Char* pcstr1 = SGE_WSTR("测试");
+	StringImplement::Storage<Char> s2(SGE_WSTR("测试"), 3);
 	ASSERT_EQ(s2.GetSize(), 3);
 	ASSERT_EQ(memcmp(s2.GetData(), pcstr1, sizeof(Char) * 3), 0);
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Small);
 	s2.Clear();
 	ASSERT_EQ(s2.GetRealSize(), 0);
 
-	const Char* pcstr2 = SGE_STR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
+	const Char* pcstr2 = SGE_WSTR("测试一下中等长度的字符串，看看这样够不够字数，能不能过16/2");
 	StringImplement::Storage<Char> s3(pcstr2, 32);
 	ASSERT_EQ(s3.GetRealSize(), 32);
 	ASSERT_EQ(s3.GetSize(), 32);
@@ -856,7 +856,7 @@ TEST(Storage, ClearTest)
 	ASSERT_EQ(s3.GetRealSize(), 0);
 	ASSERT_EQ(s3.GetSize(), 0);
 
-	const Char* pcstr3 = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr3 = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringImplement::Storage<Char> s4(pcstr3, 401);
 	ASSERT_EQ(s4.GetRealSize(), 401);
 	ASSERT_EQ(s4.GetSize(), 401);
@@ -869,7 +869,7 @@ TEST(Storage, ClearTest)
 
 TEST(Storage, CopyOnWriteTest)
 {
-	const Char* pcstr = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	const Char* pcstr = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> s1(pcstr, 401);
 	ASSERT_EQ(StringImplement::StorageRef<Char>::GetCount(s1.GetData()), 1);
@@ -943,15 +943,15 @@ TEST(StringImplement, GetMultipleByteCharSizeTest)
 
 TEST(StringImplement, UTF8CharToUCS2CharTest)
 {
-	ASSERT_EQ(StringImplement::UTF8CharToUCS2Char(u8"严"), SGE_STR('严'));
-	ASSERT_EQ(StringImplement::UTF8CharToUCS2Char(u8"и"), SGE_STR('и'));
+	ASSERT_EQ(StringImplement::UTF8CharToUCS2Char(u8"严"), SGE_WSTR('严'));
+	ASSERT_EQ(StringImplement::UTF8CharToUCS2Char(u8"и"), SGE_WSTR('и'));
 }
 
 TEST(StringImplement, GetUCS2CharToUTF8CharSizeTest)
 {
-	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_STR('严')), 3);
-	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_STR('и')), 2);
-	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_STR('!')), 1);
+	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_WSTR('严')), 3);
+	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_WSTR('и')), 2);
+	ASSERT_EQ(StringImplement::GetUCS2CharToUTF8CharSize(SGE_WSTR('!')), 1);
 }
 
 TEST(StringImplement, UCS2CharToUTF8CharTest)
@@ -959,13 +959,13 @@ TEST(StringImplement, UCS2CharToUTF8CharTest)
 	char pbuf[4];
 	memset(pbuf, 0, sizeof(pbuf));
 	char* pre = nullptr;
-	pre = StringImplement::UCS2CharToUTF8Char(SGE_STR('这'), pbuf);
+	pre = StringImplement::UCS2CharToUTF8Char(SGE_WSTR('这'), pbuf);
 	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"这"));
 	ASSERT_EQ(pre, pbuf + 3);
-	pre = StringImplement::UCS2CharToUTF8Char(SGE_STR('и'), pbuf);
+	pre = StringImplement::UCS2CharToUTF8Char(SGE_WSTR('и'), pbuf);
 	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"и"));
 	ASSERT_EQ(pre, pbuf + 2);
-	pre = StringImplement::UCS2CharToUTF8Char(SGE_STR('1'), pbuf);
+	pre = StringImplement::UCS2CharToUTF8Char(SGE_WSTR('1'), pbuf);
 	ASSERT_TRUE(IsUTF8CharSame(pbuf, u8"1"));
 	ASSERT_EQ(pre, pbuf + 1);
 }
@@ -981,27 +981,27 @@ TEST(StringImplement, CompareMultipleByteCharTest)
 
 TEST(BoyerMooreSearchImplement, MakeBadCharTableTest)
 {
-	UCS2String s1_1(SGE_STR("这是测试是个这isagoodthing"));
+	UCS2String s1_1(SGE_WSTR("这是测试是个这isagoodthing"));
 	Vector<SizeType> v1_1(UCS2Trait::MaxValue + 1, 0);
 	ASSERT_EQ(s1_1.GetSize(), 19);
 	StringImplement::BoyerMooreSearchImplement::MakeBadCharTable<Char16, UCS2Trait>(v1_1.GetData(), s1_1.GetData(), s1_1.GetNormalSize());
-	ASSERT_EQ(v1_1[SGE_STR('这')], 12);
-	ASSERT_EQ(v1_1[SGE_STR('是')], 14);
-	ASSERT_EQ(v1_1[SGE_STR('个')], 13);
-	ASSERT_EQ(v1_1[SGE_STR('测')], 16);
-	ASSERT_EQ(v1_1[SGE_STR('试')], 15);
-	ASSERT_EQ(v1_1[SGE_STR('i')], 2);
-	ASSERT_EQ(v1_1[SGE_STR('s')], 10);
-	ASSERT_EQ(v1_1[SGE_STR('a')], 9);
-	ASSERT_EQ(v1_1[SGE_STR('g')], 8);
-	ASSERT_EQ(v1_1[SGE_STR('o')], 6);
-	ASSERT_EQ(v1_1[SGE_STR('d')], 5);
-	ASSERT_EQ(v1_1[SGE_STR('t')], 4);
-	ASSERT_EQ(v1_1[SGE_STR('h')], 3);
-	ASSERT_EQ(v1_1[SGE_STR('n')], 1);
+	ASSERT_EQ(v1_1[SGE_WSTR('这')], 12);
+	ASSERT_EQ(v1_1[SGE_WSTR('是')], 14);
+	ASSERT_EQ(v1_1[SGE_WSTR('个')], 13);
+	ASSERT_EQ(v1_1[SGE_WSTR('测')], 16);
+	ASSERT_EQ(v1_1[SGE_WSTR('试')], 15);
+	ASSERT_EQ(v1_1[SGE_WSTR('i')], 2);
+	ASSERT_EQ(v1_1[SGE_WSTR('s')], 10);
+	ASSERT_EQ(v1_1[SGE_WSTR('a')], 9);
+	ASSERT_EQ(v1_1[SGE_WSTR('g')], 8);
+	ASSERT_EQ(v1_1[SGE_WSTR('o')], 6);
+	ASSERT_EQ(v1_1[SGE_WSTR('d')], 5);
+	ASSERT_EQ(v1_1[SGE_WSTR('t')], 4);
+	ASSERT_EQ(v1_1[SGE_WSTR('h')], 3);
+	ASSERT_EQ(v1_1[SGE_WSTR('n')], 1);
 	ASSERT_EQ(v1_1[0], 19);
-	ASSERT_EQ(v1_1[SGE_STR('b')], 19);
-	ASSERT_EQ(v1_1[SGE_STR('不')], 19);
+	ASSERT_EQ(v1_1[SGE_WSTR('b')], 19);
+	ASSERT_EQ(v1_1[SGE_WSTR('不')], 19);
 
 	UTF8String s2_1(SGE_U8STR("测一测1212aba"));
 	Vector<SizeType> v2_1(UTF8Trait::MaxValue + 1, 0);
@@ -1023,7 +1023,7 @@ TEST(BoyerMooreSearchImplement, MakeBadCharTableTest)
 
 TEST(BoyerMooreSearchImplement, MakeSuffixTest)
 {
-	UCS2String s1(SGE_STR("测一测12aba12"));
+	UCS2String s1(SGE_WSTR("测一测12aba12"));
 	ASSERT_EQ(s1.GetNormalSize(), 10);
 	Vector<SizeType> v1(s1.GetNormalSize(), 0);
 
@@ -1074,7 +1074,7 @@ TEST(BoyerMooreSearchImplement, MakeSuffixTest)
 	ASSERT_EQ(v2[1], 0);
 	ASSERT_EQ(v2[0], 0);
 
-	UCS2String s3(SGE_STR("bcababab"));
+	UCS2String s3(SGE_WSTR("bcababab"));
 	ASSERT_EQ(s3.GetSize(), 8);
 	Vector<SizeType> v3(s3.GetNormalSize(), 0);
 
@@ -1091,7 +1091,7 @@ TEST(BoyerMooreSearchImplement, MakeSuffixTest)
 
 TEST(BoyerMooreSearchImplement, MakeGoodSuffixTableTest)
 {
-	UCS2String s1(SGE_STR("测一测12aba12"));
+	UCS2String s1(SGE_WSTR("测一测12aba12"));
 	ASSERT_EQ(s1.GetNormalSize(), 10);
 	Vector<SizeType> v1(s1.GetNormalSize(), 0);
 	StringImplement::BoyerMooreSearchImplement::MakeSuffix(v1.GetData(), s1.GetData(), s1.GetNormalSize());
@@ -1144,7 +1144,7 @@ TEST(BoyerMooreSearchImplement, MakeGoodSuffixTableTest)
 	ASSERT_EQ(v2_2[26], 28);
 	ASSERT_EQ(v2_2[27], 1);
 
-	UCS2String s3(SGE_STR("bcababab"));
+	UCS2String s3(SGE_WSTR("bcababab"));
 	ASSERT_EQ(s3.GetSize(), 8);
 	Vector<SizeType> v3(s3.GetNormalSize(), 0);
 	StringImplement::BoyerMooreSearchImplement::MakeSuffix(v3.GetData(), s3.GetData(), s3.GetNormalSize());
@@ -1164,8 +1164,8 @@ TEST(BoyerMooreSearchImplement, BoyerMooreSearchTest)
 {
 	using namespace StringImplement::BoyerMooreSearchImplement;
 
-	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试"));
-	UCS2String s1_p(SGE_STR("测试是一个测试"));
+	UCS2String s1(SGE_WSTR("这是一个测试是一个测试是一个测试"));
+	UCS2String s1_p(SGE_WSTR("测试是一个测试"));
 	Vector<SizeType> v1_bct(UCS2Trait::MaxValue + 1, 0);
 	Vector<SizeType> v1_suff(s1_p.GetNormalSize(), 0);
 	Vector<SizeType> v1_gst(s1_p.GetNormalSize(), 0);
@@ -1209,8 +1209,8 @@ TEST(BoyerMooreSearchImplement, BoyerMooreSearchTest)
 	auto res3_2 = BoyerMooreSearch(res3_1 + 1, s3.GetData() + s3.GetNormalSize(), s3_p.GetData(), v3_bct.GetData(), v3_gst.GetData(), s3_p.GetNormalSize());
 	ASSERT_EQ(res3_2, s3.GetData() + s3.GetNormalSize());
 
-	UCS2String s4(SGE_STR("bcabcdababcabaabcbcabababacbacabeeacda"));
-	UCS2String s4_p(SGE_STR("bcababa"));
+	UCS2String s4(SGE_WSTR("bcabcdababcabaabcbcabababacbacabeeacda"));
+	UCS2String s4_p(SGE_WSTR("bcababa"));
 	Vector<SizeType> v4_bct(UCS2Trait::MaxValue + 1, 0);
 	Vector<SizeType> v4_suff(s4_p.GetNormalSize(), 0);
 	Vector<SizeType> v4_gst(s4_p.GetNormalSize(), 0);
@@ -1238,27 +1238,27 @@ TEST(BoyerMooreSearchImplement, BoyerMooreSearchTest)
 
 TEST(ReverseBoyerMooreSearchImplement, MakeBadCharTableTest)
 {
-	UCS2String s1_1(SGE_STR("这是测试是个这isagoodthing"));
+	UCS2String s1_1(SGE_WSTR("这是测试是个这isagoodthing"));
 	Vector<SizeType> v1_1(UCS2Trait::MaxValue + 1, 0);
 	ASSERT_EQ(s1_1.GetSize(), 19);
 	StringImplement::ReverseBoyerMooreSearchImplement::MakeBadCharTable<Char16, UCS2Trait>(v1_1.GetData(), s1_1.GetData(), s1_1.GetNormalSize());
-	ASSERT_EQ(v1_1[SGE_STR('这')], 6);
-	ASSERT_EQ(v1_1[SGE_STR('是')], 1);
-	ASSERT_EQ(v1_1[SGE_STR('个')], 5);
-	ASSERT_EQ(v1_1[SGE_STR('测')], 2);
-	ASSERT_EQ(v1_1[SGE_STR('试')], 3);
-	ASSERT_EQ(v1_1[SGE_STR('i')], 7);
-	ASSERT_EQ(v1_1[SGE_STR('s')], 8);
-	ASSERT_EQ(v1_1[SGE_STR('a')], 9);
-	ASSERT_EQ(v1_1[SGE_STR('g')], 10);
-	ASSERT_EQ(v1_1[SGE_STR('o')], 11);
-	ASSERT_EQ(v1_1[SGE_STR('d')], 13);
-	ASSERT_EQ(v1_1[SGE_STR('t')], 14);
-	ASSERT_EQ(v1_1[SGE_STR('h')], 15);
-	ASSERT_EQ(v1_1[SGE_STR('n')], 17);
+	ASSERT_EQ(v1_1[SGE_WSTR('这')], 6);
+	ASSERT_EQ(v1_1[SGE_WSTR('是')], 1);
+	ASSERT_EQ(v1_1[SGE_WSTR('个')], 5);
+	ASSERT_EQ(v1_1[SGE_WSTR('测')], 2);
+	ASSERT_EQ(v1_1[SGE_WSTR('试')], 3);
+	ASSERT_EQ(v1_1[SGE_WSTR('i')], 7);
+	ASSERT_EQ(v1_1[SGE_WSTR('s')], 8);
+	ASSERT_EQ(v1_1[SGE_WSTR('a')], 9);
+	ASSERT_EQ(v1_1[SGE_WSTR('g')], 10);
+	ASSERT_EQ(v1_1[SGE_WSTR('o')], 11);
+	ASSERT_EQ(v1_1[SGE_WSTR('d')], 13);
+	ASSERT_EQ(v1_1[SGE_WSTR('t')], 14);
+	ASSERT_EQ(v1_1[SGE_WSTR('h')], 15);
+	ASSERT_EQ(v1_1[SGE_WSTR('n')], 17);
 	ASSERT_EQ(v1_1[0], 19);
-	ASSERT_EQ(v1_1[SGE_STR('b')], 19);
-	ASSERT_EQ(v1_1[SGE_STR('不')], 19);
+	ASSERT_EQ(v1_1[SGE_WSTR('b')], 19);
+	ASSERT_EQ(v1_1[SGE_WSTR('不')], 19);
 
 	UTF8String s2_1(SGE_U8STR("测一测1212aba"));
 	Vector<SizeType> v2_1(UTF8Trait::MaxValue + 1, 0);
@@ -1280,7 +1280,7 @@ TEST(ReverseBoyerMooreSearchImplement, MakeBadCharTableTest)
 
 TEST(ReverseBoyerMooreSearchImplement, MakePrefixTest)
 {
-	UCS2String s1(SGE_STR("测一测12aba12"));
+	UCS2String s1(SGE_WSTR("测一测12aba12"));
 	ASSERT_EQ(s1.GetNormalSize(), 10);
 	Vector<SizeType> v1(s1.GetNormalSize(), 0);
 
@@ -1331,7 +1331,7 @@ TEST(ReverseBoyerMooreSearchImplement, MakePrefixTest)
 	ASSERT_EQ(v2[1], 0);
 	ASSERT_EQ(v2[0], 28);
 
-	UCS2String s3(SGE_STR("bcababab"));
+	UCS2String s3(SGE_WSTR("bcababab"));
 	ASSERT_EQ(s3.GetSize(), 8);
 	Vector<SizeType> v3(s3.GetNormalSize(), 0);
 
@@ -1348,7 +1348,7 @@ TEST(ReverseBoyerMooreSearchImplement, MakePrefixTest)
 
 TEST(ReverseBoyerMooreSearchImplement, MakeGoodPrefixTableTest)
 {
-	UCS2String s1(SGE_STR("测一测12aba12"));
+	UCS2String s1(SGE_WSTR("测一测12aba12"));
 	ASSERT_EQ(s1.GetNormalSize(), 10);
 	Vector<SizeType> v1(s1.GetNormalSize(), 0);
 	StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(v1.GetData(), s1.GetData(), s1.GetNormalSize());
@@ -1401,7 +1401,7 @@ TEST(ReverseBoyerMooreSearchImplement, MakeGoodPrefixTableTest)
 	ASSERT_EQ(v2_2[26], 22);
 	ASSERT_EQ(v2_2[27], 22);
 
-	UCS2String s3(SGE_STR("bcababab"));
+	UCS2String s3(SGE_WSTR("bcababab"));
 	ASSERT_EQ(s3.GetSize(), 8);
 	Vector<SizeType> v3(s3.GetNormalSize(), 0);
 	StringImplement::ReverseBoyerMooreSearchImplement::MakePrefix(v3.GetData(), s3.GetData(), s3.GetNormalSize());
@@ -1421,8 +1421,8 @@ TEST(ReverseBoyerMooreSearchImplement, ReverseBoyerMooreSearchTest)
 {
 	using namespace StringImplement::ReverseBoyerMooreSearchImplement;
 
-	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试"));
-	UCS2String s1_p(SGE_STR("测试是一个测试"));
+	UCS2String s1(SGE_WSTR("这是一个测试是一个测试是一个测试"));
+	UCS2String s1_p(SGE_WSTR("测试是一个测试"));
 	Vector<SizeType> v1_bct(UCS2Trait::MaxValue + 1, 0);
 	Vector<SizeType> v1_suff(s1_p.GetNormalSize(), 0);
 	Vector<SizeType> v1_gpt(s1_p.GetNormalSize(), 0);
@@ -1466,8 +1466,8 @@ TEST(ReverseBoyerMooreSearchImplement, ReverseBoyerMooreSearchTest)
 	auto res3_2 = ReverseBoyerMooreSearch(s3.GetData(), res3_1, s3_p.GetData(), v3_bct.GetData(), v3_gpt.GetData(), s3_p.GetNormalSize());
 	ASSERT_EQ(res3_2, res3_1);
 
-	UCS2String s4(SGE_STR("bcabcdababcabaabcbcabababacbacabeeacda"));
-	UCS2String s4_p(SGE_STR("bcababa"));
+	UCS2String s4(SGE_WSTR("bcabcdababcabaabcbcabababacbacabeeacda"));
+	UCS2String s4_p(SGE_WSTR("bcababa"));
 	Vector<SizeType> v4_bct(UCS2Trait::MaxValue + 1, 0);
 	Vector<SizeType> v4_suff(s4_p.GetNormalSize(), 0);
 	Vector<SizeType> v4_gpt(s4_p.GetNormalSize(), 0);
@@ -1497,8 +1497,8 @@ TEST(SimpleSearchImplement, SimpleSearchTest)
 {
 	using namespace SpaceGameEngine::StringImplement::SimpleSearchImplement;
 
-	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试"));
-	UCS2String s1_p(SGE_STR("测试是一个测试"));
+	UCS2String s1(SGE_WSTR("这是一个测试是一个测试是一个测试"));
+	UCS2String s1_p(SGE_WSTR("测试是一个测试"));
 
 	auto res1_1 = SimpleSearch(s1.GetData(), s1.GetData() + s1.GetNormalSize(), s1_p.GetData(), s1_p.GetNormalSize());
 	ASSERT_EQ(res1_1 - s1.GetData(), 4);
@@ -1525,8 +1525,8 @@ TEST(SimpleSearchImplement, SimpleSearchTest)
 	auto res3_2 = SimpleSearch(res3_1 + 1, s3.GetData() + s3.GetNormalSize(), s3_p.GetData(), s3_p.GetNormalSize());
 	ASSERT_EQ(res3_2, s3.GetData() + s3.GetNormalSize());
 
-	UCS2String s4(SGE_STR("bcabcdababcabaabcbcabababacbacabeeacda"));
-	UCS2String s4_p(SGE_STR("bcababa"));
+	UCS2String s4(SGE_WSTR("bcabcdababcabaabcbcabababacbacabeeacda"));
+	UCS2String s4_p(SGE_WSTR("bcababa"));
 
 	auto res4_1 = SimpleSearch(s4.GetData(), s4.GetData() + s4.GetNormalSize(), s4_p.GetData(), s4_p.GetNormalSize());
 	ASSERT_EQ(res4_1 - s4.GetData(), 17);
@@ -1544,8 +1544,8 @@ TEST(SimpleSearchImplement, ReverseSimpleSearchTest)
 {
 	using namespace StringImplement::SimpleSearchImplement;
 
-	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试"));
-	UCS2String s1_p(SGE_STR("测试是一个测试"));
+	UCS2String s1(SGE_WSTR("这是一个测试是一个测试是一个测试"));
+	UCS2String s1_p(SGE_WSTR("测试是一个测试"));
 	auto res1_1 = ReverseSimpleSearch(s1.GetData(), s1.GetData() + s1.GetNormalSize(), s1_p.GetData(), s1_p.GetNormalSize());
 	ASSERT_EQ(res1_1 - s1.GetData(), 9);
 	auto res1_2 = ReverseSimpleSearch(s1.GetData(), res1_1 + 2, s1_p.GetData(), s1_p.GetNormalSize());
@@ -1569,8 +1569,8 @@ TEST(SimpleSearchImplement, ReverseSimpleSearchTest)
 	auto res3_2 = ReverseSimpleSearch(s3.GetData(), res3_1, s3_p.GetData(), s3_p.GetNormalSize());
 	ASSERT_EQ(res3_2, res3_1);
 
-	UCS2String s4(SGE_STR("bcabcdababcabaabcbcabababacbacabeeacda"));
-	UCS2String s4_p(SGE_STR("bcababa"));
+	UCS2String s4(SGE_WSTR("bcabcdababcabaabcbcabababacbacabeeacda"));
+	UCS2String s4_p(SGE_WSTR("bcababa"));
 	auto res4_1 = ReverseSimpleSearch(s4.GetData(), s4.GetData() + s4.GetNormalSize(), s4_p.GetData(), s4_p.GetNormalSize());
 	ASSERT_EQ(res4_1 - s4.GetData(), 17);
 	auto res4_2 = ReverseSimpleSearch(s4.GetData(), res4_1, s4_p.GetData(), s4_p.GetNormalSize());
@@ -1600,9 +1600,9 @@ TEST(StringCore, InstanceTest)
 	ASSERT_EQ(s1.GetSize(), 0);
 	StringCore<Char, CharTrait<Char>, StdAllocator> s2;
 	ASSERT_EQ(s2.GetSize(), 0);
-	StringCore<Char> s3(SGE_STR("这是12345abcde"));
+	StringCore<Char> s3(SGE_WSTR("这是12345abcde"));
 	ASSERT_EQ(s3.GetSize(), 12);
-	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("这是12345abcde"), s3.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s3.GetData(), SGE_WSTR("这是12345abcde"), s3.GetSize() * sizeof(Char)), 0);
 	StringCore<char, UTF8Trait, StdAllocator> s4(u8"这是12345abcde");
 	ASSERT_EQ(s4.GetSize(), 12);
 	ASSERT_EQ(memcmp(s4.GetData(), u8"这是12345abcde", s4.GetSize() * sizeof(char)), 0);
@@ -1610,36 +1610,36 @@ TEST(StringCore, InstanceTest)
 
 TEST(StringCore, CopyConstructionTest)
 {
-	StringCore<Char> s1(SGE_STR("这是12345abcde"));
+	StringCore<Char> s1(SGE_WSTR("这是12345abcde"));
 	ASSERT_EQ(s1.GetSize(), 12);
-	ASSERT_EQ(memcmp(s1.GetData(), SGE_STR("这是12345abcde"), s1.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s1.GetData(), SGE_WSTR("这是12345abcde"), s1.GetSize() * sizeof(Char)), 0);
 
-	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("这是12345abcde"));
+	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_WSTR("这是12345abcde"));
 	ASSERT_EQ(s2.GetSize(), 12);
-	ASSERT_EQ(memcmp(s2.GetData(), SGE_STR("这是12345abcde"), s2.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s2.GetData(), SGE_WSTR("这是12345abcde"), s2.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s3(s1);
 	ASSERT_EQ(s3.GetSize(), 12);
-	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("这是12345abcde"), s3.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s3.GetData(), SGE_WSTR("这是12345abcde"), s3.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s4(std::move(s3));
 	ASSERT_EQ(s4.GetSize(), 12);
-	ASSERT_EQ(memcmp(s4.GetData(), SGE_STR("这是12345abcde"), s4.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s4.GetData(), SGE_WSTR("这是12345abcde"), s4.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char> s5(s2);
 	ASSERT_EQ(s5.GetSize(), 12);
-	ASSERT_EQ(memcmp(s5.GetData(), SGE_STR("这是12345abcde"), s5.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s5.GetData(), SGE_WSTR("这是12345abcde"), s5.GetSize() * sizeof(Char)), 0);
 
 	StringCore<Char, CharTrait<Char>, StdAllocator> s6(std::move(s5));
 	ASSERT_EQ(s6.GetSize(), 12);
-	ASSERT_EQ(memcmp(s6.GetData(), SGE_STR("这是12345abcde"), s6.GetSize() * sizeof(Char)), 0);
+	ASSERT_EQ(memcmp(s6.GetData(), SGE_WSTR("这是12345abcde"), s6.GetSize() * sizeof(Char)), 0);
 }
 
 TEST(StringCore, AssignmentTest)
 {
-	StringCore<Char> s(SGE_STR("test"));
+	StringCore<Char> s(SGE_WSTR("test"));
 	ASSERT_EQ(s.GetSize(), 4);
-	ASSERT_EQ(memcmp(s.GetData(), SGE_STR("test"), sizeof(Char) * s.GetSize()), 0);
+	ASSERT_EQ(memcmp(s.GetData(), SGE_WSTR("test"), sizeof(Char) * s.GetSize()), 0);
 
 	StringCore<Char> s2, s3;
 	ASSERT_EQ(s2.GetSize(), 0);
@@ -1647,14 +1647,14 @@ TEST(StringCore, AssignmentTest)
 	s2 = s;
 
 	ASSERT_EQ(s.GetSize(), 4);
-	ASSERT_EQ(memcmp(s.GetData(), SGE_STR("test"), sizeof(Char) * s.GetSize()), 0);
+	ASSERT_EQ(memcmp(s.GetData(), SGE_WSTR("test"), sizeof(Char) * s.GetSize()), 0);
 	ASSERT_EQ(s2.GetSize(), 4);
-	ASSERT_EQ(memcmp(s2.GetData(), SGE_STR("test"), sizeof(Char) * s2.GetSize()), 0);
+	ASSERT_EQ(memcmp(s2.GetData(), SGE_WSTR("test"), sizeof(Char) * s2.GetSize()), 0);
 
 	s3 = std::move(s2);
 
 	ASSERT_EQ(s3.GetSize(), 4);
-	ASSERT_EQ(memcmp(s3.GetData(), SGE_STR("test"), sizeof(Char) * s3.GetSize()), 0);
+	ASSERT_EQ(memcmp(s3.GetData(), SGE_WSTR("test"), sizeof(Char) * s3.GetSize()), 0);
 
 	StringCore<Char, CharTrait<Char>, StdAllocator> s4, s5;
 	ASSERT_EQ(s4.GetSize(), 0);
@@ -1663,51 +1663,51 @@ TEST(StringCore, AssignmentTest)
 	s4 = s3;
 
 	ASSERT_EQ(s4.GetSize(), 4);
-	ASSERT_EQ(memcmp(s4.GetData(), SGE_STR("test"), sizeof(Char) * s4.GetSize()), 0);
+	ASSERT_EQ(memcmp(s4.GetData(), SGE_WSTR("test"), sizeof(Char) * s4.GetSize()), 0);
 
 	s5 = std::move(s3);
 
 	ASSERT_EQ(s5.GetSize(), 4);
-	ASSERT_EQ(memcmp(s5.GetData(), SGE_STR("test"), sizeof(Char) * s5.GetSize()), 0);
+	ASSERT_EQ(memcmp(s5.GetData(), SGE_WSTR("test"), sizeof(Char) * s5.GetSize()), 0);
 
 	StringCore<Char> s6;
 	ASSERT_EQ(s6.GetSize(), 0);
 
-	s6 = SGE_STR("测试");
+	s6 = SGE_WSTR("测试");
 
 	ASSERT_EQ(s6.GetSize(), 2);
-	ASSERT_EQ(memcmp(s6.GetData(), SGE_STR("测试"), sizeof(Char) * s6.GetSize()), 0);
+	ASSERT_EQ(memcmp(s6.GetData(), SGE_WSTR("测试"), sizeof(Char) * s6.GetSize()), 0);
 }
 
 TEST(StringCore, EqualOperatorTest)
 {
-	StringCore<Char> s1(SGE_STR("这是个测试"));
-	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_STR("这是个测试"));
-	StringCore<Char> s3(SGE_STR("test"));
+	StringCore<Char> s1(SGE_WSTR("这是个测试"));
+	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_WSTR("这是个测试"));
+	StringCore<Char> s3(SGE_WSTR("test"));
 
 	ASSERT_EQ(s1 == s2, true);
 	ASSERT_EQ(s1 != s2, false);
 	ASSERT_EQ(s1 == s3, false);
 	ASSERT_EQ(s2 == s3, false);
-	ASSERT_EQ(s1 == SGE_STR("这是个测试"), true);
-	ASSERT_EQ(s2 == SGE_STR("test"), false);
-	ASSERT_EQ(s3 == SGE_STR("test"), true);
+	ASSERT_EQ(s1 == SGE_WSTR("这是个测试"), true);
+	ASSERT_EQ(s2 == SGE_WSTR("test"), false);
+	ASSERT_EQ(s3 == SGE_WSTR("test"), true);
 }
 
 TEST(StringCore, ClearTest)
 {
-	StringCore<Char> s(SGE_STR("test"));
-	ASSERT_EQ(s, SGE_STR("test"));
+	StringCore<Char> s(SGE_WSTR("test"));
+	ASSERT_EQ(s, SGE_WSTR("test"));
 	ASSERT_EQ(s.GetSize(), 4);
 	s.Clear();
-	ASSERT_EQ(s != SGE_STR("test"), true);
+	ASSERT_EQ(s != SGE_WSTR("test"), true);
 	ASSERT_EQ(s.GetSize(), 0);
 }
 
 TEST(StringCore, GetNormalSizeTest)
 {
-	StringCore<Char> s1(SGE_STR("这是"));
-	ASSERT_EQ(s1, SGE_STR("这是"));
+	StringCore<Char> s1(SGE_WSTR("这是"));
+	ASSERT_EQ(s1, SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
 	ASSERT_EQ(s1.GetNormalSize(), 2);
 
@@ -1719,8 +1719,8 @@ TEST(StringCore, GetNormalSizeTest)
 
 TEST(StringCore, GetRealSizeTest)
 {
-	StringCore<Char> s1(SGE_STR("这是"));
-	ASSERT_EQ(s1, SGE_STR("这是"));
+	StringCore<Char> s1(SGE_WSTR("这是"));
+	ASSERT_EQ(s1, SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
 	ASSERT_EQ(s1.GetRealSize(), 2);
 
@@ -1732,12 +1732,12 @@ TEST(StringCore, GetRealSizeTest)
 
 TEST(StringCore, SetRealSizeTest)
 {
-	StringCore<Char> s1(SGE_STR("这是"));
-	ASSERT_EQ(s1, SGE_STR("这是"));
+	StringCore<Char> s1(SGE_WSTR("这是"));
+	ASSERT_EQ(s1, SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
 	ASSERT_EQ(s1.GetRealSize(), 2);
 	s1.SetRealSize(100);
-	ASSERT_EQ(s1, SGE_STR("这是"));
+	ASSERT_EQ(s1, SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
 	ASSERT_EQ(s1.GetRealSize(), 100);
 	ASSERT_EQ(s1.GetNormalSize(), 2);
@@ -1755,34 +1755,34 @@ TEST(StringCore, SetRealSizeTest)
 
 TEST(StringCore, SelfPlusTest)
 {
-	UCS2String s1(SGE_STR("这是"));
+	UCS2String s1(SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
-	ASSERT_EQ(s1, SGE_STR("这是"));
-	UCS2String s1_2(SGE_STR("测试"));
+	ASSERT_EQ(s1, SGE_WSTR("这是"));
+	UCS2String s1_2(SGE_WSTR("测试"));
 	ASSERT_EQ(s1_2.GetSize(), 2);
-	ASSERT_EQ(s1_2, SGE_STR("测试"));
-	UCS2String s1_3(SGE_STR("1234567890abcdefghij"));
+	ASSERT_EQ(s1_2, SGE_WSTR("测试"));
+	UCS2String s1_3(SGE_WSTR("1234567890abcdefghij"));
 	ASSERT_EQ(s1_3.GetSize(), 20);
-	ASSERT_EQ(s1_3, SGE_STR("1234567890abcdefghij"));
-	const Char* pc_long_str = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	ASSERT_EQ(s1_3, SGE_WSTR("1234567890abcdefghij"));
+	const Char* pc_long_str = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(pc_long_str);
 	ASSERT_EQ(s1_4.GetSize(), 400);
 	ASSERT_EQ(s1_4, pc_long_str);
 	s1 += s1_2;
 	ASSERT_EQ(s1.GetSize(), 4);
-	ASSERT_EQ(s1, SGE_STR("这是测试"));
+	ASSERT_EQ(s1, SGE_WSTR("这是测试"));
 	s1 += s1_3;
 	ASSERT_EQ(s1.GetSize(), 24);
-	ASSERT_EQ(s1, SGE_STR("这是测试1234567890abcdefghij"));
+	ASSERT_EQ(s1, SGE_WSTR("这是测试1234567890abcdefghij"));
 	s1 += s1_4;
 	ASSERT_EQ(s1.GetSize(), 424);
-	ASSERT_EQ(s1, SGE_STR("这是测试1234567890abcdefghij一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890"));
-	s1 += SGE_STR('这');
+	ASSERT_EQ(s1, SGE_WSTR("这是测试1234567890abcdefghij一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890"));
+	s1 += SGE_WSTR('这');
 	ASSERT_EQ(s1.GetSize(), 425);
-	ASSERT_EQ(s1, SGE_STR("这是测试1234567890abcdefghij一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890这"));
-	s1 += SGE_STR("是测试");
+	ASSERT_EQ(s1, SGE_WSTR("这是测试1234567890abcdefghij一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890这"));
+	s1 += SGE_WSTR("是测试");
 	ASSERT_EQ(s1.GetSize(), 428);
-	ASSERT_EQ(s1, SGE_STR("这是测试1234567890abcdefghij一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890这是测试"));
+	ASSERT_EQ(s1, SGE_WSTR("这是测试1234567890abcdefghij一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890这是测试"));
 
 	UTF8String s2(u8"这是");
 	ASSERT_EQ(s2.GetSize(), 2);
@@ -1816,32 +1816,32 @@ TEST(StringCore, SelfPlusTest)
 
 TEST(StringCore, OperatorPlusTest)
 {
-	UCS2String s1(SGE_STR("这是"));
+	UCS2String s1(SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
-	ASSERT_EQ(s1, SGE_STR("这是"));
-	UCS2String s1_2(SGE_STR("测试"));
+	ASSERT_EQ(s1, SGE_WSTR("这是"));
+	UCS2String s1_2(SGE_WSTR("测试"));
 	ASSERT_EQ(s1_2.GetSize(), 2);
-	ASSERT_EQ(s1_2, SGE_STR("测试"));
-	UCS2String s1_3(SGE_STR("1234567890abcdefghij"));
+	ASSERT_EQ(s1_2, SGE_WSTR("测试"));
+	UCS2String s1_3(SGE_WSTR("1234567890abcdefghij"));
 	ASSERT_EQ(s1_3.GetSize(), 20);
-	ASSERT_EQ(s1_3, SGE_STR("1234567890abcdefghij"));
-	const Char* pc_long_str = SGE_STR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
+	ASSERT_EQ(s1_3, SGE_WSTR("1234567890abcdefghij"));
+	const Char* pc_long_str = SGE_WSTR("一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(pc_long_str);
 	ASSERT_EQ(s1_4.GetSize(), 400);
 	ASSERT_EQ(s1_4, pc_long_str);
 
-	ASSERT_EQ(s1 + s1_2, SGE_STR("这是测试"));
-	ASSERT_EQ(s1 + s1_3, SGE_STR("这是1234567890abcdefghij"));
-	ASSERT_EQ(s1 + s1_4, SGE_STR("这是一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890"));
-	ASSERT_EQ(s1 + SGE_STR('!'), SGE_STR("这是!"));
-	ASSERT_EQ(s1 + SGE_STR("测试"), SGE_STR("这是测试"));
+	ASSERT_EQ(s1 + s1_2, SGE_WSTR("这是测试"));
+	ASSERT_EQ(s1 + s1_3, SGE_WSTR("这是1234567890abcdefghij"));
+	ASSERT_EQ(s1 + s1_4, SGE_WSTR("这是一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890"));
+	ASSERT_EQ(s1 + SGE_WSTR('!'), SGE_WSTR("这是!"));
+	ASSERT_EQ(s1 + SGE_WSTR("测试"), SGE_WSTR("这是测试"));
 
 	ASSERT_EQ(s1.GetSize(), 2);
-	ASSERT_EQ(s1, SGE_STR("这是"));
+	ASSERT_EQ(s1, SGE_WSTR("这是"));
 	ASSERT_EQ(s1_2.GetSize(), 2);
-	ASSERT_EQ(s1_2, SGE_STR("测试"));
+	ASSERT_EQ(s1_2, SGE_WSTR("测试"));
 	ASSERT_EQ(s1_3.GetSize(), 20);
-	ASSERT_EQ(s1_3, SGE_STR("1234567890abcdefghij"));
+	ASSERT_EQ(s1_3, SGE_WSTR("1234567890abcdefghij"));
 	ASSERT_EQ(s1_4.GetSize(), 400);
 	ASSERT_EQ(s1_4, pc_long_str);
 
@@ -1877,10 +1877,10 @@ TEST(StringCore, OperatorPlusTest)
 
 TEST(StringCore, SizeValueConstructionTest)
 {
-	UCS2String s1(10, SGE_STR('这'));
+	UCS2String s1(10, SGE_WSTR('这'));
 	ASSERT_EQ(s1.GetSize(), 10);
 	ASSERT_EQ(s1.GetNormalSize(), 10);
-	ASSERT_EQ(s1, SGE_STR("这这这这这这这这这这"));
+	ASSERT_EQ(s1, SGE_WSTR("这这这这这这这这这这"));
 	ASSERT_EQ(*(s1.GetData() + 10), 0);
 
 	UTF8String s2(10, u8"这");
@@ -1892,12 +1892,12 @@ TEST(StringCore, SizeValueConstructionTest)
 
 TEST(StringCore, IteratorPairConstructionTest)
 {
-	Vector<Char16> v1 = {SGE_STR('这'), SGE_STR('是'), SGE_STR('测'), SGE_STR('试')};
+	Vector<Char16> v1 = {SGE_WSTR('这'), SGE_WSTR('是'), SGE_WSTR('测'), SGE_WSTR('试')};
 
 	UCS2String s1(v1.GetBegin(), v1.GetEnd());
 	ASSERT_EQ(s1.GetSize(), 4);
 	ASSERT_EQ(s1.GetNormalSize(), 4);
-	ASSERT_EQ(s1, SGE_STR("这是测试"));
+	ASSERT_EQ(s1, SGE_WSTR("这是测试"));
 	ASSERT_EQ(*(s1.GetData() + 4), 0);
 
 	const UTF8String s2_0(u8"12345这是个测试abcde");
@@ -1915,10 +1915,10 @@ TEST(StringCore, IteratorPairConstructionTest)
 
 TEST(StringCore, CompareLessTest)
 {
-	UCS2String s1_1(SGE_STR("abcde"));
-	UCS2String s1_2(SGE_STR("ab"));
-	UCS2String s1_3(SGE_STR("这是"));
-	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_STR("严格"));
+	UCS2String s1_1(SGE_WSTR("abcde"));
+	UCS2String s1_2(SGE_WSTR("ab"));
+	UCS2String s1_3(SGE_WSTR("这是"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_WSTR("严格"));
 
 	ASSERT_TRUE(s1_2 < s1_1);
 	ASSERT_TRUE(s1_4 < s1_3);
@@ -1926,8 +1926,8 @@ TEST(StringCore, CompareLessTest)
 	ASSERT_TRUE(s1_2 < s1_3);
 	ASSERT_TRUE(s1_2 < s1_4);
 	ASSERT_TRUE(s1_1 < s1_4);
-	ASSERT_TRUE(s1_1 < SGE_STR("b"));
-	ASSERT_TRUE(s1_3 < SGE_STR("这是测试"));
+	ASSERT_TRUE(s1_1 < SGE_WSTR("b"));
+	ASSERT_TRUE(s1_3 < SGE_WSTR("这是测试"));
 
 	UTF8String s2_1(u8"abcde");
 	UTF8String s2_2(u8"ab");
@@ -1946,10 +1946,10 @@ TEST(StringCore, CompareLessTest)
 
 TEST(StringCore, CompareLargeTest)
 {
-	UCS2String s1_1(SGE_STR("abcde"));
-	UCS2String s1_2(SGE_STR("ab"));
-	UCS2String s1_3(SGE_STR("这是"));
-	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_STR("严格"));
+	UCS2String s1_1(SGE_WSTR("abcde"));
+	UCS2String s1_2(SGE_WSTR("ab"));
+	UCS2String s1_3(SGE_WSTR("这是"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_WSTR("严格"));
 
 	ASSERT_TRUE(s1_1 > s1_2);
 	ASSERT_TRUE(s1_3 > s1_4);
@@ -1957,8 +1957,8 @@ TEST(StringCore, CompareLargeTest)
 	ASSERT_TRUE(s1_3 > s1_2);
 	ASSERT_TRUE(s1_4 > s1_2);
 	ASSERT_TRUE(s1_4 > s1_1);
-	ASSERT_TRUE(s1_1 > SGE_STR("a"));
-	ASSERT_TRUE(s1_3 > SGE_STR("严1"));
+	ASSERT_TRUE(s1_1 > SGE_WSTR("a"));
+	ASSERT_TRUE(s1_3 > SGE_WSTR("严1"));
 
 	UTF8String s2_1(u8"abcde");
 	UTF8String s2_2(u8"ab");
@@ -1977,15 +1977,15 @@ TEST(StringCore, CompareLargeTest)
 
 TEST(StringCore, CompareLessEqualTest)
 {
-	UCS2String s1_1(SGE_STR("abc"));
-	UCS2String s1_2(SGE_STR("a"));
-	StringCore<Char16, UCS2Trait, StdAllocator> s1_3(SGE_STR("abc"));
+	UCS2String s1_1(SGE_WSTR("abc"));
+	UCS2String s1_2(SGE_WSTR("a"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_3(SGE_WSTR("abc"));
 	ASSERT_TRUE(s1_2 <= s1_1);
 	ASSERT_TRUE(s1_1 <= s1_3);
 	ASSERT_TRUE(s1_3 <= s1_1);
 	ASSERT_FALSE(s1_1 <= s1_2);
-	ASSERT_FALSE(s1_1 <= SGE_STR("aaaaa测试"));
-	ASSERT_TRUE(s1_1 <= SGE_STR("测试"));
+	ASSERT_FALSE(s1_1 <= SGE_WSTR("aaaaa测试"));
+	ASSERT_TRUE(s1_1 <= SGE_WSTR("测试"));
 
 	UTF8String s2_1(u8"abc");
 	UTF8String s2_2(u8"a");
@@ -2000,15 +2000,15 @@ TEST(StringCore, CompareLessEqualTest)
 
 TEST(StringCore, CompareLargeEqualTest)
 {
-	UCS2String s1_1(SGE_STR("abc"));
-	UCS2String s1_2(SGE_STR("a"));
-	StringCore<Char16, UCS2Trait, StdAllocator> s1_3(SGE_STR("abc"));
+	UCS2String s1_1(SGE_WSTR("abc"));
+	UCS2String s1_2(SGE_WSTR("a"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_3(SGE_WSTR("abc"));
 	ASSERT_TRUE(s1_1 >= s1_2);
 	ASSERT_TRUE(s1_3 >= s1_1);
 	ASSERT_TRUE(s1_1 >= s1_3);
 	ASSERT_FALSE(s1_2 >= s1_1);
-	ASSERT_TRUE(s1_1 >= SGE_STR("aaaaa测试"));
-	ASSERT_FALSE(s1_1 >= SGE_STR("测试"));
+	ASSERT_TRUE(s1_1 >= SGE_WSTR("aaaaa测试"));
+	ASSERT_FALSE(s1_1 >= SGE_WSTR("测试"));
 
 	UTF8String s2_1(u8"abc");
 	UTF8String s2_2(u8"a");
@@ -2029,42 +2029,42 @@ TEST(StringCore, IsTotallyOrderedTest)
 
 TEST(StringCore, InsertTest)
 {
-	UCS2String s1_1(SGE_STR("12345"));
+	UCS2String s1_1(SGE_WSTR("12345"));
 	ASSERT_EQ(s1_1.GetSize(), 5);
-	const UCS2String s1_2(SGE_STR("这是个测试"));
+	const UCS2String s1_2(SGE_WSTR("这是个测试"));
 	ASSERT_EQ(s1_2.GetSize(), 5);
 	UCS2String s1_3(s1_1);
 	ASSERT_EQ(s1_3.GetSize(), 5);
-	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_STR("Это тест"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_4(SGE_WSTR("Это тест"));
 	ASSERT_EQ(s1_4.GetSize(), 8);
-	Vector<Char16> v1 = {SGE_STR('字'),
-						 SGE_STR('符')};
+	Vector<Char16> v1 = {SGE_WSTR('字'),
+						 SGE_WSTR('符')};
 	ASSERT_EQ(v1.GetSize(), 2);
 
 	auto iter1_1 = s1_1.Insert(s1_1.GetConstEnd(), s1_2);
 	ASSERT_EQ(s1_1.GetSize(), 10);
-	ASSERT_EQ(s1_1, SGE_STR("12345这是个测试"));
-	ASSERT_EQ(*iter1_1, SGE_STR('这'));
+	ASSERT_EQ(s1_1, SGE_WSTR("12345这是个测试"));
+	ASSERT_EQ(*iter1_1, SGE_WSTR('这'));
 
 	auto iter1_2 = s1_3.Insert(s1_3.GetBegin() + 1, s1_2);
 	ASSERT_EQ(s1_3.GetSize(), 10);
-	ASSERT_EQ(s1_3, SGE_STR("1这是个测试2345"));
-	ASSERT_EQ(*iter1_2, SGE_STR('这'));
+	ASSERT_EQ(s1_3, SGE_WSTR("1这是个测试2345"));
+	ASSERT_EQ(*iter1_2, SGE_WSTR('这'));
 
 	auto iter1_3 = s1_1.Insert(s1_1.GetConstBegin() + 1, s1_4);
 	ASSERT_EQ(s1_1.GetSize(), 18);
-	ASSERT_EQ(s1_1, SGE_STR("1Это тест2345这是个测试"));
-	ASSERT_EQ(*iter1_3, SGE_STR('Э'));
+	ASSERT_EQ(s1_1, SGE_WSTR("1Это тест2345这是个测试"));
+	ASSERT_EQ(*iter1_3, SGE_WSTR('Э'));
 
-	auto iter1_4 = s1_1.Insert(s1_1.GetConstEnd() - 1, SGE_STR("δοκιμή"));
+	auto iter1_4 = s1_1.Insert(s1_1.GetConstEnd() - 1, SGE_WSTR("δοκιμή"));
 	ASSERT_EQ(s1_1.GetSize(), 24);
-	ASSERT_EQ(s1_1, SGE_STR("1Это тест2345这是个测δοκιμή试"));
-	ASSERT_EQ(*iter1_4, SGE_STR('δ'));
+	ASSERT_EQ(s1_1, SGE_WSTR("1Это тест2345这是个测δοκιμή试"));
+	ASSERT_EQ(*iter1_4, SGE_WSTR('δ'));
 
 	auto iter1_5 = s1_1.Insert(s1_1.GetConstBegin() + 2, v1.GetConstBegin(), v1.GetConstEnd());
 	ASSERT_EQ(s1_1.GetSize(), 26);
-	ASSERT_EQ(s1_1, SGE_STR("1Э字符то тест2345这是个测δοκιμή试"));
-	ASSERT_EQ(*iter1_5, SGE_STR('字'));
+	ASSERT_EQ(s1_1, SGE_WSTR("1Э字符то тест2345这是个测δοκιμή试"));
+	ASSERT_EQ(*iter1_5, SGE_WSTR('字'));
 
 	UTF8String s2_1(u8"12345");
 	ASSERT_EQ(s2_1.GetSize(), 5);
@@ -2105,49 +2105,49 @@ TEST(StringCore, InsertTest)
 
 TEST(StringCore, InsertReverseTest)
 {
-	UCS2String s1_1(SGE_STR("12345"));
+	UCS2String s1_1(SGE_WSTR("12345"));
 	ASSERT_EQ(s1_1.GetSize(), 5);
-	const UCS2String s1_2(SGE_STR("这是个测试"));
+	const UCS2String s1_2(SGE_WSTR("这是个测试"));
 	ASSERT_EQ(s1_2.GetSize(), 5);
 	UCS2String s1_3(s1_1);
 	ASSERT_EQ(s1_3.GetSize(), 5);
 	UCS2String s1_4(s1_1);
 	ASSERT_EQ(s1_4.GetSize(), 5);
-	StringCore<Char16, UCS2Trait, StdAllocator> s1_5(SGE_STR("Это тест"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_5(SGE_WSTR("Это тест"));
 	ASSERT_EQ(s1_5.GetSize(), 8);
-	Vector<Char16> v1 = {SGE_STR('字'),
-						 SGE_STR('符')};
+	Vector<Char16> v1 = {SGE_WSTR('字'),
+						 SGE_WSTR('符')};
 	ASSERT_EQ(v1.GetSize(), 2);
 
 	auto iter1_1 = s1_1.Insert(s1_1.GetConstReverseBegin(), s1_2);
 	ASSERT_EQ(s1_1.GetSize(), 10);
-	ASSERT_EQ(s1_1, SGE_STR("12345试测个是这"));
-	ASSERT_EQ(*iter1_1, SGE_STR('这'));
+	ASSERT_EQ(s1_1, SGE_WSTR("12345试测个是这"));
+	ASSERT_EQ(*iter1_1, SGE_WSTR('这'));
 
 	auto iter1_2 = s1_3.Insert(s1_3.GetConstReverseEnd(), s1_2);
 	ASSERT_EQ(s1_3.GetSize(), 10);
-	ASSERT_EQ(s1_3, SGE_STR("试测个是这12345"));
-	ASSERT_EQ(*iter1_2, SGE_STR('这'));
+	ASSERT_EQ(s1_3, SGE_WSTR("试测个是这12345"));
+	ASSERT_EQ(*iter1_2, SGE_WSTR('这'));
 
 	auto iter1_3 = s1_4.Insert(s1_4.GetConstReverseEnd() - 1, s1_2);
 	ASSERT_EQ(s1_4.GetSize(), 10);
-	ASSERT_EQ(s1_4, SGE_STR("1试测个是这2345"));
-	ASSERT_EQ(*iter1_3, SGE_STR('这'));
+	ASSERT_EQ(s1_4, SGE_WSTR("1试测个是这2345"));
+	ASSERT_EQ(*iter1_3, SGE_WSTR('这'));
 
 	auto iter1_4 = s1_1.Insert(s1_1.GetReverseBegin() + 1, s1_5);
 	ASSERT_EQ(s1_1.GetSize(), 18);
-	ASSERT_EQ(s1_1, SGE_STR("12345试测个是тсет отЭ这"));
-	ASSERT_EQ(*iter1_4, SGE_STR('Э'));
+	ASSERT_EQ(s1_1, SGE_WSTR("12345试测个是тсет отЭ这"));
+	ASSERT_EQ(*iter1_4, SGE_WSTR('Э'));
 
-	auto iter1_5 = s1_1.Insert(s1_1.GetConstReverseEnd() - 1, SGE_STR("δοκιμή"));
+	auto iter1_5 = s1_1.Insert(s1_1.GetConstReverseEnd() - 1, SGE_WSTR("δοκιμή"));
 	ASSERT_EQ(s1_1.GetSize(), 24);
-	ASSERT_EQ(s1_1, SGE_STR("1ήμικοδ2345试测个是тсет отЭ这"));
-	ASSERT_EQ(*iter1_5, SGE_STR('δ'));
+	ASSERT_EQ(s1_1, SGE_WSTR("1ήμικοδ2345试测个是тсет отЭ这"));
+	ASSERT_EQ(*iter1_5, SGE_WSTR('δ'));
 
 	auto iter1_6 = s1_1.Insert(s1_1.GetConstReverseBegin() + 2, v1.GetConstReverseBegin(), v1.GetConstReverseEnd());
 	ASSERT_EQ(s1_1.GetSize(), 26);
-	ASSERT_EQ(s1_1, SGE_STR("1ήμικοδ2345试测个是тсет от字符Э这"));
-	ASSERT_EQ(*iter1_6, SGE_STR('符'));
+	ASSERT_EQ(s1_1, SGE_WSTR("1ήμικοδ2345试测个是тсет от字符Э这"));
+	ASSERT_EQ(*iter1_6, SGE_WSTR('符'));
 
 	UTF8String s2_1(SGE_U8STR("12345"));
 	ASSERT_EQ(s2_1.GetSize(), 5);
@@ -2195,37 +2195,37 @@ TEST(StringCore, InsertReverseTest)
 
 TEST(StringCore, SubstringTest)
 {
-	UCS2String str1(SGE_STR("这是test测试"));
+	UCS2String str1(SGE_WSTR("这是test测试"));
 	ASSERT_EQ(str1.GetSize(), 8);
-	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+	ASSERT_EQ(str1, SGE_WSTR("这是test测试"));
 
 	auto ss_1 = str1.Substring(str1.GetBegin(), str1.GetSize());
 	ASSERT_TRUE((std::is_same_v<decltype(ss_1), UCS2String>));
 	ASSERT_EQ(ss_1.GetSize(), 8);
 	ASSERT_EQ(ss_1, str1);
 	ASSERT_EQ(str1.GetSize(), 8);
-	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+	ASSERT_EQ(str1, SGE_WSTR("这是test测试"));
 
 	auto ss_2 = str1.Substring(str1.GetConstBegin() + 1, 5);
 	ASSERT_TRUE((std::is_same_v<decltype(ss_2), UCS2String>));
 	ASSERT_EQ(ss_2.GetSize(), 5);
-	ASSERT_EQ(ss_2, SGE_STR("是test"));
+	ASSERT_EQ(ss_2, SGE_WSTR("是test"));
 	ASSERT_EQ(str1.GetSize(), 8);
-	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+	ASSERT_EQ(str1, SGE_WSTR("这是test测试"));
 
 	auto ss_3 = str1.Substring(str1.GetReverseEnd() - 6, 6);
 	ASSERT_TRUE((std::is_same_v<decltype(ss_3), UCS2String>));
 	ASSERT_EQ(ss_3.GetSize(), 6);
-	ASSERT_EQ(ss_3, SGE_STR("tset是这"));
+	ASSERT_EQ(ss_3, SGE_WSTR("tset是这"));
 	ASSERT_EQ(str1.GetSize(), 8);
-	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+	ASSERT_EQ(str1, SGE_WSTR("这是test测试"));
 
 	auto ss_4 = str1.Substring(str1.GetConstReverseBegin(), 1);
 	ASSERT_TRUE((std::is_same_v<decltype(ss_4), UCS2String>));
 	ASSERT_EQ(ss_4.GetSize(), 1);
-	ASSERT_EQ(ss_4, SGE_STR("试"));
+	ASSERT_EQ(ss_4, SGE_WSTR("试"));
 	ASSERT_EQ(str1.GetSize(), 8);
-	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+	ASSERT_EQ(str1, SGE_WSTR("这是test测试"));
 
 	const UTF8String str2(SGE_U8STR("这是test测试"));
 	ASSERT_EQ(str2.GetSize(), 8);
@@ -2254,25 +2254,25 @@ TEST(StringCore, SubstringTest)
 
 TEST(StringCore, ReverseTest)
 {
-	UCS2String str1(SGE_STR("这是test测试"));
+	UCS2String str1(SGE_WSTR("这是test测试"));
 	ASSERT_EQ(str1.GetSize(), 8);
-	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+	ASSERT_EQ(str1, SGE_WSTR("这是test测试"));
 
 	auto rs1 = str1.Reverse();
 	ASSERT_TRUE((std::is_same_v<decltype(rs1), UCS2String>));
 	ASSERT_EQ(rs1.GetSize(), 8);
-	ASSERT_EQ(rs1, SGE_STR("试测tset是这"));
+	ASSERT_EQ(rs1, SGE_WSTR("试测tset是这"));
 	ASSERT_EQ(str1.GetSize(), 8);
-	ASSERT_EQ(str1, SGE_STR("这是test测试"));
+	ASSERT_EQ(str1, SGE_WSTR("这是test测试"));
 
 	const UCS2String str2;
 	ASSERT_EQ(str2.GetSize(), 0);
-	ASSERT_EQ(str2, SGE_STR(""));
+	ASSERT_EQ(str2, SGE_WSTR(""));
 
 	auto rs2 = str2.Reverse();
 	ASSERT_TRUE((std::is_same_v<decltype(rs2), UCS2String>));
 	ASSERT_EQ(rs2.GetSize(), 0);
-	ASSERT_EQ(rs2, SGE_STR(""));
+	ASSERT_EQ(rs2, SGE_WSTR(""));
 
 	const UTF8String str3(SGE_U8STR("这是test测试"));
 	ASSERT_EQ(str3.GetSize(), 8);
@@ -2297,18 +2297,18 @@ TEST(StringCore, ReverseTest)
 
 TEST(StringCore, RemoveTest)
 {
-	UCS2String s1_1(SGE_STR("这是测试"));
+	UCS2String s1_1(SGE_WSTR("这是测试"));
 	ASSERT_EQ(s1_1.GetSize(), 4);
 
 	auto iter1_1 = s1_1.Remove(s1_1.GetConstBegin() + 1);
 	ASSERT_EQ(s1_1.GetSize(), 3);
-	ASSERT_EQ(s1_1, SGE_STR("这测试"));
-	ASSERT_EQ(*iter1_1, SGE_STR('测'));
+	ASSERT_EQ(s1_1, SGE_WSTR("这测试"));
+	ASSERT_EQ(*iter1_1, SGE_WSTR('测'));
 
 	auto iter1_2 = s1_1.Remove(s1_1.GetReverseEnd() - 1);
 	ASSERT_EQ(s1_1.GetSize(), 2);
-	ASSERT_EQ(s1_1, SGE_STR("测试"));
-	ASSERT_EQ(*iter1_2, SGE_STR('\0'));
+	ASSERT_EQ(s1_1, SGE_WSTR("测试"));
+	ASSERT_EQ(*iter1_2, SGE_WSTR('\0'));
 
 	UTF8String s2_1(SGE_U8STR("这是测试"));
 	ASSERT_EQ(s2_1.GetSize(), 4);
@@ -2326,18 +2326,18 @@ TEST(StringCore, RemoveTest)
 
 TEST(StringCore, RemoveRangeTest)
 {
-	UCS2String s1_1(SGE_STR("这是一个测试"));
+	UCS2String s1_1(SGE_WSTR("这是一个测试"));
 	ASSERT_EQ(s1_1.GetSize(), 6);
 
 	auto iter1_1 = s1_1.Remove(s1_1.GetConstBegin(), s1_1.GetConstBegin() + 2);
 	ASSERT_EQ(s1_1.GetSize(), 4);
-	ASSERT_EQ(s1_1, SGE_STR("一个测试"));
-	ASSERT_EQ(*iter1_1, SGE_STR('一'));
+	ASSERT_EQ(s1_1, SGE_WSTR("一个测试"));
+	ASSERT_EQ(*iter1_1, SGE_WSTR('一'));
 
 	auto iter1_2 = s1_1.Remove(s1_1.GetReverseBegin(), s1_1.GetReverseEnd() - 1);
 	ASSERT_EQ(s1_1.GetSize(), 1);
-	ASSERT_EQ(s1_1, SGE_STR("一"));
-	ASSERT_EQ(*iter1_2, SGE_STR('一'));
+	ASSERT_EQ(s1_1, SGE_WSTR("一"));
+	ASSERT_EQ(*iter1_2, SGE_WSTR('一'));
 
 	UTF8String s2_1(SGE_U8STR("这是一个测试"));
 	ASSERT_EQ(s2_1.GetSize(), 6);
@@ -2355,17 +2355,17 @@ TEST(StringCore, RemoveRangeTest)
 
 TEST(StringCore, OperatorAtTest)
 {
-	UCS2String s1_1(SGE_STR("这是测试"));
-	const UCS2String s1_2(SGE_STR("这是测试"));
+	UCS2String s1_1(SGE_WSTR("这是测试"));
+	const UCS2String s1_2(SGE_WSTR("这是测试"));
 	ASSERT_EQ(s1_1.GetSize(), 4);
 	ASSERT_EQ(s1_2.GetSize(), 4);
 	for (SizeType i = 0; i < 4; i++)
 		ASSERT_EQ(s1_1[i], s1_2[i]);
 
-	s1_1[1] = SGE_STR('i');
+	s1_1[1] = SGE_WSTR('i');
 
 	ASSERT_EQ(s1_1.GetSize(), 4);
-	ASSERT_EQ(s1_1, SGE_STR("这i测试"));
+	ASSERT_EQ(s1_1, SGE_WSTR("这i测试"));
 
 	UTF8String s2_1(SGE_U8STR("这是测试"));
 	const UTF8String s2_2(SGE_U8STR("这是测试"));
@@ -2382,8 +2382,8 @@ TEST(StringCore, OperatorAtTest)
 
 TEST(StringCore, FindTest)
 {
-	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试是一个"));
-	UCS2String p1(SGE_STR("测试是一个测试"));
+	UCS2String s1(SGE_WSTR("这是一个测试是一个测试是一个测试是一个"));
+	UCS2String p1(SGE_WSTR("测试是一个测试"));
 	auto res1_1 = s1.Find(p1, s1.GetBegin(), s1.GetEnd());
 	ASSERT_EQ(res1_1.GetData(), s1.GetData() + 4);
 	auto res1_2 = s1.Find(p1, res1_1 + 1, s1.GetEnd());
@@ -2391,7 +2391,7 @@ TEST(StringCore, FindTest)
 	auto res1_3 = s1.Find(p1, res1_1 + 1, s1.GetEnd() - 4);
 	ASSERT_EQ(res1_3, s1.GetEnd() - 4);
 
-	StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_STR("一个测试"));
+	StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_WSTR("一个测试"));
 	auto res1_4 = s1.Find(p1_2, s1.GetBegin(), s1.GetEnd());
 	ASSERT_EQ(res1_4.GetData(), s1.GetData() + 2);
 	auto res1_5 = s1.Find(p1_2, res1_4 + 1, s1.GetEnd());
@@ -2401,11 +2401,11 @@ TEST(StringCore, FindTest)
 	auto res1_7 = s1.Find(p1_2, res1_6 + 1, s1.GetEnd());
 	ASSERT_EQ(res1_7, s1.GetEnd());
 
-	auto res1_8 = s1.Find(SGE_STR("一个测试是一个测试"), s1.GetBegin(), s1.GetEnd());
+	auto res1_8 = s1.Find(SGE_WSTR("一个测试是一个测试"), s1.GetBegin(), s1.GetEnd());
 	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 2);
-	auto res1_9 = s1.Find(SGE_STR("一个测试是一个测试"), res1_8 + 1, s1.GetEnd());
+	auto res1_9 = s1.Find(SGE_WSTR("一个测试是一个测试"), res1_8 + 1, s1.GetEnd());
 	ASSERT_EQ(res1_9.GetData(), s1.GetData() + 7);
-	auto res1_10 = s1.Find(SGE_STR("一个测试是一个测试"), res1_9 + 1, s1.GetEnd());
+	auto res1_10 = s1.Find(SGE_WSTR("一个测试是一个测试"), res1_9 + 1, s1.GetEnd());
 	ASSERT_EQ(res1_10, s1.GetEnd());
 
 	UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试是一个"));
@@ -2437,8 +2437,8 @@ TEST(StringCore, FindTest)
 
 TEST(StringCore, ConstFindTest)
 {
-	const UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试是一个"));
-	const UCS2String p1(SGE_STR("测试是一个测试"));
+	const UCS2String s1(SGE_WSTR("这是一个测试是一个测试是一个测试是一个"));
+	const UCS2String p1(SGE_WSTR("测试是一个测试"));
 	auto res1_1 = s1.Find(p1, s1.GetConstBegin(), s1.GetConstEnd());
 	ASSERT_EQ(res1_1.GetData(), s1.GetData() + 4);
 	auto res1_2 = s1.Find(p1, res1_1 + 1, s1.GetConstEnd());
@@ -2446,7 +2446,7 @@ TEST(StringCore, ConstFindTest)
 	auto res1_3 = s1.Find(p1, res1_1 + 1, s1.GetConstEnd() - 4);
 	ASSERT_EQ(res1_3, s1.GetConstEnd() - 4);
 
-	const StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_STR("一个测试"));
+	const StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_WSTR("一个测试"));
 	auto res1_4 = s1.Find(p1_2, s1.GetConstBegin(), s1.GetConstEnd());
 	ASSERT_EQ(res1_4.GetData(), s1.GetData() + 2);
 	auto res1_5 = s1.Find(p1_2, res1_4 + 1, s1.GetConstEnd());
@@ -2456,11 +2456,11 @@ TEST(StringCore, ConstFindTest)
 	auto res1_7 = s1.Find(p1_2, res1_6 + 1, s1.GetConstEnd());
 	ASSERT_EQ(res1_7, s1.GetConstEnd());
 
-	auto res1_8 = s1.Find(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), s1.GetConstEnd());
+	auto res1_8 = s1.Find(SGE_WSTR("一个测试是一个测试"), s1.GetConstBegin(), s1.GetConstEnd());
 	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 2);
-	auto res1_9 = s1.Find(SGE_STR("一个测试是一个测试"), res1_8 + 1, s1.GetConstEnd());
+	auto res1_9 = s1.Find(SGE_WSTR("一个测试是一个测试"), res1_8 + 1, s1.GetConstEnd());
 	ASSERT_EQ(res1_9.GetData(), s1.GetData() + 7);
-	auto res1_10 = s1.Find(SGE_STR("一个测试是一个测试"), res1_9 + 1, s1.GetConstEnd());
+	auto res1_10 = s1.Find(SGE_WSTR("一个测试是一个测试"), res1_9 + 1, s1.GetConstEnd());
 	ASSERT_EQ(res1_10, s1.GetConstEnd());
 
 	const UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试是一个"));
@@ -2492,8 +2492,8 @@ TEST(StringCore, ConstFindTest)
 
 TEST(StringCore, ReverseFindTest)
 {
-	UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试是一个"));
-	UCS2String p1(SGE_STR("测试是一个测试"));
+	UCS2String s1(SGE_WSTR("这是一个测试是一个测试是一个测试是一个"));
+	UCS2String p1(SGE_WSTR("测试是一个测试"));
 	auto res1_1 = s1.ReverseFind(p1, s1.GetBegin(), s1.GetEnd());
 	ASSERT_EQ(res1_1.GetData(), s1.GetData() + 9);
 	auto res1_2 = s1.ReverseFind(p1, s1.GetBegin(), res1_1 + 2);
@@ -2501,7 +2501,7 @@ TEST(StringCore, ReverseFindTest)
 	auto res1_3 = s1.ReverseFind(p1, s1.GetBegin(), res1_2 + 2);
 	ASSERT_EQ(res1_3, res1_2 + 2);
 
-	StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_STR("一个测试"));
+	StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_WSTR("一个测试"));
 	auto res1_4 = s1.ReverseFind(p1_2, s1.GetBegin(), s1.GetEnd());
 	ASSERT_EQ(res1_4.GetData(), s1.GetData() + 12);
 	auto res1_5 = s1.ReverseFind(p1_2, s1.GetBegin(), res1_4);
@@ -2511,11 +2511,11 @@ TEST(StringCore, ReverseFindTest)
 	auto res1_7 = s1.ReverseFind(p1_2, s1.GetBegin(), res1_6);
 	ASSERT_EQ(res1_7, res1_6);
 
-	auto res1_8 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetBegin(), s1.GetEnd());
+	auto res1_8 = s1.ReverseFind(SGE_WSTR("一个测试是一个测试"), s1.GetBegin(), s1.GetEnd());
 	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 7);
-	auto res1_9 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetBegin(), res1_8 + 4);
+	auto res1_9 = s1.ReverseFind(SGE_WSTR("一个测试是一个测试"), s1.GetBegin(), res1_8 + 4);
 	ASSERT_EQ(res1_9.GetData(), s1.GetData() + 2);
-	auto res1_10 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetBegin(), res1_9 + 4);
+	auto res1_10 = s1.ReverseFind(SGE_WSTR("一个测试是一个测试"), s1.GetBegin(), res1_9 + 4);
 	ASSERT_EQ(res1_10, res1_9 + 4);
 
 	UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试是一个"));
@@ -2547,8 +2547,8 @@ TEST(StringCore, ReverseFindTest)
 
 TEST(StringCore, ConstReverseFindTest)
 {
-	const UCS2String s1(SGE_STR("这是一个测试是一个测试是一个测试是一个"));
-	const UCS2String p1(SGE_STR("测试是一个测试"));
+	const UCS2String s1(SGE_WSTR("这是一个测试是一个测试是一个测试是一个"));
+	const UCS2String p1(SGE_WSTR("测试是一个测试"));
 	auto res1_1 = s1.ReverseFind(p1, s1.GetConstBegin(), s1.GetConstEnd());
 	ASSERT_EQ(res1_1.GetData(), s1.GetData() + 9);
 	auto res1_2 = s1.ReverseFind(p1, s1.GetConstBegin(), res1_1 + 2);
@@ -2556,7 +2556,7 @@ TEST(StringCore, ConstReverseFindTest)
 	auto res1_3 = s1.ReverseFind(p1, s1.GetConstBegin(), res1_2 + 2);
 	ASSERT_EQ(res1_3, res1_2 + 2);
 
-	const StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_STR("一个测试"));
+	const StringCore<Char16, UCS2Trait, StdAllocator> p1_2(SGE_WSTR("一个测试"));
 	auto res1_4 = s1.ReverseFind(p1_2, s1.GetConstBegin(), s1.GetConstEnd());
 	ASSERT_EQ(res1_4.GetData(), s1.GetData() + 12);
 	auto res1_5 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_4);
@@ -2566,11 +2566,11 @@ TEST(StringCore, ConstReverseFindTest)
 	auto res1_7 = s1.ReverseFind(p1_2, s1.GetConstBegin(), res1_6);
 	ASSERT_EQ(res1_7, res1_6);
 
-	auto res1_8 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), s1.GetConstEnd());
+	auto res1_8 = s1.ReverseFind(SGE_WSTR("一个测试是一个测试"), s1.GetConstBegin(), s1.GetConstEnd());
 	ASSERT_EQ(res1_8.GetData(), s1.GetData() + 7);
-	auto res1_9 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), res1_8 + 4);
+	auto res1_9 = s1.ReverseFind(SGE_WSTR("一个测试是一个测试"), s1.GetConstBegin(), res1_8 + 4);
 	ASSERT_EQ(res1_9.GetData(), s1.GetData() + 2);
-	auto res1_10 = s1.ReverseFind(SGE_STR("一个测试是一个测试"), s1.GetConstBegin(), res1_9 + 4);
+	auto res1_10 = s1.ReverseFind(SGE_WSTR("一个测试是一个测试"), s1.GetConstBegin(), res1_9 + 4);
 	ASSERT_EQ(res1_10, res1_9 + 4);
 
 	const UTF8String s2(SGE_U8STR("这是一个测试是一个测试是一个测试是一个"));
@@ -2602,9 +2602,9 @@ TEST(StringCore, ConstReverseFindTest)
 
 TEST(StringCoreIterator, GetBeginTest)
 {
-	UCS2String s1(SGE_STR("这是测试"));
+	UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetBegin();
-	ASSERT_EQ(*iter1, SGE_STR('这'));
+	ASSERT_EQ(*iter1, SGE_WSTR('这'));
 
 	UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetBegin();
@@ -2613,9 +2613,9 @@ TEST(StringCoreIterator, GetBeginTest)
 
 TEST(StringCoreIterator, GetEndTest)
 {
-	UCS2String s1(SGE_STR("这是测试"));
+	UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetEnd();
-	ASSERT_EQ(*iter1, SGE_STR('\0'));
+	ASSERT_EQ(*iter1, SGE_WSTR('\0'));
 
 	UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetEnd();
@@ -2624,9 +2624,9 @@ TEST(StringCoreIterator, GetEndTest)
 
 TEST(StringCoreIterator, GetConstBeginTest)
 {
-	const UCS2String s1(SGE_STR("这是测试"));
+	const UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetConstBegin();
-	ASSERT_EQ(*iter1, SGE_STR('这'));
+	ASSERT_EQ(*iter1, SGE_WSTR('这'));
 
 	const UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetConstBegin();
@@ -2635,9 +2635,9 @@ TEST(StringCoreIterator, GetConstBeginTest)
 
 TEST(StringCoreIterator, GetConstEndTest)
 {
-	const UCS2String s1(SGE_STR("这是测试"));
+	const UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetConstEnd();
-	ASSERT_EQ(*iter1, SGE_STR('\0'));
+	ASSERT_EQ(*iter1, SGE_WSTR('\0'));
 
 	const UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetConstEnd();
@@ -2646,9 +2646,9 @@ TEST(StringCoreIterator, GetConstEndTest)
 
 TEST(StringCoreIterator, GetReverseBeginTest)
 {
-	UCS2String s1(SGE_STR("这是测试"));
+	UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetReverseBegin();
-	ASSERT_EQ(*iter1, SGE_STR('试'));
+	ASSERT_EQ(*iter1, SGE_WSTR('试'));
 
 	UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetReverseBegin();
@@ -2657,9 +2657,9 @@ TEST(StringCoreIterator, GetReverseBeginTest)
 
 TEST(StringCoreIterator, GetReverseEndTest)
 {
-	UCS2String s1(SGE_STR("这是测试"));
+	UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetReverseEnd();
-	ASSERT_EQ(*(iter1 - 1), SGE_STR('这'));
+	ASSERT_EQ(*(iter1 - 1), SGE_WSTR('这'));
 
 	UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetReverseEnd();
@@ -2668,9 +2668,9 @@ TEST(StringCoreIterator, GetReverseEndTest)
 
 TEST(StringCoreIterator, GetConstReverseBeginTest)
 {
-	const UCS2String s1(SGE_STR("这是测试"));
+	const UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetConstReverseBegin();
-	ASSERT_EQ(*iter1, SGE_STR('试'));
+	ASSERT_EQ(*iter1, SGE_WSTR('试'));
 
 	const UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetConstReverseBegin();
@@ -2679,9 +2679,9 @@ TEST(StringCoreIterator, GetConstReverseBeginTest)
 
 TEST(StringCoreIterator, GetConstReverseEndTest)
 {
-	const UCS2String s1(SGE_STR("这是测试"));
+	const UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetConstReverseEnd();
-	ASSERT_EQ(*(iter1 - 1), SGE_STR('这'));
+	ASSERT_EQ(*(iter1 - 1), SGE_WSTR('这'));
 
 	const UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetConstReverseEnd();
@@ -2690,14 +2690,14 @@ TEST(StringCoreIterator, GetConstReverseEndTest)
 
 TEST(StringCoreIterator, CopyTest)
 {
-	UCS2String s1(SGE_STR("这是测试"));
+	UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetBegin();
-	ASSERT_EQ(*iter1, SGE_STR('这'));
+	ASSERT_EQ(*iter1, SGE_WSTR('这'));
 	auto iter2 = iter1;
-	ASSERT_EQ(*iter1, SGE_STR('这'));
-	ASSERT_EQ(*iter2, SGE_STR('这'));
+	ASSERT_EQ(*iter1, SGE_WSTR('这'));
+	ASSERT_EQ(*iter2, SGE_WSTR('这'));
 	iter2 = s1.GetEnd();
-	ASSERT_EQ(*iter2, SGE_STR('\0'));
+	ASSERT_EQ(*iter2, SGE_WSTR('\0'));
 
 	UTF8String s2(u8"这是测试");
 	auto iter3 = s2.GetBegin();
@@ -2708,14 +2708,14 @@ TEST(StringCoreIterator, CopyTest)
 	iter4 = s2.GetEnd();
 	ASSERT_TRUE(IsUTF8CharSame(*iter4, u8"\0"));
 
-	UCS2String s3(SGE_STR("这是测试"));
+	UCS2String s3(SGE_WSTR("这是测试"));
 	auto iter5 = s3.GetReverseBegin();
-	ASSERT_EQ(*iter5, SGE_STR('试'));
+	ASSERT_EQ(*iter5, SGE_WSTR('试'));
 	auto iter6 = iter5;
-	ASSERT_EQ(*iter5, SGE_STR('试'));
-	ASSERT_EQ(*iter6, SGE_STR('试'));
+	ASSERT_EQ(*iter5, SGE_WSTR('试'));
+	ASSERT_EQ(*iter6, SGE_WSTR('试'));
 	iter6 = s3.GetReverseEnd() - 1;
-	ASSERT_EQ(*iter6, SGE_STR('这'));
+	ASSERT_EQ(*iter6, SGE_WSTR('这'));
 
 	const UTF8String s4(u8"这是测试");
 	auto iter7 = s4.GetConstReverseBegin();
@@ -2729,25 +2729,25 @@ TEST(StringCoreIterator, CopyTest)
 
 TEST(StringCoreIterator, CalculationOperatorTest)
 {
-	UCS2String s1(SGE_STR("这是测试"));
+	UCS2String s1(SGE_WSTR("这是测试"));
 	auto iter1 = s1.GetBegin();
-	ASSERT_EQ(*iter1, SGE_STR('这'));
+	ASSERT_EQ(*iter1, SGE_WSTR('这'));
 	iter1++;
-	ASSERT_EQ(*iter1, SGE_STR('是'));
+	ASSERT_EQ(*iter1, SGE_WSTR('是'));
 	++iter1;
-	ASSERT_EQ(*iter1, SGE_STR('测'));
+	ASSERT_EQ(*iter1, SGE_WSTR('测'));
 	iter1 += 1;
-	ASSERT_EQ(*iter1, SGE_STR('试'));
+	ASSERT_EQ(*iter1, SGE_WSTR('试'));
 	iter1 = iter1 + 1;
-	ASSERT_EQ(*iter1, SGE_STR('\0'));
+	ASSERT_EQ(*iter1, SGE_WSTR('\0'));
 	iter1--;
-	ASSERT_EQ(*iter1, SGE_STR('试'));
+	ASSERT_EQ(*iter1, SGE_WSTR('试'));
 	--iter1;
-	ASSERT_EQ(*iter1, SGE_STR('测'));
+	ASSERT_EQ(*iter1, SGE_WSTR('测'));
 	iter1 -= 1;
-	ASSERT_EQ(*iter1, SGE_STR('是'));
+	ASSERT_EQ(*iter1, SGE_WSTR('是'));
 	iter1 = iter1 - 1;
-	ASSERT_EQ(*iter1, SGE_STR('这'));
+	ASSERT_EQ(*iter1, SGE_WSTR('这'));
 
 	UTF8String s2(u8"这是测试");
 	auto iter2 = s2.GetBegin();
@@ -2769,25 +2769,25 @@ TEST(StringCoreIterator, CalculationOperatorTest)
 	iter2 = iter2 - 1;
 	ASSERT_TRUE(IsUTF8CharSame(*iter2, u8"这"));
 
-	const UCS2String s3(SGE_STR("这是测试"));
+	const UCS2String s3(SGE_WSTR("这是测试"));
 	auto iter3 = s3.GetConstReverseBegin() - 1;
-	ASSERT_EQ(*iter3, SGE_STR('\0'));
+	ASSERT_EQ(*iter3, SGE_WSTR('\0'));
 	iter3++;
-	ASSERT_EQ(*iter3, SGE_STR('试'));
+	ASSERT_EQ(*iter3, SGE_WSTR('试'));
 	++iter3;
-	ASSERT_EQ(*iter3, SGE_STR('测'));
+	ASSERT_EQ(*iter3, SGE_WSTR('测'));
 	iter3 += 1;
-	ASSERT_EQ(*iter3, SGE_STR('是'));
+	ASSERT_EQ(*iter3, SGE_WSTR('是'));
 	iter3 = iter3 + 1;
-	ASSERT_EQ(*iter3, SGE_STR('这'));
+	ASSERT_EQ(*iter3, SGE_WSTR('这'));
 	iter3--;
-	ASSERT_EQ(*iter3, SGE_STR('是'));
+	ASSERT_EQ(*iter3, SGE_WSTR('是'));
 	--iter3;
-	ASSERT_EQ(*iter3, SGE_STR('测'));
+	ASSERT_EQ(*iter3, SGE_WSTR('测'));
 	iter3 -= 1;
-	ASSERT_EQ(*iter3, SGE_STR('试'));
+	ASSERT_EQ(*iter3, SGE_WSTR('试'));
 	iter3 = iter3 - 1;
-	ASSERT_EQ(*iter3, SGE_STR('\0'));
+	ASSERT_EQ(*iter3, SGE_WSTR('\0'));
 
 	UTF8String s4(u8"这是测试");
 	auto iter4 = s4.GetReverseBegin() - 1;
@@ -2812,7 +2812,7 @@ TEST(StringCoreIterator, CalculationOperatorTest)
 
 TEST(StringCoreIterator, DistanceTest)
 {
-	UCS2String s1(SGE_STR("这是测试"));
+	UCS2String s1(SGE_WSTR("这是测试"));
 	ASSERT_EQ(s1.GetEnd() - s1.GetBegin(), 4);
 	ASSERT_EQ(s1.GetReverseEnd() - s1.GetReverseBegin(), 4);
 
@@ -2823,7 +2823,7 @@ TEST(StringCoreIterator, DistanceTest)
 
 TEST(StringCoreIterator, OutOfRangeTest)
 {
-	UCS2String s1(SGE_STR("这是测试"));
+	UCS2String s1(SGE_WSTR("这是测试"));
 	ASSERT_FALSE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetBegin(), s1.GetData(), s1.GetData() + s1.GetNormalSize()));
 	ASSERT_FALSE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetEnd(), s1.GetData(), s1.GetData() + s1.GetNormalSize()));
 	ASSERT_TRUE(UCS2String::Iterator::OutOfRangeError::Judge(s1.GetEnd() + 1, s1.GetData(), s1.GetData() + s1.GetNormalSize()));
@@ -2867,27 +2867,27 @@ TEST(StringCoreIterator, IsStringCoreIteratorTest)
 
 TEST(StringCoreIterator, ConvertTest)
 {
-	UCS2String s1(SGE_STR("测试一下test"));
+	UCS2String s1(SGE_WSTR("测试一下test"));
 
 	UCS2String::Iterator i1_1(s1.GetReverseBegin());
-	ASSERT_EQ(*i1_1, SGE_STR('t'));
+	ASSERT_EQ(*i1_1, SGE_WSTR('t'));
 
 	UCS2String::ConstIterator i1_2(s1.GetBegin());
-	ASSERT_EQ(*i1_2, SGE_STR('测'));
+	ASSERT_EQ(*i1_2, SGE_WSTR('测'));
 	UCS2String::ConstIterator i1_3(s1.GetReverseBegin());
-	ASSERT_EQ(*i1_3, SGE_STR('t'));
+	ASSERT_EQ(*i1_3, SGE_WSTR('t'));
 	UCS2String::ConstIterator i1_4(s1.GetConstReverseBegin());
-	ASSERT_EQ(*i1_4, SGE_STR('t'));
+	ASSERT_EQ(*i1_4, SGE_WSTR('t'));
 
 	UCS2String::ReverseIterator i1_5(s1.GetBegin());
-	ASSERT_EQ(*i1_5, SGE_STR('测'));
+	ASSERT_EQ(*i1_5, SGE_WSTR('测'));
 
 	UCS2String::ConstReverseIterator i1_6(s1.GetReverseBegin());
-	ASSERT_EQ(*i1_6, SGE_STR('t'));
+	ASSERT_EQ(*i1_6, SGE_WSTR('t'));
 	UCS2String::ConstReverseIterator i1_7(s1.GetBegin());
-	ASSERT_EQ(*i1_7, SGE_STR('测'));
+	ASSERT_EQ(*i1_7, SGE_WSTR('测'));
 	UCS2String::ConstReverseIterator i1_8(s1.GetConstBegin());
-	ASSERT_EQ(*i1_8, SGE_STR('测'));
+	ASSERT_EQ(*i1_8, SGE_WSTR('测'));
 
 	UTF8String s2(SGE_U8STR("这是测试test!"));
 
@@ -2921,7 +2921,7 @@ TEST(StringConvert, UTF8StringToUCS2StringTest)
 	auto s1_1r = UTF8StringToUCS2String(s1_1);
 	ASSERT_TRUE((std::is_same_v<decltype(s1_1r), UCS2String>));
 	ASSERT_EQ(s1_1r.GetSize(), 12);
-	ASSERT_EQ(s1_1r, SGE_STR("这是个测试test123"));
+	ASSERT_EQ(s1_1r, SGE_WSTR("这是个测试test123"));
 
 	StringCore<char, UTF8Trait, StdAllocator> s1_2(SGE_U8STR("这是个测试test123"));
 	ASSERT_EQ(s1_2.GetSize(), 12);
@@ -2930,24 +2930,24 @@ TEST(StringConvert, UTF8StringToUCS2StringTest)
 	auto s1_2r = UTF8StringToUCS2String(s1_2);
 	ASSERT_TRUE((std::is_same_v<decltype(s1_2r), StringCore<Char16, UCS2Trait, StdAllocator>>));
 	ASSERT_EQ(s1_2r.GetSize(), 12);
-	ASSERT_EQ(s1_2r, SGE_STR("这是个测试test123"));
+	ASSERT_EQ(s1_2r, SGE_WSTR("这是个测试test123"));
 
 	auto s2_1r = UTF8StringToUCS2String(SGE_U8STR("test测试"));
 	ASSERT_TRUE((std::is_same_v<decltype(s2_1r), UCS2String>));
 	ASSERT_EQ(s2_1r.GetSize(), 6);
-	ASSERT_EQ(s2_1r, SGE_STR("test测试"));
+	ASSERT_EQ(s2_1r, SGE_WSTR("test测试"));
 
 	auto s2_2r = UTF8StringToUCS2String<StdAllocator>(SGE_U8STR("test测试"));
 	ASSERT_TRUE((std::is_same_v<decltype(s2_2r), StringCore<Char16, UCS2Trait, StdAllocator>>));
 	ASSERT_EQ(s2_2r.GetSize(), 6);
-	ASSERT_EQ(s2_2r, SGE_STR("test测试"));
+	ASSERT_EQ(s2_2r, SGE_WSTR("test测试"));
 }
 
 TEST(StringConvert, UCS2StringToUTF8StringTest)
 {
-	UCS2String s1_1(SGE_STR("这是个测试test123"));
+	UCS2String s1_1(SGE_WSTR("这是个测试test123"));
 	ASSERT_EQ(s1_1.GetSize(), 12);
-	ASSERT_EQ(s1_1, SGE_STR("这是个测试test123"));
+	ASSERT_EQ(s1_1, SGE_WSTR("这是个测试test123"));
 
 	auto s1_1r = UCS2StringToUTF8String(s1_1);
 	ASSERT_TRUE((std::is_same_v<decltype(s1_1r), UTF8String>));
@@ -2955,9 +2955,9 @@ TEST(StringConvert, UCS2StringToUTF8StringTest)
 	ASSERT_EQ(s1_1r, SGE_U8STR("这是个测试test123"));
 	ASSERT_EQ(s1_1r.GetNormalSize(), 22);
 
-	StringCore<Char16, UCS2Trait, StdAllocator> s1_2(SGE_STR("这是个测试test123"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s1_2(SGE_WSTR("这是个测试test123"));
 	ASSERT_EQ(s1_2.GetSize(), 12);
-	ASSERT_EQ(s1_2, SGE_STR("这是个测试test123"));
+	ASSERT_EQ(s1_2, SGE_WSTR("这是个测试test123"));
 
 	auto s1_2r = UCS2StringToUTF8String(s1_2);
 	ASSERT_TRUE((std::is_same_v<decltype(s1_2r), StringCore<char, UTF8Trait, StdAllocator>>));
@@ -2965,13 +2965,13 @@ TEST(StringConvert, UCS2StringToUTF8StringTest)
 	ASSERT_EQ(s1_2r, SGE_U8STR("这是个测试test123"));
 	ASSERT_EQ(s1_2r.GetNormalSize(), 22);
 
-	auto s2_1r = UCS2StringToUTF8String(SGE_STR("test测试"));
+	auto s2_1r = UCS2StringToUTF8String(SGE_WSTR("test测试"));
 	ASSERT_TRUE((std::is_same_v<decltype(s2_1r), UTF8String>));
 	ASSERT_EQ(s2_1r.GetSize(), 6);
 	ASSERT_EQ(s2_1r, SGE_U8STR("test测试"));
 	ASSERT_EQ(s2_1r.GetNormalSize(), 10);
 
-	auto s2_2r = UCS2StringToUTF8String<StdAllocator>(SGE_STR("test测试"));
+	auto s2_2r = UCS2StringToUTF8String<StdAllocator>(SGE_WSTR("test测试"));
 	ASSERT_TRUE((std::is_same_v<decltype(s2_2r), StringCore<char, UTF8Trait, StdAllocator>>));
 	ASSERT_EQ(s2_2r.GetSize(), 6);
 	ASSERT_EQ(s2_2r, SGE_U8STR("test测试"));
@@ -3013,7 +3013,7 @@ TEST(TString, ConvertTest)
 	auto s1_2 = SGE_TSTR_TO_UCS2(s1_1);
 	ASSERT_TRUE((std::is_same_v<decltype(s1_2), UCS2String>));
 	ASSERT_EQ(s1_2.GetSize(), 8);
-	ASSERT_EQ(s1_2, SGE_STR("这是一个test"));
+	ASSERT_EQ(s1_2, SGE_WSTR("这是一个test"));
 
 	auto s1_3 = SGE_TSTR_TO_UTF8(s1_1);
 	ASSERT_TRUE((std::is_same_v<decltype(s1_3), UTF8String>));
@@ -3043,7 +3043,7 @@ TEST(TString, ConvertTest)
 	auto s2_2 = SGE_TSTR_TO_UCS2(s2_1);
 	ASSERT_TRUE((std::is_same_v<decltype(s2_2), StringCore<Char16, UCS2Trait, StdAllocator>>));
 	ASSERT_EQ(s2_2.GetSize(), 8);
-	ASSERT_EQ(s2_2, SGE_STR("这是一个test"));
+	ASSERT_EQ(s2_2, SGE_WSTR("这是一个test"));
 
 	auto s2_3 = SGE_TSTR_TO_UTF8(s2_1);
 	ASSERT_TRUE((std::is_same_v<decltype(s2_3), StringCore<char, UTF8Trait, StdAllocator>>));
@@ -3064,27 +3064,27 @@ TEST(TString, ConvertTest)
 
 TEST(ToString, IntTest)
 {
-	ASSERT_EQ(ToString<UCS2String>(1u), SGE_STR("1"));
-	ASSERT_EQ(ToString<UCS2String>(12u), SGE_STR("12"));
-	ASSERT_EQ(ToString<UCS2String>(123u), SGE_STR("123"));
-	ASSERT_EQ(ToString<UCS2String>(1234u), SGE_STR("1234"));
-	ASSERT_EQ(ToString<UCS2String>(12345u), SGE_STR("12345"));
-	ASSERT_EQ(ToString<UCS2String>(123456u), SGE_STR("123456"));
-	ASSERT_EQ(ToString<UCS2String>(1234567u), SGE_STR("1234567"));
-	ASSERT_EQ(ToString<UCS2String>(12345678u), SGE_STR("12345678"));
-	ASSERT_EQ(ToString<UCS2String>(123456789u), SGE_STR("123456789"));
-	ASSERT_EQ(ToString<UCS2String>(1234567890u), SGE_STR("1234567890"));
-	ASSERT_EQ(ToString<UCS2String>(0), SGE_STR("0"));
-	ASSERT_EQ(ToString<UCS2String>(-1), SGE_STR("-1"));
-	ASSERT_EQ(ToString<UCS2String>(-12), SGE_STR("-12"));
-	ASSERT_EQ(ToString<UCS2String>(-123), SGE_STR("-123"));
-	ASSERT_EQ(ToString<UCS2String>(-1234), SGE_STR("-1234"));
-	ASSERT_EQ(ToString<UCS2String>(-12345), SGE_STR("-12345"));
-	ASSERT_EQ(ToString<UCS2String>(-123456), SGE_STR("-123456"));
-	ASSERT_EQ(ToString<UCS2String>(-1234567), SGE_STR("-1234567"));
-	ASSERT_EQ(ToString<UCS2String>(-12345678), SGE_STR("-12345678"));
-	ASSERT_EQ(ToString<UCS2String>(-123456789), SGE_STR("-123456789"));
-	ASSERT_EQ(ToString<UCS2String>(-1234567890), SGE_STR("-1234567890"));
+	ASSERT_EQ(ToString<UCS2String>(1u), SGE_WSTR("1"));
+	ASSERT_EQ(ToString<UCS2String>(12u), SGE_WSTR("12"));
+	ASSERT_EQ(ToString<UCS2String>(123u), SGE_WSTR("123"));
+	ASSERT_EQ(ToString<UCS2String>(1234u), SGE_WSTR("1234"));
+	ASSERT_EQ(ToString<UCS2String>(12345u), SGE_WSTR("12345"));
+	ASSERT_EQ(ToString<UCS2String>(123456u), SGE_WSTR("123456"));
+	ASSERT_EQ(ToString<UCS2String>(1234567u), SGE_WSTR("1234567"));
+	ASSERT_EQ(ToString<UCS2String>(12345678u), SGE_WSTR("12345678"));
+	ASSERT_EQ(ToString<UCS2String>(123456789u), SGE_WSTR("123456789"));
+	ASSERT_EQ(ToString<UCS2String>(1234567890u), SGE_WSTR("1234567890"));
+	ASSERT_EQ(ToString<UCS2String>(0), SGE_WSTR("0"));
+	ASSERT_EQ(ToString<UCS2String>(-1), SGE_WSTR("-1"));
+	ASSERT_EQ(ToString<UCS2String>(-12), SGE_WSTR("-12"));
+	ASSERT_EQ(ToString<UCS2String>(-123), SGE_WSTR("-123"));
+	ASSERT_EQ(ToString<UCS2String>(-1234), SGE_WSTR("-1234"));
+	ASSERT_EQ(ToString<UCS2String>(-12345), SGE_WSTR("-12345"));
+	ASSERT_EQ(ToString<UCS2String>(-123456), SGE_WSTR("-123456"));
+	ASSERT_EQ(ToString<UCS2String>(-1234567), SGE_WSTR("-1234567"));
+	ASSERT_EQ(ToString<UCS2String>(-12345678), SGE_WSTR("-12345678"));
+	ASSERT_EQ(ToString<UCS2String>(-123456789), SGE_WSTR("-123456789"));
+	ASSERT_EQ(ToString<UCS2String>(-1234567890), SGE_WSTR("-1234567890"));
 
 	ASSERT_EQ(ToString<UTF8String>(1u), SGE_U8STR("1"));
 	ASSERT_EQ(ToString<UTF8String>(12u), SGE_U8STR("12"));
@@ -3111,16 +3111,16 @@ TEST(ToString, IntTest)
 
 TEST(ToString, FloatTest)
 {
-	ASSERT_EQ(ToString<UCS2String>(0.0f), SGE_STR("0.0000"));
-	ASSERT_EQ(ToString<UCS2String>(0.0001f), SGE_STR("0.0001"));
-	ASSERT_EQ(ToString<UCS2String>(0.00015f), SGE_STR("0.0002"));
-	ASSERT_EQ(ToString<UCS2String>(0.00014f), SGE_STR("0.0001"));
-	ASSERT_EQ(ToString<UCS2String>(123.0045678f), SGE_STR("123.0046"));
-	ASSERT_EQ(ToString<UCS2String>(-123.0045678f), SGE_STR("-123.0046"));
-	ASSERT_EQ(ToString<UCS2String>(-123.0045678f, 2), SGE_STR("-123.00"));
-	ASSERT_EQ(ToString<UCS2String>(-123.0055678f, 2), SGE_STR("-123.01"));
-	ASSERT_EQ(ToString<UCS2String>(-123.0045678f, 0), SGE_STR("-123"));
-	ASSERT_EQ(ToString<UCS2String>(-123.5045678f, 0), SGE_STR("-124"));
+	ASSERT_EQ(ToString<UCS2String>(0.0f), SGE_WSTR("0.0000"));
+	ASSERT_EQ(ToString<UCS2String>(0.0001f), SGE_WSTR("0.0001"));
+	ASSERT_EQ(ToString<UCS2String>(0.00015f), SGE_WSTR("0.0002"));
+	ASSERT_EQ(ToString<UCS2String>(0.00014f), SGE_WSTR("0.0001"));
+	ASSERT_EQ(ToString<UCS2String>(123.0045678f), SGE_WSTR("123.0046"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678f), SGE_WSTR("-123.0046"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678f, 2), SGE_WSTR("-123.00"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0055678f, 2), SGE_WSTR("-123.01"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678f, 0), SGE_WSTR("-123"));
+	ASSERT_EQ(ToString<UCS2String>(-123.5045678f, 0), SGE_WSTR("-124"));
 
 	ASSERT_EQ(ToString<UTF8String>(0.0f), SGE_U8STR("0.0000"));
 	ASSERT_EQ(ToString<UTF8String>(0.0001f), SGE_U8STR("0.0001"));
@@ -3136,16 +3136,16 @@ TEST(ToString, FloatTest)
 
 TEST(ToString, DoubleTest)
 {
-	ASSERT_EQ(ToString<UCS2String>(0.0), SGE_STR("0.000000"));
-	ASSERT_EQ(ToString<UCS2String>(0.000001), SGE_STR("0.000001"));
-	ASSERT_EQ(ToString<UCS2String>(0.0000015), SGE_STR("0.000002"));
-	ASSERT_EQ(ToString<UCS2String>(0.0000014), SGE_STR("0.000001"));
-	ASSERT_EQ(ToString<UCS2String>(123.0045678), SGE_STR("123.004568"));
-	ASSERT_EQ(ToString<UCS2String>(-123.0045678), SGE_STR("-123.004568"));
-	ASSERT_EQ(ToString<UCS2String>(-123.0045678, 2), SGE_STR("-123.00"));
-	ASSERT_EQ(ToString<UCS2String>(-123.0055678, 2), SGE_STR("-123.01"));
-	ASSERT_EQ(ToString<UCS2String>(-123.0045678, 0), SGE_STR("-123"));
-	ASSERT_EQ(ToString<UCS2String>(-123.5045678, 0), SGE_STR("-124"));
+	ASSERT_EQ(ToString<UCS2String>(0.0), SGE_WSTR("0.000000"));
+	ASSERT_EQ(ToString<UCS2String>(0.000001), SGE_WSTR("0.000001"));
+	ASSERT_EQ(ToString<UCS2String>(0.0000015), SGE_WSTR("0.000002"));
+	ASSERT_EQ(ToString<UCS2String>(0.0000014), SGE_WSTR("0.000001"));
+	ASSERT_EQ(ToString<UCS2String>(123.0045678), SGE_WSTR("123.004568"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678), SGE_WSTR("-123.004568"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678, 2), SGE_WSTR("-123.00"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0055678, 2), SGE_WSTR("-123.01"));
+	ASSERT_EQ(ToString<UCS2String>(-123.0045678, 0), SGE_WSTR("-123"));
+	ASSERT_EQ(ToString<UCS2String>(-123.5045678, 0), SGE_WSTR("-124"));
 
 	ASSERT_EQ(ToString<UTF8String>(0.0), SGE_U8STR("0.000000"));
 	ASSERT_EQ(ToString<UTF8String>(0.000001), SGE_U8STR("0.000001"));
@@ -3161,38 +3161,38 @@ TEST(ToString, DoubleTest)
 
 TEST(StringTo, IntTest)
 {
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("0"))), 0);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("1"))), 1);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("12"))), 12);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("123"))), 123);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("1234"))), 1234);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("12345"))), 12345);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("123456"))), 123456);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("1234567"))), 1234567);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("12345678"))), 12345678);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("123456789"))), 123456789);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("1234567890"))), 1234567890);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-1"))), -1);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-12"))), -12);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-123"))), -123);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-1234"))), -1234);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-12345"))), -12345);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-123456"))), -123456);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-1234567"))), -1234567);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-12345678"))), -12345678);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-123456789"))), -123456789);
-	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_STR("-1234567890"))), -1234567890);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("0"))), 0);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("1"))), 1);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("12"))), 12);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("123"))), 123);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("1234"))), 1234);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("12345"))), 12345);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("123456"))), 123456);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("1234567"))), 1234567);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("12345678"))), 12345678);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("123456789"))), 123456789);
-	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_STR("1234567890"))), 1234567890);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("0"))), 0);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("1"))), 1);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("12"))), 12);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("123"))), 123);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("1234"))), 1234);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("12345"))), 12345);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("123456"))), 123456);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("1234567"))), 1234567);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("12345678"))), 12345678);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("123456789"))), 123456789);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("1234567890"))), 1234567890);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-1"))), -1);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-12"))), -12);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-123"))), -123);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-1234"))), -1234);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-12345"))), -12345);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-123456"))), -123456);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-1234567"))), -1234567);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-12345678"))), -12345678);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-123456789"))), -123456789);
+	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("-1234567890"))), -1234567890);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("0"))), 0);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("1"))), 1);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("12"))), 12);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("123"))), 123);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("1234"))), 1234);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("12345"))), 12345);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("123456"))), 123456);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("1234567"))), 1234567);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("12345678"))), 12345678);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("123456789"))), 123456789);
+	ASSERT_EQ((StringTo<UCS2String, UInt64>(SGE_WSTR("1234567890"))), 1234567890);
 
 	ASSERT_EQ((StringTo<UTF8String, Int64>(SGE_U8STR("0"))), 0);
 	ASSERT_EQ((StringTo<UTF8String, Int64>(SGE_U8STR("1"))), 1);
@@ -3230,13 +3230,13 @@ TEST(StringTo, IntTest)
 
 TEST(StringTo, FloatTest)
 {
-	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("0"))), 0.0f);
-	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("0.0"))), 0.0f);
-	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("0.1"))), 0.1f);
-	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("1.1"))), 1.1f);
-	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("123.456"))), 123.456f);
-	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("123456"))), 123456.0f);
-	ASSERT_EQ((StringTo<UCS2String, float>(SGE_STR("-123.456"))), -123.456f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_WSTR("0"))), 0.0f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_WSTR("0.0"))), 0.0f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_WSTR("0.1"))), 0.1f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_WSTR("1.1"))), 1.1f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_WSTR("123.456"))), 123.456f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_WSTR("123456"))), 123456.0f);
+	ASSERT_EQ((StringTo<UCS2String, float>(SGE_WSTR("-123.456"))), -123.456f);
 
 	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("0"))), 0.0f);
 	ASSERT_EQ((StringTo<UTF8String, float>(SGE_U8STR("0.0"))), 0.0f);
@@ -3249,13 +3249,13 @@ TEST(StringTo, FloatTest)
 
 TEST(StringTo, DoubleTest)
 {
-	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("0"))), 0.0);
-	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("0.0"))), 0.0);
-	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("0.1"))), 0.1);
-	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("1.1"))), 1.1);
-	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("123.456"))), 123.456);
-	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("123456"))), 123456.0);
-	ASSERT_EQ((StringTo<UCS2String, double>(SGE_STR("-123.456"))), -123.456);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_WSTR("0"))), 0.0);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_WSTR("0.0"))), 0.0);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_WSTR("0.1"))), 0.1);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_WSTR("1.1"))), 1.1);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_WSTR("123.456"))), 123.456);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_WSTR("123456"))), 123456.0);
+	ASSERT_EQ((StringTo<UCS2String, double>(SGE_WSTR("-123.456"))), -123.456);
 
 	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("0"))), 0.0);
 	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("0.0"))), 0.0);

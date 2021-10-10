@@ -3524,19 +3524,19 @@ namespace SpaceGameEngine
 		inline static StringType Get(UInt64 value)
 		{
 			static const Char16 digits[201] =
-				SGE_STR("00010203040506070809")
-					SGE_STR("10111213141516171819")
-						SGE_STR("20212223242526272829")
-							SGE_STR("30313233343536373839")
-								SGE_STR("40414243444546474849")
-									SGE_STR("50515253545556575859")
-										SGE_STR("60616263646566676869")
-											SGE_STR("70717273747576777879")
-												SGE_STR("80818283848586878889")
-													SGE_STR("90919293949596979899");
+				SGE_WSTR("00010203040506070809")
+					SGE_WSTR("10111213141516171819")
+						SGE_WSTR("20212223242526272829")
+							SGE_WSTR("30313233343536373839")
+								SGE_WSTR("40414243444546474849")
+									SGE_WSTR("50515253545556575859")
+										SGE_WSTR("60616263646566676869")
+											SGE_WSTR("70717273747576777879")
+												SGE_WSTR("80818283848586878889")
+													SGE_WSTR("90919293949596979899");
 			const UInt64 length = Digits10(value);
 			UInt64 next = length - 1;
-			StringType re(length, SGE_STR(' '));
+			StringType re(length, SGE_WSTR(' '));
 			Char16* dst = re.GetData();
 			while (value >= 100)
 			{
@@ -3548,7 +3548,7 @@ namespace SpaceGameEngine
 			}
 			if (value < 10)
 			{
-				dst[next] = SGE_STR('0') + UInt64(value);
+				dst[next] = SGE_WSTR('0') + UInt64(value);
 			}
 			else
 			{
@@ -3569,24 +3569,24 @@ namespace SpaceGameEngine
 		inline static StringType Get(Int64 value)
 		{
 			static const Char16 digits[201] =
-				SGE_STR("00010203040506070809")
-					SGE_STR("10111213141516171819")
-						SGE_STR("20212223242526272829")
-							SGE_STR("30313233343536373839")
-								SGE_STR("40414243444546474849")
-									SGE_STR("50515253545556575859")
-										SGE_STR("60616263646566676869")
-											SGE_STR("70717273747576777879")
-												SGE_STR("80818283848586878889")
-													SGE_STR("90919293949596979899");
+				SGE_WSTR("00010203040506070809")
+					SGE_WSTR("10111213141516171819")
+						SGE_WSTR("20212223242526272829")
+							SGE_WSTR("30313233343536373839")
+								SGE_WSTR("40414243444546474849")
+									SGE_WSTR("50515253545556575859")
+										SGE_WSTR("60616263646566676869")
+											SGE_WSTR("70717273747576777879")
+												SGE_WSTR("80818283848586878889")
+													SGE_WSTR("90919293949596979899");
 			if (value < 0)
 			{
 				value *= -1;
 				const UInt64 length = Digits10(value) + 1;
 				UInt64 next = length - 1;
-				StringType re(length, SGE_STR(' '));
+				StringType re(length, SGE_WSTR(' '));
 				Char16* dst = re.GetData();
-				dst[0] = SGE_STR('-');
+				dst[0] = SGE_WSTR('-');
 				while (value >= 100)
 				{
 					UInt64 i = (value % 100) * 2;
@@ -3597,7 +3597,7 @@ namespace SpaceGameEngine
 				}
 				if (value < 10)
 				{
-					dst[next] = SGE_STR('0') + UInt64(value);
+					dst[next] = SGE_WSTR('0') + UInt64(value);
 				}
 				else
 				{
@@ -3612,7 +3612,7 @@ namespace SpaceGameEngine
 			{
 				const UInt64 length = Digits10(value);
 				UInt64 next = length - 1;
-				StringType re(length, SGE_STR(' '));
+				StringType re(length, SGE_WSTR(' '));
 				Char16* dst = re.GetData();
 				while (value >= 100)
 				{
@@ -3624,7 +3624,7 @@ namespace SpaceGameEngine
 				}
 				if (value < 10)
 				{
-					dst[next] = SGE_STR('0') + UInt64(value);
+					dst[next] = SGE_WSTR('0') + UInt64(value);
 				}
 				else
 				{
@@ -3649,7 +3649,7 @@ namespace SpaceGameEngine
 			StringType re = ToString<StringType, Int64>(integer);
 			if (precision != 0)
 			{
-				re += SGE_STR('.');
+				re += SGE_WSTR('.');
 				value -= (float)integer;
 				if (value < 0.0f)
 					value *= -1.0f;
@@ -3660,7 +3660,7 @@ namespace SpaceGameEngine
 				UInt64 decimal = round(value);
 				StringType decimal_str = ToString<StringType, UInt64>(decimal);
 				if (decimal_str.GetSize() < precision)
-					re += StringType(precision - decimal_str.GetSize(), SGE_STR('0'));
+					re += StringType(precision - decimal_str.GetSize(), SGE_WSTR('0'));
 				re += decimal_str;
 			}
 			return re;
@@ -3678,7 +3678,7 @@ namespace SpaceGameEngine
 			StringType re = ToString<StringType, Int64>(integer);
 			if (precision != 0)
 			{
-				re += SGE_STR('.');
+				re += SGE_WSTR('.');
 				value -= (double)integer;
 				if (value < 0.0)
 					value *= -1.0;
@@ -3689,7 +3689,7 @@ namespace SpaceGameEngine
 				UInt64 decimal = round(value);
 				StringType decimal_str = ToString<StringType, UInt64>(decimal);
 				if (decimal_str.GetSize() < precision)
-					re += StringType(precision - decimal_str.GetSize(), SGE_STR('0'));
+					re += StringType(precision - decimal_str.GetSize(), SGE_WSTR('0'));
 				re += decimal_str;
 			}
 			return re;
@@ -3935,7 +3935,7 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("The character is not numerical character.");
 		inline static bool Judge(Char16 c)
 		{
-			return !(c >= SGE_STR('0') && c <= SGE_STR('9'));
+			return !(c >= SGE_WSTR('0') && c <= SGE_WSTR('9'));
 		}
 	};
 
@@ -3964,7 +3964,7 @@ namespace SpaceGameEngine
 			if (str.GetSize() == 0)
 				return true;
 			else
-				return str[0] == SGE_STR('-') && str.GetSize() == 1;
+				return str[0] == SGE_WSTR('-') && str.GetSize() == 1;
 		}
 	};
 
@@ -4027,7 +4027,7 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NonNumericalStringError<StringType>, str);
 			bool is_negative = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (*next == SGE_STR('-'))
+			if (*next == SGE_WSTR('-'))
 			{
 				is_negative = true;
 				++next;
@@ -4037,7 +4037,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 				re *= 10;
-				re += (*next) - SGE_STR('0');
+				re += (*next) - SGE_WSTR('0');
 			}
 			return (is_negative ? -1 * re : re);
 		}
@@ -4058,7 +4058,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 				re *= 10;
-				re += (*next) - SGE_STR('0');
+				re += (*next) - SGE_WSTR('0');
 			}
 			return re;
 		}
@@ -4076,7 +4076,7 @@ namespace SpaceGameEngine
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (*next == SGE_STR('-'))
+			if (*next == SGE_WSTR('-'))
 			{
 				is_negative = true;
 				++next;
@@ -4085,7 +4085,7 @@ namespace SpaceGameEngine
 			float decimal = 1.0f;
 			for (; next != str.GetConstEnd(); ++next)
 			{
-				if ((!is_after_point) && (*next) == SGE_STR('.'))
+				if ((!is_after_point) && (*next) == SGE_WSTR('.'))
 				{
 					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
 					is_after_point = true;
@@ -4095,12 +4095,12 @@ namespace SpaceGameEngine
 				if (is_after_point)
 				{
 					decimal *= 0.1f;
-					re += decimal * ((float)((*next) - SGE_STR('0')));
+					re += decimal * ((float)((*next) - SGE_WSTR('0')));
 				}
 				else
 				{
 					re *= 10.0f;
-					re += (float)((*next) - SGE_STR('0'));
+					re += (float)((*next) - SGE_WSTR('0'));
 				}
 			}
 			return (is_negative ? -1.0f * re : re);
@@ -4119,7 +4119,7 @@ namespace SpaceGameEngine
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (*next == SGE_STR('-'))
+			if (*next == SGE_WSTR('-'))
 			{
 				is_negative = true;
 				++next;
@@ -4128,7 +4128,7 @@ namespace SpaceGameEngine
 			double decimal = 1.0;
 			for (; next != str.GetConstEnd(); ++next)
 			{
-				if ((!is_after_point) && (*next) == SGE_STR('.'))
+				if ((!is_after_point) && (*next) == SGE_WSTR('.'))
 				{
 					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
 					is_after_point = true;
@@ -4138,12 +4138,12 @@ namespace SpaceGameEngine
 				if (is_after_point)
 				{
 					decimal *= 0.1;
-					re += decimal * ((double)((*next) - SGE_STR('0')));
+					re += decimal * ((double)((*next) - SGE_WSTR('0')));
 				}
 				else
 				{
 					re *= 10.0;
-					re += (double)((*next) - SGE_STR('0'));
+					re += (double)((*next) - SGE_WSTR('0'));
 				}
 			}
 			return (is_negative ? -1.0 * re : re);
