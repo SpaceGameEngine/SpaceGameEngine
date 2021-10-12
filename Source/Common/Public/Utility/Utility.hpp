@@ -98,32 +98,36 @@ namespace SpaceGameEngine
 		}
 	};
 
-
-	inline UInt64 Digits10(UInt64 v)
+	template<UInt64 Base>
+	inline UInt64 Digits(UInt64 v)
 	{
+		static constexpr const UInt64 Base2 = Base * Base;
+		static constexpr const UInt64 Base3 = Base * Base * Base;
+		static constexpr const UInt64 Base4 = Base * Base * Base * Base;
 		UInt64 re = 1;
 		while (true)
 		{
-			if (v < 10)
+			if (v < Base)
 			{
 				return re;
 			}
-			if (v < 100)
+			if (v < Base2)
 			{
 				return re + 1;
 			}
-			if (v < 1000)
+			if (v < Base3)
 			{
 				return re + 2;
 			}
-			if (v < 10000)
+			if (v < Base4)
 			{
 				return re + 3;
 			}
-			v /= 10000U;
+			v /= Base4;
 			re += 4;
 		}
 	}
+
 	/*!
 	@}
 	*/

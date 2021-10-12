@@ -173,12 +173,32 @@ TEST(Greater, GreaterTest)
 	ASSERT_FALSE(Greater<int>::Compare(1, 2));
 }
 
-TEST(Digits10,CorrectnessTest)
+TEST(Digits10, CorrectnessTest)
 {
 	std::random_device rd;
-	for (int i=0;i<=10000;++i)
+	for (int i = 0; i <= 10000; ++i)
 	{
-		UInt64 num = rd() % UINT64_MAX;
-		ASSERT_EQ(Digits10(num), (UInt64)(std::log10(num)) + 1);
+		UInt64 num = (rd() % UINT64_MAX) + 1;
+		ASSERT_EQ(Digits<10>(num), (UInt64)(std::log10(num)) + 1);
+	}
+}
+
+TEST(Digits2, CorrectnessTest)
+{
+	std::random_device rd;
+	for (int i = 0; i <= 10000; ++i)
+	{
+		UInt64 num = (rd() % UINT64_MAX) + 1;
+		ASSERT_EQ(Digits<2>(num), (UInt64)(std::log2(num)) + 1);
+	}
+}
+
+TEST(Digits16, CorrectnessTest)
+{
+	std::random_device rd;
+	for (int i = 0; i <= 10000; ++i)
+	{
+		UInt64 num = (rd() % UINT64_MAX) + 1;
+		ASSERT_EQ(Digits<16>(num), (UInt64)(std::log2(num) / 4.0) + 1);
 	}
 }
