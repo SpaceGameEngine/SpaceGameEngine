@@ -3845,6 +3845,50 @@ namespace SpaceGameEngine
 		}
 	};
 
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, long>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(long value, NumberBase base = NumberBase::Decimal)
+		{
+			return ToStringCore<StringType, Int64>::Get(value, base);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, unsigned long>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(unsigned long value, NumberBase base = NumberBase::Decimal)
+		{
+			return ToStringCore<StringType, UInt64>::Get(value, base);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, short>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(short value, NumberBase base = NumberBase::Decimal)
+		{
+			return ToStringCore<StringType, Int64>::Get(value, base);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, unsigned short>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(unsigned short value, NumberBase base = NumberBase::Decimal)
+		{
+			return ToStringCore<StringType, UInt64>::Get(value, base);
+		}
+	};
+
 	//------------------------------------------------------------------
 
 	template<typename Allocator>
@@ -4155,6 +4199,50 @@ namespace SpaceGameEngine
 		using StringType = StringCore<char, UTF8Trait, Allocator>;
 
 		inline static StringType Get(unsigned int value, NumberBase base = NumberBase::Decimal)
+		{
+			return ToStringCore<StringType, UInt64>::Get(value, base);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, long>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(long value, NumberBase base = NumberBase::Decimal)
+		{
+			return ToStringCore<StringType, Int64>::Get(value, base);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, unsigned long>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(unsigned long value, NumberBase base = NumberBase::Decimal)
+		{
+			return ToStringCore<StringType, UInt64>::Get(value, base);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, short>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(short value, NumberBase base = NumberBase::Decimal)
+		{
+			return ToStringCore<StringType, Int64>::Get(value, base);
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, unsigned short>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(unsigned short value, NumberBase base = NumberBase::Decimal)
 		{
 			return ToStringCore<StringType, UInt64>::Get(value, base);
 		}
