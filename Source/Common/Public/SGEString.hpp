@@ -3551,140 +3551,10 @@ namespace SpaceGameEngine
 
 		inline static constexpr const Char16 digits16[17] = SGE_WSTR("0123456789abcdef");
 
-		inline static StringType Get(std::make_unsigned_t<IntegerType> value, NumberBase base = NumberBase::Decimal)
+		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
 		{
 			SGE_ASSERT(InvalidNumberBaseError, base);
-			if (base == NumberBase::Decimal)
-			{
-				const SizeType length = Digits<10>(value);
-				SizeType next = length - 1;
-				StringType re(length, SGE_WSTR(' '));
-				Char16* dst = re.GetData();
-				while (value >= 100)
-				{
-					UInt64 i = (value % 100) * 2;
-					value /= 100;
-					dst[next] = digits[i + 1];
-					dst[next - 1] = digits[i];
-					next -= 2;
-				}
-				if (value < 10)
-				{
-					dst[next] = SGE_WSTR('0') + value;
-				}
-				else
-				{
-					auto i = SizeType(value) * 2;
-					dst[next] = digits[i + 1];
-					dst[next - 1] = digits[i];
-				}
-
-				return re;
-			}
-			else if (base == NumberBase::Binary)
-			{
-				const SizeType length = Digits<2>(value);
-				SizeType next = length - 1;
-				StringType re(length, SGE_WSTR(' '));
-				Char16* dst = re.GetData();
-				while (value >= 2)
-				{
-					dst[next] = digits16[value % 2];
-					value /= 2;
-					next -= 1;
-				}
-				dst[next] = digits16[value];
-
-				return re;
-			}
-			else if (base == NumberBase::Hex)
-			{
-				const SizeType length = Digits<16>(value);
-				SizeType next = length - 1;
-				StringType re(length, SGE_WSTR(' '));
-				Char16* dst = re.GetData();
-				while (value >= 16)
-				{
-					dst[next] = digits16[value % 16];
-					value /= 16;
-					next -= 1;
-				}
-				dst[next] = digits16[value];
-
-				return re;
-			}
-		}
-
-		inline static StringType Get(std::make_signed_t<IntegerType> value, NumberBase base = NumberBase::Decimal)
-		{
-			SGE_ASSERT(InvalidNumberBaseError, base);
-			if (value < 0)
-			{
-				value *= -1;
-				if (base == NumberBase::Decimal)
-				{
-					const SizeType length = Digits<10>(value) + 1;
-					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
-					Char16* dst = re.GetData();
-					dst[0] = SGE_WSTR('-');
-					while (value >= 100)
-					{
-						UInt64 i = (value % 100) * 2;
-						value /= 100;
-						dst[next] = digits[i + 1];
-						dst[next - 1] = digits[i];
-						next -= 2;
-					}
-					if (value < 10)
-					{
-						dst[next] = SGE_WSTR('0') + value;
-					}
-					else
-					{
-						auto i = SizeType(value) * 2;
-						dst[next] = digits[i + 1];
-						dst[next - 1] = digits[i];
-					}
-
-					return re;
-				}
-				else if (base == NumberBase::Binary)
-				{
-					const SizeType length = Digits<2>(value) + 1;
-					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
-					Char16* dst = re.GetData();
-					dst[0] = SGE_WSTR('-');
-					while (value >= 2)
-					{
-						dst[next] = digits16[value % 2];
-						value /= 2;
-						next -= 1;
-					}
-					dst[next] = digits16[value];
-
-					return re;
-				}
-				else if (base == NumberBase::Hex)
-				{
-					const SizeType length = Digits<16>(value) + 1;
-					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
-					Char16* dst = re.GetData();
-					dst[0] = SGE_WSTR('-');
-					while (value >= 16)
-					{
-						dst[next] = digits16[value % 16];
-						value /= 16;
-						next -= 1;
-					}
-					dst[next] = digits16[value];
-
-					return re;
-				}
-			}
-			else
+			if constexpr (std::is_unsigned_v<IntegerType>)
 			{
 				if (base == NumberBase::Decimal)
 				{
@@ -3744,6 +3614,137 @@ namespace SpaceGameEngine
 					dst[next] = digits16[value];
 
 					return re;
+				}
+			}
+			else
+			{
+				if (value < 0)
+				{
+					value *= -1;
+					if (base == NumberBase::Decimal)
+					{
+						const SizeType length = Digits<10>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						dst[0] = SGE_WSTR('-');
+						while (value >= 100)
+						{
+							UInt64 i = (value % 100) * 2;
+							value /= 100;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+							next -= 2;
+						}
+						if (value < 10)
+						{
+							dst[next] = SGE_WSTR('0') + value;
+						}
+						else
+						{
+							auto i = SizeType(value) * 2;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+						}
+
+						return re;
+					}
+					else if (base == NumberBase::Binary)
+					{
+						const SizeType length = Digits<2>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						dst[0] = SGE_WSTR('-');
+						while (value >= 2)
+						{
+							dst[next] = digits16[value % 2];
+							value /= 2;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+					else if (base == NumberBase::Hex)
+					{
+						const SizeType length = Digits<16>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						dst[0] = SGE_WSTR('-');
+						while (value >= 16)
+						{
+							dst[next] = digits16[value % 16];
+							value /= 16;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+				}
+				else
+				{
+					if (base == NumberBase::Decimal)
+					{
+						const SizeType length = Digits<10>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						while (value >= 100)
+						{
+							UInt64 i = (value % 100) * 2;
+							value /= 100;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+							next -= 2;
+						}
+						if (value < 10)
+						{
+							dst[next] = SGE_WSTR('0') + value;
+						}
+						else
+						{
+							auto i = SizeType(value) * 2;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+						}
+
+						return re;
+					}
+					else if (base == NumberBase::Binary)
+					{
+						const SizeType length = Digits<2>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						while (value >= 2)
+						{
+							dst[next] = digits16[value % 2];
+							value /= 2;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+					else if (base == NumberBase::Hex)
+					{
+						const SizeType length = Digits<16>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						while (value >= 16)
+						{
+							dst[next] = digits16[value % 16];
+							value /= 16;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
 				}
 			}
 		}
@@ -3828,140 +3829,10 @@ namespace SpaceGameEngine
 
 		inline static constexpr const char digits16[17] = SGE_U8STR("0123456789abcdef");
 
-		inline static StringType Get(std::make_unsigned_t<IntegerType> value, NumberBase base = NumberBase::Decimal)
+		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
 		{
 			SGE_ASSERT(InvalidNumberBaseError, base);
-			if (base == NumberBase::Decimal)
-			{
-				const SizeType length = Digits<10>(value);
-				SizeType next = length - 1;
-				StringType re(length, SGE_U8STR(" "));
-				char* dst = re.GetData();
-				while (value >= 100)
-				{
-					UInt64 i = (value % 100) * 2;
-					value /= 100;
-					dst[next] = digits[i + 1];
-					dst[next - 1] = digits[i];
-					next -= 2;
-				}
-				if (value < 10)
-				{
-					dst[next] = SGE_U8STR('0') + value;
-				}
-				else
-				{
-					auto i = SizeType(value) * 2;
-					dst[next] = digits[i + 1];
-					dst[next - 1] = digits[i];
-				}
-
-				return re;
-			}
-			else if (base == NumberBase::Binary)
-			{
-				const SizeType length = Digits<2>(value);
-				SizeType next = length - 1;
-				StringType re(length, SGE_U8STR(" "));
-				char* dst = re.GetData();
-				while (value >= 2)
-				{
-					dst[next] = digits16[value % 2];
-					value /= 2;
-					next -= 1;
-				}
-				dst[next] = digits16[value];
-
-				return re;
-			}
-			else if (base == NumberBase::Hex)
-			{
-				const SizeType length = Digits<16>(value);
-				SizeType next = length - 1;
-				StringType re(length, SGE_U8STR(" "));
-				char* dst = re.GetData();
-				while (value >= 16)
-				{
-					dst[next] = digits16[value % 16];
-					value /= 16;
-					next -= 1;
-				}
-				dst[next] = digits16[value];
-
-				return re;
-			}
-		}
-
-		inline static StringType Get(std::make_signed_t<IntegerType> value, NumberBase base = NumberBase::Decimal)
-		{
-			SGE_ASSERT(InvalidNumberBaseError, base);
-			if (value < 0)
-			{
-				value *= -1;
-				if (base == NumberBase::Decimal)
-				{
-					const SizeType length = Digits<10>(value) + 1;
-					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
-					char* dst = re.GetData();
-					dst[0] = SGE_U8STR('-');
-					while (value >= 100)
-					{
-						UInt64 i = (value % 100) * 2;
-						value /= 100;
-						dst[next] = digits[i + 1];
-						dst[next - 1] = digits[i];
-						next -= 2;
-					}
-					if (value < 10)
-					{
-						dst[next] = SGE_U8STR('0') + value;
-					}
-					else
-					{
-						auto i = SizeType(value) * 2;
-						dst[next] = digits[i + 1];
-						dst[next - 1] = digits[i];
-					}
-
-					return re;
-				}
-				else if (base == NumberBase::Binary)
-				{
-					const SizeType length = Digits<2>(value) + 1;
-					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
-					char* dst = re.GetData();
-					dst[0] = SGE_U8STR('-');
-					while (value >= 2)
-					{
-						dst[next] = digits16[value % 2];
-						value /= 2;
-						next -= 1;
-					}
-					dst[next] = digits16[value];
-
-					return re;
-				}
-				else if (base == NumberBase::Hex)
-				{
-					const SizeType length = Digits<16>(value) + 1;
-					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
-					char* dst = re.GetData();
-					dst[0] = SGE_U8STR('-');
-					while (value >= 16)
-					{
-						dst[next] = digits16[value % 16];
-						value /= 16;
-						next -= 1;
-					}
-					dst[next] = digits16[value];
-
-					return re;
-				}
-			}
-			else
+			if constexpr (std::is_unsigned_v<IntegerType>)
 			{
 				if (base == NumberBase::Decimal)
 				{
@@ -4021,6 +3892,137 @@ namespace SpaceGameEngine
 					dst[next] = digits16[value];
 
 					return re;
+				}
+			}
+			else
+			{
+				if (value < 0)
+				{
+					value *= -1;
+					if (base == NumberBase::Decimal)
+					{
+						const SizeType length = Digits<10>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						dst[0] = SGE_U8STR('-');
+						while (value >= 100)
+						{
+							UInt64 i = (value % 100) * 2;
+							value /= 100;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+							next -= 2;
+						}
+						if (value < 10)
+						{
+							dst[next] = SGE_U8STR('0') + value;
+						}
+						else
+						{
+							auto i = SizeType(value) * 2;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+						}
+
+						return re;
+					}
+					else if (base == NumberBase::Binary)
+					{
+						const SizeType length = Digits<2>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						dst[0] = SGE_U8STR('-');
+						while (value >= 2)
+						{
+							dst[next] = digits16[value % 2];
+							value /= 2;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+					else if (base == NumberBase::Hex)
+					{
+						const SizeType length = Digits<16>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						dst[0] = SGE_U8STR('-');
+						while (value >= 16)
+						{
+							dst[next] = digits16[value % 16];
+							value /= 16;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+				}
+				else
+				{
+					if (base == NumberBase::Decimal)
+					{
+						const SizeType length = Digits<10>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						while (value >= 100)
+						{
+							UInt64 i = (value % 100) * 2;
+							value /= 100;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+							next -= 2;
+						}
+						if (value < 10)
+						{
+							dst[next] = SGE_U8STR('0') + value;
+						}
+						else
+						{
+							auto i = SizeType(value) * 2;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+						}
+
+						return re;
+					}
+					else if (base == NumberBase::Binary)
+					{
+						const SizeType length = Digits<2>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						while (value >= 2)
+						{
+							dst[next] = digits16[value % 2];
+							value /= 2;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+					else if (base == NumberBase::Hex)
+					{
+						const SizeType length = Digits<16>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						while (value >= 16)
+						{
+							dst[next] = digits16[value % 16];
+							value /= 16;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
 				}
 			}
 		}
