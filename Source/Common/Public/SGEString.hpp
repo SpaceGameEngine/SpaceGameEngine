@@ -3532,30 +3532,32 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, UInt64>
+	template<typename Allocator, typename IntegerType>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
 
-		inline static StringType Get(UInt64 value, NumberBase base = NumberBase::Decimal)
+		inline static constexpr const Char16 digits[201] =
+			SGE_WSTR("00010203040506070809")
+				SGE_WSTR("10111213141516171819")
+					SGE_WSTR("20212223242526272829")
+						SGE_WSTR("30313233343536373839")
+							SGE_WSTR("40414243444546474849")
+								SGE_WSTR("50515253545556575859")
+									SGE_WSTR("60616263646566676869")
+										SGE_WSTR("70717273747576777879")
+											SGE_WSTR("80818283848586878889")
+												SGE_WSTR("90919293949596979899");
+
+		inline static constexpr const Char16 digits16[17] = SGE_WSTR("0123456789abcdef");
+
+		inline static StringType Get(std::make_unsigned_t<IntegerType> value, NumberBase base = NumberBase::Decimal)
 		{
-			static const Char16 digits[201] =
-				SGE_WSTR("00010203040506070809")
-					SGE_WSTR("10111213141516171819")
-						SGE_WSTR("20212223242526272829")
-							SGE_WSTR("30313233343536373839")
-								SGE_WSTR("40414243444546474849")
-									SGE_WSTR("50515253545556575859")
-										SGE_WSTR("60616263646566676869")
-											SGE_WSTR("70717273747576777879")
-												SGE_WSTR("80818283848586878889")
-													SGE_WSTR("90919293949596979899");
-			static const Char16 digits16[17] = SGE_WSTR("0123456789abcdef");
 			SGE_ASSERT(InvalidNumberBaseError, base);
 			if (base == NumberBase::Decimal)
 			{
-				const UInt64 length = Digits<10>(value);
-				UInt64 next = length - 1;
+				const SizeType length = Digits<10>(value);
+				SizeType next = length - 1;
 				StringType re(length, SGE_WSTR(' '));
 				Char16* dst = re.GetData();
 				while (value >= 100)
@@ -3568,11 +3570,11 @@ namespace SpaceGameEngine
 				}
 				if (value < 10)
 				{
-					dst[next] = SGE_WSTR('0') + UInt64(value);
+					dst[next] = SGE_WSTR('0') + value;
 				}
 				else
 				{
-					auto i = UInt64(value) * 2;
+					auto i = SizeType(value) * 2;
 					dst[next] = digits[i + 1];
 					dst[next - 1] = digits[i];
 				}
@@ -3581,8 +3583,8 @@ namespace SpaceGameEngine
 			}
 			else if (base == NumberBase::Binary)
 			{
-				const UInt64 length = Digits<2>(value);
-				UInt64 next = length - 1;
+				const SizeType length = Digits<2>(value);
+				SizeType next = length - 1;
 				StringType re(length, SGE_WSTR(' '));
 				Char16* dst = re.GetData();
 				while (value >= 2)
@@ -3597,8 +3599,8 @@ namespace SpaceGameEngine
 			}
 			else if (base == NumberBase::Hex)
 			{
-				const UInt64 length = Digits<16>(value);
-				UInt64 next = length - 1;
+				const SizeType length = Digits<16>(value);
+				SizeType next = length - 1;
 				StringType re(length, SGE_WSTR(' '));
 				Char16* dst = re.GetData();
 				while (value >= 16)
@@ -3612,35 +3614,17 @@ namespace SpaceGameEngine
 				return re;
 			}
 		}
-	};
 
-	template<typename Allocator>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, Int64>
-	{
-		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-
-		inline static StringType Get(Int64 value, NumberBase base = NumberBase::Decimal)
+		inline static StringType Get(std::make_signed_t<IntegerType> value, NumberBase base = NumberBase::Decimal)
 		{
-			static const Char16 digits[201] =
-				SGE_WSTR("00010203040506070809")
-					SGE_WSTR("10111213141516171819")
-						SGE_WSTR("20212223242526272829")
-							SGE_WSTR("30313233343536373839")
-								SGE_WSTR("40414243444546474849")
-									SGE_WSTR("50515253545556575859")
-										SGE_WSTR("60616263646566676869")
-											SGE_WSTR("70717273747576777879")
-												SGE_WSTR("80818283848586878889")
-													SGE_WSTR("90919293949596979899");
-			static const Char16 digits16[17] = SGE_WSTR("0123456789abcdef");
 			SGE_ASSERT(InvalidNumberBaseError, base);
 			if (value < 0)
 			{
 				value *= -1;
 				if (base == NumberBase::Decimal)
 				{
-					const UInt64 length = Digits<10>(value) + 1;
-					UInt64 next = length - 1;
+					const SizeType length = Digits<10>(value) + 1;
+					SizeType next = length - 1;
 					StringType re(length, SGE_WSTR(' '));
 					Char16* dst = re.GetData();
 					dst[0] = SGE_WSTR('-');
@@ -3654,11 +3638,11 @@ namespace SpaceGameEngine
 					}
 					if (value < 10)
 					{
-						dst[next] = SGE_WSTR('0') + UInt64(value);
+						dst[next] = SGE_WSTR('0') + value;
 					}
 					else
 					{
-						auto i = UInt64(value) * 2;
+						auto i = SizeType(value) * 2;
 						dst[next] = digits[i + 1];
 						dst[next - 1] = digits[i];
 					}
@@ -3667,8 +3651,8 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Binary)
 				{
-					const UInt64 length = Digits<2>(value) + 1;
-					UInt64 next = length - 1;
+					const SizeType length = Digits<2>(value) + 1;
+					SizeType next = length - 1;
 					StringType re(length, SGE_WSTR(' '));
 					Char16* dst = re.GetData();
 					dst[0] = SGE_WSTR('-');
@@ -3684,8 +3668,8 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Hex)
 				{
-					const UInt64 length = Digits<16>(value) + 1;
-					UInt64 next = length - 1;
+					const SizeType length = Digits<16>(value) + 1;
+					SizeType next = length - 1;
 					StringType re(length, SGE_WSTR(' '));
 					Char16* dst = re.GetData();
 					dst[0] = SGE_WSTR('-');
@@ -3704,8 +3688,8 @@ namespace SpaceGameEngine
 			{
 				if (base == NumberBase::Decimal)
 				{
-					const UInt64 length = Digits<10>(value);
-					UInt64 next = length - 1;
+					const SizeType length = Digits<10>(value);
+					SizeType next = length - 1;
 					StringType re(length, SGE_WSTR(' '));
 					Char16* dst = re.GetData();
 					while (value >= 100)
@@ -3718,11 +3702,11 @@ namespace SpaceGameEngine
 					}
 					if (value < 10)
 					{
-						dst[next] = SGE_WSTR('0') + UInt64(value);
+						dst[next] = SGE_WSTR('0') + value;
 					}
 					else
 					{
-						auto i = UInt64(value) * 2;
+						auto i = SizeType(value) * 2;
 						dst[next] = digits[i + 1];
 						dst[next - 1] = digits[i];
 					}
@@ -3731,8 +3715,8 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Binary)
 				{
-					const UInt64 length = Digits<2>(value);
-					UInt64 next = length - 1;
+					const SizeType length = Digits<2>(value);
+					SizeType next = length - 1;
 					StringType re(length, SGE_WSTR(' '));
 					Char16* dst = re.GetData();
 					while (value >= 2)
@@ -3747,8 +3731,8 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Hex)
 				{
-					const UInt64 length = Digits<16>(value);
-					UInt64 next = length - 1;
+					const SizeType length = Digits<16>(value);
+					SizeType next = length - 1;
 					StringType re(length, SGE_WSTR(' '));
 					Char16* dst = re.GetData();
 					while (value >= 16)
@@ -3823,98 +3807,34 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, int>
-	{
-		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-
-		inline static StringType Get(int value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, Int64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, unsigned int>
-	{
-		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-
-		inline static StringType Get(unsigned int value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, UInt64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, long>
-	{
-		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-
-		inline static StringType Get(long value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, Int64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, unsigned long>
-	{
-		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-
-		inline static StringType Get(unsigned long value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, UInt64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, short>
-	{
-		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-
-		inline static StringType Get(short value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, Int64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, unsigned short>
-	{
-		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-
-		inline static StringType Get(unsigned short value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, UInt64>::Get(value, base);
-		}
-	};
-
 	//------------------------------------------------------------------
 
-	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, UInt64>
+	template<typename Allocator, typename IntegerType>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<char, UTF8Trait, Allocator>;
 
-		inline static StringType Get(UInt64 value, NumberBase base = NumberBase::Decimal)
+		inline static constexpr const char digits[201] =
+			SGE_U8STR("00010203040506070809")
+				SGE_U8STR("10111213141516171819")
+					SGE_U8STR("20212223242526272829")
+						SGE_U8STR("30313233343536373839")
+							SGE_U8STR("40414243444546474849")
+								SGE_U8STR("50515253545556575859")
+									SGE_U8STR("60616263646566676869")
+										SGE_U8STR("70717273747576777879")
+											SGE_U8STR("80818283848586878889")
+												SGE_U8STR("90919293949596979899");
+
+		inline static constexpr const char digits16[17] = SGE_U8STR("0123456789abcdef");
+
+		inline static StringType Get(std::make_unsigned_t<IntegerType> value, NumberBase base = NumberBase::Decimal)
 		{
-			static const char digits[201] =
-				SGE_U8STR("00010203040506070809")
-					SGE_U8STR("10111213141516171819")
-						SGE_U8STR("20212223242526272829")
-							SGE_U8STR("30313233343536373839")
-								SGE_U8STR("40414243444546474849")
-									SGE_U8STR("50515253545556575859")
-										SGE_U8STR("60616263646566676869")
-											SGE_U8STR("70717273747576777879")
-												SGE_U8STR("80818283848586878889")
-													SGE_U8STR("90919293949596979899");
-			static const char digits16[17] = SGE_U8STR("0123456789abcdef");
 			SGE_ASSERT(InvalidNumberBaseError, base);
 			if (base == NumberBase::Decimal)
 			{
-				const UInt64 length = Digits<10>(value);
-				UInt64 next = length - 1;
+				const SizeType length = Digits<10>(value);
+				SizeType next = length - 1;
 				StringType re(length, SGE_U8STR(" "));
 				char* dst = re.GetData();
 				while (value >= 100)
@@ -3927,11 +3847,11 @@ namespace SpaceGameEngine
 				}
 				if (value < 10)
 				{
-					dst[next] = SGE_U8STR('0') + UInt64(value);
+					dst[next] = SGE_U8STR('0') + value;
 				}
 				else
 				{
-					auto i = UInt64(value) * 2;
+					auto i = SizeType(value) * 2;
 					dst[next] = digits[i + 1];
 					dst[next - 1] = digits[i];
 				}
@@ -3940,8 +3860,8 @@ namespace SpaceGameEngine
 			}
 			else if (base == NumberBase::Binary)
 			{
-				const UInt64 length = Digits<2>(value);
-				UInt64 next = length - 1;
+				const SizeType length = Digits<2>(value);
+				SizeType next = length - 1;
 				StringType re(length, SGE_U8STR(" "));
 				char* dst = re.GetData();
 				while (value >= 2)
@@ -3956,8 +3876,8 @@ namespace SpaceGameEngine
 			}
 			else if (base == NumberBase::Hex)
 			{
-				const UInt64 length = Digits<16>(value);
-				UInt64 next = length - 1;
+				const SizeType length = Digits<16>(value);
+				SizeType next = length - 1;
 				StringType re(length, SGE_U8STR(" "));
 				char* dst = re.GetData();
 				while (value >= 16)
@@ -3971,35 +3891,17 @@ namespace SpaceGameEngine
 				return re;
 			}
 		}
-	};
 
-	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, Int64>
-	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
-
-		inline static StringType Get(Int64 value, NumberBase base = NumberBase::Decimal)
+		inline static StringType Get(std::make_signed_t<IntegerType> value, NumberBase base = NumberBase::Decimal)
 		{
-			static const char digits[201] =
-				SGE_U8STR("00010203040506070809")
-					SGE_U8STR("10111213141516171819")
-						SGE_U8STR("20212223242526272829")
-							SGE_U8STR("30313233343536373839")
-								SGE_U8STR("40414243444546474849")
-									SGE_U8STR("50515253545556575859")
-										SGE_U8STR("60616263646566676869")
-											SGE_U8STR("70717273747576777879")
-												SGE_U8STR("80818283848586878889")
-													SGE_U8STR("90919293949596979899");
-			static const char digits16[17] = SGE_U8STR("0123456789abcdef");
 			SGE_ASSERT(InvalidNumberBaseError, base);
 			if (value < 0)
 			{
 				value *= -1;
 				if (base == NumberBase::Decimal)
 				{
-					const UInt64 length = Digits<10>(value) + 1;
-					UInt64 next = length - 1;
+					const SizeType length = Digits<10>(value) + 1;
+					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
 					char* dst = re.GetData();
 					dst[0] = SGE_U8STR('-');
@@ -4013,11 +3915,11 @@ namespace SpaceGameEngine
 					}
 					if (value < 10)
 					{
-						dst[next] = SGE_U8STR('0') + UInt64(value);
+						dst[next] = SGE_U8STR('0') + value;
 					}
 					else
 					{
-						auto i = UInt64(value) * 2;
+						auto i = SizeType(value) * 2;
 						dst[next] = digits[i + 1];
 						dst[next - 1] = digits[i];
 					}
@@ -4026,8 +3928,8 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Binary)
 				{
-					const UInt64 length = Digits<2>(value) + 1;
-					UInt64 next = length - 1;
+					const SizeType length = Digits<2>(value) + 1;
+					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
 					char* dst = re.GetData();
 					dst[0] = SGE_U8STR('-');
@@ -4043,8 +3945,8 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Hex)
 				{
-					const UInt64 length = Digits<16>(value) + 1;
-					UInt64 next = length - 1;
+					const SizeType length = Digits<16>(value) + 1;
+					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
 					char* dst = re.GetData();
 					dst[0] = SGE_U8STR('-');
@@ -4063,8 +3965,8 @@ namespace SpaceGameEngine
 			{
 				if (base == NumberBase::Decimal)
 				{
-					const UInt64 length = Digits<10>(value);
-					UInt64 next = length - 1;
+					const SizeType length = Digits<10>(value);
+					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
 					char* dst = re.GetData();
 					while (value >= 100)
@@ -4077,11 +3979,11 @@ namespace SpaceGameEngine
 					}
 					if (value < 10)
 					{
-						dst[next] = SGE_U8STR('0') + UInt64(value);
+						dst[next] = SGE_U8STR('0') + value;
 					}
 					else
 					{
-						auto i = UInt64(value) * 2;
+						auto i = SizeType(value) * 2;
 						dst[next] = digits[i + 1];
 						dst[next - 1] = digits[i];
 					}
@@ -4090,8 +3992,8 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Binary)
 				{
-					const UInt64 length = Digits<2>(value);
-					UInt64 next = length - 1;
+					const SizeType length = Digits<2>(value);
+					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
 					char* dst = re.GetData();
 					while (value >= 2)
@@ -4106,8 +4008,8 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Hex)
 				{
-					const UInt64 length = Digits<16>(value);
-					UInt64 next = length - 1;
+					const SizeType length = Digits<16>(value);
+					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
 					char* dst = re.GetData();
 					while (value >= 16)
@@ -4182,72 +4084,6 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, int>
-	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
-
-		inline static StringType Get(int value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, Int64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, unsigned int>
-	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
-
-		inline static StringType Get(unsigned int value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, UInt64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, long>
-	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
-
-		inline static StringType Get(long value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, Int64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, unsigned long>
-	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
-
-		inline static StringType Get(unsigned long value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, UInt64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, short>
-	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
-
-		inline static StringType Get(short value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, Int64>::Get(value, base);
-		}
-	};
-
-	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, unsigned short>
-	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
-
-		inline static StringType Get(unsigned short value, NumberBase base = NumberBase::Decimal)
-		{
-			return ToStringCore<StringType, UInt64>::Get(value, base);
-		}
-	};
-
 	//------------------------------------------------------------------
 
 	template<typename T, typename Trait = CharTrait<T>>
@@ -4277,12 +4113,12 @@ namespace SpaceGameEngine
 	};
 
 	template<typename StringType>
-	struct NonNumericalStringError
+	struct NonSignedNumericalStringError
 	{
 	};
 
 	template<typename Allocator>
-	struct NonNumericalStringError<StringCore<Char16, UCS2Trait, Allocator>>
+	struct NonSignedNumericalStringError<StringCore<Char16, UCS2Trait, Allocator>>
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not numerical string.");
 		inline static bool Judge(const StringCore<Char16, UCS2Trait, Allocator>& str)
@@ -4295,7 +4131,7 @@ namespace SpaceGameEngine
 	};
 
 	template<typename Allocator>
-	struct NonNumericalStringError<StringCore<char, UTF8Trait, Allocator>>
+	struct NonSignedNumericalStringError<StringCore<char, UTF8Trait, Allocator>>
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not numerical string.");
 		inline static bool Judge(const StringCore<char, UTF8Trait, Allocator>& str)
@@ -4342,51 +4178,46 @@ namespace SpaceGameEngine
 		return StringToCore<StringType, T>::Get(str);
 	}
 
-	template<typename Allocator>
-	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, Int64>
+	template<typename Allocator, typename IntegerType>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
 		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
 
-		inline static Int64 Get(const StringType& str)
+		inline static IntegerType Get(const StringType& str)
 		{
-			SGE_ASSERT(NonNumericalStringError<StringType>, str);
-			bool is_negative = false;
-			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (*next == SGE_WSTR('-'))
+			if constexpr (std::is_signed_v<IntegerType>)
 			{
-				is_negative = true;
-				++next;
+				SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
+				bool is_negative = false;
+				typename StringType::ConstIterator next = str.GetConstBegin();
+				if (*next == SGE_WSTR('-'))
+				{
+					is_negative = true;
+					++next;
+				}
+				IntegerType re = 0;
+				for (; next != str.GetConstEnd(); ++next)
+				{
+					SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+					re *= 10;
+					re += (*next) - SGE_WSTR('0');
+				}
+				return (is_negative ? -1 * re : re);
 			}
-			Int64 re = 0;
-			for (; next != str.GetConstEnd(); ++next)
+			else
 			{
-				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
-				re *= 10;
-				re += (*next) - SGE_WSTR('0');
+				SGE_ASSERT(NonUnsignedNumericalStringError, str);
+				typename StringType::ConstIterator next = str.GetConstBegin();
+				IntegerType re = 0;
+				for (; next != str.GetConstEnd(); ++next)
+				{
+					SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+					re *= 10;
+					re += (*next) - SGE_WSTR('0');
+				}
+				return re;
 			}
-			return (is_negative ? -1 * re : re);
-		}
-	};
-
-	template<typename Allocator>
-	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, UInt64>
-	{
-		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
-
-		inline static UInt64 Get(const StringType& str)
-		{
-			SGE_ASSERT(NonUnsignedNumericalStringError, str);
-			typename StringType::ConstIterator next = str.GetConstBegin();
-			UInt64 re = 0;
-			for (; next != str.GetConstEnd(); ++next)
-			{
-				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
-				re *= 10;
-				re += (*next) - SGE_WSTR('0');
-			}
-			return re;
 		}
 	};
 
@@ -4398,7 +4229,7 @@ namespace SpaceGameEngine
 
 		inline static float Get(const StringType& str)
 		{
-			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
@@ -4441,7 +4272,7 @@ namespace SpaceGameEngine
 
 		inline static double Get(const StringType& str)
 		{
-			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
@@ -4478,51 +4309,46 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename Allocator>
-	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, Int64>
+	template<typename Allocator, typename IntegerType>
+	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<char, UTF8Trait, Allocator>;
 		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
 
-		inline static Int64 Get(const StringType& str)
+		inline static IntegerType Get(const StringType& str)
 		{
-			SGE_ASSERT(NonNumericalStringError<StringType>, str);
-			bool is_negative = false;
-			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (**next == SGE_U8STR('-'))
+			if constexpr (std::is_signed_v<IntegerType>)
 			{
-				is_negative = true;
-				++next;
+				SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
+				bool is_negative = false;
+				typename StringType::ConstIterator next = str.GetConstBegin();
+				if (**next == SGE_U8STR('-'))
+				{
+					is_negative = true;
+					++next;
+				}
+				IntegerType re = 0;
+				for (; next != str.GetConstEnd(); ++next)
+				{
+					SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+					re *= 10;
+					re += (**next) - SGE_U8STR('0');
+				}
+				return (is_negative ? -1 * re : re);
 			}
-			Int64 re = 0;
-			for (; next != str.GetConstEnd(); ++next)
+			else
 			{
-				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
-				re *= 10;
-				re += (**next) - SGE_U8STR('0');
+				SGE_ASSERT(NonUnsignedNumericalStringError, str);
+				typename StringType::ConstIterator next = str.GetConstBegin();
+				IntegerType re = 0;
+				for (; next != str.GetConstEnd(); ++next)
+				{
+					SGE_ASSERT(NonNumericalCharacterErrorType, *next);
+					re *= 10;
+					re += (**next) - SGE_U8STR('0');
+				}
+				return re;
 			}
-			return (is_negative ? -1 * re : re);
-		}
-	};
-
-	template<typename Allocator>
-	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, UInt64>
-	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
-		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
-
-		inline static UInt64 Get(const StringType& str)
-		{
-			SGE_ASSERT(NonUnsignedNumericalStringError, str);
-			typename StringType::ConstIterator next = str.GetConstBegin();
-			UInt64 re = 0;
-			for (; next != str.GetConstEnd(); ++next)
-			{
-				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
-				re *= 10;
-				re += (**next) - SGE_U8STR('0');
-			}
-			return re;
 		}
 	};
 
@@ -4534,7 +4360,7 @@ namespace SpaceGameEngine
 
 		inline static float Get(const StringType& str)
 		{
-			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
@@ -4577,7 +4403,7 @@ namespace SpaceGameEngine
 
 		inline static double Get(const StringType& str)
 		{
-			SGE_ASSERT(NonNumericalStringError<StringType>, str);
+			SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
