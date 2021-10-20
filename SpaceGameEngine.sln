@@ -74,6 +74,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bootstrap", "Source\Bootstr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestModule", "Test\TestModule\TestModule.vcxproj", "{F39D2A87-13CE-4476-9308-E1D897D12BA5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utility", "Utility", "{7F5D9099-4CA8-47E1-A754-DEE2C866608C}"
+	ProjectSection(SolutionItems) = preProject
+		Document\Document\Common\Utility\Format.md = Document\Document\Common\Utility\Format.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -172,6 +177,7 @@ Global
 		{5C7E3D68-FEBE-44E8-A289-63E01D984092} = {6B44D9C0-3589-476C-8789-6CC132708D99}
 		{84ADE34B-02BD-4712-8FED-84B671CA59CD} = {72DE90D1-ACF7-4F34-8E54-E28BFDE1018F}
 		{F39D2A87-13CE-4476-9308-E1D897D12BA5} = {E09406D8-3CBC-473A-8715-05471C55AAFA}
+		{7F5D9099-4CA8-47E1-A754-DEE2C866608C} = {6B44D9C0-3589-476C-8789-6CC132708D99}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}
