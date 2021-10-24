@@ -17,6 +17,7 @@ limitations under the License.
 #include "CommonAPI.h"
 #include "Container/Stack.hpp"
 #include "Concurrent/Lock.h"
+#include "Utility/Utility.hpp"
 
 namespace SpaceGameEngine
 {
@@ -25,7 +26,7 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	class COMMON_API GlobalVariableCore
+	class COMMON_API GlobalVariableCore : public UncopyableAndUnmovable
 	{
 	public:
 		friend class GlobalVariableManager;
@@ -37,7 +38,7 @@ namespace SpaceGameEngine
 	template class COMMON_API List<GlobalVariableCore*, StdAllocator>;
 	template class COMMON_API Stack<GlobalVariableCore*, StdAllocator>;
 
-	class COMMON_API GlobalVariableManager
+	class COMMON_API GlobalVariableManager : public UncopyableAndUnmovable
 	{
 	public:
 		~GlobalVariableManager();
