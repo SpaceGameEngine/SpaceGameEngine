@@ -145,6 +145,40 @@ TEST(Stack, PushAndPopTest)
 	}
 }
 
+TEST(Stack, EmplaceAndPopTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_stack_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	Stack<test_stack_object>* ps = new Stack<test_stack_object>();
+	const Stack<test_stack_object>* pcs = ps;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ps->Emplace(i, val_rel_func);
+		ASSERT_EQ(ps->GetTop().val, i);
+	}
+	ASSERT_EQ(ps->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; --i)
+	{
+		ASSERT_EQ(pcs->GetTop().val, i);
+		ps->Pop();
+		ASSERT_EQ(ps->GetSize(), i);
+	}
+	ASSERT_EQ(ps->GetSize(), 0);
+
+	delete ps;
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(Stack, CopyConstructionTest)
 {
 	const int test_size = 1000;
