@@ -16,17 +16,13 @@ limitations under the License.
 #include "GlobalVariable.h"
 #include "Error.h"
 
-void SpaceGameEngine::GlobalVariableCore::OnRelease()
-{
-}
-
 SpaceGameEngine::GlobalVariableManager::~GlobalVariableManager()
 {
 	while (m_Content.GetSize() != 0)
 	{
-		GlobalVariableCore* ptr = m_Content.GetTop();
+		Function<void(), StdAllocator> rel_func(std::move(m_Content.GetTop()));
 		m_Content.Pop();
-		ptr->OnRelease();
+		rel_func();
 	}
 }
 
@@ -40,10 +36,9 @@ SpaceGameEngine::GlobalVariableManager::GlobalVariableManager()
 {
 }
 
-void SpaceGameEngine::GlobalVariableManager::Add(GlobalVariableCore* ptr)
+void SpaceGameEngine::GlobalVariableManager::Add(Function<void(), StdAllocator>&& rel_func)
 {
-	SGE_ASSERT(NullPointerError, ptr);
 	RecursiveLock lock(m_Mutex);
 	lock.Lock();
-	m_Content.Push(ptr);
+	m_Content.Push(std::move(rel_func));
 }

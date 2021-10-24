@@ -18,6 +18,7 @@ limitations under the License.
 #include "Container/Stack.hpp"
 #include "Concurrent/Lock.h"
 #include "Utility/Utility.hpp"
+#include "Function.hpp"
 
 namespace SpaceGameEngine
 {
@@ -26,17 +27,10 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	class COMMON_API GlobalVariableCore : public UncopyableAndUnmovable
-	{
-	public:
-		friend class GlobalVariableManager;
-
-	private:
-		virtual void OnRelease();
-	};
-
-	template class COMMON_API List<GlobalVariableCore*, StdAllocator>;
-	template class COMMON_API Stack<GlobalVariableCore*, StdAllocator>;
+	template class COMMON_API ControllableObject<MetaObject<StdAllocator>, StdAllocator>;
+	template class COMMON_API Function<void(), StdAllocator>;
+	template class COMMON_API List<Function<void(), StdAllocator>, StdAllocator>;
+	template class COMMON_API Stack<Function<void(), StdAllocator>, StdAllocator>;
 
 	class COMMON_API GlobalVariableManager : public UncopyableAndUnmovable
 	{
@@ -50,22 +44,24 @@ namespace SpaceGameEngine
 
 	private:
 		GlobalVariableManager();
-		void Add(GlobalVariableCore* ptr);
+		void Add(Function<void(), StdAllocator>&& rel_func);
 
 	private:
 		Mutex m_Mutex;
-		Stack<GlobalVariableCore*, StdAllocator> m_Content;
+		Stack<Function<void(), StdAllocator>, StdAllocator> m_Content;
 	};
 
 	template<typename T, typename Allocator = DefaultAllocator>
-	class GlobalVariable : public GlobalVariableCore
+	class GlobalVariable : public UncopyableAndUnmovable
 	{
 	public:
 		template<typename... Args>
 		inline GlobalVariable(Args&&... args)
 		{
 			m_pContent = Allocator::template New<T>(std::forward<Args>(args)...);
-			GlobalVariableManager::GetSingleton().Add(this);
+			GlobalVariableManager::GetSingleton().Add([ptr = m_pContent]() {
+				Allocator::Delete(ptr);
+			});
 		}
 
 		inline T& Get()
@@ -76,12 +72,6 @@ namespace SpaceGameEngine
 		inline const T& Get() const
 		{
 			return *m_pContent;
-		}
-
-	private:
-		inline virtual void OnRelease() override
-		{
-			Allocator::Delete(m_pContent);
 		}
 
 	private:
