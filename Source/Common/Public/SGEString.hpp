@@ -4088,80 +4088,194 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename T, typename Trait = CharTrait<T>>
-	struct NonNumericalCharacterError
+	template<typename T, typename Trait>
+	struct IsNumericalCharacterCore
 	{
 	};
 
-	template<>
-	struct NonNumericalCharacterError<Char16, UCS2Trait>
+	template<typename T, typename Trait, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
+	inline bool IsNumericalCharacter(ArgType c)
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The character is not numerical character.");
-		inline static bool Judge(Char16 c)
+		return IsNumericalCharacterCore<T, Trait>::Get(c);
+	}
+
+	template<>
+	struct IsNumericalCharacterCore<Char16, UCS2Trait>
+	{
+		inline static bool Get(Char16 c)
 		{
-			return !(c >= SGE_WSTR('0') && c <= SGE_WSTR('9'));
+			return c >= SGE_WSTR('0') && c <= SGE_WSTR('9');
 		}
 	};
 
 	template<>
-	struct NonNumericalCharacterError<char, UTF8Trait>
+	struct IsNumericalCharacterCore<char, UTF8Trait>
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The character is not numerical character.");
-		inline static bool Judge(const char* pc)
+		inline static bool Get(const char* pc)
 		{
 			SGE_ASSERT(NullPointerError, pc);
-			return !((*pc) >= SGE_U8STR('0') && (*pc) <= SGE_U8STR('9'));
+			return (*pc) >= SGE_U8STR('0') && (*pc) <= SGE_U8STR('9');
 		}
 	};
 
-	template<typename StringType>
+	template<typename T, typename Trait, typename Allocator>
+	inline bool IsSignedNumericalString(const StringCore<T, Trait, Allocator>& str)
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+		if (str.GetSize() == 0)
+			return false;
+
+		if constexpr (std::is_same_v<Trait, UCS2Trait>)
+		{
+			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			{
+				if (str.GetSize() == 1)
+					return false;
+				else if (str[0] != SGE_WSTR('-'))
+					return false;
+			}
+		}
+		else	//UTF8Trait
+		{
+			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			{
+				if (str.GetSize() == 1)
+					return false;
+				else if ((*str[0]) != SGE_U8STR('-'))
+					return false;
+			}
+		}
+
+		for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
+		{
+			if (!IsNumericalCharacter<T, Trait>(*iter))
+				return false;
+		}
+
+		return true;
+	}
+
+	template<typename T, typename Trait, typename Allocator>
+	inline bool IsUnsignedNumericalString(const StringCore<T, Trait, Allocator>& str)
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+		if (str.GetSize() == 0)
+			return false;
+
+		for (auto iter = str.GetConstBegin(); iter != str.GetConstEnd(); ++iter)
+		{
+			if (!IsNumericalCharacter<T, Trait>(*iter))
+				return false;
+		}
+
+		return true;
+	}
+
+	template<typename T, typename Trait, typename Allocator>
+	inline bool IsDecimalString(const StringCore<T, Trait, Allocator>& str)
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+		if (str.GetSize() == 0)
+			return false;
+
+		bool has_meet_point = false;
+
+		if constexpr (std::is_same_v<Trait, UCS2Trait>)
+		{
+			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			{
+				if (str.GetSize() == 1)
+					return false;
+				else if (str[0] != SGE_WSTR('-'))
+					return false;
+			}
+
+			for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<T, Trait>(*iter))
+				{
+					if (*iter != SGE_WSTR('.'))
+						return false;
+					else
+					{
+						if (has_meet_point)
+							return false;
+						else if (iter + 1 == str.GetConstEnd())
+							return false;
+						else if (!IsNumericalCharacter<T, Trait>(*(iter - 1)))
+							return false;
+						else
+							has_meet_point = true;
+					}
+				}
+			}
+		}
+		else	//UTF8Trait
+		{
+			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			{
+				if (str.GetSize() == 1)
+					return false;
+				else if ((*str[0]) != SGE_U8STR('-'))
+					return false;
+			}
+
+			for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<T, Trait>(*iter))
+				{
+					if ((**iter) != SGE_U8STR('.'))
+						return false;
+					else
+					{
+						if (has_meet_point)
+							return false;
+						else if (iter + 1 == str.GetConstEnd())
+							return false;
+						else if (!IsNumericalCharacter<T, Trait>(*(iter - 1)))
+							return false;
+						else
+							has_meet_point = true;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
 	struct NonSignedNumericalStringError
 	{
-	};
-
-	template<typename Allocator>
-	struct NonSignedNumericalStringError<StringCore<Char16, UCS2Trait, Allocator>>
-	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not numerical string.");
-		inline static bool Judge(const StringCore<Char16, UCS2Trait, Allocator>& str)
+		template<typename StringType>
+		inline static bool Judge(const StringType& str)
 		{
-			if (str.GetSize() == 0)
-				return true;
-			else
-				return str[0] == SGE_WSTR('-') && str.GetSize() == 1;
-		}
-	};
-
-	template<typename Allocator>
-	struct NonSignedNumericalStringError<StringCore<char, UTF8Trait, Allocator>>
-	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not numerical string.");
-		inline static bool Judge(const StringCore<char, UTF8Trait, Allocator>& str)
-		{
-			if (str.GetSize() == 0)
-				return true;
-			else
-				return (*str[0]) == SGE_U8STR('-') && str.GetSize() == 1;
+			return !IsSignedNumericalString(str);
 		}
 	};
 
 	struct NonUnsignedNumericalStringError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not unsigned numerical string.");
-		template<typename T, typename Trait, typename Allocator>
-		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
+		template<typename StringType>
+		inline static bool Judge(const StringType& str)
 		{
-			return str.GetSize() == 0;
+			return !IsUnsignedNumericalString(str);
 		}
 	};
 
 	struct NonDecimalStringError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not decimal string.");
-		template<typename IteratorType>
-		inline static bool Judge(const IteratorType& point_iter, const IteratorType& end_iter)
+		template<typename StringType>
+		inline static bool Judge(const StringType& str)
 		{
-			return point_iter + 1 == end_iter;
+			return !IsDecimalString(str);
 		}
 	};
 
@@ -4184,13 +4298,12 @@ namespace SpaceGameEngine
 	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
 
 		inline static IntegerType Get(const StringType& str)
 		{
 			if constexpr (std::is_signed_v<IntegerType>)
 			{
-				SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
+				SGE_ASSERT(NonSignedNumericalStringError, str);
 				bool is_negative = false;
 				typename StringType::ConstIterator next = str.GetConstBegin();
 				if (*next == SGE_WSTR('-'))
@@ -4201,7 +4314,6 @@ namespace SpaceGameEngine
 				IntegerType re = 0;
 				for (; next != str.GetConstEnd(); ++next)
 				{
-					SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 					re *= 10;
 					re += (*next) - SGE_WSTR('0');
 				}
@@ -4214,7 +4326,6 @@ namespace SpaceGameEngine
 				IntegerType re = 0;
 				for (; next != str.GetConstEnd(); ++next)
 				{
-					SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 					re *= 10;
 					re += (*next) - SGE_WSTR('0');
 				}
@@ -4227,11 +4338,10 @@ namespace SpaceGameEngine
 	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, float>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
 
 		inline static float Get(const StringType& str)
 		{
-			SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
+			SGE_ASSERT(NonDecimalStringError, str);
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
@@ -4246,11 +4356,9 @@ namespace SpaceGameEngine
 			{
 				if ((!is_after_point) && (*next) == SGE_WSTR('.'))
 				{
-					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
 					is_after_point = true;
 					continue;
 				}
-				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 				if (is_after_point)
 				{
 					decimal *= 0.1f;
@@ -4270,11 +4378,10 @@ namespace SpaceGameEngine
 	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, double>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
-		using NonNumericalCharacterErrorType = NonNumericalCharacterError<Char16, UCS2Trait>;
 
 		inline static double Get(const StringType& str)
 		{
-			SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
+			SGE_ASSERT(NonDecimalStringError, str);
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
@@ -4289,11 +4396,9 @@ namespace SpaceGameEngine
 			{
 				if ((!is_after_point) && (*next) == SGE_WSTR('.'))
 				{
-					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
 					is_after_point = true;
 					continue;
 				}
-				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 				if (is_after_point)
 				{
 					decimal *= 0.1;
@@ -4315,13 +4420,12 @@ namespace SpaceGameEngine
 	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<char, UTF8Trait, Allocator>;
-		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
 
 		inline static IntegerType Get(const StringType& str)
 		{
 			if constexpr (std::is_signed_v<IntegerType>)
 			{
-				SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
+				SGE_ASSERT(NonSignedNumericalStringError, str);
 				bool is_negative = false;
 				typename StringType::ConstIterator next = str.GetConstBegin();
 				if (**next == SGE_U8STR('-'))
@@ -4332,7 +4436,6 @@ namespace SpaceGameEngine
 				IntegerType re = 0;
 				for (; next != str.GetConstEnd(); ++next)
 				{
-					SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 					re *= 10;
 					re += (**next) - SGE_U8STR('0');
 				}
@@ -4345,7 +4448,6 @@ namespace SpaceGameEngine
 				IntegerType re = 0;
 				for (; next != str.GetConstEnd(); ++next)
 				{
-					SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 					re *= 10;
 					re += (**next) - SGE_U8STR('0');
 				}
@@ -4358,11 +4460,10 @@ namespace SpaceGameEngine
 	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, float>
 	{
 		using StringType = StringCore<char, UTF8Trait, Allocator>;
-		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
 
 		inline static float Get(const StringType& str)
 		{
-			SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
+			SGE_ASSERT(NonDecimalStringError, str);
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
@@ -4377,11 +4478,9 @@ namespace SpaceGameEngine
 			{
 				if ((!is_after_point) && (**next) == SGE_U8STR('.'))
 				{
-					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
 					is_after_point = true;
 					continue;
 				}
-				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 				if (is_after_point)
 				{
 					decimal *= 0.1f;
@@ -4401,11 +4500,10 @@ namespace SpaceGameEngine
 	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, double>
 	{
 		using StringType = StringCore<char, UTF8Trait, Allocator>;
-		using NonNumericalCharacterErrorType = NonNumericalCharacterError<char, UTF8Trait>;
 
 		inline static double Get(const StringType& str)
 		{
-			SGE_ASSERT(NonSignedNumericalStringError<StringType>, str);
+			SGE_ASSERT(NonDecimalStringError, str);
 			bool is_negative = false;
 			bool is_after_point = false;
 			typename StringType::ConstIterator next = str.GetConstBegin();
@@ -4420,11 +4518,9 @@ namespace SpaceGameEngine
 			{
 				if ((!is_after_point) && (**next) == SGE_U8STR('.'))
 				{
-					SGE_ASSERT(NonDecimalStringError, next, str.GetConstEnd());
 					is_after_point = true;
 					continue;
 				}
-				SGE_ASSERT(NonNumericalCharacterErrorType, *next);
 				if (is_after_point)
 				{
 					decimal *= 0.1;

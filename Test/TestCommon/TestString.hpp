@@ -3283,6 +3283,148 @@ TEST(ToString, DoubleTest)
 	ASSERT_EQ(ToString<UTF8String>(-123.5045678, 0), SGE_U8STR("-124"));
 }
 
+TEST(StringTo, IsNumericalCharacterTest)
+{
+	ASSERT_FALSE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR(' '))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('0'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('1'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('2'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('3'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('4'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('5'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('6'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('7'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('8'))));
+	ASSERT_TRUE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('9'))));
+	ASSERT_FALSE((IsNumericalCharacter<Char16, UCS2Trait>(SGE_WSTR('A'))));
+
+	ASSERT_FALSE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR(" "))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("0"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("1"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("2"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("3"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("4"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("5"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("6"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("7"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("8"))));
+	ASSERT_TRUE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("9"))));
+	ASSERT_FALSE((IsNumericalCharacter<char, UTF8Trait>(SGE_U8STR("A"))));
+}
+
+TEST(StringTo, IsSignedNumericalStringTest)
+{
+	ASSERT_FALSE((IsSignedNumericalString(UCS2String(SGE_WSTR("")))));
+	ASSERT_FALSE((IsSignedNumericalString(UCS2String(SGE_WSTR("abc")))));
+	ASSERT_FALSE((IsSignedNumericalString(UCS2String(SGE_WSTR("-")))));
+	ASSERT_FALSE((IsSignedNumericalString(UCS2String(SGE_WSTR("-a")))));
+	ASSERT_FALSE((IsSignedNumericalString(UCS2String(SGE_WSTR(".")))));
+	ASSERT_FALSE((IsSignedNumericalString(UCS2String(SGE_WSTR("   ")))));
+	ASSERT_TRUE((IsSignedNumericalString(UCS2String(SGE_WSTR("0")))));
+	ASSERT_TRUE((IsSignedNumericalString(UCS2String(SGE_WSTR("1")))));
+	ASSERT_TRUE((IsSignedNumericalString(UCS2String(SGE_WSTR("12")))));
+	ASSERT_TRUE((IsSignedNumericalString(UCS2String(SGE_WSTR("12345")))));
+	ASSERT_TRUE((IsSignedNumericalString(UCS2String(SGE_WSTR("-1")))));
+	ASSERT_TRUE((IsSignedNumericalString(UCS2String(SGE_WSTR("-123")))));
+	ASSERT_TRUE((IsSignedNumericalString(UCS2String(SGE_WSTR("-12345")))));
+
+	ASSERT_FALSE((IsSignedNumericalString(UTF8String(SGE_U8STR("")))));
+	ASSERT_FALSE((IsSignedNumericalString(UTF8String(SGE_U8STR("abc")))));
+	ASSERT_FALSE((IsSignedNumericalString(UTF8String(SGE_U8STR("-")))));
+	ASSERT_FALSE((IsSignedNumericalString(UTF8String(SGE_U8STR("-a")))));
+	ASSERT_FALSE((IsSignedNumericalString(UTF8String(SGE_U8STR(".")))));
+	ASSERT_FALSE((IsSignedNumericalString(UTF8String(SGE_U8STR("   ")))));
+	ASSERT_TRUE((IsSignedNumericalString(UTF8String(SGE_U8STR("0")))));
+	ASSERT_TRUE((IsSignedNumericalString(UTF8String(SGE_U8STR("1")))));
+	ASSERT_TRUE((IsSignedNumericalString(UTF8String(SGE_U8STR("12")))));
+	ASSERT_TRUE((IsSignedNumericalString(UTF8String(SGE_U8STR("12345")))));
+	ASSERT_TRUE((IsSignedNumericalString(UTF8String(SGE_U8STR("-1")))));
+	ASSERT_TRUE((IsSignedNumericalString(UTF8String(SGE_U8STR("-123")))));
+	ASSERT_TRUE((IsSignedNumericalString(UTF8String(SGE_U8STR("-12345")))));
+}
+
+TEST(StringTo, IsUnsignedNumericalStringTest)
+{
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("abc")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("-")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("-a")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR(".")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("   ")))));
+	ASSERT_TRUE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("0")))));
+	ASSERT_TRUE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("1")))));
+	ASSERT_TRUE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("12")))));
+	ASSERT_TRUE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("12345")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("-1")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("-123")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UCS2String(SGE_WSTR("-12345")))));
+
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("abc")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("-")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("-a")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR(".")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("   ")))));
+	ASSERT_TRUE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("0")))));
+	ASSERT_TRUE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("1")))));
+	ASSERT_TRUE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("12")))));
+	ASSERT_TRUE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("12345")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("-1")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("-123")))));
+	ASSERT_FALSE((IsUnsignedNumericalString(UTF8String(SGE_U8STR("-12345")))));
+}
+
+TEST(StringTo, IsDecimalStringTest)
+{
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("abc")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("-")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("-a")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR(".")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("    ")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("1.")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("1.2.3")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("1.2..3")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("-.")))));
+	ASSERT_FALSE((IsDecimalString(UCS2String(SGE_WSTR("-.0")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("0")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("0.0")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("0.000")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("000.000")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("1.0")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("123.0")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("123.1")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("123.123")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("-1.0")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("-1.1")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("-1.123")))));
+	ASSERT_TRUE((IsDecimalString(UCS2String(SGE_WSTR("-123.123")))));
+
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("abc")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("-")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("-a")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR(".")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("    ")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("1.")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("1.2.3")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("1.2..3")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("-.")))));
+	ASSERT_FALSE((IsDecimalString(UTF8String(SGE_U8STR("-.0")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("0")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("0.0")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("0.000")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("000.000")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("1.0")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("123.0")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("123.1")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("123.123")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("-1.0")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("-1.1")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("-1.123")))));
+	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("-123.123")))));
+}
+
 TEST(StringTo, IntTest)
 {
 	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("0"))), 0);
