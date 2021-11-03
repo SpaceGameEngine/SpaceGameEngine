@@ -22,6 +22,7 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "Concurrent/Atomic.hpp"
 #include <cstring>
+#include <cmath>
 
 namespace SpaceGameEngine
 {
@@ -1252,6 +1253,7 @@ namespace SpaceGameEngine
 	class StringCore
 	{
 	public:
+		using CharType = T;
 		using ValueType = std::conditional_t<Trait::IsMultipleByte, T*, T>;
 		using ConstValueType = std::conditional_t<Trait::IsMultipleByte, const T*, const T>;
 		using ValueTrait = Trait;
@@ -3498,6 +3500,1048 @@ namespace SpaceGameEngine
 #define SGE_TSTR_TO_UCS2(str) SpaceGameEngine::UTF8StringToUCS2String(str)
 #define SGE_TSTR_TO_UTF8(str) str
 #endif
+
+	template<typename StringType, typename T>
+	struct ToStringCore
+	{
+		inline static StringType Get(const T& value)
+		{
+			return StringType(value);
+		}
+	};
+
+	template<typename StringType, typename T, typename... Args>
+	inline StringType ToString(const T& value, Args&&... args)
+	{
+		return ToStringCore<StringType, T>::Get(value, std::forward<Args>(args)...);
+	}
+
+	enum class NumberBase : UInt8
+	{
+		Decimal = 10,
+		Binary = 2,
+		Hex = 16
+	};
+
+	struct InvalidNumberBaseError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The number base is invalid.");
+		inline static bool Judge(NumberBase base)
+		{
+			return base != NumberBase::Decimal && base != NumberBase::Binary && base != NumberBase::Hex;
+		}
+	};
+
+	template<typename Allocator, typename IntegerType>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static constexpr const Char16 digits[201] =
+			SGE_WSTR("00010203040506070809")
+				SGE_WSTR("10111213141516171819")
+					SGE_WSTR("20212223242526272829")
+						SGE_WSTR("30313233343536373839")
+							SGE_WSTR("40414243444546474849")
+								SGE_WSTR("50515253545556575859")
+									SGE_WSTR("60616263646566676869")
+										SGE_WSTR("70717273747576777879")
+											SGE_WSTR("80818283848586878889")
+												SGE_WSTR("90919293949596979899");
+
+		inline static constexpr const Char16 digits16[17] = SGE_WSTR("0123456789abcdef");
+
+		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
+		{
+			SGE_ASSERT(InvalidNumberBaseError, base);
+			if constexpr (std::is_unsigned_v<IntegerType>)
+			{
+				if (base == NumberBase::Decimal)
+				{
+					const SizeType length = Digits<10>(value);
+					SizeType next = length - 1;
+					StringType re(length, SGE_WSTR(' '));
+					Char16* dst = re.GetData();
+					while (value >= 100)
+					{
+						UInt64 i = (value % 100) * 2;
+						value /= 100;
+						dst[next] = digits[i + 1];
+						dst[next - 1] = digits[i];
+						next -= 2;
+					}
+					if (value < 10)
+					{
+						dst[next] = SGE_WSTR('0') + value;
+					}
+					else
+					{
+						auto i = SizeType(value) * 2;
+						dst[next] = digits[i + 1];
+						dst[next - 1] = digits[i];
+					}
+
+					return re;
+				}
+				else if (base == NumberBase::Binary)
+				{
+					const SizeType length = Digits<2>(value);
+					SizeType next = length - 1;
+					StringType re(length, SGE_WSTR(' '));
+					Char16* dst = re.GetData();
+					while (value >= 2)
+					{
+						dst[next] = digits16[value % 2];
+						value /= 2;
+						next -= 1;
+					}
+					dst[next] = digits16[value];
+
+					return re;
+				}
+				else if (base == NumberBase::Hex)
+				{
+					const SizeType length = Digits<16>(value);
+					SizeType next = length - 1;
+					StringType re(length, SGE_WSTR(' '));
+					Char16* dst = re.GetData();
+					while (value >= 16)
+					{
+						dst[next] = digits16[value % 16];
+						value /= 16;
+						next -= 1;
+					}
+					dst[next] = digits16[value];
+
+					return re;
+				}
+			}
+			else
+			{
+				if (value < 0)
+				{
+					value *= -1;
+					if (base == NumberBase::Decimal)
+					{
+						const SizeType length = Digits<10>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						dst[0] = SGE_WSTR('-');
+						while (value >= 100)
+						{
+							UInt64 i = (value % 100) * 2;
+							value /= 100;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+							next -= 2;
+						}
+						if (value < 10)
+						{
+							dst[next] = SGE_WSTR('0') + value;
+						}
+						else
+						{
+							auto i = SizeType(value) * 2;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+						}
+
+						return re;
+					}
+					else if (base == NumberBase::Binary)
+					{
+						const SizeType length = Digits<2>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						dst[0] = SGE_WSTR('-');
+						while (value >= 2)
+						{
+							dst[next] = digits16[value % 2];
+							value /= 2;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+					else if (base == NumberBase::Hex)
+					{
+						const SizeType length = Digits<16>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						dst[0] = SGE_WSTR('-');
+						while (value >= 16)
+						{
+							dst[next] = digits16[value % 16];
+							value /= 16;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+				}
+				else
+				{
+					if (base == NumberBase::Decimal)
+					{
+						const SizeType length = Digits<10>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						while (value >= 100)
+						{
+							UInt64 i = (value % 100) * 2;
+							value /= 100;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+							next -= 2;
+						}
+						if (value < 10)
+						{
+							dst[next] = SGE_WSTR('0') + value;
+						}
+						else
+						{
+							auto i = SizeType(value) * 2;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+						}
+
+						return re;
+					}
+					else if (base == NumberBase::Binary)
+					{
+						const SizeType length = Digits<2>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						while (value >= 2)
+						{
+							dst[next] = digits16[value % 2];
+							value /= 2;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+					else if (base == NumberBase::Hex)
+					{
+						const SizeType length = Digits<16>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_WSTR(' '));
+						Char16* dst = re.GetData();
+						while (value >= 16)
+						{
+							dst[next] = digits16[value % 16];
+							value /= 16;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+				}
+			}
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, float>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(float value, SizeType precision = 4)
+		{
+			Int64 integer = (Int64)round(value);
+			StringType re = ToString<StringType, Int64>(integer);
+			if (precision != 0)
+			{
+				re += SGE_WSTR('.');
+				value -= (float)integer;
+				if (value < 0.0f)
+					value *= -1.0f;
+				for (SizeType i = 0; i < precision; ++i)
+				{
+					value *= 10.0f;
+				}
+				UInt64 decimal = round(value);
+				StringType decimal_str = ToString<StringType, UInt64>(decimal);
+				if (decimal_str.GetSize() < precision)
+					re += StringType(precision - decimal_str.GetSize(), SGE_WSTR('0'));
+				re += decimal_str;
+			}
+			return re;
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, double>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(double value, SizeType precision = 6)
+		{
+			Int64 integer = (Int64)round(value);
+			StringType re = ToString<StringType, Int64>(integer);
+			if (precision != 0)
+			{
+				re += SGE_WSTR('.');
+				value -= (double)integer;
+				if (value < 0.0)
+					value *= -1.0;
+				for (SizeType i = 0; i < precision; ++i)
+				{
+					value *= 10.0;
+				}
+				UInt64 decimal = round(value);
+				StringType decimal_str = ToString<StringType, UInt64>(decimal);
+				if (decimal_str.GetSize() < precision)
+					re += StringType(precision - decimal_str.GetSize(), SGE_WSTR('0'));
+				re += decimal_str;
+			}
+			return re;
+		}
+	};
+
+	//------------------------------------------------------------------
+
+	template<typename Allocator, typename IntegerType>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, IntegerType>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static constexpr const char digits[201] =
+			SGE_U8STR("00010203040506070809")
+				SGE_U8STR("10111213141516171819")
+					SGE_U8STR("20212223242526272829")
+						SGE_U8STR("30313233343536373839")
+							SGE_U8STR("40414243444546474849")
+								SGE_U8STR("50515253545556575859")
+									SGE_U8STR("60616263646566676869")
+										SGE_U8STR("70717273747576777879")
+											SGE_U8STR("80818283848586878889")
+												SGE_U8STR("90919293949596979899");
+
+		inline static constexpr const char digits16[17] = SGE_U8STR("0123456789abcdef");
+
+		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
+		{
+			SGE_ASSERT(InvalidNumberBaseError, base);
+			if constexpr (std::is_unsigned_v<IntegerType>)
+			{
+				if (base == NumberBase::Decimal)
+				{
+					const SizeType length = Digits<10>(value);
+					SizeType next = length - 1;
+					StringType re(length, SGE_U8STR(" "));
+					char* dst = re.GetData();
+					while (value >= 100)
+					{
+						UInt64 i = (value % 100) * 2;
+						value /= 100;
+						dst[next] = digits[i + 1];
+						dst[next - 1] = digits[i];
+						next -= 2;
+					}
+					if (value < 10)
+					{
+						dst[next] = SGE_U8STR('0') + value;
+					}
+					else
+					{
+						auto i = SizeType(value) * 2;
+						dst[next] = digits[i + 1];
+						dst[next - 1] = digits[i];
+					}
+
+					return re;
+				}
+				else if (base == NumberBase::Binary)
+				{
+					const SizeType length = Digits<2>(value);
+					SizeType next = length - 1;
+					StringType re(length, SGE_U8STR(" "));
+					char* dst = re.GetData();
+					while (value >= 2)
+					{
+						dst[next] = digits16[value % 2];
+						value /= 2;
+						next -= 1;
+					}
+					dst[next] = digits16[value];
+
+					return re;
+				}
+				else if (base == NumberBase::Hex)
+				{
+					const SizeType length = Digits<16>(value);
+					SizeType next = length - 1;
+					StringType re(length, SGE_U8STR(" "));
+					char* dst = re.GetData();
+					while (value >= 16)
+					{
+						dst[next] = digits16[value % 16];
+						value /= 16;
+						next -= 1;
+					}
+					dst[next] = digits16[value];
+
+					return re;
+				}
+			}
+			else
+			{
+				if (value < 0)
+				{
+					value *= -1;
+					if (base == NumberBase::Decimal)
+					{
+						const SizeType length = Digits<10>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						dst[0] = SGE_U8STR('-');
+						while (value >= 100)
+						{
+							UInt64 i = (value % 100) * 2;
+							value /= 100;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+							next -= 2;
+						}
+						if (value < 10)
+						{
+							dst[next] = SGE_U8STR('0') + value;
+						}
+						else
+						{
+							auto i = SizeType(value) * 2;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+						}
+
+						return re;
+					}
+					else if (base == NumberBase::Binary)
+					{
+						const SizeType length = Digits<2>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						dst[0] = SGE_U8STR('-');
+						while (value >= 2)
+						{
+							dst[next] = digits16[value % 2];
+							value /= 2;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+					else if (base == NumberBase::Hex)
+					{
+						const SizeType length = Digits<16>(value) + 1;
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						dst[0] = SGE_U8STR('-');
+						while (value >= 16)
+						{
+							dst[next] = digits16[value % 16];
+							value /= 16;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+				}
+				else
+				{
+					if (base == NumberBase::Decimal)
+					{
+						const SizeType length = Digits<10>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						while (value >= 100)
+						{
+							UInt64 i = (value % 100) * 2;
+							value /= 100;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+							next -= 2;
+						}
+						if (value < 10)
+						{
+							dst[next] = SGE_U8STR('0') + value;
+						}
+						else
+						{
+							auto i = SizeType(value) * 2;
+							dst[next] = digits[i + 1];
+							dst[next - 1] = digits[i];
+						}
+
+						return re;
+					}
+					else if (base == NumberBase::Binary)
+					{
+						const SizeType length = Digits<2>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						while (value >= 2)
+						{
+							dst[next] = digits16[value % 2];
+							value /= 2;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+					else if (base == NumberBase::Hex)
+					{
+						const SizeType length = Digits<16>(value);
+						SizeType next = length - 1;
+						StringType re(length, SGE_U8STR(" "));
+						char* dst = re.GetData();
+						while (value >= 16)
+						{
+							dst[next] = digits16[value % 16];
+							value /= 16;
+							next -= 1;
+						}
+						dst[next] = digits16[value];
+
+						return re;
+					}
+				}
+			}
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, float>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(float value, SizeType precision = 4)
+		{
+			Int64 integer = (Int64)round(value);
+			StringType re = ToString<StringType, Int64>(integer);
+			if (precision != 0)
+			{
+				re += SGE_U8STR('.');
+				value -= (float)integer;
+				if (value < 0.0f)
+					value *= -1.0f;
+				for (SizeType i = 0; i < precision; ++i)
+				{
+					value *= 10.0f;
+				}
+				UInt64 decimal = round(value);
+				StringType decimal_str = ToString<StringType, UInt64>(decimal);
+				if (decimal_str.GetSize() < precision)
+					re += StringType(precision - decimal_str.GetSize(), SGE_U8STR("0"));
+				re += decimal_str;
+			}
+			return re;
+		}
+	};
+
+	template<typename Allocator>
+	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, double>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static StringType Get(double value, SizeType precision = 6)
+		{
+			Int64 integer = (Int64)round(value);
+			StringType re = ToString<StringType, Int64>(integer);
+			if (precision != 0)
+			{
+				re += SGE_U8STR('.');
+				value -= (double)integer;
+				if (value < 0.0)
+					value *= -1.0;
+				for (SizeType i = 0; i < precision; ++i)
+				{
+					value *= 10.0;
+				}
+				UInt64 decimal = round(value);
+				StringType decimal_str = ToString<StringType, UInt64>(decimal);
+				if (decimal_str.GetSize() < precision)
+					re += StringType(precision - decimal_str.GetSize(), SGE_U8STR("0"));
+				re += decimal_str;
+			}
+			return re;
+		}
+	};
+
+	//------------------------------------------------------------------
+
+	template<typename T, typename Trait>
+	struct IsNumericalCharacterCore
+	{
+	};
+
+	template<typename T, typename Trait, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
+	inline bool IsNumericalCharacter(ArgType c)
+	{
+		return IsNumericalCharacterCore<T, Trait>::Get(c);
+	}
+
+	template<>
+	struct IsNumericalCharacterCore<Char16, UCS2Trait>
+	{
+		inline static bool Get(Char16 c)
+		{
+			return c >= SGE_WSTR('0') && c <= SGE_WSTR('9');
+		}
+	};
+
+	template<>
+	struct IsNumericalCharacterCore<char, UTF8Trait>
+	{
+		inline static bool Get(const char* pc)
+		{
+			SGE_ASSERT(NullPointerError, pc);
+			return (*pc) >= SGE_U8STR('0') && (*pc) <= SGE_U8STR('9');
+		}
+	};
+
+	template<typename T, typename Trait, typename Allocator>
+	inline bool IsSignedNumericalString(const StringCore<T, Trait, Allocator>& str)
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+		if (str.GetSize() == 0)
+			return false;
+
+		if constexpr (std::is_same_v<Trait, UCS2Trait>)
+		{
+			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			{
+				if (str.GetSize() == 1)
+					return false;
+				else if (str[0] != SGE_WSTR('-'))
+					return false;
+			}
+		}
+		else	//UTF8Trait
+		{
+			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			{
+				if (str.GetSize() == 1)
+					return false;
+				else if ((*str[0]) != SGE_U8STR('-'))
+					return false;
+			}
+		}
+
+		for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
+		{
+			if (!IsNumericalCharacter<T, Trait>(*iter))
+				return false;
+		}
+
+		return true;
+	}
+
+	template<typename T, typename Trait, typename Allocator>
+	inline bool IsUnsignedNumericalString(const StringCore<T, Trait, Allocator>& str)
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+		if (str.GetSize() == 0)
+			return false;
+
+		for (auto iter = str.GetConstBegin(); iter != str.GetConstEnd(); ++iter)
+		{
+			if (!IsNumericalCharacter<T, Trait>(*iter))
+				return false;
+		}
+
+		return true;
+	}
+
+	template<typename T, typename Trait, typename Allocator>
+	inline bool IsDecimalString(const StringCore<T, Trait, Allocator>& str)
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+		if (str.GetSize() == 0)
+			return false;
+
+		bool has_meet_point = false;
+
+		if constexpr (std::is_same_v<Trait, UCS2Trait>)
+		{
+			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			{
+				if (str.GetSize() == 1)
+					return false;
+				else if (str[0] != SGE_WSTR('-'))
+					return false;
+			}
+
+			for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<T, Trait>(*iter))
+				{
+					if (*iter != SGE_WSTR('.'))
+						return false;
+					else
+					{
+						if (has_meet_point)
+							return false;
+						else if (iter + 1 == str.GetConstEnd())
+							return false;
+						else if (!IsNumericalCharacter<T, Trait>(*(iter - 1)))
+							return false;
+						else
+							has_meet_point = true;
+					}
+				}
+			}
+		}
+		else	//UTF8Trait
+		{
+			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			{
+				if (str.GetSize() == 1)
+					return false;
+				else if ((*str[0]) != SGE_U8STR('-'))
+					return false;
+			}
+
+			for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<T, Trait>(*iter))
+				{
+					if ((**iter) != SGE_U8STR('.'))
+						return false;
+					else
+					{
+						if (has_meet_point)
+							return false;
+						else if (iter + 1 == str.GetConstEnd())
+							return false;
+						else if (!IsNumericalCharacter<T, Trait>(*(iter - 1)))
+							return false;
+						else
+							has_meet_point = true;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	struct NonSignedNumericalStringError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not numerical string.");
+		template<typename T, typename Trait, typename Allocator>
+		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
+		{
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+			return !IsSignedNumericalString(str);
+		}
+	};
+
+	struct NonUnsignedNumericalStringError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not unsigned numerical string.");
+		template<typename T, typename Trait, typename Allocator>
+		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
+		{
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+			return !IsUnsignedNumericalString(str);
+		}
+	};
+
+	struct NonDecimalStringError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not decimal string.");
+		template<typename T, typename Trait, typename Allocator>
+		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
+		{
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+			return !IsDecimalString(str);
+		}
+	};
+
+	template<typename StringType, typename T>
+	struct StringToCore
+	{
+		inline static T Get(const StringType& str)
+		{
+			return T(str);
+		}
+	};
+
+	template<typename StringType, typename T>
+	inline T StringTo(const StringType& str)
+	{
+		return StringToCore<StringType, T>::Get(str);
+	}
+
+	template<typename Allocator, typename IntegerType>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static IntegerType Get(const StringType& str)
+		{
+			if constexpr (std::is_signed_v<IntegerType>)
+			{
+				SGE_ASSERT(NonSignedNumericalStringError, str);
+				bool is_negative = false;
+				typename StringType::ConstIterator next = str.GetConstBegin();
+				if (*next == SGE_WSTR('-'))
+				{
+					is_negative = true;
+					++next;
+				}
+				IntegerType re = 0;
+				for (; next != str.GetConstEnd(); ++next)
+				{
+					re *= 10;
+					re += (*next) - SGE_WSTR('0');
+				}
+				return (is_negative ? -1 * re : re);
+			}
+			else
+			{
+				SGE_ASSERT(NonUnsignedNumericalStringError, str);
+				typename StringType::ConstIterator next = str.GetConstBegin();
+				IntegerType re = 0;
+				for (; next != str.GetConstEnd(); ++next)
+				{
+					re *= 10;
+					re += (*next) - SGE_WSTR('0');
+				}
+				return re;
+			}
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, float>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static float Get(const StringType& str)
+		{
+			SGE_ASSERT(NonDecimalStringError, str);
+			bool is_negative = false;
+			bool is_after_point = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (*next == SGE_WSTR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			float re = 0.0f;
+			float decimal = 1.0f;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				if ((!is_after_point) && (*next) == SGE_WSTR('.'))
+				{
+					is_after_point = true;
+					continue;
+				}
+				if (is_after_point)
+				{
+					decimal *= 0.1f;
+					re += decimal * ((float)((*next) - SGE_WSTR('0')));
+				}
+				else
+				{
+					re *= 10.0f;
+					re += (float)((*next) - SGE_WSTR('0'));
+				}
+			}
+			return (is_negative ? -1.0f * re : re);
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, double>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static double Get(const StringType& str)
+		{
+			SGE_ASSERT(NonDecimalStringError, str);
+			bool is_negative = false;
+			bool is_after_point = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (*next == SGE_WSTR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			double re = 0.0;
+			double decimal = 1.0;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				if ((!is_after_point) && (*next) == SGE_WSTR('.'))
+				{
+					is_after_point = true;
+					continue;
+				}
+				if (is_after_point)
+				{
+					decimal *= 0.1;
+					re += decimal * ((double)((*next) - SGE_WSTR('0')));
+				}
+				else
+				{
+					re *= 10.0;
+					re += (double)((*next) - SGE_WSTR('0'));
+				}
+			}
+			return (is_negative ? -1.0 * re : re);
+		}
+	};
+
+	//------------------------------------------------------------------
+
+	template<typename Allocator, typename IntegerType>
+	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, IntegerType>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static IntegerType Get(const StringType& str)
+		{
+			if constexpr (std::is_signed_v<IntegerType>)
+			{
+				SGE_ASSERT(NonSignedNumericalStringError, str);
+				bool is_negative = false;
+				typename StringType::ConstIterator next = str.GetConstBegin();
+				if (**next == SGE_U8STR('-'))
+				{
+					is_negative = true;
+					++next;
+				}
+				IntegerType re = 0;
+				for (; next != str.GetConstEnd(); ++next)
+				{
+					re *= 10;
+					re += (**next) - SGE_U8STR('0');
+				}
+				return (is_negative ? -1 * re : re);
+			}
+			else
+			{
+				SGE_ASSERT(NonUnsignedNumericalStringError, str);
+				typename StringType::ConstIterator next = str.GetConstBegin();
+				IntegerType re = 0;
+				for (; next != str.GetConstEnd(); ++next)
+				{
+					re *= 10;
+					re += (**next) - SGE_U8STR('0');
+				}
+				return re;
+			}
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, float>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static float Get(const StringType& str)
+		{
+			SGE_ASSERT(NonDecimalStringError, str);
+			bool is_negative = false;
+			bool is_after_point = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (**next == SGE_U8STR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			float re = 0.0f;
+			float decimal = 1.0f;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				if ((!is_after_point) && (**next) == SGE_U8STR('.'))
+				{
+					is_after_point = true;
+					continue;
+				}
+				if (is_after_point)
+				{
+					decimal *= 0.1f;
+					re += decimal * ((float)((**next) - SGE_U8STR('0')));
+				}
+				else
+				{
+					re *= 10.0f;
+					re += (float)((**next) - SGE_U8STR('0'));
+				}
+			}
+			return (is_negative ? -1.0f * re : re);
+		}
+	};
+
+	template<typename Allocator>
+	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, double>
+	{
+		using StringType = StringCore<char, UTF8Trait, Allocator>;
+
+		inline static double Get(const StringType& str)
+		{
+			SGE_ASSERT(NonDecimalStringError, str);
+			bool is_negative = false;
+			bool is_after_point = false;
+			typename StringType::ConstIterator next = str.GetConstBegin();
+			if (**next == SGE_U8STR('-'))
+			{
+				is_negative = true;
+				++next;
+			}
+			double re = 0.0;
+			double decimal = 1.0;
+			for (; next != str.GetConstEnd(); ++next)
+			{
+				if ((!is_after_point) && (**next) == SGE_U8STR('.'))
+				{
+					is_after_point = true;
+					continue;
+				}
+				if (is_after_point)
+				{
+					decimal *= 0.1;
+					re += decimal * ((double)((**next) - SGE_U8STR('0')));
+				}
+				else
+				{
+					re *= 10.0;
+					re += (double)((**next) - SGE_U8STR('0'));
+				}
+			}
+			return (is_negative ? -1.0 * re : re);
+		}
+	};
+
 	/*!
 	@}
 	*/

@@ -120,7 +120,7 @@ namespace SpaceGameEngine
 			inline RedBlackTree& operator=(const RedBlackTree& t)
 			{
 				SGE_ASSERT(SelfAssignmentError, this, &t);
-				Clear();
+				RawClear();
 				m_Size = t.m_Size;
 				if (m_Size)
 				{
@@ -134,7 +134,7 @@ namespace SpaceGameEngine
 			inline RedBlackTree& operator=(RedBlackTree&& t)
 			{
 				SGE_ASSERT(SelfAssignmentError, this, &t);
-				Clear();
+				RawClear();
 				m_Size = t.m_Size;
 				if (m_Size)
 				{
@@ -174,7 +174,7 @@ namespace SpaceGameEngine
 			template<typename OtherAllocator>
 			inline RedBlackTree& operator=(const RedBlackTree<K, V, LessComparer, OtherAllocator>& t)
 			{
-				Clear();
+				RawClear();
 				m_Size = t.m_Size;
 				if (m_Size)
 				{
@@ -188,7 +188,7 @@ namespace SpaceGameEngine
 			template<typename OtherAllocator>
 			inline RedBlackTree& operator=(RedBlackTree<K, V, LessComparer, OtherAllocator>&& t)
 			{
-				Clear();
+				RawClear();
 				m_Size = t.m_Size;
 				if (m_Size)
 				{
@@ -307,6 +307,13 @@ namespace SpaceGameEngine
 			}
 
 		private:
+			inline void RawClear()
+			{
+				SGE_ASSERT(NullPointerError, m_pRoot);
+				if (m_pRoot != &m_NilNode)
+					ReleaseNode(m_pRoot);
+			}
+
 			inline void ReleaseNode(Node* p)
 			{
 				SGE_ASSERT(NullPointerError, p);

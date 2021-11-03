@@ -145,6 +145,40 @@ TEST(Queue, PushAndPopTest)
 	}
 }
 
+TEST(Queue, EmplaceAndPopTest)
+{
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	Queue<test_queue_object>* pq = new Queue<test_queue_object>();
+	const Queue<test_queue_object>* pcq = pq;
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		pq->Emplace(i, val_rel_func);
+		ASSERT_EQ(pq->GetFront().val, 0);
+	}
+	ASSERT_EQ(pq->GetSize(), test_size);
+
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(pcq->GetFront().val, i);
+		pq->Pop();
+		ASSERT_EQ(pq->GetSize(), test_size - 1 - i);
+	}
+	ASSERT_EQ(pq->GetSize(), 0);
+
+	delete pq;
+	for (int i = 0; i < test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(Queue, CopyConstructionTest)
 {
 	const int test_size = 1000;

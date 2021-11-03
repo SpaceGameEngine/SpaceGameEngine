@@ -163,6 +163,12 @@ namespace SpaceGameEngine
 			m_Implement.PushBack(std::move(val));
 		}
 
+		template<typename... Args>
+		inline void Emplace(Args&&... args)
+		{
+			m_Implement.EmplaceBack(std::forward<Args>(args)...);
+		}
+
 		inline void Pop()
 		{
 			SGE_ASSERT(EmptyStackError, m_Implement.GetSize());

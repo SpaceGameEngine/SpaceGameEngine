@@ -97,6 +97,37 @@ namespace SpaceGameEngine
 			return lhs > rhs;
 		}
 	};
+
+	template<UInt64 Base>
+	inline UInt64 Digits(UInt64 v)
+	{
+		static constexpr const UInt64 Base2 = Base * Base;
+		static constexpr const UInt64 Base3 = Base * Base * Base;
+		static constexpr const UInt64 Base4 = Base * Base * Base * Base;
+		UInt64 re = 1;
+		while (true)
+		{
+			if (v < Base)
+			{
+				return re;
+			}
+			if (v < Base2)
+			{
+				return re + 1;
+			}
+			if (v < Base3)
+			{
+				return re + 2;
+			}
+			if (v < Base4)
+			{
+				return re + 3;
+			}
+			v /= Base4;
+			re += 4;
+		}
+	}
+
 	/*!
 	@}
 	*/
