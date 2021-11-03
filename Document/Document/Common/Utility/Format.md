@@ -1,7 +1,7 @@
-# SpaceGameEngine
+﻿# SpaceGameEngine
 ## Format
 ### 概述
-`Format`是用来提供格式化产生字符串的功能的。其可以通过通过`Format(str,Args...)`函数来使用格式化功能，且可以通过特化`Formatter`模板类来扩充格式化对其他类型的支持。
+`Format`是用来提供格式化产生字符串的功能的。用户可以通过调用`Format(str,Args...)`函数来使用格式化功能，且可以通过特化`Formatter`或是`ToString`模板类来扩充格式化对其他类型的支持（如果想要自定义option就应特化`Formatter`）。
 
 ### 格式化字符串的格式
 * 格式化字符串可以为空。

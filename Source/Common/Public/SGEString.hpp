@@ -3755,7 +3755,7 @@ namespace SpaceGameEngine
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
 
-		inline static StringType Get(float value, UInt64 precision = 4)
+		inline static StringType Get(float value, SizeType precision = 4)
 		{
 			Int64 integer = (Int64)round(value);
 			StringType re = ToString<StringType, Int64>(integer);
@@ -3784,7 +3784,7 @@ namespace SpaceGameEngine
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
 
-		inline static StringType Get(double value, UInt64 precision = 6)
+		inline static StringType Get(double value, SizeType precision = 6)
 		{
 			Int64 integer = (Int64)round(value);
 			StringType re = ToString<StringType, Int64>(integer);
@@ -4033,7 +4033,7 @@ namespace SpaceGameEngine
 	{
 		using StringType = StringCore<char, UTF8Trait, Allocator>;
 
-		inline static StringType Get(float value, UInt64 precision = 4)
+		inline static StringType Get(float value, SizeType precision = 4)
 		{
 			Int64 integer = (Int64)round(value);
 			StringType re = ToString<StringType, Int64>(integer);
@@ -4062,7 +4062,7 @@ namespace SpaceGameEngine
 	{
 		using StringType = StringCore<char, UTF8Trait, Allocator>;
 
-		inline static StringType Get(double value, UInt64 precision = 6)
+		inline static StringType Get(double value, SizeType precision = 6)
 		{
 			Int64 integer = (Int64)round(value);
 			StringType re = ToString<StringType, Int64>(integer);
@@ -4252,9 +4252,11 @@ namespace SpaceGameEngine
 	struct NonSignedNumericalStringError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not numerical string.");
-		template<typename StringType>
-		inline static bool Judge(const StringType& str)
+		template<typename T, typename Trait, typename Allocator>
+		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
 			return !IsSignedNumericalString(str);
 		}
 	};
@@ -4262,9 +4264,11 @@ namespace SpaceGameEngine
 	struct NonUnsignedNumericalStringError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not unsigned numerical string.");
-		template<typename StringType>
-		inline static bool Judge(const StringType& str)
+		template<typename T, typename Trait, typename Allocator>
+		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
 			return !IsUnsignedNumericalString(str);
 		}
 	};
@@ -4272,9 +4276,11 @@ namespace SpaceGameEngine
 	struct NonDecimalStringError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not decimal string.");
-		template<typename StringType>
-		inline static bool Judge(const StringType& str)
+		template<typename T, typename Trait, typename Allocator>
+		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
 			return !IsDecimalString(str);
 		}
 	};
