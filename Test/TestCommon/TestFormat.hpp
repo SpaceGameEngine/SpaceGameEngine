@@ -16,3 +16,40 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "Utility/Format.hpp"
+
+TEST(Format, IsFormatStringTest)
+{
+	ASSERT_FALSE((IsFormatString(UCS2String(SGE_WSTR("test{")))));
+	ASSERT_FALSE((IsFormatString(UCS2String(SGE_WSTR("test{{}")))));
+	ASSERT_FALSE((IsFormatString(UCS2String(SGE_WSTR("test{}}")))));
+	ASSERT_FALSE((IsFormatString(UCS2String(SGE_WSTR("test{#}")))));
+	ASSERT_FALSE((IsFormatString(UCS2String(SGE_WSTR("test{0")))));
+	ASSERT_FALSE((IsFormatString(UCS2String(SGE_WSTR("test{:")))));
+	ASSERT_FALSE((IsFormatString(UCS2String(SGE_WSTR("test{}{0}")))));
+	ASSERT_FALSE((IsFormatString(UCS2String(SGE_WSTR("test{0}{}")))));
+	ASSERT_TRUE((IsFormatString(UCS2String(SGE_WSTR("")))));
+	ASSERT_TRUE((IsFormatString(UCS2String(SGE_WSTR("test{{")))));
+	ASSERT_TRUE((IsFormatString(UCS2String(SGE_WSTR("test}}")))));
+	ASSERT_TRUE((IsFormatString(UCS2String(SGE_WSTR("test{{}}")))));
+	ASSERT_TRUE((IsFormatString(UCS2String(SGE_WSTR("test{}{}")))));
+	ASSERT_TRUE((IsFormatString(UCS2String(SGE_WSTR("test{0}{1}")))));
+	ASSERT_TRUE((IsFormatString(UCS2String(SGE_WSTR("test{:test}{}")))));
+	ASSERT_TRUE((IsFormatString(UCS2String(SGE_WSTR("test{0}{1:test}")))));
+
+	ASSERT_FALSE((IsFormatString(UTF8String(SGE_U8STR("test{")))));
+	ASSERT_FALSE((IsFormatString(UTF8String(SGE_U8STR("test{{}")))));
+	ASSERT_FALSE((IsFormatString(UTF8String(SGE_U8STR("test{}}")))));
+	ASSERT_FALSE((IsFormatString(UTF8String(SGE_U8STR("test{#}")))));
+	ASSERT_FALSE((IsFormatString(UTF8String(SGE_U8STR("test{0")))));
+	ASSERT_FALSE((IsFormatString(UTF8String(SGE_U8STR("test{:")))));
+	ASSERT_FALSE((IsFormatString(UTF8String(SGE_U8STR("test{}{0}")))));
+	ASSERT_FALSE((IsFormatString(UTF8String(SGE_U8STR("test{0}{}")))));
+	ASSERT_TRUE((IsFormatString(UTF8String(SGE_U8STR("")))));
+	ASSERT_TRUE((IsFormatString(UTF8String(SGE_U8STR("test{{")))));
+	ASSERT_TRUE((IsFormatString(UTF8String(SGE_U8STR("test}}")))));
+	ASSERT_TRUE((IsFormatString(UTF8String(SGE_U8STR("test{{}}")))));
+	ASSERT_TRUE((IsFormatString(UTF8String(SGE_U8STR("test{}{}")))));
+	ASSERT_TRUE((IsFormatString(UTF8String(SGE_U8STR("test{0}{1}")))));
+	ASSERT_TRUE((IsFormatString(UTF8String(SGE_U8STR("test{:test}{}")))));
+	ASSERT_TRUE((IsFormatString(UTF8String(SGE_U8STR("test{0}{1:test}")))));
+}
