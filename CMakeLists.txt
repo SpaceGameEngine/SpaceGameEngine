@@ -38,10 +38,10 @@ find_package(Threads REQUIRED)
 function(CopySharedLibrary target)
 if(CMAKE_HOST_UNIX)
 if(CMAKE_HOST_APPLE)
-add_custom_command(TARGET ${target}
+add_custom_command(TARGET ${target} POST_BUILD
                    COMMAND cp ./lib${target}.dylib ../../)
 else()
-add_custom_command(TARGET ${target}
+add_custom_command(TARGET ${target} POST_BUILD
                    COMMAND cp ./lib${target}.so ../../)
 endif()
 endif()
