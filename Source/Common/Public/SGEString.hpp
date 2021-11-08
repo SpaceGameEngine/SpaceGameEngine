@@ -3501,6 +3501,9 @@ namespace SpaceGameEngine
 #define SGE_TSTR_TO_UTF8(str) str
 #endif
 
+#define SGE_STR_TO_TSTR(str) SGE_UCS2_TO_TSTR(str)
+#define SGE_TSTR_TO_STR(str) SGE_TSTR_TO_UCS2(str)
+
 	template<typename StringType, typename T>
 	struct ToStringCore
 	{

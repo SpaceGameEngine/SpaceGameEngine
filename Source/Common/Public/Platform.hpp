@@ -70,6 +70,10 @@ limitations under the License.
 #define SGE_DEBUG
 #endif
 
+#if defined(SGE_UNIX) || defined(SGE_LINUX) || defined(SGE_MACOS)
+#define SGE_POSIX
+#endif
+
 /*!
 @file
 @todo check these platform macros.
