@@ -51,7 +51,7 @@ namespace SpaceGameEngine
 
 	/*!
 	@brief Make the absolute path without "." and "..".
-	@warning The parameter path must be a normalized path string.
+	@warning The parameter path must be a normalized absolute path string.
 	*/
 	COMMON_API String NormalizeAbsolutePathString(const String& path);
 
