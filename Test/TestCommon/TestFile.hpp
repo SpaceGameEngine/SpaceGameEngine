@@ -40,6 +40,45 @@ TEST(Path, NormalizePathStringTest)
 	ASSERT_EQ(NormalizePathString(SGE_STR("")), SGE_STR("."));
 }
 
+TEST(Path, NormalizeAbsolutePathStringTest)
+{
+#ifdef SGE_WINDOWS
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:")), SGE_STR("C:"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test")), SGE_STR("C:/test"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/..")), SGE_STR("C:"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/../..")), SGE_STR("C:"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/../../..")), SGE_STR("C:"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/./..")), SGE_STR("C:"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/./test1/..")), SGE_STR("C:/test"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/test1/..")), SGE_STR("C:/test"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/test1/../..")), SGE_STR("C:"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/test1/../.")), SGE_STR("C:/test"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("C:/test/test1/././.")), SGE_STR("C:/test/test1"));
+#elif defined(SGE_POSIX)
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/.")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/../..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/./.")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/../../..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/../../../.")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/../../.././..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/../../.././../.")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test")), SGE_STR("/test"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/../..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/../../..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/./..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/./test1/..")), SGE_STR("/test"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/test1/..")), SGE_STR("/test"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/test1/../..")), SGE_STR("/"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/test1/../.")), SGE_STR("/test"));
+	ASSERT_EQ(NormalizeAbsolutePathString(SGE_STR("/test/test1/././.")), SGE_STR("/test/test1"));
+#else
+#error this os has not been supported.
+#endif
+}
+
 TEST(Path, InstanceTest)
 {
 	Path p1;
@@ -105,7 +144,7 @@ TEST(Path, GetAbsolutePathTest)
 	ASSERT_FALSE(p.IsAbsolute());
 	Path ap = p.GetAbsolutePath();
 	ASSERT_TRUE(ap.IsAbsolute());
-	std::wcout << ap.GetString().GetData() << std::endl;
+	StdTCout << SGE_STR_TO_TSTR(ap.GetString()).GetData() << std::endl;
 #ifdef SGE_WINDOWS
 	Path p2(SGE_STR("C:/test"));
 	ASSERT_TRUE(p2.IsAbsolute());
@@ -135,5 +174,5 @@ TEST(Path, GetCurrentDirectoryPathTest)
 {
 	Path p = GetCurrentDirectoryPath();
 	ASSERT_TRUE(p.IsAbsolute());
-	std::wcout << p.GetString().GetData() << std::endl;
+	StdTCout << SGE_STR_TO_TSTR(p.GetString()).GetData() << std::endl;
 }

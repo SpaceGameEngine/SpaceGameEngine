@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "File.h"
+#include "Container/Stack.hpp"
 #ifdef SGE_POSIX
 #include <unistd.h>
 #endif
@@ -59,21 +60,39 @@ bool SpaceGameEngine::Path::IsAbsolute() const
 		return false;
 	if (m_Content[1] != SGE_STR(':'))
 		return false;
-	return true;
 #elif defined(SGE_POSIX)
 	if (m_Content.GetSize() < 1)
 		return false;
 	if (m_Content[0] != SGE_STR('/'))
 		return false;
-	return true;
 #else
 #error this os has not been supported.
 #endif
+	return true;
 }
 
 bool SpaceGameEngine::Path::IsRelative() const
 {
 	return !IsAbsolute();
+}
+
+namespace
+{
+	using namespace SpaceGameEngine;
+
+	void WalkThroughPath(const Vector<String>& dirs, SizeType idx, Stack<SizeType, DefaultAllocator, Vector>& stack)
+	{
+		if (idx == dirs.GetSize())
+			return;
+		if (dirs[idx] == SGE_STR(".."))
+		{
+			if (stack.GetSize())
+				stack.Pop();
+		}
+		else if (dirs[idx] != SGE_STR("."))
+			stack.Push(idx);
+		WalkThroughPath(dirs, idx + 1, stack);
+	}
 }
 
 SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
@@ -84,15 +103,23 @@ SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
 		const unsigned int buf_size = 4096;
 		TChar out_buffer[buf_size] = SGE_TSTR("");
 		SGE_CHECK(GetFullPathNameFailError, GetFullPathName(SGE_STR_TO_TSTR(m_Content).GetData(), buf_size, out_buffer, NULL));
-		return Path(SGE_TSTR_TO_STR(out_buffer));
+		Path re(SGE_TSTR_TO_STR(out_buffer));
 #elif defined(SGE_POSIX)
-		return GetCurrentDirectoryPath() / (*this);
+		Path re(GetCurrentDirectoryPath() / (*this));
 #else
 #error this os has not been supported.
 #endif
+		re.m_Content = NormalizeAbsolutePathString(re.m_Content);
+		return re;
 	}
 	else
 		return m_Content;
+}
+
+SpaceGameEngine::Path SpaceGameEngine::Path::GetParentPath() const
+{
+	//todo
+	return Path();
 }
 
 SpaceGameEngine::Path SpaceGameEngine::Path::operator/(const Path& path) const
@@ -143,6 +170,34 @@ COMMON_API SpaceGameEngine::String SpaceGameEngine::NormalizePathString(const St
 	return re;
 }
 
+SpaceGameEngine::String SpaceGameEngine::NormalizeAbsolutePathString(const String& path)
+{
+	Vector<String> dirs = Split(path, String(SGE_STR("/")));
+	Stack<SizeType, DefaultAllocator, Vector> stack;
+	WalkThroughPath(dirs, 1, stack);
+#ifdef SGE_WINDOWS
+	String re(dirs[0]);
+	for (auto iter = stack.GetImplement().GetConstBegin(); iter != stack.GetImplement().GetConstEnd(); ++iter)
+	{
+		re += SGE_STR('/');
+		re += dirs[*iter];
+	}
+#elif defined(SGE_POSIX)
+	String re;
+	for (auto iter = stack.GetImplement().GetConstBegin(); iter != stack.GetImplement().GetConstEnd(); ++iter)
+	{
+		re += SGE_STR('/');
+		re += dirs[*iter];
+	}
+	if (re.GetSize() == 0)
+		re += SGE_STR('/');
+#else
+#error this os has not been supported.
+#endif
+
+	return re;
+}
+
 SpaceGameEngine::Path SpaceGameEngine::GetCurrentDirectoryPath()
 {
 #ifdef SGE_WINDOWS
@@ -158,6 +213,18 @@ SpaceGameEngine::Path SpaceGameEngine::GetCurrentDirectoryPath()
 #else
 #error this os has not been supported.
 #endif
+}
+
+SpaceGameEngine::Path SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
+{
+	//todo : need to add check exist first to assert for the path's existion.
+	return Path();
+}
+
+SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
+{
+	//todo : need to add get parent path first
+	return Path();
 }
 
 #ifdef SGE_WINDOWS

@@ -49,6 +49,12 @@ namespace SpaceGameEngine
 
 	COMMON_API String NormalizePathString(const String& path);
 
+	/*!
+	@brief Make the absolute path without "." and "..".
+	@warning The parameter path must be a normalized path string.
+	*/
+	COMMON_API String NormalizeAbsolutePathString(const String& path);
+
 	class COMMON_API Path
 	{
 	public:
@@ -62,6 +68,7 @@ namespace SpaceGameEngine
 		bool IsRelative() const;
 
 		Path GetAbsolutePath() const;
+		Path GetParentPath() const;
 
 		Path operator/(const Path& path) const;
 

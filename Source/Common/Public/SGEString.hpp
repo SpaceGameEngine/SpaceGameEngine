@@ -21,6 +21,7 @@ limitations under the License.
 #include "Container/ContainerConcept.hpp"
 #include "Utility/Utility.hpp"
 #include "Concurrent/Atomic.hpp"
+#include "Container/Vector.hpp"
 #include <cstring>
 #include <cmath>
 
@@ -971,7 +972,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType tsize = ptext_end - ptext_begin;
-				SGE_ASSERT(InvalidSizeError, tsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidSizeError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				if (tsize < nsize)
 				{
@@ -1082,7 +1083,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType tsize = ptext_end - ptext_begin;
-				SGE_ASSERT(InvalidSizeError, tsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidSizeError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				if (tsize < nsize)
 				{
@@ -1128,7 +1129,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType tsize = ptext_end - ptext_begin;
-				SGE_ASSERT(InvalidSizeError, tsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidSizeError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				if (tsize < nsize)
 				{
@@ -1183,7 +1184,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType tsize = ptext_end - ptext_begin;
-				SGE_ASSERT(InvalidSizeError, tsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidSizeError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				if (tsize < nsize)
 				{
@@ -2980,11 +2981,11 @@ namespace SpaceGameEngine
 		}
 
 		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
-		inline Iterator Find(const StringCore& str, const Iterator& begin, const Iterator& end)
+		inline Iterator Find(const StringCore& str, const Iterator& begin, const Iterator& end) const
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3018,7 +3019,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3048,11 +3049,11 @@ namespace SpaceGameEngine
 		}
 
 		template<typename OtherAllocator, typename SearchStrategy = StringImplement::SimpleSearchStrategy>
-		inline Iterator Find(const StringCore<T, Trait, OtherAllocator>& str, const Iterator& begin, const Iterator& end)
+		inline Iterator Find(const StringCore<T, Trait, OtherAllocator>& str, const Iterator& begin, const Iterator& end) const
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3086,7 +3087,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3116,12 +3117,12 @@ namespace SpaceGameEngine
 		}
 
 		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
-		inline Iterator Find(const T* pstr, const Iterator& begin, const Iterator& end)
+		inline Iterator Find(const T* pstr, const Iterator& begin, const Iterator& end) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = GetCStringNormalSize(pstr);
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3155,7 +3156,7 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = GetCStringNormalSize(pstr);
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3184,11 +3185,11 @@ namespace SpaceGameEngine
 		}
 
 		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
-		inline Iterator ReverseFind(const StringCore& str, const Iterator& begin, const Iterator& end)
+		inline Iterator ReverseFind(const StringCore& str, const Iterator& begin, const Iterator& end) const
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3222,7 +3223,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3252,11 +3253,11 @@ namespace SpaceGameEngine
 		}
 
 		template<typename OtherAllocator, typename SearchStrategy = StringImplement::SimpleSearchStrategy>
-		inline Iterator ReverseFind(const StringCore<T, Trait, OtherAllocator>& str, const Iterator& begin, const Iterator& end)
+		inline Iterator ReverseFind(const StringCore<T, Trait, OtherAllocator>& str, const Iterator& begin, const Iterator& end) const
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3290,7 +3291,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3320,12 +3321,12 @@ namespace SpaceGameEngine
 		}
 
 		template<typename SearchStrategy = StringImplement::SimpleSearchStrategy>
-		inline Iterator ReverseFind(const T* pstr, const Iterator& begin, const Iterator& end)
+		inline Iterator ReverseFind(const T* pstr, const Iterator& begin, const Iterator& end) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = GetCStringNormalSize(pstr);
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -3359,7 +3360,7 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 1, m_Size);
+			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
 
 			SizeType nsize = GetCStringNormalSize(pstr);
 			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
@@ -4544,6 +4545,24 @@ namespace SpaceGameEngine
 			return (is_negative ? -1.0 * re : re);
 		}
 	};
+
+	template<typename T, typename Trait, typename Allocator>
+	inline Vector<StringCore<T, Trait, Allocator>, Allocator> Split(const StringCore<T, Trait, Allocator>& str, const StringCore<T, Trait, Allocator>& separ)
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+		Vector<StringCore<T, Trait, Allocator>, Allocator> re;
+		auto siter = str.GetConstBegin();
+		auto eiter = str.Find(separ, siter, str.GetConstEnd());
+		while (eiter != str.GetConstEnd())
+		{
+			re.EmplaceBack(siter, eiter);
+			siter = eiter + separ.GetSize();
+			eiter = str.Find(separ, siter, str.GetConstEnd());
+		}
+		re.EmplaceBack(siter, eiter);
+		return re;
+	}
 
 	/*!
 	@}
