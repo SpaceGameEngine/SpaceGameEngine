@@ -5,5 +5,7 @@ tests=($(ls))
 cd ..
 
 for test in "${tests[@]}"; do
-  ./build/Test/$test/$test --gtest_output=xml:$test-REPORT.xml
+  if [ $test != "TestModule" ];then
+    ./build/Test/$test/$test --gtest_output=xml:$test-REPORT.xml
+  fi
 done

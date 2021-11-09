@@ -4,6 +4,8 @@ project(SpaceGameEngine VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+cmake_policy(SET CMP0054 NEW)
+
 ## set utf8 runtime environment
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 add_compile_options(/source-charset:utf-8 /source-charset:utf-8)
