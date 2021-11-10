@@ -257,7 +257,7 @@ SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 #elif defined(SGE_MACOS)
 	uint32_t buf_size2 = buf_size;
 	TChar out_buffer2[buf_size] = SGE_TSTR("");
-	SGE_CHECK(NSGetExecutablePathFailError, _NSGetExecutablePath(out_buffer2, buf_size2));
+	SGE_CHECK(NSGetExecutablePathFailError, _NSGetExecutablePath(out_buffer2, &buf_size2));
 	out_buffer2[buf_size2] = SGE_TSTR('\0');
 	SGE_CHECK(RealPathFailError, realpath(out_buffer2, out_buffer));
 #else
