@@ -19,6 +19,9 @@ limitations under the License.
 #ifdef SGE_WINDOWS
 #include <Windows.h>
 #endif
+#ifdef SGE_POSIX
+#include <unistd.h>
+#endif
 
 namespace SpaceGameEngine
 {
@@ -31,19 +34,30 @@ namespace SpaceGameEngine
 	struct GetFullPathNameFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("GetFullPathName failed.");
-		static COMMON_API bool Judge(DWORD re);
+		static COMMON_API bool Judge(DWORD re, SizeType buf_size);
 	};
 
 	struct GetCurrentDirectoryFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("GetCurrentDirectory failed.");
-		static COMMON_API bool Judge(DWORD re);
+		static COMMON_API bool Judge(DWORD re, SizeType buf_size);
+	};
+
+	struct GetModuleFileNameFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("GetModuleFileName failed.");
+		static COMMON_API bool Judge(DWORD re, SizeType buf_size);
 	};
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("getcwd failed.");
 		static COMMON_API bool Judge(char* re);
+	};
+	struct ReadLinkFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("readlink failed.");
+		static COMMON_API bool Judge(ssize_t re);
 	};
 #endif
 

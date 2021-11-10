@@ -197,3 +197,10 @@ TEST(Path, GetCurrentDirectoryPathTest)
 	ASSERT_TRUE(p.IsAbsolute());
 	StdTCout << SGE_STR_TO_TSTR(p.GetString()).GetData() << std::endl;
 }
+
+TEST(Path, GetModuleDirectoryPathTest)
+{
+	String path_str = GetModuleDirectoryPath().GetString();
+	StdTCout << SGE_STR_TO_TSTR(path_str).GetData() << std::endl;
+	ASSERT_NE(path_str.Find(SGE_STR("TestCommon"), path_str.GetConstBegin(), path_str.GetConstEnd()), path_str.GetConstEnd());
+}

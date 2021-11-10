@@ -15,9 +15,6 @@ limitations under the License.
 */
 #include "File.h"
 #include "Container/Stack.hpp"
-#ifdef SGE_POSIX
-#include <unistd.h>
-#endif
 
 SpaceGameEngine::Path::Path()
 	: m_Content(SGE_STR("."))
@@ -117,9 +114,9 @@ SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
 	if (IsRelative())
 	{
 #ifdef SGE_WINDOWS
-		const unsigned int buf_size = 4096;
+		const SizeType buf_size = 4096;
 		TChar out_buffer[buf_size] = SGE_TSTR("");
-		SGE_CHECK(GetFullPathNameFailError, GetFullPathName(SGE_STR_TO_TSTR(m_Content).GetData(), buf_size, out_buffer, NULL));
+		SGE_CHECK(GetFullPathNameFailError, GetFullPathName(SGE_STR_TO_TSTR(m_Content).GetData(), buf_size, out_buffer, NULL), buf_size);
 		return Path(SGE_TSTR_TO_STR(out_buffer));
 #elif defined(SGE_POSIX)
 		return Path(GetCurrentDirectoryPath() / (*this));
@@ -225,19 +222,16 @@ SpaceGameEngine::String SpaceGameEngine::NormalizeAbsolutePathString(const Strin
 
 SpaceGameEngine::Path SpaceGameEngine::GetCurrentDirectoryPath()
 {
+	const SizeType buf_size = 4096;
+	TChar out_buffer[buf_size] = SGE_TSTR("");
 #ifdef SGE_WINDOWS
-	const unsigned int buf_size = 4096;
-	TChar out_buffer[buf_size] = SGE_TSTR("");
-	SGE_CHECK(GetCurrentDirectoryFailError, GetCurrentDirectory(buf_size, out_buffer));
-	return Path(SGE_TSTR_TO_STR(out_buffer));
+	SGE_CHECK(GetCurrentDirectoryFailError, GetCurrentDirectory(buf_size, out_buffer), buf_size);
 #elif defined(SGE_POSIX)
-	const unsigned int buf_size = 4096;
-	TChar out_buffer[buf_size] = SGE_TSTR("");
 	SGE_CHECK(GetCWDFailError, getcwd(out_buffer, buf_size));
-	return Path(SGE_TSTR_TO_STR(out_buffer));
 #else
 #error this os has not been supported.
 #endif
+	return Path(SGE_TSTR_TO_STR(out_buffer));
 }
 
 SpaceGameEngine::Path SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
@@ -248,24 +242,44 @@ SpaceGameEngine::Path SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
 
 SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 {
-	//todo : need to add get parent path first
-	return Path();
+	const SizeType buf_size = 4096;
+	TChar out_buffer[buf_size] = SGE_TSTR("");
+#ifdef SGE_WINDOWS
+	SGE_CHECK(GetModuleFileNameFailError, GetModuleFileName(NULL, out_buffer, buf_size), buf_size);
+#elif defined(SGE_POSIX)
+	SizeType re_size = readlink("/proc/self/exe", out_buffer, buf_size);
+	SGE_CHECK(ReadLinkFailError, re_size);
+	out_buffer[re_size] = SGE_TSTR('\0');
+#else
+#error this os has not been supported.
+#endif
+	return Path(SGE_TSTR_TO_STR(out_buffer)).GetParentPath();
 }
 
 #ifdef SGE_WINDOWS
-bool SpaceGameEngine::GetFullPathNameFailError::Judge(DWORD re)
+bool SpaceGameEngine::GetFullPathNameFailError::Judge(DWORD re, SizeType buf_size)
 {
-	return re == 0;
+	return re == 0 || re >= buf_size;
 }
 
-bool SpaceGameEngine::GetCurrentDirectoryFailError::Judge(DWORD re)
+bool SpaceGameEngine::GetCurrentDirectoryFailError::Judge(DWORD re, SizeType buf_size)
 {
-	return re == 0;
+	return re == 0 || re >= buf_size;
+}
+
+bool SpaceGameEngine::GetModuleFileNameFailError::Judge(DWORD re, SizeType buf_size)
+{
+	return re == 0 || re >= buf_size;
 }
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
 	return re == NULL;
+}
+
+bool SpaceGameEngine::ReadLinkFailError::Judge(ssize_t re)
+{
+	return re == -1;
 }
 #endif
 
