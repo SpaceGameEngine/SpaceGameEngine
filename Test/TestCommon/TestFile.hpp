@@ -138,6 +138,22 @@ TEST(Path, IsAbsoluteOrRelativeTest)
 #endif
 }
 
+TEST(Path, IsRootTest)
+{
+#ifdef SGE_WINDOWS
+	ASSERT_TRUE(Path(SGE_STR("C:")).IsRoot());
+	ASSERT_TRUE(Path(SGE_STR("D:")).IsRoot());
+	ASSERT_FALSE(Path(SGE_STR("C:/test")).IsRoot());
+	ASSERT_FALSE(Path(SGE_STR("test")).IsRoot());
+#elif defined(SGE_POSIX)
+	ASSERT_TRUE(Path(SGE_STR("/")).IsRoot());
+	ASSERT_FALSE(Path(SGE_STR("/test")).IsRoot());
+	ASSERT_FALSE(Path(SGE_STR("test")).IsRoot());
+#else
+#error this os has not been supported.
+#endif
+}
+
 TEST(Path, GetAbsolutePathTest)
 {
 	Path p(SGE_STR("test"));
@@ -168,6 +184,11 @@ TEST(Path, AdditionTest)
 #else
 #error this os has not been supported.
 #endif
+}
+
+TEST(Path, GetParentPathTest)
+{
+	ASSERT_EQ(Path(SGE_STR("./test/test1")).GetParentPath().GetString(), Path(SGE_STR("test")).GetAbsolutePath().GetString());
 }
 
 TEST(Path, GetCurrentDirectoryPathTest)

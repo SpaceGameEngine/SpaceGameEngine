@@ -66,8 +66,13 @@ namespace SpaceGameEngine
 
 		bool IsAbsolute() const;
 		bool IsRelative() const;
+		bool IsRoot() const;
 
 		Path GetAbsolutePath() const;
+		/*!
+		@brief Get the parent path of this path.
+		@return The absolute parent path.
+		*/
 		Path GetParentPath() const;
 
 		Path operator/(const Path& path) const;

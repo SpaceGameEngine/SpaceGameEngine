@@ -27,6 +27,8 @@ SpaceGameEngine::Path::Path()
 SpaceGameEngine::Path::Path(const String& path)
 	: m_Content(NormalizePathString(path))
 {
+	if (IsAbsolute())
+		m_Content = NormalizeAbsolutePathString(m_Content);
 }
 
 SpaceGameEngine::String SpaceGameEngine::Path::GetSystemPathString() const
@@ -76,6 +78,21 @@ bool SpaceGameEngine::Path::IsRelative() const
 	return !IsAbsolute();
 }
 
+bool SpaceGameEngine::Path::IsRoot() const
+{
+#ifdef SGE_WINDOWS
+	if (m_Content.GetSize() != 2)
+		return false;
+	if (m_Content[1] != SGE_STR(':'))
+		return false;
+	return true;
+#elif defined(SGE_POSIX)
+	return m_Content == SGE_STR("/");
+#else
+#error this os has not been supported.
+#endif
+}
+
 namespace
 {
 	using namespace SpaceGameEngine;
@@ -103,14 +120,12 @@ SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
 		const unsigned int buf_size = 4096;
 		TChar out_buffer[buf_size] = SGE_TSTR("");
 		SGE_CHECK(GetFullPathNameFailError, GetFullPathName(SGE_STR_TO_TSTR(m_Content).GetData(), buf_size, out_buffer, NULL));
-		Path re(SGE_TSTR_TO_STR(out_buffer));
+		return Path(SGE_TSTR_TO_STR(out_buffer));
 #elif defined(SGE_POSIX)
-		Path re(GetCurrentDirectoryPath() / (*this));
+		return Path(GetCurrentDirectoryPath() / (*this));
 #else
 #error this os has not been supported.
 #endif
-		re.m_Content = NormalizeAbsolutePathString(re.m_Content);
-		return re;
 	}
 	else
 		return m_Content;
@@ -118,8 +133,18 @@ SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
 
 SpaceGameEngine::Path SpaceGameEngine::Path::GetParentPath() const
 {
-	//todo
-	return Path();
+	Path re = GetAbsolutePath();
+	if (re.IsRoot())
+		return re;
+	for (auto iter = re.m_Content.GetConstReverseBegin(); iter != re.m_Content.GetConstReverseEnd(); ++iter)
+	{
+		if (*iter == SGE_STR('/'))
+		{
+			re.m_Content.Remove(re.m_Content.GetConstReverseBegin(), ++iter);
+			break;
+		}
+	}
+	return re;
 }
 
 SpaceGameEngine::Path SpaceGameEngine::Path::operator/(const Path& path) const
