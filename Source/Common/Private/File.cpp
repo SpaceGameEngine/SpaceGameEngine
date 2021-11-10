@@ -15,6 +15,10 @@ limitations under the License.
 */
 #include "File.h"
 #include "Container/Stack.hpp"
+#ifdef SGE_MACOS
+#include <mach-o/dyld.h>
+#include <stdlib.h>
+#endif
 
 SpaceGameEngine::Path::Path()
 	: m_Content(SGE_STR("."))
@@ -246,10 +250,16 @@ SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 	TChar out_buffer[buf_size] = SGE_TSTR("");
 #ifdef SGE_WINDOWS
 	SGE_CHECK(GetModuleFileNameFailError, GetModuleFileName(NULL, out_buffer, buf_size), buf_size);
-#elif defined(SGE_POSIX)
+#elif defined(SGE_LINUX)
 	SizeType re_size = readlink("/proc/self/exe", out_buffer, buf_size);
 	SGE_CHECK(ReadLinkFailError, re_size);
 	out_buffer[re_size] = SGE_TSTR('\0');
+#elif defined(SGE_MACOS)
+	uint32_t buf_size2 = buf_size;
+	TChar out_buffer2[buf_size] = SGE_TSTR("");
+	SGE_CHECK(NSGetExecutablePathFailError, _NSGetExecutablePath(out_buffer2, buf_size2));
+	out_buffer2[buf_size2] = SGE_TSTR('\0');
+	SGE_CHECK(RealPathFailError, realpath(out_buffer2, out_buffer));
 #else
 #error this os has not been supported.
 #endif
@@ -276,10 +286,22 @@ bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
 	return re == NULL;
 }
+#endif
 
+#ifdef SGE_LINUX
 bool SpaceGameEngine::ReadLinkFailError::Judge(ssize_t re)
 {
 	return re == -1;
+}
+#elif defined(SGE_MACOS)
+bool SpaceGameEngine::NSGetExecutablePathFailError::Judge(int re)
+{
+	return re != 0;
+}
+
+bool SpaceGameEngine::RealPathFailError::Judge(char* re)
+{
+	return re == NULL;
 }
 #endif
 

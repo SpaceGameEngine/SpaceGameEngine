@@ -18,8 +18,7 @@ limitations under the License.
 #include "SGEString.hpp"
 #ifdef SGE_WINDOWS
 #include <Windows.h>
-#endif
-#ifdef SGE_POSIX
+#elif defined(SGE_POSIX)
 #include <unistd.h>
 #endif
 
@@ -54,10 +53,25 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("getcwd failed.");
 		static COMMON_API bool Judge(char* re);
 	};
+#endif
+
+#ifdef SGE_LINUX
 	struct ReadLinkFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("readlink failed.");
 		static COMMON_API bool Judge(ssize_t re);
+	};
+#elif defined(SGE_MACOS)
+	struct NSGetExecutablePathFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("NSGetExecutablePath failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct RealPathFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("NSGetExecutablePath failed.");
+		static COMMON_API bool Judge(char* re);
 	};
 #endif
 
