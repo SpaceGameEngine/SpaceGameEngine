@@ -154,6 +154,12 @@ TEST(Path, IsRootTest)
 #endif
 }
 
+TEST(Path, IsExistTest)
+{
+	ASSERT_TRUE(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")).IsExist());
+	ASSERT_FALSE(Path(SGE_STR("./TestData/TestCommon/TestFile/test_not_exist.txt")).IsExist());
+}
+
 TEST(Path, GetAbsolutePathTest)
 {
 	Path p(SGE_STR("test"));
@@ -186,6 +192,14 @@ TEST(Path, AdditionTest)
 #endif
 }
 
+TEST(Path, EqualnessTest)
+{
+	ASSERT_EQ(Path(SGE_STR("./test")), Path(SGE_STR("./test")));
+	ASSERT_EQ(Path(SGE_STR("test")), Path(SGE_STR("test")));
+	ASSERT_NE(Path(SGE_STR("./test")), Path(SGE_STR("test")));
+	ASSERT_NE(Path(SGE_STR("test")), Path(SGE_STR("./test")));
+}
+
 TEST(Path, GetParentPathTest)
 {
 	ASSERT_EQ(Path(SGE_STR("./test/test1")).GetParentPath().GetString(), Path(SGE_STR("test")).GetAbsolutePath().GetString());
@@ -196,6 +210,16 @@ TEST(Path, GetCurrentDirectoryPathTest)
 	Path p = GetCurrentDirectoryPath();
 	ASSERT_TRUE(p.IsAbsolute());
 	StdTCout << SGE_STR_TO_TSTR(p.GetString()).GetData() << std::endl;
+}
+
+TEST(Path,SetCurrentDirectoryPathTest)
+{
+	Path pold = GetCurrentDirectoryPath();
+	Path p = Path(SGE_STR("./TestData")).GetAbsolutePath();
+	SetCurrentDirectoryPath(p);
+	ASSERT_EQ(GetCurrentDirectoryPath().GetString(), p.GetString());
+	SetCurrentDirectoryPath(pold);
+	ASSERT_EQ(GetCurrentDirectoryPath().GetString(), pold.GetString());
 }
 
 TEST(Path, GetModuleDirectoryPathTest)

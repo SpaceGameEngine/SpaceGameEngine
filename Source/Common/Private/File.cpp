@@ -94,23 +94,24 @@ bool SpaceGameEngine::Path::IsRoot() const
 #endif
 }
 
-namespace
+bool SpaceGameEngine::Path::IsExist() const
 {
-	using namespace SpaceGameEngine;
-
-	void WalkThroughPath(const Vector<String>& dirs, SizeType idx, Stack<SizeType, DefaultAllocator, Vector>& stack)
+	Path apath = GetAbsolutePath();
+#ifdef SGE_WINDOWS
+	WIN32_FIND_DATA find_file_data;
+	HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(apath.GetString()).GetData(), &find_file_data);
+	bool re = false;
+	if (handle != INVALID_HANDLE_VALUE)
 	{
-		if (idx == dirs.GetSize())
-			return;
-		if (dirs[idx] == SGE_STR(".."))
-		{
-			if (stack.GetSize())
-				stack.Pop();
-		}
-		else if (dirs[idx] != SGE_STR("."))
-			stack.Push(idx);
-		WalkThroughPath(dirs, idx + 1, stack);
+		SGE_CHECK(FindCloseFailError, FindClose(handle));
+		re = true;
 	}
+	return re;
+#elif defined(SGE_POSIX)
+	return access(SGE_STR_TO_TSTR(apath.GetString()).GetData(), F_OK) == 0;
+#else
+#error this os has not been supported.
+#endif
 }
 
 SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
@@ -152,6 +153,35 @@ SpaceGameEngine::Path SpaceGameEngine::Path::operator/(const Path& path) const
 {
 	SGE_ASSERT(AbsolutePathAdditionError, path);
 	return Path(m_Content + SGE_STR('/') + path.m_Content);
+}
+
+bool SpaceGameEngine::Path::operator==(const Path& path) const
+{
+	return m_Content == path.m_Content;
+}
+
+bool SpaceGameEngine::Path::operator!=(const Path& path) const
+{
+	return m_Content != path.m_Content;
+}
+
+namespace
+{
+	using namespace SpaceGameEngine;
+
+	void WalkThroughPath(const Vector<String>& dirs, SizeType idx, Stack<SizeType, DefaultAllocator, Vector>& stack)
+	{
+		if (idx == dirs.GetSize())
+			return;
+		if (dirs[idx] == SGE_STR(".."))
+		{
+			if (stack.GetSize())
+				stack.Pop();
+		}
+		else if (dirs[idx] != SGE_STR("."))
+			stack.Push(idx);
+		WalkThroughPath(dirs, idx + 1, stack);
+	}
 }
 
 COMMON_API SpaceGameEngine::String SpaceGameEngine::NormalizePathString(const String& path)
@@ -238,10 +268,17 @@ SpaceGameEngine::Path SpaceGameEngine::GetCurrentDirectoryPath()
 	return Path(SGE_TSTR_TO_STR(out_buffer));
 }
 
-SpaceGameEngine::Path SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
+void SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
 {
-	//todo : need to add check exist first to assert for the path's existion.
-	return Path();
+	Path apath = path.GetAbsolutePath();
+	SGE_ASSERT(PathNotExistError, apath);
+#ifdef SGE_WINDOWS
+	SGE_CHECK(SetCurrentDirectoryFailError, SetCurrentDirectory(SGE_STR_TO_TSTR(apath.GetString()).GetData()));
+#elif defined(SGE_POSIX)
+	SGE_CHECK(ChDirFailError, chdir(SGE_STR_TO_TSTR(apath.GetString()).GetData()));
+#else
+#error this os has not been supported.
+#endif
 }
 
 SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
@@ -281,10 +318,30 @@ bool SpaceGameEngine::GetModuleFileNameFailError::Judge(DWORD re, SizeType buf_s
 {
 	return re == 0 || re >= buf_size;
 }
+
+bool SpaceGameEngine::FindFirstFileFailError::Judge(HANDLE handle)
+{
+	return handle == INVALID_HANDLE_VALUE;
+}
+
+bool SpaceGameEngine::FindCloseFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
+
+bool SpaceGameEngine::SetCurrentDirectoryFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
 	return re == NULL;
+}
+
+bool SpaceGameEngine::ChDirFailError::Judge(int re)
+{
+	return re == -1;
 }
 #endif
 
@@ -308,4 +365,9 @@ bool SpaceGameEngine::RealPathFailError::Judge(char* re)
 bool SpaceGameEngine::AbsolutePathAdditionError::Judge(const Path& path)
 {
 	return path.IsAbsolute();
+}
+
+bool SpaceGameEngine::PathNotExistError::Judge(const Path& path)
+{
+	return !path.IsExist();
 }

@@ -47,11 +47,35 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("GetModuleFileName failed.");
 		static COMMON_API bool Judge(DWORD re, SizeType buf_size);
 	};
+
+	struct FindFirstFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FindFirstFile failed.");
+		static COMMON_API bool Judge(HANDLE handle);
+	};
+
+	struct FindCloseFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FindClose failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
+	struct SetCurrentDirectoryFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("SetCurrentDirectory failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("getcwd failed.");
 		static COMMON_API bool Judge(char* re);
+	};
+
+	struct ChDirFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("chdir failed.");
+		static COMMON_API bool Judge(int re);
 	};
 #endif
 
@@ -95,6 +119,7 @@ namespace SpaceGameEngine
 		bool IsAbsolute() const;
 		bool IsRelative() const;
 		bool IsRoot() const;
+		bool IsExist() const;
 
 		Path GetAbsolutePath() const;
 		/*!
@@ -104,6 +129,15 @@ namespace SpaceGameEngine
 		Path GetParentPath() const;
 
 		Path operator/(const Path& path) const;
+
+		/*!
+		@brief Compare the two paths by comparing their inner string content;
+		*/
+		bool operator==(const Path& path) const;
+		/*!
+		@brief Compare the two paths by comparing their inner string content;
+		*/
+		bool operator!=(const Path& path) const;
 
 	private:
 		String m_Content;
@@ -115,9 +149,15 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const Path& path);
 	};
 
+	struct PathNotExistError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Path does not exist.");
+		static COMMON_API bool Judge(const Path& path);
+	};
+
 	COMMON_API Path GetCurrentDirectoryPath();
 
-	COMMON_API Path SetCurrentDirectoryPath(const Path& path);
+	COMMON_API void SetCurrentDirectoryPath(const Path& path);
 
 	COMMON_API Path GetModuleDirectoryPath();
 
