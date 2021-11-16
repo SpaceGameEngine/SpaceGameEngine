@@ -77,6 +77,12 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("chdir failed.");
 		static COMMON_API bool Judge(int re);
 	};
+
+	struct StatFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("stat failed.");
+		static COMMON_API bool Judge(int re);
+	};
 #endif
 
 #ifdef SGE_LINUX
@@ -107,6 +113,15 @@ namespace SpaceGameEngine
 	*/
 	COMMON_API String NormalizeAbsolutePathString(const String& path);
 
+	enum class PathType : UInt8
+	{
+		NotExist = 0,
+		File = 1,
+		Directory = 2,
+		Link = 3,
+		Unknown = 4
+	};
+
 	class COMMON_API Path
 	{
 	public:
@@ -120,6 +135,8 @@ namespace SpaceGameEngine
 		bool IsRelative() const;
 		bool IsRoot() const;
 		bool IsExist() const;
+
+		PathType GetPathType() const;
 
 		Path GetAbsolutePath() const;
 		/*!

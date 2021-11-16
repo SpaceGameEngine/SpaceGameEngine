@@ -160,6 +160,13 @@ TEST(Path, IsExistTest)
 	ASSERT_FALSE(Path(SGE_STR("./TestData/TestCommon/TestFile/test_not_exist.txt")).IsExist());
 }
 
+TEST(Path, GetPathTypeTest)
+{
+	ASSERT_EQ(Path(SGE_STR("./TestData/TestCommon/TestFile/test_not_exist.txt")).GetPathType(), PathType::NotExist);
+	ASSERT_EQ(Path(SGE_STR("./TestData/TestCommon/TestFile")).GetPathType(), PathType::Directory);
+	ASSERT_EQ(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")).GetPathType(), PathType::File);
+}
+
 TEST(Path, GetAbsolutePathTest)
 {
 	Path p(SGE_STR("test"));
@@ -212,7 +219,7 @@ TEST(Path, GetCurrentDirectoryPathTest)
 	StdTCout << SGE_STR_TO_TSTR(p.GetString()).GetData() << std::endl;
 }
 
-TEST(Path,SetCurrentDirectoryPathTest)
+TEST(Path, SetCurrentDirectoryPathTest)
 {
 	Path pold = GetCurrentDirectoryPath();
 	Path p = Path(SGE_STR("./TestData")).GetAbsolutePath();

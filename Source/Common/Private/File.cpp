@@ -15,6 +15,9 @@ limitations under the License.
 */
 #include "File.h"
 #include "Container/Stack.hpp"
+#ifdef SGE_POSIX
+#include <sys/stat.h>
+#endif
 #ifdef SGE_MACOS
 #include <mach-o/dyld.h>
 #include <stdlib.h>
@@ -112,6 +115,46 @@ bool SpaceGameEngine::Path::IsExist() const
 #else
 #error this os has not been supported.
 #endif
+}
+
+SpaceGameEngine::PathType SpaceGameEngine::Path::GetPathType() const
+{
+	Path apath = GetAbsolutePath();
+	PathType re = PathType::NotExist;
+#ifdef SGE_WINDOWS
+	WIN32_FIND_DATA find_file_data;
+	HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(apath.GetString()).GetData(), &find_file_data);
+
+	if (handle != INVALID_HANDLE_VALUE)
+	{
+		SGE_CHECK(FindCloseFailError, FindClose(handle));
+		if (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
+			re = PathType::Link;
+		else if (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			re = PathType::Directory;
+		else if ((find_file_data.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) || (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL))
+			re = PathType::File;
+		else
+			re = PathType::Unknown;
+	}
+#elif defined(SGE_POSIX)
+	struct stat buf;
+	int stat_re = stat(SGE_STR_TO_TSTR(apath.GetString()).GetData(), &buf);
+	if (stat_re == 0)
+	{
+		if (S_ISLNK(buf.st_mode))
+			re = PathType::Link;
+		else if (S_ISDIR(buf.st_mode))
+			re = PathType::Directory;
+		else if (S_ISREG(buf.st_mode))
+			re = PathType::File;
+		else
+			re = PathType::Unknown;
+	}
+#else
+#error this os has not been supported.
+#endif
+	return re;
 }
 
 SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
@@ -340,6 +383,11 @@ bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 }
 
 bool SpaceGameEngine::ChDirFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::StatFailError::Judge(int re)
 {
 	return re == -1;
 }
