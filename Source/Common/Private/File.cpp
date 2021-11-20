@@ -16,10 +16,6 @@ limitations under the License.
 #include "File.h"
 #include "Container/Stack.hpp"
 
-#ifdef SGE_WINDOWS
-#include <tchar.h>
-#endif
-
 #ifdef SGE_MACOS
 #include <mach-o/dyld.h>
 #include <stdlib.h>
@@ -217,7 +213,6 @@ SpaceGameEngine::Vector<SpaceGameEngine::Pair<SpaceGameEngine::Path, SpaceGameEn
 	{
 		if (_tcscmp(find_file_data.cFileName, SGE_TSTR(".")) == 0 || _tcscmp(find_file_data.cFileName, SGE_TSTR("..")) == 0)
 			continue;
-
 		PathType pt = PathType::NotExist;
 		if (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
 			pt = PathType::Link;

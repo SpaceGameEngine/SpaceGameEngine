@@ -18,6 +18,7 @@ limitations under the License.
 #include "SGEString.hpp"
 #ifdef SGE_WINDOWS
 #include <Windows.h>
+#include <tchar.h>
 #elif defined(SGE_POSIX)
 #include <unistd.h>
 #include <sys/stat.h>
@@ -133,6 +134,8 @@ namespace SpaceGameEngine
 	*/
 	COMMON_API String NormalizeAbsolutePathString(const String& path);
 
+	struct PathNotDirectoryError;
+
 	enum class PathType : UInt8
 	{
 		NotExist = 0,
@@ -170,6 +173,63 @@ namespace SpaceGameEngine
 		@brief Get the child paths in Vector<Pair<Path, PathType>> which the Path is the absolute path.
 		*/
 		Vector<Pair<Path, PathType>> GetChildPath() const;
+
+		/*!
+		@brief Visit the child paths.
+		@note GetChildPath returns absolute child paths, but this function calls the parameter with the filename.
+		@param callable function which adopts (file_name, path_type) as arguments.
+		*/
+		template<typename Callable>
+		inline void VisitChildPath(Callable&& callable) const
+		{
+			Path apath = GetAbsolutePath();
+			SGE_ASSERT(PathNotDirectoryError, apath);
+#ifdef SGE_WINDOWS
+			String qstr = apath.GetString() + SGE_STR("/*");
+			WIN32_FIND_DATA find_file_data;
+			HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(qstr).GetData(), &find_file_data);
+			SGE_CHECK(FindFirstFileFailError, handle);
+			do
+			{
+				if (_tcscmp(find_file_data.cFileName, SGE_TSTR(".")) == 0 || _tcscmp(find_file_data.cFileName, SGE_TSTR("..")) == 0)
+					continue;
+				PathType pt = PathType::NotExist;
+				if (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
+					pt = PathType::Link;
+				else if (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+					pt = PathType::Directory;
+				else if ((find_file_data.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) || (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL))
+					pt = PathType::File;
+				else
+					pt = PathType::Unknown;
+				callable(SGE_TSTR_TO_STR(find_file_data.cFileName), pt);
+			} while (FindNextFile(handle, &find_file_data));
+			SGE_CHECK(FindCloseFailError, FindClose(handle));
+			SGE_CHECK(FindNextFileFailError, GetLastError());
+#elif defined(SGE_POSIX)
+			DIR* pdir = opendir(SGE_STR_TO_TSTR(apath.GetString()).GetData());
+			SGE_CHECK(OpenDirFailError, pdir);
+			dirent* pchild = nullptr;
+			while (pchild = readdir(pdir))
+			{
+				if (strcmp(pchild->d_name, SGE_TSTR(".")) == 0 || strcmp(pchild->d_name, SGE_TSTR("..")) == 0)
+					continue;
+				PathType pt = PathType::NotExist;
+				if (pchild->d_type == DT_LNK)
+					pt = PathType::Link;
+				else if (pchild->d_type == DT_DIR)
+					pt = PathType::Directory;
+				else if (pchild->d_type == DT_REG)
+					pt = PathType::File;
+				else
+					pt = PathType::Unknown;
+				callable(SGE_TSTR_TO_STR(pchild->d_name), pt);
+			}
+			SGE_CHECK(CloseDirFailError, closedir(pdir));
+#else
+#error this os has not been supported.
+#endif
+		}
 
 		Path operator/(const Path& path) const;
 

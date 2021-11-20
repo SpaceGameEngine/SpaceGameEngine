@@ -212,6 +212,20 @@ TEST(Path, GetChildPathTest)
 	ASSERT_EQ(check_map[SGE_STR("TestDirectory")], PathType::Directory);
 }
 
+TEST(Path, VisitChildPathTest)
+{
+	Map<String, PathType> check_map;
+	Path(SGE_STR("./TestData/TestCommon/TestFile")).VisitChildPath([&](const String& file_name, PathType pt) {
+		auto fiter = check_map.Find(file_name);
+		ASSERT_EQ(fiter, check_map.GetEnd());
+		check_map.Insert(file_name, pt);
+	});
+	ASSERT_EQ(check_map.GetSize(), 3);
+	ASSERT_EQ(check_map[SGE_STR("test1.txt")], PathType::File);
+	ASSERT_EQ(check_map[SGE_STR("test2.txt")], PathType::File);
+	ASSERT_EQ(check_map[SGE_STR("TestDirectory")], PathType::Directory);
+}
+
 TEST(Path, AdditionTest)
 {
 	ASSERT_EQ((Path(SGE_STR("test")) / Path(SGE_STR("test1.txt"))).GetString(), SGE_STR("test/test1.txt"));
