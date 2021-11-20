@@ -20,6 +20,8 @@ limitations under the License.
 #include <Windows.h>
 #elif defined(SGE_POSIX)
 #include <unistd.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #endif
 
 namespace SpaceGameEngine
@@ -54,6 +56,12 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(HANDLE handle);
 	};
 
+	struct FindNextFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FindNextFile failed.");
+		static COMMON_API bool Judge(DWORD last_error);
+	};
+
 	struct FindCloseFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("FindClose failed.");
@@ -81,6 +89,18 @@ namespace SpaceGameEngine
 	struct StatFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("stat failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct OpenDirFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("opendir failed.");
+		static COMMON_API bool Judge(DIR* re);
+	};
+
+	struct CloseDirFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("closedir failed.");
 		static COMMON_API bool Judge(int re);
 	};
 #endif
@@ -130,6 +150,7 @@ namespace SpaceGameEngine
 
 		String GetSystemPathString() const;
 		String GetString() const;
+		String GetFileName() const;
 
 		bool IsAbsolute() const;
 		bool IsRelative() const;
@@ -144,6 +165,11 @@ namespace SpaceGameEngine
 		@return The absolute parent path.
 		*/
 		Path GetParentPath() const;
+
+		/*!
+		@brief Get the child paths in Vector<Pair<Path, PathType>> which the Path is the absolute path.
+		*/
+		Vector<Pair<Path, PathType>> GetChildPath() const;
 
 		Path operator/(const Path& path) const;
 
@@ -169,6 +195,12 @@ namespace SpaceGameEngine
 	struct PathNotExistError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Path does not exist.");
+		static COMMON_API bool Judge(const Path& path);
+	};
+
+	struct PathNotDirectoryError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Path is not a directory.");
 		static COMMON_API bool Judge(const Path& path);
 	};
 

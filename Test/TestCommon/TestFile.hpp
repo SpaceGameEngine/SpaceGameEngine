@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "File.h"
+#include "Container/Map.hpp"
 
 using namespace SpaceGameEngine;
 
@@ -108,6 +109,14 @@ TEST(Path, GetStringTest)
 	ASSERT_EQ(p2.GetString(), SGE_STR("test/test2"));
 }
 
+TEST(Path, GetFileNameTest)
+{
+	ASSERT_EQ(Path(SGE_STR("./TestData")).GetFileName(), SGE_STR("TestData"));
+	ASSERT_EQ(Path(SGE_STR("./TestData/TestCommon")).GetFileName(), SGE_STR("TestCommon"));
+	ASSERT_EQ(Path(SGE_STR("./TestData/TestCommon/TestFile")).GetFileName(), SGE_STR("TestFile"));
+	ASSERT_EQ(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")).GetFileName(), SGE_STR("test1.txt"));
+}
+
 TEST(Path, IsAbsoluteOrRelativeTest)
 {
 #ifdef SGE_WINDOWS
@@ -185,6 +194,22 @@ TEST(Path, GetAbsolutePathTest)
 #else
 #error this os has not been supported.
 #endif
+}
+
+TEST(Path, GetChildPathTest)
+{
+	Map<String, PathType> check_map;
+	auto result = Path(SGE_STR("./TestData/TestCommon/TestFile")).GetChildPath();
+	for (auto iter = result.GetConstBegin(); iter != result.GetConstEnd(); ++iter)
+	{
+		auto fiter = check_map.Find(iter->m_First.GetFileName());
+		ASSERT_EQ(fiter, check_map.GetEnd());
+		check_map.Insert(iter->m_First.GetFileName(), iter->m_Second);
+	}
+	ASSERT_EQ(check_map.GetSize(), 3);
+	ASSERT_EQ(check_map[SGE_STR("test1.txt")], PathType::File);
+	ASSERT_EQ(check_map[SGE_STR("test2.txt")], PathType::File);
+	ASSERT_EQ(check_map[SGE_STR("TestDirectory")], PathType::Directory);
 }
 
 TEST(Path, AdditionTest)
