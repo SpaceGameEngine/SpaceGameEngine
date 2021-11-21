@@ -106,10 +106,10 @@ bool SpaceGameEngine::Path::IsRoot() const
 
 bool SpaceGameEngine::Path::IsExist() const
 {
-	Path apath = GetAbsolutePath();
+	String astr = GetAbsolutePath().GetString();
 #ifdef SGE_WINDOWS
 	WIN32_FIND_DATA find_file_data;
-	HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(apath.GetString()).GetData(), &find_file_data);
+	HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(astr).GetData(), &find_file_data);
 	bool re = false;
 	if (handle != INVALID_HANDLE_VALUE)
 	{
@@ -118,7 +118,7 @@ bool SpaceGameEngine::Path::IsExist() const
 	}
 	return re;
 #elif defined(SGE_POSIX)
-	return access(SGE_STR_TO_TSTR(apath.GetString()).GetData(), F_OK) == 0;
+	return access(SGE_STR_TO_TSTR(astr).GetData(), F_OK) == 0;
 #else
 #error this os has not been supported.
 #endif
@@ -126,11 +126,11 @@ bool SpaceGameEngine::Path::IsExist() const
 
 SpaceGameEngine::PathType SpaceGameEngine::Path::GetPathType() const
 {
-	Path apath = GetAbsolutePath();
+	String astr = GetAbsolutePath().GetString();
 	PathType re = PathType::NotExist;
 #ifdef SGE_WINDOWS
 	WIN32_FIND_DATA find_file_data;
-	HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(apath.GetString()).GetData(), &find_file_data);
+	HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(astr).GetData(), &find_file_data);
 
 	if (handle != INVALID_HANDLE_VALUE)
 	{
@@ -146,7 +146,7 @@ SpaceGameEngine::PathType SpaceGameEngine::Path::GetPathType() const
 	}
 #elif defined(SGE_POSIX)
 	struct stat buf;
-	int stat_re = stat(SGE_STR_TO_TSTR(apath.GetString()).GetData(), &buf);
+	int stat_re = stat(SGE_STR_TO_TSTR(astr).GetData(), &buf);
 	if (stat_re == 0)
 	{
 		if (S_ISLNK(buf.st_mode))
@@ -203,9 +203,10 @@ SpaceGameEngine::Vector<SpaceGameEngine::Pair<SpaceGameEngine::Path, SpaceGameEn
 {
 	Path apath = GetAbsolutePath();
 	SGE_ASSERT(PathNotDirectoryError, apath);
+	String astr = apath.GetString();
 	Vector<Pair<Path, PathType>> re;
 #ifdef SGE_WINDOWS
-	String qstr = apath.GetString() + SGE_STR("/*");
+	String qstr = astr + SGE_STR("/*");
 	WIN32_FIND_DATA find_file_data;
 	HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(qstr).GetData(), &find_file_data);
 	SGE_CHECK(FindFirstFileFailError, handle);
@@ -222,12 +223,12 @@ SpaceGameEngine::Vector<SpaceGameEngine::Pair<SpaceGameEngine::Path, SpaceGameEn
 			pt = PathType::File;
 		else
 			pt = PathType::Unknown;
-		re.EmplaceBack(Pair<Path, PathType>(Path(apath.GetString() + SGE_STR("/") + SGE_TSTR_TO_STR(find_file_data.cFileName)), pt));
+		re.EmplaceBack(Pair<Path, PathType>(Path(astr + SGE_STR("/") + SGE_TSTR_TO_STR(find_file_data.cFileName)), pt));
 	} while (FindNextFile(handle, &find_file_data));
 	SGE_CHECK(FindCloseFailError, FindClose(handle));
 	SGE_CHECK(FindNextFileFailError, GetLastError());
 #elif defined(SGE_POSIX)
-	DIR* pdir = opendir(SGE_STR_TO_TSTR(apath.GetString()).GetData());
+	DIR* pdir = opendir(SGE_STR_TO_TSTR(astr).GetData());
 	SGE_CHECK(OpenDirFailError, pdir);
 	dirent* pchild = nullptr;
 	while (pchild = readdir(pdir))
@@ -243,7 +244,7 @@ SpaceGameEngine::Vector<SpaceGameEngine::Pair<SpaceGameEngine::Path, SpaceGameEn
 			pt = PathType::File;
 		else
 			pt = PathType::Unknown;
-		re.EmplaceBack(Pair<Path, PathType>(Path(apath.GetString() + SGE_STR("/") + SGE_TSTR_TO_STR(pchild->d_name)), pt));
+		re.EmplaceBack(Pair<Path, PathType>(Path(astr + SGE_STR("/") + SGE_TSTR_TO_STR(pchild->d_name)), pt));
 	}
 	SGE_CHECK(CloseDirFailError, closedir(pdir));
 #else
@@ -266,6 +267,36 @@ bool SpaceGameEngine::Path::operator==(const Path& path) const
 bool SpaceGameEngine::Path::operator!=(const Path& path) const
 {
 	return m_Content != path.m_Content;
+}
+
+bool SpaceGameEngine::Path::IsEquivalent(const Path& path) const
+{
+	if ((!IsExist()) || (!path.IsExist()))
+		return false;
+	String astr1 = GetAbsolutePath().GetString();
+	String astr2 = path.GetAbsolutePath().GetString();
+#ifdef SGE_WINDOWS
+	FILE_ID_INFO id1, id2;
+
+	HANDLE handle1 = CreateFile(SGE_STR_TO_TSTR(astr1).GetData(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	SGE_CHECK(CreateFileFailError, handle1);
+	SGE_CHECK(GetFileInformationByHandleExFailError, GetFileInformationByHandleEx(handle1, FileIdInfo, &id1, sizeof(FILE_ID_INFO)));
+	SGE_CHECK(CloseHandleFailError, CloseHandle(handle1));
+
+	HANDLE handle2 = CreateFile(SGE_STR_TO_TSTR(astr2).GetData(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	SGE_CHECK(CreateFileFailError, handle2);
+	SGE_CHECK(GetFileInformationByHandleExFailError, GetFileInformationByHandleEx(handle2, FileIdInfo, &id2, sizeof(FILE_ID_INFO)));
+	SGE_CHECK(CloseHandleFailError, CloseHandle(handle2));
+
+	return memcmp(&id1, &id2, sizeof(FILE_ID_INFO)) == 0;
+#elif defined(SGE_POSIX)
+	struct stat sbuf1, sbuf2;
+	SGE_CHECK(StatFailError, stat(SGE_STR_TO_TSTR(astr1).GetData(), &sbuf1));
+	SGE_CHECK(StatFailError, stat(SGE_STR_TO_TSTR(astr2).GetData(), &sbuf2));
+	return (sbuf1.st_dev == sbuf2.st_dev) && (sbuf1.st_ino == sbuf2.st_ino);
+#else
+#error this os has not been supported.
+#endif
 }
 
 namespace
@@ -438,6 +469,21 @@ bool SpaceGameEngine::FindCloseFailError::Judge(BOOL re)
 }
 
 bool SpaceGameEngine::SetCurrentDirectoryFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
+
+bool SpaceGameEngine::CreateFileFailError::Judge(HANDLE handle)
+{
+	return handle == INVALID_HANDLE_VALUE;
+}
+
+bool SpaceGameEngine::CloseHandleFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
+
+bool SpaceGameEngine::GetFileInformationByHandleExFailError::Judge(BOOL re)
 {
 	return re == 0;
 }

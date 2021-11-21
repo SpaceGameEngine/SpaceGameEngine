@@ -246,6 +246,17 @@ TEST(Path, EqualnessTest)
 	ASSERT_NE(Path(SGE_STR("test")), Path(SGE_STR("./test")));
 }
 
+TEST(Path, IsEquivalentTest)
+{
+	ASSERT_FALSE(Path(SGE_STR("./TestData/TestCommon/TestFile/not_exist.txt")).IsEquivalent(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt"))));
+	ASSERT_FALSE(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")).IsEquivalent(Path(SGE_STR("./TestData/TestCommon/TestFile/not_exist.txt"))));
+	ASSERT_FALSE(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")).IsEquivalent(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt"))));
+	ASSERT_FALSE(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")).IsEquivalent(Path(SGE_STR("./TestData/TestCommon/TestFile/TestDirectory"))));
+	ASSERT_TRUE(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")).IsEquivalent(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt"))));
+	ASSERT_TRUE(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt")).IsEquivalent(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt"))));
+	ASSERT_TRUE(Path(SGE_STR("./TestData/TestCommon/TestFile/TestDirectory")).IsEquivalent(Path(SGE_STR("./TestData/TestCommon/TestFile/TestDirectory"))));
+}
+
 TEST(Path, GetParentPathTest)
 {
 	ASSERT_EQ(Path(SGE_STR("./test/test1")).GetParentPath().GetString(), Path(SGE_STR("test")).GetAbsolutePath().GetString());

@@ -74,6 +74,24 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("SetCurrentDirectory failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
+
+	struct CreateFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("CreateFile failed.");
+		static COMMON_API bool Judge(HANDLE handle);
+	};
+
+	struct CloseHandleFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("CloseHandle failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
+	struct GetFileInformationByHandleExFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("GetFileInformationByHandleEx failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
 	{
@@ -184,8 +202,9 @@ namespace SpaceGameEngine
 		{
 			Path apath = GetAbsolutePath();
 			SGE_ASSERT(PathNotDirectoryError, apath);
+			String astr = apath.GetString();
 #ifdef SGE_WINDOWS
-			String qstr = apath.GetString() + SGE_STR("/*");
+			String qstr = astr + SGE_STR("/*");
 			WIN32_FIND_DATA find_file_data;
 			HANDLE handle = FindFirstFile(SGE_STR_TO_TSTR(qstr).GetData(), &find_file_data);
 			SGE_CHECK(FindFirstFileFailError, handle);
@@ -207,7 +226,7 @@ namespace SpaceGameEngine
 			SGE_CHECK(FindCloseFailError, FindClose(handle));
 			SGE_CHECK(FindNextFileFailError, GetLastError());
 #elif defined(SGE_POSIX)
-			DIR* pdir = opendir(SGE_STR_TO_TSTR(apath.GetString()).GetData());
+			DIR* pdir = opendir(SGE_STR_TO_TSTR(astr).GetData());
 			SGE_CHECK(OpenDirFailError, pdir);
 			dirent* pchild = nullptr;
 			while (pchild = readdir(pdir))
@@ -241,6 +260,8 @@ namespace SpaceGameEngine
 		@brief Compare the two paths by comparing their inner string content;
 		*/
 		bool operator!=(const Path& path) const;
+
+		bool IsEquivalent(const Path& path) const;
 
 	private:
 		String m_Content;
