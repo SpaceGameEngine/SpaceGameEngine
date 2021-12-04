@@ -27,10 +27,12 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
 	template class COMMON_API ControllableObject<MetaObject<StdAllocator>, StdAllocator>;
 	template class COMMON_API Function<void(), StdAllocator>;
 	template class COMMON_API List<Function<void(), StdAllocator>, StdAllocator>;
 	template class COMMON_API Stack<Function<void(), StdAllocator>, StdAllocator>;
+#endif
 
 	class COMMON_API GlobalVariableManager : public UncopyableAndUnmovable
 	{
