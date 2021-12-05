@@ -27,7 +27,7 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API ControllableObject<MetaObject<StdAllocator>, StdAllocator>;
 	template class COMMON_API Function<void(), StdAllocator>;
 	template class COMMON_API List<Function<void(), StdAllocator>, StdAllocator>;

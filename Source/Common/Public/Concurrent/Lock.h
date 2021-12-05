@@ -22,7 +22,7 @@ limitations under the License.
 #include <shared_mutex>
 #include <condition_variable>
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 namespace std	 //declaration for dll export
 {
 	class COMMON_API recursive_timed_mutex;

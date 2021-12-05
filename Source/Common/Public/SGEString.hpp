@@ -3397,7 +3397,7 @@ namespace SpaceGameEngine
 	using UTF8String = StringCore<char, UTF8Trait, DefaultAllocator>;
 	using String = UCS2String;
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API StringImplement::Storage<Char16, DefaultAllocator>;
 	template class COMMON_API StringImplement::Storage<char, DefaultAllocator>;
 	template class COMMON_API StringCore<Char16, UCS2Trait, DefaultAllocator>;
