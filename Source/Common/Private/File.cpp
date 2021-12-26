@@ -318,7 +318,7 @@ namespace
 	}
 }
 
-COMMON_API SpaceGameEngine::String SpaceGameEngine::NormalizePathString(const String& path)
+SpaceGameEngine::String SpaceGameEngine::NormalizePathString(const String& path)
 {
 	if (path.GetSize() == 0)
 		return String(SGE_STR("."));

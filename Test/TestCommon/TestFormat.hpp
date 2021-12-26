@@ -56,6 +56,12 @@ TEST(Format, IsFormatStringTest)
 
 TEST(Format, FormatTest)
 {
+	ASSERT_EQ(Format(UCS2String(SGE_WSTR("test format{}{}!"))), SGE_WSTR("test format!"));
+	ASSERT_EQ(Format(UCS2String(SGE_WSTR("test format{0}{0}!"))), SGE_WSTR("test format!"));
+	ASSERT_EQ(Format(UCS2String(SGE_WSTR("test format{1}{1}!"))), SGE_WSTR("test format!"));
+	ASSERT_EQ(Format(UCS2String(SGE_WSTR("test format{0}{1}!"))), SGE_WSTR("test format!"));
+	ASSERT_EQ(Format(UCS2String(SGE_WSTR("test format{1}{0}!"))), SGE_WSTR("test format!"));
+	ASSERT_EQ(Format(UCS2String(SGE_WSTR("test format{1:test}{0:format}!"))), SGE_WSTR("test format!"));
 	ASSERT_EQ(Format(UCS2String(SGE_WSTR("{}, {}!")), SGE_WSTR("Hello"), SGE_WSTR("world")), SGE_WSTR("Hello, world!"));
 	ASSERT_EQ(Format(UCS2String(SGE_WSTR("{0}, {1}!")), SGE_WSTR("Hello"), SGE_WSTR("world")), SGE_WSTR("Hello, world!"));
 	ASSERT_EQ(Format(UCS2String(SGE_WSTR("{1}, {0}!")), SGE_WSTR("world"), SGE_WSTR("Hello")), SGE_WSTR("Hello, world!"));
@@ -74,6 +80,12 @@ TEST(Format, FormatTest)
 	ASSERT_EQ(Format(UCS2String(SGE_WSTR("this is {0},{1:2},{2:4} a {3} test.")), 1, 2.22f, 3.3333, SGE_WSTR("good")), SGE_WSTR("this is 1,2.22,3.3333 a good test."));
 	ASSERT_EQ(Format(UCS2String(SGE_WSTR("this is {},{:2},{:4} a {} test.")), 1, 2.22f, 3.3333, SGE_WSTR("good")), SGE_WSTR("this is 1,2.22,3.3333 a good test."));
 
+	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test format{}{}!"))), SGE_U8STR("test format!"));
+	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test format{0}{0}!"))), SGE_U8STR("test format!"));
+	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test format{1}{1}!"))), SGE_U8STR("test format!"));
+	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test format{0}{1}!"))), SGE_U8STR("test format!"));
+	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test format{1}{0}!"))), SGE_U8STR("test format!"));
+	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test format{1:test}{0:format}!"))), SGE_U8STR("test format!"));
 	ASSERT_EQ(Format(UTF8String(SGE_U8STR("{}, {}!")), SGE_U8STR("Hello"), SGE_U8STR("world")), SGE_U8STR("Hello, world!"));
 	ASSERT_EQ(Format(UTF8String(SGE_U8STR("{0}, {1}!")), SGE_U8STR("Hello"), SGE_U8STR("world")), SGE_U8STR("Hello, world!"));
 	ASSERT_EQ(Format(UTF8String(SGE_U8STR("{1}, {0}!")), SGE_U8STR("world"), SGE_U8STR("Hello")), SGE_U8STR("Hello, world!"));
