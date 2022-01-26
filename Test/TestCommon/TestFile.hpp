@@ -285,3 +285,13 @@ TEST(Path, GetModuleDirectoryPathTest)
 	StdTCout << SGE_STR_TO_TSTR(path_str).GetData() << std::endl;
 	ASSERT_NE(path_str.Find(SGE_STR("TestCommon"), path_str.GetConstBegin(), path_str.GetConstEnd()), path_str.GetConstEnd());
 }
+
+TEST(Path, CreateAndDeleteFileTest)
+{
+	Path p(SGE_STR("./TestData/TestCommon/TestFile/test_c_d.txt"));
+	ASSERT_FALSE(p.IsExist());
+	CreateFile(p);
+	ASSERT_TRUE(p.IsExist());
+	DeleteFile(p);
+	ASSERT_FALSE(p.IsExist());
+}

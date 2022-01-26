@@ -15,6 +15,10 @@ limitations under the License.
 */
 #include "System/DllLoader.h"
 
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+#endif
+
 bool SpaceGameEngine::EmptyDllNameError::Judge(const String& name)
 {
 	return name.GetSize() == 0;

@@ -16,6 +16,12 @@ limitations under the License.
 #include "File.h"
 #include "Container/Stack.hpp"
 
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+#elif defined(SGE_POSIX)
+#include "fcntl.h"
+#endif
+
 #ifdef SGE_MACOS
 #include <mach-o/dyld.h>
 #include <stdlib.h>
@@ -438,6 +444,47 @@ SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 }
 
 #ifdef SGE_WINDOWS
+#include "System/HideWindowsMacro.h"
+#endif
+void SpaceGameEngine::CreateFile(const Path& path)
+{
+	SGE_ASSERT(PathExistError, path);
+	String astr = path.GetAbsolutePath().GetString();
+
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+	HANDLE handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+	SGE_CHECK(CreateFileFailError, handle);
+	SGE_CHECK(CloseHandleFailError, CloseHandle(handle));
+#elif defined(SGE_POSIX)
+	int fd = creat(SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO);
+	SGE_CHECK(CreatFailError, fd);
+	SGE_CHECK(CloseFailError, close(fd));
+#else
+#error this os has not been supported.
+#endif
+}
+
+#ifdef SGE_WINDOWS
+#include "System/HideWindowsMacro.h"
+#endif
+void SpaceGameEngine::DeleteFile(const Path& path)
+{
+	SGE_ASSERT(PathNotExistError, path);
+	SGE_ASSERT(PathNotFileError, path);
+	String astr = path.GetAbsolutePath().GetString();
+
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+	SGE_CHECK(DeleteFileFailError, DeleteFile(SGE_STR_TO_TSTR(astr).GetData()));
+#elif defined(SGE_POSIX)
+	SGE_CHECK(UnlinkFailError, unlink(SGE_STR_TO_TSTR(astr).GetData()));
+#else
+#error this os has not been supported.
+#endif
+}
+
+#ifdef SGE_WINDOWS
 bool SpaceGameEngine::GetFullPathNameFailError::Judge(DWORD re, SizeType buf_size)
 {
 	return re == 0 || re >= buf_size;
@@ -487,6 +534,11 @@ bool SpaceGameEngine::GetFileInformationByHandleExFailError::Judge(BOOL re)
 {
 	return re == 0;
 }
+
+bool SpaceGameEngine::DeleteFileFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
@@ -509,6 +561,26 @@ bool SpaceGameEngine::OpenDirFailError::Judge(DIR* re)
 }
 
 bool SpaceGameEngine::CloseDirFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::CreatFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::OpenFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::CloseFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::UnlinkFailError::Judge(int re)
 {
 	return re == -1;
 }
@@ -536,6 +608,11 @@ bool SpaceGameEngine::AbsolutePathAdditionError::Judge(const Path& path)
 	return path.IsAbsolute();
 }
 
+bool SpaceGameEngine::PathExistError::Judge(const Path& path)
+{
+	return path.IsExist();
+}
+
 bool SpaceGameEngine::PathNotExistError::Judge(const Path& path)
 {
 	return !path.IsExist();
@@ -544,4 +621,9 @@ bool SpaceGameEngine::PathNotExistError::Judge(const Path& path)
 bool SpaceGameEngine::PathNotDirectoryError::Judge(const Path& path)
 {
 	return path.GetPathType() != PathType::Directory;
+}
+
+bool SpaceGameEngine::PathNotFileError::Judge(const Path& path)
+{
+	return path.GetPathType() != PathType::File;
 }

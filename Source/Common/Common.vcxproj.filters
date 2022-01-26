@@ -171,6 +171,12 @@
     <ClInclude Include="Public\File.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\System\HideWindowsMacro.h">
+      <Filter>Public\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\System\AllowWindowsMacro.h">
+      <Filter>Public\System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

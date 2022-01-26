@@ -92,6 +92,15 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("GetFileInformationByHandleEx failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
+
+	struct DeleteFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("DeleteFile failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
+#include "System/HideWindowsMacro.h"
+
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
 	{
@@ -120,6 +129,30 @@ namespace SpaceGameEngine
 	struct CloseDirFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("closedir failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct CreatFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("creat failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct OpenFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("open failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct CloseFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("close failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct UnlinkFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("unlink failed.");
 		static COMMON_API bool Judge(int re);
 	};
 #endif
@@ -273,6 +306,12 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const Path& path);
 	};
 
+	struct PathExistError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Path has been existed.");
+		static COMMON_API bool Judge(const Path& path);
+	};
+
 	struct PathNotExistError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Path does not exist.");
@@ -285,12 +324,21 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const Path& path);
 	};
 
+	struct PathNotFileError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Path is not a file.");
+		static COMMON_API bool Judge(const Path& path);
+	};
+
 	COMMON_API Path GetCurrentDirectoryPath();
 
 	COMMON_API void SetCurrentDirectoryPath(const Path& path);
 
 	COMMON_API Path GetModuleDirectoryPath();
 
+	COMMON_API void CreateFile(const Path& path);
+
+	COMMON_API void DeleteFile(const Path& path);
 	/*!
 	@}
 	*/

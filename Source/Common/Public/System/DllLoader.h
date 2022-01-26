@@ -87,6 +87,10 @@ namespace SpaceGameEngine
 	*/
 	COMMON_API String GetDllPath(const String& dll_name);
 
+#ifdef SGE_WINDOWS
+#include "System/HideWindowsMacro.h"
+#endif
+
 	/*!
 	@}
 	*/

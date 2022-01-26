@@ -188,7 +188,9 @@
     <ClInclude Include="Public\Platform.hpp" />
     <ClInclude Include="Public\SGEString.hpp" />
     <ClInclude Include="Public\SGEStringForward.h" />
+    <ClInclude Include="Public\System\AllowWindowsMacro.h" />
     <ClInclude Include="Public\System\DllLoader.h" />
+    <ClInclude Include="Public\System\HideWindowsMacro.h" />
     <ClInclude Include="Public\Time\TimeCounter.h" />
     <ClInclude Include="Public\TypeDefinition.hpp" />
     <ClInclude Include="Public\Concurrent\Thread.h" />
