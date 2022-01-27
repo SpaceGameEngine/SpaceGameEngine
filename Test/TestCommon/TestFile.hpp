@@ -366,3 +366,59 @@ TEST(Path, CopyFileOverwriteTest)
 	DeleteFile(dst);
 	ASSERT_FALSE(dst.IsExist());
 }
+
+TEST(Path, MoveFileTest)
+{
+	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_mv_src.txt"));
+	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_mv_dst.txt"));
+	ASSERT_FALSE(src.IsExist());
+	std::ofstream test_mv_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	test_mv_w << 1024;
+	test_mv_w.close();
+	ASSERT_TRUE(src.IsExist());
+
+	MoveFile(dst, src, false);
+
+	ASSERT_FALSE(src.IsExist());
+	ASSERT_TRUE(dst.IsExist());
+
+	int num = 0;
+	std::ifstream test_mv_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	test_mv_i_dst >> num;
+	ASSERT_EQ(num, 1024);
+	test_mv_i_dst.close();
+
+	DeleteFile(dst);
+	ASSERT_FALSE(dst.IsExist());
+}
+
+TEST(Path, MoveFileOverwriteTest)
+{
+	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_mv_ow_src.txt"));
+	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_mv_ow_dst.txt"));
+	ASSERT_FALSE(src.IsExist());
+	std::ofstream test_mv_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	test_mv_w << 1024;
+	test_mv_w.close();
+	ASSERT_TRUE(src.IsExist());
+
+	ASSERT_FALSE(dst.IsExist());
+	std::ofstream test_mv_w2(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	test_mv_w2 << 2048;
+	test_mv_w2.close();
+	ASSERT_TRUE(dst.IsExist());
+
+	MoveFile(dst, src, true);
+
+	ASSERT_FALSE(src.IsExist());
+	ASSERT_TRUE(dst.IsExist());
+
+	int num = 0;
+	std::ifstream test_cp_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	test_cp_i_dst >> num;
+	ASSERT_EQ(num, 1024);
+	test_cp_i_dst.close();
+
+	DeleteFile(dst);
+	ASSERT_FALSE(dst.IsExist());
+}

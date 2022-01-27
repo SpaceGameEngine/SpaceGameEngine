@@ -105,6 +105,12 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(BOOL re);
 	};
 
+	struct MoveFileExFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("MoveFileEx failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
 #include "System/HideWindowsMacro.h"
 
 #elif defined(SGE_POSIX)
@@ -166,6 +172,12 @@ namespace SpaceGameEngine
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("STL copy_file failed.");
 		static COMMON_API bool Judge(bool re);
+	};
+
+	struct RenameFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("rename failed.");
+		static COMMON_API bool Judge(int re);
 	};
 #endif
 
@@ -353,6 +365,8 @@ namespace SpaceGameEngine
 	COMMON_API void DeleteFile(const Path& path);
 
 	COMMON_API void CopyFile(const Path& dst, const Path& src, bool can_overwrite = true);
+
+	COMMON_API void MoveFile(const Path& dst, const Path& src, bool can_overwrite = true);
 	/*!
 	@}
 	*/

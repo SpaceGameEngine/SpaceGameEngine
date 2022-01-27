@@ -30,4 +30,9 @@ limitations under the License.
 #pragma push_macro("CopyFile")
 #undef CopyFile
 #endif
+
+#ifdef MoveFile
+#pragma push_macro("MoveFile")
+#undef MoveFile
+#endif
 #endif

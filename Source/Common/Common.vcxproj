@@ -218,9 +218,6 @@
     <ClCompile Include="Private\Time\WindowsTimeImplement.cpp" />
     <ClCompile Include="Private\Utility\AutoReleaseBuffer.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
