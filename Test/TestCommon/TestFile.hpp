@@ -414,10 +414,10 @@ TEST(Path, MoveFileOverwriteTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_cp_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
-	test_cp_i_dst >> num;
+	std::ifstream test_mv_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	test_mv_i_dst >> num;
 	ASSERT_EQ(num, 1024);
-	test_cp_i_dst.close();
+	test_mv_i_dst.close();
 
 	DeleteFile(dst);
 	ASSERT_FALSE(dst.IsExist());
