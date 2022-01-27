@@ -19,7 +19,8 @@ limitations under the License.
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
 #elif defined(SGE_POSIX)
-#include "fcntl.h"
+#include <fcntl.h>
+#include <filesystem>
 #endif
 
 #ifdef SGE_MACOS
@@ -483,6 +484,32 @@ void SpaceGameEngine::DeleteFile(const Path& path)
 #error this os has not been supported.
 #endif
 }
+#ifdef SGE_WINDOWS
+#include "System/HideWindowsMacro.h"
+#endif
+void SpaceGameEngine::CopyFile(const Path& dst, const Path& src, bool can_overwrite)
+{
+	SGE_ASSERT(PathNotExistError, src);
+	SGE_ASSERT(PathNotFileError, src);
+	if (can_overwrite)
+	{
+		if (dst.IsExist())
+			SGE_ASSERT(PathNotFileError, dst);
+	}
+	else
+		SGE_ASSERT(PathExistError, dst);
+	String dstr = dst.GetAbsolutePath().GetString();
+	String sstr = src.GetAbsolutePath().GetString();
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+	SGE_CHECK(CopyFileFailError, CopyFile(SGE_STR_TO_TSTR(sstr).GetData(), SGE_STR_TO_TSTR(dstr).GetData(), !can_overwrite));
+#elif defined(SGE_POSIX)
+	//no portable solution for unix platform to copy file, so use STL
+	SGE_CHECK(STLCopyFileFailError, std::filesystem::copy_file(std::filesystem::path(SGE_STR_TO_UTF8(sstr).GetData()), std::filesystem::path(SGE_STR_TO_UTF8(dstr).GetData()), (can_overwrite ? std::filesystem::copy_options::overwrite_existing : std::filesystem::copy_options::none)));
+#else
+#error this os has not been supported.
+#endif
+}
 
 #ifdef SGE_WINDOWS
 bool SpaceGameEngine::GetFullPathNameFailError::Judge(DWORD re, SizeType buf_size)
@@ -539,6 +566,11 @@ bool SpaceGameEngine::DeleteFileFailError::Judge(BOOL re)
 {
 	return re == 0;
 }
+
+bool SpaceGameEngine::CopyFileFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
@@ -584,6 +616,12 @@ bool SpaceGameEngine::UnlinkFailError::Judge(int re)
 {
 	return re == -1;
 }
+
+bool SpaceGameEngine::STLCopyFileFailError::Judge(bool re)
+{
+	return re == false;
+}
+
 #endif
 
 #ifdef SGE_LINUX

@@ -99,6 +99,12 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(BOOL re);
 	};
 
+	struct CopyFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("CopyFile failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
 #include "System/HideWindowsMacro.h"
 
 #elif defined(SGE_POSIX)
@@ -154,6 +160,12 @@ namespace SpaceGameEngine
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("unlink failed.");
 		static COMMON_API bool Judge(int re);
+	};
+
+	struct STLCopyFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("STL copy_file failed.");
+		static COMMON_API bool Judge(bool re);
 	};
 #endif
 
@@ -339,6 +351,8 @@ namespace SpaceGameEngine
 	COMMON_API void CreateFile(const Path& path);
 
 	COMMON_API void DeleteFile(const Path& path);
+
+	COMMON_API void CopyFile(const Path& dst, const Path& src, bool can_overwrite = true);
 	/*!
 	@}
 	*/

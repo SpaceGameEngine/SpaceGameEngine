@@ -25,4 +25,9 @@ limitations under the License.
 #pragma push_macro("DeleteFile")
 #undef DeleteFile
 #endif
+
+#ifdef CopyFile
+#pragma push_macro("CopyFile")
+#undef CopyFile
+#endif
 #endif

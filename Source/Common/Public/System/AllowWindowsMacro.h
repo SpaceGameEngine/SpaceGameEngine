@@ -16,6 +16,10 @@ limitations under the License.
 #include "Platform.hpp"
 
 #ifdef SGE_WINDOWS
+#ifndef CopyFile
+#pragma pop_macro("CopyFile")
+#endif
+
 #ifndef DeleteFile
 #pragma pop_macro("DeleteFile")
 #endif

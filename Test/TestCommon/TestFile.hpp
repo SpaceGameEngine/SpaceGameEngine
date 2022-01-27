@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include <fstream>
 #include "gtest/gtest.h"
 #include "File.h"
 #include "Container/Map.hpp"
@@ -294,4 +295,74 @@ TEST(Path, CreateAndDeleteFileTest)
 	ASSERT_TRUE(p.IsExist());
 	DeleteFile(p);
 	ASSERT_FALSE(p.IsExist());
+}
+
+TEST(Path, CopyFileTest)
+{
+	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_cp_src.txt"));
+	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_cp_dst.txt"));
+	ASSERT_FALSE(src.IsExist());
+	std::ofstream test_cp_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	test_cp_w << 1024;
+	test_cp_w.close();
+	ASSERT_TRUE(src.IsExist());
+
+	CopyFile(dst, src, false);
+
+	ASSERT_TRUE(src.IsExist());
+	ASSERT_TRUE(dst.IsExist());
+
+	int num = 0;
+	std::ifstream test_cp_i_src(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	test_cp_i_src >> num;
+	ASSERT_EQ(num, 1024);
+	test_cp_i_src.close();
+	num = 0;
+	std::ifstream test_cp_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	test_cp_i_dst >> num;
+	ASSERT_EQ(num, 1024);
+	test_cp_i_dst.close();
+
+	DeleteFile(src);
+	ASSERT_FALSE(src.IsExist());
+	DeleteFile(dst);
+	ASSERT_FALSE(dst.IsExist());
+}
+
+TEST(Path, CopyFileOverwriteTest)
+{
+	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_cp_ow_src.txt"));
+	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_cp_ow_dst.txt"));
+	ASSERT_FALSE(src.IsExist());
+	std::ofstream test_cp_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	test_cp_w << 1024;
+	test_cp_w.close();
+	ASSERT_TRUE(src.IsExist());
+
+	ASSERT_FALSE(dst.IsExist());
+	std::ofstream test_cp_w2(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	test_cp_w2 << 2048;
+	test_cp_w2.close();
+	ASSERT_TRUE(dst.IsExist());
+
+	CopyFile(dst, src, true);
+
+	ASSERT_TRUE(src.IsExist());
+	ASSERT_TRUE(dst.IsExist());
+
+	int num = 0;
+	std::ifstream test_cp_i_src(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	test_cp_i_src >> num;
+	ASSERT_EQ(num, 1024);
+	test_cp_i_src.close();
+	num = 0;
+	std::ifstream test_cp_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	test_cp_i_dst >> num;
+	ASSERT_EQ(num, 1024);
+	test_cp_i_dst.close();
+
+	DeleteFile(src);
+	ASSERT_FALSE(src.IsExist());
+	DeleteFile(dst);
+	ASSERT_FALSE(dst.IsExist());
 }
