@@ -111,6 +111,18 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(BOOL re);
 	};
 
+	struct CreateDirectoryFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("CreateDirectory failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
+	struct RemoveDirectoryFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("RemoveDirectory failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
 #include "System/HideWindowsMacro.h"
 
 #elif defined(SGE_POSIX)
@@ -177,6 +189,18 @@ namespace SpaceGameEngine
 	struct RenameFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("rename failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct MkdirFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("mkdir failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct RmdirFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("rmdir failed.");
 		static COMMON_API bool Judge(int re);
 	};
 #endif
@@ -354,6 +378,13 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const Path& path);
 	};
 
+	struct PathNotFileOrDirectoryError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Path is not a file or a directory.");
+		static COMMON_API bool Judge(const Path& path);
+		static COMMON_API bool Judge(PathType ptype);
+	};
+
 	COMMON_API Path GetCurrentDirectoryPath();
 
 	COMMON_API void SetCurrentDirectoryPath(const Path& path);
@@ -367,6 +398,11 @@ namespace SpaceGameEngine
 	COMMON_API void CopyFile(const Path& dst, const Path& src, bool can_overwrite = true);
 
 	COMMON_API void MoveFile(const Path& dst, const Path& src, bool can_overwrite = true);
+
+	COMMON_API void CreateDirectory(const Path& path);
+
+	COMMON_API void DeleteDirectory(const Path& path);
+
 	/*!
 	@}
 	*/

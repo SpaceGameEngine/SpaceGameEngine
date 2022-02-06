@@ -450,6 +450,8 @@ SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 void SpaceGameEngine::CreateFile(const Path& path)
 {
 	SGE_ASSERT(PathExistError, path);
+	SGE_ASSERT(PathNotExistError, path.GetParentPath());
+	SGE_ASSERT(PathNotDirectoryError, path.GetParentPath());
 	String astr = path.GetAbsolutePath().GetString();
 
 #ifdef SGE_WINDOWS
@@ -541,6 +543,61 @@ void SpaceGameEngine::MoveFile(const Path& dst, const Path& src, bool can_overwr
 }
 
 #ifdef SGE_WINDOWS
+#include "System/HideWindowsMacro.h"
+#endif
+void SpaceGameEngine::CreateDirectory(const Path& path)
+{
+	SGE_ASSERT(PathExistError, path);
+	SGE_ASSERT(PathNotExistError, path.GetParentPath());
+	SGE_ASSERT(PathNotDirectoryError, path.GetParentPath());
+
+	String astr = path.GetAbsolutePath().GetString();
+
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+	SGE_CHECK(CreateDirectoryFailError, CreateDirectory(SGE_STR_TO_TSTR(astr).GetData(), NULL));
+#elif defined(SGE_POSIX)
+	SGE_CHECK(MkdirFailError, mkdir(SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO));
+#else
+#error this os has not been supported.
+#endif
+}
+
+#ifdef SGE_WINDOWS
+#include "System/HideWindowsMacro.h"
+#endif
+void SpaceGameEngine::DeleteDirectory(const Path& path)
+{
+	SGE_ASSERT(PathNotExistError, path);
+	SGE_ASSERT(PathNotDirectoryError, path);
+	String astr = path.GetAbsolutePath().GetString();
+	auto children_paths = path.GetChildPath();
+
+	if (children_paths.GetSize())
+	{
+		for (auto iter = children_paths.GetConstBegin(); iter != children_paths.GetConstEnd(); ++iter)
+		{
+			SGE_CHECK(PathNotFileOrDirectoryError, iter->m_Second);
+			if (iter->m_Second == PathType::File)
+				DeleteFile(iter->m_First);
+			else if (iter->m_Second == PathType::Directory)
+				DeleteDirectory(iter->m_First);
+		}
+	}
+
+#ifdef SGE_WINDOWS
+	SGE_CHECK(RemoveDirectoryFailError, RemoveDirectory(SGE_STR_TO_TSTR(astr).GetData()));
+#elif defined(SGE_POSIX)
+	SGE_CHECK(RmdirFailError, rmdir(SGE_STR_TO_TSTR(astr).GetData()));
+#else
+#error this os has not been supported.
+#endif
+}
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+#endif
+
+#ifdef SGE_WINDOWS
 bool SpaceGameEngine::GetFullPathNameFailError::Judge(DWORD re, SizeType buf_size)
 {
 	return re == 0 || re >= buf_size;
@@ -605,6 +662,16 @@ bool SpaceGameEngine::MoveFileExFailError::Judge(BOOL re)
 {
 	return re == 0;
 }
+
+bool SpaceGameEngine::CreateDirectoryFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
+
+bool SpaceGameEngine::RemoveDirectoryFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
@@ -660,6 +727,16 @@ bool SpaceGameEngine::RenameFailError::Judge(int re)
 {
 	return re == -1;
 }
+
+bool SpaceGameEngine::MkdirFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::RmdirFailError::Judge(int re)
+{
+	return re == -1;
+}
 #endif
 
 #ifdef SGE_LINUX
@@ -702,4 +779,15 @@ bool SpaceGameEngine::PathNotDirectoryError::Judge(const Path& path)
 bool SpaceGameEngine::PathNotFileError::Judge(const Path& path)
 {
 	return path.GetPathType() != PathType::File;
+}
+
+bool SpaceGameEngine::PathNotFileOrDirectoryError::Judge(const Path& path)
+{
+	auto ptype = path.GetPathType();
+	return ptype != PathType::File && ptype != PathType::Directory;
+}
+
+bool SpaceGameEngine::PathNotFileOrDirectoryError::Judge(PathType ptype)
+{
+	return ptype != PathType::File && ptype != PathType::Directory;
 }

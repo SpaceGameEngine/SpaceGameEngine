@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include <fstream>
+#include <iostream>
 #include "gtest/gtest.h"
 #include "File.h"
 #include "Container/Map.hpp"
@@ -421,4 +422,47 @@ TEST(Path, MoveFileOverwriteTest)
 
 	DeleteFile(dst);
 	ASSERT_FALSE(dst.IsExist());
+}
+
+TEST(Path, CreateAndDeleteDirectoryTest)
+{
+	Path test_dir1(SGE_STR("./TestData/TestCommon/TestFile/test_dir"));
+	ASSERT_FALSE(test_dir1.IsExist());
+	CreateDirectory(test_dir1);
+	ASSERT_TRUE(test_dir1.IsExist());
+
+	Path test_file1 = test_dir1 / Path(SGE_STR("test_dir_file1.txt"));
+	ASSERT_FALSE(test_file1.IsExist());
+	CreateFile(test_file1);
+	ASSERT_TRUE(test_file1.IsExist());
+
+	std::ofstream test_file1_output(SGE_STR_TO_UTF8(test_file1.GetAbsolutePath().GetString()).GetData());
+	test_file1_output << "test_file1";
+	test_file1_output.close();
+
+	Path test_dir2 = test_dir1 / Path(SGE_STR("test_dir2"));
+	ASSERT_FALSE(test_dir2.IsExist());
+	CreateDirectory(test_dir2);
+	ASSERT_TRUE(test_dir2.IsExist());
+
+	Path test_file2 = test_dir2 / Path(SGE_STR("test_dir_file2.txt"));
+	ASSERT_FALSE(test_file2.IsExist());
+	CreateFile(test_file2);
+	ASSERT_TRUE(test_file2.IsExist());
+
+	std::ofstream test_file2_output(SGE_STR_TO_UTF8(test_file2.GetAbsolutePath().GetString()).GetData());
+	test_file2_output << "test_file2";
+	test_file2_output.close();
+
+	ASSERT_EQ(test_dir1.GetChildPath().GetSize(), 2);
+	ASSERT_EQ(test_dir2.GetChildPath().GetSize(), 1);
+	ASSERT_TRUE(test_file1.GetParentPath().IsEquivalent(test_dir1));
+	ASSERT_TRUE(test_dir2.GetParentPath().IsEquivalent(test_dir1));
+	ASSERT_TRUE(test_file2.GetParentPath().IsEquivalent(test_dir2));
+
+	DeleteDirectory(test_dir1);
+	ASSERT_FALSE(test_dir1.IsExist());
+	ASSERT_FALSE(test_dir2.IsExist());
+	ASSERT_FALSE(test_file1.IsExist());
+	ASSERT_FALSE(test_file2.IsExist());
 }

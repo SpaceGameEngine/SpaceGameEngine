@@ -35,4 +35,9 @@ limitations under the License.
 #pragma push_macro("MoveFile")
 #undef MoveFile
 #endif
+
+#ifdef CreateDirectory
+#pragma push_macro("CreateDirectory")
+#undef CreateDirectory
+#endif
 #endif
