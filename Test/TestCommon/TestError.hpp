@@ -25,3 +25,19 @@ TEST(IsError, CorrectnessTest)
 	ASSERT_TRUE((IsError<InvalidSizeError, SizeType, SizeType, SizeType>::Value == true));
 	ASSERT_TRUE((IsError<int>::Value == false));
 }
+
+#ifdef SGE_DEBUG
+TEST(Assert, HandleTest)
+{
+	int test = 0;
+	SGE_ASSERT(NullPointerError, nullptr).Handle([&]() { test = 1; });
+	ASSERT_EQ(test, 1);
+}
+#endif
+
+TEST(Check, HandleTest)
+{
+	int test = 0;
+	SGE_CHECK(NullPointerError, nullptr).Handle([&]() { test = 1; });
+	ASSERT_EQ(test, 1);
+}
