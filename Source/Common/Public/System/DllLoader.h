@@ -15,9 +15,10 @@ limitations under the License.
 */
 #pragma once
 #include "SGEString.hpp"
+#include "File.h"
 #ifdef SGE_WINDOWS
 #include <Windows.h>
-#elif defined(SGE_UNIX)
+#elif defined(SGE_POSIX)
 #include <dlfcn.h>
 #else
 #error "this platform is not supported"
@@ -32,7 +33,7 @@ namespace SpaceGameEngine
 
 #ifdef SGE_WINDOWS
 	using DllHandle = HMODULE;
-#elif defined(SGE_UNIX)
+#elif defined(SGE_POSIX)
 	using DllHandle = void*;
 #else
 #error "this platform is not supported"
@@ -74,7 +75,7 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const DllHandle& handle);
 	};
 
-	COMMON_API DllHandle LoadDll(const String& dll);
+	COMMON_API DllHandle LoadDll(const Path& dll_path);
 
 	COMMON_API void* GetAddressFromDll(const DllHandle& handle, const String& symbol);
 
@@ -82,10 +83,9 @@ namespace SpaceGameEngine
 
 	/*!
 	@brief get the dll's relative path which conform with the project rule.
-	@todo use Path instead of String.
 	@param dll_name the name of the dll(without any prefix or suffix).
 	*/
-	COMMON_API String GetDllPath(const String& dll_name);
+	COMMON_API Path GetDllPath(const String& dll_name);
 
 #ifdef SGE_WINDOWS
 #include "System/HideWindowsMacro.h"

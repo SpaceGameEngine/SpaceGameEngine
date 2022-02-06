@@ -6,6 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 cmake_policy(SET CMP0054 NEW)
 
+## set debug definition
+if($ENV{CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    add_compile_definitions("DEBUG")
+endif()
+
 ## set utf8 runtime environment
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 add_compile_options(/source-charset:utf-8 /source-charset:utf-8)

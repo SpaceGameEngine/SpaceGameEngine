@@ -31,7 +31,7 @@ bool SpaceGameEngine::EmptySymbolError::Judge(const String& symbol)
 
 bool SpaceGameEngine::LoadDllFailedError::Judge(const DllHandle& re)
 {
-#if defined(SGE_WINDOWS) || defined(SGE_UNIX)
+#if defined(SGE_WINDOWS) || defined(SGE_POSIX)
 	return re == 0;
 #else
 #error "this platform is not supported"
@@ -40,7 +40,7 @@ bool SpaceGameEngine::LoadDllFailedError::Judge(const DllHandle& re)
 
 bool SpaceGameEngine::GetAddressFromDllFailedError::Judge(void* re)
 {
-#if defined(SGE_WINDOWS) || defined(SGE_UNIX)
+#if defined(SGE_WINDOWS) || defined(SGE_POSIX)
 	return re == nullptr;
 #else
 #error "this platform is not supported"
@@ -51,7 +51,7 @@ bool SpaceGameEngine::UnloadDllFailedError::Judge(int re)
 {
 #if defined(SGE_WINDOWS)
 	return re == 0;
-#elif defined(SGE_UNIX)
+#elif defined(SGE_POSIX)
 	return re != 0;
 #else
 #error "this platform is not supported"
@@ -60,22 +60,23 @@ bool SpaceGameEngine::UnloadDllFailedError::Judge(int re)
 
 bool SpaceGameEngine::NullDllHandleError::Judge(const DllHandle& handle)
 {
-#if defined(SGE_WINDOWS) || defined(SGE_UNIX)
+#if defined(SGE_WINDOWS) || defined(SGE_POSIX)
 	return handle == 0;
 #else
 #error "this platform is not supported"
 #endif
 }
 
-SpaceGameEngine::DllHandle SpaceGameEngine::LoadDll(const String& dll)
+SpaceGameEngine::DllHandle SpaceGameEngine::LoadDll(const Path& dll_path)
 {
-	SGE_ASSERT(EmptyDllNameError, dll);
+	SGE_ASSERT(PathNotExistError, dll_path);
+	SGE_ASSERT(PathNotFileError, dll_path);
 #ifdef SGE_WINDOWS
-	DllHandle re = LoadLibrary(SGE_UCS2_TO_TSTR(dll).GetData());
+	DllHandle re = LoadLibrary(SGE_STR_TO_TSTR(dll_path.GetAbsolutePath().GetString()).GetData());
 	SGE_CHECK(LoadDllFailedError, re);
 	return re;
-#elif defined(SGE_UNIX)
-	DllHandle re = dlopen(SGE_UCS2_TO_TSTR(dll).GetData(), RTLD_NOW | RTLD_GLOBAL);
+#elif defined(SGE_POSIX)
+	DllHandle re = dlopen(SGE_STR_TO_TSTR(dll_path.GetAbsolutePath().GetString()).GetData(), RTLD_NOW | RTLD_GLOBAL);
 	SGE_CHECK(LoadDllFailedError, re);
 	return re;
 #else
@@ -91,7 +92,7 @@ void* SpaceGameEngine::GetAddressFromDll(const DllHandle& handle, const String& 
 	void* re = (void*)GetProcAddress(handle, UCS2StringToUTF8String(symbol).GetData());
 	SGE_CHECK(GetAddressFromDllFailedError, re);
 	return re;
-#elif defined(SGE_UNIX)
+#elif defined(SGE_POSIX)
 	void* re = dlsym(handle, UCS2StringToUTF8String(symbol).GetData());
 	SGE_CHECK(GetAddressFromDllFailedError, re);
 	return re;
@@ -105,15 +106,16 @@ void SpaceGameEngine::UnloadDll(const DllHandle& handle)
 	SGE_ASSERT(NullDllHandleError, handle);
 #ifdef SGE_WINDOWS
 	SGE_CHECK(UnloadDllFailedError, FreeLibrary(handle));
-#elif defined(SGE_UNIX)
+#elif defined(SGE_POSIX)
 	SGE_CHECK(UnloadDllFailedError, dlclose(handle));
 #else
 #error "this platform is not supported"
 #endif
 }
 
-SpaceGameEngine::String SpaceGameEngine::GetDllPath(const String& dll_name)
+SpaceGameEngine::Path SpaceGameEngine::GetDllPath(const String& dll_name)
 {
+	SGE_ASSERT(EmptyDllNameError, dll_name);
 #ifdef SGE_WINDOWS
 	String dll_path(SGE_STR(".\\Binary\\"));
 	dll_path += dll_name;
@@ -134,17 +136,17 @@ SpaceGameEngine::String SpaceGameEngine::GetDllPath(const String& dll_name)
 	dll_path += dll_name;
 	dll_path += SGE_STR(".dll");
 
-	return dll_path;
+	return Path(dll_path);
 #elif defined(SGE_MACOS)
 	String re(SGE_STR("lib"));
 	re += dll_name;
 	re += SGE_STR(".dylib");
-	return re;
+	return Path(re);
 #elif defined(SGE_LINUX)
 	String re(SGE_STR("lib"));
 	re += dll_name;
 	re += SGE_STR(".so");
-	return re;
+	return Path(re);
 #else
 #error "this platform is not supported"
 #endif
