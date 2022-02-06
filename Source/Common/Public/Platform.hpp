@@ -75,10 +75,5 @@ limitations under the License.
 #endif
 
 /*!
-@file
-@todo check these platform macros.
-*/
-
-/*!
 @}
 */

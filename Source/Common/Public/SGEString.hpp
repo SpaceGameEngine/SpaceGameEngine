@@ -2462,7 +2462,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert a StringCore to the StringCore before the iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@return Iterator pointing to the inserted StringCore's first char.
 		*/
@@ -2548,7 +2547,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert a StringCore to the StringCore before the iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@return Iterator pointing to the inserted StringCore's first char.
 		*/
@@ -2633,7 +2631,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert a CString to the StringCore before the iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the string which pstr pointing to can not be a part of this StringCore's content.
 		@return Iterator pointing to the inserted CString's first char.
@@ -2722,7 +2719,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert the content between the given iterator pair to the StringCore before the iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the begin&end's Container can not be the current Vector.
 		@return Iterator pointing to the inserted content's first char.
@@ -2828,7 +2824,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief remove a element in StringCore by giving a iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@return the iterator which points to the next element after the removing has been done.
 		*/
@@ -2899,7 +2894,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief remove some elements in StringCore by giving the iterators.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the begin&end's Container must be current StringCore.
 		@return the iterator which points to the next element after the removing has been done.

@@ -52,7 +52,6 @@ namespace SpaceGameEngine
 
 	/*!
 	@brief Can check whether a type is a error type or not.But need to specify the Judge function's arguments' types.
-	@todo use concept when c++20 can be used
 	*/
 	template<typename T, typename... Args>
 	struct IsError

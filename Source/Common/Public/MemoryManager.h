@@ -51,11 +51,6 @@ namespace SpaceGameEngine
 	*/
 	COMMON_API SizeType GetDefaultAlignment(SizeType size);
 
-	/*!
-	@file
-	@todo add Allocator as a concept when c++20 can be used
-	*/
-
 	struct COMMON_API StdAllocator
 	{
 		static void* RawNew(SizeType size, SizeType alignment = 0);

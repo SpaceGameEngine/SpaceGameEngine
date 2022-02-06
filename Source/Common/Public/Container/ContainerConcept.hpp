@@ -68,7 +68,6 @@ namespace SpaceGameEngine
 	/*!
 	@brief check the type to make sure that it is Base Iterator Type.
 	@param U the type need to be checked.
-	@todo use concept.
 	*/
 	template<typename U>
 	struct IsBaseIterator
@@ -106,7 +105,6 @@ namespace SpaceGameEngine
 	/*!
 	@brief check the type to make sure that it is Base Bidirectional Iterator Type.
 	@param U the type need to be checked.
-	@todo use concept.
 	*/
 	template<typename U>
 	struct IsBidirectionalBaseIterator
@@ -142,7 +140,6 @@ namespace SpaceGameEngine
 	/*!
 	@brief check the type to make sure that it is sequential Iterator Type.
 	@param U the type need to be checked.
-	@todo use concept.
 	*/
 	template<typename U>
 	struct IsSequentialIterator
@@ -179,7 +176,6 @@ namespace SpaceGameEngine
 	/*!
 	@brief check the type to make sure that it is bidirectional Iterator Type.
 	@param U the type need to be checked.
-	@todo use concept.
 	*/
 	template<typename U>
 	struct IsBidirectionalSequentialIterator
