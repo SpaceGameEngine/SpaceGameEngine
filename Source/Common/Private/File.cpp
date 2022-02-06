@@ -16,9 +16,7 @@ limitations under the License.
 #include "File.h"
 #include "Container/Stack.hpp"
 
-#ifdef SGE_WINDOWS
-#include "System/AllowWindowsMacro.h"
-#elif defined(SGE_POSIX)
+#ifdef SGE_POSIX
 #include <fcntl.h>
 #include <filesystem>
 #endif
@@ -283,6 +281,7 @@ bool SpaceGameEngine::Path::IsEquivalent(const Path& path) const
 	String astr1 = GetAbsolutePath().GetString();
 	String astr2 = path.GetAbsolutePath().GetString();
 #ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
 	FILE_ID_INFO id1, id2;
 
 	HANDLE handle1 = CreateFile(SGE_STR_TO_TSTR(astr1).GetData(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
@@ -296,6 +295,7 @@ bool SpaceGameEngine::Path::IsEquivalent(const Path& path) const
 	SGE_CHECK(CloseHandleFailError, CloseHandle(handle2));
 
 	return memcmp(&id1, &id2, sizeof(FILE_ID_INFO)) == 0;
+#include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	struct stat sbuf1, sbuf2;
 	SGE_CHECK(StatFailError, stat(SGE_STR_TO_TSTR(astr1).GetData(), &sbuf1));
@@ -444,9 +444,6 @@ SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 	return Path(SGE_TSTR_TO_STR(out_buffer)).GetParentPath();
 }
 
-#ifdef SGE_WINDOWS
-#include "System/HideWindowsMacro.h"
-#endif
 void SpaceGameEngine::CreateFile(const Path& path)
 {
 	SGE_ASSERT(PathExistError, path);
@@ -459,6 +456,7 @@ void SpaceGameEngine::CreateFile(const Path& path)
 	HANDLE handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 	SGE_CHECK(CreateFileFailError, handle);
 	SGE_CHECK(CloseHandleFailError, CloseHandle(handle));
+#include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	int fd = creat(SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(CreatFailError, fd);
@@ -468,9 +466,6 @@ void SpaceGameEngine::CreateFile(const Path& path)
 #endif
 }
 
-#ifdef SGE_WINDOWS
-#include "System/HideWindowsMacro.h"
-#endif
 void SpaceGameEngine::DeleteFile(const Path& path)
 {
 	SGE_ASSERT(PathNotExistError, path);
@@ -480,6 +475,7 @@ void SpaceGameEngine::DeleteFile(const Path& path)
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
 	SGE_CHECK(DeleteFileFailError, DeleteFile(SGE_STR_TO_TSTR(astr).GetData()));
+#include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	SGE_CHECK(UnlinkFailError, unlink(SGE_STR_TO_TSTR(astr).GetData()));
 #else
@@ -487,13 +483,12 @@ void SpaceGameEngine::DeleteFile(const Path& path)
 #endif
 }
 
-#ifdef SGE_WINDOWS
-#include "System/HideWindowsMacro.h"
-#endif
 void SpaceGameEngine::CopyFile(const Path& dst, const Path& src, bool can_overwrite)
 {
 	SGE_ASSERT(PathNotExistError, src);
 	SGE_ASSERT(PathNotFileError, src);
+	SGE_ASSERT(PathNotExistError, dst.GetParentPath());
+	SGE_ASSERT(PathNotDirectoryError, dst.GetParentPath());
 	if (can_overwrite)
 	{
 		if (dst.IsExist())
@@ -506,6 +501,7 @@ void SpaceGameEngine::CopyFile(const Path& dst, const Path& src, bool can_overwr
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
 	SGE_CHECK(CopyFileFailError, CopyFile(SGE_STR_TO_TSTR(sstr).GetData(), SGE_STR_TO_TSTR(dstr).GetData(), !can_overwrite));
+#include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	//no portable solution for unix platform to copy file, so use STL
 	SGE_CHECK(STLCopyFileFailError, std::filesystem::copy_file(std::filesystem::path(SGE_STR_TO_UTF8(sstr).GetData()), std::filesystem::path(SGE_STR_TO_UTF8(dstr).GetData()), (can_overwrite ? std::filesystem::copy_options::overwrite_existing : std::filesystem::copy_options::none)));
@@ -514,13 +510,12 @@ void SpaceGameEngine::CopyFile(const Path& dst, const Path& src, bool can_overwr
 #endif
 }
 
-#ifdef SGE_WINDOWS
-#include "System/HideWindowsMacro.h"
-#endif
 void SpaceGameEngine::MoveFile(const Path& dst, const Path& src, bool can_overwrite)
 {
 	SGE_ASSERT(PathNotExistError, src);
 	SGE_ASSERT(PathNotFileError, src);
+	SGE_ASSERT(PathNotExistError, dst.GetParentPath());
+	SGE_ASSERT(PathNotDirectoryError, dst.GetParentPath());
 	if (can_overwrite)
 	{
 		if (dst.IsExist())
@@ -533,6 +528,7 @@ void SpaceGameEngine::MoveFile(const Path& dst, const Path& src, bool can_overwr
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
 	SGE_CHECK(MoveFileExFailError, MoveFileEx(SGE_STR_TO_TSTR(sstr).GetData(), SGE_STR_TO_TSTR(dstr).GetData(), MOVEFILE_COPY_ALLOWED | MOVEFILE_WRITE_THROUGH | (can_overwrite ? MOVEFILE_REPLACE_EXISTING : 0)));
+#include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	if (!can_overwrite)
 		SGE_CHECK(PathExistError, dst);
@@ -542,9 +538,6 @@ void SpaceGameEngine::MoveFile(const Path& dst, const Path& src, bool can_overwr
 #endif
 }
 
-#ifdef SGE_WINDOWS
-#include "System/HideWindowsMacro.h"
-#endif
 void SpaceGameEngine::CreateDirectory(const Path& path)
 {
 	SGE_ASSERT(PathExistError, path);
@@ -556,6 +549,7 @@ void SpaceGameEngine::CreateDirectory(const Path& path)
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
 	SGE_CHECK(CreateDirectoryFailError, CreateDirectory(SGE_STR_TO_TSTR(astr).GetData(), NULL));
+#include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	SGE_CHECK(MkdirFailError, mkdir(SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO));
 #else
@@ -563,9 +557,6 @@ void SpaceGameEngine::CreateDirectory(const Path& path)
 #endif
 }
 
-#ifdef SGE_WINDOWS
-#include "System/HideWindowsMacro.h"
-#endif
 void SpaceGameEngine::DeleteDirectory(const Path& path)
 {
 	SGE_ASSERT(PathNotExistError, path);
@@ -593,9 +584,63 @@ void SpaceGameEngine::DeleteDirectory(const Path& path)
 #error this os has not been supported.
 #endif
 }
-#ifdef SGE_WINDOWS
-#include "System/AllowWindowsMacro.h"
-#endif
+
+void SpaceGameEngine::CopyDirectory(const Path& dst, const Path& src, bool can_overwrite)
+{
+	SGE_ASSERT(PathNotExistError, src);
+	SGE_ASSERT(PathNotDirectoryError, src);
+	SGE_ASSERT(PathNotExistError, dst.GetParentPath());
+	SGE_ASSERT(PathNotDirectoryError, dst.GetParentPath());
+	if (can_overwrite)
+	{
+		if (dst.IsExist())
+			SGE_ASSERT(PathNotDirectoryError, dst);
+	}
+	else
+		SGE_ASSERT(PathExistError, dst);
+	String dstr = dst.GetAbsolutePath().GetString();
+	String sstr = src.GetAbsolutePath().GetString();
+
+	if (dst.IsExist())
+		DeleteDirectory(dst);
+	CreateDirectory(dst);
+	src.VisitChildPath([&](const String& file_name, PathType ptype) {
+		SGE_CHECK(PathNotFileOrDirectoryError, ptype);
+		if (ptype == PathType::File)
+			CopyFile(dst / Path(file_name), src / Path(file_name), can_overwrite);
+		else if (ptype == PathType::Directory)
+			CopyDirectory(dst / Path(file_name), src / Path(file_name), can_overwrite);
+	});
+}
+
+void SpaceGameEngine::MoveDirectory(const Path& dst, const Path& src, bool can_overwrite)
+{
+	SGE_ASSERT(PathNotExistError, src);
+	SGE_ASSERT(PathNotDirectoryError, src);
+	SGE_ASSERT(PathNotExistError, dst.GetParentPath());
+	SGE_ASSERT(PathNotDirectoryError, dst.GetParentPath());
+	if (can_overwrite)
+	{
+		if (dst.IsExist())
+			SGE_ASSERT(PathNotDirectoryError, dst);
+	}
+	else
+		SGE_ASSERT(PathExistError, dst);
+	String dstr = dst.GetAbsolutePath().GetString();
+	String sstr = src.GetAbsolutePath().GetString();
+
+	if (dst.IsExist())
+		DeleteDirectory(dst);
+	CreateDirectory(dst);
+	src.VisitChildPath([&](const String& file_name, PathType ptype) {
+		SGE_CHECK(PathNotFileOrDirectoryError, ptype);
+		if (ptype == PathType::File)
+			MoveFile(dst / Path(file_name), src / Path(file_name), can_overwrite);
+		else if (ptype == PathType::Directory)
+			MoveDirectory(dst / Path(file_name), src / Path(file_name), can_overwrite);
+	});
+	DeleteDirectory(src);
+}
 
 #ifdef SGE_WINDOWS
 bool SpaceGameEngine::GetFullPathNameFailError::Judge(DWORD re, SizeType buf_size)

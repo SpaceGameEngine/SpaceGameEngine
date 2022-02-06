@@ -391,17 +391,39 @@ namespace SpaceGameEngine
 
 	COMMON_API Path GetModuleDirectoryPath();
 
+	/*!
+	@warning the path's parent directory must be existed.
+	*/
 	COMMON_API void CreateFile(const Path& path);
 
 	COMMON_API void DeleteFile(const Path& path);
 
+	/*!
+	@warning the dst's parent directory must be existed.
+	*/
 	COMMON_API void CopyFile(const Path& dst, const Path& src, bool can_overwrite = true);
 
+	/*!
+	@warning the dst's parent directory must be existed.
+	*/
 	COMMON_API void MoveFile(const Path& dst, const Path& src, bool can_overwrite = true);
 
+	/*!
+	@warning the path's parent directory must be existed.
+	*/
 	COMMON_API void CreateDirectory(const Path& path);
 
 	COMMON_API void DeleteDirectory(const Path& path);
+
+	/*!
+	@warning the dst's parent directory must be existed.
+	*/
+	COMMON_API void CopyDirectory(const Path& dst, const Path& src, bool can_overwrite = true);
+
+	/*!
+	@warning the dst's parent directory must be existed.
+	*/
+	COMMON_API void MoveDirectory(const Path& dst, const Path& src, bool can_overwrite = true);
 
 	/*!
 	@}

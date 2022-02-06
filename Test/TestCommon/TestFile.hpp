@@ -466,3 +466,247 @@ TEST(Path, CreateAndDeleteDirectoryTest)
 	ASSERT_FALSE(test_file1.IsExist());
 	ASSERT_FALSE(test_file2.IsExist());
 }
+
+TEST(Path, CopyDirectoryTest)
+{
+	Path test_src_dir(SGE_STR("./TestData/TestCommon/TestFile/test_dir_cp_src"));
+	ASSERT_FALSE(test_src_dir.IsExist());
+	CreateDirectory(test_src_dir);
+	ASSERT_TRUE(test_src_dir.IsExist());
+	Path test_src_file = test_src_dir / Path(SGE_STR("test_dir_cp_file.txt"));
+	ASSERT_FALSE(test_src_file.IsExist());
+	CreateFile(test_src_file);
+	ASSERT_TRUE(test_src_file.IsExist());
+	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	test_src_file_output << 256;
+	test_src_file_output.close();
+	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
+	ASSERT_FALSE(test_src_dir2.IsExist());
+	CreateDirectory(test_src_dir2);
+	ASSERT_TRUE(test_src_dir2.IsExist());
+	Path test_src_file2 = test_src_dir2 / Path(SGE_STR("test_file2.txt"));
+	ASSERT_FALSE(test_src_file2.IsExist());
+	CreateFile(test_src_file2);
+	ASSERT_TRUE(test_src_file2.IsExist());
+
+	Path test_dst_dir(SGE_STR("./TestData/TestCommon/TestFile/test_dir_cp_dst"));
+	Path test_dst_file = test_dst_dir / Path(SGE_STR("test_dir_cp_file.txt"));
+	Path test_dst_dir2 = test_dst_dir / Path(SGE_STR("test_dir2"));
+	Path test_dst_file2 = test_dst_dir2 / Path(SGE_STR("test_file2.txt"));
+	ASSERT_FALSE(test_dst_dir.IsExist());
+	ASSERT_FALSE(test_dst_file.IsExist());
+	ASSERT_FALSE(test_dst_dir2.IsExist());
+	ASSERT_FALSE(test_dst_file2.IsExist());
+
+	CopyDirectory(test_dst_dir, test_src_dir, false);
+
+	ASSERT_TRUE(test_src_dir.IsExist());
+	ASSERT_TRUE(test_src_file.IsExist());
+	ASSERT_TRUE(test_src_dir2.IsExist());
+	ASSERT_TRUE(test_src_file2.IsExist());
+	ASSERT_TRUE(test_dst_dir.IsExist());
+	ASSERT_TRUE(test_dst_file.IsExist());
+	ASSERT_TRUE(test_dst_dir2.IsExist());
+	ASSERT_TRUE(test_dst_file2.IsExist());
+
+	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	int num = 0;
+	test_dst_file_input >> num;
+	ASSERT_EQ(num, 256);
+	test_dst_file_input.close();
+
+	DeleteDirectory(test_src_dir);
+	ASSERT_FALSE(test_src_dir.IsExist());
+	ASSERT_FALSE(test_src_file.IsExist());
+	ASSERT_FALSE(test_src_dir2.IsExist());
+	ASSERT_FALSE(test_src_file2.IsExist());
+	DeleteDirectory(test_dst_dir);
+	ASSERT_FALSE(test_dst_dir.IsExist());
+	ASSERT_FALSE(test_dst_file.IsExist());
+	ASSERT_FALSE(test_dst_dir2.IsExist());
+	ASSERT_FALSE(test_dst_file2.IsExist());
+}
+
+TEST(Path, CopyDirectoryOverwriteTest)
+{
+	Path test_src_dir(SGE_STR("./TestData/TestCommon/TestFile/test_dir_cp_ow_src"));
+	ASSERT_FALSE(test_src_dir.IsExist());
+	CreateDirectory(test_src_dir);
+	ASSERT_TRUE(test_src_dir.IsExist());
+	Path test_src_file = test_src_dir / Path(SGE_STR("test_dir_cp_file.txt"));
+	ASSERT_FALSE(test_src_file.IsExist());
+	CreateFile(test_src_file);
+	ASSERT_TRUE(test_src_file.IsExist());
+	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	test_src_file_output << 256;
+	test_src_file_output.close();
+	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
+	ASSERT_FALSE(test_src_dir2.IsExist());
+	CreateDirectory(test_src_dir2);
+	ASSERT_TRUE(test_src_dir2.IsExist());
+	Path test_src_file2 = test_src_dir2 / Path(SGE_STR("test_file2.txt"));
+	ASSERT_FALSE(test_src_file2.IsExist());
+	CreateFile(test_src_file2);
+	ASSERT_TRUE(test_src_file2.IsExist());
+
+	Path test_dst_dir(SGE_STR("./TestData/TestCommon/TestFile/test_dir_cp_ow_dst"));
+	Path test_dst_file = test_dst_dir / Path(SGE_STR("test_dir_cp_file.txt"));
+	Path test_dst_dir2 = test_dst_dir / Path(SGE_STR("test_dir2"));
+	Path test_dst_file2 = test_dst_dir2 / Path(SGE_STR("test_file2.txt"));
+	ASSERT_FALSE(test_dst_dir.IsExist());
+	ASSERT_FALSE(test_dst_file.IsExist());
+	ASSERT_FALSE(test_dst_dir2.IsExist());
+	ASSERT_FALSE(test_dst_file2.IsExist());
+	CreateDirectory(test_dst_dir);
+	CreateFile(test_dst_file);
+	ASSERT_TRUE(test_dst_dir.IsExist());
+	ASSERT_TRUE(test_dst_file.IsExist());
+	std::ofstream test_dst_file_output(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	test_dst_file_output << 1024;
+	test_dst_file_output.close();
+
+	CopyDirectory(test_dst_dir, test_src_dir, true);
+
+	ASSERT_TRUE(test_src_dir.IsExist());
+	ASSERT_TRUE(test_src_file.IsExist());
+	ASSERT_TRUE(test_src_dir2.IsExist());
+	ASSERT_TRUE(test_src_file2.IsExist());
+	ASSERT_TRUE(test_dst_dir.IsExist());
+	ASSERT_TRUE(test_dst_file.IsExist());
+	ASSERT_TRUE(test_dst_dir2.IsExist());
+	ASSERT_TRUE(test_dst_file2.IsExist());
+
+	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	int num = 0;
+	test_dst_file_input >> num;
+	ASSERT_EQ(num, 256);
+	test_dst_file_input.close();
+
+	DeleteDirectory(test_src_dir);
+	ASSERT_FALSE(test_src_dir.IsExist());
+	ASSERT_FALSE(test_src_file.IsExist());
+	ASSERT_FALSE(test_src_dir2.IsExist());
+	ASSERT_FALSE(test_src_file2.IsExist());
+	DeleteDirectory(test_dst_dir);
+	ASSERT_FALSE(test_dst_dir.IsExist());
+	ASSERT_FALSE(test_dst_file.IsExist());
+	ASSERT_FALSE(test_dst_dir2.IsExist());
+	ASSERT_FALSE(test_dst_file2.IsExist());
+}
+
+TEST(Path, MoveDirectoryTest)
+{
+	Path test_src_dir(SGE_STR("./TestData/TestCommon/TestFile/test_dir_mv_src"));
+	ASSERT_FALSE(test_src_dir.IsExist());
+	CreateDirectory(test_src_dir);
+	ASSERT_TRUE(test_src_dir.IsExist());
+	Path test_src_file = test_src_dir / Path(SGE_STR("test_dir_mv_file.txt"));
+	ASSERT_FALSE(test_src_file.IsExist());
+	CreateFile(test_src_file);
+	ASSERT_TRUE(test_src_file.IsExist());
+	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	test_src_file_output << 256;
+	test_src_file_output.close();
+	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
+	ASSERT_FALSE(test_src_dir2.IsExist());
+	CreateDirectory(test_src_dir2);
+	ASSERT_TRUE(test_src_dir2.IsExist());
+	Path test_src_file2 = test_src_dir2 / Path(SGE_STR("test_file2.txt"));
+	ASSERT_FALSE(test_src_file2.IsExist());
+	CreateFile(test_src_file2);
+	ASSERT_TRUE(test_src_file2.IsExist());
+
+	Path test_dst_dir(SGE_STR("./TestData/TestCommon/TestFile/test_dir_mv_dst"));
+	Path test_dst_file = test_dst_dir / Path(SGE_STR("test_dir_mv_file.txt"));
+	Path test_dst_dir2 = test_dst_dir / Path(SGE_STR("test_dir2"));
+	Path test_dst_file2 = test_dst_dir2 / Path(SGE_STR("test_file2.txt"));
+	ASSERT_FALSE(test_dst_dir.IsExist());
+	ASSERT_FALSE(test_dst_file.IsExist());
+	ASSERT_FALSE(test_dst_dir2.IsExist());
+	ASSERT_FALSE(test_dst_file2.IsExist());
+
+	MoveDirectory(test_dst_dir, test_src_dir, false);
+
+	ASSERT_FALSE(test_src_dir.IsExist());
+	ASSERT_FALSE(test_src_file.IsExist());
+	ASSERT_FALSE(test_src_dir2.IsExist());
+	ASSERT_FALSE(test_src_file2.IsExist());
+	ASSERT_TRUE(test_dst_dir.IsExist());
+	ASSERT_TRUE(test_dst_file.IsExist());
+	ASSERT_TRUE(test_dst_dir2.IsExist());
+	ASSERT_TRUE(test_dst_file2.IsExist());
+
+	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	int num = 0;
+	test_dst_file_input >> num;
+	ASSERT_EQ(num, 256);
+	test_dst_file_input.close();
+
+	DeleteDirectory(test_dst_dir);
+	ASSERT_FALSE(test_dst_dir.IsExist());
+	ASSERT_FALSE(test_dst_file.IsExist());
+	ASSERT_FALSE(test_dst_dir2.IsExist());
+	ASSERT_FALSE(test_dst_file2.IsExist());
+}
+
+TEST(Path, MoveDirectoryOverwriteTest)
+{
+	Path test_src_dir(SGE_STR("./TestData/TestCommon/TestFile/test_dir_mv_ow_src"));
+	ASSERT_FALSE(test_src_dir.IsExist());
+	CreateDirectory(test_src_dir);
+	ASSERT_TRUE(test_src_dir.IsExist());
+	Path test_src_file = test_src_dir / Path(SGE_STR("test_dir_mv_file.txt"));
+	ASSERT_FALSE(test_src_file.IsExist());
+	CreateFile(test_src_file);
+	ASSERT_TRUE(test_src_file.IsExist());
+	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	test_src_file_output << 256;
+	test_src_file_output.close();
+	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
+	ASSERT_FALSE(test_src_dir2.IsExist());
+	CreateDirectory(test_src_dir2);
+	ASSERT_TRUE(test_src_dir2.IsExist());
+	Path test_src_file2 = test_src_dir2 / Path(SGE_STR("test_file2.txt"));
+	ASSERT_FALSE(test_src_file2.IsExist());
+	CreateFile(test_src_file2);
+	ASSERT_TRUE(test_src_file2.IsExist());
+
+	Path test_dst_dir(SGE_STR("./TestData/TestCommon/TestFile/test_dir_mv_ow_dst"));
+	Path test_dst_file = test_dst_dir / Path(SGE_STR("test_dir_mv_file.txt"));
+	Path test_dst_dir2 = test_dst_dir / Path(SGE_STR("test_dir2"));
+	Path test_dst_file2 = test_dst_dir2 / Path(SGE_STR("test_file2.txt"));
+	ASSERT_FALSE(test_dst_dir.IsExist());
+	ASSERT_FALSE(test_dst_file.IsExist());
+	ASSERT_FALSE(test_dst_dir2.IsExist());
+	ASSERT_FALSE(test_dst_file2.IsExist());
+	CreateDirectory(test_dst_dir);
+	CreateFile(test_dst_file);
+	ASSERT_TRUE(test_dst_dir.IsExist());
+	ASSERT_TRUE(test_dst_file.IsExist());
+	std::ofstream test_dst_file_output(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	test_dst_file_output << 1024;
+	test_dst_file_output.close();
+
+	MoveDirectory(test_dst_dir, test_src_dir, true);
+
+	ASSERT_FALSE(test_src_dir.IsExist());
+	ASSERT_FALSE(test_src_file.IsExist());
+	ASSERT_FALSE(test_src_dir2.IsExist());
+	ASSERT_FALSE(test_src_file2.IsExist());
+	ASSERT_TRUE(test_dst_dir.IsExist());
+	ASSERT_TRUE(test_dst_file.IsExist());
+	ASSERT_TRUE(test_dst_dir2.IsExist());
+	ASSERT_TRUE(test_dst_file2.IsExist());
+
+	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	int num = 0;
+	test_dst_file_input >> num;
+	ASSERT_EQ(num, 256);
+	test_dst_file_input.close();
+
+	DeleteDirectory(test_dst_dir);
+	ASSERT_FALSE(test_dst_dir.IsExist());
+	ASSERT_FALSE(test_dst_file.IsExist());
+	ASSERT_FALSE(test_dst_dir2.IsExist());
+	ASSERT_FALSE(test_dst_file2.IsExist());
+}
