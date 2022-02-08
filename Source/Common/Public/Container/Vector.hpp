@@ -1173,7 +1173,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert a value to the Vector before the iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the inserted value.
@@ -1241,7 +1240,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert a value to the Vector before the iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the value can not be one of the elements of this Vector.
 		@return Iterator pointing to the inserted value.
@@ -1373,7 +1371,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert some same values to the Vector before the iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the size can not be zero.
 		@warning the value can not be one of the elements of this Vector.
@@ -1496,7 +1493,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert some values to the Vector before the iterator by giving iterators.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning this function can not check whether the given two arguments(begin&end) are out of their range or not.
 		@warning the begin&end's Container can not be the current Vector.
@@ -1633,7 +1629,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief insert some values to the Vector before the iterator by giving initializer_list.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the size of initializer_list can not be zero.
 		@warning the value can not be one of the elements of this Vector.
@@ -1781,7 +1776,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief remove a element in Vector by giving a iterator.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@return the iterator which points to the next element after the removing has been done.
 		*/
@@ -1843,7 +1837,6 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief remove some elements in Vector by giving the iterators.
-		@todo use concept instead of sfinae.
 		@warning only support sequential iterator.
 		@warning the begin&end's Container must be current Vector.
 		@return the iterator which points to the next element after the removing has been done.

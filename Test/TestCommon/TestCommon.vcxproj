@@ -183,6 +183,7 @@
   <ItemGroup>
     <ClInclude Include="TestContainerConcept.hpp" />
     <ClInclude Include="TestError.hpp" />
+    <ClInclude Include="TestFile.hpp" />
     <ClInclude Include="TestFormat.hpp" />
     <ClInclude Include="TestHashMap.hpp" />
     <ClInclude Include="TestList.hpp" />

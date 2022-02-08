@@ -39,30 +39,45 @@ namespace SpaceGameEngine
 	struct Pair
 	{
 		inline Pair() = default;
+
 		template<typename T2, typename U2>
 		inline Pair(T2&& t, U2&& u)
 			: m_First(std::forward<T2>(t)), m_Second(std::forward<U2>(u))
 		{
 		}
+
 		inline Pair(const Pair<T, U>& c)
 			: Pair(c.m_First, c.m_Second)
 		{
 		}
+
 		inline Pair(Pair<T, U>&& c)
 			: Pair(std::move(c.m_First), std::move(c.m_Second))
 		{
 		}
+
 		inline Pair<T, U>& operator=(const Pair<T, U>& c)
 		{
 			m_First = c.m_First;
 			m_Second = c.m_Second;
 			return *this;
 		}
+
 		inline Pair<T, U>& operator=(Pair<T, U>&& c)
 		{
 			m_First = std::move(c.m_First);
 			m_Second = std::move(c.m_Second);
 			return *this;
+		}
+
+		inline bool operator==(const Pair<T, U>& c) const
+		{
+			return c.m_First == m_First && c.m_Second == m_Second;
+		}
+
+		inline bool operator!=(const Pair<T, U>& c) const
+		{
+			return c.m_First != m_First || c.m_Second != m_Second;
 		}
 		T m_First;
 		U m_Second;

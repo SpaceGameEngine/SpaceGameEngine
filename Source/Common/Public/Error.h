@@ -52,7 +52,6 @@ namespace SpaceGameEngine
 
 	/*!
 	@brief Can check whether a type is a error type or not.But need to specify the Judge function's arguments' types.
-	@todo use concept when c++20 can be used
 	*/
 	template<typename T, typename... Args>
 	struct IsError
@@ -81,7 +80,11 @@ namespace SpaceGameEngine
 	struct NullPointerError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
-		static COMMON_API bool Judge(const void* ptr);
+		template<typename T>
+		inline static bool Judge(const T ptr)
+		{
+			return ptr == nullptr;
+		}
 	};
 
 	struct InvalidSizeError

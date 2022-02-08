@@ -42,15 +42,15 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const Map<String, Module*>& m, const String& name);
 	};
 
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API List<Module*>;
 	template class COMMON_API Stack<Module*>;
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
 	template struct COMMON_API MapImplement::RedBlackTree<String, Module*>::Node;
-#endif
 	template class COMMON_API MapImplement::RedBlackTree<String, Module*>;
 	template class COMMON_API Map<String, Module*>;
 	template class COMMON_API List<DllHandle>;
 	template class COMMON_API Stack<DllHandle>;
+#endif
 
 	class COMMON_API ModuleManager : public UncopyableAndUnmovable, public Singleton<ModuleManager>
 	{

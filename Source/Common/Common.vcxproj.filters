@@ -168,6 +168,15 @@
     <ClInclude Include="Public\Utility\Format.hpp">
       <Filter>Public\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Public\File.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\System\HideWindowsMacro.h">
+      <Filter>Public\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\System\AllowWindowsMacro.h">
+      <Filter>Public\System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -210,6 +219,9 @@
       <Filter>Private\Module</Filter>
     </ClCompile>
     <ClCompile Include="Private\GlobalVariable.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\File.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

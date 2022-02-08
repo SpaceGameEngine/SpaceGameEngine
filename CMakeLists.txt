@@ -4,6 +4,11 @@ project(SpaceGameEngine VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+cmake_policy(SET CMP0054 NEW)
+
+## set debug definition
+add_compile_definitions($<$<CONFIG:DEBUG>:DEBUG>)
+
 ## set utf8 runtime environment
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 add_compile_options(/source-charset:utf-8 /source-charset:utf-8)
@@ -38,10 +43,10 @@ find_package(Threads REQUIRED)
 function(CopySharedLibrary target)
 if(CMAKE_HOST_UNIX)
 if(CMAKE_HOST_APPLE)
-add_custom_command(TARGET ${target}
+add_custom_command(TARGET ${target} POST_BUILD
                    COMMAND cp ./lib${target}.dylib ../../)
 else()
-add_custom_command(TARGET ${target}
+add_custom_command(TARGET ${target} POST_BUILD
                    COMMAND cp ./lib${target}.so ../../)
 endif()
 endif()

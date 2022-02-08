@@ -3531,3 +3531,42 @@ TEST(StringTo, DoubleTest)
 	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("123456"))), 123456.0);
 	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("-123.456"))), -123.456);
 }
+
+TEST(Split, SplitTest)
+{
+	Vector<UCS2String> v1 = Split(UCS2String(SGE_WSTR("test0//test1//test2")), UCS2String(SGE_WSTR("//")));
+	ASSERT_EQ(v1.GetSize(), 3);
+	ASSERT_EQ(v1[0], SGE_WSTR("test0"));
+	ASSERT_EQ(v1[1], SGE_WSTR("test1"));
+	ASSERT_EQ(v1[2], SGE_WSTR("test2"));
+
+	v1 = Split(UCS2String(SGE_WSTR("//test1//test2")), UCS2String(SGE_WSTR("//")));
+	ASSERT_EQ(v1.GetSize(), 3);
+	ASSERT_EQ(v1[0], SGE_WSTR(""));
+	ASSERT_EQ(v1[1], SGE_WSTR("test1"));
+	ASSERT_EQ(v1[2], SGE_WSTR("test2"));
+
+	v1 = Split(UCS2String(SGE_WSTR("test0//test1//")), UCS2String(SGE_WSTR("//")));
+	ASSERT_EQ(v1.GetSize(), 3);
+	ASSERT_EQ(v1[0], SGE_WSTR("test0"));
+	ASSERT_EQ(v1[1], SGE_WSTR("test1"));
+	ASSERT_EQ(v1[2], SGE_WSTR(""));
+
+	Vector<UTF8String> v2 = Split(UTF8String(SGE_U8STR("test0//test1//test2")), UTF8String(SGE_U8STR("//")));
+	ASSERT_EQ(v2.GetSize(), 3);
+	ASSERT_EQ(v2[0], SGE_U8STR("test0"));
+	ASSERT_EQ(v2[1], SGE_U8STR("test1"));
+	ASSERT_EQ(v2[2], SGE_U8STR("test2"));
+
+	v2 = Split(UTF8String(SGE_U8STR("//test1//test2")), UTF8String(SGE_U8STR("//")));
+	ASSERT_EQ(v2.GetSize(), 3);
+	ASSERT_EQ(v2[0], SGE_U8STR(""));
+	ASSERT_EQ(v2[1], SGE_U8STR("test1"));
+	ASSERT_EQ(v2[2], SGE_U8STR("test2"));
+
+	v2 = Split(UTF8String(SGE_U8STR("test0//test1//")), UTF8String(SGE_U8STR("//")));
+	ASSERT_EQ(v2.GetSize(), 3);
+	ASSERT_EQ(v2[0], SGE_U8STR("test0"));
+	ASSERT_EQ(v2[1], SGE_U8STR("test1"));
+	ASSERT_EQ(v2[2], SGE_U8STR(""));
+}
