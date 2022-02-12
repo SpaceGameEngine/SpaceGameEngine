@@ -22,7 +22,7 @@ using namespace SpaceGameEngine;
 TEST(IsError, CorrectnessTest)
 {
 	ASSERT_TRUE((IsError<NullPointerError, const void*>::Value == true));
-	ASSERT_TRUE((IsError<InvalidSizeError, SizeType, SizeType, SizeType>::Value == true));
+	ASSERT_TRUE((IsError<InvalidValueError, SizeType, SizeType, SizeType>::Value == true));
 	ASSERT_TRUE((IsError<int>::Value == false));
 }
 

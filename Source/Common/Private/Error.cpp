@@ -45,8 +45,3 @@ void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_
 #endif
 	abort();
 }
-
-bool SpaceGameEngine::InvalidSizeError::Judge(SizeType size, SizeType min_size, SizeType max_size)
-{
-	return !(size >= min_size && size <= max_size);
-}

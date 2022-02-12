@@ -368,7 +368,7 @@ namespace SpaceGameEngine
 			inline void Rehash(Bucket* nbs, SizeType nbs_size)
 			{
 				SGE_ASSERT(NullPointerError, nbs);
-				SGE_ASSERT(InvalidSizeError, nbs_size, 1, SGE_MAX_MEMORY_SIZE / sizeof(Bucket));
+				SGE_ASSERT(InvalidValueError, nbs_size, 1, SGE_MAX_MEMORY_SIZE / sizeof(Bucket));
 				Node* pnow = m_pHead;
 				while (pnow != nullptr)
 				{
@@ -777,7 +777,7 @@ namespace SpaceGameEngine
 		inline static SizeType GetCorrectBucketQuantity(double load_factor, SizeType size)
 		{
 			SGE_ASSERT(ZeroLoadFactorError, load_factor);
-			SGE_ASSERT(InvalidSizeError, size, 0, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 0, sm_MaxSize);
 			SizeType buf = (SizeType)std::round((double)size / load_factor);
 			if (buf <= 1)
 				return 1;
@@ -915,7 +915,7 @@ namespace SpaceGameEngine
 
 		inline void Rehash(SizeType new_bucket_quantity)
 		{
-			SGE_ASSERT(InvalidSizeError, new_bucket_quantity, 1, sm_MaxBucketQuantity);
+			SGE_ASSERT(InvalidValueError, new_bucket_quantity, 1, sm_MaxBucketQuantity);
 
 			Bucket* pbuf = (Bucket*)Allocator::RawNew(new_bucket_quantity * sizeof(Bucket), alignof(Bucket));
 			for (SizeType i = 0; i < new_bucket_quantity; ++i)

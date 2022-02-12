@@ -85,7 +85,7 @@ namespace SpaceGameEngine
 			*/
 			inline static T* Create(const SizeType size)
 			{
-				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				StorageRef& re = *(new (Allocator::RawNew(sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
 				memset(re.m_pContent, NULL, size * sizeof(T));
 				re.m_Count.Store(1, MemoryOrderRelease);
@@ -97,7 +97,7 @@ namespace SpaceGameEngine
 			*/
 			inline static T* Create(const T* ptr, const SizeType size)
 			{
-				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				SGE_ASSERT(NullPointerError, ptr);
 				StorageRef& re = *(new (Allocator::RawNew(sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
 				memcpy(re.m_pContent, ptr, size * sizeof(T));
@@ -128,7 +128,7 @@ namespace SpaceGameEngine
 
 			inline static bool TryRelease(const T* ptr, SizeType size)
 			{
-				SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				SGE_ASSERT(NullPointerError, ptr);
 				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
 				if (pcount->Load(MemoryOrderAcquire) == 1)
@@ -559,7 +559,7 @@ namespace SpaceGameEngine
 			*/
 			inline void SetRealSize(const SizeType size)
 			{
-				SGE_ASSERT(InvalidSizeError, size, GetSize(), SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, size, GetSize(), SGE_MAX_MEMORY_SIZE / sizeof(T));
 				if (m_RealSize == size)
 					return;
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
@@ -665,7 +665,7 @@ namespace SpaceGameEngine
 
 			inline void SetSize(const SizeType size)
 			{
-				SGE_ASSERT(InvalidSizeError, size, 0, GetRealSize());
+				SGE_ASSERT(InvalidValueError, size, 0, GetRealSize());
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
 					m_RealSize = size;
@@ -885,7 +885,7 @@ namespace SpaceGameEngine
 				static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, pstr);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				for (SizeType i = 0; i <= Trait::MaxValue; i++)
 					pdst[i] = nsize;
@@ -898,7 +898,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, pstr);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				pdst[nsize - 1] = nsize;
 				SizeType last_end = nsize - 2;
 				SizeType last_begin = nsize - 1;
@@ -935,7 +935,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, psuff);
 				SGE_ASSERT(NullPointerError, pstr);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType j = 0;
 				for (SizeType i = 0; i < nsize; i++)
@@ -969,10 +969,10 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, ppat);
 				SGE_ASSERT(NullPointerError, pbct);
 				SGE_ASSERT(NullPointerError, pgst);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType tsize = ptext_end - ptext_begin;
-				SGE_ASSERT(InvalidSizeError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				if (tsize < nsize)
 				{
@@ -1009,7 +1009,7 @@ namespace SpaceGameEngine
 				static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, pstr);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				for (SizeType i = 0; i <= Trait::MaxValue; i++)
 					pdst[i] = nsize;
@@ -1022,7 +1022,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, pstr);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 				pdst[0] = nsize;
 				SizeType last_end = 0;
 				SizeType last_begin = 0;
@@ -1048,7 +1048,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, pdst);
 				SGE_ASSERT(NullPointerError, ppref);
 				SGE_ASSERT(NullPointerError, pstr);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType j = nsize - 1;
 				for (SizeType i = 0; i < nsize; i++)
@@ -1080,10 +1080,10 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, ppat);
 				SGE_ASSERT(NullPointerError, pbct);
 				SGE_ASSERT(NullPointerError, pgpt);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType tsize = ptext_end - ptext_begin;
-				SGE_ASSERT(InvalidSizeError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				if (tsize < nsize)
 				{
@@ -1126,10 +1126,10 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, ptext_begin);
 				SGE_ASSERT(NullPointerError, ptext_end);
 				SGE_ASSERT(NullPointerError, ppat);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType tsize = ptext_end - ptext_begin;
-				SGE_ASSERT(InvalidSizeError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				if (tsize < nsize)
 				{
@@ -1181,10 +1181,10 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, ptext_begin);
 				SGE_ASSERT(NullPointerError, ptext_end);
 				SGE_ASSERT(NullPointerError, ppat);
-				SGE_ASSERT(InvalidSizeError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType tsize = ptext_end - ptext_begin;
-				SGE_ASSERT(InvalidSizeError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
+				SGE_ASSERT(InvalidValueError, tsize, 0, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				if (tsize < nsize)
 				{
@@ -1563,7 +1563,7 @@ namespace SpaceGameEngine
 		*/
 		inline void SetRealSize(const SizeType size)
 		{
-			SGE_ASSERT(InvalidSizeError, size, GetNormalSize(), sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, GetNormalSize(), sm_MaxSize);
 			m_Storage.SetRealSize(size + 1);
 		}
 
@@ -2868,7 +2868,7 @@ namespace SpaceGameEngine
 		inline StringCore Substring(const IteratorType& iter, SizeType size) const
 		{
 			SGE_ASSERT(EmptyStringCoreError, m_Size);
-			SGE_ASSERT(InvalidSizeError, size, 1, m_Size);
+			SGE_ASSERT(InvalidValueError, size, 1, m_Size);
 			IteratorType eiter = iter + size;
 			if constexpr (!Trait::IsMultipleByte)
 			{
@@ -2903,7 +2903,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(EmptyStringCoreError, m_Size);
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidSizeError, size, 1, m_Size);
+			SGE_ASSERT(InvalidValueError, size, 1, m_Size);
 			SizeType nsize = GetNormalSize();
 			if constexpr (!Trait::IsMultipleByte)
 			{
@@ -2949,7 +2949,7 @@ namespace SpaceGameEngine
 
 		inline std::conditional_t<!Trait::IsMultipleByte, T&, T*> operator[](const SizeType i)
 		{
-			SGE_ASSERT(InvalidSizeError, i, 0, m_Size - 1);
+			SGE_ASSERT(InvalidValueError, i, 0, m_Size - 1);
 			m_Storage.CopyOnWrite();
 			if constexpr (!Trait::IsMultipleByte)
 			{
@@ -2963,7 +2963,7 @@ namespace SpaceGameEngine
 
 		inline std::conditional_t<!Trait::IsMultipleByte, T, const T*> operator[](const SizeType i) const
 		{
-			SGE_ASSERT(InvalidSizeError, i, 0, m_Size - 1);
+			SGE_ASSERT(InvalidValueError, i, 0, m_Size - 1);
 			if constexpr (!Trait::IsMultipleByte)
 			{
 				return *(GetData() + i);
@@ -2979,10 +2979,10 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
@@ -3013,10 +3013,10 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
@@ -3047,10 +3047,10 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
@@ -3081,10 +3081,10 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
@@ -3116,10 +3116,10 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = GetCStringNormalSize(pstr);
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
 				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
@@ -3150,10 +3150,10 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = GetCStringNormalSize(pstr);
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
 				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
@@ -3183,10 +3183,10 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
@@ -3217,10 +3217,10 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
@@ -3251,10 +3251,10 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
@@ -3285,10 +3285,10 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = str.GetNormalSize();
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			const T* pstr = str.GetData();
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
@@ -3320,10 +3320,10 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = GetCStringNormalSize(pstr);
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
 				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
@@ -3354,10 +3354,10 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-			SGE_ASSERT(InvalidSizeError, end - begin, 0, m_Size);
+			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
 
 			SizeType nsize = GetCStringNormalSize(pstr);
-			SGE_ASSERT(InvalidSizeError, nsize, 1, GetNormalSize());
+			SGE_ASSERT(InvalidValueError, nsize, 1, GetNormalSize());
 			if constexpr (std::is_same_v<SearchStrategy, StringImplement::BoyerMooreSearchStrategy>)
 			{
 				SizeType* pbct = (SizeType*)Allocator::RawNew((Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));

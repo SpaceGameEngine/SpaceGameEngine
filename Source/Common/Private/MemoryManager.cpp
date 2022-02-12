@@ -26,7 +26,7 @@ limitations under the License.
 
 void* SpaceGameEngine::StdAllocator::RawNew(SizeType size, SizeType alignment)
 {
-	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
 	return _mm_malloc(size, alignment == 0 ? GetDefaultAlignment(size) : alignment);
@@ -46,8 +46,8 @@ SpaceGameEngine::MemoryManager::MemoryBlockHeader* SpaceGameEngine::MemoryManage
 
 SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment)
 {
-	SGE_ASSERT(InvalidSizeError, alloc_mem_size, 1, SGE_MAX_MEMORY_SIZE);
-	SGE_ASSERT(InvalidSizeError, page_mem_size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidValueError, alloc_mem_size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidValueError, page_mem_size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
 	m_pFreeMemoryBlocks = nullptr;
@@ -131,7 +131,7 @@ bool SpaceGameEngine::InvalidAlignmentError::Judge(SizeType alignment)
 
 SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
 {
-	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	if (size >= 16)
 		return 16;
 	else
@@ -155,7 +155,7 @@ SpaceGameEngine::MemoryManager& SpaceGameEngine::MemoryManager::GetSingleton()
 
 void* SpaceGameEngine::MemoryManager::Allocate(SizeType size, SizeType alignment)
 {
-	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
 	if (size > sm_MaxMemoryBlockSize)
@@ -175,7 +175,7 @@ void* SpaceGameEngine::MemoryManager::Allocate(SizeType size, SizeType alignment
 void SpaceGameEngine::MemoryManager::Free(void* ptr, SizeType size, SizeType alignment)
 {
 	SGE_ASSERT(NullPointerError, ptr);
-	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
 	if (size > sm_MaxMemoryBlockSize)
@@ -198,7 +198,7 @@ SpaceGameEngine::MemoryManager::MemoryManager()
 
 SpaceGameEngine::UInt32 SpaceGameEngine::MemoryManager::RequestInformationToIndex(const RequestInformation& request_info)
 {
-	SGE_ASSERT(InvalidSizeError, request_info.m_First, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidValueError, request_info.m_First, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, request_info.m_Second);
 	SGE_ASSERT(InvalidRequestInformationError, request_info);
 
@@ -212,7 +212,7 @@ bool SpaceGameEngine::MemoryManager::InvalidRequestInformationError::Judge(const
 
 void* SpaceGameEngine::MemoryManagerAllocator::RawNew(SizeType size, SizeType alignment)
 {
-	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE - 2 * sizeof(SizeType));
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE - 2 * sizeof(SizeType));
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
 	SizeType real_size = size + 2 * sizeof(SizeType);
@@ -230,7 +230,7 @@ void SpaceGameEngine::MemoryManagerAllocator::RawDelete(void* ptr)
 	SizeType* p = ((SizeType*)ptr) - 2;
 	SizeType size = p[0];
 	SizeType alignment = p[1];
-	SGE_ASSERT(InvalidSizeError, size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
 	MemoryManager::GetSingleton().Free(p, size, alignment);

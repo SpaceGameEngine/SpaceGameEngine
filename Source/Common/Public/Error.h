@@ -87,10 +87,14 @@ namespace SpaceGameEngine
 		}
 	};
 
-	struct InvalidSizeError
+	struct InvalidValueError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
-		static COMMON_API bool Judge(SizeType size, SizeType min_size, SizeType max_size);
+		inline static const TChar sm_pContent[] = SGE_TSTR("The value is invalid");
+		template<typename T1, typename T2, typename T3>
+		inline static bool Judge(T1&& size, T2&& min_size, T3&& max_size)
+		{
+			return !(size >= min_size && size <= max_size);
+		}
 	};
 
 	struct SelfAssignmentError

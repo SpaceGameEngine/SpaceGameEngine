@@ -76,7 +76,7 @@ namespace SpaceGameEngine
 
 		inline List(SizeType size, const T& val)
 		{
-			SGE_ASSERT(InvalidSizeError, size, 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 1, sm_MaxSize);
 
 			m_pHead = Allocator::template New<Node>(val);
 			m_pTail = m_pHead;
@@ -95,7 +95,7 @@ namespace SpaceGameEngine
 		inline List(const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidSizeError, size, 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 1, sm_MaxSize);
 
 			auto aiter = begin;
 			m_pHead = Allocator::template New<Node>(*aiter);
@@ -115,7 +115,7 @@ namespace SpaceGameEngine
 
 		inline List(std::initializer_list<T> ilist)
 		{
-			SGE_ASSERT(InvalidSizeError, ilist.size(), 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, ilist.size(), 1, sm_MaxSize);
 
 			auto aiter = ilist.begin();
 			m_pHead = Allocator::template New<Node>(*aiter);
@@ -989,7 +989,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, SizeType size, const T& val)
 		{
-			SGE_ASSERT(InvalidSizeError, size, 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 1, sm_MaxSize);
 
 			Node* pnhead = Allocator::template New<Node>(val);
 			Node* pntail = pnhead;
@@ -1038,7 +1038,7 @@ namespace SpaceGameEngine
 		inline IteratorType Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidSizeError, size, 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 1, sm_MaxSize);
 
 			auto aiter = begin;
 			Node* pnhead = Allocator::template New<Node>(*aiter);
@@ -1102,7 +1102,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, std::initializer_list<T> ilist)
 		{
-			SGE_ASSERT(InvalidSizeError, ilist.size(), 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, ilist.size(), 1, sm_MaxSize);
 
 			auto aiter = ilist.begin();
 			Node* pnhead = Allocator::template New<Node>(*aiter);
@@ -1232,7 +1232,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(EmptyListError, m_Size);
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, beg);
-			SGE_ASSERT(InvalidSizeError, end - beg, 1, m_Size);
+			SGE_ASSERT(InvalidValueError, end - beg, 1, m_Size);
 			SGE_ASSERT(ExternalIteratorError, beg, *this);
 			SGE_ASSERT(ExternalIteratorError, end, *this);
 
