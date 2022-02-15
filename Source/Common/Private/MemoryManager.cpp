@@ -215,7 +215,7 @@ void* SpaceGameEngine::MemoryManagerAllocator::RawNew(SizeType size, SizeType al
 	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE - 2 * sizeof(SizeType));
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
-	SizeType real_size = size + std::max(2 * sizeof(SizeType), alignment);
+	SizeType real_size = size + std::max<SizeType>(2 * sizeof(SizeType), alignment);
 	SizeType real_alignment = (alignment == 0 ? GetDefaultAlignment(size) : alignment);
 	SizeType* p = (SizeType*)((AddressType)MemoryManager::GetSingleton().Allocate(real_size, real_alignment) + ((alignment > 2 * sizeof(SizeType)) ? alignment - 2 * sizeof(SizeType) : 0));
 	p[0] = real_size;
