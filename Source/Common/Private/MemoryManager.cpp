@@ -135,7 +135,7 @@ SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
 	if (size >= 16)
 		return 16;
 	else
-		return 4;
+		return alignof(std::max_align_t);
 }
 
 SpaceGameEngine::MemoryManager::~MemoryManager()
@@ -215,10 +215,9 @@ void* SpaceGameEngine::MemoryManagerAllocator::RawNew(SizeType size, SizeType al
 	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE - 2 * sizeof(SizeType));
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
-	SizeType real_size = size + 2 * sizeof(SizeType);
+	SizeType real_size = size + std::max(2 * sizeof(SizeType), alignment);
 	SizeType real_alignment = (alignment == 0 ? GetDefaultAlignment(size) : alignment);
-	SizeType* p = (SizeType*)MemoryManager::GetSingleton().Allocate(real_size, real_alignment);
-	//because the alignment can not be larger than 128, and the (size + alignment)'s size is 128, so we do not need to consider alignment here.
+	SizeType* p = (SizeType*)((AddressType)MemoryManager::GetSingleton().Allocate(real_size, real_alignment) + ((alignment > 2 * sizeof(SizeType)) ? alignment - 2 * sizeof(SizeType) : 0));
 	p[0] = real_size;
 	p[1] = real_alignment;
 	return p + 2;
@@ -233,7 +232,7 @@ void SpaceGameEngine::MemoryManagerAllocator::RawDelete(void* ptr)
 	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
-	MemoryManager::GetSingleton().Free(p, size, alignment);
+	MemoryManager::GetSingleton().Free(((alignment > 2 * sizeof(SizeType)) ? (void*)((AddressType)ptr - alignment) : p), size, alignment);
 }
 
 /*

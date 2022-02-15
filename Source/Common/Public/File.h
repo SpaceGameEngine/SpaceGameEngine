@@ -19,6 +19,7 @@ limitations under the License.
 #ifdef SGE_WINDOWS
 #include <Windows.h>
 #include <tchar.h>
+#include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 #include <unistd.h>
 #include <sys/stat.h>
@@ -123,7 +124,11 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(BOOL re);
 	};
 
-#include "System/HideWindowsMacro.h"
+	struct FlushFileBuffersFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FlushFileBuffers failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
 
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
@@ -424,6 +429,67 @@ namespace SpaceGameEngine
 	@warning the dst's parent directory must be existed.
 	*/
 	COMMON_API void MoveDirectory(const Path& dst, const Path& src, bool can_overwrite = true);
+
+#ifdef SGE_WINDOWS
+	using FileHandle = HANDLE;
+#elif defined(SGE_POSIX)
+#else
+#error this os has not been supported.
+#endif
+
+	enum class FileIOMode : UInt8
+	{
+		Unknown = 0,
+		Read = 1,
+		Write = 2,
+		Append = 6
+	};
+
+	class COMMON_API BinaryFile
+	{
+	public:
+		BinaryFile();
+		BinaryFile(const Path& path, FileIOMode mode);
+		~BinaryFile();
+
+		void Open(const Path& path, FileIOMode mode);
+		void Close();
+		void Flush();
+
+	private:
+		FileHandle m_Handle;
+		FileIOMode m_Mode;
+	};
+
+	struct FileHandleOccupiedError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FileHandle is occupied.");
+		static COMMON_API bool Judge(FileHandle handle);
+	};
+
+	struct FileHandleReleasedError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FileHandle is released.");
+		static COMMON_API bool Judge(FileHandle handle);
+	};
+
+	struct FileIOModeUnknownError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is unknown.");
+		static COMMON_API bool Judge(FileIOMode mode);
+	};
+
+	struct FileIOModeNotReadError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is not Read.");
+		static COMMON_API bool Judge(FileIOMode mode);
+	};
+
+	struct FileIOModeNotWriteError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is not Write.");
+		static COMMON_API bool Judge(FileIOMode mode);
+	};
 
 	/*!
 	@}
