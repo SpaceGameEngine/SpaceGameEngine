@@ -877,7 +877,8 @@ SpaceGameEngine::BinaryFile::~BinaryFile()
 #ifdef SGE_WINDOWS
 	if (m_Handle)
 	{
-		//SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+		if ((UInt8)m_Mode & (UInt8)FileIOMode::Write)
+			SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 		SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	}
 #elif defined(SGE_POSIX)
@@ -911,7 +912,8 @@ void SpaceGameEngine::BinaryFile::Close()
 {
 	SGE_ASSERT(FileHandleReleasedError, m_Handle);
 #ifdef SGE_WINDOWS
-	//SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+	if ((UInt8)m_Mode & (UInt8)FileIOMode::Write)
+		SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 	SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	m_Handle = NULL;
 #elif defined(SGE_POSIX)
