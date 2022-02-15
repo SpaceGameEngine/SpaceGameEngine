@@ -710,3 +710,42 @@ TEST(Path, MoveDirectoryOverwriteTest)
 	ASSERT_FALSE(test_dst_dir2.IsExist());
 	ASSERT_FALSE(test_dst_file2.IsExist());
 }
+
+TEST(BinaryFile, InstanceTest)
+{
+	BinaryFile file1;
+}
+
+TEST(BinaryFile, ConstructionAndDestructionTest)
+{
+	{
+		BinaryFile file1(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")), FileIOMode::Read);
+		BinaryFile file2(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt")), FileIOMode::Write);
+		BinaryFile file3(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")), FileIOMode::Append);
+	}
+	DeleteFile(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")));
+}
+
+TEST(BinaryFile, OpenTest)
+{
+	{
+		BinaryFile file1;
+		file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")), FileIOMode::Read);
+		BinaryFile file2;
+		file2.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt")), FileIOMode::Write);
+		BinaryFile file3;
+		file3.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")), FileIOMode::Append);
+	}
+	DeleteFile(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")));
+}
+
+TEST(BinaryFile, CloseTest)
+{
+	BinaryFile file1(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")), FileIOMode::Read);
+	file1.Close();
+	file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt")), FileIOMode::Write);
+	file1.Close();
+	file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")), FileIOMode::Append);
+	file1.Close();
+	DeleteFile(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")));
+}

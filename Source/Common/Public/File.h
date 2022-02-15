@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "CommonAPI.h"
 #include "SGEString.hpp"
+#include "Utility/Utility.hpp"
 #ifdef SGE_WINDOWS
 #include <Windows.h>
 #include <tchar.h>
@@ -445,7 +446,7 @@ namespace SpaceGameEngine
 		Append = 6
 	};
 
-	class COMMON_API BinaryFile
+	class COMMON_API BinaryFile : public UncopyableAndUnmovable
 	{
 	public:
 		BinaryFile();
