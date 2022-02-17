@@ -1102,9 +1102,12 @@ namespace
 
 Int64 SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin origin, Int64 offset)
 {
+	SGE_ASSERT(FileHandleReleasedError, m_Handle);
 	SGE_ASSERT(InvalidFilePositionOriginError, origin);
 	if (origin == FilePositionOrigin::Begin)
 		SGE_ASSERT(InvalidValueError, offset, 0, INT64_MAX);
+	if (origin == FilePositionOrigin::End)
+		SGE_ASSERT(InvalidValueError, offset, -INT64_MAX, 0);
 #ifdef SGE_WINDOWS
 	LARGE_INTEGER buf;
 	LARGE_INTEGER input;

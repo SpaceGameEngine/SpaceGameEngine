@@ -941,7 +941,7 @@ TEST(BinaryFile, MoveFilePositionTest)
 	ASSERT_EQ(bf.Read(test_data_input + 3, sizeof(int)), sizeof(int));
 	Int64 fp_cur = bf.MoveFilePosition(FilePositionOrigin::Current, 0);
 	ASSERT_EQ(fp + sizeof(int), fp_cur);
-	bf.MoveFilePosition(FilePositionOrigin::Begin, fp - 3 * (Int64)sizeof(int));
+	ASSERT_EQ(bf.MoveFilePosition(FilePositionOrigin::Begin, fp - 3 * (Int64)sizeof(int)),0);
 	ASSERT_EQ(bf.Read(test_data_input, 3 * sizeof(int)), 3 * sizeof(int));
 	bf.Close();
 
