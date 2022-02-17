@@ -1062,7 +1062,7 @@ SizeType SpaceGameEngine::BinaryFile::Write(const void* psrc, SizeType size)
 	SGE_CHECK(WriteFileFailError, WriteFile(m_Handle, psrc, size, &buf, NULL));
 	return buf;
 #elif defined(SGE_POSIX)
-	ssize_t re = write(m_Handle, pdst, size);
+	ssize_t re = write(m_Handle, psrc, size);
 	SGE_CHECK(WriteFailError, re);
 	return re;
 #else
@@ -1099,6 +1099,8 @@ namespace
 Int64 SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin origin, Int64 offset)
 {
 	SGE_ASSERT(InvalidFilePositionOriginError, origin);
+	if (origin == FilePositionOrigin::Begin)
+		SGE_ASSERT(InvalidValueError, offset, 0, SGE_MAX_MEMORY_SIZE);
 #ifdef SGE_WINDOWS
 	LARGE_INTEGER buf;
 	LARGE_INTEGER input;
