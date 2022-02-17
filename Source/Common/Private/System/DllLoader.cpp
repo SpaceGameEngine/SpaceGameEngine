@@ -69,9 +69,10 @@ bool SpaceGameEngine::NullDllHandleError::Judge(const DllHandle& handle)
 
 SpaceGameEngine::DllHandle SpaceGameEngine::LoadDll(const Path& dll_path)
 {
+#ifdef SGE_WINDOWS
+	//can not do this on posix platform because of the using of rpath
 	SGE_ASSERT(PathNotExistError, dll_path);
 	SGE_ASSERT(PathNotFileError, dll_path);
-#ifdef SGE_WINDOWS
 	DllHandle re = LoadLibrary(SGE_STR_TO_TSTR(dll_path.GetAbsolutePath().GetString()).GetData());
 	SGE_CHECK(LoadDllFailedError, re);
 	return re;
