@@ -458,6 +458,9 @@ namespace SpaceGameEngine
 		Append = 6
 	};
 
+	COMMON_API FileIOMode operator|(const FileIOMode& m1, const FileIOMode& m2);
+	COMMON_API FileIOMode operator&(const FileIOMode& m1, const FileIOMode& m2);
+
 	class COMMON_API BinaryFile : public UncopyableAndUnmovable
 	{
 	public:

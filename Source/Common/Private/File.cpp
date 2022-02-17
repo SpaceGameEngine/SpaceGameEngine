@@ -852,6 +852,16 @@ bool SpaceGameEngine::PathNotFileOrDirectoryError::Judge(PathType ptype)
 	return ptype != PathType::File && ptype != PathType::Directory;
 }
 
+FileIOMode SpaceGameEngine::operator|(const FileIOMode& m1, const FileIOMode& m2)
+{
+	return FileIOMode((UInt8)m1 | (UInt8)m2);
+}
+
+FileIOMode SpaceGameEngine::operator&(const FileIOMode& m1, const FileIOMode& m2)
+{
+	return FileIOMode((UInt8)m1 & (UInt8)m2);
+}
+
 SpaceGameEngine::BinaryFile::BinaryFile()
 #ifdef SGE_WINDOWS
 	: m_Handle(NULL), m_Mode(FileIOMode::Unknown)
@@ -866,14 +876,14 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 	: m_Mode(mode)
 {
 	SGE_ASSERT(FileIOModeUnknownError, mode);
-	if ((UInt8)mode & (UInt8)FileIOMode::Read)
+	if ((UInt8)(mode & FileIOMode::Read))
 		SGE_ASSERT(PathNotExistError, path);
 	if (path.IsExist())
 		SGE_ASSERT(PathNotFileError, path);
 	String astr = path.GetAbsolutePath().GetString();
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
-	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), (((UInt8)mode & (UInt8)FileIOMode::Read) ? GENERIC_READ : 0) | (((UInt8)mode & (UInt8)FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
+	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
 	SGE_CHECK(CreateFileFailError, m_Handle);
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
@@ -887,7 +897,7 @@ SpaceGameEngine::BinaryFile::~BinaryFile()
 #ifdef SGE_WINDOWS
 	if (m_Handle)
 	{
-		if ((UInt8)m_Mode & (UInt8)FileIOMode::Write)
+		if ((UInt8)(m_Mode & FileIOMode::Write))
 			SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 		SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	}
@@ -901,7 +911,7 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 {
 	SGE_ASSERT(FileHandleOccupiedError, m_Handle);
 	SGE_ASSERT(FileIOModeUnknownError, mode);
-	if ((UInt8)mode & (UInt8)FileIOMode::Read)
+	if ((UInt8)(mode & FileIOMode::Read))
 		SGE_ASSERT(PathNotExistError, path);
 	if (path.IsExist())
 		SGE_ASSERT(PathNotFileError, path);
@@ -909,7 +919,7 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 	m_Mode = mode;
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
-	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), (((UInt8)mode & (UInt8)FileIOMode::Read) ? GENERIC_READ : 0) | (((UInt8)mode & (UInt8)FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
+	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
 	SGE_CHECK(CreateFileFailError, m_Handle);
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
@@ -922,7 +932,7 @@ void SpaceGameEngine::BinaryFile::Close()
 {
 	SGE_ASSERT(FileHandleReleasedError, m_Handle);
 #ifdef SGE_WINDOWS
-	if ((UInt8)m_Mode & (UInt8)FileIOMode::Write)
+	if ((UInt8)(m_Mode & FileIOMode::Write))
 		SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 	SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	m_Handle = NULL;
@@ -1002,10 +1012,10 @@ bool SpaceGameEngine::FileIOModeUnknownError::Judge(FileIOMode mode)
 
 bool SpaceGameEngine::FileIOModeNotReadError::Judge(FileIOMode mode)
 {
-	return ((UInt8)mode & (UInt8)FileIOMode::Read) == 0;
+	return (UInt8)(mode & FileIOMode::Read) == 0;
 }
 
 bool SpaceGameEngine::FileIOModeNotWriteError::Judge(FileIOMode mode)
 {
-	return ((UInt8)mode & (UInt8)FileIOMode::Write) == 0;
+	return (UInt8)(mode & FileIOMode::Write) == 0;
 }

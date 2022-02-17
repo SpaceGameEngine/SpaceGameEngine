@@ -795,3 +795,38 @@ TEST(BinaryFile, WriteTest)
 	DeleteFile(path);
 	ASSERT_FALSE(path.IsExist());
 }
+
+TEST(BinaryFile, ReadWriteTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbrw.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_input[4] = {0, 0, 0, 0};
+	int test_data_output[4] = {101, 202, 303, 404};
+	BinaryFile bf_read_write(path, FileIOMode::Read | FileIOMode::Write);
+	bf_read_write.Read(test_data_input, sizeof(test_data_input));
+	bf_read_write.Write(test_data_output, sizeof(test_data_output));
+	bf_read_write.Close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data[i], test_data_input[i]);
+
+	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_check, sizeof(test_data_check));
+	b_input.close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data_input[i], test_data_check[i]);
+	for (int i = 4; i < 8; ++i)
+		ASSERT_EQ(test_data_output[i - 4], test_data_check[i]);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
