@@ -956,7 +956,7 @@ SpaceGameEngine::BinaryFile::~BinaryFile()
 		SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	}
 #elif defined(SGE_POSIX)
-	if (m_Handle >= 0)
+	if (m_Handle > -1)
 	{
 		//if ((UInt8)(m_Mode & FileIOMode::Write))
 		//	SGE_CHECK(FsyncFailError, fsync(m_Handle));
@@ -1104,7 +1104,7 @@ Int64 SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin origin, I
 {
 	SGE_ASSERT(InvalidFilePositionOriginError, origin);
 	if (origin == FilePositionOrigin::Begin)
-		SGE_ASSERT(InvalidValueError, offset, 0, SGE_MAX_MEMORY_SIZE);
+		SGE_ASSERT(InvalidValueError, offset, 0, INT64_MAX);
 #ifdef SGE_WINDOWS
 	LARGE_INTEGER buf;
 	LARGE_INTEGER input;
