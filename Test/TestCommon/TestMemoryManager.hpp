@@ -19,6 +19,7 @@ limitations under the License.
 #include "Concurrent/Lock.h"
 #include "gtest/gtest.h"
 #include <unordered_map>
+#include <cstddef>
 
 using namespace SpaceGameEngine;
 
