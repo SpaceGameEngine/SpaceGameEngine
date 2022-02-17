@@ -949,15 +949,15 @@ SpaceGameEngine::BinaryFile::~BinaryFile()
 #ifdef SGE_WINDOWS
 	if (m_Handle)
 	{
-		if ((UInt8)(m_Mode & FileIOMode::Write))
-			SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+		//if ((UInt8)(m_Mode & FileIOMode::Write))
+		//	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 		SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	}
 #elif defined(SGE_POSIX)
 	if (m_Handle)
 	{
-		if ((UInt8)(m_Mode & FileIOMode::Write))
-			SGE_CHECK(FsyncFailError, fsync(m_Handle));
+		//if ((UInt8)(m_Mode & FileIOMode::Write))
+		//	SGE_CHECK(FsyncFailError, fsync(m_Handle));
 		SGE_CHECK(CloseFailError, close(m_Handle));
 	}
 #else
