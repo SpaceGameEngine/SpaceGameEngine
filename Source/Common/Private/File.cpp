@@ -732,6 +732,11 @@ bool SpaceGameEngine::WriteFileFailError::Judge(BOOL re)
 {
 	return re == 0 && GetLastError() != ERROR_IO_PENDING;
 }
+
+bool SpaceGameEngine::SetFilePointerExFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
@@ -862,6 +867,16 @@ FileIOMode SpaceGameEngine::operator&(const FileIOMode& m1, const FileIOMode& m2
 	return FileIOMode((UInt8)m1 & (UInt8)m2);
 }
 
+bool SpaceGameEngine::InvalidFileIOModeError::Judge(FileIOMode mode)
+{
+	return (UInt8)mode > 7;
+}
+
+bool SpaceGameEngine::InvalidFilePositionOriginError::Judge(FilePositionOrigin origin)
+{
+	return (UInt8)origin > 2;
+}
+
 SpaceGameEngine::BinaryFile::BinaryFile()
 #ifdef SGE_WINDOWS
 	: m_Handle(NULL), m_Mode(FileIOMode::Unknown)
@@ -875,6 +890,7 @@ SpaceGameEngine::BinaryFile::BinaryFile()
 SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 	: m_Mode(mode)
 {
+	SGE_ASSERT(InvalidFileIOModeError, mode);
 	SGE_ASSERT(FileIOModeUnknownError, mode);
 	if ((UInt8)(mode & FileIOMode::Read))
 		SGE_ASSERT(PathNotExistError, path);
@@ -885,6 +901,8 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 #include "System/AllowWindowsMacro.h"
 	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
 	SGE_CHECK(CreateFileFailError, m_Handle);
+	if ((mode & FileIOMode::Append) == FileIOMode::Append)
+		MoveFilePosition(FilePositionOrigin::End, 0);
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 #else
@@ -910,6 +928,7 @@ SpaceGameEngine::BinaryFile::~BinaryFile()
 void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 {
 	SGE_ASSERT(FileHandleOccupiedError, m_Handle);
+	SGE_ASSERT(InvalidFileIOModeError, mode);
 	SGE_ASSERT(FileIOModeUnknownError, mode);
 	if ((UInt8)(mode & FileIOMode::Read))
 		SGE_ASSERT(PathNotExistError, path);
@@ -921,6 +940,8 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 #include "System/AllowWindowsMacro.h"
 	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
 	SGE_CHECK(CreateFileFailError, m_Handle);
+	if ((mode & FileIOMode::Append) == FileIOMode::Append)
+		MoveFilePosition(FilePositionOrigin::End, 0);
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 #else
@@ -979,6 +1000,67 @@ SizeType SpaceGameEngine::BinaryFile::Write(const void* psrc, SizeType size)
 	DWORD buf = 0;
 	SGE_CHECK(WriteFileFailError, WriteFile(m_Handle, psrc, size, &buf, NULL));
 	return buf;
+#elif defined(SGE_POSIX)
+#else
+#error this os has not been supported.
+#endif
+}
+
+namespace
+{
+	using namespace SpaceGameEngine;
+#ifdef SGE_WINDOWS
+	DWORD GetSystemFilePositionOrigin(FilePositionOrigin origin)
+	{
+		if (origin == FilePositionOrigin::Begin)
+			return FILE_BEGIN;
+		else if (origin == FilePositionOrigin::Current)
+			return FILE_CURRENT;
+		else if (origin == FilePositionOrigin::End)
+			return FILE_END;
+	}
+#elif defined(SGE_POSIX)
+#endif
+}
+
+FilePosition SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin origin, Int64 offset)
+{
+	SGE_ASSERT(InvalidFilePositionOriginError, origin);
+	SGE_ASSERT(InvalidValueError, (offset >= 0 ? (GetFilePosition(origin) + (FilePosition)offset) : (GetFilePosition(origin) - (FilePosition)(-1 * offset))), GetFilePosition(FilePositionOrigin::Begin), GetFilePosition(FilePositionOrigin::End));
+#ifdef SGE_WINDOWS
+	LARGE_INTEGER buf;
+	LARGE_INTEGER input;
+	input.QuadPart = offset;
+	SGE_CHECK(SetFilePointerExFailError, SetFilePointerEx(m_Handle, input, &buf, GetSystemFilePositionOrigin(origin)));
+	return buf.QuadPart;
+#elif defined(SGE_POSIX)
+#else
+#error this os has not been supported.
+#endif
+}
+
+FilePosition SpaceGameEngine::BinaryFile::GetFilePosition(FilePositionOrigin origin) const
+{
+	SGE_ASSERT(InvalidFilePositionOriginError, origin);
+#ifdef SGE_WINDOWS
+	LARGE_INTEGER buf;
+	LARGE_INTEGER input;
+	input.QuadPart = 0;
+	SGE_CHECK(SetFilePointerExFailError, SetFilePointerEx(const_cast<FileHandle>(m_Handle), input, &buf, GetSystemFilePositionOrigin(origin)));
+	return buf.QuadPart;
+#elif defined(SGE_POSIX)
+#else
+#error this os has not been supported.
+#endif
+}
+
+void SpaceGameEngine::BinaryFile::SetFilePosition(FilePosition fpos)
+{
+	SGE_ASSERT(InvalidValueError, fpos, GetFilePosition(FilePositionOrigin::Begin), GetFilePosition(FilePositionOrigin::End));
+#ifdef SGE_WINDOWS
+	LARGE_INTEGER input;
+	input.QuadPart = fpos;
+	SGE_CHECK(SetFilePointerExFailError, SetFilePointerEx(m_Handle, input, NULL, GetSystemFilePositionOrigin(FilePositionOrigin::Begin)));
 #elif defined(SGE_POSIX)
 #else
 #error this os has not been supported.

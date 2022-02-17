@@ -143,6 +143,12 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(BOOL re);
 	};
 
+	struct SetFilePointerExFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("SetFilePointerEx failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
 	{
@@ -461,6 +467,27 @@ namespace SpaceGameEngine
 	COMMON_API FileIOMode operator|(const FileIOMode& m1, const FileIOMode& m2);
 	COMMON_API FileIOMode operator&(const FileIOMode& m1, const FileIOMode& m2);
 
+	struct InvalidFileIOModeError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is invalid.");
+		static COMMON_API bool Judge(FileIOMode mode);
+	};
+
+	using FilePosition = UInt64;
+
+	enum class FilePositionOrigin
+	{
+		Begin = 0,
+		Current = 1,
+		End = 2
+	};
+
+	struct InvalidFilePositionOriginError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("FilePositionOrigin is invalid.");
+		static COMMON_API bool Judge(FilePositionOrigin origin);
+	};
+
 	class COMMON_API BinaryFile : public UncopyableAndUnmovable
 	{
 	public:
@@ -473,6 +500,9 @@ namespace SpaceGameEngine
 		void Flush();
 		SizeType Read(void* pdst, SizeType size);
 		SizeType Write(const void* psrc, SizeType size);
+		FilePosition MoveFilePosition(FilePositionOrigin origin, Int64 offset);
+		FilePosition GetFilePosition(FilePositionOrigin origin) const;
+		void SetFilePosition(FilePosition fpos);
 
 	private:
 		FileHandle m_Handle;

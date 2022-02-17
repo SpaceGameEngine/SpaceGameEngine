@@ -830,3 +830,100 @@ TEST(BinaryFile, ReadWriteTest)
 	DeleteFile(path);
 	ASSERT_FALSE(path.IsExist());
 }
+
+TEST(BinaryFile, AppendTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testba.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_output[4] = {90, 112, 134, 156};
+	BinaryFile bf_append(path, FileIOMode::Append);
+	bf_append.Write(test_data_output, sizeof(int) * 2);
+	bf_append.Close();
+	bf_append.Open(path, FileIOMode::Append);	 //test open append
+	bf_append.Write(test_data_output + 2, sizeof(int) * 2);
+	bf_append.Close();
+
+	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_check, sizeof(test_data_check));
+	b_input.close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data[i], test_data_check[i]);
+	for (int i = 4; i < 8; ++i)
+		ASSERT_EQ(test_data_output[i - 4], test_data_check[i]);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
+
+TEST(BinaryFile, ReadWriteAppendTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbrwa.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_input[4] = {0, 0, 0, 0};
+	int test_data_output[4] = {101, 202, 303, 404};
+	BinaryFile bf_read_write_append(path, FileIOMode::Read | FileIOMode::Write | FileIOMode::Append);
+	bf_read_write_append.Write(test_data_output, sizeof(test_data_output));
+	bf_read_write_append.MoveFilePosition(FilePositionOrigin::Begin, 0);
+	bf_read_write_append.Read(test_data_input, sizeof(test_data_input));
+	bf_read_write_append.Close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data[i], test_data_input[i]);
+
+	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_check, sizeof(test_data_check));
+	b_input.close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data_input[i], test_data_check[i]);
+	for (int i = 4; i < 8; ++i)
+		ASSERT_EQ(test_data_output[i - 4], test_data_check[i]);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
+
+TEST(BinaryFile, FilePositionTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfp.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_input[4] = {0, 0, 0, 0};
+	BinaryFile bf(path, FileIOMode::Read);
+	FilePosition fp = bf.MoveFilePosition(FilePositionOrigin::End, -1 * sizeof(int));
+	bf.Read(test_data_input + 3, sizeof(int));
+	FilePosition fp_cur = bf.GetFilePosition(FilePositionOrigin::Current);
+	ASSERT_EQ(fp + sizeof(int), fp_cur);
+	bf.SetFilePosition(fp - 3 * sizeof(int));
+	bf.Read(test_data_input, 3 * sizeof(int));
+	bf.Close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data[i], test_data_input[i]);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}

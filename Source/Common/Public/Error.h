@@ -91,9 +91,9 @@ namespace SpaceGameEngine
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The value is invalid");
 		template<typename T1, typename T2, typename T3>
-		inline static bool Judge(T1&& size, T2&& min_size, T3&& max_size)
+		inline static bool Judge(T1&& val, T2&& min_val, T3&& max_val)
 		{
-			return !(size >= min_size && size <= max_size);
+			return !(val >= min_val && val <= max_val);
 		}
 	};
 
