@@ -227,6 +227,30 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("rmdir failed.");
 		static COMMON_API bool Judge(int re);
 	};
+
+	struct FsyncFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("fsync failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct ReadFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("read failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct WriteFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("write failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct LSeekFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("lseek failed.");
+		static COMMON_API bool Judge(int re);
+	};
 #endif
 
 #ifdef SGE_LINUX
@@ -452,6 +476,7 @@ namespace SpaceGameEngine
 #ifdef SGE_WINDOWS
 	using FileHandle = HANDLE;
 #elif defined(SGE_POSIX)
+	using FileHandle = int;
 #else
 #error this os has not been supported.
 #endif
@@ -472,8 +497,6 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is invalid.");
 		static COMMON_API bool Judge(FileIOMode mode);
 	};
-
-	using FilePosition = UInt64;
 
 	enum class FilePositionOrigin
 	{
@@ -500,9 +523,7 @@ namespace SpaceGameEngine
 		void Flush();
 		SizeType Read(void* pdst, SizeType size);
 		SizeType Write(const void* psrc, SizeType size);
-		FilePosition MoveFilePosition(FilePositionOrigin origin, Int64 offset);
-		FilePosition GetFilePosition(FilePositionOrigin origin) const;
-		void SetFilePosition(FilePosition fpos);
+		Int64 MoveFilePosition(FilePositionOrigin origin, Int64 offset);
 
 	private:
 		FileHandle m_Handle;

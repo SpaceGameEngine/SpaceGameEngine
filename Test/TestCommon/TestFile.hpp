@@ -763,7 +763,7 @@ TEST(BinaryFile, ReadTest)
 
 	int test_data_input[4] = {0, 0, 0, 0};
 	BinaryFile bf_read(path, FileIOMode::Read);
-	bf_read.Read(test_data_input, sizeof(test_data_input));
+	ASSERT_EQ(bf_read.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
 	bf_read.Close();
 
 	for (int i = 0; i < 4; ++i)
@@ -780,8 +780,32 @@ TEST(BinaryFile, WriteTest)
 	ASSERT_FALSE(path.IsExist());
 
 	BinaryFile bf_write(path, FileIOMode::Write);
-	bf_write.Write(test_data, sizeof(test_data));
+	ASSERT_EQ(bf_write.Write(test_data, sizeof(test_data)), sizeof(test_data));
 	bf_write.Close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_input[4] = {0, 0, 0, 0};
+	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_input, sizeof(test_data_input));
+	b_input.close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data[i], test_data_input[i]);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
+
+TEST(BinaryFile, FlushTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbf.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	BinaryFile bf_flush(path, FileIOMode::Write);
+	ASSERT_EQ(bf_flush.Write(test_data, sizeof(test_data)), sizeof(test_data));
+	bf_flush.Flush();
+	bf_flush.Close();
 	ASSERT_TRUE(path.IsExist());
 
 	int test_data_input[4] = {0, 0, 0, 0};
@@ -810,8 +834,8 @@ TEST(BinaryFile, ReadWriteTest)
 	int test_data_input[4] = {0, 0, 0, 0};
 	int test_data_output[4] = {101, 202, 303, 404};
 	BinaryFile bf_read_write(path, FileIOMode::Read | FileIOMode::Write);
-	bf_read_write.Read(test_data_input, sizeof(test_data_input));
-	bf_read_write.Write(test_data_output, sizeof(test_data_output));
+	ASSERT_EQ(bf_read_write.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
+	ASSERT_EQ(bf_read_write.Write(test_data_output, sizeof(test_data_output)), sizeof(test_data_output));
 	bf_read_write.Close();
 
 	for (int i = 0; i < 4; ++i)
@@ -844,10 +868,10 @@ TEST(BinaryFile, AppendTest)
 
 	int test_data_output[4] = {90, 112, 134, 156};
 	BinaryFile bf_append(path, FileIOMode::Append);
-	bf_append.Write(test_data_output, sizeof(int) * 2);
+	ASSERT_EQ(bf_append.Write(test_data_output, sizeof(int) * 2), sizeof(int) * 2);
 	bf_append.Close();
 	bf_append.Open(path, FileIOMode::Append);	 //test open append
-	bf_append.Write(test_data_output + 2, sizeof(int) * 2);
+	ASSERT_EQ(bf_append.Write(test_data_output + 2, sizeof(int) * 2), sizeof(int) * 2);
 	bf_append.Close();
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -878,9 +902,9 @@ TEST(BinaryFile, ReadWriteAppendTest)
 	int test_data_input[4] = {0, 0, 0, 0};
 	int test_data_output[4] = {101, 202, 303, 404};
 	BinaryFile bf_read_write_append(path, FileIOMode::Read | FileIOMode::Write | FileIOMode::Append);
-	bf_read_write_append.Write(test_data_output, sizeof(test_data_output));
+	ASSERT_EQ(bf_read_write_append.Write(test_data_output, sizeof(test_data_output)), sizeof(test_data_output));
 	bf_read_write_append.MoveFilePosition(FilePositionOrigin::Begin, 0);
-	bf_read_write_append.Read(test_data_input, sizeof(test_data_input));
+	ASSERT_EQ(bf_read_write_append.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
 	bf_read_write_append.Close();
 
 	for (int i = 0; i < 4; ++i)
@@ -900,7 +924,7 @@ TEST(BinaryFile, ReadWriteAppendTest)
 	ASSERT_FALSE(path.IsExist());
 }
 
-TEST(BinaryFile, FilePositionTest)
+TEST(BinaryFile, MoveFilePositionTest)
 {
 	int test_data[4] = {12, 34, 56, 78};
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfp.dat"));
@@ -913,12 +937,12 @@ TEST(BinaryFile, FilePositionTest)
 
 	int test_data_input[4] = {0, 0, 0, 0};
 	BinaryFile bf(path, FileIOMode::Read);
-	FilePosition fp = bf.MoveFilePosition(FilePositionOrigin::End, -1 * sizeof(int));
-	bf.Read(test_data_input + 3, sizeof(int));
-	FilePosition fp_cur = bf.GetFilePosition(FilePositionOrigin::Current);
+	Int64 fp = bf.MoveFilePosition(FilePositionOrigin::End, -1 * sizeof(int));
+	ASSERT_EQ(bf.Read(test_data_input + 3, sizeof(int)), sizeof(int));
+	Int64 fp_cur = bf.MoveFilePosition(FilePositionOrigin::Current, 0);
 	ASSERT_EQ(fp + sizeof(int), fp_cur);
-	bf.SetFilePosition(fp - 3 * sizeof(int));
-	bf.Read(test_data_input, 3 * sizeof(int));
+	bf.MoveFilePosition(FilePositionOrigin::Begin, fp - 3 * sizeof(int));
+	ASSERT_EQ(bf.Read(test_data_input, 3 * sizeof(int)), 3 * sizeof(int));
 	bf.Close();
 
 	for (int i = 0; i < 4; ++i)

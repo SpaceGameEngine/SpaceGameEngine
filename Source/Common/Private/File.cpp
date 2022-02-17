@@ -19,6 +19,7 @@ limitations under the License.
 #ifdef SGE_POSIX
 #include <fcntl.h>
 #include <filesystem>
+#include <unistd.h>
 #endif
 
 #ifdef SGE_MACOS
@@ -802,6 +803,26 @@ bool SpaceGameEngine::RmdirFailError::Judge(int re)
 {
 	return re == -1;
 }
+
+bool SpaceGameEngine::FsyncFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::ReadFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::WriteFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::LSeekFailError::Judge(int re)
+{
+	return re == -1;
+}
 #endif
 
 #ifdef SGE_LINUX
@@ -881,6 +902,7 @@ SpaceGameEngine::BinaryFile::BinaryFile()
 #ifdef SGE_WINDOWS
 	: m_Handle(NULL), m_Mode(FileIOMode::Unknown)
 #elif defined(SGE_POSIX)
+	: m_Handle(-1), m_Mode(FileIOMode::Unknown)
 #else
 #error this os has not been supported.
 #endif
@@ -901,13 +923,25 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 #include "System/AllowWindowsMacro.h"
 	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
 	SGE_CHECK(CreateFileFailError, m_Handle);
-	if ((mode & FileIOMode::Append) == FileIOMode::Append)
-		MoveFilePosition(FilePositionOrigin::End, 0);
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
+	int oflag = 0;
+	if ((UInt8)(mode & FileIOMode::Read))
+	{
+		if ((UInt8)(mode & FileIOMode::Write))
+			oflag = O_RDWR;
+		else
+			oflag = O_RDONLY;
+	}
+	else
+		oflag = O_WRONLY;
+	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
+	SGE_CHECK(OpenFailError, m_Handle);
 #else
 #error this os has not been supported.
 #endif
+	if ((mode & FileIOMode::Append) == FileIOMode::Append)
+		MoveFilePosition(FilePositionOrigin::End, 0);
 }
 
 SpaceGameEngine::BinaryFile::~BinaryFile()
@@ -920,6 +954,12 @@ SpaceGameEngine::BinaryFile::~BinaryFile()
 		SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	}
 #elif defined(SGE_POSIX)
+	if (m_Handle)
+	{
+		if ((UInt8)(m_Mode & FileIOMode::Write))
+			SGE_CHECK(FsyncFailError, fsync(m_Handle));
+		SGE_CHECK(CloseFailError, close(m_Handle));
+	}
 #else
 #error this os has not been supported.
 #endif
@@ -940,24 +980,40 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 #include "System/AllowWindowsMacro.h"
 	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
 	SGE_CHECK(CreateFileFailError, m_Handle);
-	if ((mode & FileIOMode::Append) == FileIOMode::Append)
-		MoveFilePosition(FilePositionOrigin::End, 0);
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
+	int oflag = 0;
+	if ((UInt8)(mode & FileIOMode::Read))
+	{
+		if ((UInt8)(mode & FileIOMode::Write))
+			oflag = O_RDWR;
+		else
+			oflag = O_RDONLY;
+	}
+	else
+		oflag = O_WRONLY;
+	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
+	SGE_CHECK(OpenFailError, m_Handle);
 #else
 #error this os has not been supported.
 #endif
+	if ((mode & FileIOMode::Append) == FileIOMode::Append)
+		MoveFilePosition(FilePositionOrigin::End, 0);
 }
 
 void SpaceGameEngine::BinaryFile::Close()
 {
 	SGE_ASSERT(FileHandleReleasedError, m_Handle);
 #ifdef SGE_WINDOWS
-	if ((UInt8)(m_Mode & FileIOMode::Write))
-		SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+	//if ((UInt8)(m_Mode & FileIOMode::Write))
+	//	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 	SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	m_Handle = NULL;
 #elif defined(SGE_POSIX)
+	//if ((UInt8)(m_Mode & FileIOMode::Write))
+	//	SGE_CHECK(FsyncFailError, fsync(m_Handle));
+	SGE_CHECK(CloseFailError, close(m_Handle));
+	m_Handle = -1;
 #else
 #error this os has not been supported.
 #endif
@@ -966,9 +1022,11 @@ void SpaceGameEngine::BinaryFile::Close()
 void SpaceGameEngine::BinaryFile::Flush()
 {
 	SGE_ASSERT(FileHandleReleasedError, m_Handle);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
 #ifdef SGE_WINDOWS
 	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 #elif defined(SGE_POSIX)
+	SGE_CHECK(FsyncFailError, fsync(m_Handle));
 #else
 #error this os has not been supported.
 #endif
@@ -985,6 +1043,9 @@ SizeType SpaceGameEngine::BinaryFile::Read(void* pdst, SizeType size)
 	SGE_CHECK(ReadFileFailError, ReadFile(m_Handle, pdst, size, &buf, NULL));
 	return buf;
 #elif defined(SGE_POSIX)
+	ssize_t re = read(m_Handle, pdst, size);
+	SGE_CHECK(ReadFailError, re);
+	return re;
 #else
 #error this os has not been supported.
 #endif
@@ -1001,6 +1062,9 @@ SizeType SpaceGameEngine::BinaryFile::Write(const void* psrc, SizeType size)
 	SGE_CHECK(WriteFileFailError, WriteFile(m_Handle, psrc, size, &buf, NULL));
 	return buf;
 #elif defined(SGE_POSIX)
+	ssize_t re = write(m_Handle, pdst, size);
+	SGE_CHECK(WriteFailError, re);
+	return re;
 #else
 #error this os has not been supported.
 #endif
@@ -1020,13 +1084,21 @@ namespace
 			return FILE_END;
 	}
 #elif defined(SGE_POSIX)
+	int GetSystemFilePositionOrigin(FilePositionOrigin origin)
+	{
+		if (origin == FilePositionOrigin::Begin)
+			return SEEK_SET;
+		else if (origin == FilePositionOrigin::Current)
+			return SEEK_CUR;
+		else if (origin == FilePositionOrigin::End)
+			return SEEK_END;
+	}
 #endif
 }
 
-FilePosition SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin origin, Int64 offset)
+Int64 SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin origin, Int64 offset)
 {
 	SGE_ASSERT(InvalidFilePositionOriginError, origin);
-	SGE_ASSERT(InvalidValueError, (offset >= 0 ? (GetFilePosition(origin) + (FilePosition)offset) : (GetFilePosition(origin) - (FilePosition)(-1 * offset))), GetFilePosition(FilePositionOrigin::Begin), GetFilePosition(FilePositionOrigin::End));
 #ifdef SGE_WINDOWS
 	LARGE_INTEGER buf;
 	LARGE_INTEGER input;
@@ -1034,34 +1106,9 @@ FilePosition SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin or
 	SGE_CHECK(SetFilePointerExFailError, SetFilePointerEx(m_Handle, input, &buf, GetSystemFilePositionOrigin(origin)));
 	return buf.QuadPart;
 #elif defined(SGE_POSIX)
-#else
-#error this os has not been supported.
-#endif
-}
-
-FilePosition SpaceGameEngine::BinaryFile::GetFilePosition(FilePositionOrigin origin) const
-{
-	SGE_ASSERT(InvalidFilePositionOriginError, origin);
-#ifdef SGE_WINDOWS
-	LARGE_INTEGER buf;
-	LARGE_INTEGER input;
-	input.QuadPart = 0;
-	SGE_CHECK(SetFilePointerExFailError, SetFilePointerEx(const_cast<FileHandle>(m_Handle), input, &buf, GetSystemFilePositionOrigin(origin)));
-	return buf.QuadPart;
-#elif defined(SGE_POSIX)
-#else
-#error this os has not been supported.
-#endif
-}
-
-void SpaceGameEngine::BinaryFile::SetFilePosition(FilePosition fpos)
-{
-	SGE_ASSERT(InvalidValueError, fpos, GetFilePosition(FilePositionOrigin::Begin), GetFilePosition(FilePositionOrigin::End));
-#ifdef SGE_WINDOWS
-	LARGE_INTEGER input;
-	input.QuadPart = fpos;
-	SGE_CHECK(SetFilePointerExFailError, SetFilePointerEx(m_Handle, input, NULL, GetSystemFilePositionOrigin(FilePositionOrigin::Begin)));
-#elif defined(SGE_POSIX)
+	off_t re = lseek(m_Handle, offset, GetSystemFilePositionOrigin(origin));
+	SGE_CHECK(LSeekFailError, re);
+	return re;
 #else
 #error this os has not been supported.
 #endif
@@ -1072,6 +1119,7 @@ bool SpaceGameEngine::FileHandleOccupiedError::Judge(FileHandle handle)
 #ifdef SGE_WINDOWS
 	return handle != NULL;
 #elif defined(SGE_POSIX)
+	return handle != -1;
 #else
 #error this os has not been supported.
 #endif
@@ -1082,6 +1130,7 @@ bool SpaceGameEngine::FileHandleReleasedError::Judge(FileHandle handle)
 #ifdef SGE_WINDOWS
 	return handle == NULL;
 #elif defined(SGE_POSIX)
+	return handle == -1;
 #else
 #error this os has not been supported.
 #endif
