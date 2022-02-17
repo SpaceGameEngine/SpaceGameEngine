@@ -24,6 +24,11 @@ bool SpaceGameEngine::EmptyDllNameError::Judge(const String& name)
 	return name.GetSize() == 0;
 }
 
+bool SpaceGameEngine::EmptyDllPathError::Judge(const String& dll_path)
+{
+	return dll_path.GetSize() == 0;
+}
+
 bool SpaceGameEngine::EmptySymbolError::Judge(const String& symbol)
 {
 	return symbol.GetSize() == 0;
@@ -69,6 +74,7 @@ bool SpaceGameEngine::NullDllHandleError::Judge(const DllHandle& handle)
 
 SpaceGameEngine::DllHandle SpaceGameEngine::LoadDll(const String& dll_path)
 {
+	SGE_ASSERT(EmptyDllPathError, dll_path);
 #ifdef SGE_WINDOWS
 	DllHandle re = LoadLibrary(SGE_STR_TO_TSTR(dll_path).GetData());
 	SGE_CHECK(LoadDllFailedError, re);

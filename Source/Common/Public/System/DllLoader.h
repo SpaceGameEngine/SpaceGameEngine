@@ -44,6 +44,12 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const String& name);
 	};
 
+	struct EmptyDllPathError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Dll's path is empty.");
+		static COMMON_API bool Judge(const String& dll_path);
+	};
+
 	struct EmptySymbolError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Symbol's string is empty.");
