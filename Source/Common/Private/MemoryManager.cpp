@@ -18,6 +18,7 @@ limitations under the License.
 #include "GlobalVariable.h"
 #include <algorithm>
 #include <cstring>
+#include <cstddef>
 #ifdef SGE_WINDOWS
 #include <malloc.h>
 #else
