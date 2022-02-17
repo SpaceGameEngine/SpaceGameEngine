@@ -935,6 +935,8 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 	}
 	else
 		oflag = O_WRONLY;
+	if (mode != FileIOMode::Read)
+		oflag |= O_CREAT;
 	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(OpenFailError, m_Handle);
 #else
@@ -992,6 +994,8 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 	}
 	else
 		oflag = O_WRONLY;
+	if (mode != FileIOMode::Read)
+		oflag |= O_CREAT;
 	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(OpenFailError, m_Handle);
 #else
