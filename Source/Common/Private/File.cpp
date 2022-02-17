@@ -722,6 +722,16 @@ bool SpaceGameEngine::FlushFileBuffersFailError::Judge(BOOL re)
 {
 	return re == 0;
 }
+
+bool SpaceGameEngine::ReadFileFailError::Judge(BOOL re)
+{
+	return re == 0 && GetLastError() != ERROR_IO_PENDING;
+}
+
+bool SpaceGameEngine::WriteFileFailError::Judge(BOOL re)
+{
+	return re == 0 && GetLastError() != ERROR_IO_PENDING;
+}
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
@@ -858,9 +868,9 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 	SGE_ASSERT(FileIOModeUnknownError, mode);
 	if ((UInt8)mode & (UInt8)FileIOMode::Read)
 		SGE_ASSERT(PathNotExistError, path);
-	String astr = path.GetAbsolutePath().GetString();
 	if (path.IsExist())
 		SGE_ASSERT(PathNotFileError, path);
+	String astr = path.GetAbsolutePath().GetString();
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
 	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), (((UInt8)mode & (UInt8)FileIOMode::Read) ? GENERIC_READ : 0) | (((UInt8)mode & (UInt8)FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
@@ -893,9 +903,9 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 	SGE_ASSERT(FileIOModeUnknownError, mode);
 	if ((UInt8)mode & (UInt8)FileIOMode::Read)
 		SGE_ASSERT(PathNotExistError, path);
-	String astr = path.GetAbsolutePath().GetString();
 	if (path.IsExist())
 		SGE_ASSERT(PathNotFileError, path);
+	String astr = path.GetAbsolutePath().GetString();
 	m_Mode = mode;
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
@@ -927,6 +937,38 @@ void SpaceGameEngine::BinaryFile::Flush()
 	SGE_ASSERT(FileHandleReleasedError, m_Handle);
 #ifdef SGE_WINDOWS
 	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+#elif defined(SGE_POSIX)
+#else
+#error this os has not been supported.
+#endif
+}
+
+SizeType SpaceGameEngine::BinaryFile::Read(void* pdst, SizeType size)
+{
+	SGE_ASSERT(FileHandleReleasedError, m_Handle);
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(NullPointerError, pdst);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+#ifdef SGE_WINDOWS
+	DWORD buf = 0;
+	SGE_CHECK(ReadFileFailError, ReadFile(m_Handle, pdst, size, &buf, NULL));
+	return buf;
+#elif defined(SGE_POSIX)
+#else
+#error this os has not been supported.
+#endif
+}
+
+SizeType SpaceGameEngine::BinaryFile::Write(const void* psrc, SizeType size)
+{
+	SGE_ASSERT(FileHandleReleasedError, m_Handle);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(NullPointerError, psrc);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+#ifdef SGE_WINDOWS
+	DWORD buf = 0;
+	SGE_CHECK(WriteFileFailError, WriteFile(m_Handle, psrc, size, &buf, NULL));
+	return buf;
 #elif defined(SGE_POSIX)
 #else
 #error this os has not been supported.

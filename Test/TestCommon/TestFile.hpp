@@ -749,3 +749,49 @@ TEST(BinaryFile, CloseTest)
 	file1.Close();
 	DeleteFile(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")));
 }
+
+TEST(BinaryFile, ReadTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbr.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_input[4] = {0, 0, 0, 0};
+	BinaryFile bf_read(path, FileIOMode::Read);
+	bf_read.Read(test_data_input, sizeof(test_data_input));
+	bf_read.Close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data[i], test_data_input[i]);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
+
+TEST(BinaryFile, WriteTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbw.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	BinaryFile bf_write(path, FileIOMode::Write);
+	bf_write.Write(test_data, sizeof(test_data));
+	bf_write.Close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_input[4] = {0, 0, 0, 0};
+	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_input, sizeof(test_data_input));
+	b_input.close();
+
+	for (int i = 0; i < 4; ++i)
+		ASSERT_EQ(test_data[i], test_data_input[i]);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}

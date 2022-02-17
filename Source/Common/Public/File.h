@@ -131,6 +131,18 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(BOOL re);
 	};
 
+	struct ReadFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("ReadFile failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
+	struct WriteFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("WriteFile failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
 	{
@@ -456,6 +468,8 @@ namespace SpaceGameEngine
 		void Open(const Path& path, FileIOMode mode);
 		void Close();
 		void Flush();
+		SizeType Read(void* pdst, SizeType size);
+		SizeType Write(const void* psrc, SizeType size);
 
 	private:
 		FileHandle m_Handle;
