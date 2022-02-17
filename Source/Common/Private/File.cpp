@@ -954,7 +954,7 @@ SpaceGameEngine::BinaryFile::~BinaryFile()
 		SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	}
 #elif defined(SGE_POSIX)
-	if (m_Handle)
+	if (m_Handle >= 0)
 	{
 		//if ((UInt8)(m_Mode & FileIOMode::Write))
 		//	SGE_CHECK(FsyncFailError, fsync(m_Handle));

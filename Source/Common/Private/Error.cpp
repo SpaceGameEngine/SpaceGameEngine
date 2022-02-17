@@ -43,5 +43,5 @@ void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
 	DebugBreak();
 #endif
-	abort();
+	exit(-1);
 }
