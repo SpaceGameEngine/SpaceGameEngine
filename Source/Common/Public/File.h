@@ -17,6 +17,7 @@ limitations under the License.
 #include "CommonAPI.h"
 #include "SGEString.hpp"
 #include "Utility/Utility.hpp"
+#include "Utility/Endian.h"
 #ifdef SGE_WINDOWS
 #include <Windows.h>
 #include <tchar.h>
@@ -525,7 +526,7 @@ namespace SpaceGameEngine
 		SizeType Write(const void* psrc, SizeType size);
 		Int64 MoveFilePosition(FilePositionOrigin origin, Int64 offset);
 
-	private:
+	protected:
 		FileHandle m_Handle;
 		FileIOMode m_Mode;
 	};
@@ -560,6 +561,43 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(FileIOMode mode);
 	};
 
+	template<typename T, typename Trait = CharTrait<T>>
+	class FileCore
+	{
+	};
+
+	template<>
+	class COMMON_API FileCore<Char16, UCS2Trait> : public BinaryFile
+	{
+	public:
+		using CharType = Char16;
+		using ValueType = Char16;
+		using ConstValueType = const Char16;
+		using ValueTrait = UCS2Trait;
+
+		FileCore();
+		FileCore(const Path& path, FileIOMode mode);
+
+		void Open(const Path& path, FileIOMode mode);
+
+		bool IsHasBomHeader() const;
+		void SetHasBomHeader(bool val);
+
+		Endian GetEndian() const;
+		void SetEndian(Endian endian);
+
+	private:
+		void ReadBomHeaderStatus();
+
+		void AddBomHeader();
+		void RemoveBomHeader();
+
+		void ChangeFileEndian(Endian dst, Endian src);
+
+	private:
+		bool m_HasBomHeader;
+		Endian m_Endian;
+	};
 	/*!
 	@}
 	*/

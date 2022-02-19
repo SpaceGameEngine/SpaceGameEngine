@@ -19,6 +19,7 @@ limitations under the License.
 #include "Utility/ControllableObject.hpp"
 #include "Utility/Utility.hpp"
 #include "Utility/AutoReleaseBuffer.h"
+#include "Utility/Endian.h"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
@@ -201,4 +202,11 @@ TEST(Digits16, CorrectnessTest)
 		UInt64 num = (rd() % UINT64_MAX) + 1;
 		ASSERT_EQ(Digits<16>(num), (UInt64)(std::log2(num) / 4.0) + 1);
 	}
+}
+
+TEST(Endian, ChangeEndianTest)
+{
+	UInt32 test_val = 0x12345678;
+	ChangeEndian(test_val, Endian::Big, Endian::Little);
+	ASSERT_EQ(test_val, 0x78563412);
 }

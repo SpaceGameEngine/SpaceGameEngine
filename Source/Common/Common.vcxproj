@@ -197,6 +197,7 @@
     <ClInclude Include="Public\Concurrent\Lock.h" />
     <ClInclude Include="Public\Utility\AutoReleaseBuffer.h" />
     <ClInclude Include="Public\Utility\ControllableObject.hpp" />
+    <ClInclude Include="Public\Utility\Endian.h" />
     <ClInclude Include="Public\Utility\Format.hpp" />
     <ClInclude Include="Public\Utility\Singleton.hpp" />
     <ClInclude Include="Public\Utility\Utility.hpp" />
@@ -217,6 +218,7 @@
     <ClCompile Include="Private\Time\UnixTimeImplement.cpp" />
     <ClCompile Include="Private\Time\WindowsTimeImplement.cpp" />
     <ClCompile Include="Private\Utility\AutoReleaseBuffer.cpp" />
+    <ClCompile Include="Private\Utility\Endian.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1159,3 +1159,132 @@ bool SpaceGameEngine::FileIOModeNotWriteError::Judge(FileIOMode mode)
 {
 	return (UInt8)(mode & FileIOMode::Write) == 0;
 }
+
+SpaceGameEngine::FileCore<Char16, UCS2Trait>::FileCore()
+	: BinaryFile(), m_HasBomHeader(false), m_Endian(GetSystemEndian())
+{
+}
+
+SpaceGameEngine::FileCore<Char16, UCS2Trait>::FileCore(const Path& path, FileIOMode mode)
+	: BinaryFile(path, mode)
+{
+	if ((UInt8)(mode & FileIOMode::Read))
+		ReadBomHeaderStatus();
+	else
+	{
+		m_HasBomHeader = false;
+		m_Endian = GetSystemEndian();
+	}
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::Open(const Path& path, FileIOMode mode)
+{
+	BinaryFile::Open(path, mode);
+	if ((UInt8)(mode & FileIOMode::Read))
+		ReadBomHeaderStatus();
+	else
+	{
+		m_HasBomHeader = false;
+		m_Endian = GetSystemEndian();
+	}
+}
+
+bool SpaceGameEngine::FileCore<Char16, UCS2Trait>::IsHasBomHeader() const
+{
+	return m_HasBomHeader;
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::SetHasBomHeader(bool val)
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	if (m_HasBomHeader != val)
+	{
+		if (m_HasBomHeader)
+			RemoveBomHeader();
+		else
+			AddBomHeader();
+		m_HasBomHeader = val;
+	}
+}
+
+Endian SpaceGameEngine::FileCore<Char16, UCS2Trait>::GetEndian() const
+{
+	return m_Endian;
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::SetEndian(Endian endian)
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(InvalidEndianError, endian);
+	if (m_Endian != endian)
+	{
+		ChangeFileEndian(endian, m_Endian);
+		m_Endian = endian;
+	}
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadBomHeaderStatus()
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	MoveFilePosition(FilePositionOrigin::Begin, 0);
+	UInt8 bom_b = 0;
+	UInt8 bom_e = 0;
+	Read(&bom_b, sizeof(bom_b));
+	Read(&bom_e, sizeof(bom_e));
+	MoveFilePosition(FilePositionOrigin::Begin, fp);
+	if (bom_b == 0xff && bom_e == 0xfe)
+	{
+		m_Endian = Endian::Little;
+		m_HasBomHeader = true;
+	}
+	else if (bom_b == 0xfe && bom_e == 0xff)
+	{
+		m_Endian = Endian::Big;
+		m_HasBomHeader = true;
+	}
+	else
+	{
+		m_Endian = GetSystemEndian();	 //can not judge, so use system endian
+		m_HasBomHeader = false;
+	}
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::AddBomHeader()
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	MoveFilePosition(FilePositionOrigin::Begin, 0);
+	if (m_Endian == Endian::Little)
+	{
+		UInt8 buf = 0;
+		buf = 0xff;
+		Write(&buf, sizeof(buf));
+		buf = 0xfe;
+		Write(&buf, sizeof(buf));
+	}
+	else	//big endian
+	{
+		UInt8 buf = 0;
+		buf = 0xfe;
+		Write(&buf, sizeof(buf));
+		buf = 0xff;
+		Write(&buf, sizeof(buf));
+	}
+	MoveFilePosition(FilePositionOrigin::Current, fp);
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::RemoveBomHeader()
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	//todo move file content forward 2 bytes;
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ChangeFileEndian(Endian dst, Endian src)
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(InvalidEndianError, dst);
+	SGE_ASSERT(InvalidEndianError, src);
+	//todo read a lot byte and change each of them then write back
+}
