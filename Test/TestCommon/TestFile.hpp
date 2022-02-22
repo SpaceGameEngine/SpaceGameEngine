@@ -941,12 +941,61 @@ TEST(BinaryFile, MoveFilePositionTest)
 	ASSERT_EQ(bf.Read(test_data_input + 3, sizeof(int)), sizeof(int));
 	Int64 fp_cur = bf.MoveFilePosition(FilePositionOrigin::Current, 0);
 	ASSERT_EQ(fp + sizeof(int), fp_cur);
-	ASSERT_EQ(bf.MoveFilePosition(FilePositionOrigin::Begin, fp - 3 * (Int64)sizeof(int)),0);
+	ASSERT_EQ(bf.MoveFilePosition(FilePositionOrigin::Begin, fp - 3 * (Int64)sizeof(int)), 0);
 	ASSERT_EQ(bf.Read(test_data_input, 3 * sizeof(int)), 3 * sizeof(int));
 	bf.Close();
 
 	for (int i = 0; i < 4; ++i)
 		ASSERT_EQ(test_data[i], test_data_input[i]);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
+
+TEST(BinaryFile, GetFileSizeTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfgs.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	{
+		const BinaryFile bf(path, FileIOMode::Read);
+		ASSERT_EQ(bf.GetFileSize(), sizeof(test_data));
+	}
+	BinaryFile bf(path, FileIOMode::Read);
+	bf.MoveFilePosition(FilePositionOrigin::Begin, 2);
+	ASSERT_EQ(bf.GetFileSize(), sizeof(test_data));
+	ASSERT_EQ(bf.MoveFilePosition(FilePositionOrigin::Current, 0), 2);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
+
+TEST(BinaryFile, SetFileSizeTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfss.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	BinaryFile bf(path, FileIOMode::Read | FileIOMode::Write);
+	ASSERT_EQ(bf.GetFileSize(), sizeof(test_data));
+	bf.MoveFilePosition(FilePositionOrigin::Begin, 2);
+	bf.SetFileSize(2 * sizeof(test_data));
+	ASSERT_EQ(bf.GetFileSize(), 2 * sizeof(test_data));
+	ASSERT_EQ(bf.MoveFilePosition(FilePositionOrigin::Current, 0), 2);
+	bf.SetFileSize(2);
+	ASSERT_EQ(bf.GetFileSize(), 2);
+	ASSERT_EQ(bf.MoveFilePosition(FilePositionOrigin::Current, 0), 2);
 
 	DeleteFile(path);
 	ASSERT_FALSE(path.IsExist());

@@ -738,6 +738,16 @@ bool SpaceGameEngine::SetFilePointerExFailError::Judge(BOOL re)
 {
 	return re == 0;
 }
+
+bool SpaceGameEngine::GetFileSizeExFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
+
+bool SpaceGameEngine::SetEndOfFileFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
@@ -820,6 +830,16 @@ bool SpaceGameEngine::WriteFailError::Judge(int re)
 }
 
 bool SpaceGameEngine::LSeekFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::FStatFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::FTruncateFailError::Judge(int re)
 {
 	return re == -1;
 }
@@ -1123,6 +1143,38 @@ Int64 SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin origin, I
 #endif
 }
 
+SizeType SpaceGameEngine::BinaryFile::GetFileSize() const
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+#ifdef SGE_WINDOWS
+	LARGE_INTEGER re;
+	SGE_CHECK(GetFileSizeExFailError, GetFileSizeEx(m_Handle, &re));
+	return re.QuadPart;
+#elif defined(SGE_POSIX)
+	struct stat buf;
+	SGE_CHECK(FStatFailError, fstat(m_Handle, &buf));
+	return buf.st_size;
+#else
+#error this os has not been supported.
+#endif
+}
+
+void SpaceGameEngine::BinaryFile::SetFileSize(SizeType size)
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(InvalidValueError, static_cast<Int64>(size), MoveFilePosition(FilePositionOrigin::Current, 0), INT64_MAX);
+#ifdef SGE_WINDOWS
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	MoveFilePosition(FilePositionOrigin::Begin, size);
+	SGE_CHECK(SetEndOfFileFailError, SetEndOfFile(m_Handle));
+	MoveFilePosition(FilePositionOrigin::Begin, fp);
+#elif defined(SGE_POSIX)
+	SGE_CHECK(FTruncateFailError, ftruncate(m_Handle, static_cast<Int64>(size)));
+#else
+#error this os has not been supported.
+#endif
+}
+
 bool SpaceGameEngine::FileHandleOccupiedError::Judge(FileHandle handle)
 {
 #ifdef SGE_WINDOWS
@@ -1228,17 +1280,15 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadBomHeaderStatus()
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
 	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
 	MoveFilePosition(FilePositionOrigin::Begin, 0);
-	UInt8 bom_b = 0;
-	UInt8 bom_e = 0;
-	Read(&bom_b, sizeof(bom_b));
-	Read(&bom_e, sizeof(bom_e));
+	UInt8 bom[2] = {0, 0};
+	SGE_CHECK(InvalidUCS2FileSizeError, Read(bom, sizeof(bom)));
 	MoveFilePosition(FilePositionOrigin::Begin, fp);
-	if (bom_b == 0xff && bom_e == 0xfe)
+	if (bom[0] == 0xff && bom[1] == 0xfe)
 	{
 		m_Endian = Endian::Little;
 		m_HasBomHeader = true;
 	}
-	else if (bom_b == 0xfe && bom_e == 0xff)
+	else if (bom[0] == 0xfe && bom[1] == 0xff)
 	{
 		m_Endian = Endian::Big;
 		m_HasBomHeader = true;
@@ -1278,6 +1328,18 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::RemoveBomHeader()
 {
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
 	//todo move file content forward 2 bytes;
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	MoveFilePosition(FilePositionOrigin::Begin, 2);
+	/*const SizeType block_size = 4096;
+	Char16 buffer[block_size / sizeof(Char16)];
+	SizeType size = block_size;
+	while (size == block_size)
+	{
+		size = Read(buffer, sizeof(buffer));
+		if (size)
+		{
+		}
+	}*/
 }
 
 void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ChangeFileEndian(Endian dst, Endian src)
@@ -1286,5 +1348,31 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ChangeFileEndian(Endian dst, 
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
 	SGE_ASSERT(InvalidEndianError, dst);
 	SGE_ASSERT(InvalidEndianError, src);
-	//todo read a lot byte and change each of them then write back
+
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	MoveFilePosition(FilePositionOrigin::Begin, 0);
+	//todo
+	/*const SizeType block_size = 4096;
+	Char16 buffer[block_size / sizeof(Char16)];
+	SizeType size = block_size;
+	while (size == block_size)
+	{
+		size = Read(buffer, sizeof(buffer));
+		if (size)
+		{
+			for (SizeType i = 0; i < size / sizeof(Char16); ++i)
+			{
+				ChangeEndian(buffer[i], dst, src);
+			}
+			MoveFilePosition(FilePositionOrigin::Current, -1 * static_cast<Int64>(size));
+			Write(buffer, size);
+		}
+	}
+	SGE_CHECK(InvalidUCS2FileSizeError, size);*/
+	MoveFilePosition(FilePositionOrigin::Begin, fp);
+}
+
+bool InvalidUCS2FileSizeError::Judge(SizeType size)
+{
+	return size % 2 == 1;
 }

@@ -150,6 +150,18 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(BOOL re);
 	};
 
+	struct GetFileSizeExFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("GetFileSizeEx failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
+	struct SetEndOfFileFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("SetEndOfFile failed.");
+		static COMMON_API bool Judge(BOOL re);
+	};
+
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
 	{
@@ -250,6 +262,18 @@ namespace SpaceGameEngine
 	struct LSeekFailError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("lseek failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct FStatFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("fstat failed.");
+		static COMMON_API bool Judge(int re);
+	};
+
+	struct FTruncateFailError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("ftruncate failed.");
 		static COMMON_API bool Judge(int re);
 	};
 #endif
@@ -525,6 +549,8 @@ namespace SpaceGameEngine
 		SizeType Read(void* pdst, SizeType size);
 		SizeType Write(const void* psrc, SizeType size);
 		Int64 MoveFilePosition(FilePositionOrigin origin, Int64 offset);
+		SizeType GetFileSize() const;
+		void SetFileSize(SizeType size);
 
 	protected:
 		FileHandle m_Handle;
@@ -597,6 +623,12 @@ namespace SpaceGameEngine
 	private:
 		bool m_HasBomHeader;
 		Endian m_Endian;
+	};
+
+	struct InvalidUCS2FileSizeError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The UCS2File's size is invalid.");
+		static COMMON_API bool Judge(SizeType size);
 	};
 	/*!
 	@}
