@@ -550,6 +550,9 @@ namespace SpaceGameEngine
 		SizeType Write(const void* psrc, SizeType size);
 		Int64 MoveFilePosition(FilePositionOrigin origin, Int64 offset);
 		SizeType GetFileSize() const;
+		/*!
+		@warning the size must >= current file position
+		*/
 		void SetFileSize(SizeType size);
 
 	protected:
@@ -613,7 +616,7 @@ namespace SpaceGameEngine
 		void SetEndian(Endian endian);
 
 	private:
-		void ReadBomHeaderStatus();
+		void ReadBomHeader();
 
 		void AddBomHeader();
 		void RemoveBomHeader();
