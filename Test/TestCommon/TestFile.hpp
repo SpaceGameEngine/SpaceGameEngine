@@ -971,6 +971,7 @@ TEST(BinaryFile, GetFileSizeTest)
 	bf.MoveFilePosition(FilePositionOrigin::Begin, 2);
 	ASSERT_EQ(bf.GetFileSize(), sizeof(test_data));
 	ASSERT_EQ(bf.MoveFilePosition(FilePositionOrigin::Current, 0), 2);
+	bf.Close();
 
 	DeleteFile(path);
 	ASSERT_FALSE(path.IsExist());
@@ -996,6 +997,7 @@ TEST(BinaryFile, SetFileSizeTest)
 	bf.SetFileSize(2);
 	ASSERT_EQ(bf.GetFileSize(), 2);
 	ASSERT_EQ(bf.MoveFilePosition(FilePositionOrigin::Current, 0), 2);
+	bf.Close();
 
 	DeleteFile(path);
 	ASSERT_FALSE(path.IsExist());
