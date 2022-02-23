@@ -1215,3 +1215,169 @@ TEST(UCS2FileCore, SetEndianTest)
 	DeleteFile(p_be);
 	ASSERT_FALSE(p_be.IsExist());
 }
+
+TEST(UCS2FileCore, ReadCharTest)
+{
+	Path p_le(SGE_STR("./TestData/TestCommon/TestFile/test_ucs2_le_r.txt"));
+	ASSERT_FALSE(p_le.IsExist());
+	Path p_be(SGE_STR("./TestData/TestCommon/TestFile/test_ucs2_be_r.txt"));
+	ASSERT_FALSE(p_be.IsExist());
+
+	UInt8 bom[2] = {0, 0};
+	Char16 test_data = SGE_WSTR('测');
+	BinaryFile bf_output(p_le, FileIOMode::Write);
+	bom[0] = 0xff;
+	bom[1] = 0xfe;
+	bf_output.Write(bom, sizeof(bom));
+	ChangeEndian(test_data, Endian::Little, GetSystemEndian());
+	bf_output.Write(&test_data, sizeof(test_data));
+	bf_output.Close();
+	ASSERT_TRUE(p_le.IsExist());
+
+	bf_output.Open(p_be, FileIOMode::Write);
+	bom[0] = 0xfe;
+	bom[1] = 0xff;
+	bf_output.Write(bom, sizeof(bom));
+	ChangeEndian(test_data, Endian::Big, Endian::Little);
+	bf_output.Write(&test_data, sizeof(test_data));
+	bf_output.Close();
+	ASSERT_TRUE(p_be.IsExist());
+
+	ChangeEndian(test_data, GetSystemEndian(), Endian::Big);
+	ASSERT_EQ(test_data, SGE_WSTR('测'));
+
+	FileCore<Char16, UCS2Trait> file;
+
+	file.Open(p_le, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.ReadChar(), test_data);
+	file.Close();
+
+	file.Open(p_be, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetEndian(), Endian::Big);
+	ASSERT_EQ(file.ReadChar(), test_data);
+	file.Close();
+
+	DeleteFile(p_le);
+	ASSERT_FALSE(p_le.IsExist());
+	DeleteFile(p_be);
+	ASSERT_FALSE(p_be.IsExist());
+}
+
+TEST(UCS2FileCore, WriteCharTest)
+{
+	Path p_le(SGE_STR("./TestData/TestCommon/TestFile/test_ucs2_le_w.txt"));
+	ASSERT_FALSE(p_le.IsExist());
+	Path p_be(SGE_STR("./TestData/TestCommon/TestFile/test_ucs2_be_w.txt"));
+	ASSERT_FALSE(p_be.IsExist());
+
+	UInt8 bom[2] = {0, 0};
+	Char16 test_data = SGE_WSTR('测');
+	BinaryFile bf_output(p_le, FileIOMode::Write);
+	bom[0] = 0xff;
+	bom[1] = 0xfe;
+	bf_output.Write(bom, sizeof(bom));
+	bf_output.Close();
+	ASSERT_TRUE(p_le.IsExist());
+
+	bf_output.Open(p_be, FileIOMode::Write);
+	bom[0] = 0xfe;
+	bom[1] = 0xff;
+	bf_output.Write(bom, sizeof(bom));
+	bf_output.Close();
+	ASSERT_TRUE(p_be.IsExist());
+
+	FileCore<Char16, UCS2Trait> file;
+
+	file.Open(p_le, FileIOMode::Read | FileIOMode::Write);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	file.WriteChar(test_data);
+	file.Close();
+
+	file.Open(p_be, FileIOMode::Read | FileIOMode::Write);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetEndian(), Endian::Big);
+	file.WriteChar(test_data);
+	file.Close();
+
+	Char16 test_data_input = 0;
+	BinaryFile bf_input(p_le, FileIOMode::Read);
+	bf_input.MoveFilePosition(FilePositionOrigin::Begin, 2);
+	ASSERT_EQ(bf_input.Read(&test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
+	ChangeEndian(test_data, Endian::Little, GetSystemEndian());
+	ASSERT_EQ(test_data_input, test_data);
+	bf_input.Close();
+
+	bf_input.Open(p_be, FileIOMode::Read);
+	bf_input.MoveFilePosition(FilePositionOrigin::Begin, 2);
+	ASSERT_EQ(bf_input.Read(&test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
+	ChangeEndian(test_data, Endian::Big, Endian::Little);
+	ASSERT_EQ(test_data_input, test_data);
+	bf_input.Close();
+
+	ChangeEndian(test_data, GetSystemEndian(), Endian::Big);
+	ASSERT_EQ(test_data, SGE_WSTR('测'));
+
+	DeleteFile(p_le);
+	ASSERT_FALSE(p_le.IsExist());
+	DeleteFile(p_be);
+	ASSERT_FALSE(p_be.IsExist());
+}
+
+TEST(UCS2FileCore, SeekTest)
+{
+	Path p_b(SGE_STR("./TestData/TestCommon/TestFile/test_ucs2_bs.txt"));
+	ASSERT_FALSE(p_b.IsExist());
+	Path p_nb(SGE_STR("./TestData/TestCommon/TestFile/test_ucs2_nbs.txt"));
+	ASSERT_FALSE(p_nb.IsExist());
+
+	UInt8 bom[2] = {0, 0};
+	Int8 test_data[4] = {12, 34, 56, 78};
+	BinaryFile bf_output(p_b, FileIOMode::Write);
+	bom[0] = 0xff;
+	bom[1] = 0xfe;
+	bf_output.Write(bom, sizeof(bom));
+	bf_output.Write(test_data, sizeof(test_data));
+	bf_output.Close();
+	ASSERT_TRUE(p_b.IsExist());
+
+	bf_output.Open(p_nb, FileIOMode::Write);
+	bf_output.Write(test_data, sizeof(test_data));
+	bf_output.Close();
+	ASSERT_TRUE(p_nb.IsExist());
+
+	Int8 test_data_input;
+	FileCore<Char16, UCS2Trait> file(p_b, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.MoveFilePosition(FilePositionOrigin::Current, 0), 2);
+	ASSERT_EQ(file.Read(&test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
+	ASSERT_EQ(test_data_input, test_data[0]);
+	ASSERT_EQ(file.Seek(FilePositionOrigin::Begin, 2), 2);
+	ASSERT_EQ(file.Seek(FilePositionOrigin::Current, 0), 2);
+	ASSERT_EQ(file.MoveFilePosition(FilePositionOrigin::Current, 0), 4);
+	ASSERT_EQ(file.Read(&test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
+	ASSERT_EQ(test_data_input, test_data[2]);
+	file.Close();
+
+	file.Open(p_nb, FileIOMode::Read);
+	ASSERT_FALSE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetEndian(), GetSystemEndian());
+	ASSERT_EQ(file.MoveFilePosition(FilePositionOrigin::Current, 0), 0);
+	ASSERT_EQ(file.Read(&test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
+	ASSERT_EQ(test_data_input, test_data[0]);
+	ASSERT_EQ(file.Seek(FilePositionOrigin::Begin, 2), 2);
+	ASSERT_EQ(file.Seek(FilePositionOrigin::Current, 0), 2);
+	ASSERT_EQ(file.MoveFilePosition(FilePositionOrigin::Current, 0), 2);
+	ASSERT_EQ(file.Read(&test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
+	ASSERT_EQ(test_data_input, test_data[2]);
+	file.Close();
+
+	DeleteFile(p_b);
+	ASSERT_FALSE(p_b.IsExist());
+	DeleteFile(p_nb);
+	ASSERT_FALSE(p_nb.IsExist());
+}

@@ -1275,6 +1275,43 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::SetEndian(Endian endian)
 	}
 }
 
+Char16 SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadChar()
+{
+	Char16 re;
+	Read(&re, sizeof(re));
+	if (m_Endian != GetSystemEndian())
+		ChangeEndian(re, GetSystemEndian(), m_Endian);
+	return re;
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::WriteChar(Char16 c)
+{
+	if (m_Endian != GetSystemEndian())
+		ChangeEndian(c, m_Endian, GetSystemEndian());
+	Write(&c, sizeof(c));
+}
+
+Int64 SpaceGameEngine::FileCore<Char16, UCS2Trait>::Seek(FilePositionOrigin origin, Int64 offset)
+{
+	SGE_ASSERT(InvalidFilePositionOriginError, origin);
+	if (origin == FilePositionOrigin::Begin)
+		SGE_ASSERT(InvalidValueError, offset, 0, INT64_MAX);
+	if (origin == FilePositionOrigin::End)
+		SGE_ASSERT(InvalidValueError, offset, -INT64_MAX, 0);
+	if (m_HasBomHeader)
+	{
+		if (origin == FilePositionOrigin::Begin)
+			offset += 2;
+		Int64 re = MoveFilePosition(origin, offset);
+		if (re < 2)
+			return 0;
+		else
+			return re - 2;
+	}
+	else
+		return MoveFilePosition(origin, offset);
+}
+
 void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadBomHeader()
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
