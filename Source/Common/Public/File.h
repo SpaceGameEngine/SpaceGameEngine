@@ -645,6 +645,33 @@ namespace SpaceGameEngine
 		inline static const TChar sm_pContent[] = SGE_TSTR("The UCS2File's size is invalid.");
 		static COMMON_API bool Judge(SizeType size);
 	};
+
+	template<>
+	class COMMON_API FileCore<char, UTF8Trait> : public BinaryFile
+	{
+	public:
+		using CharType = char;
+		using ValueType = char*;
+		using ConstValueType = const char*;
+		using ValueTrait = UTF8Trait;
+
+		FileCore();
+		FileCore(const Path& path, FileIOMode mode);
+
+		void Open(const Path& path, FileIOMode mode);
+
+		bool IsHasBomHeader() const;
+		void SetHasBomHeader(bool val);
+
+	private:
+		void ReadBomHeader();
+
+		void AddBomHeader();
+		void RemoveBomHeader();
+
+	private:
+		bool m_HasBomHeader;
+	};
 	/*!
 	@}
 	*/
