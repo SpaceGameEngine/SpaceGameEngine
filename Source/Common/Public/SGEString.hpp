@@ -709,6 +709,97 @@ namespace SpaceGameEngine
 		}
 
 		template<typename T, typename Trait = CharTrait<T>>
+		struct InvalidMultipleByteCharHeadError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The multiple byte char's head is invalid.");
+		};
+
+		template<typename T, typename Trait = CharTrait<T>>
+		struct InvalidMultipleByteCharError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The multiple byte char is invalid.");
+		};
+
+		template<typename T, typename Trait = CharTrait<T>>
+		struct InvalidMultipleByteStringError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The multiple byte string is invalid.");
+		};
+
+		template<>
+		struct InvalidMultipleByteCharHeadError<char, UTF8Trait>
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 char's head is invalid.");
+			inline static bool Judge(const char* pc)
+			{
+				if (!pc)
+					return true;
+				return static_cast<const UInt8>(*pc) > 0b11110111;
+			}
+		};
+
+		using InvalidUTF8CharHeadError = InvalidMultipleByteCharHeadError<char, UTF8Trait>;
+
+		template<>
+		struct InvalidMultipleByteCharError<char, UTF8Trait>
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 char is invalid.");
+			inline static Pair<bool, const char*> JudgeCharContent(const char* pc)
+			{
+				if (static_cast<const UInt8>(*pc) > 0b11110111)
+					return Pair<bool, const char*>(true, nullptr);
+				SizeType left_size = 0;
+				if (static_cast<const UInt8>(*pc) <= 0b01111111)
+					left_size = 0;
+				else if (static_cast<const UInt8>(*pc) <= 0b11011111)
+					left_size = 1;
+				else if (static_cast<const UInt8>(*pc) <= 0b11101111)
+					left_size = 2;
+				else if (static_cast<const UInt8>(*pc) <= 0b11110111)
+					left_size = 3;
+				pc += 1;
+				for (SizeType i = 0; i < left_size; ++i)
+				{
+					if ((static_cast<const UInt8>(*pc) & 0b11000000) != 0b10000000)
+						return Pair<bool, const char*>(true, nullptr);
+					pc += 1;
+				}
+				return Pair<bool, const char*>(false, pc);
+			}
+
+			inline static bool Judge(const char* pc)
+			{
+				if (!pc)
+					return true;
+				return JudgeCharContent(pc).m_First;
+			}
+		};
+
+		using InvalidUTF8CharError = InvalidMultipleByteCharError<char, UTF8Trait>;
+
+		template<>
+		struct InvalidMultipleByteStringError<char, UTF8Trait>
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 string is invalid.");
+			inline static bool Judge(const char* pstr)
+			{
+				if (!pstr)
+					return true;
+				while (*pstr)
+				{
+					auto res = InvalidMultipleByteCharError<char, UTF8Trait>::JudgeCharContent(pstr);
+					if (res.m_First)
+						return true;
+					else
+						pstr = res.m_Second;
+				}
+				return false;
+			}
+		};
+
+		using InvalidUTF8StringError = InvalidMultipleByteStringError<char, UTF8Trait>;
+
+		template<typename T, typename Trait = CharTrait<T>>
 		inline const T* GetNextMultipleByteChar(const T* ptr)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -722,6 +813,7 @@ namespace SpaceGameEngine
 		inline const char* GetNextMultipleByteChar<char, UTF8Trait>(const char* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
+			SGE_ASSERT(InvalidUTF8CharError, ptr);
 			if (static_cast<const UInt8>(*ptr) <= 0b01111111)
 				return ptr + 1;
 			else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
@@ -750,6 +842,7 @@ namespace SpaceGameEngine
 			{
 				ptr -= 1;
 			} while ((static_cast<const UInt8>(*ptr) & 0b11000000) == 0b10000000);
+			SGE_ASSERT(InvalidUTF8CharError, ptr);
 			return ptr;
 		}
 
@@ -770,6 +863,7 @@ namespace SpaceGameEngine
 		inline SizeType GetMultipleByteCharSize<char, UTF8Trait>(const char* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
+			SGE_ASSERT(InvalidUTF8CharHeadError, ptr);
 			if (static_cast<const UInt8>(*ptr) <= 0b01111111)
 				return 1;
 			else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
@@ -790,9 +884,63 @@ namespace SpaceGameEngine
 			return 0;
 		}
 
+		struct InvalidUTF8CharForUCS2CharError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 char is invalid for UCS2 char.");
+			inline static Pair<bool, const char*> JudgeCharContent(const char* pc)
+			{
+				if (static_cast<const UInt8>(*pc) > 0b11110111)
+					return Pair<bool, const char*>(true, nullptr);
+				SizeType left_size = 0;
+				if (static_cast<const UInt8>(*pc) <= 0b01111111)
+					left_size = 0;
+				else if (static_cast<const UInt8>(*pc) <= 0b11011111)
+					left_size = 1;
+				else if (static_cast<const UInt8>(*pc) <= 0b11101111)
+					left_size = 2;
+				else if (static_cast<const UInt8>(*pc) <= 0b11110111)
+					return Pair<bool, const char*>(true, nullptr);
+				pc += 1;
+				for (SizeType i = 0; i < left_size; ++i)
+				{
+					if ((static_cast<const UInt8>(*pc) & 0b11000000) != 0b10000000)
+						return Pair<bool, const char*>(true, nullptr);
+					pc += 1;
+				}
+				return Pair<bool, const char*>(false, pc);
+			}
+
+			inline static bool Judge(const char* pc)
+			{
+				if (!pc)
+					return true;
+				return JudgeCharContent(pc).m_First;
+			}
+		};
+
+		struct InvalidUTF8StringForUCS2StringError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 string is invalid for UCS2 string.");
+			inline static bool Judge(const char* pc)
+			{
+				if (!pc)
+					return true;
+				while (*pc)
+				{
+					auto res = InvalidUTF8CharForUCS2CharError::JudgeCharContent(pc);
+					if (res.m_First)
+						return true;
+					else
+						pc = res.m_Second;
+				}
+				return false;
+			}
+		};
+
 		inline Char16 UTF8CharToUCS2Char(const char* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
+			SGE_ASSERT(InvalidUTF8CharForUCS2CharError, ptr);
 			if (static_cast<const UInt8>(*ptr) <= 0b01111111)
 				return *ptr;
 			else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
@@ -855,6 +1003,8 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr1);
 			SGE_ASSERT(NullPointerError, ptr2);
+			SGE_ASSERT(InvalidUTF8CharError, ptr1);
+			SGE_ASSERT(InvalidUTF8CharError, ptr2);
 			Char16 c1 = UTF8CharToUCS2Char(ptr1);
 			Char16 c2 = UTF8CharToUCS2Char(ptr2);
 			if (c1 < c2)
@@ -864,6 +1014,66 @@ namespace SpaceGameEngine
 			else if (c1 > c2)
 				return 1;
 		}
+
+		template<typename T, typename Trait = CharTrait<T>>
+		struct InvalidCharError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The char is invalid.");
+			inline static bool Judge(T c)
+			{
+				return false;
+			}
+		};
+
+		template<>
+		struct InvalidCharError<Char16, UCS2Trait>
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UCS2 char is invalid.");
+			inline static bool Judge(Char16 c)
+			{
+				return false;
+			}
+		};
+
+		template<>
+		struct InvalidCharError<char, UTF8Trait>
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 char is invalid.");
+			inline static bool Judge(const char* pc)
+			{
+				return InvalidMultipleByteCharError<char, UTF8Trait>::Judge(pc);
+			}
+		};
+
+		template<typename T, typename Trait = CharTrait<T>>
+		struct InvalidStringError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The string is invalid.");
+			inline static bool Judge(const T* pstr)
+			{
+				return pstr == nullptr;
+			}
+		};
+
+		template<>
+		struct InvalidStringError<Char16, UCS2Trait>
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UCS2 string is invalid.");
+			inline static bool Judge(const Char16* pstr)
+			{
+				return pstr == nullptr;
+			}
+		};
+
+		template<>
+		struct InvalidStringError<char, UTF8Trait>
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 string is invalid.");
+			inline static bool Judge(const char* pstr)
+			{
+				return InvalidMultipleByteStringError<char, UTF8Trait>::Judge(pstr);
+			}
+		};
 
 		template<typename T>
 		struct MakeCharTypeUnsigned
@@ -1288,6 +1498,8 @@ namespace SpaceGameEngine
 		inline static SizeType GetCStringSize(const T* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, ptr);
 			SizeType re = 0;
 			if constexpr (!Trait::IsMultipleByte)
 			{
@@ -1314,6 +1526,8 @@ namespace SpaceGameEngine
 		inline static SizeType GetCStringNormalSize(const T* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, ptr);
 			SizeType re = 0;
 			while ((*ptr) != static_cast<T>(0))
 			{
@@ -1353,6 +1567,8 @@ namespace SpaceGameEngine
 		inline StringCore(const T* ptr)
 			: m_Storage(ptr, GetCStringNormalSize(ptr) + 1), m_Size(GetCStringSize(ptr))
 		{
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, ptr);
 		}
 
 		inline StringCore(const SizeType size, ConstValueType val)
@@ -1419,6 +1635,8 @@ namespace SpaceGameEngine
 				SizeType i = 0;
 				for (auto iter = begin; iter != end; ++iter)
 				{
+					using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
+					SGE_ASSERT(_InvalidMultipleByteCharError, *iter);
 					memcpy(GetData() + i, *iter, StringImplement::GetMultipleByteCharSize<T, Trait>(*iter) * sizeof(T));
 					i += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
 				}
@@ -1461,6 +1679,8 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			SGE_ASSERT(SelfAssignmentError, GetData(), ptr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, ptr);
 			m_Storage = std::move(StringImplement::Storage<T, Allocator>(ptr, GetCStringNormalSize(ptr) + 1));
 			m_Size = GetCStringSize(ptr);
 			return *this;
@@ -1518,6 +1738,8 @@ namespace SpaceGameEngine
 		inline bool operator==(const T* ptr) const
 		{
 			SGE_ASSERT(NullPointerError, ptr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, ptr);
 			auto size = GetCStringNormalSize(ptr) + 1;
 			if (m_Storage.GetSize() != size)
 				return false;
@@ -1528,6 +1750,8 @@ namespace SpaceGameEngine
 		inline bool operator!=(const T* ptr) const
 		{
 			SGE_ASSERT(NullPointerError, ptr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, ptr);
 			auto size = GetCStringNormalSize(ptr) + 1;
 			if (m_Storage.GetSize() != size)
 				return true;
@@ -2132,8 +2356,25 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		struct InvalidCharAppendError
+		{
+			inline static const TChar sm_pContent[] = SGE_TSTR("The char appending is invalid.");
+			inline static bool Judge(const T c)
+			{
+				if constexpr (!Trait::IsMultipleByte)
+				{
+					return false;
+				}
+				else
+				{
+					return StringImplement::GetMultipleByteCharSize<T, Trait>(&c) != 1;
+				}
+			}
+		};
+
 		inline StringCore& operator+=(const T c)
 		{
+			SGE_ASSERT(InvalidCharAppendError, c);
 			SizeType nsize = GetNormalSize() + 1;
 			SizeType osize = GetNormalSize();
 			if (GetRealSize() < nsize)
@@ -2154,6 +2395,8 @@ namespace SpaceGameEngine
 		inline StringCore& operator+=(const T* pstr)
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			SizeType size = GetCStringNormalSize(pstr);
 			SizeType nsize = GetNormalSize() + size;
 			SizeType osize = GetNormalSize();
@@ -2185,6 +2428,7 @@ namespace SpaceGameEngine
 
 		inline StringCore operator+(const T c) const
 		{
+			SGE_ASSERT(InvalidCharAppendError, c);
 			StringCore re(*this);
 			re += c;
 			return re;
@@ -2193,6 +2437,8 @@ namespace SpaceGameEngine
 		inline StringCore operator+(const T* pstr) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			StringCore re(*this);
 			re += pstr;
 			return re;
@@ -2276,6 +2522,8 @@ namespace SpaceGameEngine
 		inline bool operator<(const T* pstr) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 
 			SizeType size = GetCStringSize(pstr);
 			if constexpr (!Trait::IsMultipleByte)
@@ -2391,6 +2639,8 @@ namespace SpaceGameEngine
 		inline bool operator>(const T* pstr) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 
 			SizeType size = GetCStringSize(pstr);
 			if constexpr (!Trait::IsMultipleByte)
@@ -2441,6 +2691,9 @@ namespace SpaceGameEngine
 
 		inline bool operator<=(const T* pstr) const
 		{
+			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			return StringCore::operator<(pstr) || StringCore::operator==(pstr);
 		}
 
@@ -2457,6 +2710,9 @@ namespace SpaceGameEngine
 
 		inline bool operator>=(const T* pstr) const
 		{
+			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			return StringCore::operator>(pstr) || StringCore::operator==(pstr);
 		}
 
@@ -2639,6 +2895,8 @@ namespace SpaceGameEngine
 		inline IteratorType Insert(const IteratorType& iter, const T* pstr)
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, (GetData()), (GetData()) + GetNormalSize());
@@ -2735,6 +2993,8 @@ namespace SpaceGameEngine
 			{
 				for (auto pbuf = begin; pbuf != end; ++pbuf)
 				{
+					using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
+					SGE_ASSERT(_InvalidMultipleByteCharError, *pbuf);
 					snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*pbuf);
 				}
 			}
@@ -2961,7 +3221,7 @@ namespace SpaceGameEngine
 			}
 		}
 
-		inline std::conditional_t<!Trait::IsMultipleByte, T, const T*> operator[](const SizeType i) const
+		inline std::conditional_t<!Trait::IsMultipleByte, const T, const T*> operator[](const SizeType i) const
 		{
 			SGE_ASSERT(InvalidValueError, i, 0, m_Size - 1);
 			if constexpr (!Trait::IsMultipleByte)
@@ -3114,6 +3374,8 @@ namespace SpaceGameEngine
 		inline Iterator Find(const T* pstr, const Iterator& begin, const Iterator& end) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
@@ -3148,6 +3410,8 @@ namespace SpaceGameEngine
 		inline ConstIterator Find(const T* pstr, const ConstIterator& begin, const ConstIterator& end) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
@@ -3318,6 +3582,8 @@ namespace SpaceGameEngine
 		inline Iterator ReverseFind(const T* pstr, const Iterator& begin, const Iterator& end) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			SGE_ASSERT(typename Iterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename Iterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
@@ -3352,6 +3618,8 @@ namespace SpaceGameEngine
 		inline ConstIterator ReverseFind(const T* pstr, const ConstIterator& begin, const ConstIterator& end) const
 		{
 			SGE_ASSERT(NullPointerError, pstr);
+			using _InvalidStringError = StringImplement::InvalidStringError<T, Trait>;
+			SGE_ASSERT(_InvalidStringError, pstr);
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, begin, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(typename ConstIterator::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
 			SGE_ASSERT(InvalidValueError, end - begin, 0, m_Size);
@@ -3418,6 +3686,8 @@ namespace SpaceGameEngine
 	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const char* pstr)
 	{
 		SGE_ASSERT(NullPointerError, pstr);
+		using _InvalidUTF8StringForUCS2StringError = StringImplement::InvalidUTF8StringForUCS2StringError;
+		SGE_ASSERT(_InvalidUTF8StringForUCS2StringError, pstr);
 		SizeType size = StringCore<char, UTF8Trait, Allocator>::GetCStringSize(pstr);
 		StringCore<Char16, UCS2Trait, Allocator> re(size, 0);
 		auto pdst = re.GetData();

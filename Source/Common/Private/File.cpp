@@ -1484,6 +1484,51 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::SetHasBomHeader(bool val)
 	}
 }
 
+void SpaceGameEngine::FileCore<char, UTF8Trait>::ReadChar(char* pc)
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(NullPointerError, pc);
+
+	Read(pc, sizeof(char));
+	SizeType left_size = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc) - 1;
+	if (left_size)
+		Read(pc + 1, left_size * sizeof(char));
+	using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
+	SGE_CHECK(_InvalidMultipleByteCharError, pc);
+}
+
+void SpaceGameEngine::FileCore<char, UTF8Trait>::WriteChar(const char* pc)
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(NullPointerError, pc);
+	using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
+	SGE_ASSERT(_InvalidMultipleByteCharError, pc);
+
+	Write(pc, StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc) * sizeof(char));
+}
+
+Int64 SpaceGameEngine::FileCore<char, UTF8Trait>::Seek(FilePositionOrigin origin, Int64 offset)
+{
+	SGE_ASSERT(InvalidFilePositionOriginError, origin);
+	if (origin == FilePositionOrigin::Begin)
+		SGE_ASSERT(InvalidValueError, offset, 0, INT64_MAX);
+	if (origin == FilePositionOrigin::End)
+		SGE_ASSERT(InvalidValueError, offset, -INT64_MAX, 0);
+
+	if (m_HasBomHeader)
+	{
+		if (origin == FilePositionOrigin::Begin)
+			offset += 3;
+		Int64 re = MoveFilePosition(origin, offset);
+		if (re < 3)
+			return 0;
+		else
+			return re - 3;
+	}
+	else
+		return MoveFilePosition(origin, offset);
+}
+
 void SpaceGameEngine::FileCore<char, UTF8Trait>::ReadBomHeader()
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);

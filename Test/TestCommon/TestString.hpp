@@ -1596,11 +1596,11 @@ TEST(StringCore, GetCStringNormalSize)
 
 TEST(StringCore, InstanceTest)
 {
-	StringCore<Char> s1;
+	StringCore<Char16, UCS2Trait> s1;
 	ASSERT_EQ(s1.GetSize(), 0);
-	StringCore<Char, CharTrait<Char>, StdAllocator> s2;
+	StringCore<Char16, UCS2Trait, StdAllocator> s2;
 	ASSERT_EQ(s2.GetSize(), 0);
-	StringCore<Char> s3(SGE_WSTR("这是12345abcde"));
+	StringCore<Char16, UCS2Trait> s3(SGE_WSTR("这是12345abcde"));
 	ASSERT_EQ(s3.GetSize(), 12);
 	ASSERT_EQ(memcmp(s3.GetData(), SGE_WSTR("这是12345abcde"), s3.GetSize() * sizeof(Char)), 0);
 	StringCore<char, UTF8Trait, StdAllocator> s4(u8"这是12345abcde");
@@ -1610,38 +1610,38 @@ TEST(StringCore, InstanceTest)
 
 TEST(StringCore, CopyConstructionTest)
 {
-	StringCore<Char> s1(SGE_WSTR("这是12345abcde"));
+	StringCore<Char16, UCS2Trait> s1(SGE_WSTR("这是12345abcde"));
 	ASSERT_EQ(s1.GetSize(), 12);
 	ASSERT_EQ(memcmp(s1.GetData(), SGE_WSTR("这是12345abcde"), s1.GetSize() * sizeof(Char)), 0);
 
-	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_WSTR("这是12345abcde"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s2(SGE_WSTR("这是12345abcde"));
 	ASSERT_EQ(s2.GetSize(), 12);
 	ASSERT_EQ(memcmp(s2.GetData(), SGE_WSTR("这是12345abcde"), s2.GetSize() * sizeof(Char)), 0);
 
-	StringCore<Char> s3(s1);
+	StringCore<Char16, UCS2Trait> s3(s1);
 	ASSERT_EQ(s3.GetSize(), 12);
 	ASSERT_EQ(memcmp(s3.GetData(), SGE_WSTR("这是12345abcde"), s3.GetSize() * sizeof(Char)), 0);
 
-	StringCore<Char> s4(std::move(s3));
+	StringCore<Char16, UCS2Trait> s4(std::move(s3));
 	ASSERT_EQ(s4.GetSize(), 12);
 	ASSERT_EQ(memcmp(s4.GetData(), SGE_WSTR("这是12345abcde"), s4.GetSize() * sizeof(Char)), 0);
 
-	StringCore<Char> s5(s2);
+	StringCore<Char16, UCS2Trait> s5(s2);
 	ASSERT_EQ(s5.GetSize(), 12);
 	ASSERT_EQ(memcmp(s5.GetData(), SGE_WSTR("这是12345abcde"), s5.GetSize() * sizeof(Char)), 0);
 
-	StringCore<Char, CharTrait<Char>, StdAllocator> s6(std::move(s5));
+	StringCore<Char16, UCS2Trait, StdAllocator> s6(std::move(s5));
 	ASSERT_EQ(s6.GetSize(), 12);
 	ASSERT_EQ(memcmp(s6.GetData(), SGE_WSTR("这是12345abcde"), s6.GetSize() * sizeof(Char)), 0);
 }
 
 TEST(StringCore, AssignmentTest)
 {
-	StringCore<Char> s(SGE_WSTR("test"));
+	StringCore<Char16, UCS2Trait> s(SGE_WSTR("test"));
 	ASSERT_EQ(s.GetSize(), 4);
 	ASSERT_EQ(memcmp(s.GetData(), SGE_WSTR("test"), sizeof(Char) * s.GetSize()), 0);
 
-	StringCore<Char> s2, s3;
+	StringCore<Char16, UCS2Trait> s2, s3;
 	ASSERT_EQ(s2.GetSize(), 0);
 
 	s2 = s;
@@ -1656,7 +1656,7 @@ TEST(StringCore, AssignmentTest)
 	ASSERT_EQ(s3.GetSize(), 4);
 	ASSERT_EQ(memcmp(s3.GetData(), SGE_WSTR("test"), sizeof(Char) * s3.GetSize()), 0);
 
-	StringCore<Char, CharTrait<Char>, StdAllocator> s4, s5;
+	StringCore<Char16, UCS2Trait, StdAllocator> s4, s5;
 	ASSERT_EQ(s4.GetSize(), 0);
 	ASSERT_EQ(s5.GetSize(), 0);
 
@@ -1670,7 +1670,7 @@ TEST(StringCore, AssignmentTest)
 	ASSERT_EQ(s5.GetSize(), 4);
 	ASSERT_EQ(memcmp(s5.GetData(), SGE_WSTR("test"), sizeof(Char) * s5.GetSize()), 0);
 
-	StringCore<Char> s6;
+	StringCore<Char16, UCS2Trait> s6;
 	ASSERT_EQ(s6.GetSize(), 0);
 
 	s6 = SGE_WSTR("测试");
@@ -1681,9 +1681,9 @@ TEST(StringCore, AssignmentTest)
 
 TEST(StringCore, EqualOperatorTest)
 {
-	StringCore<Char> s1(SGE_WSTR("这是个测试"));
-	StringCore<Char, CharTrait<Char>, StdAllocator> s2(SGE_WSTR("这是个测试"));
-	StringCore<Char> s3(SGE_WSTR("test"));
+	StringCore<Char16, UCS2Trait> s1(SGE_WSTR("这是个测试"));
+	StringCore<Char16, UCS2Trait, StdAllocator> s2(SGE_WSTR("这是个测试"));
+	StringCore<Char16, UCS2Trait> s3(SGE_WSTR("test"));
 
 	ASSERT_EQ(s1 == s2, true);
 	ASSERT_EQ(s1 != s2, false);
@@ -1696,7 +1696,7 @@ TEST(StringCore, EqualOperatorTest)
 
 TEST(StringCore, ClearTest)
 {
-	StringCore<Char> s(SGE_WSTR("test"));
+	StringCore<Char16, UCS2Trait> s(SGE_WSTR("test"));
 	ASSERT_EQ(s, SGE_WSTR("test"));
 	ASSERT_EQ(s.GetSize(), 4);
 	s.Clear();
@@ -1706,7 +1706,7 @@ TEST(StringCore, ClearTest)
 
 TEST(StringCore, GetNormalSizeTest)
 {
-	StringCore<Char> s1(SGE_WSTR("这是"));
+	StringCore<Char16, UCS2Trait> s1(SGE_WSTR("这是"));
 	ASSERT_EQ(s1, SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
 	ASSERT_EQ(s1.GetNormalSize(), 2);
@@ -1719,7 +1719,7 @@ TEST(StringCore, GetNormalSizeTest)
 
 TEST(StringCore, GetRealSizeTest)
 {
-	StringCore<Char> s1(SGE_WSTR("这是"));
+	StringCore<Char16, UCS2Trait> s1(SGE_WSTR("这是"));
 	ASSERT_EQ(s1, SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
 	ASSERT_EQ(s1.GetRealSize(), 2);
@@ -1732,7 +1732,7 @@ TEST(StringCore, GetRealSizeTest)
 
 TEST(StringCore, SetRealSizeTest)
 {
-	StringCore<Char> s1(SGE_WSTR("这是"));
+	StringCore<Char16, UCS2Trait> s1(SGE_WSTR("这是"));
 	ASSERT_EQ(s1, SGE_WSTR("这是"));
 	ASSERT_EQ(s1.GetSize(), 2);
 	ASSERT_EQ(s1.GetRealSize(), 2);

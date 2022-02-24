@@ -663,6 +663,18 @@ namespace SpaceGameEngine
 		bool IsHasBomHeader() const;
 		void SetHasBomHeader(bool val);
 
+		void ReadChar(char* pc);
+		void WriteChar(const char* pc);
+
+		/*!
+		@note When the file has bom header, the offset is not as same as the
+		MoveFilePosition's offset, but the offset starting from the bom header's
+		end, when the origin is FilePositionOrigin::Begin.
+		@return the offset starting from the bom header's end if the file has
+		bom header.
+		*/
+		Int64 Seek(FilePositionOrigin origin, Int64 offset);
+
 	private:
 		void ReadBomHeader();
 
