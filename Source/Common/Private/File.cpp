@@ -1278,15 +1278,20 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::SetEndian(Endian endian)
 	}
 }
 
-Char16 SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadChar()
+Pair<Char16, bool> SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadChar()
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
 
-	Char16 re;
-	Read(&re, sizeof(re));
-	if (m_Endian != GetSystemEndian())
-		ChangeEndian(re, GetSystemEndian(), m_Endian);
-	return re;
+	Char16 re = 0;
+	SizeType read_size = Read(&re, sizeof(re));
+	if (read_size)
+	{
+		if (m_Endian != GetSystemEndian())
+			ChangeEndian(re, GetSystemEndian(), m_Endian);
+		return Pair<Char16, bool>(re, true);
+	}
+	else
+		return Pair<Char16, bool>(0, false);
 }
 
 void SpaceGameEngine::FileCore<Char16, UCS2Trait>::WriteChar(Char16 c)
@@ -1369,7 +1374,7 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::AddBomHeader()
 		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
 		Read(pbuf, size);
 		MoveFilePosition(FilePositionOrigin::Begin, 0);
-		SetFileSize(0);
+		SetFileSize(sizeof(bom) + size);
 		Write(bom, sizeof(bom));
 		Write(pbuf, size);
 		DefaultAllocator::RawDelete(pbuf);
@@ -1394,7 +1399,7 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::RemoveBomHeader()
 		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
 		Read(pbuf, size);
 		MoveFilePosition(FilePositionOrigin::Begin, 0);
-		SetFileSize(0);
+		SetFileSize(size);
 		Write(pbuf, size);
 		DefaultAllocator::RawDelete(pbuf);
 	}
@@ -1429,14 +1434,14 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ChangeFileEndian(Endian dst, 
 			ChangeEndian(pbuf[i], dst, src);
 		}
 		MoveFilePosition(FilePositionOrigin::Begin, 0);
-		SetFileSize(0);
+		SetFileSize(size);
 		Write(pbuf, size);
 		DefaultAllocator::RawDelete(pbuf);
 		MoveFilePosition(FilePositionOrigin::Begin, fp);
 	}
 }
 
-bool InvalidUCS2FileSizeError::Judge(SizeType size)
+bool SpaceGameEngine::InvalidUCS2FileSizeError::Judge(SizeType size)
 {
 	return size % 2 == 1;
 }
@@ -1484,17 +1489,23 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::SetHasBomHeader(bool val)
 	}
 }
 
-void SpaceGameEngine::FileCore<char, UTF8Trait>::ReadChar(char* pc)
+char* SpaceGameEngine::FileCore<char, UTF8Trait>::ReadChar(char* pc)
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
 	SGE_ASSERT(NullPointerError, pc);
 
-	Read(pc, sizeof(char));
-	SizeType left_size = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc) - 1;
-	if (left_size)
-		Read(pc + 1, left_size * sizeof(char));
-	using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
-	SGE_CHECK(_InvalidMultipleByteCharError, pc);
+	SizeType read_size = Read(pc, sizeof(char));
+	if (read_size)
+	{
+		SizeType left_size = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc) - 1;
+		if (left_size)
+			Read(pc + 1, left_size * sizeof(char));
+		using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
+		SGE_CHECK(_InvalidMultipleByteCharError, pc);
+		return pc + 1 + left_size;
+	}
+	else
+		return nullptr;
 }
 
 void SpaceGameEngine::FileCore<char, UTF8Trait>::WriteChar(const char* pc)
@@ -1558,7 +1569,7 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::AddBomHeader()
 		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
 		Read(pbuf, size);
 		MoveFilePosition(FilePositionOrigin::Begin, 0);
-		SetFileSize(0);
+		SetFileSize(sizeof(bom) + size);
 		Write(bom, sizeof(bom));
 		Write(pbuf, size);
 		DefaultAllocator::RawDelete(pbuf);
@@ -1582,7 +1593,7 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::RemoveBomHeader()
 		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
 		Read(pbuf, size);
 		MoveFilePosition(FilePositionOrigin::Begin, 0);
-		SetFileSize(0);
+		SetFileSize(size);
 		Write(pbuf, size);
 		DefaultAllocator::RawDelete(pbuf);
 	}
@@ -1595,4 +1606,24 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::RemoveBomHeader()
 		MoveFilePosition(FilePositionOrigin::Begin, fp - 3);
 	else
 		MoveFilePosition(FilePositionOrigin::Begin, 0);
+}
+
+bool SpaceGameEngine::UnknownFileLineBreakError::Judge(FileLineBreak flb)
+{
+	return flb == FileLineBreak::Unknown;
+}
+
+FileLineBreak SpaceGameEngine::GetSystemFileLineBreak()
+{
+#ifdef SGE_WINDOWS
+	return FileLineBreak::CRLF;
+//#elif defined(SGE_MACOS)
+//	return FileLineBreak::CR;
+//#elif defined(SGE_LINUX)
+//	return FileLineBreak::LF;
+#elif defined(SGE_UNIX)
+	return FileLineBreak::LF;
+#else
+#error this os has not been supported.
+#endif
 }

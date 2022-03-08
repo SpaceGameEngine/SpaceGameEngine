@@ -38,6 +38,7 @@ namespace SpaceGameEngine
 		using ValueType = T;
 		inline static constexpr const bool IsMultipleByte = false;
 		inline static constexpr const SizeType MaxValue = (1 << (sizeof(T) * 8)) - 1;
+		inline static constexpr const SizeType MaxMultipleByteSize = 1;
 	};
 
 	struct UCS2Trait
@@ -45,6 +46,7 @@ namespace SpaceGameEngine
 		using ValueType = Char16;
 		inline static constexpr const bool IsMultipleByte = false;
 		inline static constexpr const SizeType MaxValue = (1 << (sizeof(Char16) * 8)) - 1;
+		inline static constexpr const SizeType MaxMultipleByteSize = 1;
 	};
 
 	struct UTF8Trait
@@ -52,6 +54,7 @@ namespace SpaceGameEngine
 		using ValueType = char;
 		inline static constexpr const bool IsMultipleByte = true;
 		inline static constexpr const SizeType MaxValue = (1 << (sizeof(char) * 8)) - 1;
+		inline static constexpr const SizeType MaxMultipleByteSize = 4;
 	};
 
 	namespace StringImplement
@@ -4360,12 +4363,12 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename T, typename Trait>
+	template<typename T, typename Trait = CharTrait<T>>
 	struct IsNumericalCharacterCore
 	{
 	};
 
-	template<typename T, typename Trait, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
+	template<typename T, typename Trait = CharTrait<T>, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
 	inline bool IsNumericalCharacter(ArgType c)
 	{
 		return IsNumericalCharacterCore<T, Trait>::Get(c);
@@ -4386,6 +4389,7 @@ namespace SpaceGameEngine
 		inline static bool Get(const char* pc)
 		{
 			SGE_ASSERT(NullPointerError, pc);
+			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);
 			return (*pc) >= SGE_U8STR('0') && (*pc) <= SGE_U8STR('9');
 		}
 	};
@@ -4831,6 +4835,68 @@ namespace SpaceGameEngine
 		re.EmplaceBack(siter, eiter);
 		return re;
 	}
+
+	template<typename T, typename Trait = CharTrait<T>>
+	struct IsLineSeparatorCharacterCore
+	{
+	};
+
+	template<typename T, typename Trait = CharTrait<T>, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
+	inline bool IsLineSeparatorCharacter(ArgType c)
+	{
+		return IsLineSeparatorCharacterCore<T, Trait>::Get(c);
+	}
+
+	template<>
+	struct IsLineSeparatorCharacterCore<Char16, UCS2Trait>
+	{
+		inline static bool Get(Char16 c)
+		{
+			return c == SGE_WSTR('\n') || c == SGE_WSTR('\r');
+		}
+	};
+
+	template<>
+	struct IsLineSeparatorCharacterCore<char, UTF8Trait>
+	{
+		inline static bool Get(const char* pc)
+		{
+			SGE_ASSERT(NullPointerError, pc);
+			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);
+			return (*pc) == SGE_U8STR('\n') || (*pc) == SGE_U8STR('\r');
+		}
+	};
+
+	template<typename T, typename Trait = CharTrait<T>>
+	struct IsWordSeparatorCharacterCore
+	{
+	};
+
+	template<typename T, typename Trait = CharTrait<T>, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
+	inline bool IsWordSeparatorCharacter(ArgType c)
+	{
+		return IsWordSeparatorCharacterCore<T, Trait>::Get(c);
+	}
+
+	template<>
+	struct IsWordSeparatorCharacterCore<Char16, UCS2Trait>
+	{
+		inline static bool Get(Char16 c)
+		{
+			return c == SGE_WSTR(' ') || c == SGE_WSTR('\t') || c == SGE_WSTR('\n') || c == SGE_WSTR('\r');
+		}
+	};
+
+	template<>
+	struct IsWordSeparatorCharacterCore<char, UTF8Trait>
+	{
+		inline static bool Get(const char* pc)
+		{
+			SGE_ASSERT(NullPointerError, pc);
+			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);
+			return (*pc) == SGE_U8STR(' ') || (*pc) == SGE_U8STR('\t') || (*pc) == SGE_U8STR('\n') || (*pc) == SGE_U8STR('\r');
+		}
+	};
 
 	/*!
 	@}
