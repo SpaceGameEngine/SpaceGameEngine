@@ -4038,10 +4038,10 @@ namespace SpaceGameEngine
 
 		inline static StringType Get(float value, SizeType precision = 4)
 		{
-			Int64 integer = (Int64)round(value);
-			StringType re = ToString<StringType, Int64>(integer);
 			if (precision != 0)
 			{
+				Int64 integer = (Int64)value;
+				StringType re = ToString<StringType, Int64>(integer);
 				re += SGE_WSTR('.');
 				value -= (float)integer;
 				if (value < 0.0f)
@@ -4055,8 +4055,10 @@ namespace SpaceGameEngine
 				if (decimal_str.GetSize() < precision)
 					re += StringType(precision - decimal_str.GetSize(), SGE_WSTR('0'));
 				re += decimal_str;
+				return re;
 			}
-			return re;
+			else
+				return ToString<StringType, Int64>((Int64)round(value));
 		}
 	};
 
@@ -4067,10 +4069,10 @@ namespace SpaceGameEngine
 
 		inline static StringType Get(double value, SizeType precision = 6)
 		{
-			Int64 integer = (Int64)round(value);
-			StringType re = ToString<StringType, Int64>(integer);
 			if (precision != 0)
 			{
+				Int64 integer = (Int64)value;
+				StringType re = ToString<StringType, Int64>(integer);
 				re += SGE_WSTR('.');
 				value -= (double)integer;
 				if (value < 0.0)
@@ -4084,8 +4086,10 @@ namespace SpaceGameEngine
 				if (decimal_str.GetSize() < precision)
 					re += StringType(precision - decimal_str.GetSize(), SGE_WSTR('0'));
 				re += decimal_str;
+				return re;
 			}
-			return re;
+			else
+				return ToString<StringType, Int64>((Int64)round(value));
 		}
 	};
 
@@ -4316,10 +4320,10 @@ namespace SpaceGameEngine
 
 		inline static StringType Get(float value, SizeType precision = 4)
 		{
-			Int64 integer = (Int64)round(value);
-			StringType re = ToString<StringType, Int64>(integer);
 			if (precision != 0)
 			{
+				Int64 integer = (Int64)value;
+				StringType re = ToString<StringType, Int64>(integer);
 				re += SGE_U8STR('.');
 				value -= (float)integer;
 				if (value < 0.0f)
@@ -4333,8 +4337,10 @@ namespace SpaceGameEngine
 				if (decimal_str.GetSize() < precision)
 					re += StringType(precision - decimal_str.GetSize(), SGE_U8STR("0"));
 				re += decimal_str;
+				return re;
 			}
-			return re;
+			else
+				return ToString<StringType, Int64>((Int64)round(value));
 		}
 	};
 
@@ -4345,10 +4351,10 @@ namespace SpaceGameEngine
 
 		inline static StringType Get(double value, SizeType precision = 6)
 		{
-			Int64 integer = (Int64)round(value);
-			StringType re = ToString<StringType, Int64>(integer);
 			if (precision != 0)
 			{
+				Int64 integer = (Int64)value;
+				StringType re = ToString<StringType, Int64>(integer);
 				re += SGE_U8STR('.');
 				value -= (double)integer;
 				if (value < 0.0)
@@ -4362,8 +4368,10 @@ namespace SpaceGameEngine
 				if (decimal_str.GetSize() < precision)
 					re += StringType(precision - decimal_str.GetSize(), SGE_U8STR("0"));
 				re += decimal_str;
+				return re;
 			}
-			return re;
+			else
+				return ToString<StringType, Int64>((Int64)round(value));
 		}
 	};
 

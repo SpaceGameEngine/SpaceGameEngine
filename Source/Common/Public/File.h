@@ -794,6 +794,12 @@ namespace SpaceGameEngine
 
 	COMMON_API FileLineBreak GetSystemFileLineBreak();
 
+	struct EndLineType
+	{
+	};
+
+	inline constexpr const EndLineType EndLine;
+
 	template<typename T, typename Trait = CharTrait<T>>
 	class File : public FileCore<T, Trait>
 	{
@@ -934,9 +940,12 @@ namespace SpaceGameEngine
 						}
 					}
 				}
-				FileCore<T, Trait>::Seek(FilePositionOrigin::Begin, 0);
-				BinaryFile::SetFileSize(str_buffer.GetNormalSize() * sizeof(T));
-				BinaryFile::Write(str_buffer.GetData(), str_buffer.GetNormalSize() * sizeof(T));
+				if (str_buffer.GetNormalSize())
+				{
+					FileCore<T, Trait>::Seek(FilePositionOrigin::Begin, 0);
+					BinaryFile::SetFileSize(str_buffer.GetNormalSize() * sizeof(T));
+					BinaryFile::Write(str_buffer.GetData(), str_buffer.GetNormalSize() * sizeof(T));
+				}
 				FileCore<T, Trait>::Seek(FilePositionOrigin::Begin, fpos + fpos_offset);
 				m_FileLineBreak = flb;
 			}
@@ -1048,9 +1057,53 @@ namespace SpaceGameEngine
 		template<typename U>
 		inline File& operator>>(U& val)
 		{
+			SGE_ASSERT(FileIOModeNotReadError, BinaryFile::m_Mode);
 			StringCore<T, Trait> str = ReadWord();
 			if (str.GetSize())
 				val = StringTo<StringCore<T, Trait>, U>(str);
+			return *this;
+		}
+
+		template<typename Allocator>
+		inline File& operator>>(StringCore<T, Trait, Allocator>& val)
+		{
+			SGE_ASSERT(FileIOModeNotReadError, BinaryFile::m_Mode);
+			StringCore<T, Trait> str = ReadWord();
+			if (str.GetSize())
+				val = str;
+			return *this;
+		}
+
+		inline void WriteString(const StringCore<T, Trait>& str)
+		{
+			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);
+			for (auto iter = str.GetConstBegin(); iter != str.GetConstEnd(); ++iter)
+			{
+				FileCore<T, Trait>::WriteChar(*iter);
+			}
+		}
+
+		template<typename U>
+		inline File& operator<<(const U& val)
+		{
+			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);
+			WriteString(ToString<StringCore<T, Trait>, U>(val));
+			return *this;
+		}
+
+		template<typename Allocator>
+		inline File& operator<<(StringCore<T, Trait, Allocator>& val)
+		{
+			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);
+			WriteString(val);
+			return *this;
+		}
+
+		template<>
+		inline File& operator<<(const EndLineType& endl)
+		{
+			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);
+			WriteString(GetFileLineBreakString<T, Trait>(m_FileLineBreak));
 			return *this;
 		}
 

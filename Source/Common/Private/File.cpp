@@ -934,7 +934,7 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 {
 	SGE_ASSERT(InvalidFileIOModeError, mode);
 	SGE_ASSERT(FileIOModeUnknownError, mode);
-	if ((UInt8)(mode & FileIOMode::Read))
+	if (mode == FileIOMode::Read)
 		SGE_ASSERT(PathNotExistError, path);
 	if (path.IsExist())
 		SGE_ASSERT(PathNotFileError, path);
@@ -992,7 +992,7 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 	SGE_ASSERT(FileHandleOccupiedError, m_Handle);
 	SGE_ASSERT(InvalidFileIOModeError, mode);
 	SGE_ASSERT(FileIOModeUnknownError, mode);
-	if ((UInt8)(mode & FileIOMode::Read))
+	if (mode == FileIOMode::Read)
 		SGE_ASSERT(PathNotExistError, path);
 	if (path.IsExist())
 		SGE_ASSERT(PathNotFileError, path);

@@ -2186,6 +2186,179 @@ TEST(UCS2File, ReadOperatorTest)
 	ASSERT_FALSE(p_crlf.IsExist());
 }
 
+TEST(UCS2File, WriteStringTest)
+{
+	Path p_cr(SGE_STR("./TestData/TestCommon/TestFile/test_usc2_crww.txt"));
+	ASSERT_FALSE(p_cr.IsExist());
+	Path p_lf(SGE_STR("./TestData/TestCommon/TestFile/test_usc2_lfww.txt"));
+	ASSERT_FALSE(p_lf.IsExist());
+	Path p_crlf(SGE_STR("./TestData/TestCommon/TestFile/test_usc2_crlfww.txt"));
+	ASSERT_FALSE(p_crlf.IsExist());
+
+	Char16 test_str[] = SGE_WSTR("this is test 测试");
+	Char16 test_str2[] = SGE_WSTR("file end?");
+	Char16 cr[] = SGE_WSTR("\r");
+	Char16 crlf[] = SGE_WSTR("\r\n");
+	Char16 lf[] = SGE_WSTR("\n");
+
+	UCS2File output_file;
+	output_file.Open(p_cr, FileIOMode::Write);
+	output_file.SetEndian(Endian::Little);
+	output_file.WriteString(test_str);
+	output_file.WriteString(cr);
+	output_file.WriteString(test_str2);
+	output_file.Close();
+	ASSERT_TRUE(p_cr.IsExist());
+
+	output_file.Open(p_lf, FileIOMode::Write);
+	output_file.SetEndian(Endian::Little);
+	output_file.WriteString(test_str);
+	output_file.WriteString(lf);
+	output_file.WriteString(test_str2);
+	output_file.Close();
+	ASSERT_TRUE(p_lf.IsExist());
+
+	output_file.Open(p_crlf, FileIOMode::Write);
+	output_file.SetEndian(Endian::Little);
+	output_file.WriteString(test_str);
+	output_file.WriteString(crlf);
+	output_file.WriteString(test_str2);
+	output_file.Close();
+	ASSERT_TRUE(p_crlf.IsExist());
+
+	UCS2File file(p_cr, FileIOMode::Read);
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("测试"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("file"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("end?"));
+	file.Close();
+
+	file.Open(p_lf, FileIOMode::Read);
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("测试"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("file"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("end?"));
+	file.Close();
+
+	file.Open(p_crlf, FileIOMode::Read);
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("测试"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("file"));
+	ASSERT_EQ(file.ReadWord(), SGE_WSTR("end?"));
+	file.Close();
+
+	DeleteFile(p_cr);
+	ASSERT_FALSE(p_cr.IsExist());
+	DeleteFile(p_lf);
+	ASSERT_FALSE(p_lf.IsExist());
+	DeleteFile(p_crlf);
+	ASSERT_FALSE(p_crlf.IsExist());
+}
+
+TEST(UCS2File, WriteOperatorTest)
+{
+	Path p_cr(SGE_STR("./TestData/TestCommon/TestFile/test_usc2_crwo.txt"));
+	ASSERT_FALSE(p_cr.IsExist());
+	Path p_lf(SGE_STR("./TestData/TestCommon/TestFile/test_usc2_lfwo.txt"));
+	ASSERT_FALSE(p_lf.IsExist());
+	Path p_crlf(SGE_STR("./TestData/TestCommon/TestFile/test_usc2_crlfwo.txt"));
+	ASSERT_FALSE(p_crlf.IsExist());
+
+	UCS2File output_file;
+	output_file.Open(p_cr, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetEndian(Endian::Little);
+	output_file.SetFileLineBreak(FileLineBreak::CR);
+	output_file << 1 << SGE_WSTR(" ") << 1.5f << SGE_WSTR(" ") << 2.5f << EndLine;
+	output_file << SGE_WSTR("str") << EndLine;
+	output_file.Close();
+	ASSERT_TRUE(p_cr.IsExist());
+
+	output_file.Open(p_lf, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetEndian(Endian::Little);
+	output_file.SetFileLineBreak(FileLineBreak::LF);
+	output_file << 1 << SGE_WSTR(" ") << 1.5f << SGE_WSTR(" ") << 2.5f << EndLine;
+	output_file << SGE_WSTR("str") << EndLine;
+	output_file.Close();
+	ASSERT_TRUE(p_lf.IsExist());
+
+	output_file.Open(p_crlf, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetEndian(Endian::Little);
+	output_file.SetFileLineBreak(FileLineBreak::CRLF);
+	output_file << 1 << SGE_WSTR(" ") << 1.5f << SGE_WSTR(" ") << 2.5f << EndLine;
+	output_file << SGE_WSTR("str") << EndLine;
+	output_file.Close();
+	ASSERT_TRUE(p_crlf.IsExist());
+
+	int ival = 0;
+	float fval = 0.0f;
+	double dval = 0.0f;
+	UCS2String sval;
+	int uval = 5;
+
+	UCS2File file(p_cr, FileIOMode::Read);
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
+	ASSERT_FALSE(file >> uval);
+	ASSERT_EQ(ival, 1);
+	ASSERT_EQ(fval, 1.5f);
+	ASSERT_EQ(dval, 2.5);
+	ASSERT_EQ(sval, SGE_WSTR("str"));
+	ASSERT_EQ(uval, 5);
+	file.Close();
+
+	file.Open(p_lf, FileIOMode::Read);
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ival = 0;
+	fval = 0;
+	dval = 0;
+	sval.Clear();
+	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
+	ASSERT_FALSE(file >> uval);
+	ASSERT_EQ(ival, 1);
+	ASSERT_EQ(fval, 1.5f);
+	ASSERT_EQ(dval, 2.5);
+	ASSERT_EQ(sval, SGE_WSTR("str"));
+	ASSERT_EQ(uval, 5);
+	file.Close();
+
+	file.Open(p_crlf, FileIOMode::Read);
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ival = 0;
+	fval = 0;
+	dval = 0;
+	sval.Clear();
+	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
+	ASSERT_FALSE(file >> uval);
+	ASSERT_EQ(ival, 1);
+	ASSERT_EQ(fval, 1.5f);
+	ASSERT_EQ(dval, 2.5);
+	ASSERT_EQ(sval, SGE_WSTR("str"));
+	ASSERT_EQ(uval, 5);
+	file.Close();
+
+	DeleteFile(p_cr);
+	ASSERT_FALSE(p_cr.IsExist());
+	DeleteFile(p_lf);
+	ASSERT_FALSE(p_lf.IsExist());
+	DeleteFile(p_crlf);
+	ASSERT_FALSE(p_crlf.IsExist());
+}
+
 TEST(UTF8File, InstanceTest)
 {
 	UTF8File file;
@@ -2491,11 +2664,11 @@ TEST(UTF8File, ReadLineTest)
 
 TEST(UTF8File, ReadWordTest)
 {
-	Path p_cr(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crr.txt"));
+	Path p_cr(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crw.txt"));
 	ASSERT_FALSE(p_cr.IsExist());
-	Path p_lf(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_lfr.txt"));
+	Path p_lf(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_lfw.txt"));
 	ASSERT_FALSE(p_lf.IsExist());
-	Path p_crlf(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crlfr.txt"));
+	Path p_crlf(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crlfw.txt"));
 	ASSERT_FALSE(p_crlf.IsExist());
 
 	BinaryFile bf_output;
@@ -2613,6 +2786,180 @@ TEST(UTF8File, ReadOperatorTest)
 	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
 	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
 	bf_output.Close();
+	ASSERT_TRUE(p_crlf.IsExist());
+
+	int ival = 0;
+	float fval = 0.0f;
+	double dval = 0.0f;
+	UTF8String sval;
+	int uval = 5;
+
+	UTF8File file(p_cr, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
+	ASSERT_FALSE(file >> uval);
+	ASSERT_EQ(ival, 1);
+	ASSERT_EQ(fval, 1.5f);
+	ASSERT_EQ(dval, 2.5);
+	ASSERT_EQ(sval, SGE_U8STR("str"));
+	ASSERT_EQ(uval, 5);
+	file.Close();
+
+	file.Open(p_lf, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ival = 0;
+	fval = 0;
+	dval = 0;
+	sval.Clear();
+	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
+	ASSERT_FALSE(file >> uval);
+	ASSERT_EQ(ival, 1);
+	ASSERT_EQ(fval, 1.5f);
+	ASSERT_EQ(dval, 2.5);
+	ASSERT_EQ(sval, SGE_U8STR("str"));
+	ASSERT_EQ(uval, 5);
+	file.Close();
+
+	file.Open(p_crlf, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ival = 0;
+	fval = 0;
+	dval = 0;
+	sval.Clear();
+	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
+	ASSERT_FALSE(file >> uval);
+	ASSERT_EQ(ival, 1);
+	ASSERT_EQ(fval, 1.5f);
+	ASSERT_EQ(dval, 2.5);
+	ASSERT_EQ(sval, SGE_U8STR("str"));
+	ASSERT_EQ(uval, 5);
+	file.Close();
+
+	DeleteFile(p_cr);
+	ASSERT_FALSE(p_cr.IsExist());
+	DeleteFile(p_lf);
+	ASSERT_FALSE(p_lf.IsExist());
+	DeleteFile(p_crlf);
+	ASSERT_FALSE(p_crlf.IsExist());
+}
+
+TEST(UTF8File, WriteStringTest)
+{
+	Path p_cr(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crww.txt"));
+	ASSERT_FALSE(p_cr.IsExist());
+	Path p_lf(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_lfww.txt"));
+	ASSERT_FALSE(p_lf.IsExist());
+	Path p_crlf(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crlfww.txt"));
+	ASSERT_FALSE(p_crlf.IsExist());
+
+	UTF8File output_file;
+	char test_str[] = SGE_U8STR("this is test 测试");
+	char test_str2[] = SGE_U8STR("file end?");
+	char cr[] = SGE_U8STR("\r");
+	char crlf[] = SGE_U8STR("\r\n");
+	char lf[] = SGE_U8STR("\n");
+
+	output_file.Open(p_cr, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetHasBomHeader(true);
+	output_file.WriteString(test_str);
+	output_file.WriteString(cr);
+	output_file.WriteString(test_str2);
+	output_file.Close();
+	ASSERT_TRUE(p_cr.IsExist());
+
+	output_file.Open(p_lf, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetHasBomHeader(true);
+	output_file.WriteString(test_str);
+	output_file.WriteString(lf);
+	output_file.WriteString(test_str2);
+	output_file.Close();
+	ASSERT_TRUE(p_lf.IsExist());
+
+	output_file.Open(p_crlf, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetHasBomHeader(true);
+	output_file.WriteString(test_str);
+	output_file.WriteString(crlf);
+	output_file.WriteString(test_str2);
+	output_file.Close();
+	ASSERT_TRUE(p_crlf.IsExist());
+
+	UTF8File file(p_cr, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("测试"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("file"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("end?"));
+	file.Close();
+
+	file.Open(p_lf, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("测试"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("file"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("end?"));
+	file.Close();
+
+	file.Open(p_crlf, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("测试"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("file"));
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("end?"));
+	file.Close();
+
+	DeleteFile(p_cr);
+	ASSERT_FALSE(p_cr.IsExist());
+	DeleteFile(p_lf);
+	ASSERT_FALSE(p_lf.IsExist());
+	DeleteFile(p_crlf);
+	ASSERT_FALSE(p_crlf.IsExist());
+}
+
+TEST(UTF8File, WriteOperatorTest)
+{
+	Path p_cr(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crwo.txt"));
+	ASSERT_FALSE(p_cr.IsExist());
+	Path p_lf(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_lfwo.txt"));
+	ASSERT_FALSE(p_lf.IsExist());
+	Path p_crlf(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crlfwo.txt"));
+	ASSERT_FALSE(p_crlf.IsExist());
+
+	UTF8File output_file;
+
+	output_file.Open(p_cr, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetHasBomHeader(true);
+	output_file.SetFileLineBreak(FileLineBreak::CR);
+	output_file << 1 << SGE_U8STR(" ") << 1.5f << SGE_U8STR(" ") << 2.5f << EndLine;
+	output_file << SGE_U8STR("str") << EndLine;
+	output_file.Close();
+	ASSERT_TRUE(p_cr.IsExist());
+
+	output_file.Open(p_lf, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetHasBomHeader(true);
+	output_file.SetFileLineBreak(FileLineBreak::LF);
+	output_file << 1 << SGE_U8STR(" ") << 1.5f << SGE_U8STR(" ") << 2.5f << EndLine;
+	output_file << SGE_U8STR("str") << EndLine;
+	output_file.Close();
+	ASSERT_TRUE(p_lf.IsExist());
+
+	output_file.Open(p_crlf, FileIOMode::Read | FileIOMode::Write);
+	output_file.SetHasBomHeader(true);
+	output_file.SetFileLineBreak(FileLineBreak::CRLF);
+	output_file << 1 << SGE_U8STR(" ") << 1.5f << SGE_U8STR(" ") << 2.5f << EndLine;
+	output_file << SGE_U8STR("str") << EndLine;
+	output_file.Close();
 	ASSERT_TRUE(p_crlf.IsExist());
 
 	int ival = 0;
