@@ -840,7 +840,7 @@ namespace SpaceGameEngine
 				Int64 fpos_offset = 0;
 				if constexpr (!Trait::IsMultipleByte)
 				{
-					Pair<Char16, bool> buffer = FileCore<T, Trait>::ReadChar();
+					Pair<T, bool> buffer = FileCore<T, Trait>::ReadChar();
 					if (m_FileLineBreak != FileLineBreak::CRLF)
 					{
 						while (buffer.m_Second)
@@ -944,7 +944,7 @@ namespace SpaceGameEngine
 			StringCore<T, Trait> re;
 			if constexpr (!Trait::IsMultipleByte)
 			{
-				Pair<Char16, bool> buffer = FileCore<T, Trait>::ReadChar();
+				Pair<T, bool> buffer = FileCore<T, Trait>::ReadChar();
 				if (m_FileLineBreak != FileLineBreak::CRLF)
 				{
 					while (buffer.m_Second && SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer.m_First) != m_FileLineBreak)
@@ -1011,13 +1011,43 @@ namespace SpaceGameEngine
 			return re;
 		}
 
+		inline StringCore<T, Trait> ReadWord()
+		{
+			SGE_ASSERT(FileIOModeNotReadError, BinaryFile::m_Mode);
+			StringCore<T, Trait> re;
+			if constexpr (!Trait::IsMultipleByte)
+			{
+				Pair<T, bool> buffer = FileCore<T, Trait>::ReadChar();
+				while (buffer.m_Second && IsWordSeparatorCharacter<T, Trait>(buffer.m_First))
+					buffer = FileCore<T, Trait>::ReadChar();
+				while (buffer.m_Second && !IsWordSeparatorCharacter<T, Trait>(buffer.m_First))
+				{
+					re += buffer.m_First;
+					buffer = FileCore<T, Trait>::ReadChar();
+				}
+			}
+			else
+			{
+				T buffer[Trait::MaxMultipleByteSize];
+				bool is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
+				while (is_read && IsWordSeparatorCharacter<T, Trait>(buffer))
+					is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
+				while (is_read && !IsWordSeparatorCharacter<T, Trait>(buffer))
+				{
+					re += (T*)buffer;
+					is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
+				}
+			}
+			return re;
+		}
+
 	private:
 		inline void ReadFileLineBreak()
 		{
 			SGE_ASSERT(FileIOModeNotReadError, BinaryFile::m_Mode);
 			if constexpr (!Trait::IsMultipleByte)
 			{
-				Pair<Char16, bool> buffer(0, false);
+				Pair<T, bool> buffer(0, false);
 				do
 				{
 					buffer = FileCore<T, Trait>::ReadChar();
