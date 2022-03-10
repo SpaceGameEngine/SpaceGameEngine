@@ -1099,7 +1099,6 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		template<>
 		inline File& operator<<(const EndLineType& endl)
 		{
 			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);
