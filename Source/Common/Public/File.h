@@ -554,6 +554,7 @@ namespace SpaceGameEngine
 		@warning the size must >= current file position
 		*/
 		void SetFileSize(SizeType size);
+		FileIOMode GetFileIOMode() const;
 
 	protected:
 		FileHandle m_Handle;
@@ -616,7 +617,7 @@ namespace SpaceGameEngine
 		void SetEndian(Endian endian);
 
 		Pair<Char16, bool> ReadChar();
-		void WriteChar(Char16 c);
+		bool WriteChar(Char16 c);
 
 		/*!
 		@note When the file has bom header, the offset is not as same as the
@@ -664,7 +665,7 @@ namespace SpaceGameEngine
 		void SetHasBomHeader(bool val);
 
 		char* ReadChar(char* pc);
-		void WriteChar(const char* pc);
+		const char* WriteChar(const char* pc);
 
 		/*!
 		@note When the file has bom header, the offset is not as same as the
@@ -1054,6 +1055,11 @@ namespace SpaceGameEngine
 
 	using UCS2File = File<Char16, UCS2Trait>;
 	using UTF8File = File<char, UTF8Trait>;
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class COMMON_API File<Char16, UCS2Trait>;
+	template class COMMON_API File<char, UTF8Trait>;
+#endif
 	/*!
 	@}
 	*/

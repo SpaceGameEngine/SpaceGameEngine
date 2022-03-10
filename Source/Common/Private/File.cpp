@@ -1175,6 +1175,11 @@ void SpaceGameEngine::BinaryFile::SetFileSize(SizeType size)
 #endif
 }
 
+FileIOMode SpaceGameEngine::BinaryFile::GetFileIOMode() const
+{
+	return m_Mode;
+}
+
 bool SpaceGameEngine::FileHandleOccupiedError::Judge(FileHandle handle)
 {
 #ifdef SGE_WINDOWS
@@ -1294,13 +1299,16 @@ Pair<Char16, bool> SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadChar()
 		return Pair<Char16, bool>(0, false);
 }
 
-void SpaceGameEngine::FileCore<Char16, UCS2Trait>::WriteChar(Char16 c)
+bool SpaceGameEngine::FileCore<Char16, UCS2Trait>::WriteChar(Char16 c)
 {
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
 
 	if (m_Endian != GetSystemEndian())
 		ChangeEndian(c, m_Endian, GetSystemEndian());
-	Write(&c, sizeof(c));
+	if (Write(&c, sizeof(c)) == sizeof(c))
+		return true;
+	else
+		return false;
 }
 
 Int64 SpaceGameEngine::FileCore<Char16, UCS2Trait>::Seek(FilePositionOrigin origin, Int64 offset)
@@ -1508,14 +1516,18 @@ char* SpaceGameEngine::FileCore<char, UTF8Trait>::ReadChar(char* pc)
 		return nullptr;
 }
 
-void SpaceGameEngine::FileCore<char, UTF8Trait>::WriteChar(const char* pc)
+const char* SpaceGameEngine::FileCore<char, UTF8Trait>::WriteChar(const char* pc)
 {
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
 	SGE_ASSERT(NullPointerError, pc);
 	using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
 	SGE_ASSERT(_InvalidMultipleByteCharError, pc);
 
-	Write(pc, StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc) * sizeof(char));
+	SizeType mchar_size = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc);
+	if (Write(pc, mchar_size * sizeof(char)) == mchar_size * sizeof(char))
+		return pc + mchar_size;
+	else
+		return nullptr;
 }
 
 Int64 SpaceGameEngine::FileCore<char, UTF8Trait>::Seek(FilePositionOrigin origin, Int64 offset)

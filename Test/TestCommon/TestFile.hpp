@@ -1003,6 +1003,19 @@ TEST(BinaryFile, SetFileSizeTest)
 	ASSERT_FALSE(path.IsExist());
 }
 
+TEST(BinaryFile, GetFileIOModeTest)
+{
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt"));
+	ASSERT_TRUE(path.IsExist());
+
+	BinaryFile bf(path, FileIOMode::Read | FileIOMode::Write);
+	ASSERT_EQ(bf.GetFileIOMode(), FileIOMode::Read | FileIOMode::Write);
+	bf.Close();
+
+	const BinaryFile cbf(path, FileIOMode::Read);
+	ASSERT_EQ(cbf.GetFileIOMode(), FileIOMode::Read);
+}
+
 TEST(UCS2FileCore, InstanceTest)
 {
 	FileCore<Char16, UCS2Trait> file;
@@ -1294,13 +1307,13 @@ TEST(UCS2FileCore, WriteCharTest)
 	file.Open(p_le, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	file.WriteChar(test_data);
+	ASSERT_TRUE(file.WriteChar(test_data));
 	file.Close();
 
 	file.Open(p_be, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetEndian(), Endian::Big);
-	file.WriteChar(test_data);
+	ASSERT_TRUE(file.WriteChar(test_data));
 	file.Close();
 
 	Char16 test_data_input = 0;
@@ -1554,12 +1567,12 @@ TEST(UTF8FileCore, WriteCharTest)
 
 	FileCore<char, UTF8Trait> file(p_b, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	file.WriteChar(test_data);
+	ASSERT_EQ(file.WriteChar(test_data), test_data + (StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(test_data)));
 	file.Close();
 
 	file.Open(p_nb, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_FALSE(file.IsHasBomHeader());
-	file.WriteChar(test_data);
+	ASSERT_EQ(file.WriteChar(test_data), test_data + (StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(test_data)));
 	file.Close();
 
 	char test_data_input[sizeof(test_data) / sizeof(char)];
