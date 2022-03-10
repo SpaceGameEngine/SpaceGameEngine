@@ -2106,6 +2106,7 @@ TEST(UCS2File, ReadOperatorTest)
 	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char16));
 	bf_output.Write(cr, sizeof(cr) - sizeof(Char16));
 	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char16));
+	bf_output.Write(cr, sizeof(cr) - sizeof(Char16));
 	bf_output.Close();
 	ASSERT_TRUE(p_cr.IsExist());
 
@@ -2114,6 +2115,7 @@ TEST(UCS2File, ReadOperatorTest)
 	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char16));
 	bf_output.Write(lf, sizeof(lf) - sizeof(Char16));
 	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char16));
+	bf_output.Write(lf, sizeof(lf) - sizeof(Char16));
 	bf_output.Close();
 	ASSERT_TRUE(p_lf.IsExist());
 
@@ -2122,6 +2124,7 @@ TEST(UCS2File, ReadOperatorTest)
 	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char16));
 	bf_output.Write(crlf, sizeof(crlf) - sizeof(Char16));
 	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char16));
+	bf_output.Write(crlf, sizeof(crlf) - sizeof(Char16));
 	bf_output.Close();
 	ASSERT_TRUE(p_crlf.IsExist());
 
@@ -2590,6 +2593,7 @@ TEST(UTF8File, ReadOperatorTest)
 	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
 	bf_output.Write(cr, sizeof(cr) - sizeof(char));
 	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(cr, sizeof(cr) - sizeof(char));
 	bf_output.Close();
 	ASSERT_TRUE(p_cr.IsExist());
 
@@ -2598,6 +2602,7 @@ TEST(UTF8File, ReadOperatorTest)
 	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
 	bf_output.Write(lf, sizeof(lf) - sizeof(char));
 	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(lf, sizeof(lf) - sizeof(char));
 	bf_output.Close();
 	ASSERT_TRUE(p_lf.IsExist());
 
@@ -2606,6 +2611,7 @@ TEST(UTF8File, ReadOperatorTest)
 	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
 	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
 	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
 	bf_output.Close();
 	ASSERT_TRUE(p_crlf.IsExist());
 

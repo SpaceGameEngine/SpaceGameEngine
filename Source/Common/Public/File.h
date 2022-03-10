@@ -1050,7 +1050,7 @@ namespace SpaceGameEngine
 		{
 			StringCore<T, Trait> str = ReadWord();
 			if (str.GetSize())
-				val = StringTo<StringCore<T, Trait>, std::decay_t<U>>(str);
+				val = StringTo<StringCore<T, Trait>, U>(str);
 			return *this;
 		}
 
