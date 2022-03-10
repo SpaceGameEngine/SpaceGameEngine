@@ -3791,6 +3791,17 @@ namespace SpaceGameEngine
 		return ToStringCore<StringType, T>::Get(value, std::forward<Args>(args)...);
 	}
 
+	template<typename T, typename Trait, typename Allocator, typename OtherAllocator>
+	struct ToStringCore<StringCore<T, Trait, Allocator>, StringCore<T, Trait, OtherAllocator>>
+	{
+		using StringType = StringCore<T, Trait, Allocator>;
+
+		inline static StringType Get(const StringCore<T, Trait, OtherAllocator>& str)
+		{
+			return str;
+		}
+	};
+
 	enum class NumberBase : UInt8
 	{
 		Decimal = 10,
@@ -4575,6 +4586,17 @@ namespace SpaceGameEngine
 	{
 		return StringToCore<StringType, T>::Get(str);
 	}
+
+	template<typename T, typename Trait, typename Allocator, typename OtherAllocator>
+	struct StringToCore<StringCore<T, Trait, Allocator>, StringCore<T, Trait, OtherAllocator>>
+	{
+		using StringType = StringCore<T, Trait, Allocator>;
+
+		inline static StringCore<T, Trait, OtherAllocator> Get(const StringType& str)
+		{
+			return str;
+		}
+	};
 
 	template<typename Allocator, typename IntegerType>
 	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>

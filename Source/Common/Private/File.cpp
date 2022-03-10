@@ -920,9 +920,9 @@ bool SpaceGameEngine::InvalidFilePositionOriginError::Judge(FilePositionOrigin o
 
 SpaceGameEngine::BinaryFile::BinaryFile()
 #ifdef SGE_WINDOWS
-	: m_Handle(NULL), m_Mode(FileIOMode::Unknown)
+	: m_Handle(NULL), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true)
 #elif defined(SGE_POSIX)
-	: m_Handle(-1), m_Mode(FileIOMode::Unknown)
+	: m_Handle(-1), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true)
 #else
 #error this os has not been supported.
 #endif
@@ -930,7 +930,7 @@ SpaceGameEngine::BinaryFile::BinaryFile()
 }
 
 SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
-	: m_Mode(mode)
+	: m_Mode(mode), m_IsReadFinished((UInt8)(mode & FileIOMode::Read) ? false : true)
 {
 	SGE_ASSERT(InvalidFileIOModeError, mode);
 	SGE_ASSERT(FileIOModeUnknownError, mode);
@@ -998,6 +998,7 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 		SGE_ASSERT(PathNotFileError, path);
 	String astr = path.GetAbsolutePath().GetString();
 	m_Mode = mode;
+	m_IsReadFinished = ((UInt8)(mode & FileIOMode::Read) ? false : true);
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
 	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
@@ -1065,10 +1066,18 @@ SizeType SpaceGameEngine::BinaryFile::Read(void* pdst, SizeType size)
 #ifdef SGE_WINDOWS
 	DWORD buf = 0;
 	SGE_CHECK(ReadFileFailError, ReadFile(m_Handle, pdst, size, &buf, NULL));
+	if (buf != size)
+		m_IsReadFinished = true;
+	else
+		m_IsReadFinished = false;
 	return buf;
 #elif defined(SGE_POSIX)
 	ssize_t re = read(m_Handle, pdst, size);
 	SGE_CHECK(ReadFailError, re);
+	if (re != size)
+		m_IsReadFinished = true;
+	else
+		m_IsReadFinished = false;
 	return re;
 #else
 #error this os has not been supported.
@@ -1178,6 +1187,16 @@ void SpaceGameEngine::BinaryFile::SetFileSize(SizeType size)
 FileIOMode SpaceGameEngine::BinaryFile::GetFileIOMode() const
 {
 	return m_Mode;
+}
+
+bool SpaceGameEngine::BinaryFile::IsReadFinished() const
+{
+	return m_IsReadFinished;
+}
+
+SpaceGameEngine::BinaryFile::operator bool() const
+{
+	return !m_IsReadFinished;
 }
 
 bool SpaceGameEngine::FileHandleOccupiedError::Judge(FileHandle handle)

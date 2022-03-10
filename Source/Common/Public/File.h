@@ -556,9 +556,13 @@ namespace SpaceGameEngine
 		void SetFileSize(SizeType size);
 		FileIOMode GetFileIOMode() const;
 
+		bool IsReadFinished() const;
+		operator bool() const;
+
 	protected:
 		FileHandle m_Handle;
 		FileIOMode m_Mode;
+		bool m_IsReadFinished;
 	};
 
 	struct FileHandleOccupiedError
@@ -1039,6 +1043,15 @@ namespace SpaceGameEngine
 				}
 			}
 			return re;
+		}
+
+		template<typename U>
+		inline File& operator>>(U& val)
+		{
+			StringCore<T, Trait> str = ReadWord();
+			if (str.GetSize())
+				val = StringTo<StringCore<T, Trait>, std::decay_t<U>>(str);
+			return *this;
 		}
 
 	private:
