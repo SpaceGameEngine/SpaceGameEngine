@@ -1070,7 +1070,7 @@ namespace SpaceGameEngine
 			SGE_ASSERT(FileIOModeNotReadError, BinaryFile::m_Mode);
 			StringCore<T, Trait> str = ReadWord();
 			if (str.GetSize())
-				val = str;
+				val = std::move(str);
 			return *this;
 		}
 
