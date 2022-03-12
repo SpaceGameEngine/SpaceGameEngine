@@ -1,5 +1,8 @@
 ﻿# Space Game Engine
 
+## Cpp Version
+Use Cpp20
+
 ## CI Matrix
 
 We use [Azure Pipeline](https://azure.microsoft.com/en-us/services/devops/pipelines/) as our CI service.
@@ -53,7 +56,7 @@ We use [Azure Pipeline](https://azure.microsoft.com/en-us/services/devops/pipeli
   </tr>
   <tr>
     <td rowspan="4">Ubuntu 16.04</td>
-    <td rowspan="4">G++ 9</td>
+    <td rowspan="4">G++ 11</td>
     <td colspan="2">Debug</td>
     <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Ubuntu?branchName=master&jobName=Ubuntu_Debug"></td>
   </tr>
