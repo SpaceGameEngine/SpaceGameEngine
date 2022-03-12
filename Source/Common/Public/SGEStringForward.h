@@ -49,18 +49,19 @@ namespace SpaceGameEngine
 	using StdTString = std::wstring;
 #define StdTCin std::wcin
 #define StdTCout std::wcout
-#define StdToTString std::to_wstring
+#define StdToTString(x) std::to_wstring((x))
 	using TChar = wchar_t;
 #define SGE_TSTR_(str) L##str
 #else
 #ifdef SGE_CPP20
 	using StdTString = std::u8string;
+#define StdToTString(x) std::u8string((const char8_t*)std::to_string((x)).c_str())
 #else
 	using StdTString = std::string;
+#define StdToTString(x) std::to_string((x))
 #endif
 #define StdTCin std::cin
 #define StdTCout std::cout
-#define StdToTString std::to_string
 	using TChar = Char8;
 #define SGE_TSTR_(str) u8##str
 #endif
