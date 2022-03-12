@@ -34,12 +34,12 @@ namespace SpaceGameEngine
 
 	enum class MemoryOrder
 	{
-		Relaxed = std::memory_order_relaxed,
-		Consume = std::memory_order_consume,
-		Acquire = std::memory_order_acquire,
-		Release = std::memory_order_release,
-		AcquireRelease = std::memory_order_acq_rel,
-		SequentiallyConsistent = std::memory_order_seq_cst
+		Relaxed = (int)std::memory_order_relaxed,
+		Consume = (int)std::memory_order_consume,
+		Acquire = (int)std::memory_order_acquire,
+		Release = (int)std::memory_order_release,
+		AcquireRelease = (int)std::memory_order_acq_rel,
+		SequentiallyConsistent = (int)std::memory_order_seq_cst
 	};
 
 	inline constexpr MemoryOrder MemoryOrderRelaxed = MemoryOrder::Relaxed;
