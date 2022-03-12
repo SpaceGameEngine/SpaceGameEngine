@@ -1078,9 +1078,7 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);
 			for (auto iter = str.GetConstBegin(); iter != str.GetConstEnd(); ++iter)
-			{
 				FileCore<T, Trait>::WriteChar(*iter);
-			}
 		}
 
 		template<typename U>
