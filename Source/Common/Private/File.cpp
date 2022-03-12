@@ -176,7 +176,8 @@ SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
 	{
 #ifdef SGE_WINDOWS
 		const SizeType buf_size = 4096;
-		TChar out_buffer[buf_size] = SGE_TSTR("");
+		TChar out_buffer[buf_size];
+		memset(out_buffer, 0, sizeof(out_buffer));
 		SGE_CHECK(GetFullPathNameFailError, GetFullPathName(SGE_STR_TO_TSTR(m_Content).GetData(), buf_size, out_buffer, NULL), buf_size);
 		return Path(SGE_TSTR_TO_STR(out_buffer));
 #elif defined(SGE_POSIX)
@@ -250,7 +251,7 @@ SpaceGameEngine::Vector<SpaceGameEngine::Pair<SpaceGameEngine::Path, SpaceGameEn
 			pt = PathType::File;
 		else
 			pt = PathType::Unknown;
-		re.EmplaceBack(Pair<Path, PathType>(Path(astr + SGE_STR("/") + SGE_TSTR_TO_STR(pchild->d_name)), pt));
+		re.EmplaceBack(Pair<Path, PathType>(Path(astr + SGE_STR("/") + SGE_TSTR_TO_STR((const char8_t*)pchild->d_name)), pt));
 	}
 	SGE_CHECK(CloseDirFailError, closedir(pdir));
 #else
@@ -399,11 +400,12 @@ SpaceGameEngine::String SpaceGameEngine::NormalizeAbsolutePathString(const Strin
 SpaceGameEngine::Path SpaceGameEngine::GetCurrentDirectoryPath()
 {
 	const SizeType buf_size = 4096;
-	TChar out_buffer[buf_size] = SGE_TSTR("");
+	TChar out_buffer[buf_size];
+	memset(out_buffer, 0, sizeof(out_buffer));
 #ifdef SGE_WINDOWS
 	SGE_CHECK(GetCurrentDirectoryFailError, GetCurrentDirectory(buf_size, out_buffer), buf_size);
 #elif defined(SGE_POSIX)
-	SGE_CHECK(GetCWDFailError, getcwd(out_buffer, buf_size));
+	SGE_CHECK(GetCWDFailError, getcwd((char*)out_buffer, buf_size));
 #else
 #error this os has not been supported.
 #endif
@@ -426,7 +428,8 @@ void SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
 SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 {
 	const SizeType buf_size = 4096;
-	TChar out_buffer[buf_size] = SGE_TSTR("");
+	TChar out_buffer[buf_size];
+	memset(out_buffer, 0, sizeof(out_buffer));
 #ifdef SGE_WINDOWS
 	SGE_CHECK(GetModuleFileNameFailError, GetModuleFileName(NULL, out_buffer, buf_size), buf_size);
 #elif defined(SGE_LINUX)
@@ -435,10 +438,11 @@ SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 	out_buffer[re_size] = SGE_TSTR('\0');
 #elif defined(SGE_MACOS)
 	uint32_t buf_size2 = buf_size;
-	TChar out_buffer2[buf_size] = SGE_TSTR("");
-	SGE_CHECK(NSGetExecutablePathFailError, _NSGetExecutablePath(out_buffer2, &buf_size2));
+	TChar out_buffer2[buf_size];
+	memset(out_buffer2, 0, sizeof(out_buffer2));
+	SGE_CHECK(NSGetExecutablePathFailError, _NSGetExecutablePath((char*)out_buffer2, &buf_size2));
 	out_buffer2[buf_size2] = SGE_TSTR('\0');
-	SGE_CHECK(RealPathFailError, realpath(out_buffer2, out_buffer));
+	SGE_CHECK(RealPathFailError, realpath((char*)out_buffer2, (char*)out_buffer));
 #else
 #error this os has not been supported.
 #endif
@@ -505,7 +509,7 @@ void SpaceGameEngine::CopyFile(const Path& dst, const Path& src, bool can_overwr
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	//no portable solution for unix platform to copy file, so use STL
-	SGE_CHECK(STLCopyFileFailError, std::filesystem::copy_file(std::filesystem::path(SGE_STR_TO_UTF8(sstr).GetData()), std::filesystem::path(SGE_STR_TO_UTF8(dstr).GetData()), (can_overwrite ? std::filesystem::copy_options::overwrite_existing : std::filesystem::copy_options::none)));
+	SGE_CHECK(STLCopyFileFailError, std::filesystem::copy_file(std::filesystem::path((const char*)SGE_STR_TO_UTF8(sstr).GetData()), std::filesystem::path((const char*)SGE_STR_TO_UTF8(dstr).GetData()), (can_overwrite ? std::filesystem::copy_options::overwrite_existing : std::filesystem::copy_options::none)));
 #else
 #error this os has not been supported.
 #endif

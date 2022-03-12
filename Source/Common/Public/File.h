@@ -396,7 +396,7 @@ namespace SpaceGameEngine
 					pt = PathType::File;
 				else
 					pt = PathType::Unknown;
-				callable(SGE_TSTR_TO_STR(pchild->d_name), pt);
+				callable(SGE_TSTR_TO_STR((const char8_t*)pchild->d_name), pt);
 			}
 			SGE_CHECK(CloseDirFailError, closedir(pdir));
 #else
