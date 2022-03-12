@@ -51,9 +51,9 @@ namespace SpaceGameEngine
 
 	struct UTF8Trait
 	{
-		using ValueType = char;
+		using ValueType = Char8;
 		inline static constexpr const bool IsMultipleByte = true;
-		inline static constexpr const SizeType MaxValue = (1 << (sizeof(char) * 8)) - 1;
+		inline static constexpr const SizeType MaxValue = (1 << (sizeof(Char8) * 8)) - 1;
 		inline static constexpr const SizeType MaxMultipleByteSize = 4;
 	};
 
@@ -730,10 +730,10 @@ namespace SpaceGameEngine
 		};
 
 		template<>
-		struct InvalidMultipleByteCharHeadError<char, UTF8Trait>
+		struct InvalidMultipleByteCharHeadError<Char8, UTF8Trait>
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 char's head is invalid.");
-			inline static bool Judge(const char* pc)
+			inline static bool Judge(const Char8* pc)
 			{
 				if (!pc)
 					return true;
@@ -741,16 +741,16 @@ namespace SpaceGameEngine
 			}
 		};
 
-		using InvalidUTF8CharHeadError = InvalidMultipleByteCharHeadError<char, UTF8Trait>;
+		using InvalidUTF8CharHeadError = InvalidMultipleByteCharHeadError<Char8, UTF8Trait>;
 
 		template<>
-		struct InvalidMultipleByteCharError<char, UTF8Trait>
+		struct InvalidMultipleByteCharError<Char8, UTF8Trait>
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 char is invalid.");
-			inline static Pair<bool, const char*> JudgeCharContent(const char* pc)
+			inline static Pair<bool, const Char8*> JudgeCharContent(const Char8* pc)
 			{
 				if (static_cast<const UInt8>(*pc) > 0b11110111)
-					return Pair<bool, const char*>(true, nullptr);
+					return Pair<bool, const Char8*>(true, nullptr);
 				SizeType left_size = 0;
 				if (static_cast<const UInt8>(*pc) <= 0b01111111)
 					left_size = 0;
@@ -764,13 +764,13 @@ namespace SpaceGameEngine
 				for (SizeType i = 0; i < left_size; ++i)
 				{
 					if ((static_cast<const UInt8>(*pc) & 0b11000000) != 0b10000000)
-						return Pair<bool, const char*>(true, nullptr);
+						return Pair<bool, const Char8*>(true, nullptr);
 					pc += 1;
 				}
-				return Pair<bool, const char*>(false, pc);
+				return Pair<bool, const Char8*>(false, pc);
 			}
 
-			inline static bool Judge(const char* pc)
+			inline static bool Judge(const Char8* pc)
 			{
 				if (!pc)
 					return true;
@@ -778,19 +778,19 @@ namespace SpaceGameEngine
 			}
 		};
 
-		using InvalidUTF8CharError = InvalidMultipleByteCharError<char, UTF8Trait>;
+		using InvalidUTF8CharError = InvalidMultipleByteCharError<Char8, UTF8Trait>;
 
 		template<>
-		struct InvalidMultipleByteStringError<char, UTF8Trait>
+		struct InvalidMultipleByteStringError<Char8, UTF8Trait>
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 string is invalid.");
-			inline static bool Judge(const char* pstr)
+			inline static bool Judge(const Char8* pstr)
 			{
 				if (!pstr)
 					return true;
 				while (*pstr)
 				{
-					auto res = InvalidMultipleByteCharError<char, UTF8Trait>::JudgeCharContent(pstr);
+					auto res = InvalidMultipleByteCharError<Char8, UTF8Trait>::JudgeCharContent(pstr);
 					if (res.m_First)
 						return true;
 					else
@@ -800,7 +800,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-		using InvalidUTF8StringError = InvalidMultipleByteStringError<char, UTF8Trait>;
+		using InvalidUTF8StringError = InvalidMultipleByteStringError<Char8, UTF8Trait>;
 
 		template<typename T, typename Trait = CharTrait<T>>
 		inline const T* GetNextMultipleByteChar(const T* ptr)
@@ -813,7 +813,7 @@ namespace SpaceGameEngine
 		}
 
 		template<>
-		inline const char* GetNextMultipleByteChar<char, UTF8Trait>(const char* ptr)
+		inline const Char8* GetNextMultipleByteChar<Char8, UTF8Trait>(const Char8* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			SGE_ASSERT(InvalidUTF8CharError, ptr);
@@ -838,7 +838,7 @@ namespace SpaceGameEngine
 		}
 
 		template<>
-		inline const char* GetPreviousMultipleByteChar<char, UTF8Trait>(const char* ptr)
+		inline const Char8* GetPreviousMultipleByteChar<Char8, UTF8Trait>(const Char8* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			do
@@ -863,7 +863,7 @@ namespace SpaceGameEngine
 		}
 
 		template<>
-		inline SizeType GetMultipleByteCharSize<char, UTF8Trait>(const char* ptr)
+		inline SizeType GetMultipleByteCharSize<Char8, UTF8Trait>(const Char8* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			SGE_ASSERT(InvalidUTF8CharHeadError, ptr);
@@ -890,10 +890,10 @@ namespace SpaceGameEngine
 		struct InvalidUTF8CharForUCS2CharError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 char is invalid for UCS2 char.");
-			inline static Pair<bool, const char*> JudgeCharContent(const char* pc)
+			inline static Pair<bool, const Char8*> JudgeCharContent(const Char8* pc)
 			{
 				if (static_cast<const UInt8>(*pc) > 0b11110111)
-					return Pair<bool, const char*>(true, nullptr);
+					return Pair<bool, const Char8*>(true, nullptr);
 				SizeType left_size = 0;
 				if (static_cast<const UInt8>(*pc) <= 0b01111111)
 					left_size = 0;
@@ -902,18 +902,18 @@ namespace SpaceGameEngine
 				else if (static_cast<const UInt8>(*pc) <= 0b11101111)
 					left_size = 2;
 				else if (static_cast<const UInt8>(*pc) <= 0b11110111)
-					return Pair<bool, const char*>(true, nullptr);
+					return Pair<bool, const Char8*>(true, nullptr);
 				pc += 1;
 				for (SizeType i = 0; i < left_size; ++i)
 				{
 					if ((static_cast<const UInt8>(*pc) & 0b11000000) != 0b10000000)
-						return Pair<bool, const char*>(true, nullptr);
+						return Pair<bool, const Char8*>(true, nullptr);
 					pc += 1;
 				}
-				return Pair<bool, const char*>(false, pc);
+				return Pair<bool, const Char8*>(false, pc);
 			}
 
-			inline static bool Judge(const char* pc)
+			inline static bool Judge(const Char8* pc)
 			{
 				if (!pc)
 					return true;
@@ -924,7 +924,7 @@ namespace SpaceGameEngine
 		struct InvalidUTF8StringForUCS2StringError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 string is invalid for UCS2 string.");
-			inline static bool Judge(const char* pc)
+			inline static bool Judge(const Char8* pc)
 			{
 				if (!pc)
 					return true;
@@ -940,7 +940,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-		inline Char16 UTF8CharToUCS2Char(const char* ptr)
+		inline Char16 UTF8CharToUCS2Char(const Char8* ptr)
 		{
 			SGE_ASSERT(NullPointerError, ptr);
 			SGE_ASSERT(InvalidUTF8CharForUCS2CharError, ptr);
@@ -970,7 +970,7 @@ namespace SpaceGameEngine
 		@brief Write the utf8 char to a existing memory according to the given ucs2 char.
 		@return The next utf8 char's address.
 		*/
-		inline char* UCS2CharToUTF8Char(const Char16 c, char* pdst)
+		inline Char8* UCS2CharToUTF8Char(const Char16 c, Char8* pdst)
 		{
 			SGE_ASSERT(NullPointerError, pdst);
 			if (c <= 0x7f)
@@ -1002,7 +1002,7 @@ namespace SpaceGameEngine
 		}
 
 		template<>
-		inline Int8 CompareMultipleByteChar<char, UTF8Trait>(const char* ptr1, const char* ptr2)
+		inline Int8 CompareMultipleByteChar<Char8, UTF8Trait>(const Char8* ptr1, const Char8* ptr2)
 		{
 			SGE_ASSERT(NullPointerError, ptr1);
 			SGE_ASSERT(NullPointerError, ptr2);
@@ -1039,12 +1039,12 @@ namespace SpaceGameEngine
 		};
 
 		template<>
-		struct InvalidCharError<char, UTF8Trait>
+		struct InvalidCharError<Char8, UTF8Trait>
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 char is invalid.");
-			inline static bool Judge(const char* pc)
+			inline static bool Judge(const Char8* pc)
 			{
-				return InvalidMultipleByteCharError<char, UTF8Trait>::Judge(pc);
+				return InvalidMultipleByteCharError<Char8, UTF8Trait>::Judge(pc);
 			}
 		};
 
@@ -1069,12 +1069,12 @@ namespace SpaceGameEngine
 		};
 
 		template<>
-		struct InvalidStringError<char, UTF8Trait>
+		struct InvalidStringError<Char8, UTF8Trait>
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The UTF8 string is invalid.");
-			inline static bool Judge(const char* pstr)
+			inline static bool Judge(const Char8* pstr)
 			{
-				return InvalidMultipleByteStringError<char, UTF8Trait>::Judge(pstr);
+				return InvalidMultipleByteStringError<Char8, UTF8Trait>::Judge(pstr);
 			}
 		};
 
@@ -1461,7 +1461,7 @@ namespace SpaceGameEngine
 	class StringCore;
 
 	template<typename Allocator = DefaultAllocator>
-	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr);
+	inline StringCore<Char8, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr);
 
 	template<typename T, typename Trait, typename Allocator>
 	class StringCore
@@ -1481,10 +1481,10 @@ namespace SpaceGameEngine
 		friend class StringCore;
 
 		template<typename _Allocator>
-		friend inline StringCore<char, UTF8Trait, _Allocator> UCS2StringToUTF8String(const StringCore<Char16, UCS2Trait, _Allocator>& str);
+		friend inline StringCore<Char8, UTF8Trait, _Allocator> UCS2StringToUTF8String(const StringCore<Char16, UCS2Trait, _Allocator>& str);
 
 		template<typename _Allocator>
-		friend inline StringCore<char, UTF8Trait, _Allocator> UCS2StringToUTF8String(const Char16* pstr);
+		friend inline StringCore<Char8, UTF8Trait, _Allocator> UCS2StringToUTF8String(const Char16* pstr);
 
 		struct EmptyStringCoreError
 		{
@@ -3659,18 +3659,18 @@ namespace SpaceGameEngine
 	};
 
 	using UCS2String = StringCore<Char16, UCS2Trait, DefaultAllocator>;
-	using UTF8String = StringCore<char, UTF8Trait, DefaultAllocator>;
+	using UTF8String = StringCore<Char8, UTF8Trait, DefaultAllocator>;
 	using String = UCS2String;
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API StringImplement::Storage<Char16, DefaultAllocator>;
-	template class COMMON_API StringImplement::Storage<char, DefaultAllocator>;
+	template class COMMON_API StringImplement::Storage<Char8, DefaultAllocator>;
 	template class COMMON_API StringCore<Char16, UCS2Trait, DefaultAllocator>;
-	template class COMMON_API StringCore<char, UTF8Trait, DefaultAllocator>;
+	template class COMMON_API StringCore<Char8, UTF8Trait, DefaultAllocator>;
 #endif
 
 	template<typename Allocator>
-	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const StringCore<char, UTF8Trait, Allocator>& str)
+	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const StringCore<Char8, UTF8Trait, Allocator>& str)
 	{
 		SizeType size = str.GetSize();
 		StringCore<Char16, UCS2Trait, Allocator> re(size, 0);
@@ -3680,18 +3680,18 @@ namespace SpaceGameEngine
 		{
 			*pdst = StringImplement::UTF8CharToUCS2Char(psrc);
 			pdst += 1;
-			psrc = StringImplement::GetNextMultipleByteChar<char, UTF8Trait>(psrc);
+			psrc = StringImplement::GetNextMultipleByteChar<Char8, UTF8Trait>(psrc);
 		}
 		return re;
 	}
 
 	template<typename Allocator = DefaultAllocator>
-	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const char* pstr)
+	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const Char8* pstr)
 	{
 		SGE_ASSERT(NullPointerError, pstr);
 		using _InvalidUTF8StringForUCS2StringError = StringImplement::InvalidUTF8StringForUCS2StringError;
 		SGE_ASSERT(_InvalidUTF8StringForUCS2StringError, pstr);
-		SizeType size = StringCore<char, UTF8Trait, Allocator>::GetCStringSize(pstr);
+		SizeType size = StringCore<Char8, UTF8Trait, Allocator>::GetCStringSize(pstr);
 		StringCore<Char16, UCS2Trait, Allocator> re(size, 0);
 		auto pdst = re.GetData();
 		auto psrc = pstr;
@@ -3699,13 +3699,13 @@ namespace SpaceGameEngine
 		{
 			*pdst = StringImplement::UTF8CharToUCS2Char(psrc);
 			pdst += 1;
-			psrc = StringImplement::GetNextMultipleByteChar<char, UTF8Trait>(psrc);
+			psrc = StringImplement::GetNextMultipleByteChar<Char8, UTF8Trait>(psrc);
 		}
 		return re;
 	}
 
 	template<typename Allocator>
-	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const StringCore<Char16, UCS2Trait, Allocator>& str)
+	inline StringCore<Char8, UTF8Trait, Allocator> UCS2StringToUTF8String(const StringCore<Char16, UCS2Trait, Allocator>& str)
 	{
 		SizeType nsize = 0;
 		SizeType size = str.GetSize();
@@ -3715,7 +3715,7 @@ namespace SpaceGameEngine
 			nsize += StringImplement::GetUCS2CharToUTF8CharSize(*psrc);
 			psrc += 1;
 		}
-		StringCore<char, UTF8Trait, Allocator> re(nsize, " ");
+		StringCore<Char8, UTF8Trait, Allocator> re(nsize, " ");
 		auto pdst = re.GetData();
 		psrc = str.GetData();
 		for (SizeType i = 0; i < size; i++)
@@ -3728,7 +3728,7 @@ namespace SpaceGameEngine
 	}
 
 	template<typename Allocator>
-	inline StringCore<char, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr)
+	inline StringCore<Char8, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr)
 	{
 		SGE_ASSERT(NullPointerError, pstr);
 		SizeType nsize = 0;
@@ -3739,7 +3739,7 @@ namespace SpaceGameEngine
 			nsize += StringImplement::GetUCS2CharToUTF8CharSize(*psrc);
 			psrc += 1;
 		}
-		StringCore<char, UTF8Trait, Allocator> re(nsize, " ");
+		StringCore<Char8, UTF8Trait, Allocator> re(nsize, " ");
 		auto pdst = re.GetData();
 		psrc = pstr;
 		for (SizeType i = 0; i < size; i++)
@@ -3762,7 +3762,7 @@ namespace SpaceGameEngine
 #define SGE_TSTR_TO_UTF8(str) SpaceGameEngine::UCS2StringToUTF8String(str)
 #else
 	template<typename Allocator = DefaultAllocator>
-	using TString = StringCore<char, UTF8Trait, Allocator>;
+	using TString = StringCore<Char8, UTF8Trait, Allocator>;
 
 #define SGE_UCS2_TO_TSTR(str) SpaceGameEngine::UCS2StringToUTF8String(str)
 #define SGE_UTF8_TO_TSTR(str) str
@@ -4096,11 +4096,11 @@ namespace SpaceGameEngine
 	//------------------------------------------------------------------
 
 	template<typename Allocator, typename IntegerType>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
 	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
-		inline static constexpr const char digits[201] =
+		inline static constexpr const Char8 digits[201] =
 			SGE_U8STR("00010203040506070809")
 				SGE_U8STR("10111213141516171819")
 					SGE_U8STR("20212223242526272829")
@@ -4112,7 +4112,7 @@ namespace SpaceGameEngine
 											SGE_U8STR("80818283848586878889")
 												SGE_U8STR("90919293949596979899");
 
-		inline static constexpr const char digits16[17] = SGE_U8STR("0123456789abcdef");
+		inline static constexpr const Char8 digits16[17] = SGE_U8STR("0123456789abcdef");
 
 		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
 		{
@@ -4124,7 +4124,7 @@ namespace SpaceGameEngine
 					const SizeType length = Digits<10>(value);
 					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
-					char* dst = re.GetData();
+					Char8* dst = re.GetData();
 					while (value >= 100)
 					{
 						UInt64 i = (value % 100) * 2;
@@ -4151,7 +4151,7 @@ namespace SpaceGameEngine
 					const SizeType length = Digits<2>(value);
 					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
-					char* dst = re.GetData();
+					Char8* dst = re.GetData();
 					while (value >= 2)
 					{
 						dst[next] = digits16[value % 2];
@@ -4167,7 +4167,7 @@ namespace SpaceGameEngine
 					const SizeType length = Digits<16>(value);
 					SizeType next = length - 1;
 					StringType re(length, SGE_U8STR(" "));
-					char* dst = re.GetData();
+					Char8* dst = re.GetData();
 					while (value >= 16)
 					{
 						dst[next] = digits16[value % 16];
@@ -4189,7 +4189,7 @@ namespace SpaceGameEngine
 						const SizeType length = Digits<10>(value) + 1;
 						SizeType next = length - 1;
 						StringType re(length, SGE_U8STR(" "));
-						char* dst = re.GetData();
+						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 100)
 						{
@@ -4217,7 +4217,7 @@ namespace SpaceGameEngine
 						const SizeType length = Digits<2>(value) + 1;
 						SizeType next = length - 1;
 						StringType re(length, SGE_U8STR(" "));
-						char* dst = re.GetData();
+						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 2)
 						{
@@ -4234,7 +4234,7 @@ namespace SpaceGameEngine
 						const SizeType length = Digits<16>(value) + 1;
 						SizeType next = length - 1;
 						StringType re(length, SGE_U8STR(" "));
-						char* dst = re.GetData();
+						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 16)
 						{
@@ -4254,7 +4254,7 @@ namespace SpaceGameEngine
 						const SizeType length = Digits<10>(value);
 						SizeType next = length - 1;
 						StringType re(length, SGE_U8STR(" "));
-						char* dst = re.GetData();
+						Char8* dst = re.GetData();
 						while (value >= 100)
 						{
 							UInt64 i = (value % 100) * 2;
@@ -4281,7 +4281,7 @@ namespace SpaceGameEngine
 						const SizeType length = Digits<2>(value);
 						SizeType next = length - 1;
 						StringType re(length, SGE_U8STR(" "));
-						char* dst = re.GetData();
+						Char8* dst = re.GetData();
 						while (value >= 2)
 						{
 							dst[next] = digits16[value % 2];
@@ -4297,7 +4297,7 @@ namespace SpaceGameEngine
 						const SizeType length = Digits<16>(value);
 						SizeType next = length - 1;
 						StringType re(length, SGE_U8STR(" "));
-						char* dst = re.GetData();
+						Char8* dst = re.GetData();
 						while (value >= 16)
 						{
 							dst[next] = digits16[value % 16];
@@ -4314,9 +4314,9 @@ namespace SpaceGameEngine
 	};
 
 	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, float>
+	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, float>
 	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
 		inline static StringType Get(float value, SizeType precision = 4)
 		{
@@ -4345,9 +4345,9 @@ namespace SpaceGameEngine
 	};
 
 	template<typename Allocator>
-	struct ToStringCore<StringCore<char, UTF8Trait, Allocator>, double>
+	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, double>
 	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
 		inline static StringType Get(double value, SizeType precision = 6)
 		{
@@ -4398,9 +4398,9 @@ namespace SpaceGameEngine
 	};
 
 	template<>
-	struct IsNumericalCharacterCore<char, UTF8Trait>
+	struct IsNumericalCharacterCore<Char8, UTF8Trait>
 	{
-		inline static bool Get(const char* pc)
+		inline static bool Get(const Char8* pc)
 		{
 			SGE_ASSERT(NullPointerError, pc);
 			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);
@@ -4713,9 +4713,9 @@ namespace SpaceGameEngine
 	//------------------------------------------------------------------
 
 	template<typename Allocator, typename IntegerType>
-	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
 	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
 		inline static IntegerType Get(const StringType& str)
 		{
@@ -4753,9 +4753,9 @@ namespace SpaceGameEngine
 	};
 
 	template<typename Allocator>
-	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, float>
+	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, float>
 	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
 		inline static float Get(const StringType& str)
 		{
@@ -4793,9 +4793,9 @@ namespace SpaceGameEngine
 	};
 
 	template<typename Allocator>
-	struct StringToCore<StringCore<char, UTF8Trait, Allocator>, double>
+	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, double>
 	{
-		using StringType = StringCore<char, UTF8Trait, Allocator>;
+		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
 		inline static double Get(const StringType& str)
 		{
@@ -4871,9 +4871,9 @@ namespace SpaceGameEngine
 	};
 
 	template<>
-	struct IsLineSeparatorCharacterCore<char, UTF8Trait>
+	struct IsLineSeparatorCharacterCore<Char8, UTF8Trait>
 	{
-		inline static bool Get(const char* pc)
+		inline static bool Get(const Char8* pc)
 		{
 			SGE_ASSERT(NullPointerError, pc);
 			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);
@@ -4902,9 +4902,9 @@ namespace SpaceGameEngine
 	};
 
 	template<>
-	struct IsWordSeparatorCharacterCore<char, UTF8Trait>
+	struct IsWordSeparatorCharacterCore<Char8, UTF8Trait>
 	{
-		inline static bool Get(const char* pc)
+		inline static bool Get(const Char8* pc)
 		{
 			SGE_ASSERT(NullPointerError, pc);
 			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);

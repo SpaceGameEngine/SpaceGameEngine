@@ -652,12 +652,12 @@ namespace SpaceGameEngine
 	};
 
 	template<>
-	class COMMON_API FileCore<char, UTF8Trait> : public BinaryFile
+	class COMMON_API FileCore<Char8, UTF8Trait> : public BinaryFile
 	{
 	public:
-		using CharType = char;
-		using ValueType = char*;
-		using ConstValueType = const char*;
+		using CharType = Char8;
+		using ValueType = Char8*;
+		using ConstValueType = const Char8*;
 		using ValueTrait = UTF8Trait;
 
 		FileCore();
@@ -668,8 +668,8 @@ namespace SpaceGameEngine
 		bool IsHasBomHeader() const;
 		void SetHasBomHeader(bool val);
 
-		char* ReadChar(char* pc);
-		const char* WriteChar(const char* pc);
+		Char8* ReadChar(Char8* pc);
+		const Char8* WriteChar(const Char8* pc);
 
 		/*!
 		@note When the file has bom header, the offset is not as same as the
@@ -732,9 +732,9 @@ namespace SpaceGameEngine
 	};
 
 	template<>
-	struct GetFileLineBreakCore<char, UTF8Trait>
+	struct GetFileLineBreakCore<Char8, UTF8Trait>
 	{
-		inline static FileLineBreak Get(const char* pc1, const char* pc2)
+		inline static FileLineBreak Get(const Char8* pc1, const Char8* pc2)
 		{
 			SGE_ASSERT(NullPointerError, pc1);
 			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc1);
@@ -778,9 +778,9 @@ namespace SpaceGameEngine
 	};
 
 	template<typename Allocator>
-	struct GetFileLineBreakStringCore<char, UTF8Trait, Allocator>
+	struct GetFileLineBreakStringCore<Char8, UTF8Trait, Allocator>
 	{
-		inline static StringCore<char, UTF8Trait, Allocator> Get(FileLineBreak flb)
+		inline static StringCore<Char8, UTF8Trait, Allocator> Get(FileLineBreak flb)
 		{
 			SGE_ASSERT(UnknownFileLineBreakError, flb);
 			if (flb == FileLineBreak::CR)
@@ -1147,11 +1147,11 @@ namespace SpaceGameEngine
 	};
 
 	using UCS2File = File<Char16, UCS2Trait>;
-	using UTF8File = File<char, UTF8Trait>;
+	using UTF8File = File<Char8, UTF8Trait>;
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API File<Char16, UCS2Trait>;
-	template class COMMON_API File<char, UTF8Trait>;
+	template class COMMON_API File<Char8, UTF8Trait>;
 #endif
 	/*!
 	@}
