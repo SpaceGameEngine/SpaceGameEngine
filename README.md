@@ -33,23 +33,23 @@ We use [Azure Pipeline](https://azure.microsoft.com/en-us/services/devops/pipeli
     <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2019_x86_Release"></td>
   </tr>
   <tr>
-    <td rowspan="4">Visual Studio 2017</td>
+    <td rowspan="4">Visual Studio 2022</td>
     <td rowspan="2">Debug</td>
     <td>x64</td>
-    <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2017_x64_Debug"></td>
+    <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2022_x64_Debug"></td>
   </tr>
   <tr>
     <td>x86</td>
-    <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2017_x86_Debug"></td>
+    <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2022_x86_Debug"></td>
   </tr>
   <tr>
     <td rowspan="2">Release</td>
     <td>x64</td>
-    <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2017_x64_Release"></td>
+    <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2022_x64_Release"></td>
   </tr>
   <tr>
     <td>x86</td>
-    <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2017_x86_Release"></td>
+    <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.Windows?branchName=master&jobName=VS2022_x86_Release"></td>
   </tr>
   <tr>
     <td rowspan="4">Ubuntu 16.04</td>
