@@ -19,6 +19,7 @@ limitations under the License.
 #ifdef SGE_POSIX
 #include <fcntl.h>
 #include <filesystem>
+#include <unistd.h>
 #endif
 
 #ifdef SGE_MACOS
@@ -717,6 +718,36 @@ bool SpaceGameEngine::RemoveDirectoryFailError::Judge(BOOL re)
 {
 	return re == 0;
 }
+
+bool SpaceGameEngine::FlushFileBuffersFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
+
+bool SpaceGameEngine::ReadFileFailError::Judge(BOOL re)
+{
+	return re == 0 && GetLastError() != ERROR_IO_PENDING;
+}
+
+bool SpaceGameEngine::WriteFileFailError::Judge(BOOL re)
+{
+	return re == 0 && GetLastError() != ERROR_IO_PENDING;
+}
+
+bool SpaceGameEngine::SetFilePointerExFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
+
+bool SpaceGameEngine::GetFileSizeExFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
+
+bool SpaceGameEngine::SetEndOfFileFailError::Judge(BOOL re)
+{
+	return re == 0;
+}
 #elif defined(SGE_POSIX)
 bool SpaceGameEngine::GetCWDFailError::Judge(char* re)
 {
@@ -782,6 +813,36 @@ bool SpaceGameEngine::RmdirFailError::Judge(int re)
 {
 	return re == -1;
 }
+
+bool SpaceGameEngine::FsyncFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::ReadFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::WriteFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::LSeekFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::FStatFailError::Judge(int re)
+{
+	return re == -1;
+}
+
+bool SpaceGameEngine::FTruncateFailError::Judge(int re)
+{
+	return re == -1;
+}
 #endif
 
 #ifdef SGE_LINUX
@@ -835,4 +896,765 @@ bool SpaceGameEngine::PathNotFileOrDirectoryError::Judge(const Path& path)
 bool SpaceGameEngine::PathNotFileOrDirectoryError::Judge(PathType ptype)
 {
 	return ptype != PathType::File && ptype != PathType::Directory;
+}
+
+FileIOMode SpaceGameEngine::operator|(const FileIOMode& m1, const FileIOMode& m2)
+{
+	return FileIOMode((UInt8)m1 | (UInt8)m2);
+}
+
+FileIOMode SpaceGameEngine::operator&(const FileIOMode& m1, const FileIOMode& m2)
+{
+	return FileIOMode((UInt8)m1 & (UInt8)m2);
+}
+
+bool SpaceGameEngine::InvalidFileIOModeError::Judge(FileIOMode mode)
+{
+	return (UInt8)mode > 7;
+}
+
+bool SpaceGameEngine::InvalidFilePositionOriginError::Judge(FilePositionOrigin origin)
+{
+	return (UInt8)origin > 2;
+}
+
+SpaceGameEngine::BinaryFile::BinaryFile()
+#ifdef SGE_WINDOWS
+	: m_Handle(NULL), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true)
+#elif defined(SGE_POSIX)
+	: m_Handle(-1), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true)
+#else
+#error this os has not been supported.
+#endif
+{
+}
+
+SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
+	: m_Mode(mode), m_IsReadFinished((UInt8)(mode & FileIOMode::Read) ? false : true)
+{
+	SGE_ASSERT(InvalidFileIOModeError, mode);
+	SGE_ASSERT(FileIOModeUnknownError, mode);
+	if (mode == FileIOMode::Read)
+		SGE_ASSERT(PathNotExistError, path);
+	if (path.IsExist())
+		SGE_ASSERT(PathNotFileError, path);
+	String astr = path.GetAbsolutePath().GetString();
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
+	SGE_CHECK(CreateFileFailError, m_Handle);
+#include "System/HideWindowsMacro.h"
+#elif defined(SGE_POSIX)
+	int oflag = 0;
+	if ((UInt8)(mode & FileIOMode::Read))
+	{
+		if ((UInt8)(mode & FileIOMode::Write))
+			oflag = O_RDWR;
+		else
+			oflag = O_RDONLY;
+	}
+	else
+		oflag = O_WRONLY;
+	if (mode != FileIOMode::Read)
+		oflag |= O_CREAT;
+	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
+	SGE_CHECK(OpenFailError, m_Handle);
+#else
+#error this os has not been supported.
+#endif
+	if ((mode & FileIOMode::Append) == FileIOMode::Append)
+		MoveFilePosition(FilePositionOrigin::End, 0);
+}
+
+SpaceGameEngine::BinaryFile::~BinaryFile()
+{
+#ifdef SGE_WINDOWS
+	if (m_Handle)
+	{
+		//if ((UInt8)(m_Mode & FileIOMode::Write))
+		//	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+		SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
+	}
+#elif defined(SGE_POSIX)
+	if (m_Handle > -1)
+	{
+		//if ((UInt8)(m_Mode & FileIOMode::Write))
+		//	SGE_CHECK(FsyncFailError, fsync(m_Handle));
+		SGE_CHECK(CloseFailError, close(m_Handle));
+	}
+#else
+#error this os has not been supported.
+#endif
+}
+
+void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
+{
+	SGE_ASSERT(FileHandleOccupiedError, m_Handle);
+	SGE_ASSERT(InvalidFileIOModeError, mode);
+	SGE_ASSERT(FileIOModeUnknownError, mode);
+	if (mode == FileIOMode::Read)
+		SGE_ASSERT(PathNotExistError, path);
+	if (path.IsExist())
+		SGE_ASSERT(PathNotFileError, path);
+	String astr = path.GetAbsolutePath().GetString();
+	m_Mode = mode;
+	m_IsReadFinished = ((UInt8)(mode & FileIOMode::Read) ? false : true);
+#ifdef SGE_WINDOWS
+#include "System/AllowWindowsMacro.h"
+	m_Handle = CreateFile(SGE_STR_TO_TSTR(astr).GetData(), ((UInt8)(mode & FileIOMode::Read) ? GENERIC_READ : 0) | ((UInt8)(mode & FileIOMode::Write) ? GENERIC_WRITE : 0), FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, ((mode == FileIOMode::Read) ? OPEN_EXISTING : OPEN_ALWAYS), FILE_ATTRIBUTE_NORMAL, NULL);
+	SGE_CHECK(CreateFileFailError, m_Handle);
+#include "System/HideWindowsMacro.h"
+#elif defined(SGE_POSIX)
+	int oflag = 0;
+	if ((UInt8)(mode & FileIOMode::Read))
+	{
+		if ((UInt8)(mode & FileIOMode::Write))
+			oflag = O_RDWR;
+		else
+			oflag = O_RDONLY;
+	}
+	else
+		oflag = O_WRONLY;
+	if (mode != FileIOMode::Read)
+		oflag |= O_CREAT;
+	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
+	SGE_CHECK(OpenFailError, m_Handle);
+#else
+#error this os has not been supported.
+#endif
+	if ((mode & FileIOMode::Append) == FileIOMode::Append)
+		MoveFilePosition(FilePositionOrigin::End, 0);
+}
+
+void SpaceGameEngine::BinaryFile::Close()
+{
+	SGE_ASSERT(FileHandleReleasedError, m_Handle);
+#ifdef SGE_WINDOWS
+	//if ((UInt8)(m_Mode & FileIOMode::Write))
+	//	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+	SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
+	m_Handle = NULL;
+#elif defined(SGE_POSIX)
+	//if ((UInt8)(m_Mode & FileIOMode::Write))
+	//	SGE_CHECK(FsyncFailError, fsync(m_Handle));
+	SGE_CHECK(CloseFailError, close(m_Handle));
+	m_Handle = -1;
+#else
+#error this os has not been supported.
+#endif
+}
+
+void SpaceGameEngine::BinaryFile::Flush()
+{
+	SGE_ASSERT(FileHandleReleasedError, m_Handle);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+#ifdef SGE_WINDOWS
+	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+#elif defined(SGE_POSIX)
+	SGE_CHECK(FsyncFailError, fsync(m_Handle));
+#else
+#error this os has not been supported.
+#endif
+}
+
+SizeType SpaceGameEngine::BinaryFile::Read(void* pdst, SizeType size)
+{
+	SGE_ASSERT(FileHandleReleasedError, m_Handle);
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(NullPointerError, pdst);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+#ifdef SGE_WINDOWS
+	DWORD buf = 0;
+	SGE_CHECK(ReadFileFailError, ReadFile(m_Handle, pdst, size, &buf, NULL));
+	if (buf != size)
+		m_IsReadFinished = true;
+	else
+		m_IsReadFinished = false;
+	return buf;
+#elif defined(SGE_POSIX)
+	ssize_t re = read(m_Handle, pdst, size);
+	SGE_CHECK(ReadFailError, re);
+	if (re != size)
+		m_IsReadFinished = true;
+	else
+		m_IsReadFinished = false;
+	return re;
+#else
+#error this os has not been supported.
+#endif
+}
+
+SizeType SpaceGameEngine::BinaryFile::Write(const void* psrc, SizeType size)
+{
+	SGE_ASSERT(FileHandleReleasedError, m_Handle);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(NullPointerError, psrc);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+#ifdef SGE_WINDOWS
+	DWORD buf = 0;
+	SGE_CHECK(WriteFileFailError, WriteFile(m_Handle, psrc, size, &buf, NULL));
+	return buf;
+#elif defined(SGE_POSIX)
+	ssize_t re = write(m_Handle, psrc, size);
+	SGE_CHECK(WriteFailError, re);
+	return re;
+#else
+#error this os has not been supported.
+#endif
+}
+
+namespace
+{
+	using namespace SpaceGameEngine;
+#ifdef SGE_WINDOWS
+	DWORD GetSystemFilePositionOrigin(FilePositionOrigin origin)
+	{
+		if (origin == FilePositionOrigin::Begin)
+			return FILE_BEGIN;
+		else if (origin == FilePositionOrigin::Current)
+			return FILE_CURRENT;
+		else if (origin == FilePositionOrigin::End)
+			return FILE_END;
+	}
+#elif defined(SGE_POSIX)
+	int GetSystemFilePositionOrigin(FilePositionOrigin origin)
+	{
+		if (origin == FilePositionOrigin::Begin)
+			return SEEK_SET;
+		else if (origin == FilePositionOrigin::Current)
+			return SEEK_CUR;
+		else if (origin == FilePositionOrigin::End)
+			return SEEK_END;
+	}
+#endif
+}
+
+Int64 SpaceGameEngine::BinaryFile::MoveFilePosition(FilePositionOrigin origin, Int64 offset)
+{
+	SGE_ASSERT(FileHandleReleasedError, m_Handle);
+	SGE_ASSERT(InvalidFilePositionOriginError, origin);
+	if (origin == FilePositionOrigin::Begin)
+		SGE_ASSERT(InvalidValueError, offset, 0, INT64_MAX);
+	if (origin == FilePositionOrigin::End)
+		SGE_ASSERT(InvalidValueError, offset, -INT64_MAX, 0);
+#ifdef SGE_WINDOWS
+	LARGE_INTEGER buf;
+	LARGE_INTEGER input;
+	input.QuadPart = offset;
+	SGE_CHECK(SetFilePointerExFailError, SetFilePointerEx(m_Handle, input, &buf, GetSystemFilePositionOrigin(origin)));
+	return buf.QuadPart;
+#elif defined(SGE_POSIX)
+	off_t re = lseek(m_Handle, offset, GetSystemFilePositionOrigin(origin));
+	SGE_CHECK(LSeekFailError, re);
+	return re;
+#else
+#error this os has not been supported.
+#endif
+}
+
+SizeType SpaceGameEngine::BinaryFile::GetFileSize() const
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+#ifdef SGE_WINDOWS
+	LARGE_INTEGER re;
+	SGE_CHECK(GetFileSizeExFailError, GetFileSizeEx(m_Handle, &re));
+	return re.QuadPart;
+#elif defined(SGE_POSIX)
+	struct stat buf;
+	SGE_CHECK(FStatFailError, fstat(m_Handle, &buf));
+	return buf.st_size;
+#else
+#error this os has not been supported.
+#endif
+}
+
+void SpaceGameEngine::BinaryFile::SetFileSize(SizeType size)
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(InvalidValueError, static_cast<Int64>(size), MoveFilePosition(FilePositionOrigin::Current, 0), INT64_MAX);
+#ifdef SGE_WINDOWS
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	MoveFilePosition(FilePositionOrigin::Begin, size);
+	SGE_CHECK(SetEndOfFileFailError, SetEndOfFile(m_Handle));
+	MoveFilePosition(FilePositionOrigin::Begin, fp);
+#elif defined(SGE_POSIX)
+	SGE_CHECK(FTruncateFailError, ftruncate(m_Handle, static_cast<Int64>(size)));
+#else
+#error this os has not been supported.
+#endif
+}
+
+FileIOMode SpaceGameEngine::BinaryFile::GetFileIOMode() const
+{
+	return m_Mode;
+}
+
+bool SpaceGameEngine::BinaryFile::IsReadFinished() const
+{
+	return m_IsReadFinished;
+}
+
+SpaceGameEngine::BinaryFile::operator bool() const
+{
+	return !m_IsReadFinished;
+}
+
+bool SpaceGameEngine::FileHandleOccupiedError::Judge(FileHandle handle)
+{
+#ifdef SGE_WINDOWS
+	return handle != NULL;
+#elif defined(SGE_POSIX)
+	return handle != -1;
+#else
+#error this os has not been supported.
+#endif
+}
+
+bool SpaceGameEngine::FileHandleReleasedError::Judge(FileHandle handle)
+{
+#ifdef SGE_WINDOWS
+	return handle == NULL;
+#elif defined(SGE_POSIX)
+	return handle == -1;
+#else
+#error this os has not been supported.
+#endif
+}
+
+bool SpaceGameEngine::FileIOModeUnknownError::Judge(FileIOMode mode)
+{
+	return mode == FileIOMode::Unknown;
+}
+
+bool SpaceGameEngine::FileIOModeNotReadError::Judge(FileIOMode mode)
+{
+	return (UInt8)(mode & FileIOMode::Read) == 0;
+}
+
+bool SpaceGameEngine::FileIOModeNotWriteError::Judge(FileIOMode mode)
+{
+	return (UInt8)(mode & FileIOMode::Write) == 0;
+}
+
+SpaceGameEngine::FileCore<Char16, UCS2Trait>::FileCore()
+	: BinaryFile(), m_HasBomHeader(false), m_Endian(GetSystemEndian())
+{
+}
+
+SpaceGameEngine::FileCore<Char16, UCS2Trait>::FileCore(const Path& path, FileIOMode mode)
+	: BinaryFile(path, mode)
+{
+	if ((UInt8)(mode & FileIOMode::Read))
+		ReadBomHeader();
+	else
+	{
+		m_HasBomHeader = false;
+		m_Endian = GetSystemEndian();
+	}
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::Open(const Path& path, FileIOMode mode)
+{
+	BinaryFile::Open(path, mode);
+	if ((UInt8)(mode & FileIOMode::Read))
+		ReadBomHeader();
+	else
+	{
+		m_HasBomHeader = false;
+		m_Endian = GetSystemEndian();
+	}
+}
+
+bool SpaceGameEngine::FileCore<Char16, UCS2Trait>::IsHasBomHeader() const
+{
+	return m_HasBomHeader;
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::SetHasBomHeader(bool val)
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+
+	if (m_HasBomHeader != val)
+	{
+		if (m_HasBomHeader)
+			RemoveBomHeader();
+		else
+			AddBomHeader();
+		m_HasBomHeader = val;
+	}
+}
+
+Endian SpaceGameEngine::FileCore<Char16, UCS2Trait>::GetEndian() const
+{
+	return m_Endian;
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::SetEndian(Endian endian)
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(InvalidEndianError, endian);
+
+	if (m_Endian != endian)
+	{
+		ChangeFileEndian(endian, m_Endian);
+		m_Endian = endian;
+	}
+}
+
+Pair<Char16, bool> SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadChar()
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+
+	Char16 re = 0;
+	SizeType read_size = Read(&re, sizeof(re));
+	if (read_size)
+	{
+		if (m_Endian != GetSystemEndian())
+			ChangeEndian(re, GetSystemEndian(), m_Endian);
+		return Pair<Char16, bool>(re, true);
+	}
+	else
+		return Pair<Char16, bool>(0, false);
+}
+
+bool SpaceGameEngine::FileCore<Char16, UCS2Trait>::WriteChar(Char16 c)
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+
+	if (m_Endian != GetSystemEndian())
+		ChangeEndian(c, m_Endian, GetSystemEndian());
+	if (Write(&c, sizeof(c)) == sizeof(c))
+		return true;
+	else
+		return false;
+}
+
+Int64 SpaceGameEngine::FileCore<Char16, UCS2Trait>::Seek(FilePositionOrigin origin, Int64 offset)
+{
+	SGE_ASSERT(InvalidFilePositionOriginError, origin);
+	if (origin == FilePositionOrigin::Begin)
+		SGE_ASSERT(InvalidValueError, offset, 0, INT64_MAX);
+	if (origin == FilePositionOrigin::End)
+		SGE_ASSERT(InvalidValueError, offset, -INT64_MAX, 0);
+
+	if (m_HasBomHeader)
+	{
+		if (origin == FilePositionOrigin::Begin)
+			offset += 2;
+		Int64 re = MoveFilePosition(origin, offset);
+		if (re < 2)
+			return 0;
+		else
+			return re - 2;
+	}
+	else
+		return MoveFilePosition(origin, offset);
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadBomHeader()
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+
+	UInt8 bom[2] = {0, 0};
+	SGE_CHECK(InvalidUCS2FileSizeError, Read(bom, sizeof(bom)));
+	if (bom[0] == 0xff && bom[1] == 0xfe)
+	{
+		m_Endian = Endian::Little;
+		m_HasBomHeader = true;
+	}
+	else if (bom[0] == 0xfe && bom[1] == 0xff)
+	{
+		m_Endian = Endian::Big;
+		m_HasBomHeader = true;
+	}
+	else
+	{
+		m_Endian = GetSystemEndian();	 //can not judge, so use system endian
+		m_HasBomHeader = false;
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+	}
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::AddBomHeader()
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+
+	UInt8 bom[2] = {0, 0};
+	if (m_Endian == Endian::Little)
+	{
+		bom[0] = 0xff;
+		bom[1] = 0xfe;
+	}
+	else	//big endian
+	{
+		bom[0] = 0xfe;
+		bom[1] = 0xff;
+	}
+	SizeType size = GetFileSize();
+	SGE_CHECK(InvalidUCS2FileSizeError, size);
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	MoveFilePosition(FilePositionOrigin::Begin, 0);
+	if (size)
+	{
+		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
+		Read(pbuf, size);
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+		SetFileSize(sizeof(bom) + size);
+		Write(bom, sizeof(bom));
+		Write(pbuf, size);
+		DefaultAllocator::RawDelete(pbuf);
+	}
+	else
+		Write(bom, sizeof(bom));
+	MoveFilePosition(FilePositionOrigin::Begin, fp + 2);
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::RemoveBomHeader()
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+
+	SizeType size = GetFileSize();
+	SGE_CHECK(InvalidUCS2FileSizeError, size);
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	if (size > 2)
+	{
+		size -= 2;
+		MoveFilePosition(FilePositionOrigin::Begin, 2);
+		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
+		Read(pbuf, size);
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+		SetFileSize(size);
+		Write(pbuf, size);
+		DefaultAllocator::RawDelete(pbuf);
+	}
+	else
+	{
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+		SetFileSize(0);
+	}
+	if (fp > 1)
+		MoveFilePosition(FilePositionOrigin::Begin, fp - 2);
+	else
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+}
+
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ChangeFileEndian(Endian dst, Endian src)
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(InvalidEndianError, dst);
+	SGE_ASSERT(InvalidEndianError, src);
+
+	SizeType size = GetFileSize();
+	SGE_CHECK(InvalidUCS2FileSizeError, size);
+	if (size)
+	{
+		Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
+		Read(pbuf, size);
+		for (SizeType i = 0; i < size / sizeof(Char16); ++i)
+		{
+			ChangeEndian(pbuf[i], dst, src);
+		}
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+		SetFileSize(size);
+		Write(pbuf, size);
+		DefaultAllocator::RawDelete(pbuf);
+		MoveFilePosition(FilePositionOrigin::Begin, fp);
+	}
+}
+
+bool SpaceGameEngine::InvalidUCS2FileSizeError::Judge(SizeType size)
+{
+	return size % 2 == 1;
+}
+
+SpaceGameEngine::FileCore<char, UTF8Trait>::FileCore()
+	: BinaryFile(), m_HasBomHeader(false)
+{
+}
+
+SpaceGameEngine::FileCore<char, UTF8Trait>::FileCore(const Path& path, FileIOMode mode)
+	: BinaryFile(path, mode)
+{
+	if ((UInt8)(mode & FileIOMode::Read))
+		ReadBomHeader();
+	else
+		m_HasBomHeader = false;
+}
+
+void SpaceGameEngine::FileCore<char, UTF8Trait>::Open(const Path& path, FileIOMode mode)
+{
+	BinaryFile::Open(path, mode);
+	if ((UInt8)(mode & FileIOMode::Read))
+		ReadBomHeader();
+	else
+		m_HasBomHeader = false;
+}
+
+bool SpaceGameEngine::FileCore<char, UTF8Trait>::IsHasBomHeader() const
+{
+	return m_HasBomHeader;
+}
+
+void SpaceGameEngine::FileCore<char, UTF8Trait>::SetHasBomHeader(bool val)
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+
+	if (m_HasBomHeader != val)
+	{
+		if (m_HasBomHeader)
+			RemoveBomHeader();
+		else
+			AddBomHeader();
+		m_HasBomHeader = val;
+	}
+}
+
+char* SpaceGameEngine::FileCore<char, UTF8Trait>::ReadChar(char* pc)
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(NullPointerError, pc);
+
+	SizeType read_size = Read(pc, sizeof(char));
+	if (read_size)
+	{
+		SizeType left_size = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc) - 1;
+		if (left_size)
+			Read(pc + 1, left_size * sizeof(char));
+		using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
+		SGE_CHECK(_InvalidMultipleByteCharError, pc);
+		return pc + 1 + left_size;
+	}
+	else
+		return nullptr;
+}
+
+const char* SpaceGameEngine::FileCore<char, UTF8Trait>::WriteChar(const char* pc)
+{
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+	SGE_ASSERT(NullPointerError, pc);
+	using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
+	SGE_ASSERT(_InvalidMultipleByteCharError, pc);
+
+	SizeType mchar_size = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc);
+	if (Write(pc, mchar_size * sizeof(char)) == mchar_size * sizeof(char))
+		return pc + mchar_size;
+	else
+		return nullptr;
+}
+
+Int64 SpaceGameEngine::FileCore<char, UTF8Trait>::Seek(FilePositionOrigin origin, Int64 offset)
+{
+	SGE_ASSERT(InvalidFilePositionOriginError, origin);
+	if (origin == FilePositionOrigin::Begin)
+		SGE_ASSERT(InvalidValueError, offset, 0, INT64_MAX);
+	if (origin == FilePositionOrigin::End)
+		SGE_ASSERT(InvalidValueError, offset, -INT64_MAX, 0);
+
+	if (m_HasBomHeader)
+	{
+		if (origin == FilePositionOrigin::Begin)
+			offset += 3;
+		Int64 re = MoveFilePosition(origin, offset);
+		if (re < 3)
+			return 0;
+		else
+			return re - 3;
+	}
+	else
+		return MoveFilePosition(origin, offset);
+}
+
+void SpaceGameEngine::FileCore<char, UTF8Trait>::ReadBomHeader()
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+
+	UInt8 bom[3] = {0, 0, 0};
+	Read(bom, sizeof(bom));
+	if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf)
+		m_HasBomHeader = true;
+	else
+	{
+		m_HasBomHeader = false;
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+	}
+}
+
+void SpaceGameEngine::FileCore<char, UTF8Trait>::AddBomHeader()
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+
+	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
+	SizeType size = GetFileSize();
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	MoveFilePosition(FilePositionOrigin::Begin, 0);
+	if (size)
+	{
+		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
+		Read(pbuf, size);
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+		SetFileSize(sizeof(bom) + size);
+		Write(bom, sizeof(bom));
+		Write(pbuf, size);
+		DefaultAllocator::RawDelete(pbuf);
+	}
+	else
+		Write(bom, sizeof(bom));
+	MoveFilePosition(FilePositionOrigin::Begin, fp + 3);
+}
+
+void SpaceGameEngine::FileCore<char, UTF8Trait>::RemoveBomHeader()
+{
+	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
+	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
+
+	SizeType size = GetFileSize();
+	Int64 fp = MoveFilePosition(FilePositionOrigin::Current, 0);
+	if (size > 3)
+	{
+		size -= 3;
+		MoveFilePosition(FilePositionOrigin::Begin, 3);
+		Char16* pbuf = (Char16*)DefaultAllocator::RawNew(size, alignof(Char16));
+		Read(pbuf, size);
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+		SetFileSize(size);
+		Write(pbuf, size);
+		DefaultAllocator::RawDelete(pbuf);
+	}
+	else
+	{
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+		SetFileSize(0);
+	}
+	if (fp > 2)
+		MoveFilePosition(FilePositionOrigin::Begin, fp - 3);
+	else
+		MoveFilePosition(FilePositionOrigin::Begin, 0);
+}
+
+bool SpaceGameEngine::UnknownFileLineBreakError::Judge(FileLineBreak flb)
+{
+	return flb == FileLineBreak::Unknown;
+}
+
+FileLineBreak SpaceGameEngine::GetSystemFileLineBreak()
+{
+#ifdef SGE_WINDOWS
+	return FileLineBreak::CRLF;
+//#elif defined(SGE_MACOS)
+//	return FileLineBreak::CR;
+//#elif defined(SGE_LINUX)
+//	return FileLineBreak::LF;
+#elif defined(SGE_UNIX)
+	return FileLineBreak::LF;
+#else
+#error this os has not been supported.
+#endif
 }

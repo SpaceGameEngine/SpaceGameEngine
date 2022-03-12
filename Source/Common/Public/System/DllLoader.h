@@ -15,7 +15,6 @@ limitations under the License.
 */
 #pragma once
 #include "SGEString.hpp"
-#include "File.h"
 #ifdef SGE_WINDOWS
 #include <Windows.h>
 #elif defined(SGE_POSIX)
@@ -43,6 +42,12 @@ namespace SpaceGameEngine
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("Dll's name is empty.");
 		static COMMON_API bool Judge(const String& name);
+	};
+
+	struct EmptyDllPathError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Dll's path is empty.");
+		static COMMON_API bool Judge(const String& dll_path);
 	};
 
 	struct EmptySymbolError
@@ -75,7 +80,7 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const DllHandle& handle);
 	};
 
-	COMMON_API DllHandle LoadDll(const Path& dll_path);
+	COMMON_API DllHandle LoadDll(const String& dll_path);
 
 	COMMON_API void* GetAddressFromDll(const DllHandle& handle, const String& symbol);
 
@@ -85,7 +90,7 @@ namespace SpaceGameEngine
 	@brief get the dll's relative path which conform with the project rule.
 	@param dll_name the name of the dll(without any prefix or suffix).
 	*/
-	COMMON_API Path GetDllPath(const String& dll_name);
+	COMMON_API String GetDllPath(const String& dll_name);
 
 #ifdef SGE_WINDOWS
 #include "System/HideWindowsMacro.h"

@@ -19,6 +19,7 @@ limitations under the License.
 #include "Concurrent/Lock.h"
 #include "gtest/gtest.h"
 #include <unordered_map>
+#include <cstddef>
 
 using namespace SpaceGameEngine;
 
@@ -81,16 +82,16 @@ TEST(MemoryManager, InvalidAlignmentErrorTest)
 
 TEST(MemoryManager, GetDefaultAlignmentTest)
 {
-	ASSERT_EQ(GetDefaultAlignment(1), 4);
-	ASSERT_EQ(GetDefaultAlignment(2), 4);
-	ASSERT_EQ(GetDefaultAlignment(3), 4);
-	ASSERT_EQ(GetDefaultAlignment(4), 4);
-	ASSERT_EQ(GetDefaultAlignment(5), 4);
-	ASSERT_EQ(GetDefaultAlignment(6), 4);
-	ASSERT_EQ(GetDefaultAlignment(7), 4);
-	ASSERT_EQ(GetDefaultAlignment(8), 4);
-	ASSERT_EQ(GetDefaultAlignment(9), 4);
-	ASSERT_EQ(GetDefaultAlignment(15), 4);
+	ASSERT_EQ(GetDefaultAlignment(1), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(2), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(3), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(4), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(5), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(6), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(7), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(8), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(9), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(15), alignof(std::max_align_t));
 	ASSERT_EQ(GetDefaultAlignment(16), 16);
 	ASSERT_EQ(GetDefaultAlignment(17), 16);
 }

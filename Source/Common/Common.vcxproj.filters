@@ -177,6 +177,9 @@
     <ClInclude Include="Public\System\AllowWindowsMacro.h">
       <Filter>Public\System</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\Endian.h">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -223,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="Private\File.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Utility\Endian.cpp">
+      <Filter>Private\Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

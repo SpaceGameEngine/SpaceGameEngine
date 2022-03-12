@@ -24,6 +24,11 @@ bool SpaceGameEngine::EmptyDllNameError::Judge(const String& name)
 	return name.GetSize() == 0;
 }
 
+bool SpaceGameEngine::EmptyDllPathError::Judge(const String& dll_path)
+{
+	return dll_path.GetSize() == 0;
+}
+
 bool SpaceGameEngine::EmptySymbolError::Judge(const String& symbol)
 {
 	return symbol.GetSize() == 0;
@@ -67,16 +72,15 @@ bool SpaceGameEngine::NullDllHandleError::Judge(const DllHandle& handle)
 #endif
 }
 
-SpaceGameEngine::DllHandle SpaceGameEngine::LoadDll(const Path& dll_path)
+SpaceGameEngine::DllHandle SpaceGameEngine::LoadDll(const String& dll_path)
 {
-	SGE_ASSERT(PathNotExistError, dll_path);
-	SGE_ASSERT(PathNotFileError, dll_path);
+	SGE_ASSERT(EmptyDllPathError, dll_path);
 #ifdef SGE_WINDOWS
-	DllHandle re = LoadLibrary(SGE_STR_TO_TSTR(dll_path.GetAbsolutePath().GetString()).GetData());
+	DllHandle re = LoadLibrary(SGE_STR_TO_TSTR(dll_path).GetData());
 	SGE_CHECK(LoadDllFailedError, re);
 	return re;
 #elif defined(SGE_POSIX)
-	DllHandle re = dlopen(SGE_STR_TO_TSTR(dll_path.GetAbsolutePath().GetString()).GetData(), RTLD_NOW | RTLD_GLOBAL);
+	DllHandle re = dlopen(SGE_STR_TO_TSTR(dll_path).GetData(), RTLD_NOW | RTLD_GLOBAL);
 	SGE_CHECK(LoadDllFailedError, re);
 	return re;
 #else
@@ -113,7 +117,7 @@ void SpaceGameEngine::UnloadDll(const DllHandle& handle)
 #endif
 }
 
-SpaceGameEngine::Path SpaceGameEngine::GetDllPath(const String& dll_name)
+SpaceGameEngine::String SpaceGameEngine::GetDllPath(const String& dll_name)
 {
 	SGE_ASSERT(EmptyDllNameError, dll_name);
 #ifdef SGE_WINDOWS
@@ -136,17 +140,17 @@ SpaceGameEngine::Path SpaceGameEngine::GetDllPath(const String& dll_name)
 	dll_path += dll_name;
 	dll_path += SGE_STR(".dll");
 
-	return Path(dll_path);
+	return dll_path;
 #elif defined(SGE_MACOS)
 	String re(SGE_STR("lib"));
 	re += dll_name;
 	re += SGE_STR(".dylib");
-	return Path(re);
+	return re;
 #elif defined(SGE_LINUX)
 	String re(SGE_STR("lib"));
 	re += dll_name;
 	re += SGE_STR(".so");
-	return Path(re);
+	return re;
 #else
 #error "this platform is not supported"
 #endif

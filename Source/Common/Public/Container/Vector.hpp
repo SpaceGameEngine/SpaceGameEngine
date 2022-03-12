@@ -577,7 +577,7 @@ namespace SpaceGameEngine
 
 		inline Vector(SizeType size, const T& val)
 		{
-			SGE_ASSERT(InvalidSizeError, size, 0, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 0, sm_MaxSize);
 			m_Size = size;
 			m_RealSize = size * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -591,7 +591,7 @@ namespace SpaceGameEngine
 		inline Vector(const IteratorType& begin, const IteratorType& end)
 		{
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidSizeError, size, 0, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 0, sm_MaxSize);
 			m_Size = size;
 			m_RealSize = size * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -613,7 +613,7 @@ namespace SpaceGameEngine
 		*/
 		inline void SetRealSize(SizeType size)
 		{
-			SGE_ASSERT(InvalidSizeError, size, m_Size, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, m_Size, sm_MaxSize);
 			if (m_RealSize == size)
 				return;
 			else
@@ -740,25 +740,25 @@ namespace SpaceGameEngine
 
 		inline T& GetObject(SizeType index)
 		{
-			SGE_ASSERT(InvalidSizeError, index, 0, m_Size - 1);
+			SGE_ASSERT(InvalidValueError, index, 0, m_Size - 1);
 			return *reinterpret_cast<T*>((AddressType)(m_pContent) + index * sizeof(T));
 		}
 
 		inline const T& GetObject(SizeType index) const
 		{
-			SGE_ASSERT(InvalidSizeError, index, 0, m_Size - 1);
+			SGE_ASSERT(InvalidValueError, index, 0, m_Size - 1);
 			return *reinterpret_cast<T*>((AddressType)(m_pContent) + index * sizeof(T));
 		}
 
 		inline T& operator[](SizeType index)
 		{
-			SGE_ASSERT(InvalidSizeError, index, 0, m_Size - 1);
+			SGE_ASSERT(InvalidValueError, index, 0, m_Size - 1);
 			return GetObject(index);
 		}
 
 		inline const T& operator[](SizeType index) const
 		{
-			SGE_ASSERT(InvalidSizeError, index, 0, m_Size - 1);
+			SGE_ASSERT(InvalidValueError, index, 0, m_Size - 1);
 			return GetObject(index);
 		}
 
@@ -1382,7 +1382,7 @@ namespace SpaceGameEngine
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
-				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == m_Size)
 				{
@@ -1437,7 +1437,7 @@ namespace SpaceGameEngine
 			else	//reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == 0)
 				{
@@ -1507,7 +1507,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 				SizeType size = end - begin;
-				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == m_Size)
 				{
@@ -1565,7 +1565,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SizeType size = end - begin;
-				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == 0)
 				{
@@ -1642,7 +1642,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 				SizeType size = ilist.size();
-				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == m_Size)
 				{
@@ -1700,7 +1700,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SizeType size = ilist.size();
-				SGE_ASSERT(InvalidSizeError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == 0)
 				{
@@ -1856,7 +1856,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, end, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 			}
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidSizeError, size, 1, m_Size);
+			SGE_ASSERT(InvalidValueError, size, 1, m_Size);
 
 			if constexpr (IsTrivial<T>::Value)
 			{
