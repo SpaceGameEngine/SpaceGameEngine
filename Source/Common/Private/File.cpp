@@ -433,7 +433,7 @@ SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 #ifdef SGE_WINDOWS
 	SGE_CHECK(GetModuleFileNameFailError, GetModuleFileName(NULL, out_buffer, buf_size), buf_size);
 #elif defined(SGE_LINUX)
-	SizeType re_size = readlink("/proc/self/exe", out_buffer, buf_size);
+	SizeType re_size = readlink("/proc/self/exe", (char*)out_buffer, buf_size);
 	SGE_CHECK(ReadLinkFailError, re_size);
 	out_buffer[re_size] = SGE_TSTR('\0');
 #elif defined(SGE_MACOS)
