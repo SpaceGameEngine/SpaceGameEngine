@@ -80,7 +80,7 @@ SpaceGameEngine::DllHandle SpaceGameEngine::LoadDll(const String& dll_path)
 	SGE_CHECK(LoadDllFailedError, re);
 	return re;
 #elif defined(SGE_POSIX)
-	DllHandle re = dlopen(SGE_STR_TO_TSTR(dll_path).GetData(), RTLD_NOW | RTLD_GLOBAL);
+	DllHandle re = dlopen((const char*)SGE_STR_TO_TSTR(dll_path).GetData(), RTLD_NOW | RTLD_GLOBAL);
 	SGE_CHECK(LoadDllFailedError, re);
 	return re;
 #else
@@ -97,7 +97,7 @@ void* SpaceGameEngine::GetAddressFromDll(const DllHandle& handle, const String& 
 	SGE_CHECK(GetAddressFromDllFailedError, re);
 	return re;
 #elif defined(SGE_POSIX)
-	void* re = dlsym(handle, UCS2StringToUTF8String(symbol).GetData());
+	void* re = dlsym(handle, (const char*)UCS2StringToUTF8String(symbol).GetData());
 	SGE_CHECK(GetAddressFromDllFailedError, re);
 	return re;
 #else
