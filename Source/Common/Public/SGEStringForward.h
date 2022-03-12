@@ -53,7 +53,11 @@ namespace SpaceGameEngine
 	using TChar = wchar_t;
 #define SGE_TSTR_(str) L##str
 #else
+#ifdef SGE_CPP20
+	using StdTString = std::u8string;
+#else
 	using StdTString = std::string;
+#endif
 #define StdTCin std::cin
 #define StdTCout std::cout
 #define StdToTString std::to_string
