@@ -2015,6 +2015,18 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent;
 			}
 
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pContent == iter.m_pContent;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			inline bool operator!=(const IteratorType& iter) const
+			{
+				return m_pContent != iter.m_pContent;
+			}
+
 			inline _T* GetData() const
 			{
 				return m_pContent;
@@ -2247,6 +2259,18 @@ namespace SpaceGameEngine
 			}
 
 			inline bool operator!=(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent != iter.m_pContent;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pContent == iter.m_pContent;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			inline bool operator!=(const IteratorType& iter) const
 			{
 				return m_pContent != iter.m_pContent;
 			}

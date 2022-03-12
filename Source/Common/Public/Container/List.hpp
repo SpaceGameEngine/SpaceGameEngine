@@ -490,6 +490,18 @@ namespace SpaceGameEngine
 				return m_pNode != iter.m_pNode || m_pHead != iter.m_pHead || m_pTail != iter.m_pTail;
 			}
 
+			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pNode == iter.m_pNode && m_pHead == iter.m_pHead && m_pTail == iter.m_pTail;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator!=(const IteratorType& iter) const
+			{
+				return m_pNode != iter.m_pNode || m_pHead != iter.m_pHead || m_pTail != iter.m_pTail;
+			}
+
 			inline _T* GetData() const
 			{
 				SGE_ASSERT(OutOfRangeError, *this);
@@ -543,7 +555,7 @@ namespace SpaceGameEngine
 
 			friend class List<T, Allocator>;
 
-			template<typename IteratorType>
+			template<typename __T>
 			friend class IteratorImpl;
 
 		public:
@@ -672,6 +684,18 @@ namespace SpaceGameEngine
 			}
 
 			inline bool operator!=(const ReverseIteratorImpl& iter) const
+			{
+				return m_pNode != iter.m_pNode || m_pHead != iter.m_pHead || m_pTail != iter.m_pTail;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pNode == iter.m_pNode && m_pHead == iter.m_pHead && m_pTail == iter.m_pTail;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator!=(const IteratorType& iter) const
 			{
 				return m_pNode != iter.m_pNode || m_pHead != iter.m_pHead || m_pTail != iter.m_pTail;
 			}
