@@ -303,7 +303,7 @@ TEST(Path, CopyFileTest)
 	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_cp_src.txt"));
 	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_cp_dst.txt"));
 	ASSERT_FALSE(src.IsExist());
-	std::ofstream test_cp_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ofstream test_cp_w((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_cp_w << 1024;
 	test_cp_w.close();
 	ASSERT_TRUE(src.IsExist());
@@ -314,12 +314,12 @@ TEST(Path, CopyFileTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_cp_i_src(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ifstream test_cp_i_src((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_cp_i_src >> num;
 	ASSERT_EQ(num, 1024);
 	test_cp_i_src.close();
 	num = 0;
-	std::ifstream test_cp_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ifstream test_cp_i_dst((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_cp_i_dst >> num;
 	ASSERT_EQ(num, 1024);
 	test_cp_i_dst.close();
@@ -335,13 +335,13 @@ TEST(Path, CopyFileOverwriteTest)
 	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_cp_ow_src.txt"));
 	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_cp_ow_dst.txt"));
 	ASSERT_FALSE(src.IsExist());
-	std::ofstream test_cp_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ofstream test_cp_w((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_cp_w << 1024;
 	test_cp_w.close();
 	ASSERT_TRUE(src.IsExist());
 
 	ASSERT_FALSE(dst.IsExist());
-	std::ofstream test_cp_w2(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ofstream test_cp_w2((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_cp_w2 << 2048;
 	test_cp_w2.close();
 	ASSERT_TRUE(dst.IsExist());
@@ -352,12 +352,12 @@ TEST(Path, CopyFileOverwriteTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_cp_i_src(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ifstream test_cp_i_src((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_cp_i_src >> num;
 	ASSERT_EQ(num, 1024);
 	test_cp_i_src.close();
 	num = 0;
-	std::ifstream test_cp_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ifstream test_cp_i_dst((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_cp_i_dst >> num;
 	ASSERT_EQ(num, 1024);
 	test_cp_i_dst.close();
@@ -373,7 +373,7 @@ TEST(Path, MoveFileTest)
 	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_mv_src.txt"));
 	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_mv_dst.txt"));
 	ASSERT_FALSE(src.IsExist());
-	std::ofstream test_mv_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ofstream test_mv_w((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_mv_w << 1024;
 	test_mv_w.close();
 	ASSERT_TRUE(src.IsExist());
@@ -384,7 +384,7 @@ TEST(Path, MoveFileTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_mv_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ifstream test_mv_i_dst((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_mv_i_dst >> num;
 	ASSERT_EQ(num, 1024);
 	test_mv_i_dst.close();
@@ -398,13 +398,13 @@ TEST(Path, MoveFileOverwriteTest)
 	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_mv_ow_src.txt"));
 	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_mv_ow_dst.txt"));
 	ASSERT_FALSE(src.IsExist());
-	std::ofstream test_mv_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ofstream test_mv_w((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_mv_w << 1024;
 	test_mv_w.close();
 	ASSERT_TRUE(src.IsExist());
 
 	ASSERT_FALSE(dst.IsExist());
-	std::ofstream test_mv_w2(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ofstream test_mv_w2((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_mv_w2 << 2048;
 	test_mv_w2.close();
 	ASSERT_TRUE(dst.IsExist());
@@ -415,7 +415,7 @@ TEST(Path, MoveFileOverwriteTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_mv_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ifstream test_mv_i_dst((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_mv_i_dst >> num;
 	ASSERT_EQ(num, 1024);
 	test_mv_i_dst.close();
@@ -436,7 +436,7 @@ TEST(Path, CreateAndDeleteDirectoryTest)
 	CreateFile(test_file1);
 	ASSERT_TRUE(test_file1.IsExist());
 
-	std::ofstream test_file1_output(SGE_STR_TO_UTF8(test_file1.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_file1_output((char*)SGE_STR_TO_UTF8(test_file1.GetAbsolutePath().GetString()).GetData());
 	test_file1_output << "test_file1";
 	test_file1_output.close();
 
@@ -450,7 +450,7 @@ TEST(Path, CreateAndDeleteDirectoryTest)
 	CreateFile(test_file2);
 	ASSERT_TRUE(test_file2.IsExist());
 
-	std::ofstream test_file2_output(SGE_STR_TO_UTF8(test_file2.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_file2_output((char*)SGE_STR_TO_UTF8(test_file2.GetAbsolutePath().GetString()).GetData());
 	test_file2_output << "test_file2";
 	test_file2_output.close();
 
@@ -477,7 +477,7 @@ TEST(Path, CopyDirectoryTest)
 	ASSERT_FALSE(test_src_file.IsExist());
 	CreateFile(test_src_file);
 	ASSERT_TRUE(test_src_file.IsExist());
-	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_src_file_output((char*)SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
 	test_src_file_output << 256;
 	test_src_file_output.close();
 	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
@@ -509,7 +509,7 @@ TEST(Path, CopyDirectoryTest)
 	ASSERT_TRUE(test_dst_dir2.IsExist());
 	ASSERT_TRUE(test_dst_file2.IsExist());
 
-	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ifstream test_dst_file_input((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	int num = 0;
 	test_dst_file_input >> num;
 	ASSERT_EQ(num, 256);
@@ -537,7 +537,7 @@ TEST(Path, CopyDirectoryOverwriteTest)
 	ASSERT_FALSE(test_src_file.IsExist());
 	CreateFile(test_src_file);
 	ASSERT_TRUE(test_src_file.IsExist());
-	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_src_file_output((char*)SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
 	test_src_file_output << 256;
 	test_src_file_output.close();
 	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
@@ -561,7 +561,7 @@ TEST(Path, CopyDirectoryOverwriteTest)
 	CreateFile(test_dst_file);
 	ASSERT_TRUE(test_dst_dir.IsExist());
 	ASSERT_TRUE(test_dst_file.IsExist());
-	std::ofstream test_dst_file_output(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_dst_file_output((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	test_dst_file_output << 1024;
 	test_dst_file_output.close();
 
@@ -576,7 +576,7 @@ TEST(Path, CopyDirectoryOverwriteTest)
 	ASSERT_TRUE(test_dst_dir2.IsExist());
 	ASSERT_TRUE(test_dst_file2.IsExist());
 
-	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ifstream test_dst_file_input((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	int num = 0;
 	test_dst_file_input >> num;
 	ASSERT_EQ(num, 256);
@@ -604,7 +604,7 @@ TEST(Path, MoveDirectoryTest)
 	ASSERT_FALSE(test_src_file.IsExist());
 	CreateFile(test_src_file);
 	ASSERT_TRUE(test_src_file.IsExist());
-	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_src_file_output((char*)SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
 	test_src_file_output << 256;
 	test_src_file_output.close();
 	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
@@ -636,7 +636,7 @@ TEST(Path, MoveDirectoryTest)
 	ASSERT_TRUE(test_dst_dir2.IsExist());
 	ASSERT_TRUE(test_dst_file2.IsExist());
 
-	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ifstream test_dst_file_input((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	int num = 0;
 	test_dst_file_input >> num;
 	ASSERT_EQ(num, 256);
@@ -659,7 +659,7 @@ TEST(Path, MoveDirectoryOverwriteTest)
 	ASSERT_FALSE(test_src_file.IsExist());
 	CreateFile(test_src_file);
 	ASSERT_TRUE(test_src_file.IsExist());
-	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_src_file_output((char*)SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
 	test_src_file_output << 256;
 	test_src_file_output.close();
 	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
@@ -683,7 +683,7 @@ TEST(Path, MoveDirectoryOverwriteTest)
 	CreateFile(test_dst_file);
 	ASSERT_TRUE(test_dst_dir.IsExist());
 	ASSERT_TRUE(test_dst_file.IsExist());
-	std::ofstream test_dst_file_output(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_dst_file_output((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	test_dst_file_output << 1024;
 	test_dst_file_output.close();
 
@@ -698,7 +698,7 @@ TEST(Path, MoveDirectoryOverwriteTest)
 	ASSERT_TRUE(test_dst_dir2.IsExist());
 	ASSERT_TRUE(test_dst_file2.IsExist());
 
-	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ifstream test_dst_file_input((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	int num = 0;
 	test_dst_file_input >> num;
 	ASSERT_EQ(num, 256);
@@ -756,8 +756,8 @@ TEST(BinaryFile, ReadTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbr.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_output.write((const Char8*)test_data, sizeof(test_data));
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -785,8 +785,8 @@ TEST(BinaryFile, WriteTest)
 	ASSERT_TRUE(path.IsExist());
 
 	int test_data_input[4] = {0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_input.read((Char8*)test_data_input, sizeof(test_data_input));
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_input, sizeof(test_data_input));
 	b_input.close();
 
 	for (int i = 0; i < 4; ++i)
@@ -809,8 +809,8 @@ TEST(BinaryFile, FlushTest)
 	ASSERT_TRUE(path.IsExist());
 
 	int test_data_input[4] = {0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_input.read((Char8*)test_data_input, sizeof(test_data_input));
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_input, sizeof(test_data_input));
 	b_input.close();
 
 	for (int i = 0; i < 4; ++i)
@@ -826,8 +826,8 @@ TEST(BinaryFile, ReadWriteTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbrw.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_output.write((const Char8*)test_data, sizeof(test_data));
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -842,8 +842,8 @@ TEST(BinaryFile, ReadWriteTest)
 		ASSERT_EQ(test_data[i], test_data_input[i]);
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_input.read((Char8*)test_data_check, sizeof(test_data_check));
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_check, sizeof(test_data_check));
 	b_input.close();
 
 	for (int i = 0; i < 4; ++i)
@@ -861,8 +861,8 @@ TEST(BinaryFile, AppendTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testba.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_output.write((const Char8*)test_data, sizeof(test_data));
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -875,8 +875,8 @@ TEST(BinaryFile, AppendTest)
 	bf_append.Close();
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_input.read((Char8*)test_data_check, sizeof(test_data_check));
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_check, sizeof(test_data_check));
 	b_input.close();
 
 	for (int i = 0; i < 4; ++i)
@@ -894,8 +894,8 @@ TEST(BinaryFile, ReadWriteAppendTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbrwa.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_output.write((const Char8*)test_data, sizeof(test_data));
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -911,8 +911,8 @@ TEST(BinaryFile, ReadWriteAppendTest)
 		ASSERT_EQ(test_data[i], test_data_input[i]);
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_input.read((Char8*)test_data_check, sizeof(test_data_check));
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_input.read((char*)test_data_check, sizeof(test_data_check));
 	b_input.close();
 
 	for (int i = 0; i < 4; ++i)
@@ -930,8 +930,8 @@ TEST(BinaryFile, MoveFilePositionTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfp.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_output.write((const Char8*)test_data, sizeof(test_data));
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -958,8 +958,8 @@ TEST(BinaryFile, GetFileSizeTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfgs.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_output.write((const Char8*)test_data, sizeof(test_data));
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -983,8 +983,8 @@ TEST(BinaryFile, SetFileSizeTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfss.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_output.write((const Char8*)test_data, sizeof(test_data));
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -1022,8 +1022,8 @@ TEST(BinaryFile, IsReadFinishedTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbrf.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
-	b_output.write((const Char8*)test_data, sizeof(test_data));
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
 

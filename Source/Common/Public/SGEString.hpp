@@ -3715,7 +3715,7 @@ namespace SpaceGameEngine
 			nsize += StringImplement::GetUCS2CharToUTF8CharSize(*psrc);
 			psrc += 1;
 		}
-		StringCore<Char8, UTF8Trait, Allocator> re(nsize, " ");
+		StringCore<Char8, UTF8Trait, Allocator> re(nsize, SGE_U8STR(" "));
 		auto pdst = re.GetData();
 		psrc = str.GetData();
 		for (SizeType i = 0; i < size; i++)
@@ -3739,7 +3739,7 @@ namespace SpaceGameEngine
 			nsize += StringImplement::GetUCS2CharToUTF8CharSize(*psrc);
 			psrc += 1;
 		}
-		StringCore<Char8, UTF8Trait, Allocator> re(nsize, " ");
+		StringCore<Char8, UTF8Trait, Allocator> re(nsize, SGE_U8STR(" "));
 		auto pdst = re.GetData();
 		psrc = pstr;
 		for (SizeType i = 0; i < size; i++)

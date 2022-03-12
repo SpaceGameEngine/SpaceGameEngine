@@ -93,7 +93,7 @@ void* SpaceGameEngine::GetAddressFromDll(const DllHandle& handle, const String& 
 	SGE_ASSERT(NullDllHandleError, handle);
 	SGE_ASSERT(EmptySymbolError, symbol);
 #ifdef SGE_WINDOWS
-	void* re = (void*)GetProcAddress(handle, UCS2StringToUTF8String(symbol).GetData());
+	void* re = (void*)GetProcAddress(handle, (char*)UCS2StringToUTF8String(symbol).GetData());
 	SGE_CHECK(GetAddressFromDllFailedError, re);
 	return re;
 #elif defined(SGE_POSIX)
