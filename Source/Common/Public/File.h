@@ -385,7 +385,7 @@ namespace SpaceGameEngine
 			dirent* pchild = nullptr;
 			while (pchild = readdir(pdir))
 			{
-				if (strcmp(pchild->d_name, SGE_TSTR(".")) == 0 || strcmp(pchild->d_name, SGE_TSTR("..")) == 0)
+				if (strcmp(pchild->d_name, (const char*)SGE_TSTR(".")) == 0 || strcmp(pchild->d_name, (const char*)SGE_TSTR("..")) == 0)
 					continue;
 				PathType pt = PathType::NotExist;
 				if (pchild->d_type == DT_LNK)

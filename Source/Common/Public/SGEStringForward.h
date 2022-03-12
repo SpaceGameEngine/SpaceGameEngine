@@ -50,7 +50,7 @@ namespace SpaceGameEngine
 #define StdTCin std::wcin
 #define StdTCout std::wcout
 #define StdToTString(x) std::to_wstring((x))
-	using TChar = wchar_t;
+	using TChar = Char16;
 #define SGE_TSTR_(str) L##str
 #else
 #ifdef SGE_CPP20
