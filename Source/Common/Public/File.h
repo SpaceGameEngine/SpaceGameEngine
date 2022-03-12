@@ -380,7 +380,7 @@ namespace SpaceGameEngine
 			SGE_CHECK(FindCloseFailError, FindClose(handle));
 			SGE_CHECK(FindNextFileFailError, GetLastError());
 #elif defined(SGE_POSIX)
-			DIR* pdir = opendir(SGE_STR_TO_TSTR(astr).GetData());
+			DIR* pdir = opendir((const char*)SGE_STR_TO_TSTR(astr).GetData());
 			SGE_CHECK(OpenDirFailError, pdir);
 			dirent* pchild = nullptr;
 			while (pchild = readdir(pdir))

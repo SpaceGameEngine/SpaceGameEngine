@@ -124,7 +124,7 @@ bool SpaceGameEngine::Path::IsExist() const
 	}
 	return re;
 #elif defined(SGE_POSIX)
-	return access(SGE_STR_TO_TSTR(astr).GetData(), F_OK) == 0;
+	return access((const char*)SGE_STR_TO_TSTR(astr).GetData(), F_OK) == 0;
 #else
 #error this os has not been supported.
 #endif
@@ -152,7 +152,7 @@ SpaceGameEngine::PathType SpaceGameEngine::Path::GetPathType() const
 	}
 #elif defined(SGE_POSIX)
 	struct stat buf;
-	int stat_re = stat(SGE_STR_TO_TSTR(astr).GetData(), &buf);
+	int stat_re = stat((const char*)SGE_STR_TO_TSTR(astr).GetData(), &buf);
 	if (stat_re == 0)
 	{
 		if (S_ISLNK(buf.st_mode))
@@ -234,7 +234,7 @@ SpaceGameEngine::Vector<SpaceGameEngine::Pair<SpaceGameEngine::Path, SpaceGameEn
 	SGE_CHECK(FindCloseFailError, FindClose(handle));
 	SGE_CHECK(FindNextFileFailError, GetLastError());
 #elif defined(SGE_POSIX)
-	DIR* pdir = opendir(SGE_STR_TO_TSTR(astr).GetData());
+	DIR* pdir = opendir((const char*)SGE_STR_TO_TSTR(astr).GetData());
 	SGE_CHECK(OpenDirFailError, pdir);
 	dirent* pchild = nullptr;
 	while (pchild = readdir(pdir))
@@ -299,8 +299,8 @@ bool SpaceGameEngine::Path::IsEquivalent(const Path& path) const
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	struct stat sbuf1, sbuf2;
-	SGE_CHECK(StatFailError, stat(SGE_STR_TO_TSTR(astr1).GetData(), &sbuf1));
-	SGE_CHECK(StatFailError, stat(SGE_STR_TO_TSTR(astr2).GetData(), &sbuf2));
+	SGE_CHECK(StatFailError, stat((const char*)SGE_STR_TO_TSTR(astr1).GetData(), &sbuf1));
+	SGE_CHECK(StatFailError, stat((const char*)SGE_STR_TO_TSTR(astr2).GetData(), &sbuf2));
 	return (sbuf1.st_dev == sbuf2.st_dev) && (sbuf1.st_ino == sbuf2.st_ino);
 #else
 #error this os has not been supported.
@@ -417,7 +417,7 @@ void SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
 #ifdef SGE_WINDOWS
 	SGE_CHECK(SetCurrentDirectoryFailError, SetCurrentDirectory(SGE_STR_TO_TSTR(apath.GetString()).GetData()));
 #elif defined(SGE_POSIX)
-	SGE_CHECK(ChDirFailError, chdir(SGE_STR_TO_TSTR(apath.GetString()).GetData()));
+	SGE_CHECK(ChDirFailError, chdir((const char*)SGE_STR_TO_TSTR(apath.GetString()).GetData()));
 #else
 #error this os has not been supported.
 #endif
@@ -459,7 +459,7 @@ void SpaceGameEngine::CreateFile(const Path& path)
 	SGE_CHECK(CloseHandleFailError, CloseHandle(handle));
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
-	int fd = creat(SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO);
+	int fd = creat((const char*)SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(CreatFailError, fd);
 	SGE_CHECK(CloseFailError, close(fd));
 #else
@@ -478,7 +478,7 @@ void SpaceGameEngine::DeleteFile(const Path& path)
 	SGE_CHECK(DeleteFileFailError, DeleteFile(SGE_STR_TO_TSTR(astr).GetData()));
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
-	SGE_CHECK(UnlinkFailError, unlink(SGE_STR_TO_TSTR(astr).GetData()));
+	SGE_CHECK(UnlinkFailError, unlink((const char*)SGE_STR_TO_TSTR(astr).GetData()));
 #else
 #error this os has not been supported.
 #endif
@@ -533,7 +533,7 @@ void SpaceGameEngine::MoveFile(const Path& dst, const Path& src, bool can_overwr
 #elif defined(SGE_POSIX)
 	if (!can_overwrite)
 		SGE_CHECK(PathExistError, dst);
-	SGE_CHECK(RenameFailError, rename(SGE_STR_TO_TSTR(sstr).GetData(), SGE_STR_TO_TSTR(dstr).GetData()));
+	SGE_CHECK(RenameFailError, rename((const char*)SGE_STR_TO_TSTR(sstr).GetData(), (const char*)SGE_STR_TO_TSTR(dstr).GetData()));
 #else
 #error this os has not been supported.
 #endif
@@ -552,7 +552,7 @@ void SpaceGameEngine::CreateDirectory(const Path& path)
 	SGE_CHECK(CreateDirectoryFailError, CreateDirectory(SGE_STR_TO_TSTR(astr).GetData(), NULL));
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
-	SGE_CHECK(MkdirFailError, mkdir(SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO));
+	SGE_CHECK(MkdirFailError, mkdir((const char*)SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO));
 #else
 #error this os has not been supported.
 #endif
@@ -580,7 +580,7 @@ void SpaceGameEngine::DeleteDirectory(const Path& path)
 #ifdef SGE_WINDOWS
 	SGE_CHECK(RemoveDirectoryFailError, RemoveDirectory(SGE_STR_TO_TSTR(astr).GetData()));
 #elif defined(SGE_POSIX)
-	SGE_CHECK(RmdirFailError, rmdir(SGE_STR_TO_TSTR(astr).GetData()));
+	SGE_CHECK(RmdirFailError, rmdir((const char*)SGE_STR_TO_TSTR(astr).GetData()));
 #else
 #error this os has not been supported.
 #endif
@@ -957,7 +957,7 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 		oflag = O_WRONLY;
 	if (mode != FileIOMode::Read)
 		oflag |= O_CREAT;
-	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
+	m_Handle = open((const char*)SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(OpenFailError, m_Handle);
 #else
 #error this os has not been supported.
@@ -1017,7 +1017,7 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 		oflag = O_WRONLY;
 	if (mode != FileIOMode::Read)
 		oflag |= O_CREAT;
-	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
+	m_Handle = open((const char*)SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(OpenFailError, m_Handle);
 #else
 #error this os has not been supported.
