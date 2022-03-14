@@ -91,7 +91,7 @@ namespace SpaceGameEngine
 			m_Size = size;
 		}
 
-		template<typename AnotherIteratorType, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Value, bool>>
+		template<typename AnotherIteratorType, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>, bool>>
 		inline List(const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			SizeType size = end - begin;
@@ -1058,7 +1058,7 @@ namespace SpaceGameEngine
 				return IteratorType(pntail, m_pHead, m_pTail);
 		}
 
-		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Value, bool>>
+		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>, bool>>
 		inline IteratorType Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			SizeType size = end - begin;

@@ -2023,8 +2023,8 @@ TEST(StringCore, CompareLargeEqualTest)
 
 TEST(StringCore, IsTotallyOrderedTest)
 {
-	ASSERT_TRUE(IsTotallyOrdered<UCS2String>::Value);
-	ASSERT_TRUE(IsTotallyOrdered<UTF8String>::Value);
+	ASSERT_TRUE(IsTotallyOrdered<UCS2String>);
+	ASSERT_TRUE(IsTotallyOrdered<UTF8String>);
 }
 
 TEST(StringCore, InsertTest)

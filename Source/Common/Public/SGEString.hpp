@@ -1609,7 +1609,7 @@ namespace SpaceGameEngine
 		must be the pointer to the StringCore's T(it means that the iterator's value type
 		must be equal to the StringCore's ValueType).
 		*/
-		template<typename IteratorType, typename = std::enable_if_t<IsSequentialIterator<IteratorType>::Value, void>, typename = std::enable_if_t<std::is_same_v<decltype(new ValueType((ValueType)(IteratorValueType<IteratorType>())), true), bool>, void>>
+		template<typename IteratorType, typename = std::enable_if_t<IsSequentialIterator<IteratorType>, void>, typename = std::enable_if_t<std::is_same_v<decltype(new ValueType((ValueType)(IteratorValueType<IteratorType>())), true), bool>, void>>
 		inline StringCore(const IteratorType& begin, const IteratorType& end)
 			: m_Storage(1), m_Size(end - begin)
 		{
@@ -3008,7 +3008,7 @@ namespace SpaceGameEngine
 		@warning the begin&end's Container can not be the current Vector.
 		@return Iterator pointing to the inserted content's first char.
 		*/
-		template<typename IteratorType, typename OtherIteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<OtherIteratorType>::Value, void>>
+		template<typename IteratorType, typename OtherIteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<OtherIteratorType>, void>>
 		inline IteratorType Insert(const IteratorType& iter, const OtherIteratorType& begin, const OtherIteratorType& end)
 		{
 			SizeType snsize = 0;

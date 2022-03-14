@@ -89,36 +89,36 @@ TEST(MetaTrait, TypeWrapperTest)
 
 TEST(MetaConcept, IsWeakEqualityComparableTest)
 {
-	ASSERT_TRUE((IsWeakEqualityComparable<int, long>::Value));
-	ASSERT_FALSE((IsWeakEqualityComparable<std::string, float>::Value));
-	ASSERT_TRUE((IsWeakEqualityComparable<int, int>::Value));
-	ASSERT_TRUE((IsWeakEqualityComparable<double>::Value));
+	ASSERT_TRUE((IsWeakEqualityComparable<int, long>));
+	ASSERT_FALSE((IsWeakEqualityComparable<std::string, float>));
+	ASSERT_TRUE((IsWeakEqualityComparable<int, int>));
+	ASSERT_TRUE((IsWeakEqualityComparable<double>));
 }
 
 TEST(MetaConcept, IsEqualityComparableTest)
 {
-	ASSERT_TRUE((IsEqualityComparable<int, long>::Value));
-	ASSERT_FALSE((IsEqualityComparable<std::string, float>::Value));
-	ASSERT_TRUE((IsEqualityComparable<int, int>::Value));
-	ASSERT_TRUE((IsEqualityComparable<double>::Value));
+	ASSERT_TRUE((IsEqualityComparable<int, long>));
+	ASSERT_FALSE((IsEqualityComparable<std::string, float>));
+	ASSERT_TRUE((IsEqualityComparable<int, int>));
+	ASSERT_TRUE((IsEqualityComparable<double>));
 }
 
 TEST(MetaConcept, IsTotallyOrderedTest)
 {
-	ASSERT_TRUE((IsTotallyOrdered<int, long>::Value));
-	ASSERT_FALSE((IsTotallyOrdered<std::string, float>::Value));
-	ASSERT_TRUE((IsTotallyOrdered<int, int>::Value));
-	ASSERT_TRUE((IsTotallyOrdered<double>::Value));
+	ASSERT_TRUE((IsTotallyOrdered<int, long>));
+	ASSERT_FALSE((IsTotallyOrdered<std::string, float>));
+	ASSERT_TRUE((IsTotallyOrdered<int, int>));
+	ASSERT_TRUE((IsTotallyOrdered<double>));
 }
 
 TEST(MetaConcept, IsTrivialTest)
 {
-	ASSERT_TRUE(IsTrivial<int>::Value);
-	ASSERT_TRUE(IsTrivial<test_trivial>::Value);
-	ASSERT_FALSE(IsTrivial<test_trivial_constructor>::Value);
-	ASSERT_FALSE(IsTrivial<test_trivial_copy_constructor>::Value);
-	ASSERT_FALSE(IsTrivial<test_trivial_move_constructor>::Value);
-	ASSERT_FALSE(IsTrivial<test_trivial_copy_operator>::Value);
-	ASSERT_FALSE(IsTrivial<test_trivial_move_operator>::Value);
-	ASSERT_FALSE(IsTrivial<test_trivial_destructor>::Value);
+	ASSERT_TRUE(IsTrivial<int>);
+	ASSERT_TRUE(IsTrivial<test_trivial>);
+	ASSERT_FALSE(IsTrivial<test_trivial_constructor>);
+	ASSERT_FALSE(IsTrivial<test_trivial_copy_constructor>);
+	ASSERT_FALSE(IsTrivial<test_trivial_move_constructor>);
+	ASSERT_FALSE(IsTrivial<test_trivial_copy_operator>);
+	ASSERT_FALSE(IsTrivial<test_trivial_move_operator>);
+	ASSERT_FALSE(IsTrivial<test_trivial_destructor>);
 }
