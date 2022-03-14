@@ -9,10 +9,11 @@ cmake_policy(SET CMP0054 NEW)
 ## set debug definition
 add_compile_definitions($<$<CONFIG:DEBUG>:DEBUG>)
 
-## set utf8 runtime environment
+## set compile options
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 # add_compile_options(/source-charset:utf-8 /source-charset:utf-8)
 add_compile_options(-fexec-charset=UTF-8 -finput-charset=UTF-8)
+add_compile_options(-Wno-unused-but-set-variable)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 add_compile_options(-fexec-charset=UTF-8 -finput-charset=UTF-8)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
