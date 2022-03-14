@@ -11,7 +11,8 @@ add_compile_definitions($<$<CONFIG:DEBUG>:DEBUG>)
 
 ## set utf8 runtime environment
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-add_compile_options(/source-charset:utf-8 /source-charset:utf-8)
+# add_compile_options(/source-charset:utf-8 /source-charset:utf-8)
+add_compile_options(-fexec-charset=UTF-8 -finput-charset=UTF-8)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 add_compile_options(-fexec-charset=UTF-8 -finput-charset=UTF-8)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
