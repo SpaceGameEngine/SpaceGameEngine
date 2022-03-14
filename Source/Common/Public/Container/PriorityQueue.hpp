@@ -106,7 +106,7 @@ namespace SpaceGameEngine
 		{
 		}
 
-		template<typename AnotherIteratorType, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Value, bool>>
+		template<typename AnotherIteratorType, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>, bool>>
 		inline PriorityQueue(const AnotherIteratorType& begin, const AnotherIteratorType& end)
 			: m_Implement(begin, end)
 		{

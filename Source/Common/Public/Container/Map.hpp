@@ -1091,6 +1091,18 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
 			}
 
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pContent == iter.m_pContent && m_pTree == iter.m_pTree;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator!=(const IteratorType& iter) const
+			{
+				return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
+			}
+
 			inline T* GetData() const
 			{
 				return &(m_pContent->m_KeyValuePair);
@@ -1284,6 +1296,18 @@ namespace SpaceGameEngine
 			}
 
 			inline bool operator!=(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pContent == iter.m_pContent && m_pTree == iter.m_pTree;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator!=(const IteratorType& iter) const
 			{
 				return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
 			}

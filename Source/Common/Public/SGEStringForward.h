@@ -28,6 +28,19 @@ namespace SpaceGameEngine
 	@{
 	*/
 
+#ifdef SGE_WINDOWS
+	using Char16 = wchar_t;
+#else
+	using Char16 = char16_t;
+#endif
+	using Char = Char16;
+
+#ifdef SGE_CPP20
+	using Char8 = char8_t;
+#else
+	using Char8 = char;
+#endif
+
 #if defined(SGE_WINDOWS) && defined(UNICODE)
 #define SGE_USE_WIDE_CHAR
 #endif
@@ -36,26 +49,24 @@ namespace SpaceGameEngine
 	using StdTString = std::wstring;
 #define StdTCin std::wcin
 #define StdTCout std::wcout
-#define StdToTString std::to_wstring
-	using TChar = wchar_t;
+#define StdToTString(x) std::to_wstring((x))
+	using TChar = Char16;
 #define SGE_TSTR_(str) L##str
 #else
+#ifdef SGE_CPP20
+	using StdTString = std::u8string;
+#define StdToTString(x) std::u8string((const char8_t*)std::to_string((x)).c_str())
+#else
 	using StdTString = std::string;
+#define StdToTString(x) std::to_string((x))
+#endif
 #define StdTCin std::cin
 #define StdTCout std::cout
-#define StdToTString std::to_string
-	using TChar = char;
+	using TChar = Char8;
 #define SGE_TSTR_(str) u8##str
 #endif
 
 #define SGE_TSTR(str) SGE_TSTR_(str)
-
-#ifdef SGE_WINDOWS
-	using Char16 = wchar_t;
-#else
-	using Char16 = char16_t;
-#endif
-	using Char = Char16;
 
 #ifdef SGE_WINDOWS
 #define SGE_WSTR_(str) L##str

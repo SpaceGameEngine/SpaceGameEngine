@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include <concepts>
 #include "Trait.hpp"
 
 namespace SpaceGameEngine
@@ -23,134 +24,92 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	/*!
-	@file
-	@todo use cpp20's concept instead of sfinae(change IsXxx to Xxx).
-	*/
+	template<typename T>
+	concept IsDefaultConstructible = std::is_default_constructible_v<T>;
 
 	template<typename T>
-	struct IsDefaultConstructible
-	{
-		inline static constexpr const bool Value = std::is_default_constructible_v<T>;
-	};
+	concept IsCopyConstructible = std::is_copy_constructible_v<T>;
 
 	template<typename T>
-	struct IsCopyConstructible
-	{
-		inline static constexpr const bool Value = std::is_copy_constructible_v<T>;
-	};
+	concept IsMoveConstructible = std::is_move_constructible_v<T>;
 
 	template<typename T>
-	struct IsMoveConstructible
-	{
-		inline static constexpr const bool Value = std::is_move_constructible_v<T>;
-	};
+	concept IsCopyAssignable = std::is_copy_assignable_v<T>;
 
 	template<typename T>
-	struct IsCopyAssignable
-	{
-		inline static constexpr const bool Value = std::is_copy_assignable_v<T>;
-	};
+	concept IsMoveAssignable = std::is_move_assignable_v<T>;
 
 	template<typename T>
-	struct IsMoveAssignable
-	{
-		inline static constexpr const bool Value = std::is_move_assignable_v<T>;
-	};
+	concept IsMovable = IsMoveConstructible<T>&& IsMoveAssignable<T>;
 
 	template<typename T>
-	struct IsMovable
-	{
-		inline static constexpr const bool Value = IsMoveConstructible<T>::Value && IsMoveAssignable<T>::Value;
-	};
+	concept IsCopyable = IsMovable<T>&& IsCopyConstructible<T>&& IsCopyAssignable<T>;
 
-	template<typename T>
-	struct IsCopyable
+	template<typename T, typename U = T>
+	concept IsWeakEqualityComparable = requires(T t, U u)
 	{
-		inline static constexpr const bool Value = IsMovable<T>::Value && IsCopyConstructible<T>::Value && IsCopyAssignable<T>::Value;
+		{
+			t == u
+		}
+		->std::same_as<bool>;
+		{
+			u == t
+		}
+		->std::same_as<bool>;
 	};
 
 	template<typename T, typename U = T>
-	struct IsWeakEqualityComparable
+	concept IsEqualityComparable = IsWeakEqualityComparable<T, U>&& requires(T t, U u)
 	{
-	private:
-		template<typename _T, typename _U>
-		inline static constexpr std::enable_if_t<
-			std::is_same_v<decltype(std::declval<const RemoveCVRefType<_T>&>() == std::declval<const RemoveCVRefType<_U>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_U>&>() == std::declval<const RemoveCVRefType<_T>&>()), bool>,
-			bool>
-		Check(int)
 		{
-			return true;
+			t != u
 		}
-		template<typename _T, typename _U>
-		inline static constexpr bool Check(...)
+		->std::same_as<bool>;
 		{
-			return false;
+			u != t
 		}
-
-	public:
-		inline static constexpr const bool Value = Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
+		->std::same_as<bool>;
 	};
 
 	template<typename T, typename U = T>
-	struct IsEqualityComparable
+	concept IsTotallyOrdered = IsEqualityComparable<T, U>&& requires(T t, U u)
 	{
-	private:
-		template<typename _T, typename _U>
-		inline static constexpr std::enable_if_t<
-			IsWeakEqualityComparable<_T, _U>::Value &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_T>&>() != std::declval<const RemoveCVRefType<_U>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_U>&>() != std::declval<const RemoveCVRefType<_T>&>()), bool>,
-			bool>
-		Check(int)
 		{
-			return true;
+			t < u
 		}
-		template<typename _T, typename _U>
-		inline static constexpr bool Check(...)
+		->std::same_as<bool>;
 		{
-			return false;
+			t > u
 		}
-
-	public:
-		inline static constexpr const bool Value = Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
-	};
-
-	template<typename T, typename U = T>
-	struct IsTotallyOrdered
-	{
-	private:
-		template<typename _T, typename _U>
-		inline static constexpr std::enable_if_t<
-			std::is_same_v<decltype(std::declval<const RemoveCVRefType<_T>&>() < std::declval<const RemoveCVRefType<_U>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_T>&>() > std::declval<const RemoveCVRefType<_U>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_T>&>() <= std::declval<const RemoveCVRefType<_U>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_T>&>() >= std::declval<const RemoveCVRefType<_U>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_U>&>() < std::declval<const RemoveCVRefType<_T>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_U>&>() > std::declval<const RemoveCVRefType<_T>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_U>&>() <= std::declval<const RemoveCVRefType<_T>&>()), bool> &&
-				std::is_same_v<decltype(std::declval<const RemoveCVRefType<_U>&>() >= std::declval<const RemoveCVRefType<_T>&>()), bool>,
-			bool>
-		Check(int)
+		->std::same_as<bool>;
 		{
-			return true;
+			t <= u
 		}
-		template<typename _T, typename _U>
-		inline static constexpr bool Check(...)
+		->std::same_as<bool>;
 		{
-			return false;
+			t >= u
 		}
-
-	public:
-		inline static constexpr const bool Value = IsEqualityComparable<T, U>::Value && Check<T, T>(0) && Check<U, U>(0) && Check<T, U>(0);
+		->std::same_as<bool>;
+		{
+			u < t
+		}
+		->std::same_as<bool>;
+		{
+			u > t
+		}
+		->std::same_as<bool>;
+		{
+			u <= t
+		}
+		->std::same_as<bool>;
+		{
+			u >= t
+		}
+		->std::same_as<bool>;
 	};
 
 	template<typename T>
-	struct IsTrivial
-	{
-		inline static constexpr const bool Value = std::is_trivial_v<T>;
-	};
+	concept IsTrivial = std::is_trivial_v<T>;
 
 	/*!
 	@}

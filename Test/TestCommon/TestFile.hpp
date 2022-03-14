@@ -184,7 +184,7 @@ TEST(Path, GetAbsolutePathTest)
 	ASSERT_FALSE(p.IsAbsolute());
 	Path ap = p.GetAbsolutePath();
 	ASSERT_TRUE(ap.IsAbsolute());
-	StdTCout << SGE_STR_TO_TSTR(ap.GetString()).GetData() << std::endl;
+	StdTCout << (const char*)SGE_STR_TO_TSTR(ap.GetString()).GetData() << std::endl;
 #ifdef SGE_WINDOWS
 	Path p2(SGE_STR("C:/test"));
 	ASSERT_TRUE(p2.IsAbsolute());
@@ -268,7 +268,7 @@ TEST(Path, GetCurrentDirectoryPathTest)
 {
 	Path p = GetCurrentDirectoryPath();
 	ASSERT_TRUE(p.IsAbsolute());
-	StdTCout << SGE_STR_TO_TSTR(p.GetString()).GetData() << std::endl;
+	StdTCout << (const char*)SGE_STR_TO_TSTR(p.GetString()).GetData() << std::endl;
 }
 
 TEST(Path, SetCurrentDirectoryPathTest)
@@ -284,7 +284,7 @@ TEST(Path, SetCurrentDirectoryPathTest)
 TEST(Path, GetModuleDirectoryPathTest)
 {
 	String path_str = GetModuleDirectoryPath().GetString();
-	StdTCout << SGE_STR_TO_TSTR(path_str).GetData() << std::endl;
+	StdTCout << (const char*)SGE_STR_TO_TSTR(path_str).GetData() << std::endl;
 	ASSERT_NE(path_str.Find(SGE_STR("TestCommon"), path_str.GetConstBegin(), path_str.GetConstEnd()), path_str.GetConstEnd());
 }
 
@@ -303,7 +303,7 @@ TEST(Path, CopyFileTest)
 	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_cp_src.txt"));
 	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_cp_dst.txt"));
 	ASSERT_FALSE(src.IsExist());
-	std::ofstream test_cp_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ofstream test_cp_w((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_cp_w << 1024;
 	test_cp_w.close();
 	ASSERT_TRUE(src.IsExist());
@@ -314,12 +314,12 @@ TEST(Path, CopyFileTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_cp_i_src(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ifstream test_cp_i_src((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_cp_i_src >> num;
 	ASSERT_EQ(num, 1024);
 	test_cp_i_src.close();
 	num = 0;
-	std::ifstream test_cp_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ifstream test_cp_i_dst((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_cp_i_dst >> num;
 	ASSERT_EQ(num, 1024);
 	test_cp_i_dst.close();
@@ -335,13 +335,13 @@ TEST(Path, CopyFileOverwriteTest)
 	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_cp_ow_src.txt"));
 	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_cp_ow_dst.txt"));
 	ASSERT_FALSE(src.IsExist());
-	std::ofstream test_cp_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ofstream test_cp_w((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_cp_w << 1024;
 	test_cp_w.close();
 	ASSERT_TRUE(src.IsExist());
 
 	ASSERT_FALSE(dst.IsExist());
-	std::ofstream test_cp_w2(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ofstream test_cp_w2((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_cp_w2 << 2048;
 	test_cp_w2.close();
 	ASSERT_TRUE(dst.IsExist());
@@ -352,12 +352,12 @@ TEST(Path, CopyFileOverwriteTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_cp_i_src(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ifstream test_cp_i_src((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_cp_i_src >> num;
 	ASSERT_EQ(num, 1024);
 	test_cp_i_src.close();
 	num = 0;
-	std::ifstream test_cp_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ifstream test_cp_i_dst((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_cp_i_dst >> num;
 	ASSERT_EQ(num, 1024);
 	test_cp_i_dst.close();
@@ -373,7 +373,7 @@ TEST(Path, MoveFileTest)
 	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_mv_src.txt"));
 	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_mv_dst.txt"));
 	ASSERT_FALSE(src.IsExist());
-	std::ofstream test_mv_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ofstream test_mv_w((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_mv_w << 1024;
 	test_mv_w.close();
 	ASSERT_TRUE(src.IsExist());
@@ -384,7 +384,7 @@ TEST(Path, MoveFileTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_mv_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ifstream test_mv_i_dst((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_mv_i_dst >> num;
 	ASSERT_EQ(num, 1024);
 	test_mv_i_dst.close();
@@ -398,13 +398,13 @@ TEST(Path, MoveFileOverwriteTest)
 	Path src(SGE_STR("./TestData/TestCommon/TestFile/test_mv_ow_src.txt"));
 	Path dst(SGE_STR("./TestData/TestCommon/TestFile/test_mv_ow_dst.txt"));
 	ASSERT_FALSE(src.IsExist());
-	std::ofstream test_mv_w(SGE_STR_TO_UTF8(src.GetString()).GetData());
+	std::ofstream test_mv_w((char*)SGE_STR_TO_UTF8(src.GetString()).GetData());
 	test_mv_w << 1024;
 	test_mv_w.close();
 	ASSERT_TRUE(src.IsExist());
 
 	ASSERT_FALSE(dst.IsExist());
-	std::ofstream test_mv_w2(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ofstream test_mv_w2((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_mv_w2 << 2048;
 	test_mv_w2.close();
 	ASSERT_TRUE(dst.IsExist());
@@ -415,7 +415,7 @@ TEST(Path, MoveFileOverwriteTest)
 	ASSERT_TRUE(dst.IsExist());
 
 	int num = 0;
-	std::ifstream test_mv_i_dst(SGE_STR_TO_UTF8(dst.GetString()).GetData());
+	std::ifstream test_mv_i_dst((char*)SGE_STR_TO_UTF8(dst.GetString()).GetData());
 	test_mv_i_dst >> num;
 	ASSERT_EQ(num, 1024);
 	test_mv_i_dst.close();
@@ -436,7 +436,7 @@ TEST(Path, CreateAndDeleteDirectoryTest)
 	CreateFile(test_file1);
 	ASSERT_TRUE(test_file1.IsExist());
 
-	std::ofstream test_file1_output(SGE_STR_TO_UTF8(test_file1.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_file1_output((char*)SGE_STR_TO_UTF8(test_file1.GetAbsolutePath().GetString()).GetData());
 	test_file1_output << "test_file1";
 	test_file1_output.close();
 
@@ -450,7 +450,7 @@ TEST(Path, CreateAndDeleteDirectoryTest)
 	CreateFile(test_file2);
 	ASSERT_TRUE(test_file2.IsExist());
 
-	std::ofstream test_file2_output(SGE_STR_TO_UTF8(test_file2.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_file2_output((char*)SGE_STR_TO_UTF8(test_file2.GetAbsolutePath().GetString()).GetData());
 	test_file2_output << "test_file2";
 	test_file2_output.close();
 
@@ -477,7 +477,7 @@ TEST(Path, CopyDirectoryTest)
 	ASSERT_FALSE(test_src_file.IsExist());
 	CreateFile(test_src_file);
 	ASSERT_TRUE(test_src_file.IsExist());
-	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_src_file_output((char*)SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
 	test_src_file_output << 256;
 	test_src_file_output.close();
 	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
@@ -509,7 +509,7 @@ TEST(Path, CopyDirectoryTest)
 	ASSERT_TRUE(test_dst_dir2.IsExist());
 	ASSERT_TRUE(test_dst_file2.IsExist());
 
-	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ifstream test_dst_file_input((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	int num = 0;
 	test_dst_file_input >> num;
 	ASSERT_EQ(num, 256);
@@ -537,7 +537,7 @@ TEST(Path, CopyDirectoryOverwriteTest)
 	ASSERT_FALSE(test_src_file.IsExist());
 	CreateFile(test_src_file);
 	ASSERT_TRUE(test_src_file.IsExist());
-	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_src_file_output((char*)SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
 	test_src_file_output << 256;
 	test_src_file_output.close();
 	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
@@ -561,7 +561,7 @@ TEST(Path, CopyDirectoryOverwriteTest)
 	CreateFile(test_dst_file);
 	ASSERT_TRUE(test_dst_dir.IsExist());
 	ASSERT_TRUE(test_dst_file.IsExist());
-	std::ofstream test_dst_file_output(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_dst_file_output((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	test_dst_file_output << 1024;
 	test_dst_file_output.close();
 
@@ -576,7 +576,7 @@ TEST(Path, CopyDirectoryOverwriteTest)
 	ASSERT_TRUE(test_dst_dir2.IsExist());
 	ASSERT_TRUE(test_dst_file2.IsExist());
 
-	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ifstream test_dst_file_input((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	int num = 0;
 	test_dst_file_input >> num;
 	ASSERT_EQ(num, 256);
@@ -604,7 +604,7 @@ TEST(Path, MoveDirectoryTest)
 	ASSERT_FALSE(test_src_file.IsExist());
 	CreateFile(test_src_file);
 	ASSERT_TRUE(test_src_file.IsExist());
-	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_src_file_output((char*)SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
 	test_src_file_output << 256;
 	test_src_file_output.close();
 	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
@@ -636,7 +636,7 @@ TEST(Path, MoveDirectoryTest)
 	ASSERT_TRUE(test_dst_dir2.IsExist());
 	ASSERT_TRUE(test_dst_file2.IsExist());
 
-	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ifstream test_dst_file_input((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	int num = 0;
 	test_dst_file_input >> num;
 	ASSERT_EQ(num, 256);
@@ -659,7 +659,7 @@ TEST(Path, MoveDirectoryOverwriteTest)
 	ASSERT_FALSE(test_src_file.IsExist());
 	CreateFile(test_src_file);
 	ASSERT_TRUE(test_src_file.IsExist());
-	std::ofstream test_src_file_output(SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_src_file_output((char*)SGE_STR_TO_UTF8(test_src_file.GetAbsolutePath().GetString()).GetData());
 	test_src_file_output << 256;
 	test_src_file_output.close();
 	Path test_src_dir2 = test_src_dir / Path(SGE_STR("test_dir2"));
@@ -683,7 +683,7 @@ TEST(Path, MoveDirectoryOverwriteTest)
 	CreateFile(test_dst_file);
 	ASSERT_TRUE(test_dst_dir.IsExist());
 	ASSERT_TRUE(test_dst_file.IsExist());
-	std::ofstream test_dst_file_output(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ofstream test_dst_file_output((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	test_dst_file_output << 1024;
 	test_dst_file_output.close();
 
@@ -698,7 +698,7 @@ TEST(Path, MoveDirectoryOverwriteTest)
 	ASSERT_TRUE(test_dst_dir2.IsExist());
 	ASSERT_TRUE(test_dst_file2.IsExist());
 
-	std::ifstream test_dst_file_input(SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
+	std::ifstream test_dst_file_input((char*)SGE_STR_TO_UTF8(test_dst_file.GetAbsolutePath().GetString()).GetData());
 	int num = 0;
 	test_dst_file_input >> num;
 	ASSERT_EQ(num, 256);
@@ -756,7 +756,7 @@ TEST(BinaryFile, ReadTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbr.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
@@ -785,7 +785,7 @@ TEST(BinaryFile, WriteTest)
 	ASSERT_TRUE(path.IsExist());
 
 	int test_data_input[4] = {0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_input.read((char*)test_data_input, sizeof(test_data_input));
 	b_input.close();
 
@@ -809,7 +809,7 @@ TEST(BinaryFile, FlushTest)
 	ASSERT_TRUE(path.IsExist());
 
 	int test_data_input[4] = {0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_input.read((char*)test_data_input, sizeof(test_data_input));
 	b_input.close();
 
@@ -826,7 +826,7 @@ TEST(BinaryFile, ReadWriteTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbrw.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
@@ -842,7 +842,7 @@ TEST(BinaryFile, ReadWriteTest)
 		ASSERT_EQ(test_data[i], test_data_input[i]);
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_input.read((char*)test_data_check, sizeof(test_data_check));
 	b_input.close();
 
@@ -861,7 +861,7 @@ TEST(BinaryFile, AppendTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testba.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
@@ -875,7 +875,7 @@ TEST(BinaryFile, AppendTest)
 	bf_append.Close();
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_input.read((char*)test_data_check, sizeof(test_data_check));
 	b_input.close();
 
@@ -894,7 +894,7 @@ TEST(BinaryFile, ReadWriteAppendTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbrwa.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
@@ -911,7 +911,7 @@ TEST(BinaryFile, ReadWriteAppendTest)
 		ASSERT_EQ(test_data[i], test_data_input[i]);
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	std::ifstream b_input(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ifstream b_input((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_input.read((char*)test_data_check, sizeof(test_data_check));
 	b_input.close();
 
@@ -930,7 +930,7 @@ TEST(BinaryFile, MoveFilePositionTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfp.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
@@ -958,7 +958,7 @@ TEST(BinaryFile, GetFileSizeTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfgs.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
@@ -983,7 +983,7 @@ TEST(BinaryFile, SetFileSizeTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbfss.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
@@ -1022,7 +1022,7 @@ TEST(BinaryFile, IsReadFinishedTest)
 	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbrf.dat"));
 	ASSERT_FALSE(path.IsExist());
 
-	std::ofstream b_output(SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
 	b_output.write((const char*)test_data, sizeof(test_data));
 	b_output.close();
 	ASSERT_TRUE(path.IsExist());
@@ -1446,7 +1446,7 @@ TEST(UCS2FileCore, SeekTest)
 
 TEST(UTF8FileCore, InstanceTest)
 {
-	FileCore<char, UTF8Trait> file;
+	FileCore<Char8, UTF8Trait> file;
 }
 
 TEST(UTF8FileCore, OpenTest)
@@ -1467,14 +1467,14 @@ TEST(UTF8FileCore, OpenTest)
 	ASSERT_TRUE(p_nb.IsExist());
 
 	{
-		FileCore<char, UTF8Trait> file(p_b, FileIOMode::Read);
+		FileCore<Char8, UTF8Trait> file(p_b, FileIOMode::Read);
 		ASSERT_TRUE(file.IsHasBomHeader());
 	}
 	{
-		FileCore<char, UTF8Trait> file(p_nb, FileIOMode::Read);
+		FileCore<Char8, UTF8Trait> file(p_nb, FileIOMode::Read);
 		ASSERT_FALSE(file.IsHasBomHeader());
 	}
-	FileCore<char, UTF8Trait> file;
+	FileCore<Char8, UTF8Trait> file;
 	file.Open(p_b, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	file.Close();
@@ -1508,7 +1508,7 @@ TEST(UTF8FileCore, SetHasBomHeaderTest)
 	ASSERT_TRUE(p_nb.IsExist());
 
 	UInt8 test_data_input[4] = {0, 0, 0, 0};
-	FileCore<char, UTF8Trait> file(p_b, FileIOMode::Read | FileIOMode::Write);
+	FileCore<Char8, UTF8Trait> file(p_b, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	memset(test_data_input, 0, sizeof(test_data_input));
 	ASSERT_EQ(file.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
@@ -1562,7 +1562,7 @@ TEST(UTF8FileCore, ReadCharTest)
 	Path p_nb(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_nbr.txt"));
 	ASSERT_FALSE(p_nb.IsExist());
 
-	char test_data[] = SGE_U8STR("测");
+	Char8 test_data[] = SGE_U8STR("测");
 	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
 	BinaryFile bf_output(p_b, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
@@ -1575,18 +1575,18 @@ TEST(UTF8FileCore, ReadCharTest)
 	bf_output.Close();
 	ASSERT_TRUE(p_nb.IsExist());
 
-	char test_data_input[sizeof(test_data) / sizeof(char)];
-	FileCore<char, UTF8Trait> file(p_b, FileIOMode::Read);
+	Char8 test_data_input[sizeof(test_data) / sizeof(Char8)];
+	FileCore<Char8, UTF8Trait> file(p_b, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	memset(test_data_input, 0, sizeof(test_data_input));
-	ASSERT_EQ(file.ReadChar(test_data_input), test_data_input + (StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(test_data)));
+	ASSERT_EQ(file.ReadChar(test_data_input), test_data_input + (StringImplement::GetMultipleByteCharSize<Char8, UTF8Trait>(test_data)));
 	ASSERT_EQ(memcmp(test_data, test_data_input, sizeof(test_data_input)), 0);
 	file.Close();
 
 	file.Open(p_nb, FileIOMode::Read);
 	ASSERT_FALSE(file.IsHasBomHeader());
 	memset(test_data_input, 0, sizeof(test_data_input));
-	ASSERT_EQ(file.ReadChar(test_data_input), test_data_input + (StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(test_data)));
+	ASSERT_EQ(file.ReadChar(test_data_input), test_data_input + (StringImplement::GetMultipleByteCharSize<Char8, UTF8Trait>(test_data)));
 	ASSERT_EQ(memcmp(test_data, test_data_input, sizeof(test_data_input)), 0);
 	file.Close();
 
@@ -1603,7 +1603,7 @@ TEST(UTF8FileCore, WriteCharTest)
 	Path p_nb(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_nbw.txt"));
 	ASSERT_FALSE(p_nb.IsExist());
 
-	char test_data[] = SGE_U8STR("测");
+	Char8 test_data[] = SGE_U8STR("测");
 	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
 	BinaryFile bf_output(p_b, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
@@ -1614,17 +1614,17 @@ TEST(UTF8FileCore, WriteCharTest)
 	bf_output.Close();
 	ASSERT_TRUE(p_nb.IsExist());
 
-	FileCore<char, UTF8Trait> file(p_b, FileIOMode::Read | FileIOMode::Write);
+	FileCore<Char8, UTF8Trait> file(p_b, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.WriteChar(test_data), test_data + (StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(test_data)));
+	ASSERT_EQ(file.WriteChar(test_data), test_data + (StringImplement::GetMultipleByteCharSize<Char8, UTF8Trait>(test_data)));
 	file.Close();
 
 	file.Open(p_nb, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_FALSE(file.IsHasBomHeader());
-	ASSERT_EQ(file.WriteChar(test_data), test_data + (StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(test_data)));
+	ASSERT_EQ(file.WriteChar(test_data), test_data + (StringImplement::GetMultipleByteCharSize<Char8, UTF8Trait>(test_data)));
 	file.Close();
 
-	char test_data_input[sizeof(test_data) / sizeof(char)];
+	Char8 test_data_input[sizeof(test_data) / sizeof(Char8)];
 	BinaryFile bf_input(p_b, FileIOMode::Read);
 	bf_input.MoveFilePosition(FilePositionOrigin::Begin, 3);
 	memset(test_data_input, 0, sizeof(test_data_input));
@@ -1651,7 +1651,7 @@ TEST(UTF8FileCore, SeekTest)
 	Path p_nb(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_nbsk.txt"));
 	ASSERT_FALSE(p_nb.IsExist());
 
-	char test_data[] = SGE_U8STR("测");
+	Char8 test_data[] = SGE_U8STR("测");
 	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
 	BinaryFile bf_output(p_b, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
@@ -1664,8 +1664,8 @@ TEST(UTF8FileCore, SeekTest)
 	bf_output.Close();
 	ASSERT_TRUE(p_nb.IsExist());
 
-	char test_data_input[sizeof(test_data) / sizeof(char)];
-	FileCore<char, UTF8Trait> file(p_b, FileIOMode::Read);
+	Char8 test_data_input[sizeof(test_data) / sizeof(Char8)];
+	FileCore<Char8, UTF8Trait> file(p_b, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.MoveFilePosition(FilePositionOrigin::Current, 0), 3);
 	memset(test_data_input, 0, sizeof(test_data_input));
@@ -2377,36 +2377,36 @@ TEST(UTF8File, OpenTest)
 
 	BinaryFile bf_output;
 	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
-	char test_str[] = SGE_U8STR("this is test 测试");
-	char test_input[sizeof(test_str) / sizeof(char)];
-	char cr[] = SGE_U8STR("\r");
-	char crlf[] = SGE_U8STR("\r\n");
-	char lf[] = SGE_U8STR("\n");
+	Char8 test_str[] = SGE_U8STR("this is test 测试");
+	Char8 test_input[sizeof(test_str) / sizeof(Char8)];
+	Char8 cr[] = SGE_U8STR("\r");
+	Char8 crlf[] = SGE_U8STR("\r\n");
+	Char8 lf[] = SGE_U8STR("\n");
 
 	bf_output.Open(p_cr, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(cr, sizeof(cr) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(cr, sizeof(cr) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_cr.IsExist());
 
 	bf_output.Open(p_lf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(lf, sizeof(lf) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(lf, sizeof(lf) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_lf.IsExist());
 
 	bf_output.Open(p_crlf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(crlf, sizeof(crlf) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_crlf.IsExist());
 
 	bf_output.Open(p_nbk, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_nbk.IsExist());
 
@@ -2415,31 +2415,31 @@ TEST(UTF8File, OpenTest)
 		ASSERT_TRUE(file.IsHasBomHeader());
 		ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
 		memset(test_input, 0, sizeof(test_input));
-		ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-		ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+		ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+		ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	}
 	UTF8File file(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	file.Close();
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	file.Close();
 
 	file.Open(p_nbk, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::Unknown);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	file.Close();
 
 	DeleteFile(p_cr);
@@ -2463,34 +2463,34 @@ TEST(UTF8File, SetFileLineBreakTest)
 
 	BinaryFile bf_output;
 	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
-	char test_str[] = SGE_U8STR("this is test 测试");
-	char test_str2[] = SGE_U8STR("file end?");
-	char test_input[sizeof(test_str) / sizeof(char)];
-	char cr[] = SGE_U8STR("\r");
-	char crlf[] = SGE_U8STR("\r\n");
-	char lf[] = SGE_U8STR("\n");
+	Char8 test_str[] = SGE_U8STR("this is test 测试");
+	Char8 test_str2[] = SGE_U8STR("file end?");
+	Char8 test_input[sizeof(test_str) / sizeof(Char8)];
+	Char8 cr[] = SGE_U8STR("\r");
+	Char8 crlf[] = SGE_U8STR("\r\n");
+	Char8 lf[] = SGE_U8STR("\n");
 
 	bf_output.Open(p_cr, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(cr, sizeof(cr) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(cr, sizeof(cr) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_cr.IsExist());
 
 	bf_output.Open(p_lf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(lf, sizeof(lf) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(lf, sizeof(lf) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_lf.IsExist());
 
 	bf_output.Open(p_crlf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(crlf, sizeof(crlf) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_crlf.IsExist());
 
@@ -2498,90 +2498,90 @@ TEST(UTF8File, SetFileLineBreakTest)
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	file.SetFileLineBreak(FileLineBreak::LF);
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(lf) - sizeof(char)), sizeof(lf) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, lf, sizeof(lf) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(lf) - sizeof(Char8)), sizeof(lf) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, lf, sizeof(lf) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(char)), sizeof(test_str2) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(Char8)), sizeof(test_str2) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(Char8)), 0);
 	file.Close();
 
 	file.Open(p_lf, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	file.SetFileLineBreak(FileLineBreak::CRLF);
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(crlf) - sizeof(char)), sizeof(crlf) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, crlf, sizeof(crlf) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(crlf) - sizeof(Char8)), sizeof(crlf) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, crlf, sizeof(crlf) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(char)), sizeof(test_str2) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(Char8)), sizeof(test_str2) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(Char8)), 0);
 	file.Close();
 
 	file.Open(p_crlf, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	file.SetFileLineBreak(FileLineBreak::CR);
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(cr) - sizeof(char)), sizeof(cr) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, cr, sizeof(cr) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(cr) - sizeof(Char8)), sizeof(cr) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, cr, sizeof(cr) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(char)), sizeof(test_str2) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(Char8)), sizeof(test_str2) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(Char8)), 0);
 	file.Close();
 
 	file.Open(p_cr, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(lf) - sizeof(char)), sizeof(lf) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, lf, sizeof(lf) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(lf) - sizeof(Char8)), sizeof(lf) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, lf, sizeof(lf) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(char)), sizeof(test_str2) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(Char8)), sizeof(test_str2) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(Char8)), 0);
 	file.Close();
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(crlf) - sizeof(char)), sizeof(crlf) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, crlf, sizeof(crlf) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(crlf) - sizeof(Char8)), sizeof(crlf) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, crlf, sizeof(crlf) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(char)), sizeof(test_str2) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(Char8)), sizeof(test_str2) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(Char8)), 0);
 	file.Close();
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(char)), sizeof(test_input) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(cr) - sizeof(char)), sizeof(cr) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, cr, sizeof(cr) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(cr) - sizeof(Char8)), sizeof(cr) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, cr, sizeof(cr) - sizeof(Char8)), 0);
 	memset(test_input, 0, sizeof(test_input));
-	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(char)), sizeof(test_str2) - sizeof(char));
-	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(char)), 0);
+	ASSERT_EQ(file.Read(test_input, sizeof(test_str2) - sizeof(Char8)), sizeof(test_str2) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str2, sizeof(test_str2) - sizeof(Char8)), 0);
 	file.Close();
 
 	DeleteFile(p_cr);
@@ -2603,33 +2603,33 @@ TEST(UTF8File, ReadLineTest)
 
 	BinaryFile bf_output;
 	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
-	char test_str[] = SGE_U8STR("this is test 测试");
-	char test_str2[] = SGE_U8STR("file end?");
-	char cr[] = SGE_U8STR("\r");
-	char crlf[] = SGE_U8STR("\r\n");
-	char lf[] = SGE_U8STR("\n");
+	Char8 test_str[] = SGE_U8STR("this is test 测试");
+	Char8 test_str2[] = SGE_U8STR("file end?");
+	Char8 cr[] = SGE_U8STR("\r");
+	Char8 crlf[] = SGE_U8STR("\r\n");
+	Char8 lf[] = SGE_U8STR("\n");
 
 	bf_output.Open(p_cr, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(cr, sizeof(cr) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(cr, sizeof(cr) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_cr.IsExist());
 
 	bf_output.Open(p_lf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(lf, sizeof(lf) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(lf, sizeof(lf) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_lf.IsExist());
 
 	bf_output.Open(p_crlf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(crlf, sizeof(crlf) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_crlf.IsExist());
 
@@ -2673,33 +2673,33 @@ TEST(UTF8File, ReadWordTest)
 
 	BinaryFile bf_output;
 	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
-	char test_str[] = SGE_U8STR("this is test 测试");
-	char test_str2[] = SGE_U8STR("file end?");
-	char cr[] = SGE_U8STR("\r");
-	char crlf[] = SGE_U8STR("\r\n");
-	char lf[] = SGE_U8STR("\n");
+	Char8 test_str[] = SGE_U8STR("this is test 测试");
+	Char8 test_str2[] = SGE_U8STR("file end?");
+	Char8 cr[] = SGE_U8STR("\r");
+	Char8 crlf[] = SGE_U8STR("\r\n");
+	Char8 lf[] = SGE_U8STR("\n");
 
 	bf_output.Open(p_cr, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(cr, sizeof(cr) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(cr, sizeof(cr) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_cr.IsExist());
 
 	bf_output.Open(p_lf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(lf, sizeof(lf) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(lf, sizeof(lf) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_lf.IsExist());
 
 	bf_output.Open(p_crlf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(crlf, sizeof(crlf) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_crlf.IsExist());
 
@@ -2755,36 +2755,36 @@ TEST(UTF8File, ReadOperatorTest)
 
 	BinaryFile bf_output;
 	UInt8 bom[3] = {0xef, 0xbb, 0xbf};
-	char test_str[] = SGE_U8STR("1 1.5 2.5");
-	char test_str2[] = SGE_U8STR("str");
-	char cr[] = SGE_U8STR("\r");
-	char crlf[] = SGE_U8STR("\r\n");
-	char lf[] = SGE_U8STR("\n");
+	Char8 test_str[] = SGE_U8STR("1 1.5 2.5");
+	Char8 test_str2[] = SGE_U8STR("str");
+	Char8 cr[] = SGE_U8STR("\r");
+	Char8 crlf[] = SGE_U8STR("\r\n");
+	Char8 lf[] = SGE_U8STR("\n");
 
 	bf_output.Open(p_cr, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(cr, sizeof(cr) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
-	bf_output.Write(cr, sizeof(cr) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(cr, sizeof(cr) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
+	bf_output.Write(cr, sizeof(cr) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_cr.IsExist());
 
 	bf_output.Open(p_lf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(lf, sizeof(lf) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
-	bf_output.Write(lf, sizeof(lf) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(lf, sizeof(lf) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
+	bf_output.Write(lf, sizeof(lf) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_lf.IsExist());
 
 	bf_output.Open(p_crlf, FileIOMode::Write);
 	bf_output.Write(bom, sizeof(bom));
-	bf_output.Write(test_str, sizeof(test_str) - sizeof(char));
-	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
-	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(char));
-	bf_output.Write(crlf, sizeof(crlf) - sizeof(char));
+	bf_output.Write(test_str, sizeof(test_str) - sizeof(Char8));
+	bf_output.Write(crlf, sizeof(crlf) - sizeof(Char8));
+	bf_output.Write(test_str2, sizeof(test_str2) - sizeof(Char8));
+	bf_output.Write(crlf, sizeof(crlf) - sizeof(Char8));
 	bf_output.Close();
 	ASSERT_TRUE(p_crlf.IsExist());
 
@@ -2856,11 +2856,11 @@ TEST(UTF8File, WriteStringTest)
 	ASSERT_FALSE(p_crlf.IsExist());
 
 	UTF8File output_file;
-	char test_str[] = SGE_U8STR("this is test 测试");
-	char test_str2[] = SGE_U8STR("file end?");
-	char cr[] = SGE_U8STR("\r");
-	char crlf[] = SGE_U8STR("\r\n");
-	char lf[] = SGE_U8STR("\n");
+	Char8 test_str[] = SGE_U8STR("this is test 测试");
+	Char8 test_str2[] = SGE_U8STR("file end?");
+	Char8 cr[] = SGE_U8STR("\r");
+	Char8 crlf[] = SGE_U8STR("\r\n");
+	Char8 lf[] = SGE_U8STR("\n");
 
 	output_file.Open(p_cr, FileIOMode::Read | FileIOMode::Write);
 	output_file.SetHasBomHeader(true);

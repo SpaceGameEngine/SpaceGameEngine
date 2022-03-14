@@ -34,44 +34,44 @@ TEST(ContainerConcept, GetIteratorValueTypeTest)
 
 TEST(ContainerConcept, IsBaseIteratorTest)
 {
-	ASSERT_TRUE((IsBaseIterator<int*>::Value));
-	ASSERT_TRUE((IsBaseIterator<const int*>::Value));
-	ASSERT_TRUE((IsBaseIterator<std::vector<int>::iterator>::Value));
-	ASSERT_TRUE((IsBaseIterator<std::vector<int>::const_iterator>::Value));
-	ASSERT_TRUE((IsBaseIterator<Vector<int>::Iterator>::Value));
-	ASSERT_TRUE((IsBaseIterator<Vector<int>::ConstIterator>::Value));
-	ASSERT_FALSE((IsBaseIterator<int>::Value));
+	ASSERT_TRUE((IsBaseIterator<int*>));
+	ASSERT_TRUE((IsBaseIterator<const int*>));
+	ASSERT_TRUE((IsBaseIterator<std::vector<int>::iterator>));
+	ASSERT_TRUE((IsBaseIterator<std::vector<int>::const_iterator>));
+	ASSERT_TRUE((IsBaseIterator<Vector<int>::Iterator>));
+	ASSERT_TRUE((IsBaseIterator<Vector<int>::ConstIterator>));
+	ASSERT_FALSE((IsBaseIterator<int>));
 }
 
 TEST(ContainerConcept, IsBidirectionalBaseIteratorTest)
 {
-	ASSERT_TRUE((IsBidirectionalBaseIterator<int*>::Value));
-	ASSERT_TRUE((IsBidirectionalBaseIterator<const int*>::Value));
-	ASSERT_TRUE((IsBidirectionalBaseIterator<std::vector<int>::iterator>::Value));
-	ASSERT_TRUE((IsBidirectionalBaseIterator<std::vector<int>::const_iterator>::Value));
-	ASSERT_TRUE((IsBidirectionalBaseIterator<Vector<int>::Iterator>::Value));
-	ASSERT_TRUE((IsBidirectionalBaseIterator<Vector<int>::ConstIterator>::Value));
-	ASSERT_FALSE((IsBidirectionalBaseIterator<int>::Value));
-	ASSERT_TRUE((IsBaseIterator<std::forward_list<int>::iterator>::Value));
-	ASSERT_FALSE((IsBidirectionalBaseIterator<std::forward_list<int>::iterator>::Value));
+	ASSERT_TRUE((IsBidirectionalBaseIterator<int*>));
+	ASSERT_TRUE((IsBidirectionalBaseIterator<const int*>));
+	ASSERT_TRUE((IsBidirectionalBaseIterator<std::vector<int>::iterator>));
+	ASSERT_TRUE((IsBidirectionalBaseIterator<std::vector<int>::const_iterator>));
+	ASSERT_TRUE((IsBidirectionalBaseIterator<Vector<int>::Iterator>));
+	ASSERT_TRUE((IsBidirectionalBaseIterator<Vector<int>::ConstIterator>));
+	ASSERT_FALSE((IsBidirectionalBaseIterator<int>));
+	ASSERT_TRUE((IsBaseIterator<std::forward_list<int>::iterator>));
+	ASSERT_FALSE((IsBidirectionalBaseIterator<std::forward_list<int>::iterator>));
 }
 
 TEST(ContainerConcept, IsSequentialIteratorTest)
 {
-	ASSERT_TRUE((IsSequentialIterator<Vector<int>::Iterator>::Value));
-	ASSERT_TRUE((IsSequentialIterator<Vector<int>::ConstIterator>::Value));
-	ASSERT_TRUE((IsSequentialIterator<std::vector<int>::iterator>::Value));
-	ASSERT_TRUE((IsSequentialIterator<std::vector<int>::const_iterator>::Value));
-	ASSERT_FALSE((IsSequentialIterator<std::forward_list<int>::const_iterator>::Value));
-	ASSERT_FALSE((IsSequentialIterator<int>::Value));
+	ASSERT_TRUE((IsSequentialIterator<Vector<int>::Iterator>));
+	ASSERT_TRUE((IsSequentialIterator<Vector<int>::ConstIterator>));
+	ASSERT_TRUE((IsSequentialIterator<std::vector<int>::iterator>));
+	ASSERT_TRUE((IsSequentialIterator<std::vector<int>::const_iterator>));
+	ASSERT_FALSE((IsSequentialIterator<std::forward_list<int>::const_iterator>));
+	ASSERT_FALSE((IsSequentialIterator<int>));
 }
 
 TEST(ContainerConcept, IsBidirectionalSequentialIteratorTest)
 {
-	ASSERT_TRUE((IsBidirectionalSequentialIterator<Vector<int>::Iterator>::Value));
-	ASSERT_TRUE((IsBidirectionalSequentialIterator<Vector<int>::ConstIterator>::Value));
-	ASSERT_TRUE((IsBidirectionalSequentialIterator<std::vector<int>::iterator>::Value));
-	ASSERT_TRUE((IsBidirectionalSequentialIterator<std::vector<int>::const_iterator>::Value));
-	ASSERT_FALSE((IsBidirectionalSequentialIterator<std::forward_list<int>::const_iterator>::Value));
-	ASSERT_FALSE((IsBidirectionalSequentialIterator<int>::Value));
+	ASSERT_TRUE((IsBidirectionalSequentialIterator<Vector<int>::Iterator>));
+	ASSERT_TRUE((IsBidirectionalSequentialIterator<Vector<int>::ConstIterator>));
+	ASSERT_TRUE((IsBidirectionalSequentialIterator<std::vector<int>::iterator>));
+	ASSERT_TRUE((IsBidirectionalSequentialIterator<std::vector<int>::const_iterator>));
+	ASSERT_FALSE((IsBidirectionalSequentialIterator<std::forward_list<int>::const_iterator>));
+	ASSERT_FALSE((IsBidirectionalSequentialIterator<int>));
 }

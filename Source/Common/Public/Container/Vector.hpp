@@ -59,7 +59,7 @@ namespace SpaceGameEngine
 
 		inline static const constexpr SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(T);
 
-		static_assert(IsCopyable<T>::Value, "Vector does not support this type");
+		static_assert(IsCopyable<T>, "Vector does not support this type");
 
 		struct EmptyVectorError
 		{
@@ -91,7 +91,7 @@ namespace SpaceGameEngine
 		{
 			if (m_pContent)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 				}
 				else
@@ -115,7 +115,7 @@ namespace SpaceGameEngine
 			m_RealSize = v.m_RealSize;
 			m_Size = v.m_Size;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			if constexpr (IsTrivial<T>::Value)
+			if constexpr (IsTrivial<T>)
 			{
 				std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
 			}
@@ -159,7 +159,7 @@ namespace SpaceGameEngine
 			{
 				if (m_Size >= v.m_Size)
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						m_Size = v.m_Size;
 						std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
@@ -179,7 +179,7 @@ namespace SpaceGameEngine
 				}
 				else if (m_RealSize >= v.m_Size)
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						m_Size = v.m_Size;
 						std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
@@ -200,7 +200,7 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						Allocator::RawDelete(m_pContent);
 						m_RealSize = v.m_RealSize;
@@ -230,7 +230,7 @@ namespace SpaceGameEngine
 				m_RealSize = v.m_RealSize;
 				m_Size = v.m_Size;
 				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 					std::memcpy(m_pContent, v.m_pContent, m_Size * sizeof(T));
 				}
@@ -255,7 +255,7 @@ namespace SpaceGameEngine
 			SGE_ASSERT(SelfAssignmentError, this, &v);
 			if (m_pContent)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 				}
 				else
@@ -288,7 +288,7 @@ namespace SpaceGameEngine
 			m_Size = v.GetSize();
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 
-			if constexpr (IsTrivial<T>::Value)
+			if constexpr (IsTrivial<T>)
 			{
 				std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 			}
@@ -313,7 +313,7 @@ namespace SpaceGameEngine
 			m_Size = v.GetSize();
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 
-			if constexpr (IsTrivial<T>::Value)
+			if constexpr (IsTrivial<T>)
 			{
 				std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 			}
@@ -336,7 +336,7 @@ namespace SpaceGameEngine
 			{
 				if (m_Size >= v.GetSize())
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						m_Size = v.GetSize();
 						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
@@ -356,7 +356,7 @@ namespace SpaceGameEngine
 				}
 				else if (m_RealSize >= v.GetSize())
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						m_Size = v.GetSize();
 						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
@@ -377,7 +377,7 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						Allocator::RawDelete(m_pContent);
 						m_RealSize = v.GetRealSize();
@@ -408,7 +408,7 @@ namespace SpaceGameEngine
 				m_Size = v.GetSize();
 				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
@@ -442,7 +442,7 @@ namespace SpaceGameEngine
 			{
 				if (m_Size >= v.GetSize())
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						m_Size = v.GetSize();
 						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
@@ -462,7 +462,7 @@ namespace SpaceGameEngine
 				}
 				else if (m_RealSize >= v.GetSize())
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						m_Size = v.GetSize();
 						std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
@@ -483,7 +483,7 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						Allocator::RawDelete(m_pContent);
 						m_RealSize = v.GetRealSize();
@@ -514,7 +514,7 @@ namespace SpaceGameEngine
 				m_Size = v.GetSize();
 				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 					std::memcpy(m_pContent, v.GetData(), m_Size * sizeof(T));
 				}
@@ -534,7 +534,7 @@ namespace SpaceGameEngine
 			m_Size = ilist.size();
 			m_RealSize = ilist.size() * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			if constexpr (IsTrivial<T>::Value)
+			if constexpr (IsTrivial<T>)
 			{
 				std::memcpy(m_pContent, ilist.begin(), m_Size * sizeof(T));
 			}
@@ -587,7 +587,7 @@ namespace SpaceGameEngine
 			}
 		}
 
-		template<typename IteratorType, typename = std::enable_if_t<IsSequentialIterator<IteratorType>::Value, void>>
+		template<typename IteratorType, typename = std::enable_if_t<IsSequentialIterator<IteratorType>, void>>
 		inline Vector(const IteratorType& begin, const IteratorType& end)
 		{
 			SizeType size = end - begin;
@@ -620,7 +620,7 @@ namespace SpaceGameEngine
 			{
 				auto pbuffer = m_pContent;
 				m_pContent = Allocator::RawNew(size * sizeof(T), alignof(T));
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 					std::memcpy(m_pContent, pbuffer, m_Size * sizeof(T));
 				}
@@ -648,7 +648,7 @@ namespace SpaceGameEngine
 		{
 			if (m_pContent)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 				}
 				else
@@ -686,7 +686,7 @@ namespace SpaceGameEngine
 				return;
 			else if (size < m_Size)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 				}
 				else
@@ -896,6 +896,18 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent;
 			}
 
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pContent == iter.m_pContent;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator!=(const IteratorType& iter) const
+			{
+				return m_pContent != iter.m_pContent;
+			}
+
 			inline ValueType* GetData() const
 			{
 				return m_pContent;
@@ -1039,6 +1051,18 @@ namespace SpaceGameEngine
 			}
 
 			inline bool operator!=(const ReverseIteratorImpl& iter) const
+			{
+				return m_pContent != iter.m_pContent;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pContent == iter.m_pContent;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator!=(const IteratorType& iter) const
 			{
 				return m_pContent != iter.m_pContent;
 			}
@@ -1193,7 +1217,7 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
 					}
@@ -1221,7 +1245,7 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
 					}
@@ -1260,7 +1284,7 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
 					}
@@ -1288,7 +1312,7 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
 					}
@@ -1324,7 +1348,7 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + index + 1, (T*)(m_pContent) + index, (m_Size - 2 - index) * sizeof(T));
 					}
@@ -1352,7 +1376,7 @@ namespace SpaceGameEngine
 				{
 					T tbuf(std::move(GetObject(m_Size - 1)));
 					PushBack(std::move(tbuf));
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + m_Size - index, (T*)(m_pContent) + m_Size - index - 1, (index - 1) * sizeof(T));
 					}
@@ -1406,7 +1430,7 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
 					}
@@ -1461,7 +1485,7 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
 					}
@@ -1500,7 +1524,7 @@ namespace SpaceGameEngine
 		@return Iterator pointing to the first inserted value.
 		@note use copy not move to insert elements.
 		*/
-		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>::Value, bool>>
+		template<typename IteratorType, typename AnotherIteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>, typename = std::enable_if_t<IsSequentialIterator<AnotherIteratorType>, bool>>
 		inline IteratorType Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -1532,7 +1556,7 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
 					}
@@ -1592,7 +1616,7 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
 					}
@@ -1667,7 +1691,7 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
 					}
@@ -1727,7 +1751,7 @@ namespace SpaceGameEngine
 						SetRealSize(2 * (m_Size + size));
 					}
 
-					if constexpr (IsTrivial<T>::Value)
+					if constexpr (IsTrivial<T>)
 					{
 						memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
 					}
@@ -1785,7 +1809,7 @@ namespace SpaceGameEngine
 			SGE_ASSERT(EmptyVectorError, m_Size);
 			SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 
-			if constexpr (IsTrivial<T>::Value)
+			if constexpr (IsTrivial<T>)
 			{
 			}
 			else
@@ -1795,7 +1819,7 @@ namespace SpaceGameEngine
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 					memmove((T*)(iter.GetData()), (T*)(iter.GetData()) + 1, ((IteratorType::GetEnd(*this) - iter) - 1) * sizeof(T));
 				}
@@ -1815,7 +1839,7 @@ namespace SpaceGameEngine
 			}
 			else	//reverse
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 					memmove((T*)(iter.GetData()), (T*)(iter.GetData()) + 1, (iter - IteratorType::GetBegin(*this)) * sizeof(T));
 				}
@@ -1858,7 +1882,7 @@ namespace SpaceGameEngine
 			SizeType size = end - begin;
 			SGE_ASSERT(InvalidValueError, size, 1, m_Size);
 
-			if constexpr (IsTrivial<T>::Value)
+			if constexpr (IsTrivial<T>)
 			{
 			}
 			else
@@ -1871,7 +1895,7 @@ namespace SpaceGameEngine
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 					memmove((T*)(begin.GetData()), (T*)(end.GetData()), (IteratorType::GetEnd(*this) - end) * sizeof(T));
 				}
@@ -1895,7 +1919,7 @@ namespace SpaceGameEngine
 			}
 			else	//reverse
 			{
-				if constexpr (IsTrivial<T>::Value)
+				if constexpr (IsTrivial<T>)
 				{
 					memmove((T*)(end.GetData()) + 1, (T*)(begin.GetData()) + 1, (begin - IteratorType::GetBegin(*this)) * sizeof(T));
 				}

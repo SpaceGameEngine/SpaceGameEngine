@@ -2140,7 +2140,7 @@ TEST(Vector, TrivialInsertTest)
 
 	Vector<int> v1{0, 2};
 	ASSERT_EQ(v1.GetSize(), 2);
-	ASSERT_TRUE((IsTrivial<int>::Value));
+	ASSERT_TRUE((IsTrivial<int>));
 
 	int v = -1;
 
@@ -2182,7 +2182,7 @@ TEST(Vector, TrivialInsertTest)
 
 	Vector<int> v2{0, 2};
 	ASSERT_EQ(v2.GetSize(), 2);
-	ASSERT_TRUE((IsTrivial<int>::Value));
+	ASSERT_TRUE((IsTrivial<int>));
 
 	v2.Insert(v2.GetEnd() - 1, -1);
 	ASSERT_EQ(v2.GetSize(), 3);
@@ -2290,7 +2290,7 @@ TEST(Vector, TrivialEmplaceTest)
 {
 	Vector<int> v1{0, 2};
 	ASSERT_EQ(v1.GetSize(), 2);
-	ASSERT_TRUE((IsTrivial<int>::Value));
+	ASSERT_TRUE((IsTrivial<int>));
 
 	v1.Emplace(v1.GetEnd() - 1, -1);
 	ASSERT_EQ(v1.GetSize(), 3);

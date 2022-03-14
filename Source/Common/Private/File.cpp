@@ -124,7 +124,7 @@ bool SpaceGameEngine::Path::IsExist() const
 	}
 	return re;
 #elif defined(SGE_POSIX)
-	return access(SGE_STR_TO_TSTR(astr).GetData(), F_OK) == 0;
+	return access((const char*)SGE_STR_TO_TSTR(astr).GetData(), F_OK) == 0;
 #else
 #error this os has not been supported.
 #endif
@@ -152,7 +152,7 @@ SpaceGameEngine::PathType SpaceGameEngine::Path::GetPathType() const
 	}
 #elif defined(SGE_POSIX)
 	struct stat buf;
-	int stat_re = stat(SGE_STR_TO_TSTR(astr).GetData(), &buf);
+	int stat_re = stat((const char*)SGE_STR_TO_TSTR(astr).GetData(), &buf);
 	if (stat_re == 0)
 	{
 		if (S_ISLNK(buf.st_mode))
@@ -176,7 +176,8 @@ SpaceGameEngine::Path SpaceGameEngine::Path::GetAbsolutePath() const
 	{
 #ifdef SGE_WINDOWS
 		const SizeType buf_size = 4096;
-		TChar out_buffer[buf_size] = SGE_TSTR("");
+		TChar out_buffer[buf_size];
+		memset(out_buffer, 0, sizeof(out_buffer));
 		SGE_CHECK(GetFullPathNameFailError, GetFullPathName(SGE_STR_TO_TSTR(m_Content).GetData(), buf_size, out_buffer, NULL), buf_size);
 		return Path(SGE_TSTR_TO_STR(out_buffer));
 #elif defined(SGE_POSIX)
@@ -234,12 +235,12 @@ SpaceGameEngine::Vector<SpaceGameEngine::Pair<SpaceGameEngine::Path, SpaceGameEn
 	SGE_CHECK(FindCloseFailError, FindClose(handle));
 	SGE_CHECK(FindNextFileFailError, GetLastError());
 #elif defined(SGE_POSIX)
-	DIR* pdir = opendir(SGE_STR_TO_TSTR(astr).GetData());
+	DIR* pdir = opendir((const char*)SGE_STR_TO_TSTR(astr).GetData());
 	SGE_CHECK(OpenDirFailError, pdir);
 	dirent* pchild = nullptr;
 	while (pchild = readdir(pdir))
 	{
-		if (strcmp(pchild->d_name, SGE_TSTR(".")) == 0 || strcmp(pchild->d_name, SGE_TSTR("..")) == 0)
+		if (strcmp(pchild->d_name, (const char*)SGE_TSTR(".")) == 0 || strcmp(pchild->d_name, (const char*)SGE_TSTR("..")) == 0)
 			continue;
 		PathType pt = PathType::NotExist;
 		if (pchild->d_type == DT_LNK)
@@ -250,7 +251,7 @@ SpaceGameEngine::Vector<SpaceGameEngine::Pair<SpaceGameEngine::Path, SpaceGameEn
 			pt = PathType::File;
 		else
 			pt = PathType::Unknown;
-		re.EmplaceBack(Pair<Path, PathType>(Path(astr + SGE_STR("/") + SGE_TSTR_TO_STR(pchild->d_name)), pt));
+		re.EmplaceBack(Pair<Path, PathType>(Path(astr + SGE_STR("/") + SGE_TSTR_TO_STR((const char8_t*)pchild->d_name)), pt));
 	}
 	SGE_CHECK(CloseDirFailError, closedir(pdir));
 #else
@@ -299,8 +300,8 @@ bool SpaceGameEngine::Path::IsEquivalent(const Path& path) const
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	struct stat sbuf1, sbuf2;
-	SGE_CHECK(StatFailError, stat(SGE_STR_TO_TSTR(astr1).GetData(), &sbuf1));
-	SGE_CHECK(StatFailError, stat(SGE_STR_TO_TSTR(astr2).GetData(), &sbuf2));
+	SGE_CHECK(StatFailError, stat((const char*)SGE_STR_TO_TSTR(astr1).GetData(), &sbuf1));
+	SGE_CHECK(StatFailError, stat((const char*)SGE_STR_TO_TSTR(astr2).GetData(), &sbuf2));
 	return (sbuf1.st_dev == sbuf2.st_dev) && (sbuf1.st_ino == sbuf2.st_ino);
 #else
 #error this os has not been supported.
@@ -399,11 +400,12 @@ SpaceGameEngine::String SpaceGameEngine::NormalizeAbsolutePathString(const Strin
 SpaceGameEngine::Path SpaceGameEngine::GetCurrentDirectoryPath()
 {
 	const SizeType buf_size = 4096;
-	TChar out_buffer[buf_size] = SGE_TSTR("");
+	TChar out_buffer[buf_size];
+	memset(out_buffer, 0, sizeof(out_buffer));
 #ifdef SGE_WINDOWS
 	SGE_CHECK(GetCurrentDirectoryFailError, GetCurrentDirectory(buf_size, out_buffer), buf_size);
 #elif defined(SGE_POSIX)
-	SGE_CHECK(GetCWDFailError, getcwd(out_buffer, buf_size));
+	SGE_CHECK(GetCWDFailError, getcwd((char*)out_buffer, buf_size));
 #else
 #error this os has not been supported.
 #endif
@@ -417,7 +419,7 @@ void SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
 #ifdef SGE_WINDOWS
 	SGE_CHECK(SetCurrentDirectoryFailError, SetCurrentDirectory(SGE_STR_TO_TSTR(apath.GetString()).GetData()));
 #elif defined(SGE_POSIX)
-	SGE_CHECK(ChDirFailError, chdir(SGE_STR_TO_TSTR(apath.GetString()).GetData()));
+	SGE_CHECK(ChDirFailError, chdir((const char*)SGE_STR_TO_TSTR(apath.GetString()).GetData()));
 #else
 #error this os has not been supported.
 #endif
@@ -426,19 +428,21 @@ void SpaceGameEngine::SetCurrentDirectoryPath(const Path& path)
 SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 {
 	const SizeType buf_size = 4096;
-	TChar out_buffer[buf_size] = SGE_TSTR("");
+	TChar out_buffer[buf_size];
+	memset(out_buffer, 0, sizeof(out_buffer));
 #ifdef SGE_WINDOWS
 	SGE_CHECK(GetModuleFileNameFailError, GetModuleFileName(NULL, out_buffer, buf_size), buf_size);
 #elif defined(SGE_LINUX)
-	SizeType re_size = readlink("/proc/self/exe", out_buffer, buf_size);
+	SizeType re_size = readlink("/proc/self/exe", (char*)out_buffer, buf_size);
 	SGE_CHECK(ReadLinkFailError, re_size);
 	out_buffer[re_size] = SGE_TSTR('\0');
 #elif defined(SGE_MACOS)
 	uint32_t buf_size2 = buf_size;
-	TChar out_buffer2[buf_size] = SGE_TSTR("");
-	SGE_CHECK(NSGetExecutablePathFailError, _NSGetExecutablePath(out_buffer2, &buf_size2));
+	TChar out_buffer2[buf_size];
+	memset(out_buffer2, 0, sizeof(out_buffer2));
+	SGE_CHECK(NSGetExecutablePathFailError, _NSGetExecutablePath((char*)out_buffer2, &buf_size2));
 	out_buffer2[buf_size2] = SGE_TSTR('\0');
-	SGE_CHECK(RealPathFailError, realpath(out_buffer2, out_buffer));
+	SGE_CHECK(RealPathFailError, realpath((char*)out_buffer2, (char*)out_buffer));
 #else
 #error this os has not been supported.
 #endif
@@ -459,7 +463,7 @@ void SpaceGameEngine::CreateFile(const Path& path)
 	SGE_CHECK(CloseHandleFailError, CloseHandle(handle));
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
-	int fd = creat(SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO);
+	int fd = creat((const char*)SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(CreatFailError, fd);
 	SGE_CHECK(CloseFailError, close(fd));
 #else
@@ -478,7 +482,7 @@ void SpaceGameEngine::DeleteFile(const Path& path)
 	SGE_CHECK(DeleteFileFailError, DeleteFile(SGE_STR_TO_TSTR(astr).GetData()));
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
-	SGE_CHECK(UnlinkFailError, unlink(SGE_STR_TO_TSTR(astr).GetData()));
+	SGE_CHECK(UnlinkFailError, unlink((const char*)SGE_STR_TO_TSTR(astr).GetData()));
 #else
 #error this os has not been supported.
 #endif
@@ -505,7 +509,7 @@ void SpaceGameEngine::CopyFile(const Path& dst, const Path& src, bool can_overwr
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
 	//no portable solution for unix platform to copy file, so use STL
-	SGE_CHECK(STLCopyFileFailError, std::filesystem::copy_file(std::filesystem::path(SGE_STR_TO_UTF8(sstr).GetData()), std::filesystem::path(SGE_STR_TO_UTF8(dstr).GetData()), (can_overwrite ? std::filesystem::copy_options::overwrite_existing : std::filesystem::copy_options::none)));
+	SGE_CHECK(STLCopyFileFailError, std::filesystem::copy_file(std::filesystem::path((const char*)SGE_STR_TO_UTF8(sstr).GetData()), std::filesystem::path((const char*)SGE_STR_TO_UTF8(dstr).GetData()), (can_overwrite ? std::filesystem::copy_options::overwrite_existing : std::filesystem::copy_options::none)));
 #else
 #error this os has not been supported.
 #endif
@@ -533,7 +537,7 @@ void SpaceGameEngine::MoveFile(const Path& dst, const Path& src, bool can_overwr
 #elif defined(SGE_POSIX)
 	if (!can_overwrite)
 		SGE_CHECK(PathExistError, dst);
-	SGE_CHECK(RenameFailError, rename(SGE_STR_TO_TSTR(sstr).GetData(), SGE_STR_TO_TSTR(dstr).GetData()));
+	SGE_CHECK(RenameFailError, rename((const char*)SGE_STR_TO_TSTR(sstr).GetData(), (const char*)SGE_STR_TO_TSTR(dstr).GetData()));
 #else
 #error this os has not been supported.
 #endif
@@ -552,7 +556,7 @@ void SpaceGameEngine::CreateDirectory(const Path& path)
 	SGE_CHECK(CreateDirectoryFailError, CreateDirectory(SGE_STR_TO_TSTR(astr).GetData(), NULL));
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
-	SGE_CHECK(MkdirFailError, mkdir(SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO));
+	SGE_CHECK(MkdirFailError, mkdir((const char*)SGE_STR_TO_TSTR(astr).GetData(), S_IRWXU | S_IRWXG | S_IRWXO));
 #else
 #error this os has not been supported.
 #endif
@@ -580,7 +584,7 @@ void SpaceGameEngine::DeleteDirectory(const Path& path)
 #ifdef SGE_WINDOWS
 	SGE_CHECK(RemoveDirectoryFailError, RemoveDirectory(SGE_STR_TO_TSTR(astr).GetData()));
 #elif defined(SGE_POSIX)
-	SGE_CHECK(RmdirFailError, rmdir(SGE_STR_TO_TSTR(astr).GetData()));
+	SGE_CHECK(RmdirFailError, rmdir((const char*)SGE_STR_TO_TSTR(astr).GetData()));
 #else
 #error this os has not been supported.
 #endif
@@ -957,7 +961,7 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 		oflag = O_WRONLY;
 	if (mode != FileIOMode::Read)
 		oflag |= O_CREAT;
-	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
+	m_Handle = open((const char*)SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(OpenFailError, m_Handle);
 #else
 #error this os has not been supported.
@@ -1017,7 +1021,7 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 		oflag = O_WRONLY;
 	if (mode != FileIOMode::Read)
 		oflag |= O_CREAT;
-	m_Handle = open(SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
+	m_Handle = open((const char*)SGE_STR_TO_TSTR(astr).GetData(), oflag, S_IRWXU | S_IRWXG | S_IRWXO);
 	SGE_CHECK(OpenFailError, m_Handle);
 #else
 #error this os has not been supported.
@@ -1473,12 +1477,12 @@ bool SpaceGameEngine::InvalidUCS2FileSizeError::Judge(SizeType size)
 	return size % 2 == 1;
 }
 
-SpaceGameEngine::FileCore<char, UTF8Trait>::FileCore()
+SpaceGameEngine::FileCore<Char8, UTF8Trait>::FileCore()
 	: BinaryFile(), m_HasBomHeader(false)
 {
 }
 
-SpaceGameEngine::FileCore<char, UTF8Trait>::FileCore(const Path& path, FileIOMode mode)
+SpaceGameEngine::FileCore<Char8, UTF8Trait>::FileCore(const Path& path, FileIOMode mode)
 	: BinaryFile(path, mode)
 {
 	if ((UInt8)(mode & FileIOMode::Read))
@@ -1487,7 +1491,7 @@ SpaceGameEngine::FileCore<char, UTF8Trait>::FileCore(const Path& path, FileIOMod
 		m_HasBomHeader = false;
 }
 
-void SpaceGameEngine::FileCore<char, UTF8Trait>::Open(const Path& path, FileIOMode mode)
+void SpaceGameEngine::FileCore<Char8, UTF8Trait>::Open(const Path& path, FileIOMode mode)
 {
 	BinaryFile::Open(path, mode);
 	if ((UInt8)(mode & FileIOMode::Read))
@@ -1496,12 +1500,12 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::Open(const Path& path, FileIOMo
 		m_HasBomHeader = false;
 }
 
-bool SpaceGameEngine::FileCore<char, UTF8Trait>::IsHasBomHeader() const
+bool SpaceGameEngine::FileCore<Char8, UTF8Trait>::IsHasBomHeader() const
 {
 	return m_HasBomHeader;
 }
 
-void SpaceGameEngine::FileCore<char, UTF8Trait>::SetHasBomHeader(bool val)
+void SpaceGameEngine::FileCore<Char8, UTF8Trait>::SetHasBomHeader(bool val)
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
@@ -1516,18 +1520,18 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::SetHasBomHeader(bool val)
 	}
 }
 
-char* SpaceGameEngine::FileCore<char, UTF8Trait>::ReadChar(char* pc)
+Char8* SpaceGameEngine::FileCore<Char8, UTF8Trait>::ReadChar(Char8* pc)
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
 	SGE_ASSERT(NullPointerError, pc);
 
-	SizeType read_size = Read(pc, sizeof(char));
+	SizeType read_size = Read(pc, sizeof(Char8));
 	if (read_size)
 	{
-		SizeType left_size = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc) - 1;
+		SizeType left_size = StringImplement::GetMultipleByteCharSize<Char8, UTF8Trait>(pc) - 1;
 		if (left_size)
-			Read(pc + 1, left_size * sizeof(char));
-		using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
+			Read(pc + 1, left_size * sizeof(Char8));
+		using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<Char8, UTF8Trait>;
 		SGE_CHECK(_InvalidMultipleByteCharError, pc);
 		return pc + 1 + left_size;
 	}
@@ -1535,21 +1539,21 @@ char* SpaceGameEngine::FileCore<char, UTF8Trait>::ReadChar(char* pc)
 		return nullptr;
 }
 
-const char* SpaceGameEngine::FileCore<char, UTF8Trait>::WriteChar(const char* pc)
+const Char8* SpaceGameEngine::FileCore<Char8, UTF8Trait>::WriteChar(const Char8* pc)
 {
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
 	SGE_ASSERT(NullPointerError, pc);
-	using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<char, UTF8Trait>;
+	using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<Char8, UTF8Trait>;
 	SGE_ASSERT(_InvalidMultipleByteCharError, pc);
 
-	SizeType mchar_size = StringImplement::GetMultipleByteCharSize<char, UTF8Trait>(pc);
-	if (Write(pc, mchar_size * sizeof(char)) == mchar_size * sizeof(char))
+	SizeType mchar_size = StringImplement::GetMultipleByteCharSize<Char8, UTF8Trait>(pc);
+	if (Write(pc, mchar_size * sizeof(Char8)) == mchar_size * sizeof(Char8))
 		return pc + mchar_size;
 	else
 		return nullptr;
 }
 
-Int64 SpaceGameEngine::FileCore<char, UTF8Trait>::Seek(FilePositionOrigin origin, Int64 offset)
+Int64 SpaceGameEngine::FileCore<Char8, UTF8Trait>::Seek(FilePositionOrigin origin, Int64 offset)
 {
 	SGE_ASSERT(InvalidFilePositionOriginError, origin);
 	if (origin == FilePositionOrigin::Begin)
@@ -1571,7 +1575,7 @@ Int64 SpaceGameEngine::FileCore<char, UTF8Trait>::Seek(FilePositionOrigin origin
 		return MoveFilePosition(origin, offset);
 }
 
-void SpaceGameEngine::FileCore<char, UTF8Trait>::ReadBomHeader()
+void SpaceGameEngine::FileCore<Char8, UTF8Trait>::ReadBomHeader()
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
 
@@ -1586,7 +1590,7 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::ReadBomHeader()
 	}
 }
 
-void SpaceGameEngine::FileCore<char, UTF8Trait>::AddBomHeader()
+void SpaceGameEngine::FileCore<Char8, UTF8Trait>::AddBomHeader()
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
@@ -1610,7 +1614,7 @@ void SpaceGameEngine::FileCore<char, UTF8Trait>::AddBomHeader()
 	MoveFilePosition(FilePositionOrigin::Begin, fp + 3);
 }
 
-void SpaceGameEngine::FileCore<char, UTF8Trait>::RemoveBomHeader()
+void SpaceGameEngine::FileCore<Char8, UTF8Trait>::RemoveBomHeader()
 {
 	SGE_ASSERT(FileIOModeNotReadError, m_Mode);
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);

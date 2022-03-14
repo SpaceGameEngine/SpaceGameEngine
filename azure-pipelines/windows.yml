@@ -29,28 +29,28 @@ jobs:
 
   - template: windows-template.yml
     parameters:
-      name: 'VS2017_x86_Debug'
-      vmImage: 'vs2017-win2016'
+      name: 'VS2022_x86_Debug'
+      vmImage: 'windows-2022'
       msbuildArch: 'x86'
       msbuildConfig: 'Debug'
 
   - template: windows-template.yml
     parameters:
-      name: 'VS2017_x64_Debug'
-      vmImage: 'vs2017-win2016'
+      name: 'VS2022_x64_Debug'
+      vmImage: 'windows-2022'
       msbuildArch: 'x64'
       msbuildConfig: 'Debug'
 
   - template: windows-template.yml
     parameters:
-      name: 'VS2017_x86_Release'
-      vmImage: 'vs2017-win2016'
+      name: 'VS2022_x86_Release'
+      vmImage: 'windows-2022'
       msbuildArch: 'x86'
       msbuildConfig: 'Release'
 
   - template: windows-template.yml
     parameters:
-      name: 'VS2017_x64_Release'
-      vmImage: 'vs2017-win2016'
+      name: 'VS2022_x64_Release'
+      vmImage: 'windows-2022'
       msbuildArch: 'x64'
       msbuildConfig: 'Release'

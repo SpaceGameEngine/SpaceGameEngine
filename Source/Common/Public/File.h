@@ -380,12 +380,12 @@ namespace SpaceGameEngine
 			SGE_CHECK(FindCloseFailError, FindClose(handle));
 			SGE_CHECK(FindNextFileFailError, GetLastError());
 #elif defined(SGE_POSIX)
-			DIR* pdir = opendir(SGE_STR_TO_TSTR(astr).GetData());
+			DIR* pdir = opendir((const char*)SGE_STR_TO_TSTR(astr).GetData());
 			SGE_CHECK(OpenDirFailError, pdir);
 			dirent* pchild = nullptr;
 			while (pchild = readdir(pdir))
 			{
-				if (strcmp(pchild->d_name, SGE_TSTR(".")) == 0 || strcmp(pchild->d_name, SGE_TSTR("..")) == 0)
+				if (strcmp(pchild->d_name, (const char*)SGE_TSTR(".")) == 0 || strcmp(pchild->d_name, (const char*)SGE_TSTR("..")) == 0)
 					continue;
 				PathType pt = PathType::NotExist;
 				if (pchild->d_type == DT_LNK)
@@ -396,7 +396,7 @@ namespace SpaceGameEngine
 					pt = PathType::File;
 				else
 					pt = PathType::Unknown;
-				callable(SGE_TSTR_TO_STR(pchild->d_name), pt);
+				callable(SGE_TSTR_TO_STR((const char8_t*)pchild->d_name), pt);
 			}
 			SGE_CHECK(CloseDirFailError, closedir(pdir));
 #else
@@ -652,12 +652,12 @@ namespace SpaceGameEngine
 	};
 
 	template<>
-	class COMMON_API FileCore<char, UTF8Trait> : public BinaryFile
+	class COMMON_API FileCore<Char8, UTF8Trait> : public BinaryFile
 	{
 	public:
-		using CharType = char;
-		using ValueType = char*;
-		using ConstValueType = const char*;
+		using CharType = Char8;
+		using ValueType = Char8*;
+		using ConstValueType = const Char8*;
 		using ValueTrait = UTF8Trait;
 
 		FileCore();
@@ -668,8 +668,8 @@ namespace SpaceGameEngine
 		bool IsHasBomHeader() const;
 		void SetHasBomHeader(bool val);
 
-		char* ReadChar(char* pc);
-		const char* WriteChar(const char* pc);
+		Char8* ReadChar(Char8* pc);
+		const Char8* WriteChar(const Char8* pc);
 
 		/*!
 		@note When the file has bom header, the offset is not as same as the
@@ -732,9 +732,9 @@ namespace SpaceGameEngine
 	};
 
 	template<>
-	struct GetFileLineBreakCore<char, UTF8Trait>
+	struct GetFileLineBreakCore<Char8, UTF8Trait>
 	{
-		inline static FileLineBreak Get(const char* pc1, const char* pc2)
+		inline static FileLineBreak Get(const Char8* pc1, const Char8* pc2)
 		{
 			SGE_ASSERT(NullPointerError, pc1);
 			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc1);
@@ -778,9 +778,9 @@ namespace SpaceGameEngine
 	};
 
 	template<typename Allocator>
-	struct GetFileLineBreakStringCore<char, UTF8Trait, Allocator>
+	struct GetFileLineBreakStringCore<Char8, UTF8Trait, Allocator>
 	{
-		inline static StringCore<char, UTF8Trait, Allocator> Get(FileLineBreak flb)
+		inline static StringCore<Char8, UTF8Trait, Allocator> Get(FileLineBreak flb)
 		{
 			SGE_ASSERT(UnknownFileLineBreakError, flb);
 			if (flb == FileLineBreak::CR)
@@ -1147,11 +1147,11 @@ namespace SpaceGameEngine
 	};
 
 	using UCS2File = File<Char16, UCS2Trait>;
-	using UTF8File = File<char, UTF8Trait>;
+	using UTF8File = File<Char8, UTF8Trait>;
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API File<Char16, UCS2Trait>;
-	template class COMMON_API File<char, UTF8Trait>;
+	template class COMMON_API File<Char8, UTF8Trait>;
 #endif
 	/*!
 	@}

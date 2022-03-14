@@ -38,8 +38,12 @@ void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_
 	output_msg += StdToTString(debug_info.m_LineNumber);
 	output_msg += SGE_TSTR(" : ");
 	output_msg += error_msg;
-	/*!@todo use sge's output like log or messagebox*/
+/*!@todo use sge's output like log or messagebox*/
+#if !defined(SGE_CPP20) || defined(SGE_USE_WIDE_CHAR)
 	StdTCout << output_msg << std::endl;
+#else
+	StdTCout << (const char*)output_msg.c_str() << std::endl;
+#endif
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
 	DebugBreak();
 #endif

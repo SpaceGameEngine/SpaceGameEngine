@@ -693,6 +693,18 @@ namespace SpaceGameEngine
 				return m_pBucket != iter.m_pBucket || m_pNode != iter.m_pNode || m_pBucketEnd != iter.m_pBucketEnd;
 			}
 
+			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pBucket == iter.m_pBucket && m_pNode == iter.m_pNode && m_pBucketEnd == iter.m_pBucketEnd;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline bool operator!=(const IteratorType& iter) const
+			{
+				return m_pBucket != iter.m_pBucket || m_pNode != iter.m_pNode || m_pBucketEnd != iter.m_pBucketEnd;
+			}
+
 			inline T* GetData() const
 			{
 				SGE_ASSERT(OutOfRangeError, *this);
