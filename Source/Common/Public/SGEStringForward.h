@@ -84,12 +84,8 @@ namespace SpaceGameEngine
 
 	/*!
 	@file
-	@todo use project manager to define these compile option to set runtime character environment as utf8.
+	@todo use project manager to define utf8 compile option to set runtime character environment as utf8.
 	*/
-	//set runtime character set, the gcc and clang's setting is writing in the CMakeLists.txt
-#if defined(SGE_MSVC)
-#pragma execution_character_set("utf-8")	//set the runtime character set to utf-8
-#endif
 
 	/*!
 	@}

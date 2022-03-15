@@ -26,11 +26,6 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	/*!
-	@file
-	@todo use cpp20's concept instead of sfinae(change IsXxx to Xxx).
-	*/
-
 	template<typename IteratorType>
 	struct GetIteratorValueType
 	{
