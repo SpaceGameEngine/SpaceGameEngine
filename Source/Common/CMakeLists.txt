@@ -9,6 +9,7 @@ add_library(Common SHARED
         Private/Time/TimeCounter.cpp
         Private/Time/WindowsTimeImplement.cpp
         Private/Time/UnixTimeImplement.cpp
+        Private/Time/Date.cpp
         Private/System/DllLoader.cpp
         Private/Module/Module.cpp
         Private/Module/ModuleManager.cpp

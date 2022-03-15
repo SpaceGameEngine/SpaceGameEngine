@@ -37,6 +37,7 @@ limitations under the License.
 #include "TestModule.hpp"
 #include "TestFormat.hpp"
 #include "TestFile.hpp"
+#include "TestDate.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;
 

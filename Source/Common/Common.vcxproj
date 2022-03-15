@@ -191,6 +191,7 @@
     <ClInclude Include="Public\System\AllowWindowsMacro.h" />
     <ClInclude Include="Public\System\DllLoader.h" />
     <ClInclude Include="Public\System\HideWindowsMacro.h" />
+    <ClInclude Include="Public\Time\Date.h" />
     <ClInclude Include="Public\Time\TimeCounter.h" />
     <ClInclude Include="Public\TypeDefinition.hpp" />
     <ClInclude Include="Public\Concurrent\Thread.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="Private\Module\Module.cpp" />
     <ClCompile Include="Private\Module\ModuleManager.cpp" />
     <ClCompile Include="Private\System\DllLoader.cpp" />
+    <ClCompile Include="Private\Time\Date.cpp" />
     <ClCompile Include="Private\Time\TimeCounter.cpp" />
     <ClCompile Include="Private\Time\UnixTimeImplement.cpp" />
     <ClCompile Include="Private\Time\WindowsTimeImplement.cpp" />

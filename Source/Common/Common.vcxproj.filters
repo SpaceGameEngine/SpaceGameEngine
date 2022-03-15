@@ -180,6 +180,9 @@
     <ClInclude Include="Public\Utility\Endian.h">
       <Filter>Public\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Time\Date.h">
+      <Filter>Public\Time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -229,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="Private\Utility\Endian.cpp">
       <Filter>Private\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Time\Date.cpp">
+      <Filter>Private\Time</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
