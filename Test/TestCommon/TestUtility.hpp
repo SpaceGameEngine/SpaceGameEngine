@@ -20,6 +20,8 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "Utility/AutoReleaseBuffer.h"
 #include "Utility/Endian.h"
+#include "Utility/DebugInformation.h"
+#include "SGEString.hpp"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
@@ -209,4 +211,19 @@ TEST(Endian, ChangeEndianTest)
 	UInt32 test_val = 0x12345678;
 	ChangeEndian(test_val, Endian::Big, Endian::Little);
 	ASSERT_EQ(test_val, 0x78563412);
+}
+
+DebugInformation TestDebugInformation() 
+{
+	return DebugInformation(SGE_DEBUG_INFORMATION);
+}
+
+TEST(DebugInformation, DebugInformationTest)
+{
+	DebugInformation di=TestDebugInformation();
+	TString<> filename(di.m_pFileName);
+	TString<> funcname(di.m_pFunctionName);
+	ASSERT_NE(filename.Find(SGE_TSTR("TestUtility.hpp"),filename.GetConstBegin(),filename.GetConstEnd()),filename.GetConstEnd());
+	ASSERT_NE(funcname.Find(SGE_TSTR("TestDebugInformation"),funcname.GetConstBegin(),funcname.GetConstEnd()),funcname.GetConstEnd());
+	ASSERT_EQ(di.m_LineNumber,218);
 }

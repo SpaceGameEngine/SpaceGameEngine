@@ -21,13 +21,6 @@ limitations under the License.
 #include <Windows.h>
 #endif
 
-SpaceGameEngine::DebugInformation::DebugInformation(const TChar* file_name, const TChar* func_name, UInt32 line_number)
-{
-	m_pFileName = file_name;
-	m_pFunctionName = func_name;
-	m_LineNumber = line_number;
-}
-
 void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_info)
 {
 	StdTString output_msg = SGE_TSTR("error happend in ");

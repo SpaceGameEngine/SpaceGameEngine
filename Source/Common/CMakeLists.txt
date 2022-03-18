@@ -6,6 +6,7 @@ add_library(Common SHARED
         Private/MetaData/MetaData.cpp
         Private/Utility/AutoReleaseBuffer.cpp
         Private/Utility/Endian.cpp
+        Private/Utility/DebugInformation.cpp
         Private/Time/TimeCounter.cpp
         Private/Time/WindowsTimeImplement.cpp
         Private/Time/UnixTimeImplement.cpp
