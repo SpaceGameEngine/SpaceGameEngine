@@ -24,6 +24,7 @@ limitations under the License.
 #include "Container/Vector.hpp"
 #include <cstring>
 #include <cmath>
+#include <algorithm>
 
 namespace SpaceGameEngine
 {
@@ -3856,16 +3857,16 @@ namespace SpaceGameEngine
 
 		inline static constexpr const Char16 digits16[17] = SGE_WSTR("0123456789abcdef");
 
-		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
+		inline static StringType Get(IntegerType value, SizeType min_length = 0, NumberBase base = NumberBase::Decimal)
 		{
 			SGE_ASSERT(InvalidNumberBaseError, base);
 			if constexpr (std::is_unsigned_v<IntegerType>)
 			{
 				if (base == NumberBase::Decimal)
 				{
-					const SizeType length = Digits<10>(value);
+					const SizeType length = std::max(Digits<10>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
+					StringType re(length, SGE_WSTR('0'));
 					Char16* dst = re.GetData();
 					while (value >= 100)
 					{
@@ -3890,9 +3891,9 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Binary)
 				{
-					const SizeType length = Digits<2>(value);
+					const SizeType length = std::max(Digits<2>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
+					StringType re(length, SGE_WSTR('0'));
 					Char16* dst = re.GetData();
 					while (value >= 2)
 					{
@@ -3906,9 +3907,9 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Hex)
 				{
-					const SizeType length = Digits<16>(value);
+					const SizeType length = std::max(Digits<16>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
+					StringType re(length, SGE_WSTR('0'));
 					Char16* dst = re.GetData();
 					while (value >= 16)
 					{
@@ -3928,9 +3929,9 @@ namespace SpaceGameEngine
 					value *= -1;
 					if (base == NumberBase::Decimal)
 					{
-						const SizeType length = Digits<10>(value) + 1;
+						const SizeType length = std::max(Digits<10>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						dst[0] = SGE_WSTR('-');
 						while (value >= 100)
@@ -3956,9 +3957,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Binary)
 					{
-						const SizeType length = Digits<2>(value) + 1;
+						const SizeType length = std::max(Digits<2>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						dst[0] = SGE_WSTR('-');
 						while (value >= 2)
@@ -3973,9 +3974,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Hex)
 					{
-						const SizeType length = Digits<16>(value) + 1;
+						const SizeType length = std::max(Digits<16>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						dst[0] = SGE_WSTR('-');
 						while (value >= 16)
@@ -3993,9 +3994,9 @@ namespace SpaceGameEngine
 				{
 					if (base == NumberBase::Decimal)
 					{
-						const SizeType length = Digits<10>(value);
+						const SizeType length = std::max(Digits<10>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						while (value >= 100)
 						{
@@ -4020,9 +4021,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Binary)
 					{
-						const SizeType length = Digits<2>(value);
+						const SizeType length = std::max(Digits<2>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						while (value >= 2)
 						{
@@ -4036,9 +4037,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Hex)
 					{
-						const SizeType length = Digits<16>(value);
+						const SizeType length = std::max(Digits<16>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						while (value >= 16)
 						{
@@ -4138,16 +4139,16 @@ namespace SpaceGameEngine
 
 		inline static constexpr const Char8 digits16[17] = SGE_U8STR("0123456789abcdef");
 
-		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
+		inline static StringType Get(IntegerType value, SizeType min_length = 0, NumberBase base = NumberBase::Decimal)
 		{
 			SGE_ASSERT(InvalidNumberBaseError, base);
 			if constexpr (std::is_unsigned_v<IntegerType>)
 			{
 				if (base == NumberBase::Decimal)
 				{
-					const SizeType length = Digits<10>(value);
+					const SizeType length = std::max(Digits<10>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
+					StringType re(length, SGE_U8STR("0"));
 					Char8* dst = re.GetData();
 					while (value >= 100)
 					{
@@ -4172,9 +4173,9 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Binary)
 				{
-					const SizeType length = Digits<2>(value);
+					const SizeType length = std::max(Digits<2>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
+					StringType re(length, SGE_U8STR("0"));
 					Char8* dst = re.GetData();
 					while (value >= 2)
 					{
@@ -4188,9 +4189,9 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Hex)
 				{
-					const SizeType length = Digits<16>(value);
+					const SizeType length = std::max(Digits<16>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
+					StringType re(length, SGE_U8STR("0"));
 					Char8* dst = re.GetData();
 					while (value >= 16)
 					{
@@ -4210,9 +4211,9 @@ namespace SpaceGameEngine
 					value *= -1;
 					if (base == NumberBase::Decimal)
 					{
-						const SizeType length = Digits<10>(value) + 1;
+						const SizeType length = std::max(Digits<10>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 100)
@@ -4238,9 +4239,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Binary)
 					{
-						const SizeType length = Digits<2>(value) + 1;
+						const SizeType length = std::max(Digits<2>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 2)
@@ -4255,9 +4256,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Hex)
 					{
-						const SizeType length = Digits<16>(value) + 1;
+						const SizeType length = std::max(Digits<16>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 16)
@@ -4275,9 +4276,9 @@ namespace SpaceGameEngine
 				{
 					if (base == NumberBase::Decimal)
 					{
-						const SizeType length = Digits<10>(value);
+						const SizeType length = std::max(Digits<10>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						while (value >= 100)
 						{
@@ -4302,9 +4303,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Binary)
 					{
-						const SizeType length = Digits<2>(value);
+						const SizeType length = std::max(Digits<2>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						while (value >= 2)
 						{
@@ -4318,9 +4319,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Hex)
 					{
-						const SizeType length = Digits<16>(value);
+						const SizeType length = std::max(Digits<16>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						while (value >= 16)
 						{

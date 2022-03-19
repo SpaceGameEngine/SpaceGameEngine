@@ -79,6 +79,7 @@ TEST(Format, FormatTest)
 	ASSERT_EQ(Format(UCS2String(SGE_WSTR("{:},{:2},{:4}")), -1.0, 2.234567, 3.234567), SGE_WSTR("-1.000000,2.23,3.2346"));
 	ASSERT_EQ(Format(UCS2String(SGE_WSTR("this is {0},{1:2},{2:4} a {3} test.")), 1, 2.22f, 3.3333, SGE_WSTR("good")), SGE_WSTR("this is 1,2.22,3.3333 a good test."));
 	ASSERT_EQ(Format(UCS2String(SGE_WSTR("this is {},{:2},{:4} a {} test.")), 1, 2.22f, 3.3333, SGE_WSTR("good")), SGE_WSTR("this is 1,2.22,3.3333 a good test."));
+	ASSERT_EQ(Format(UCS2String(SGE_WSTR("test number format: {:4} {:8B} {:4D} {:4H}.")), 12, 0b1101, 34, 17), SGE_WSTR("test number format: 0012 00001101 0034 0011."));
 
 	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test format{}{}!"))), SGE_U8STR("test format!"));
 	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test format{0}{0}!"))), SGE_U8STR("test format!"));
@@ -105,4 +106,5 @@ TEST(Format, FormatTest)
 	ASSERT_EQ(Format(UTF8String(SGE_U8STR("this is {},{:2},{:4} a {} test.")), 1, 2.22f, 3.3333, SGE_U8STR("good")), SGE_U8STR("this is 1,2.22,3.3333 a good test."));
 	ASSERT_EQ(Format(UTF8String(SGE_U8STR("这是{0}{{多字节的编码}}的特殊{1}测试")), SGE_U8STR("a"), SGE_U8STR("α")), SGE_U8STR("这是a{多字节的编码}的特殊α测试"));
 	ASSERT_EQ(Format(UTF8String(SGE_U8STR("这是{}{{多字节的编码}}的特殊{}测试")), SGE_U8STR("a"), SGE_U8STR("α")), SGE_U8STR("这是a{多字节的编码}的特殊α测试"));
+	ASSERT_EQ(Format(UTF8String(SGE_U8STR("test number format: {:4} {:8B} {:4D} {:4H}.")), 12, 0b1101, 34, 17), SGE_U8STR("test number format: 0012 00001101 0034 0011."));
 }

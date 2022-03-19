@@ -235,18 +235,39 @@ namespace SpaceGameEngine
 
 			if (str.GetSize() == 0)
 				return false;
-			else if (str.GetSize() > 1)
-				return true;
 
-			if constexpr (std::is_same_v<Trait, UCS2Trait>)
+			typename std::conditional_t<Trait::IsMultipleByte, StringCore<T, Trait, Allocator>::ConstValueType, StringCore<T, Trait, Allocator>::ValueType> base_char = NULL;
+
+			for (auto i = str.GetConstBegin(); i != str.GetConstEnd(); ++i)
 			{
-				return str[0] != SGE_WSTR('B') && str[0] != SGE_WSTR('D') && str[0] != SGE_WSTR('H');
+				if (!IsNumericalCharacter<T, Trait>(*i))
+				{
+					if (i != str.GetConstEnd() - 1)
+						return true;
+					if (i != str.GetConstBegin())
+					{
+						if (!IsUnsignedNumericalString(StringCore<T, Trait, Allocator>(str.GetConstBegin(), i)))
+							return true;
+					}
+					base_char = *i;
+					break;
+				}
 			}
-			else	//UTF8Trait
-			{
-				static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
 
-				return *(str[0]) != SGE_U8STR('B') && *(str[0]) != SGE_U8STR('D') && *(str[0]) != SGE_U8STR('H');
+			if (base_char == NULL)
+				return !IsUnsignedNumericalString(str);
+			else
+			{
+				if constexpr (std::is_same_v<Trait, UCS2Trait>)
+				{
+					return base_char != SGE_WSTR('B') && base_char != SGE_WSTR('D') && base_char != SGE_WSTR('H');
+				}
+				else	//UTF8Trait
+				{
+					static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+
+					return *base_char != SGE_U8STR('B') && *base_char != SGE_U8STR('D') && *base_char != SGE_U8STR('H');
+				}
 			}
 		}
 	};
@@ -261,31 +282,52 @@ namespace SpaceGameEngine
 			if constexpr (std::is_integral_v<ValueType>)
 			{
 				SGE_ASSERT(InvalidNumberBaseOptionError, opt);
+
+				SizeType min_length = 0;
 				NumberBase base = NumberBase::Decimal;
+
 				if (opt.GetSize())
 				{
-					if constexpr (std::is_same_v<Trait, UCS2Trait>)
-					{
-						if (opt[0] == SGE_WSTR('B'))
-							base = NumberBase::Binary;
-						else if (opt[0] == SGE_WSTR('D'))
-							base = NumberBase::Decimal;
-						else if (opt[0] == SGE_WSTR('H'))
-							base = NumberBase::Hex;
-					}
-					else	//UTF8Trait
-					{
-						static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+					typename std::conditional_t<Trait::IsMultipleByte, StringCore<T, Trait, Allocator>::ConstValueType, StringCore<T, Trait, Allocator>::ValueType> base_char = NULL;
 
-						if (*(opt[0]) == SGE_U8STR('B'))
-							base = NumberBase::Binary;
-						else if (*(opt[0]) == SGE_U8STR('D'))
-							base = NumberBase::Decimal;
-						else if (*(opt[0]) == SGE_U8STR('H'))
-							base = NumberBase::Hex;
+					for (auto i = opt.GetConstBegin(); i != opt.GetConstEnd(); ++i)
+					{
+						if (!IsNumericalCharacter<T, Trait>(*i))
+						{
+							if (i != opt.GetConstBegin())
+								min_length = StringTo<StringCore<T, Trait, Allocator>, SizeType>(StringCore<T, Trait, Allocator>(opt.GetConstBegin(), i));
+							base_char = *i;
+							break;
+						}
+					}
+
+					if (base_char == NULL)
+						min_length = StringTo<StringCore<T, Trait, Allocator>, SizeType>(opt);
+					else
+					{
+						if constexpr (std::is_same_v<Trait, UCS2Trait>)
+						{
+							if (base_char == SGE_WSTR('B'))
+								base = NumberBase::Binary;
+							else if (base_char == SGE_WSTR('D'))
+								base = NumberBase::Decimal;
+							else if (base_char == SGE_WSTR('H'))
+								base = NumberBase::Hex;
+						}
+						else	//UTF8Trait
+						{
+							static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+
+							if (*base_char == SGE_U8STR('B'))
+								base = NumberBase::Binary;
+							else if (*base_char == SGE_U8STR('D'))
+								base = NumberBase::Decimal;
+							else if (*base_char == SGE_U8STR('H'))
+								base = NumberBase::Hex;
+						}
 					}
 				}
-				return ToString<StringCore<T, Trait, Allocator>, ValueType>(val, base);
+				return ToString<StringCore<T, Trait, Allocator>, ValueType>(val, min_length, base);
 			}
 			else
 				return ToString<StringCore<T, Trait, Allocator>, ValueType>(val);
