@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include <concepts>
 #include "SGEString.hpp"
 #include "Container/Vector.hpp"
 
@@ -236,7 +237,7 @@ namespace SpaceGameEngine
 			if (str.GetSize() == 0)
 				return false;
 
-			typename std::conditional_t<Trait::IsMultipleByte, StringCore<T, Trait, Allocator>::ConstValueType, StringCore<T, Trait, Allocator>::ValueType> base_char = NULL;
+			typename std::conditional_t<Trait::IsMultipleByte, typename StringCore<T, Trait, Allocator>::ConstValueType, typename StringCore<T, Trait, Allocator>::ValueType> base_char = NULL;
 
 			for (auto i = str.GetConstBegin(); i != str.GetConstEnd(); ++i)
 			{
@@ -279,58 +280,65 @@ namespace SpaceGameEngine
 
 		inline static StringCore<T, Trait, Allocator> Get(const ValueType& val, const StringCore<T, Trait, Allocator>& opt)
 		{
-			if constexpr (std::is_integral_v<ValueType>)
+			return ToString<StringCore<T, Trait, Allocator>, ValueType>(val);
+		}
+	};
+
+	template<typename T, typename Trait, typename Allocator, std::integral IntegerType>
+	struct Formatter<T, Trait, Allocator, IntegerType>
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+		inline static StringCore<T, Trait, Allocator> Get(IntegerType val, const StringCore<T, Trait, Allocator>& opt)
+		{
+			SGE_ASSERT(InvalidNumberBaseOptionError, opt);
+
+			SizeType min_length = 0;
+			NumberBase base = NumberBase::Decimal;
+
+			if (opt.GetSize())
 			{
-				SGE_ASSERT(InvalidNumberBaseOptionError, opt);
+				typename std::conditional_t<Trait::IsMultipleByte, typename StringCore<T, Trait, Allocator>::ConstValueType, typename StringCore<T, Trait, Allocator>::ValueType> base_char = NULL;
 
-				SizeType min_length = 0;
-				NumberBase base = NumberBase::Decimal;
-
-				if (opt.GetSize())
+				for (auto i = opt.GetConstBegin(); i != opt.GetConstEnd(); ++i)
 				{
-					typename std::conditional_t<Trait::IsMultipleByte, StringCore<T, Trait, Allocator>::ConstValueType, StringCore<T, Trait, Allocator>::ValueType> base_char = NULL;
-
-					for (auto i = opt.GetConstBegin(); i != opt.GetConstEnd(); ++i)
+					if (!IsNumericalCharacter<T, Trait>(*i))
 					{
-						if (!IsNumericalCharacter<T, Trait>(*i))
-						{
-							if (i != opt.GetConstBegin())
-								min_length = StringTo<StringCore<T, Trait, Allocator>, SizeType>(StringCore<T, Trait, Allocator>(opt.GetConstBegin(), i));
-							base_char = *i;
-							break;
-						}
-					}
-
-					if (base_char == NULL)
-						min_length = StringTo<StringCore<T, Trait, Allocator>, SizeType>(opt);
-					else
-					{
-						if constexpr (std::is_same_v<Trait, UCS2Trait>)
-						{
-							if (base_char == SGE_WSTR('B'))
-								base = NumberBase::Binary;
-							else if (base_char == SGE_WSTR('D'))
-								base = NumberBase::Decimal;
-							else if (base_char == SGE_WSTR('H'))
-								base = NumberBase::Hex;
-						}
-						else	//UTF8Trait
-						{
-							static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
-
-							if (*base_char == SGE_U8STR('B'))
-								base = NumberBase::Binary;
-							else if (*base_char == SGE_U8STR('D'))
-								base = NumberBase::Decimal;
-							else if (*base_char == SGE_U8STR('H'))
-								base = NumberBase::Hex;
-						}
+						if (i != opt.GetConstBegin())
+							min_length = StringTo<StringCore<T, Trait, Allocator>, SizeType>(StringCore<T, Trait, Allocator>(opt.GetConstBegin(), i));
+						base_char = *i;
+						break;
 					}
 				}
-				return ToString<StringCore<T, Trait, Allocator>, ValueType>(val, min_length, base);
+
+				if (base_char == NULL)
+					min_length = StringTo<StringCore<T, Trait, Allocator>, SizeType>(opt);
+				else
+				{
+					if constexpr (std::is_same_v<Trait, UCS2Trait>)
+					{
+						if (base_char == SGE_WSTR('B'))
+							base = NumberBase::Binary;
+						else if (base_char == SGE_WSTR('D'))
+							base = NumberBase::Decimal;
+						else if (base_char == SGE_WSTR('H'))
+							base = NumberBase::Hex;
+					}
+					else	//UTF8Trait
+					{
+						static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+
+						if (*base_char == SGE_U8STR('B'))
+							base = NumberBase::Binary;
+						else if (*base_char == SGE_U8STR('D'))
+							base = NumberBase::Decimal;
+						else if (*base_char == SGE_U8STR('H'))
+							base = NumberBase::Hex;
+					}
+				}
 			}
-			else
-				return ToString<StringCore<T, Trait, Allocator>, ValueType>(val);
+
+			return ToString<StringCore<T, Trait, Allocator>, IntegerType>(val, min_length, base);
 		}
 	};
 

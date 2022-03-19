@@ -25,6 +25,7 @@ limitations under the License.
 #include <cstring>
 #include <cmath>
 #include <algorithm>
+#include <concepts>
 
 namespace SpaceGameEngine
 {
@@ -3801,12 +3802,6 @@ namespace SpaceGameEngine
 #define SGE_STR_TO_UCS2(str) str
 #define SGE_STR_TO_UTF8(str) SpaceGameEngine::UCS2StringToUTF8String(str)
 
-	template<typename T>
-	struct IntegralTypeWrapper
-	{
-		using Type = T;
-	};
-
 	template<typename StringType, typename T>
 	struct ToStringCore
 	{
@@ -3819,7 +3814,7 @@ namespace SpaceGameEngine
 	template<typename StringType, typename T, typename... Args>
 	inline StringType ToString(const T& value, Args&&... args)
 	{
-		return ToStringCore<StringType, std::conditional_t<std::is_integral_v<T>, IntegralTypeWrapper<T>, T>>::Get(value, std::forward<Args>(args)...);
+		return ToStringCore<StringType, T>::Get(value, std::forward<Args>(args)...);
 	}
 
 	enum class NumberBase : UInt8
@@ -3838,8 +3833,8 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator, typename IntegerType>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	template<typename Allocator, std::integral IntegerType>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
 
@@ -4120,8 +4115,8 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename Allocator, typename IntegerType>
-	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	template<typename Allocator, std::integral IntegerType>
+	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
@@ -4612,11 +4607,11 @@ namespace SpaceGameEngine
 	template<typename StringType, typename T>
 	inline T StringTo(const StringType& str)
 	{
-		return StringToCore<StringType, std::conditional_t<std::is_integral_v<T>, IntegralTypeWrapper<T>, T>>::Get(str);
+		return StringToCore<StringType, T>::Get(str);
 	}
 
-	template<typename Allocator, typename IntegerType>
-	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	template<typename Allocator, std::integral IntegerType>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
 
@@ -4737,8 +4732,8 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename Allocator, typename IntegerType>
-	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	template<typename Allocator, std::integral IntegerType>
+	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
