@@ -27,5 +27,6 @@
     <ClInclude Include="TestFormat.hpp" />
     <ClInclude Include="TestFile.hpp" />
     <ClInclude Include="TestDate.hpp" />
+    <ClInclude Include="TestLog.hpp" />
   </ItemGroup>
 </Project>

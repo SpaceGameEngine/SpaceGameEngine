@@ -186,6 +186,9 @@
     <ClInclude Include="Public\Utility\DebugInformation.h">
       <Filter>Public\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Log.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -241,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="Private\Utility\DebugInformation.cpp">
       <Filter>Private\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Log.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

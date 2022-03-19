@@ -178,6 +178,7 @@
     <ClInclude Include="Public\ForwardDefinition.hpp" />
     <ClInclude Include="Public\Function.hpp" />
     <ClInclude Include="Public\GlobalVariable.h" />
+    <ClInclude Include="Public\Log.h" />
     <ClInclude Include="Public\MemoryManager.h" />
     <ClInclude Include="Public\MetaData\MetaData.h" />
     <ClInclude Include="Public\MetaData\MetaObject.hpp" />
@@ -208,6 +209,7 @@
     <ClCompile Include="Private\Error.cpp" />
     <ClCompile Include="Private\File.cpp" />
     <ClCompile Include="Private\GlobalVariable.cpp" />
+    <ClCompile Include="Private\Log.cpp" />
     <ClCompile Include="Private\MemoryManager.cpp" />
     <ClCompile Include="Private\MetaData\MetaData.cpp" />
     <ClCompile Include="Private\Concurrent\Thread.cpp" />
