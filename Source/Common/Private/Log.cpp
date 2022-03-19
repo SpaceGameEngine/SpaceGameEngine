@@ -14,5 +14,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "Log.h"
+#include <iostream>
+#include <cstdint>
+#include <functional>
 
 using namespace SpaceGameEngine;
+
+void SpaceGameEngine::WriteLogToConsole(const Char8* ptr, SizeType size)
+{
+	SGE_ASSERT(NullPointerError, ptr);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+
+	std::cout.write((const char*)ptr, size);
+}
+
+SpaceGameEngine::LogWriter::LogWriter(void (*write_func)(const Char8*, SizeType))
+	: m_WriteFunction(write_func)
+{
+	SGE_ASSERT(NullPointerError, write_func);
+	m_IsRunning.Store(true, MemoryOrder::Release);
+	m_Thread = Thread(std::bind(&LogWriter::Run, this));
+}
+
+SpaceGameEngine::LogWriter::~LogWriter()
+{
+	m_IsRunning.Store(false, MemoryOrder::Release);
+	m_Thread.Join();
+}
+
+void SpaceGameEngine::LogWriter::Run()
+{
+	while (m_IsRunning.Load(MemoryOrder::Acquire))
+	{
+	}
+}

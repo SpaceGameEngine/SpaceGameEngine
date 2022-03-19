@@ -201,6 +201,7 @@
     <ClInclude Include="Public\Utility\ControllableObject.hpp" />
     <ClInclude Include="Public\Utility\DebugInformation.h" />
     <ClInclude Include="Public\Utility\Endian.h" />
+    <ClInclude Include="Public\Utility\FixedSizeBuffer.hpp" />
     <ClInclude Include="Public\Utility\Format.hpp" />
     <ClInclude Include="Public\Utility\Singleton.hpp" />
     <ClInclude Include="Public\Utility\Utility.hpp" />

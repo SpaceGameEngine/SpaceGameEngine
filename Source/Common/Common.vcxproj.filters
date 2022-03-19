@@ -189,6 +189,9 @@
     <ClInclude Include="Public\Log.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\FixedSizeBuffer.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

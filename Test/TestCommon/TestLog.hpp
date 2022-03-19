@@ -18,3 +18,8 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
+
+TEST(LogWriter, InstanceTest)
+{
+	LogWriter lw;
+}

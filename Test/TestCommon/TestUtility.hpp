@@ -21,6 +21,7 @@ limitations under the License.
 #include "Utility/AutoReleaseBuffer.h"
 #include "Utility/Endian.h"
 #include "Utility/DebugInformation.h"
+#include "Utility/FixedSizeBuffer.hpp"
 #include "SGEString.hpp"
 #include "gtest/gtest.h"
 
@@ -213,17 +214,22 @@ TEST(Endian, ChangeEndianTest)
 	ASSERT_EQ(test_val, 0x78563412);
 }
 
-DebugInformation TestDebugInformation() 
+DebugInformation TestDebugInformation()
 {
 	return DebugInformation(SGE_DEBUG_INFORMATION);
 }
 
 TEST(DebugInformation, DebugInformationTest)
 {
-	DebugInformation di=TestDebugInformation();
+	DebugInformation di = TestDebugInformation();
 	TString<> filename(di.m_pFileName);
 	TString<> funcname(di.m_pFunctionName);
-	ASSERT_NE(filename.Find(SGE_TSTR("TestUtility.hpp"),filename.GetConstBegin(),filename.GetConstEnd()),filename.GetConstEnd());
-	ASSERT_NE(funcname.Find(SGE_TSTR("TestDebugInformation"),funcname.GetConstBegin(),funcname.GetConstEnd()),funcname.GetConstEnd());
-	ASSERT_EQ(di.m_LineNumber,218);
+	ASSERT_NE(filename.Find(SGE_TSTR("TestUtility.hpp"), filename.GetConstBegin(), filename.GetConstEnd()), filename.GetConstEnd());
+	ASSERT_NE(funcname.Find(SGE_TSTR("TestDebugInformation"), funcname.GetConstBegin(), funcname.GetConstEnd()), funcname.GetConstEnd());
+	ASSERT_EQ(di.m_LineNumber, 219);
+}
+
+TEST(FixedSizeBuffer, InstanceTest)
+{
+	FixedSizeBuffer<32> buffer;
 }

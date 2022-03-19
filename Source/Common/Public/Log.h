@@ -15,6 +15,12 @@ limitations under the License.
 */
 #pragma once
 #include "CommonAPI.h"
+#include "Utility/Utility.hpp"
+#include "Concurrent/Atomic.hpp"
+#include "Concurrent/Thread.h"
+#include "Concurrent/Lock.h"
+#include "SGEStringForward.h"
+#include "Utility/FixedSizeBuffer.hpp"
 
 namespace SpaceGameEngine
 {
@@ -22,6 +28,23 @@ namespace SpaceGameEngine
 	@ingroup Common
 	@{
 	*/
+
+	COMMON_API void WriteLogToConsole(const Char8* ptr, SizeType size);
+
+	class COMMON_API LogWriter : public UncopyableAndUnmovable
+	{
+	public:
+		LogWriter(void (*write_func)(const Char8*, SizeType) = WriteLogToConsole);
+		~LogWriter();
+
+	private:
+		void Run();
+
+	private:
+		void (*m_WriteFunction)(const Char8*, SizeType);
+		Atomic<bool> m_IsRunning;
+		Thread m_Thread;
+	};
 
 	/*!
 	@}
