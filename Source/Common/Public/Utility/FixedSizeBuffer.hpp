@@ -40,6 +40,9 @@ namespace SpaceGameEngine
 			}
 		};
 
+		template<SizeType _MaxSize, typename _Allocator>
+		friend class FixedSizeBuffer;
+
 		inline FixedSizeBuffer()
 			: m_pContent(Allocator::RawNew(MaxSize)), m_Size(0)
 		{

@@ -233,3 +233,207 @@ TEST(FixedSizeBuffer, InstanceTest)
 {
 	FixedSizeBuffer<32> buffer;
 }
+
+TEST(FixedSizeBuffer, AppendTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, SetSizeAndClearTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+	buffer.SetSize(2);
+	ASSERT_EQ(buffer.GetSize(), 2);
+	ASSERT_EQ(buffer.GetFreeSize(), 30);
+	buffer.Clear();
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+}
+
+TEST(FixedSizeBuffer, CopyConstructionTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32> buffer2(buffer);
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, MoveConstructionTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32> buffer2(std::move(buffer));
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, CopyOperatorTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32> buffer2;
+	ASSERT_EQ(buffer2.GetSize(), 0);
+	ASSERT_EQ(buffer2.GetFreeSize(), 32);
+
+	buffer2 = buffer;
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, MoveOperatorTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32> buffer2;
+	ASSERT_EQ(buffer2.GetSize(), 0);
+	ASSERT_EQ(buffer2.GetFreeSize(), 32);
+
+	buffer2 = std::move(buffer);
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, AnotherAllocatorCopyConstructionTest)
+{
+	FixedSizeBuffer<32, MemoryManagerAllocator> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32, StdAllocator> buffer2(buffer);
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, AnotherAllocatorMoveConstructionTest)
+{
+	FixedSizeBuffer<32, MemoryManagerAllocator> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32, StdAllocator> buffer2(std::move(buffer));
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, AnotherAllocatorCopyOperatorTest)
+{
+	FixedSizeBuffer<32, MemoryManagerAllocator> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32, StdAllocator> buffer2;
+	ASSERT_EQ(buffer2.GetSize(), 0);
+	ASSERT_EQ(buffer2.GetFreeSize(), 32);
+
+	buffer2 = buffer;
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, AnotherAllocatorMoveOperatorTest)
+{
+	FixedSizeBuffer<32, MemoryManagerAllocator> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32, StdAllocator> buffer2;
+	ASSERT_EQ(buffer2.GetSize(), 0);
+	ASSERT_EQ(buffer2.GetFreeSize(), 32);
+
+	buffer2 = std::move(buffer);
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+}
