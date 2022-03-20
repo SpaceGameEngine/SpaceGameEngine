@@ -19,31 +19,10 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
-void SpaceGameEngine::WriteLogToConsole(const Char8* ptr, SizeType size)
+void SpaceGameEngine::ConsoleLogWriterCore::WriteLog(const Char8* pstr, SizeType size)
 {
-	SGE_ASSERT(NullPointerError, ptr);
+	SGE_ASSERT(NullPointerError, pstr);
 	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 
-	std::cout.write((const char*)ptr, size);
-}
-
-SpaceGameEngine::LogWriter::LogWriter(void (*write_func)(const Char8*, SizeType))
-	: m_WriteFunction(write_func)
-{
-	SGE_ASSERT(NullPointerError, write_func);
-	m_IsRunning.Store(true, MemoryOrder::Release);
-	m_Thread = Thread(std::bind(&LogWriter::Run, this));
-}
-
-SpaceGameEngine::LogWriter::~LogWriter()
-{
-	m_IsRunning.Store(false, MemoryOrder::Release);
-	m_Thread.Join();
-}
-
-void SpaceGameEngine::LogWriter::Run()
-{
-	while (m_IsRunning.Load(MemoryOrder::Acquire))
-	{
-	}
+	std::cout.write((const char*)pstr, size);
 }

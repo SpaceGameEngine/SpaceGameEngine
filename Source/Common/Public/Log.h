@@ -29,19 +29,44 @@ namespace SpaceGameEngine
 	@{
 	*/
 
-	COMMON_API void WriteLogToConsole(const Char8* ptr, SizeType size);
+	template<typename T>
+	concept IsLogWriterCore = requires(T t, const Char8* pstr, SizeType size)
+	{
+		t.WriteLog(pstr, size);
+	};
 
-	class COMMON_API LogWriter : public UncopyableAndUnmovable
+	class COMMON_API ConsoleLogWriterCore
 	{
 	public:
-		LogWriter(void (*write_func)(const Char8*, SizeType) = WriteLogToConsole);
-		~LogWriter();
+		void WriteLog(const Char8* pstr, SizeType size);
+	};
+
+	template<IsLogWriterCore LogWriterCore = ConsoleLogWriterCore>
+	class LogWriter : public UncopyableAndUnmovable
+	{
+	public:
+		inline LogWriter()
+		{
+			m_IsRunning.Store(true, MemoryOrder::Release);
+			m_Thread = Thread(std::bind(&LogWriter::Run, this));
+		}
+
+		inline ~LogWriter()
+		{
+			m_IsRunning.Store(false, MemoryOrder::Release);
+			m_Thread.Join();
+		}
 
 	private:
-		void Run();
+		inline void Run()
+		{
+			while (m_IsRunning.Load(MemoryOrder::Acquire))
+			{
+			}
+		}
 
 	private:
-		void (*m_WriteFunction)(const Char8*, SizeType);
+		LogWriterCore m_LogWriterCore;
 		Atomic<bool> m_IsRunning;
 		Thread m_Thread;
 	};
