@@ -117,6 +117,10 @@ namespace SpaceGameEngine
 					m_Buffers[m_WriteIndex].Clear();
 				}
 			}
+			if (m_CurrentIndex == m_WriteIndex && m_Buffers[m_CurrentIndex].GetSize() > 0)
+				m_CurrentIndex = (m_CurrentIndex + 1) % sm_BufferArraySize;
+			for (; m_WriteIndex != m_CurrentIndex; m_WriteIndex = (m_WriteIndex + 1) % sm_BufferArraySize)
+				m_LogWriterCore.WriteLog((const Char8*)(m_Buffers[m_WriteIndex].GetData()), m_Buffers[m_WriteIndex].GetSize());
 		}
 
 	private:
