@@ -1613,10 +1613,11 @@ namespace SpaceGameEngine
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsSequentialIterator<IteratorType>, void>, typename = std::enable_if_t<std::is_same_v<decltype(new ValueType((ValueType)(IteratorValueType<IteratorType>())), true), bool>, void>>
 		inline StringCore(const IteratorType& begin, const IteratorType& end)
-			: m_Storage(1), m_Size(end - begin)
+			: m_Storage(1)
 		{
 			if constexpr (!Trait::IsMultipleByte)
 			{
+				m_Size = end - begin;
 				SizeType size = end - begin;
 				SetRealSize(size);
 				m_Storage.SetSize(size + 1);
@@ -1630,20 +1631,45 @@ namespace SpaceGameEngine
 			else
 			{
 				SizeType nsize = 0;
-				for (auto iter = begin; iter != end; ++iter)
+				using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
+				if constexpr (!std::is_pointer_v<IteratorType>)
 				{
-					nsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+					m_Size = end - begin;
+					for (auto iter = begin; iter != end; ++iter)
+					{
+						SGE_ASSERT(_InvalidMultipleByteCharError, *iter);
+						nsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+					}
+				}
+				else
+				{
+					m_Size = 0;
+					for (auto iter = begin; iter != end; iter = StringImplement::GetNextMultipleByteChar<T, Trait>(iter))
+					{
+						SGE_ASSERT(_InvalidMultipleByteCharError, iter);
+						nsize += StringImplement::GetMultipleByteCharSize<T, Trait>(iter);
+						m_Size += 1;
+					}
 				}
 				SetRealSize(nsize);
 				m_Storage.SetSize(nsize + 1);
 				*(GetData() + nsize) = 0;
 				SizeType i = 0;
-				for (auto iter = begin; iter != end; ++iter)
+				if constexpr (!std::is_pointer_v<IteratorType>)
 				{
-					using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
-					SGE_ASSERT(_InvalidMultipleByteCharError, *iter);
-					memcpy(GetData() + i, *iter, StringImplement::GetMultipleByteCharSize<T, Trait>(*iter) * sizeof(T));
-					i += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+					for (auto iter = begin; iter != end; ++iter)
+					{
+						memcpy(GetData() + i, *iter, StringImplement::GetMultipleByteCharSize<T, Trait>(*iter) * sizeof(T));
+						i += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+					}
+				}
+				else
+				{
+					for (auto iter = begin; iter != end; iter = StringImplement::GetNextMultipleByteChar<T, Trait>(iter))
+					{
+						memcpy(GetData() + i, iter, StringImplement::GetMultipleByteCharSize<T, Trait>(iter) * sizeof(T));
+						i += StringImplement::GetMultipleByteCharSize<T, Trait>(iter);
+					}
 				}
 			}
 		}
@@ -3020,11 +3046,22 @@ namespace SpaceGameEngine
 			}
 			else
 			{
-				for (auto pbuf = begin; pbuf != end; ++pbuf)
+				using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
+				if constexpr (!std::is_pointer_v<OtherIteratorType>)
 				{
-					using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
-					SGE_ASSERT(_InvalidMultipleByteCharError, *pbuf);
-					snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*pbuf);
+					for (auto pbuf = begin; pbuf != end; ++pbuf)
+					{
+						SGE_ASSERT(_InvalidMultipleByteCharError, *pbuf);
+						snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*pbuf);
+					}
+				}
+				else
+				{
+					for (auto pbuf = begin; pbuf != end; pbuf = StringImplement::GetNextMultipleByteChar<T, Trait>(pbuf))
+					{
+						SGE_ASSERT(_InvalidMultipleByteCharError, pbuf);
+						snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(pbuf);
+					}
 				}
 			}
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -3040,6 +3077,7 @@ namespace SpaceGameEngine
 				m_Storage.CopyOnWrite();
 				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
 				SizeType cnt = 0;
+				SizeType mc_cnt = 0;
 				for (auto i = begin; i != end; ++i)
 				{
 					if constexpr (!Trait::IsMultipleByte)
@@ -3049,11 +3087,25 @@ namespace SpaceGameEngine
 					}
 					else
 					{
-						memcpy(GetData() + index + cnt, *i, StringImplement::GetMultipleByteCharSize<T, Trait>(*i) * sizeof(T));
-						cnt += StringImplement::GetMultipleByteCharSize<T, Trait>(*i);
+						if constexpr (!std::is_pointer_v<OtherIteratorType>)
+						{
+							memcpy(GetData() + index + cnt, *i, StringImplement::GetMultipleByteCharSize<T, Trait>(*i) * sizeof(T));
+							cnt += StringImplement::GetMultipleByteCharSize<T, Trait>(*i);
+						}
+						else
+						{
+							memcpy(GetData() + index + cnt, i, StringImplement::GetMultipleByteCharSize<T, Trait>(i) * sizeof(T));
+							SizeType mc_size = StringImplement::GetMultipleByteCharSize<T, Trait>(i);
+							cnt += mc_size;
+							i += mc_size - 1;
+							mc_cnt += 1;
+						}
 					}
 				}
-				m_Size += (end - begin);
+				if constexpr (Trait::IsMultipleByte && std::is_pointer_v<OtherIteratorType>)
+					m_Size = mc_cnt;
+				else
+					m_Size += (end - begin);
 				m_Storage.SetSize(nsize + 1);
 				return IteratorType(GetData() + index);
 			}
@@ -3086,8 +3138,12 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+					if constexpr (!std::is_pointer_v<OtherIteratorType>)
+						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+					else
+						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(i2);
 				}
+				SizeType mc_cnt = 0;
 				while (i2 != end)
 				{
 					if constexpr (!Trait::IsMultipleByte)
@@ -3098,12 +3154,25 @@ namespace SpaceGameEngine
 					}
 					else
 					{
-						memcpy(*i1, *i2, StringImplement::GetMultipleByteCharSize<T, Trait>(*i2) * sizeof(T));
-						++i2;
-						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+						if constexpr (!std::is_pointer_v<OtherIteratorType>)
+						{
+							memcpy(*i1, *i2, StringImplement::GetMultipleByteCharSize<T, Trait>(*i2) * sizeof(T));
+							++i2;
+							i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+						}
+						else
+						{
+							memcpy(*i1, i2, StringImplement::GetMultipleByteCharSize<T, Trait>(i2) * sizeof(T));
+							i2 = StringImplement::GetNextMultipleByteChar<T, Trait>(i2);
+							i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(i2);
+							mc_cnt += 1;
+						}
 					}
 				}
-				m_Size += (end - begin);
+				if constexpr (Trait::IsMultipleByte && std::is_pointer_v<OtherIteratorType>)
+					m_Size = mc_cnt;
+				else
+					m_Size += (end - begin);
 				m_Storage.SetSize(nsize + 1);
 				IteratorType re(GetData() + index + snsize);
 				re += 1;

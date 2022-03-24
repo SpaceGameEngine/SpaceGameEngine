@@ -730,11 +730,17 @@ TEST(BinaryFile, OpenTest)
 {
 	{
 		BinaryFile file1;
+		ASSERT_FALSE(file1.IsOpen());
 		file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")), FileIOMode::Read);
+		ASSERT_TRUE(file1.IsOpen());
 		BinaryFile file2;
+		ASSERT_FALSE(file2.IsOpen());
 		file2.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt")), FileIOMode::Write);
+		ASSERT_TRUE(file2.IsOpen());
 		BinaryFile file3;
+		ASSERT_FALSE(file3.IsOpen());
 		file3.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")), FileIOMode::Append);
+		ASSERT_TRUE(file3.IsOpen());
 	}
 	DeleteFile(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")));
 }
@@ -742,11 +748,17 @@ TEST(BinaryFile, OpenTest)
 TEST(BinaryFile, CloseTest)
 {
 	BinaryFile file1(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")), FileIOMode::Read);
+	ASSERT_TRUE(file1.IsOpen());
 	file1.Close();
+	ASSERT_FALSE(file1.IsOpen());
 	file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt")), FileIOMode::Write);
+	ASSERT_TRUE(file1.IsOpen());
 	file1.Close();
+	ASSERT_FALSE(file1.IsOpen());
 	file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")), FileIOMode::Append);
+	ASSERT_TRUE(file1.IsOpen());
 	file1.Close();
+	ASSERT_FALSE(file1.IsOpen());
 	DeleteFile(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")));
 }
 

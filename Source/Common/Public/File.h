@@ -559,10 +559,13 @@ namespace SpaceGameEngine
 		bool IsReadFinished() const;
 		operator bool() const;
 
+		bool IsOpen() const;
+
 	protected:
 		FileHandle m_Handle;
 		FileIOMode m_Mode;
 		bool m_IsReadFinished;
+		bool m_IsOpen;
 	};
 
 	struct FileHandleOccupiedError

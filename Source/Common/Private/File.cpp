@@ -924,9 +924,9 @@ bool SpaceGameEngine::InvalidFilePositionOriginError::Judge(FilePositionOrigin o
 
 SpaceGameEngine::BinaryFile::BinaryFile()
 #ifdef SGE_WINDOWS
-	: m_Handle(NULL), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true)
+	: m_Handle(NULL), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true), m_IsOpen(false)
 #elif defined(SGE_POSIX)
-	: m_Handle(-1), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true)
+	: m_Handle(-1), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true), m_IsOpen(false)
 #else
 #error this os has not been supported.
 #endif
@@ -966,6 +966,7 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 #else
 #error this os has not been supported.
 #endif
+	m_IsOpen = true;
 	if ((mode & FileIOMode::Append) == FileIOMode::Append)
 		MoveFilePosition(FilePositionOrigin::End, 0);
 }
@@ -1026,6 +1027,7 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 #else
 #error this os has not been supported.
 #endif
+	m_IsOpen = true;
 	if ((mode & FileIOMode::Append) == FileIOMode::Append)
 		MoveFilePosition(FilePositionOrigin::End, 0);
 }
@@ -1046,6 +1048,7 @@ void SpaceGameEngine::BinaryFile::Close()
 #else
 #error this os has not been supported.
 #endif
+	m_IsOpen = false;
 }
 
 void SpaceGameEngine::BinaryFile::Flush()
@@ -1201,6 +1204,11 @@ bool SpaceGameEngine::BinaryFile::IsReadFinished() const
 SpaceGameEngine::BinaryFile::operator bool() const
 {
 	return !m_IsReadFinished;
+}
+
+bool SpaceGameEngine::BinaryFile::IsOpen() const
+{
+	return m_IsOpen;
 }
 
 bool SpaceGameEngine::FileHandleOccupiedError::Judge(FileHandle handle)

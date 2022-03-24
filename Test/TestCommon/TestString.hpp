@@ -2600,6 +2600,46 @@ TEST(StringCore, ConstReverseFindTest)
 	ASSERT_EQ(res2_10, res2_9 + 4);
 }
 
+TEST(StringCore, PointerAsIteratorTest)
+{
+	Char16 pucs2_str[] = SGE_WSTR("这是测试");
+	Char16 pucs2_str_r[] = SGE_WSTR("试测是这");
+	Char8 putf8_str[] = SGE_U8STR("这是测试");
+	Char8 putf8_str_r[] = SGE_U8STR("试测是这");
+
+	UCS2String ucs2_s1((const Char16*)pucs2_str, (const Char16*)pucs2_str + 4);
+	ASSERT_EQ(ucs2_s1.GetSize(), 4);
+	ASSERT_EQ(ucs2_s1, pucs2_str);
+
+	UTF8String utf8_s1((const Char8*)putf8_str, (const Char8*)putf8_str + 12);
+	ASSERT_EQ(utf8_s1.GetSize(), 4);
+	ASSERT_EQ(utf8_s1, putf8_str);
+
+	UCS2String ucs2_s2;
+	ASSERT_EQ(ucs2_s2.GetSize(), 0);
+	ucs2_s2.Insert(ucs2_s2.GetConstEnd(), (const Char16*)pucs2_str, (const Char16*)pucs2_str + 4);
+	ASSERT_EQ(ucs2_s2.GetSize(), 4);
+	ASSERT_EQ(ucs2_s2, pucs2_str);
+
+	UTF8String utf8_s2;
+	ASSERT_EQ(utf8_s2.GetSize(), 0);
+	utf8_s2.Insert(utf8_s2.GetConstEnd(), (const Char8*)putf8_str, (const Char8*)putf8_str + 12);
+	ASSERT_EQ(utf8_s2.GetSize(), 4);
+	ASSERT_EQ(utf8_s2, putf8_str);
+
+	UCS2String ucs2_s3;
+	ASSERT_EQ(ucs2_s3.GetSize(), 0);
+	ucs2_s3.Insert(ucs2_s3.GetConstReverseEnd(), (const Char16*)pucs2_str, (const Char16*)pucs2_str + 4);
+	ASSERT_EQ(ucs2_s3.GetSize(), 4);
+	ASSERT_EQ(ucs2_s3, pucs2_str_r);
+
+	UTF8String utf8_s3;
+	ASSERT_EQ(utf8_s3.GetSize(), 0);
+	utf8_s3.Insert(utf8_s3.GetConstReverseEnd(), (const Char8*)putf8_str, (const Char8*)putf8_str + 12);
+	ASSERT_EQ(utf8_s3.GetSize(), 4);
+	ASSERT_EQ(utf8_s3, putf8_str_r);
+}
+
 TEST(StringCoreIterator, GetBeginTest)
 {
 	UCS2String s1(SGE_WSTR("这是测试"));
