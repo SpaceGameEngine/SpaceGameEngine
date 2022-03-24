@@ -106,7 +106,7 @@ namespace SpaceGameEngine
 				RecursiveLock locker(m_Mutex);
 				locker.Lock();
 				if (m_CurrentIndex == m_WriteIndex)
-					m_Condition.WaitFor(locker, TimeDuration<Second, TimeType>(4));
+					m_Condition.WaitFor(locker, MakeTimeDuration<Second, TimeType>(4));
 				if (m_CurrentIndex == m_WriteIndex && m_Buffers[m_CurrentIndex].GetSize() > 0)
 					m_CurrentIndex = (m_CurrentIndex + 1) % sm_BufferArraySize;
 				locker.Unlock();
