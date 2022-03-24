@@ -64,7 +64,7 @@ TEST(LogWriter, WriteLogTest)
 			Thread t([&, i]() {
 				Char8 c_buf = i;
 				TestStringType str_buf(1024, c_buf);
-				for (auto j = 0; j < 1024; ++j)
+				for (auto j = 0; j < 128; ++j)
 				{
 					lw.WriteLog(str_buf.GetData(), str_buf.GetNormalSize());
 					SleepFor(TimeDuration<Microsecond, TimeType>(100));
@@ -81,7 +81,7 @@ TEST(LogWriter, WriteLogTest)
 		locker.Lock();
 		end_cond.Wait(locker, [&]() { return cnt == 0; });
 	}
-	ASSERT_EQ(test_output.GetNormalSize(), 256 * 1024 * 1024);
+	ASSERT_EQ(test_output.GetNormalSize(), 256 * 1024 * 128);
 	int test_cnt[256];
 	memset(test_cnt, 0, sizeof(test_cnt));
 	for (auto i = test_output.GetConstBegin(); i != test_output.GetConstEnd();)
@@ -92,5 +92,5 @@ TEST(LogWriter, WriteLogTest)
 		test_cnt[(SizeType)c] += 1024;
 	}
 	for (auto i = 0; i < 256; ++i)
-		ASSERT_EQ(test_cnt[i], 1024 * 1024);
+		ASSERT_EQ(test_cnt[i], 1024 * 128);
 }
