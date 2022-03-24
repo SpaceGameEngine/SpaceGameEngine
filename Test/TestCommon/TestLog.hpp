@@ -67,7 +67,7 @@ TEST(LogWriter, WriteLogTest)
 				for (auto j = 0; j < 1024; ++j)
 				{
 					lw.WriteLog(str_buf.GetData(), str_buf.GetNormalSize());
-					SleepFor(TimeDuration<Microsecond, TimeType>(1));
+					SleepFor(TimeDuration<Microsecond, TimeType>(10));
 				}
 				RecursiveLock locker(mutex);
 				locker.Lock();
