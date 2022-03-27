@@ -30,6 +30,16 @@ using TestStringType = StringCore<Char8>;
 class TestLogWriterCore
 {
 public:
+	TestLogWriterCore()
+		: m_Output(nullptr)
+	{
+	}
+
+	TestLogWriterCore(TestStringType& output)
+		: m_Output(&output)
+	{
+	}
+
 	void WriteLog(const Char8* pstr, SizeType size)
 	{
 		RecursiveLock locker(m_Mutex);
@@ -47,15 +57,17 @@ public:
 
 private:
 	Mutex m_Mutex;
-	TestStringType* m_Output = nullptr;
+	TestStringType* m_Output;
 };
 
 TEST(LogWriter, WriteLogTest)
 {
 	TestStringType test_output;
 	{
-		LogWriter<TestLogWriterCore> lw;
-		lw.GetLogWriterCore().SetOutput(test_output);
+		//test LogWriterCore construction
+		LogWriter<TestLogWriterCore> lw(test_output);
+		//test LogWriterCore method
+		lw.SetOutput(test_output);
 		Mutex mutex;
 		Condition end_cond;
 		int cnt = 256;

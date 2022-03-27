@@ -48,11 +48,19 @@ namespace SpaceGameEngine
 	};
 
 	template<IsLogWriterCore LogWriterCore = ConsoleLogWriterCore>
-	class LogWriter : public UncopyableAndUnmovable
+	class LogWriter : public UncopyableAndUnmovable, public LogWriterCore
 	{
 	public:
 		inline LogWriter()
-			: m_CurrentIndex(0), m_WriteIndex(0)
+			: LogWriterCore(), m_CurrentIndex(0), m_WriteIndex(0)
+		{
+			m_IsRunning.Store(true, MemoryOrder::Release);
+			m_Thread = Thread(std::bind(&LogWriter::Run, this));
+		}
+
+		template<typename... Args>
+		inline LogWriter(Args&&... args)
+			: LogWriterCore(std::forward<Args>(args)...), m_CurrentIndex(0), m_WriteIndex(0)
 		{
 			m_IsRunning.Store(true, MemoryOrder::Release);
 			m_Thread = Thread(std::bind(&LogWriter::Run, this));
@@ -88,16 +96,6 @@ namespace SpaceGameEngine
 			}
 		}
 
-		inline LogWriterCore& GetLogWriterCore()
-		{
-			return m_LogWriterCore;
-		}
-
-		inline const LogWriterCore& GetLogWriterCore() const
-		{
-			return m_LogWriterCore;
-		}
-
 	private:
 		inline void Run()
 		{
@@ -113,20 +111,19 @@ namespace SpaceGameEngine
 
 				for (; m_WriteIndex != m_CurrentIndex; m_WriteIndex = (m_WriteIndex + 1) % sm_BufferArraySize)
 				{
-					m_LogWriterCore.WriteLog((const Char8*)(m_Buffers[m_WriteIndex].GetData()), m_Buffers[m_WriteIndex].GetSize());
+					LogWriterCore::WriteLog((const Char8*)(m_Buffers[m_WriteIndex].GetData()), m_Buffers[m_WriteIndex].GetSize());
 					m_Buffers[m_WriteIndex].Clear();
 				}
 			}
 			if (m_CurrentIndex == m_WriteIndex && m_Buffers[m_CurrentIndex].GetSize() > 0)
 				m_CurrentIndex = (m_CurrentIndex + 1) % sm_BufferArraySize;
 			for (; m_WriteIndex != m_CurrentIndex; m_WriteIndex = (m_WriteIndex + 1) % sm_BufferArraySize)
-				m_LogWriterCore.WriteLog((const Char8*)(m_Buffers[m_WriteIndex].GetData()), m_Buffers[m_WriteIndex].GetSize());
+				LogWriterCore::WriteLog((const Char8*)(m_Buffers[m_WriteIndex].GetData()), m_Buffers[m_WriteIndex].GetSize());
 		}
 
 	private:
 		inline static constexpr const SizeType sm_BufferArraySize = 4;
 
-		LogWriterCore m_LogWriterCore;
 		Atomic<bool> m_IsRunning;
 		Thread m_Thread;
 		FixedSizeBuffer<LogWriterBufferSize> m_Buffers[sm_BufferArraySize];
