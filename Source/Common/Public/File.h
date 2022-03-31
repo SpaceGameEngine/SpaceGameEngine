@@ -536,6 +536,12 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(FilePositionOrigin origin);
 	};
 
+	struct IncompleteWriteError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Write is incomplete.");
+		static COMMON_API bool Judge(SizeType real, SizeType wish);
+	};
+
 	class COMMON_API BinaryFile : public UncopyableAndUnmovable
 	{
 	public:
@@ -547,7 +553,7 @@ namespace SpaceGameEngine
 		void Close();
 		void Flush();
 		SizeType Read(void* pdst, SizeType size);
-		SizeType Write(const void* psrc, SizeType size);
+		void Write(const void* psrc, SizeType size);
 		Int64 MoveFilePosition(FilePositionOrigin origin, Int64 offset);
 		SizeType GetFileSize() const;
 		/*!
@@ -624,7 +630,7 @@ namespace SpaceGameEngine
 		void SetEndian(Endian endian);
 
 		Pair<Char16, bool> ReadChar();
-		bool WriteChar(Char16 c);
+		void WriteChar(Char16 c);
 
 		/*!
 		@note When the file has bom header, the offset is not as same as the

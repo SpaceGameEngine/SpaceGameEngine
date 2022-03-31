@@ -792,7 +792,7 @@ TEST(BinaryFile, WriteTest)
 	ASSERT_FALSE(path.IsExist());
 
 	BinaryFile bf_write(path, FileIOMode::Write);
-	ASSERT_EQ(bf_write.Write(test_data, sizeof(test_data)), sizeof(test_data));
+	bf_write.Write(test_data, sizeof(test_data));
 	bf_write.Close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -821,7 +821,7 @@ TEST(BinaryFile, OverwriteTest)
 
 	int test_data_output[2] = {90, 1112};
 	BinaryFile bf_write(path, FileIOMode::Write);
-	ASSERT_EQ(bf_write.Write(test_data_output, sizeof(test_data_output)), sizeof(test_data_output));
+	bf_write.Write(test_data_output, sizeof(test_data_output));
 	bf_write.Close();
 
 	int test_data_input[4] = {0, 0, 0, 0};
@@ -845,7 +845,7 @@ TEST(BinaryFile, FlushTest)
 	ASSERT_FALSE(path.IsExist());
 
 	BinaryFile bf_flush(path, FileIOMode::Write);
-	ASSERT_EQ(bf_flush.Write(test_data, sizeof(test_data)), sizeof(test_data));
+	bf_flush.Write(test_data, sizeof(test_data));
 	bf_flush.Flush();
 	bf_flush.Close();
 	ASSERT_TRUE(path.IsExist());
@@ -877,7 +877,7 @@ TEST(BinaryFile, ReadWriteTest)
 	int test_data_output[4] = {101, 202, 303, 404};
 	BinaryFile bf_read_write(path, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_EQ(bf_read_write.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
-	ASSERT_EQ(bf_read_write.Write(test_data_output, sizeof(test_data_output)), sizeof(test_data_output));
+	bf_read_write.Write(test_data_output, sizeof(test_data_output));
 	bf_read_write.Close();
 
 	for (int i = 0; i < 4; ++i)
@@ -910,10 +910,10 @@ TEST(BinaryFile, AppendTest)
 
 	int test_data_output[4] = {90, 112, 134, 156};
 	BinaryFile bf_append(path, FileIOMode::Append);
-	ASSERT_EQ(bf_append.Write(test_data_output, sizeof(int) * 2), sizeof(int) * 2);
+	bf_append.Write(test_data_output, sizeof(int) * 2);
 	bf_append.Close();
 	bf_append.Open(path, FileIOMode::Append);	 //test open append
-	ASSERT_EQ(bf_append.Write(test_data_output + 2, sizeof(int) * 2), sizeof(int) * 2);
+	bf_append.Write(test_data_output + 2, sizeof(int) * 2);
 	bf_append.Close();
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -944,7 +944,7 @@ TEST(BinaryFile, ReadWriteAppendTest)
 	int test_data_input[4] = {0, 0, 0, 0};
 	int test_data_output[4] = {101, 202, 303, 404};
 	BinaryFile bf_read_write_append(path, FileIOMode::Read | FileIOMode::Write | FileIOMode::Append);
-	ASSERT_EQ(bf_read_write_append.Write(test_data_output, sizeof(test_data_output)), sizeof(test_data_output));
+	bf_read_write_append.Write(test_data_output, sizeof(test_data_output));
 	bf_read_write_append.MoveFilePosition(FilePositionOrigin::Begin, 0);
 	ASSERT_EQ(bf_read_write_append.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
 	bf_read_write_append.Close();
@@ -1397,13 +1397,13 @@ TEST(UCS2FileCore, WriteCharTest)
 	file.Open(p_le, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_TRUE(file.WriteChar(test_data));
+	file.WriteChar(test_data);
 	file.Close();
 
 	file.Open(p_be, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetEndian(), Endian::Big);
-	ASSERT_TRUE(file.WriteChar(test_data));
+	file.WriteChar(test_data);
 	file.Close();
 
 	Char16 test_data_input = 0;

@@ -922,6 +922,11 @@ bool SpaceGameEngine::InvalidFilePositionOriginError::Judge(FilePositionOrigin o
 	return (UInt8)origin > 2;
 }
 
+bool SpaceGameEngine::IncompleteWriteError::Judge(SizeType real, SizeType wish)
+{
+	return real != wish;
+}
+
 SpaceGameEngine::BinaryFile::BinaryFile()
 #ifdef SGE_WINDOWS
 	: m_Handle(NULL), m_Mode(FileIOMode::Unknown), m_IsReadFinished(true), m_IsOpen(false)
@@ -1095,7 +1100,7 @@ SizeType SpaceGameEngine::BinaryFile::Read(void* pdst, SizeType size)
 #endif
 }
 
-SizeType SpaceGameEngine::BinaryFile::Write(const void* psrc, SizeType size)
+void SpaceGameEngine::BinaryFile::Write(const void* psrc, SizeType size)
 {
 	SGE_ASSERT(FileHandleReleasedError, m_Handle);
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
@@ -1104,11 +1109,11 @@ SizeType SpaceGameEngine::BinaryFile::Write(const void* psrc, SizeType size)
 #ifdef SGE_WINDOWS
 	DWORD buf = 0;
 	SGE_CHECK(WriteFileFailError, WriteFile(m_Handle, psrc, size, &buf, NULL));
-	return buf;
+	SGE_CHECK(IncompleteWriteError, buf, size);
 #elif defined(SGE_POSIX)
 	ssize_t re = write(m_Handle, psrc, size);
 	SGE_CHECK(WriteFailError, re);
-	return re;
+	SGE_CHECK(IncompleteWriteError, re, size);
 #else
 #error this os has not been supported.
 #endif
@@ -1334,16 +1339,13 @@ Pair<Char16, bool> SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadChar()
 		return Pair<Char16, bool>(0, false);
 }
 
-bool SpaceGameEngine::FileCore<Char16, UCS2Trait>::WriteChar(Char16 c)
+void SpaceGameEngine::FileCore<Char16, UCS2Trait>::WriteChar(Char16 c)
 {
 	SGE_ASSERT(FileIOModeNotWriteError, m_Mode);
 
 	if (m_Endian != GetSystemEndian())
 		ChangeEndian(c, m_Endian, GetSystemEndian());
-	if (Write(&c, sizeof(c)) == sizeof(c))
-		return true;
-	else
-		return false;
+	Write(&c, sizeof(c));
 }
 
 Int64 SpaceGameEngine::FileCore<Char16, UCS2Trait>::Seek(FilePositionOrigin origin, Int64 offset)
@@ -1559,10 +1561,8 @@ const Char8* SpaceGameEngine::FileCore<Char8, UTF8Trait>::WriteChar(const Char8*
 	SGE_ASSERT(_InvalidMultipleByteCharError, pc);
 
 	SizeType mchar_size = StringImplement::GetMultipleByteCharSize<Char8, UTF8Trait>(pc);
-	if (Write(pc, mchar_size * sizeof(Char8)) == mchar_size * sizeof(Char8))
-		return pc + mchar_size;
-	else
-		return nullptr;
+	Write(pc, mchar_size * sizeof(Char8));
+	return pc + mchar_size;
 }
 
 Int64 SpaceGameEngine::FileCore<Char8, UTF8Trait>::Seek(FilePositionOrigin origin, Int64 offset)
