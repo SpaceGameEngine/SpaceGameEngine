@@ -969,6 +969,8 @@ SpaceGameEngine::BinaryFile::BinaryFile(const Path& path, FileIOMode mode)
 	m_IsOpen = true;
 	if ((mode & FileIOMode::Append) == FileIOMode::Append)
 		MoveFilePosition(FilePositionOrigin::End, 0);
+	if (mode == FileIOMode::Write)
+		SetFileSize(0);
 }
 
 SpaceGameEngine::BinaryFile::~BinaryFile()
@@ -1030,6 +1032,8 @@ void SpaceGameEngine::BinaryFile::Open(const Path& path, FileIOMode mode)
 	m_IsOpen = true;
 	if ((mode & FileIOMode::Append) == FileIOMode::Append)
 		MoveFilePosition(FilePositionOrigin::End, 0);
+	if (mode == FileIOMode::Write)
+		SetFileSize(0);
 }
 
 void SpaceGameEngine::BinaryFile::Close()

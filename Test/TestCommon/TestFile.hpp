@@ -808,6 +808,36 @@ TEST(BinaryFile, WriteTest)
 	ASSERT_FALSE(path.IsExist());
 }
 
+TEST(BinaryFile, OverwriteTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbow.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_output[2] = {90, 1112};
+	BinaryFile bf_write(path, FileIOMode::Write);
+	ASSERT_EQ(bf_write.Write(test_data_output, sizeof(test_data_output)), sizeof(test_data_output));
+	bf_write.Close();
+
+	int test_data_input[4] = {0, 0, 0, 0};
+	BinaryFile bf_read(path, FileIOMode::Read);
+	ASSERT_EQ(bf_read.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_output));
+	bf_read.Close();
+
+	for (int i = 0; i < 2; ++i)
+		ASSERT_EQ(test_data_input[i], test_data_output[i]);
+	for (int i = 2; i < 4; ++i)
+		ASSERT_EQ(test_data_input[i], 0);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
+
 TEST(BinaryFile, FlushTest)
 {
 	int test_data[4] = {12, 34, 56, 78};
@@ -1041,12 +1071,6 @@ TEST(BinaryFile, IsReadFinishedTest)
 
 	int test_data_input[4] = {0, 0, 0, 0};
 
-	{
-		const BinaryFile bf_write(path, FileIOMode::Write);
-		ASSERT_TRUE(bf_write.IsReadFinished());
-		ASSERT_FALSE(bf_write);
-	}
-
 	BinaryFile bf_read(path, FileIOMode::Read);
 	ASSERT_EQ(bf_read.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
 
@@ -1070,8 +1094,13 @@ TEST(BinaryFile, IsReadFinishedTest)
 
 	ASSERT_FALSE(bf_read.IsReadFinished());
 	ASSERT_TRUE(bf_read);
-
 	bf_read.Close();
+
+	{
+		const BinaryFile bf_write(path, FileIOMode::Write);
+		ASSERT_TRUE(bf_write.IsReadFinished());
+		ASSERT_FALSE(bf_write);
+	}
 
 	DeleteFile(path);
 	ASSERT_FALSE(path.IsExist());
