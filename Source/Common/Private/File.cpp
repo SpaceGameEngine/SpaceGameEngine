@@ -978,15 +978,15 @@ SpaceGameEngine::BinaryFile::~BinaryFile()
 #ifdef SGE_WINDOWS
 	if (m_Handle)
 	{
-		//if ((UInt8)(m_Mode & FileIOMode::Write))
-		//	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+		if ((UInt8)(m_Mode & FileIOMode::Write))
+			SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 		SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	}
 #elif defined(SGE_POSIX)
 	if (m_Handle > -1)
 	{
-		//if ((UInt8)(m_Mode & FileIOMode::Write))
-		//	SGE_CHECK(FsyncFailError, fsync(m_Handle));
+		if ((UInt8)(m_Mode & FileIOMode::Write))
+			SGE_CHECK(FsyncFailError, fsync(m_Handle));
 		SGE_CHECK(CloseFailError, close(m_Handle));
 	}
 #else
@@ -1040,13 +1040,13 @@ void SpaceGameEngine::BinaryFile::Close()
 {
 	SGE_ASSERT(FileHandleReleasedError, m_Handle);
 #ifdef SGE_WINDOWS
-	//if ((UInt8)(m_Mode & FileIOMode::Write))
-	//	SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
+	if ((UInt8)(m_Mode & FileIOMode::Write))
+		SGE_CHECK(FlushFileBuffersFailError, FlushFileBuffers(m_Handle));
 	SGE_CHECK(CloseHandleFailError, CloseHandle(m_Handle));
 	m_Handle = NULL;
 #elif defined(SGE_POSIX)
-	//if ((UInt8)(m_Mode & FileIOMode::Write))
-	//	SGE_CHECK(FsyncFailError, fsync(m_Handle));
+	if ((UInt8)(m_Mode & FileIOMode::Write))
+		SGE_CHECK(FsyncFailError, fsync(m_Handle));
 	SGE_CHECK(CloseFailError, close(m_Handle));
 	m_Handle = -1;
 #else

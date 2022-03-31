@@ -52,3 +52,38 @@ UTF8String SpaceGameEngine::GetLogLevelUTF8String(LogLevelType log_level)
 		return SGE_U8STR("ERROR_LEVEL");
 	}
 }
+
+SpaceGameEngine::FileLogWriterCore::FileLogWriterCore()
+{
+	Path dir_path = GetModuleDirectoryPath() / Path(SGE_STR("Log"));
+	if (!dir_path.IsExist())
+		CreateDirectory(dir_path);
+	Date date = GetLocalDate();
+	m_File.Open(dir_path / Path(Format(String(SGE_STR("{:4}-{:2}-{:2}_{:2}-{:2}-{:2}.log")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second)), FileIOMode::Read | FileIOMode::Write);
+	m_File.SetHasBomHeader(true);
+	m_TimeCounter.Start();
+}
+
+SpaceGameEngine::FileLogWriterCore::FileLogWriterCore(const Path& dir_path)
+{
+	SGE_ASSERT(PathNotExistError, dir_path.GetParentPath());
+	SGE_ASSERT(PathNotDirectoryError, dir_path.GetParentPath());
+
+	if (!dir_path.IsExist())
+		CreateDirectory(dir_path);
+	Date date = GetLocalDate();
+	m_File.Open(dir_path / Path(Format(String(SGE_STR("{:4}-{:2}-{:2}_{:2}-{:2}-{:2}.log")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second)), FileIOMode::Read | FileIOMode::Write);
+	m_File.SetHasBomHeader(true);
+	m_TimeCounter.Start();
+}
+
+void SpaceGameEngine::FileLogWriterCore::WriteLog(const Char8* pstr, SizeType size)
+{
+	SGE_ASSERT(NullPointerError, pstr);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+
+	m_File.Write(pstr, size);
+	m_TimeCounter.Tick();
+	if (m_TimeCounter.GetDeltaTime() >= 2)
+		m_File.Flush();
+}

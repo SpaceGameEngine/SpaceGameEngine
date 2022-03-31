@@ -20,6 +20,55 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+TEST(ConsoleLogWriterCore, WriteLogTest)
+{
+	ConsoleLogWriterCore lw;
+	lw.WriteLog(SGE_U8STR("test"), 4);
+}
+
+TEST(FileLogWriterCore, InstanceTest)
+{
+	Path log_path = GetModuleDirectoryPath() / Path(SGE_STR("Log"));
+	if (!log_path.IsExist())
+		CreateDirectory(log_path);
+	SizeType children_size = log_path.GetChildPath().GetSize();
+	FileLogWriterCore lw;
+	SizeType children_size2 = log_path.GetChildPath().GetSize();
+	ASSERT_EQ(children_size + 1, children_size2);
+
+	Path log_path2 = GetModuleDirectoryPath() / Path(SGE_STR("Log/Test"));
+	ASSERT_FALSE(log_path2.IsExist());
+	FileLogWriterCore lw2(log_path2);
+	ASSERT_TRUE(log_path2.IsExist());
+	ASSERT_EQ(log_path2.GetChildPath().GetSize(), 1);
+
+	DeleteDirectory(log_path2);
+	ASSERT_FALSE(log_path2.IsExist());
+}
+
+TEST(FileLogWriterCore, WriteLogTest)
+{
+	Path log_path = GetModuleDirectoryPath() / Path(SGE_STR("Log"));
+	Path log_path2 = GetModuleDirectoryPath() / Path(SGE_STR("Log/Test"));
+	if (!log_path.IsExist())
+		CreateDirectory(log_path);
+
+	{
+		ASSERT_FALSE(log_path2.IsExist());
+		FileLogWriterCore lw(log_path2);
+		lw.WriteLog(SGE_U8STR("test"), 4);
+		ASSERT_TRUE(log_path2.IsExist());
+		ASSERT_EQ(log_path2.GetChildPath().GetSize(), 1);
+	}
+
+	UTF8File file(log_path2.GetChildPath()[0].m_First, FileIOMode::Read);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
+
+	DeleteDirectory(log_path2);
+	ASSERT_FALSE(log_path2.IsExist());
+}
+
 TEST(LogWriter, InstanceTest)
 {
 	LogWriter lw;

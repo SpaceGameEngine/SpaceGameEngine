@@ -24,6 +24,8 @@ limitations under the License.
 #include "Utility/DebugInformation.h"
 #include "Utility/Format.hpp"
 #include "Time/Date.h"
+#include "Time/TimeCounter.h"
+#include "File.h"
 
 namespace SpaceGameEngine
 {
@@ -38,19 +40,36 @@ namespace SpaceGameEngine
 		t.WriteLog(pstr, size);
 	};
 
-	inline static constexpr const SizeType LogWriterBufferSize = 4194304;
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class COMMON_API FixedSizeBuffer<LogWriterBufferSize>;
-#endif
-
 	class COMMON_API ConsoleLogWriterCore
 	{
 	public:
 		void WriteLog(const Char8* pstr, SizeType size);
 	};
 
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class COMMON_API TimeCounter<Second>;
+#endif
+
+	class COMMON_API FileLogWriterCore : public UncopyableAndUnmovable
+	{
+	public:
+		FileLogWriterCore();
+		FileLogWriterCore(const Path& dir_path);
+
+		void WriteLog(const Char8* pstr, SizeType size);
+
+	private:
+		UTF8File m_File;
+		TimeCounter<Second> m_TimeCounter;
+	};
+
 	using DefaultLogWriterCore = ConsoleLogWriterCore;
+
+	inline static constexpr const SizeType LogWriterBufferSize = 4194304;
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class COMMON_API FixedSizeBuffer<LogWriterBufferSize>;
+#endif
 
 	template<IsLogWriterCore LogWriterCore = DefaultLogWriterCore>
 	class LogWriter : public UncopyableAndUnmovable, public LogWriterCore
