@@ -26,3 +26,29 @@ void SpaceGameEngine::ConsoleLogWriterCore::WriteLog(const Char8* pstr, SizeType
 
 	std::cout.write((const char*)pstr, size);
 }
+
+bool SpaceGameEngine::InvalidLogLevelError::Judge(LogLevelType log_level)
+{
+	return log_level > LogLevel::All;
+}
+
+UTF8String SpaceGameEngine::GetLogLevelUTF8String(LogLevelType log_level)
+{
+	SGE_ASSERT(InvalidLogLevelError, log_level);
+
+	switch (log_level)
+	{
+	case LogLevel::Error:
+		return SGE_U8STR("ERROR");
+	case LogLevel::Exception:
+		return SGE_U8STR("EXCEPTION");
+	case LogLevel::Warning:
+		return SGE_U8STR("WARNING");
+	case LogLevel::Information:
+		return SGE_U8STR("INFORMATION");
+	case LogLevel::Debug:
+		return SGE_U8STR("DEBUG");
+	default:
+		return SGE_U8STR("ERROR_LEVEL");
+	}
+}

@@ -21,6 +21,9 @@ limitations under the License.
 #include "Concurrent/Lock.h"
 #include "SGEStringForward.h"
 #include "Utility/FixedSizeBuffer.hpp"
+#include "Utility/DebugInformation.h"
+#include "Utility/Format.hpp"
+#include "Time/Date.h"
 
 namespace SpaceGameEngine
 {
@@ -47,7 +50,9 @@ namespace SpaceGameEngine
 		void WriteLog(const Char8* pstr, SizeType size);
 	};
 
-	template<IsLogWriterCore LogWriterCore = ConsoleLogWriterCore>
+	using DefaultLogWriterCore = ConsoleLogWriterCore;
+
+	template<IsLogWriterCore LogWriterCore = DefaultLogWriterCore>
 	class LogWriter : public UncopyableAndUnmovable, public LogWriterCore
 	{
 	public:
@@ -131,6 +136,80 @@ namespace SpaceGameEngine
 		SizeType m_WriteIndex;
 		Mutex m_Mutex;
 		Condition m_Condition;
+	};
+
+	using LogLevelType = UInt8;
+	namespace LogLevel
+	{
+		inline constexpr const LogLevelType Error = 0;
+		inline constexpr const LogLevelType Exception = 1;
+		inline constexpr const LogLevelType Warning = 2;
+		inline constexpr const LogLevelType Information = 3;
+		inline constexpr const LogLevelType Debug = 4;
+
+		inline constexpr const LogLevelType All = 4;
+	}
+
+	struct InvalidLogLevelError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The LogLevel is invalid.");
+		static COMMON_API bool Judge(LogLevelType log_level);
+	};
+
+	COMMON_API UTF8String GetLogLevelUTF8String(LogLevelType log_level);
+
+	template<typename T>
+	concept IsLogFormatter = requires(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str)
+	{
+		{
+			T::Format(date, debug_info, log_level, str)
+		}
+		->std::convertible_to<UTF8String>;
+	};
+
+	struct DefaultLogFormatter
+	{
+		inline static UTF8String Format(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str)
+		{
+			return SpaceGameEngine::Format(UTF8String(SGE_U8STR("{:4}-{:2}-{:2} {:2}:{:2}:{:2} {}:{}:{} {} {}\n")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second, SGE_TSTR_TO_UTF8(debug_info.m_pFileName), SGE_TSTR_TO_UTF8(debug_info.m_pFunctionName), debug_info.m_LineNumber, GetLogLevelUTF8String(log_level), str);
+		}
+	};
+
+	template<IsLogWriterCore LogWriterCore = DefaultLogWriterCore, IsLogFormatter LogFormatter = DefaultLogFormatter>
+	class Logger : public UncopyableAndUnmovable
+	{
+	public:
+		inline Logger(LogWriter<LogWriterCore>& log_writer, LogLevelType log_level = LogLevel::All)
+			: m_LogWriter(log_writer), m_LogLevel(log_level)
+		{
+		}
+
+		inline void WriteLog(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str)
+		{
+			if (log_level > m_LogLevel)
+				return;
+			else
+			{
+				UTF8String result = LogFormatter::Format(date, debug_info, log_level, str);
+				m_LogWriter.WriteLog(result.GetData(), result.GetNormalSize());
+			}
+		}
+
+		template<typename... Args>
+		inline void WriteLog(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str, Args&&... args)
+		{
+			if (log_level > m_LogLevel)
+				return;
+			else
+			{
+				UTF8String result = LogFormatter::Format(date, debug_info, log_level, Format(str, std::forward<Args>(args)...));
+				m_LogWriter.WriteLog(result.GetData(), result.GetNormalSize());
+			}
+		}
+
+	private:
+		LogWriter<LogWriterCore>& m_LogWriter;
+		LogLevelType m_LogLevel;
 	};
 
 	/*!
