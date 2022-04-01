@@ -83,7 +83,7 @@ SpaceGameEngine::Bootstrap::~Bootstrap()
 	}
 	else
 	{
-		//make sure the dll's global variable can be destructed before the main() exit.
+		//make sure the global variables which are stored in dll can be destructed before the executable exiting.
 		GlobalVariableManager::GetSingleton().~GlobalVariableManager();
 		FreeLibrary(g_CommonModule);
 	}
