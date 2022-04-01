@@ -68,6 +68,7 @@ TEST(FileLogWriterCore, WriteLogTest)
 	UTF8File file(log_path2.GetChildPath()[0].m_First, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
+	file.Close();
 
 	DeleteDirectory(log_path2);
 	ASSERT_FALSE(log_path2.IsExist());
@@ -110,6 +111,7 @@ TEST(BindConsoleLogWriterCore, WriteLogTest)
 	UTF8File file(log_path2.GetChildPath()[0].m_First, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
+	file.Close();
 
 	DeleteDirectory(log_path2);
 	ASSERT_FALSE(log_path2.IsExist());
