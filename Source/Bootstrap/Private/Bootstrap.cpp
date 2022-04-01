@@ -17,6 +17,7 @@ limitations under the License.
 #include "Platform.hpp"
 #include "SGEStringForward.h"
 #include "CommonAPI.h"
+#include "GlobalVariable.h"
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 #include <Windows.h>
 #endif
@@ -82,6 +83,8 @@ SpaceGameEngine::Bootstrap::~Bootstrap()
 	}
 	else
 	{
+		//make sure the dll's global variable can be destructed before the main() exit.
+		GlobalVariableManager::GetSingleton().~GlobalVariableManager();
 		FreeLibrary(g_CommonModule);
 	}
 #endif
