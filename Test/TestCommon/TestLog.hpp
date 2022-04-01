@@ -256,3 +256,9 @@ TEST(GetDefaultLogWriter, Test)
 	const Char8 pstr[] = SGE_U8STR("test default log writer\n");
 	GetDefaultLogWriter().WriteLog(pstr, sizeof(pstr) / sizeof(Char8) - 1);
 }
+
+TEST(GetDefaultLogger, Test)
+{
+	SGE_LOG(GetDefaultLogger(), LogLevel::Debug, SGE_U8STR("test debug"));
+	SGE_LOG(GetDefaultLogger(), LogLevel::Information, SGE_U8STR("test information:{}+{}={}"), 1, 2, 3);
+}

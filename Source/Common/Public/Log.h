@@ -262,6 +262,8 @@ namespace SpaceGameEngine
 		LogLevelType m_LogLevel;
 	};
 
+#define SGE_LOG(logger, level, str, ...) logger.WriteLog(SpaceGameEngine::GetLocalDate(), SGE_DEBUG_INFORMATION, level, str, ##__VA_ARGS__);
+
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API BindConsoleLogWriterCore<FileLogWriterCore>;
 	template class COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
