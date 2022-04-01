@@ -33,16 +33,14 @@ TEST(ConsoleLogWriterCore, WriteLogTest)
 
 TEST(FileLogWriterCore, InstanceTest)
 {
-	Path log_path = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
-	if (!log_path.IsExist())
-		CreateDirectory(log_path);
+	Path log_path = GetDefaultLogDirectoryPath();
 	SizeType children_size = log_path.GetChildPath().GetSize();
 	SleepFor(MakeTimeDuration<Second>(1));
 	FileLogWriterCore lw;
 	SizeType children_size2 = log_path.GetChildPath().GetSize();
 	ASSERT_EQ(children_size + 1, children_size2);
 
-	Path log_path2 = GetProjectDirectoryPath() / Path(SGE_STR("Log/Test"));
+	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
 	ASSERT_FALSE(log_path2.IsExist());
 	FileLogWriterCore lw2(log_path2);
 	ASSERT_TRUE(log_path2.IsExist());
@@ -54,10 +52,8 @@ TEST(FileLogWriterCore, InstanceTest)
 
 TEST(FileLogWriterCore, WriteLogTest)
 {
-	Path log_path = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
-	Path log_path2 = GetProjectDirectoryPath() / Path(SGE_STR("Log/Test"));
-	if (!log_path.IsExist())
-		CreateDirectory(log_path);
+	Path log_path = GetDefaultLogDirectoryPath();
+	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
 
 	{
 		ASSERT_FALSE(log_path2.IsExist());
@@ -77,16 +73,14 @@ TEST(FileLogWriterCore, WriteLogTest)
 
 TEST(BindConsoleLogWriterCore, InstanceTest)
 {
-	Path log_path = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
-	if (!log_path.IsExist())
-		CreateDirectory(log_path);
+	Path log_path = GetDefaultLogDirectoryPath();
 	SizeType children_size = log_path.GetChildPath().GetSize();
 	SleepFor(MakeTimeDuration<Second>(1));
 	BindConsoleLogWriterCore<FileLogWriterCore> lw;
 	SizeType children_size2 = log_path.GetChildPath().GetSize();
 	ASSERT_EQ(children_size + 1, children_size2);
 
-	Path log_path2 = GetProjectDirectoryPath() / Path(SGE_STR("Log/Test"));
+	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
 	ASSERT_FALSE(log_path2.IsExist());
 	BindConsoleLogWriterCore<FileLogWriterCore> lw2(log_path2);
 	ASSERT_TRUE(log_path2.IsExist());
@@ -98,10 +92,8 @@ TEST(BindConsoleLogWriterCore, InstanceTest)
 
 TEST(BindConsoleLogWriterCore, WriteLogTest)
 {
-	Path log_path = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
-	Path log_path2 = GetProjectDirectoryPath() / Path(SGE_STR("Log/Test"));
-	if (!log_path.IsExist())
-		CreateDirectory(log_path);
+	Path log_path = GetDefaultLogDirectoryPath();
+	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
 
 	{
 		ASSERT_FALSE(log_path2.IsExist());
@@ -257,4 +249,10 @@ TEST(Logger, WriteLogTest)
 	ASSERT_EQ(lines[0], SGE_U8STR("0001-02-03 04:05:06 test_file:test_func:78 WARNING test non-formatted warning"));
 	ASSERT_EQ(lines[1], SGE_U8STR("0001-02-03 04:05:06 test_file:test_func:78 EXCEPTION test 1+2=3 exception"));
 	ASSERT_EQ(lines[2].GetSize(), 0);
+}
+
+TEST(GetDefaultLogWriter, Test)
+{
+	const Char8 pstr[] = SGE_U8STR("test default log writer\n");
+	GetDefaultLogWriter().WriteLog(pstr, sizeof(pstr) / sizeof(Char8) - 1);
 }

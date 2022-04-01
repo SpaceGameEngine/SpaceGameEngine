@@ -27,39 +27,18 @@ void SpaceGameEngine::ConsoleLogWriterCore::WriteLog(const Char8* pstr, SizeType
 	std::cout.write((const char*)pstr, size);
 }
 
-bool SpaceGameEngine::InvalidLogLevelError::Judge(LogLevelType log_level)
+Path SpaceGameEngine::GetDefaultLogDirectoryPath()
 {
-	return log_level > LogLevel::All;
-}
-
-UTF8String SpaceGameEngine::GetLogLevelUTF8String(LogLevelType log_level)
-{
-	SGE_ASSERT(InvalidLogLevelError, log_level);
-
-	switch (log_level)
-	{
-	case LogLevel::Error:
-		return SGE_U8STR("ERROR");
-	case LogLevel::Exception:
-		return SGE_U8STR("EXCEPTION");
-	case LogLevel::Warning:
-		return SGE_U8STR("WARNING");
-	case LogLevel::Information:
-		return SGE_U8STR("INFORMATION");
-	case LogLevel::Debug:
-		return SGE_U8STR("DEBUG");
-	default:
-		return SGE_U8STR("ERROR_LEVEL");
-	}
+	Path p = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
+	if (!p.IsExist())
+		CreateDirectory(p);
+	return p;
 }
 
 SpaceGameEngine::FileLogWriterCore::FileLogWriterCore()
 {
-	Path dir_path = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
-	if (!dir_path.IsExist())
-		CreateDirectory(dir_path);
 	Date date = GetLocalDate();
-	m_File.Open(dir_path / Path(Format(String(SGE_STR("{:4}-{:2}-{:2}_{:2}-{:2}-{:2}.log")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second)), FileIOMode::Read | FileIOMode::Write);
+	m_File.Open(GetDefaultLogDirectoryPath() / Path(Format(String(SGE_STR("{:4}-{:2}-{:2}_{:2}-{:2}-{:2}.log")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second)), FileIOMode::Read | FileIOMode::Write);
 	m_File.SetHasBomHeader(true);
 	m_TimeCounter.Start();
 }
@@ -86,4 +65,47 @@ void SpaceGameEngine::FileLogWriterCore::WriteLog(const Char8* pstr, SizeType si
 	m_TimeCounter.Tick();
 	if (m_TimeCounter.GetDeltaTime() >= 2)
 		m_File.Flush();
+}
+
+bool SpaceGameEngine::InvalidLogLevelError::Judge(LogLevelType log_level)
+{
+	return log_level > LogLevel::All;
+}
+
+UTF8String SpaceGameEngine::GetLogLevelUTF8String(LogLevelType log_level)
+{
+	SGE_ASSERT(InvalidLogLevelError, log_level);
+
+	switch (log_level)
+	{
+	case LogLevel::Error:
+		return SGE_U8STR("ERROR");
+	case LogLevel::Exception:
+		return SGE_U8STR("EXCEPTION");
+	case LogLevel::Warning:
+		return SGE_U8STR("WARNING");
+	case LogLevel::Information:
+		return SGE_U8STR("INFORMATION");
+	case LogLevel::Debug:
+		return SGE_U8STR("DEBUG");
+	default:
+		return SGE_U8STR("ERROR_LEVEL");
+	}
+}
+
+UTF8String SpaceGameEngine::DefaultLogFormatter::Format(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str)
+{
+	return SpaceGameEngine::Format(UTF8String(SGE_U8STR("{:4}-{:2}-{:2} {:2}:{:2}:{:2} {}:{}:{} {} {}\n")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second, SGE_TSTR_TO_UTF8(debug_info.m_pFileName), SGE_TSTR_TO_UTF8(debug_info.m_pFunctionName), debug_info.m_LineNumber, GetLogLevelUTF8String(log_level), str);
+}
+
+LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::GetDefaultLogWriter()
+{
+	static GlobalVariable<LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>> g_DefaultLogWriter(GetDefaultLogDirectoryPath() / Path(SGE_STR("Default")));
+	return g_DefaultLogWriter.Get();
+}
+
+Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::GetDefaultLogger()
+{
+	static GlobalVariable<Logger<BindConsoleLogWriterCore<FileLogWriterCore>>> g_DefaultLogger(GetDefaultLogWriter(), LogLevel::All);
+	return g_DefaultLogger.Get();
 }

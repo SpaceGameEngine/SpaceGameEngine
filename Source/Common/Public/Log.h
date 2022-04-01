@@ -26,6 +26,7 @@ limitations under the License.
 #include "Time/Date.h"
 #include "Time/TimeCounter.h"
 #include "File.h"
+#include "GlobalVariable.h"
 
 namespace SpaceGameEngine
 {
@@ -45,6 +46,12 @@ namespace SpaceGameEngine
 	public:
 		void WriteLog(const Char8* pstr, SizeType size);
 	};
+
+	/*!
+	@brief Get default log directory path.
+	@note When the directory is not existed, the function will create it.
+	*/
+	COMMON_API Path GetDefaultLogDirectoryPath();
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template struct COMMON_API TimeStamp<Second>;
@@ -213,12 +220,9 @@ namespace SpaceGameEngine
 		->std::convertible_to<UTF8String>;
 	};
 
-	struct DefaultLogFormatter
+	struct COMMON_API DefaultLogFormatter
 	{
-		inline static UTF8String Format(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str)
-		{
-			return SpaceGameEngine::Format(UTF8String(SGE_U8STR("{:4}-{:2}-{:2} {:2}:{:2}:{:2} {}:{}:{} {} {}\n")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second, SGE_TSTR_TO_UTF8(debug_info.m_pFileName), SGE_TSTR_TO_UTF8(debug_info.m_pFunctionName), debug_info.m_LineNumber, GetLogLevelUTF8String(log_level), str);
-		}
+		static UTF8String Format(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str);
 	};
 
 	template<IsLogWriterCore LogWriterCore = DefaultLogWriterCore, IsLogFormatter LogFormatter = DefaultLogFormatter>
@@ -257,6 +261,15 @@ namespace SpaceGameEngine
 		LogWriter<LogWriterCore>& m_LogWriter;
 		LogLevelType m_LogLevel;
 	};
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class COMMON_API BindConsoleLogWriterCore<FileLogWriterCore>;
+	template class COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
+	template class COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
+#endif
+
+	COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogWriter();
+	COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogger();
 
 	/*!
 	@}
