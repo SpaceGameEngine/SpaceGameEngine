@@ -65,6 +65,31 @@ namespace SpaceGameEngine
 		TimeCounter<Second> m_TimeCounter;
 	};
 
+	template<IsLogWriterCore OtherLogWriterCore>
+	requires(!std::is_same_v<OtherLogWriterCore, ConsoleLogWriterCore>) class BindConsoleLogWriterCore : public ConsoleLogWriterCore, public OtherLogWriterCore
+	{
+	public:
+		inline BindConsoleLogWriterCore()
+			: ConsoleLogWriterCore(), OtherLogWriterCore()
+		{
+		}
+
+		template<typename... Args>
+		inline BindConsoleLogWriterCore(Args&&... args)
+			: ConsoleLogWriterCore(), OtherLogWriterCore(std::forward<Args>(args)...)
+		{
+		}
+
+		inline void WriteLog(const Char8* pstr, SizeType size)
+		{
+			SGE_ASSERT(NullPointerError, pstr);
+			SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+
+			ConsoleLogWriterCore::WriteLog(pstr, size);
+			OtherLogWriterCore::WriteLog(pstr, size);
+		}
+	};
+
 	using DefaultLogWriterCore = ConsoleLogWriterCore;
 
 	inline static constexpr const SizeType LogWriterBufferSize = 4194304;
