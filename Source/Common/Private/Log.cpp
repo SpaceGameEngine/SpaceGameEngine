@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "Log.h"
+#include "Container/Map.hpp"
 #include <iostream>
 #include <functional>
 
@@ -37,8 +38,10 @@ Path SpaceGameEngine::GetDefaultLogDirectoryPath()
 
 SpaceGameEngine::FileLogWriterCore::FileLogWriterCore()
 {
+	Path dir_path = GetDefaultLogDirectoryPath();
+	DeleteOldLogFile(dir_path);
 	Date date = GetLocalDate();
-	m_File.Open(GetDefaultLogDirectoryPath() / Path(Format(String(SGE_STR("{:4}-{:2}-{:2}_{:2}-{:2}-{:2}.log")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second)), FileIOMode::Read | FileIOMode::Write);
+	m_File.Open(dir_path / Path(Format(String(SGE_STR("{:4}-{:2}-{:2}_{:2}-{:2}-{:2}.log")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second)), FileIOMode::Read | FileIOMode::Write);
 	m_File.SetHasBomHeader(true);
 	m_TimeCounter.Start();
 }
@@ -50,6 +53,7 @@ SpaceGameEngine::FileLogWriterCore::FileLogWriterCore(const Path& dir_path)
 
 	if (!dir_path.IsExist())
 		CreateDirectory(dir_path);
+	DeleteOldLogFile(dir_path);
 	Date date = GetLocalDate();
 	m_File.Open(dir_path / Path(Format(String(SGE_STR("{:4}-{:2}-{:2}_{:2}-{:2}-{:2}.log")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second)), FileIOMode::Read | FileIOMode::Write);
 	m_File.SetHasBomHeader(true);
@@ -65,6 +69,26 @@ void SpaceGameEngine::FileLogWriterCore::WriteLog(const Char8* pstr, SizeType si
 	m_TimeCounter.Tick();
 	if (m_TimeCounter.GetDeltaTime() >= 2)
 		m_File.Flush();
+}
+
+void SpaceGameEngine::FileLogWriterCore::DeleteOldLogFile(const Path& dir_path)
+{
+	SGE_ASSERT(PathNotExistError, dir_path);
+	SGE_ASSERT(PathNotDirectoryError, dir_path);
+
+	Map<String, bool> map;
+	dir_path.VisitChildPath([&map, &dir_path](const String& filename, PathType ptype) -> void {
+		if (ptype == PathType::File)
+			map.Insert(dir_path.GetAbsolutePath().GetString() + SGE_STR("/") + filename, true);
+	});
+	if (map.GetSize() > 4)
+	{
+		auto iter = map.GetConstBegin();
+		for (SizeType i = 0; i < map.GetSize() - 4; ++i, ++iter)
+		{
+			DeleteFile(Path(iter->m_First));
+		}
+	}
 }
 
 bool SpaceGameEngine::InvalidLogLevelError::Judge(LogLevelType log_level)

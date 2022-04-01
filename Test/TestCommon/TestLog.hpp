@@ -31,14 +31,27 @@ TEST(ConsoleLogWriterCore, WriteLogTest)
 	lw.WriteLog(SGE_U8STR("test"), 4);
 }
 
+inline SizeType GetDirectoryFileChildrenSize(const Path& dir_path)
+{
+	SGE_ASSERT(PathNotExistError, dir_path);
+	SGE_ASSERT(PathNotDirectoryError, dir_path);
+
+	SizeType re = 0;
+	dir_path.VisitChildPath([&re](const String& filename, PathType ptype) -> void {
+		if (ptype == PathType::File)
+			re += 1;
+	});
+	return re;
+}
+
 TEST(FileLogWriterCore, InstanceTest)
 {
 	Path log_path = GetDefaultLogDirectoryPath();
-	SizeType children_size = log_path.GetChildPath().GetSize();
+	SizeType children_size = GetDirectoryFileChildrenSize(log_path);
 	SleepFor(MakeTimeDuration<Second>(1));
 	FileLogWriterCore lw;
-	SizeType children_size2 = log_path.GetChildPath().GetSize();
-	ASSERT_EQ(children_size + 1, children_size2);
+	SizeType children_size2 = GetDirectoryFileChildrenSize(log_path);
+	ASSERT_EQ(children_size >= 5 ? 5 : children_size + 1, children_size2);
 
 	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
 	{
@@ -77,11 +90,11 @@ TEST(FileLogWriterCore, WriteLogTest)
 TEST(BindConsoleLogWriterCore, InstanceTest)
 {
 	Path log_path = GetDefaultLogDirectoryPath();
-	SizeType children_size = log_path.GetChildPath().GetSize();
+	SizeType children_size = GetDirectoryFileChildrenSize(log_path);
 	SleepFor(MakeTimeDuration<Second>(1));
 	BindConsoleLogWriterCore<FileLogWriterCore> lw;
-	SizeType children_size2 = log_path.GetChildPath().GetSize();
-	ASSERT_EQ(children_size + 1, children_size2);
+	SizeType children_size2 = GetDirectoryFileChildrenSize(log_path);
+	ASSERT_EQ(children_size >= 5 ? 5 : children_size + 1, children_size2);
 
 	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
 	{
@@ -207,14 +220,14 @@ TEST(LogWriter, WriteLogTest)
 class TestLogWriterCore2
 {
 public:
-	void WriteLog(const Char8* pstr, SizeType size)
+	inline void WriteLog(const Char8* pstr, SizeType size)
 	{
 		RecursiveLock locker(m_Mutex);
 		locker.Lock();
 		m_String.Insert(m_String.GetConstEnd(), pstr, pstr + size);
 	}
 
-	UTF8String GetString()
+	inline UTF8String GetString()
 	{
 		RecursiveLock locker(m_Mutex);
 		locker.Lock();

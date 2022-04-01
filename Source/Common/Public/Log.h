@@ -68,6 +68,9 @@ namespace SpaceGameEngine
 		void WriteLog(const Char8* pstr, SizeType size);
 
 	private:
+		void DeleteOldLogFile(const Path& dir_path);
+
+	private:
 		UTF8File m_File;
 		TimeCounter<Second> m_TimeCounter;
 	};
