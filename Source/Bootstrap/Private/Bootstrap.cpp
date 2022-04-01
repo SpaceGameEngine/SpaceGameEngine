@@ -17,17 +17,17 @@ limitations under the License.
 #include "Platform.hpp"
 #include "SGEStringForward.h"
 #include "CommonAPI.h"
-#if defined(SGE_WINDOWS) && defined(SGE_USE_DLL)
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 #include <Windows.h>
 #endif
 
-#if defined(SGE_WINDOWS) && defined(SGE_USE_DLL)
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 static HMODULE g_CommonModule;
 #endif
 
 SpaceGameEngine::Bootstrap::Bootstrap()
 {
-#if defined(SGE_WINDOWS) && defined(SGE_USE_DLL)
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	const SizeType buf_size = 4096;
 	TChar out_buffer[buf_size];
 	memset(out_buffer, 0, sizeof(out_buffer));
@@ -74,7 +74,7 @@ SpaceGameEngine::Bootstrap::Bootstrap()
 
 SpaceGameEngine::Bootstrap::~Bootstrap()
 {
-#if defined(SGE_WINDOWS) && defined(SGE_USE_DLL)
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	if (g_CommonModule == 0)
 	{
 		DWORD error_code = GetLastError();
