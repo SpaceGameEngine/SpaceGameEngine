@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2021 creatorlxd
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "System/DllLoader.h"
+#include "File.h"
 
 #ifdef SGE_WINDOWS
 #include "System/AllowWindowsMacro.h"
@@ -121,8 +122,7 @@ SpaceGameEngine::String SpaceGameEngine::GetDllPath(const String& dll_name)
 {
 	SGE_ASSERT(EmptyDllNameError, dll_name);
 #ifdef SGE_WINDOWS
-	String dll_path(SGE_STR(".\\Binary\\"));
-	dll_path += dll_name;
+	String dll_path = (GetProjectDirectoryPath() / Path(SGE_STR("Binary")) / Path(dll_name)).GetAbsolutePath().GetSystemPathString();
 #ifdef SGE_X86
 	dll_path += SGE_STR("\\x86");
 #elif defined SGE_X64
@@ -141,12 +141,12 @@ SpaceGameEngine::String SpaceGameEngine::GetDllPath(const String& dll_name)
 	dll_path += SGE_STR(".dll");
 
 	return dll_path;
-#elif defined(SGE_MACOS)
+#elif defined(SGE_MACOS)	//CMake support @rpath
 	String re(SGE_STR("lib"));
 	re += dll_name;
 	re += SGE_STR(".dylib");
 	return re;
-#elif defined(SGE_LINUX)
+#elif defined(SGE_LINUX)	//CMake support rpath
 	String re(SGE_STR("lib"));
 	re += dll_name;
 	re += SGE_STR(".so");

@@ -6,15 +6,18 @@ add_library(Common SHARED
         Private/MetaData/MetaData.cpp
         Private/Utility/AutoReleaseBuffer.cpp
         Private/Utility/Endian.cpp
+        Private/Utility/DebugInformation.cpp
         Private/Time/TimeCounter.cpp
         Private/Time/WindowsTimeImplement.cpp
         Private/Time/UnixTimeImplement.cpp
+        Private/Time/Date.cpp
         Private/System/DllLoader.cpp
         Private/Module/Module.cpp
         Private/Module/ModuleManager.cpp
         Private/Module/CommonModule.cpp
         Private/GlobalVariable.cpp
         Private/File.cpp
+        Private/Log.cpp
         )
 target_include_directories(Common PUBLIC Public)
 target_link_libraries(Common PUBLIC ${THIRD_PARTY_LIBRARIES})

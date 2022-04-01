@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2021 creatorlxd
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ limitations under the License.
 #include "TestModule.hpp"
 #include "TestFormat.hpp"
 #include "TestFile.hpp"
+#include "TestDate.hpp"
+#include "TestLog.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;
 

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2021 creatorlxd
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -2600,6 +2600,46 @@ TEST(StringCore, ConstReverseFindTest)
 	ASSERT_EQ(res2_10, res2_9 + 4);
 }
 
+TEST(StringCore, PointerAsIteratorTest)
+{
+	Char16 pucs2_str[] = SGE_WSTR("这是测试");
+	Char16 pucs2_str_r[] = SGE_WSTR("试测是这");
+	Char8 putf8_str[] = SGE_U8STR("这是测试");
+	Char8 putf8_str_r[] = SGE_U8STR("试测是这");
+
+	UCS2String ucs2_s1((const Char16*)pucs2_str, (const Char16*)pucs2_str + 4);
+	ASSERT_EQ(ucs2_s1.GetSize(), 4);
+	ASSERT_EQ(ucs2_s1, pucs2_str);
+
+	UTF8String utf8_s1((const Char8*)putf8_str, (const Char8*)putf8_str + 12);
+	ASSERT_EQ(utf8_s1.GetSize(), 4);
+	ASSERT_EQ(utf8_s1, putf8_str);
+
+	UCS2String ucs2_s2;
+	ASSERT_EQ(ucs2_s2.GetSize(), 0);
+	ucs2_s2.Insert(ucs2_s2.GetConstEnd(), (const Char16*)pucs2_str, (const Char16*)pucs2_str + 4);
+	ASSERT_EQ(ucs2_s2.GetSize(), 4);
+	ASSERT_EQ(ucs2_s2, pucs2_str);
+
+	UTF8String utf8_s2;
+	ASSERT_EQ(utf8_s2.GetSize(), 0);
+	utf8_s2.Insert(utf8_s2.GetConstEnd(), (const Char8*)putf8_str, (const Char8*)putf8_str + 12);
+	ASSERT_EQ(utf8_s2.GetSize(), 4);
+	ASSERT_EQ(utf8_s2, putf8_str);
+
+	UCS2String ucs2_s3;
+	ASSERT_EQ(ucs2_s3.GetSize(), 0);
+	ucs2_s3.Insert(ucs2_s3.GetConstReverseEnd(), (const Char16*)pucs2_str, (const Char16*)pucs2_str + 4);
+	ASSERT_EQ(ucs2_s3.GetSize(), 4);
+	ASSERT_EQ(ucs2_s3, pucs2_str_r);
+
+	UTF8String utf8_s3;
+	ASSERT_EQ(utf8_s3.GetSize(), 0);
+	utf8_s3.Insert(utf8_s3.GetConstReverseEnd(), (const Char8*)putf8_str, (const Char8*)putf8_str + 12);
+	ASSERT_EQ(utf8_s3.GetSize(), 4);
+	ASSERT_EQ(utf8_s3, putf8_str_r);
+}
+
 TEST(StringCoreIterator, GetBeginTest)
 {
 	UCS2String s1(SGE_WSTR("这是测试"));
@@ -3075,6 +3115,7 @@ TEST(ToString, IntTest)
 	ASSERT_EQ(ToString<UCS2String>(12345678u), SGE_WSTR("12345678"));
 	ASSERT_EQ(ToString<UCS2String>(123456789u), SGE_WSTR("123456789"));
 	ASSERT_EQ(ToString<UCS2String>(1234567890u), SGE_WSTR("1234567890"));
+	ASSERT_EQ(ToString<UCS2String>(1234567890u, 15), SGE_WSTR("000001234567890"));
 	ASSERT_EQ(ToString<UCS2String>(0), SGE_WSTR("0"));
 	ASSERT_EQ(ToString<UCS2String>(1), SGE_WSTR("1"));
 	ASSERT_EQ(ToString<UCS2String>(12), SGE_WSTR("12"));
@@ -3086,6 +3127,7 @@ TEST(ToString, IntTest)
 	ASSERT_EQ(ToString<UCS2String>(12345678), SGE_WSTR("12345678"));
 	ASSERT_EQ(ToString<UCS2String>(123456789), SGE_WSTR("123456789"));
 	ASSERT_EQ(ToString<UCS2String>(1234567890), SGE_WSTR("1234567890"));
+	ASSERT_EQ(ToString<UCS2String>(1234567890, 15), SGE_WSTR("000001234567890"));
 	ASSERT_EQ(ToString<UCS2String>(-1), SGE_WSTR("-1"));
 	ASSERT_EQ(ToString<UCS2String>(-12), SGE_WSTR("-12"));
 	ASSERT_EQ(ToString<UCS2String>(-123), SGE_WSTR("-123"));
@@ -3096,57 +3138,64 @@ TEST(ToString, IntTest)
 	ASSERT_EQ(ToString<UCS2String>(-12345678), SGE_WSTR("-12345678"));
 	ASSERT_EQ(ToString<UCS2String>(-123456789), SGE_WSTR("-123456789"));
 	ASSERT_EQ(ToString<UCS2String>(-1234567890), SGE_WSTR("-1234567890"));
+	ASSERT_EQ(ToString<UCS2String>(-1234567890, 15), SGE_WSTR("-00001234567890"));
 
-	ASSERT_EQ(ToString<UCS2String>(0b0u, NumberBase::Binary), SGE_WSTR("0"));
-	ASSERT_EQ(ToString<UCS2String>(0b1u, NumberBase::Binary), SGE_WSTR("1"));
-	ASSERT_EQ(ToString<UCS2String>(0b10u, NumberBase::Binary), SGE_WSTR("10"));
-	ASSERT_EQ(ToString<UCS2String>(0b11u, NumberBase::Binary), SGE_WSTR("11"));
-	ASSERT_EQ(ToString<UCS2String>(0b100u, NumberBase::Binary), SGE_WSTR("100"));
-	ASSERT_EQ(ToString<UCS2String>(0b101u, NumberBase::Binary), SGE_WSTR("101"));
-	ASSERT_EQ(ToString<UCS2String>(0b110u, NumberBase::Binary), SGE_WSTR("110"));
-	ASSERT_EQ(ToString<UCS2String>(0b111u, NumberBase::Binary), SGE_WSTR("111"));
-	ASSERT_EQ(ToString<UCS2String>(0b1000u, NumberBase::Binary), SGE_WSTR("1000"));
-	ASSERT_EQ(ToString<UCS2String>(0b11011101u, NumberBase::Binary), SGE_WSTR("11011101"));
-	ASSERT_EQ(ToString<UCS2String>(0b0, NumberBase::Binary), SGE_WSTR("0"));
-	ASSERT_EQ(ToString<UCS2String>(0b1, NumberBase::Binary), SGE_WSTR("1"));
-	ASSERT_EQ(ToString<UCS2String>(0b10, NumberBase::Binary), SGE_WSTR("10"));
-	ASSERT_EQ(ToString<UCS2String>(0b11, NumberBase::Binary), SGE_WSTR("11"));
-	ASSERT_EQ(ToString<UCS2String>(0b100, NumberBase::Binary), SGE_WSTR("100"));
-	ASSERT_EQ(ToString<UCS2String>(0b101, NumberBase::Binary), SGE_WSTR("101"));
-	ASSERT_EQ(ToString<UCS2String>(0b110, NumberBase::Binary), SGE_WSTR("110"));
-	ASSERT_EQ(ToString<UCS2String>(0b111, NumberBase::Binary), SGE_WSTR("111"));
-	ASSERT_EQ(ToString<UCS2String>(0b1000, NumberBase::Binary), SGE_WSTR("1000"));
-	ASSERT_EQ(ToString<UCS2String>(0b11011101, NumberBase::Binary), SGE_WSTR("11011101"));
-	ASSERT_EQ(ToString<UCS2String>(-0b1, NumberBase::Binary), SGE_WSTR("-1"));
-	ASSERT_EQ(ToString<UCS2String>(-0b10, NumberBase::Binary), SGE_WSTR("-10"));
-	ASSERT_EQ(ToString<UCS2String>(-0b11, NumberBase::Binary), SGE_WSTR("-11"));
-	ASSERT_EQ(ToString<UCS2String>(-0b100, NumberBase::Binary), SGE_WSTR("-100"));
-	ASSERT_EQ(ToString<UCS2String>(-0b101, NumberBase::Binary), SGE_WSTR("-101"));
-	ASSERT_EQ(ToString<UCS2String>(-0b110, NumberBase::Binary), SGE_WSTR("-110"));
-	ASSERT_EQ(ToString<UCS2String>(-0b111, NumberBase::Binary), SGE_WSTR("-111"));
-	ASSERT_EQ(ToString<UCS2String>(-0b1000, NumberBase::Binary), SGE_WSTR("-1000"));
-	ASSERT_EQ(ToString<UCS2String>(-0b11011101, NumberBase::Binary), SGE_WSTR("-11011101"));
+	ASSERT_EQ(ToString<UCS2String>(0b0u, 0, NumberBase::Binary), SGE_WSTR("0"));
+	ASSERT_EQ(ToString<UCS2String>(0b1u, 0, NumberBase::Binary), SGE_WSTR("1"));
+	ASSERT_EQ(ToString<UCS2String>(0b10u, 0, NumberBase::Binary), SGE_WSTR("10"));
+	ASSERT_EQ(ToString<UCS2String>(0b11u, 0, NumberBase::Binary), SGE_WSTR("11"));
+	ASSERT_EQ(ToString<UCS2String>(0b100u, 0, NumberBase::Binary), SGE_WSTR("100"));
+	ASSERT_EQ(ToString<UCS2String>(0b101u, 0, NumberBase::Binary), SGE_WSTR("101"));
+	ASSERT_EQ(ToString<UCS2String>(0b110u, 0, NumberBase::Binary), SGE_WSTR("110"));
+	ASSERT_EQ(ToString<UCS2String>(0b111u, 0, NumberBase::Binary), SGE_WSTR("111"));
+	ASSERT_EQ(ToString<UCS2String>(0b1000u, 0, NumberBase::Binary), SGE_WSTR("1000"));
+	ASSERT_EQ(ToString<UCS2String>(0b11011101u, 0, NumberBase::Binary), SGE_WSTR("11011101"));
+	ASSERT_EQ(ToString<UCS2String>(0b11011101u, 10, NumberBase::Binary), SGE_WSTR("0011011101"));
+	ASSERT_EQ(ToString<UCS2String>(0b0, 0, NumberBase::Binary), SGE_WSTR("0"));
+	ASSERT_EQ(ToString<UCS2String>(0b1, 0, NumberBase::Binary), SGE_WSTR("1"));
+	ASSERT_EQ(ToString<UCS2String>(0b10, 0, NumberBase::Binary), SGE_WSTR("10"));
+	ASSERT_EQ(ToString<UCS2String>(0b11, 0, NumberBase::Binary), SGE_WSTR("11"));
+	ASSERT_EQ(ToString<UCS2String>(0b100, 0, NumberBase::Binary), SGE_WSTR("100"));
+	ASSERT_EQ(ToString<UCS2String>(0b101, 0, NumberBase::Binary), SGE_WSTR("101"));
+	ASSERT_EQ(ToString<UCS2String>(0b110, 0, NumberBase::Binary), SGE_WSTR("110"));
+	ASSERT_EQ(ToString<UCS2String>(0b111, 0, NumberBase::Binary), SGE_WSTR("111"));
+	ASSERT_EQ(ToString<UCS2String>(0b1000, 0, NumberBase::Binary), SGE_WSTR("1000"));
+	ASSERT_EQ(ToString<UCS2String>(0b11011101, 0, NumberBase::Binary), SGE_WSTR("11011101"));
+	ASSERT_EQ(ToString<UCS2String>(0b11011101, 10, NumberBase::Binary), SGE_WSTR("0011011101"));
+	ASSERT_EQ(ToString<UCS2String>(-0b1, 0, NumberBase::Binary), SGE_WSTR("-1"));
+	ASSERT_EQ(ToString<UCS2String>(-0b10, 0, NumberBase::Binary), SGE_WSTR("-10"));
+	ASSERT_EQ(ToString<UCS2String>(-0b11, 0, NumberBase::Binary), SGE_WSTR("-11"));
+	ASSERT_EQ(ToString<UCS2String>(-0b100, 0, NumberBase::Binary), SGE_WSTR("-100"));
+	ASSERT_EQ(ToString<UCS2String>(-0b101, 0, NumberBase::Binary), SGE_WSTR("-101"));
+	ASSERT_EQ(ToString<UCS2String>(-0b110, 0, NumberBase::Binary), SGE_WSTR("-110"));
+	ASSERT_EQ(ToString<UCS2String>(-0b111, 0, NumberBase::Binary), SGE_WSTR("-111"));
+	ASSERT_EQ(ToString<UCS2String>(-0b1000, 0, NumberBase::Binary), SGE_WSTR("-1000"));
+	ASSERT_EQ(ToString<UCS2String>(-0b11011101, 0, NumberBase::Binary), SGE_WSTR("-11011101"));
+	ASSERT_EQ(ToString<UCS2String>(-0b11011101, 10, NumberBase::Binary), SGE_WSTR("-011011101"));
 
-	ASSERT_EQ(ToString<UCS2String>(0x0u, NumberBase::Hex), SGE_WSTR("0"));
-	ASSERT_EQ(ToString<UCS2String>(0x1u, NumberBase::Hex), SGE_WSTR("1"));
-	ASSERT_EQ(ToString<UCS2String>(0x2u, NumberBase::Hex), SGE_WSTR("2"));
-	ASSERT_EQ(ToString<UCS2String>(0x3u, NumberBase::Hex), SGE_WSTR("3"));
-	ASSERT_EQ(ToString<UCS2String>(0x10u, NumberBase::Hex), SGE_WSTR("10"));
-	ASSERT_EQ(ToString<UCS2String>(0xafu, NumberBase::Hex), SGE_WSTR("af"));
-	ASSERT_EQ(ToString<UCS2String>(0x1234567890abcdefu, NumberBase::Hex), SGE_WSTR("1234567890abcdef"));
-	ASSERT_EQ(ToString<UCS2String>(0x0, NumberBase::Hex), SGE_WSTR("0"));
-	ASSERT_EQ(ToString<UCS2String>(0x1, NumberBase::Hex), SGE_WSTR("1"));
-	ASSERT_EQ(ToString<UCS2String>(0x2, NumberBase::Hex), SGE_WSTR("2"));
-	ASSERT_EQ(ToString<UCS2String>(0x3, NumberBase::Hex), SGE_WSTR("3"));
-	ASSERT_EQ(ToString<UCS2String>(0x10, NumberBase::Hex), SGE_WSTR("10"));
-	ASSERT_EQ(ToString<UCS2String>(0xaf, NumberBase::Hex), SGE_WSTR("af"));
-	ASSERT_EQ(ToString<UCS2String>(0x1234567890abcdef, NumberBase::Hex), SGE_WSTR("1234567890abcdef"));
-	ASSERT_EQ(ToString<UCS2String>(-0x1, NumberBase::Hex), SGE_WSTR("-1"));
-	ASSERT_EQ(ToString<UCS2String>(-0x2, NumberBase::Hex), SGE_WSTR("-2"));
-	ASSERT_EQ(ToString<UCS2String>(-0x3, NumberBase::Hex), SGE_WSTR("-3"));
-	ASSERT_EQ(ToString<UCS2String>(-0x10, NumberBase::Hex), SGE_WSTR("-10"));
-	ASSERT_EQ(ToString<UCS2String>(-0xaf, NumberBase::Hex), SGE_WSTR("-af"));
-	ASSERT_EQ(ToString<UCS2String>(-0x1234567890abcdef, NumberBase::Hex), SGE_WSTR("-1234567890abcdef"));
+	ASSERT_EQ(ToString<UCS2String>(0x0u, 0, NumberBase::Hex), SGE_WSTR("0"));
+	ASSERT_EQ(ToString<UCS2String>(0x1u, 0, NumberBase::Hex), SGE_WSTR("1"));
+	ASSERT_EQ(ToString<UCS2String>(0x2u, 0, NumberBase::Hex), SGE_WSTR("2"));
+	ASSERT_EQ(ToString<UCS2String>(0x3u, 0, NumberBase::Hex), SGE_WSTR("3"));
+	ASSERT_EQ(ToString<UCS2String>(0x10u, 0, NumberBase::Hex), SGE_WSTR("10"));
+	ASSERT_EQ(ToString<UCS2String>(0xafu, 0, NumberBase::Hex), SGE_WSTR("af"));
+	ASSERT_EQ(ToString<UCS2String>(0x1234567890abcdefu, 0, NumberBase::Hex), SGE_WSTR("1234567890abcdef"));
+	ASSERT_EQ(ToString<UCS2String>(0x1234567890abcdefu, 20, NumberBase::Hex), SGE_WSTR("00001234567890abcdef"));
+	ASSERT_EQ(ToString<UCS2String>(0x0, 0, NumberBase::Hex), SGE_WSTR("0"));
+	ASSERT_EQ(ToString<UCS2String>(0x1, 0, NumberBase::Hex), SGE_WSTR("1"));
+	ASSERT_EQ(ToString<UCS2String>(0x2, 0, NumberBase::Hex), SGE_WSTR("2"));
+	ASSERT_EQ(ToString<UCS2String>(0x3, 0, NumberBase::Hex), SGE_WSTR("3"));
+	ASSERT_EQ(ToString<UCS2String>(0x10, 0, NumberBase::Hex), SGE_WSTR("10"));
+	ASSERT_EQ(ToString<UCS2String>(0xaf, 0, NumberBase::Hex), SGE_WSTR("af"));
+	ASSERT_EQ(ToString<UCS2String>(0x1234567890abcdef, 0, NumberBase::Hex), SGE_WSTR("1234567890abcdef"));
+	ASSERT_EQ(ToString<UCS2String>(0x1234567890abcdef, 20, NumberBase::Hex), SGE_WSTR("00001234567890abcdef"));
+	ASSERT_EQ(ToString<UCS2String>(-0x1, 0, NumberBase::Hex), SGE_WSTR("-1"));
+	ASSERT_EQ(ToString<UCS2String>(-0x2, 0, NumberBase::Hex), SGE_WSTR("-2"));
+	ASSERT_EQ(ToString<UCS2String>(-0x3, 0, NumberBase::Hex), SGE_WSTR("-3"));
+	ASSERT_EQ(ToString<UCS2String>(-0x10, 0, NumberBase::Hex), SGE_WSTR("-10"));
+	ASSERT_EQ(ToString<UCS2String>(-0xaf, 0, NumberBase::Hex), SGE_WSTR("-af"));
+	ASSERT_EQ(ToString<UCS2String>(-0x1234567890abcdef, 0, NumberBase::Hex), SGE_WSTR("-1234567890abcdef"));
+	ASSERT_EQ(ToString<UCS2String>(-0x1234567890abcdef, 20, NumberBase::Hex), SGE_WSTR("-0001234567890abcdef"));
 
 	ASSERT_EQ(ToString<UTF8String>(0u), SGE_U8STR("0"));
 	ASSERT_EQ(ToString<UTF8String>(1u), SGE_U8STR("1"));
@@ -3159,6 +3208,7 @@ TEST(ToString, IntTest)
 	ASSERT_EQ(ToString<UTF8String>(12345678u), SGE_U8STR("12345678"));
 	ASSERT_EQ(ToString<UTF8String>(123456789u), SGE_U8STR("123456789"));
 	ASSERT_EQ(ToString<UTF8String>(1234567890u), SGE_U8STR("1234567890"));
+	ASSERT_EQ(ToString<UTF8String>(1234567890u, 15), SGE_U8STR("000001234567890"));
 	ASSERT_EQ(ToString<UTF8String>(0), SGE_U8STR("0"));
 	ASSERT_EQ(ToString<UTF8String>(1), SGE_U8STR("1"));
 	ASSERT_EQ(ToString<UTF8String>(12), SGE_U8STR("12"));
@@ -3170,6 +3220,7 @@ TEST(ToString, IntTest)
 	ASSERT_EQ(ToString<UTF8String>(12345678), SGE_U8STR("12345678"));
 	ASSERT_EQ(ToString<UTF8String>(123456789), SGE_U8STR("123456789"));
 	ASSERT_EQ(ToString<UTF8String>(1234567890), SGE_U8STR("1234567890"));
+	ASSERT_EQ(ToString<UTF8String>(1234567890, 15), SGE_U8STR("000001234567890"));
 	ASSERT_EQ(ToString<UTF8String>(-1), SGE_U8STR("-1"));
 	ASSERT_EQ(ToString<UTF8String>(-12), SGE_U8STR("-12"));
 	ASSERT_EQ(ToString<UTF8String>(-123), SGE_U8STR("-123"));
@@ -3180,57 +3231,64 @@ TEST(ToString, IntTest)
 	ASSERT_EQ(ToString<UTF8String>(-12345678), SGE_U8STR("-12345678"));
 	ASSERT_EQ(ToString<UTF8String>(-123456789), SGE_U8STR("-123456789"));
 	ASSERT_EQ(ToString<UTF8String>(-1234567890), SGE_U8STR("-1234567890"));
+	ASSERT_EQ(ToString<UTF8String>(-1234567890, 15), SGE_U8STR("-00001234567890"));
 
-	ASSERT_EQ(ToString<UTF8String>(0b0u, NumberBase::Binary), SGE_U8STR("0"));
-	ASSERT_EQ(ToString<UTF8String>(0b1u, NumberBase::Binary), SGE_U8STR("1"));
-	ASSERT_EQ(ToString<UTF8String>(0b10u, NumberBase::Binary), SGE_U8STR("10"));
-	ASSERT_EQ(ToString<UTF8String>(0b11u, NumberBase::Binary), SGE_U8STR("11"));
-	ASSERT_EQ(ToString<UTF8String>(0b100u, NumberBase::Binary), SGE_U8STR("100"));
-	ASSERT_EQ(ToString<UTF8String>(0b101u, NumberBase::Binary), SGE_U8STR("101"));
-	ASSERT_EQ(ToString<UTF8String>(0b110u, NumberBase::Binary), SGE_U8STR("110"));
-	ASSERT_EQ(ToString<UTF8String>(0b111u, NumberBase::Binary), SGE_U8STR("111"));
-	ASSERT_EQ(ToString<UTF8String>(0b1000u, NumberBase::Binary), SGE_U8STR("1000"));
-	ASSERT_EQ(ToString<UTF8String>(0b11011101u, NumberBase::Binary), SGE_U8STR("11011101"));
-	ASSERT_EQ(ToString<UTF8String>(0b0, NumberBase::Binary), SGE_U8STR("0"));
-	ASSERT_EQ(ToString<UTF8String>(0b1, NumberBase::Binary), SGE_U8STR("1"));
-	ASSERT_EQ(ToString<UTF8String>(0b10, NumberBase::Binary), SGE_U8STR("10"));
-	ASSERT_EQ(ToString<UTF8String>(0b11, NumberBase::Binary), SGE_U8STR("11"));
-	ASSERT_EQ(ToString<UTF8String>(0b100, NumberBase::Binary), SGE_U8STR("100"));
-	ASSERT_EQ(ToString<UTF8String>(0b101, NumberBase::Binary), SGE_U8STR("101"));
-	ASSERT_EQ(ToString<UTF8String>(0b110, NumberBase::Binary), SGE_U8STR("110"));
-	ASSERT_EQ(ToString<UTF8String>(0b111, NumberBase::Binary), SGE_U8STR("111"));
-	ASSERT_EQ(ToString<UTF8String>(0b1000, NumberBase::Binary), SGE_U8STR("1000"));
-	ASSERT_EQ(ToString<UTF8String>(0b11011101, NumberBase::Binary), SGE_U8STR("11011101"));
-	ASSERT_EQ(ToString<UTF8String>(-0b1, NumberBase::Binary), SGE_U8STR("-1"));
-	ASSERT_EQ(ToString<UTF8String>(-0b10, NumberBase::Binary), SGE_U8STR("-10"));
-	ASSERT_EQ(ToString<UTF8String>(-0b11, NumberBase::Binary), SGE_U8STR("-11"));
-	ASSERT_EQ(ToString<UTF8String>(-0b100, NumberBase::Binary), SGE_U8STR("-100"));
-	ASSERT_EQ(ToString<UTF8String>(-0b101, NumberBase::Binary), SGE_U8STR("-101"));
-	ASSERT_EQ(ToString<UTF8String>(-0b110, NumberBase::Binary), SGE_U8STR("-110"));
-	ASSERT_EQ(ToString<UTF8String>(-0b111, NumberBase::Binary), SGE_U8STR("-111"));
-	ASSERT_EQ(ToString<UTF8String>(-0b1000, NumberBase::Binary), SGE_U8STR("-1000"));
-	ASSERT_EQ(ToString<UTF8String>(-0b11011101, NumberBase::Binary), SGE_U8STR("-11011101"));
+	ASSERT_EQ(ToString<UTF8String>(0b0u, 0, NumberBase::Binary), SGE_U8STR("0"));
+	ASSERT_EQ(ToString<UTF8String>(0b1u, 0, NumberBase::Binary), SGE_U8STR("1"));
+	ASSERT_EQ(ToString<UTF8String>(0b10u, 0, NumberBase::Binary), SGE_U8STR("10"));
+	ASSERT_EQ(ToString<UTF8String>(0b11u, 0, NumberBase::Binary), SGE_U8STR("11"));
+	ASSERT_EQ(ToString<UTF8String>(0b100u, 0, NumberBase::Binary), SGE_U8STR("100"));
+	ASSERT_EQ(ToString<UTF8String>(0b101u, 0, NumberBase::Binary), SGE_U8STR("101"));
+	ASSERT_EQ(ToString<UTF8String>(0b110u, 0, NumberBase::Binary), SGE_U8STR("110"));
+	ASSERT_EQ(ToString<UTF8String>(0b111u, 0, NumberBase::Binary), SGE_U8STR("111"));
+	ASSERT_EQ(ToString<UTF8String>(0b1000u, 0, NumberBase::Binary), SGE_U8STR("1000"));
+	ASSERT_EQ(ToString<UTF8String>(0b11011101u, 0, NumberBase::Binary), SGE_U8STR("11011101"));
+	ASSERT_EQ(ToString<UTF8String>(0b11011101u, 10, NumberBase::Binary), SGE_U8STR("0011011101"));
+	ASSERT_EQ(ToString<UTF8String>(0b0, 0, NumberBase::Binary), SGE_U8STR("0"));
+	ASSERT_EQ(ToString<UTF8String>(0b1, 0, NumberBase::Binary), SGE_U8STR("1"));
+	ASSERT_EQ(ToString<UTF8String>(0b10, 0, NumberBase::Binary), SGE_U8STR("10"));
+	ASSERT_EQ(ToString<UTF8String>(0b11, 0, NumberBase::Binary), SGE_U8STR("11"));
+	ASSERT_EQ(ToString<UTF8String>(0b100, 0, NumberBase::Binary), SGE_U8STR("100"));
+	ASSERT_EQ(ToString<UTF8String>(0b101, 0, NumberBase::Binary), SGE_U8STR("101"));
+	ASSERT_EQ(ToString<UTF8String>(0b110, 0, NumberBase::Binary), SGE_U8STR("110"));
+	ASSERT_EQ(ToString<UTF8String>(0b111, 0, NumberBase::Binary), SGE_U8STR("111"));
+	ASSERT_EQ(ToString<UTF8String>(0b1000, 0, NumberBase::Binary), SGE_U8STR("1000"));
+	ASSERT_EQ(ToString<UTF8String>(0b11011101, 0, NumberBase::Binary), SGE_U8STR("11011101"));
+	ASSERT_EQ(ToString<UTF8String>(0b11011101, 10, NumberBase::Binary), SGE_U8STR("0011011101"));
+	ASSERT_EQ(ToString<UTF8String>(-0b1, 0, NumberBase::Binary), SGE_U8STR("-1"));
+	ASSERT_EQ(ToString<UTF8String>(-0b10, 0, NumberBase::Binary), SGE_U8STR("-10"));
+	ASSERT_EQ(ToString<UTF8String>(-0b11, 0, NumberBase::Binary), SGE_U8STR("-11"));
+	ASSERT_EQ(ToString<UTF8String>(-0b100, 0, NumberBase::Binary), SGE_U8STR("-100"));
+	ASSERT_EQ(ToString<UTF8String>(-0b101, 0, NumberBase::Binary), SGE_U8STR("-101"));
+	ASSERT_EQ(ToString<UTF8String>(-0b110, 0, NumberBase::Binary), SGE_U8STR("-110"));
+	ASSERT_EQ(ToString<UTF8String>(-0b111, 0, NumberBase::Binary), SGE_U8STR("-111"));
+	ASSERT_EQ(ToString<UTF8String>(-0b1000, 0, NumberBase::Binary), SGE_U8STR("-1000"));
+	ASSERT_EQ(ToString<UTF8String>(-0b11011101, 0, NumberBase::Binary), SGE_U8STR("-11011101"));
+	ASSERT_EQ(ToString<UTF8String>(-0b11011101, 10, NumberBase::Binary), SGE_U8STR("-011011101"));
 
-	ASSERT_EQ(ToString<UTF8String>(0x0u, NumberBase::Hex), SGE_U8STR("0"));
-	ASSERT_EQ(ToString<UTF8String>(0x1u, NumberBase::Hex), SGE_U8STR("1"));
-	ASSERT_EQ(ToString<UTF8String>(0x2u, NumberBase::Hex), SGE_U8STR("2"));
-	ASSERT_EQ(ToString<UTF8String>(0x3u, NumberBase::Hex), SGE_U8STR("3"));
-	ASSERT_EQ(ToString<UTF8String>(0x10u, NumberBase::Hex), SGE_U8STR("10"));
-	ASSERT_EQ(ToString<UTF8String>(0xafu, NumberBase::Hex), SGE_U8STR("af"));
-	ASSERT_EQ(ToString<UTF8String>(0x1234567890abcdefu, NumberBase::Hex), SGE_U8STR("1234567890abcdef"));
-	ASSERT_EQ(ToString<UTF8String>(0x0, NumberBase::Hex), SGE_U8STR("0"));
-	ASSERT_EQ(ToString<UTF8String>(0x1, NumberBase::Hex), SGE_U8STR("1"));
-	ASSERT_EQ(ToString<UTF8String>(0x2, NumberBase::Hex), SGE_U8STR("2"));
-	ASSERT_EQ(ToString<UTF8String>(0x3, NumberBase::Hex), SGE_U8STR("3"));
-	ASSERT_EQ(ToString<UTF8String>(0x10, NumberBase::Hex), SGE_U8STR("10"));
-	ASSERT_EQ(ToString<UTF8String>(0xaf, NumberBase::Hex), SGE_U8STR("af"));
-	ASSERT_EQ(ToString<UTF8String>(0x1234567890abcdef, NumberBase::Hex), SGE_U8STR("1234567890abcdef"));
-	ASSERT_EQ(ToString<UTF8String>(-0x1, NumberBase::Hex), SGE_U8STR("-1"));
-	ASSERT_EQ(ToString<UTF8String>(-0x2, NumberBase::Hex), SGE_U8STR("-2"));
-	ASSERT_EQ(ToString<UTF8String>(-0x3, NumberBase::Hex), SGE_U8STR("-3"));
-	ASSERT_EQ(ToString<UTF8String>(-0x10, NumberBase::Hex), SGE_U8STR("-10"));
-	ASSERT_EQ(ToString<UTF8String>(-0xaf, NumberBase::Hex), SGE_U8STR("-af"));
-	ASSERT_EQ(ToString<UTF8String>(-0x1234567890abcdef, NumberBase::Hex), SGE_U8STR("-1234567890abcdef"));
+	ASSERT_EQ(ToString<UTF8String>(0x0u, 0, NumberBase::Hex), SGE_U8STR("0"));
+	ASSERT_EQ(ToString<UTF8String>(0x1u, 0, NumberBase::Hex), SGE_U8STR("1"));
+	ASSERT_EQ(ToString<UTF8String>(0x2u, 0, NumberBase::Hex), SGE_U8STR("2"));
+	ASSERT_EQ(ToString<UTF8String>(0x3u, 0, NumberBase::Hex), SGE_U8STR("3"));
+	ASSERT_EQ(ToString<UTF8String>(0x10u, 0, NumberBase::Hex), SGE_U8STR("10"));
+	ASSERT_EQ(ToString<UTF8String>(0xafu, 0, NumberBase::Hex), SGE_U8STR("af"));
+	ASSERT_EQ(ToString<UTF8String>(0x1234567890abcdefu, 0, NumberBase::Hex), SGE_U8STR("1234567890abcdef"));
+	ASSERT_EQ(ToString<UTF8String>(0x1234567890abcdefu, 20, NumberBase::Hex), SGE_U8STR("00001234567890abcdef"));
+	ASSERT_EQ(ToString<UTF8String>(0x0, 0, NumberBase::Hex), SGE_U8STR("0"));
+	ASSERT_EQ(ToString<UTF8String>(0x1, 0, NumberBase::Hex), SGE_U8STR("1"));
+	ASSERT_EQ(ToString<UTF8String>(0x2, 0, NumberBase::Hex), SGE_U8STR("2"));
+	ASSERT_EQ(ToString<UTF8String>(0x3, 0, NumberBase::Hex), SGE_U8STR("3"));
+	ASSERT_EQ(ToString<UTF8String>(0x10, 0, NumberBase::Hex), SGE_U8STR("10"));
+	ASSERT_EQ(ToString<UTF8String>(0xaf, 0, NumberBase::Hex), SGE_U8STR("af"));
+	ASSERT_EQ(ToString<UTF8String>(0x1234567890abcdef, 0, NumberBase::Hex), SGE_U8STR("1234567890abcdef"));
+	ASSERT_EQ(ToString<UTF8String>(0x1234567890abcdef, 20, NumberBase::Hex), SGE_U8STR("00001234567890abcdef"));
+	ASSERT_EQ(ToString<UTF8String>(-0x1, 0, NumberBase::Hex), SGE_U8STR("-1"));
+	ASSERT_EQ(ToString<UTF8String>(-0x2, 0, NumberBase::Hex), SGE_U8STR("-2"));
+	ASSERT_EQ(ToString<UTF8String>(-0x3, 0, NumberBase::Hex), SGE_U8STR("-3"));
+	ASSERT_EQ(ToString<UTF8String>(-0x10, 0, NumberBase::Hex), SGE_U8STR("-10"));
+	ASSERT_EQ(ToString<UTF8String>(-0xaf, 0, NumberBase::Hex), SGE_U8STR("-af"));
+	ASSERT_EQ(ToString<UTF8String>(-0x1234567890abcdef, 0, NumberBase::Hex), SGE_U8STR("-1234567890abcdef"));
+	ASSERT_EQ(ToString<UTF8String>(-0x1234567890abcdef, 20, NumberBase::Hex), SGE_U8STR("-0001234567890abcdef"));
 }
 
 TEST(ToString, FloatTest)

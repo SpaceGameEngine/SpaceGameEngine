@@ -178,6 +178,7 @@
     <ClInclude Include="Public\ForwardDefinition.hpp" />
     <ClInclude Include="Public\Function.hpp" />
     <ClInclude Include="Public\GlobalVariable.h" />
+    <ClInclude Include="Public\Log.h" />
     <ClInclude Include="Public\MemoryManager.h" />
     <ClInclude Include="Public\MetaData\MetaData.h" />
     <ClInclude Include="Public\MetaData\MetaObject.hpp" />
@@ -191,13 +192,16 @@
     <ClInclude Include="Public\System\AllowWindowsMacro.h" />
     <ClInclude Include="Public\System\DllLoader.h" />
     <ClInclude Include="Public\System\HideWindowsMacro.h" />
+    <ClInclude Include="Public\Time\Date.h" />
     <ClInclude Include="Public\Time\TimeCounter.h" />
     <ClInclude Include="Public\TypeDefinition.hpp" />
     <ClInclude Include="Public\Concurrent\Thread.h" />
     <ClInclude Include="Public\Concurrent\Lock.h" />
     <ClInclude Include="Public\Utility\AutoReleaseBuffer.h" />
     <ClInclude Include="Public\Utility\ControllableObject.hpp" />
+    <ClInclude Include="Public\Utility\DebugInformation.h" />
     <ClInclude Include="Public\Utility\Endian.h" />
+    <ClInclude Include="Public\Utility\FixedSizeBuffer.hpp" />
     <ClInclude Include="Public\Utility\Format.hpp" />
     <ClInclude Include="Public\Utility\Singleton.hpp" />
     <ClInclude Include="Public\Utility\Utility.hpp" />
@@ -206,6 +210,7 @@
     <ClCompile Include="Private\Error.cpp" />
     <ClCompile Include="Private\File.cpp" />
     <ClCompile Include="Private\GlobalVariable.cpp" />
+    <ClCompile Include="Private\Log.cpp" />
     <ClCompile Include="Private\MemoryManager.cpp" />
     <ClCompile Include="Private\MetaData\MetaData.cpp" />
     <ClCompile Include="Private\Concurrent\Thread.cpp" />
@@ -214,10 +219,12 @@
     <ClCompile Include="Private\Module\Module.cpp" />
     <ClCompile Include="Private\Module\ModuleManager.cpp" />
     <ClCompile Include="Private\System\DllLoader.cpp" />
+    <ClCompile Include="Private\Time\Date.cpp" />
     <ClCompile Include="Private\Time\TimeCounter.cpp" />
     <ClCompile Include="Private\Time\UnixTimeImplement.cpp" />
     <ClCompile Include="Private\Time\WindowsTimeImplement.cpp" />
     <ClCompile Include="Private\Utility\AutoReleaseBuffer.cpp" />
+    <ClCompile Include="Private\Utility\DebugInformation.cpp" />
     <ClCompile Include="Private\Utility\Endian.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

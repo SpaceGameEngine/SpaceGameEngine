@@ -180,6 +180,18 @@
     <ClInclude Include="Public\Utility\Endian.h">
       <Filter>Public\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Time\Date.h">
+      <Filter>Public\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Utility\DebugInformation.h">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Log.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Utility\FixedSizeBuffer.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -229,6 +241,15 @@
     </ClCompile>
     <ClCompile Include="Private\Utility\Endian.cpp">
       <Filter>Private\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Time\Date.cpp">
+      <Filter>Private\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Utility\DebugInformation.cpp">
+      <Filter>Private\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Log.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

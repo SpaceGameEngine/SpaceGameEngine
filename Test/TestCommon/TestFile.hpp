@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2021 creatorlxd
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -286,6 +286,17 @@ TEST(Path, GetModuleDirectoryPathTest)
 	String path_str = GetModuleDirectoryPath().GetString();
 	StdTCout << (const char*)SGE_STR_TO_TSTR(path_str).GetData() << std::endl;
 	ASSERT_NE(path_str.Find(SGE_STR("TestCommon"), path_str.GetConstBegin(), path_str.GetConstEnd()), path_str.GetConstEnd());
+}
+
+TEST(Path, GetProjectDirectoryPathTest)
+{
+	Path project_dir = GetProjectDirectoryPath();
+	bool is_project_dir = false;
+	project_dir.VisitChildPath([&is_project_dir](const String& filename, PathType ptype) -> void {
+		if (filename == SGE_STR("SpaceGameEngine.sln") && ptype == PathType::File)
+			is_project_dir = true;
+	});
+	ASSERT_TRUE(is_project_dir);
 }
 
 TEST(Path, CreateAndDeleteFileTest)
@@ -730,11 +741,17 @@ TEST(BinaryFile, OpenTest)
 {
 	{
 		BinaryFile file1;
+		ASSERT_FALSE(file1.IsOpen());
 		file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")), FileIOMode::Read);
+		ASSERT_TRUE(file1.IsOpen());
 		BinaryFile file2;
+		ASSERT_FALSE(file2.IsOpen());
 		file2.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt")), FileIOMode::Write);
+		ASSERT_TRUE(file2.IsOpen());
 		BinaryFile file3;
+		ASSERT_FALSE(file3.IsOpen());
 		file3.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")), FileIOMode::Append);
+		ASSERT_TRUE(file3.IsOpen());
 	}
 	DeleteFile(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")));
 }
@@ -742,11 +759,17 @@ TEST(BinaryFile, OpenTest)
 TEST(BinaryFile, CloseTest)
 {
 	BinaryFile file1(Path(SGE_STR("./TestData/TestCommon/TestFile/test1.txt")), FileIOMode::Read);
+	ASSERT_TRUE(file1.IsOpen());
 	file1.Close();
+	ASSERT_FALSE(file1.IsOpen());
 	file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test2.txt")), FileIOMode::Write);
+	ASSERT_TRUE(file1.IsOpen());
 	file1.Close();
+	ASSERT_FALSE(file1.IsOpen());
 	file1.Open(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")), FileIOMode::Append);
+	ASSERT_TRUE(file1.IsOpen());
 	file1.Close();
+	ASSERT_FALSE(file1.IsOpen());
 	DeleteFile(Path(SGE_STR("./TestData/TestCommon/TestFile/test_app.txt")));
 }
 
@@ -780,7 +803,7 @@ TEST(BinaryFile, WriteTest)
 	ASSERT_FALSE(path.IsExist());
 
 	BinaryFile bf_write(path, FileIOMode::Write);
-	ASSERT_EQ(bf_write.Write(test_data, sizeof(test_data)), sizeof(test_data));
+	bf_write.Write(test_data, sizeof(test_data));
 	bf_write.Close();
 	ASSERT_TRUE(path.IsExist());
 
@@ -796,6 +819,36 @@ TEST(BinaryFile, WriteTest)
 	ASSERT_FALSE(path.IsExist());
 }
 
+TEST(BinaryFile, OverwriteTest)
+{
+	int test_data[4] = {12, 34, 56, 78};
+	Path path(SGE_STR("./TestData/TestCommon/TestFile/testbow.dat"));
+	ASSERT_FALSE(path.IsExist());
+
+	std::ofstream b_output((char*)SGE_STR_TO_UTF8(path.GetAbsolutePath().GetString()).GetData(), std::ios::binary);
+	b_output.write((const char*)test_data, sizeof(test_data));
+	b_output.close();
+	ASSERT_TRUE(path.IsExist());
+
+	int test_data_output[2] = {90, 1112};
+	BinaryFile bf_write(path, FileIOMode::Write);
+	bf_write.Write(test_data_output, sizeof(test_data_output));
+	bf_write.Close();
+
+	int test_data_input[4] = {0, 0, 0, 0};
+	BinaryFile bf_read(path, FileIOMode::Read);
+	ASSERT_EQ(bf_read.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_output));
+	bf_read.Close();
+
+	for (int i = 0; i < 2; ++i)
+		ASSERT_EQ(test_data_input[i], test_data_output[i]);
+	for (int i = 2; i < 4; ++i)
+		ASSERT_EQ(test_data_input[i], 0);
+
+	DeleteFile(path);
+	ASSERT_FALSE(path.IsExist());
+}
+
 TEST(BinaryFile, FlushTest)
 {
 	int test_data[4] = {12, 34, 56, 78};
@@ -803,7 +856,7 @@ TEST(BinaryFile, FlushTest)
 	ASSERT_FALSE(path.IsExist());
 
 	BinaryFile bf_flush(path, FileIOMode::Write);
-	ASSERT_EQ(bf_flush.Write(test_data, sizeof(test_data)), sizeof(test_data));
+	bf_flush.Write(test_data, sizeof(test_data));
 	bf_flush.Flush();
 	bf_flush.Close();
 	ASSERT_TRUE(path.IsExist());
@@ -835,7 +888,7 @@ TEST(BinaryFile, ReadWriteTest)
 	int test_data_output[4] = {101, 202, 303, 404};
 	BinaryFile bf_read_write(path, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_EQ(bf_read_write.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
-	ASSERT_EQ(bf_read_write.Write(test_data_output, sizeof(test_data_output)), sizeof(test_data_output));
+	bf_read_write.Write(test_data_output, sizeof(test_data_output));
 	bf_read_write.Close();
 
 	for (int i = 0; i < 4; ++i)
@@ -868,10 +921,10 @@ TEST(BinaryFile, AppendTest)
 
 	int test_data_output[4] = {90, 112, 134, 156};
 	BinaryFile bf_append(path, FileIOMode::Append);
-	ASSERT_EQ(bf_append.Write(test_data_output, sizeof(int) * 2), sizeof(int) * 2);
+	bf_append.Write(test_data_output, sizeof(int) * 2);
 	bf_append.Close();
 	bf_append.Open(path, FileIOMode::Append);	 //test open append
-	ASSERT_EQ(bf_append.Write(test_data_output + 2, sizeof(int) * 2), sizeof(int) * 2);
+	bf_append.Write(test_data_output + 2, sizeof(int) * 2);
 	bf_append.Close();
 
 	int test_data_check[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -902,7 +955,7 @@ TEST(BinaryFile, ReadWriteAppendTest)
 	int test_data_input[4] = {0, 0, 0, 0};
 	int test_data_output[4] = {101, 202, 303, 404};
 	BinaryFile bf_read_write_append(path, FileIOMode::Read | FileIOMode::Write | FileIOMode::Append);
-	ASSERT_EQ(bf_read_write_append.Write(test_data_output, sizeof(test_data_output)), sizeof(test_data_output));
+	bf_read_write_append.Write(test_data_output, sizeof(test_data_output));
 	bf_read_write_append.MoveFilePosition(FilePositionOrigin::Begin, 0);
 	ASSERT_EQ(bf_read_write_append.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
 	bf_read_write_append.Close();
@@ -1029,12 +1082,6 @@ TEST(BinaryFile, IsReadFinishedTest)
 
 	int test_data_input[4] = {0, 0, 0, 0};
 
-	{
-		const BinaryFile bf_write(path, FileIOMode::Write);
-		ASSERT_TRUE(bf_write.IsReadFinished());
-		ASSERT_FALSE(bf_write);
-	}
-
 	BinaryFile bf_read(path, FileIOMode::Read);
 	ASSERT_EQ(bf_read.Read(test_data_input, sizeof(test_data_input)), sizeof(test_data_input));
 
@@ -1058,8 +1105,13 @@ TEST(BinaryFile, IsReadFinishedTest)
 
 	ASSERT_FALSE(bf_read.IsReadFinished());
 	ASSERT_TRUE(bf_read);
-
 	bf_read.Close();
+
+	{
+		const BinaryFile bf_write(path, FileIOMode::Write);
+		ASSERT_TRUE(bf_write.IsReadFinished());
+		ASSERT_FALSE(bf_write);
+	}
 
 	DeleteFile(path);
 	ASSERT_FALSE(path.IsExist());
@@ -1356,13 +1408,13 @@ TEST(UCS2FileCore, WriteCharTest)
 	file.Open(p_le, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_TRUE(file.WriteChar(test_data));
+	file.WriteChar(test_data);
 	file.Close();
 
 	file.Open(p_be, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetEndian(), Endian::Big);
-	ASSERT_TRUE(file.WriteChar(test_data));
+	file.WriteChar(test_data);
 	file.Close();
 
 	Char16 test_data_input = 0;

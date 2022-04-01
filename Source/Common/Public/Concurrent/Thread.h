@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 Chenxi Xu (@xsun2001)
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 #pragma once
 
 #include "TypeDefinition.hpp"
@@ -23,7 +22,7 @@ limitations under the License.
 #include <thread>
 #include <atomic>
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC)
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 namespace std	 //declaration for dll export
 {
 	class COMMON_API thread;

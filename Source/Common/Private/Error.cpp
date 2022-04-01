@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2021 creatorlxd
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,35 +15,16 @@ limitations under the License.
 */
 #include "Error.h"
 #include "SGEString.hpp"
+#include "Log.h"
 #include <iostream>
 
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
 #include <Windows.h>
 #endif
 
-SpaceGameEngine::DebugInformation::DebugInformation(const TChar* file_name, const TChar* func_name, UInt32 line_number)
-{
-	m_pFileName = file_name;
-	m_pFunctionName = func_name;
-	m_LineNumber = line_number;
-}
-
 void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_info)
 {
-	StdTString output_msg = SGE_TSTR("error happend in ");
-	output_msg += debug_info.m_pFileName;
-	output_msg += SGE_TSTR(" ");
-	output_msg += debug_info.m_pFunctionName;
-	output_msg += SGE_TSTR(" ");
-	output_msg += StdToTString(debug_info.m_LineNumber);
-	output_msg += SGE_TSTR(" : ");
-	output_msg += error_msg;
-/*!@todo use sge's output like log or messagebox*/
-#if !defined(SGE_CPP20) || defined(SGE_USE_WIDE_CHAR)
-	StdTCout << output_msg << std::endl;
-#else
-	StdTCout << (const char*)output_msg.c_str() << std::endl;
-#endif
+	SGE_LOG(GetDefaultLogger(), LogLevel::Error, SGE_TSTR_TO_UTF8(error_msg));
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
 	DebugBreak();
 #endif

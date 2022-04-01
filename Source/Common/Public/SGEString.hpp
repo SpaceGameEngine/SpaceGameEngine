@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2021 creatorlxd
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ limitations under the License.
 #include "Container/Vector.hpp"
 #include <cstring>
 #include <cmath>
+#include <algorithm>
+#include <concepts>
 
 namespace SpaceGameEngine
 {
@@ -1611,10 +1613,11 @@ namespace SpaceGameEngine
 		*/
 		template<typename IteratorType, typename = std::enable_if_t<IsSequentialIterator<IteratorType>, void>, typename = std::enable_if_t<std::is_same_v<decltype(new ValueType((ValueType)(IteratorValueType<IteratorType>())), true), bool>, void>>
 		inline StringCore(const IteratorType& begin, const IteratorType& end)
-			: m_Storage(1), m_Size(end - begin)
+			: m_Storage(1)
 		{
 			if constexpr (!Trait::IsMultipleByte)
 			{
+				m_Size = end - begin;
 				SizeType size = end - begin;
 				SetRealSize(size);
 				m_Storage.SetSize(size + 1);
@@ -1628,20 +1631,45 @@ namespace SpaceGameEngine
 			else
 			{
 				SizeType nsize = 0;
-				for (auto iter = begin; iter != end; ++iter)
+				using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
+				if constexpr (!std::is_pointer_v<IteratorType>)
 				{
-					nsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+					m_Size = end - begin;
+					for (auto iter = begin; iter != end; ++iter)
+					{
+						SGE_ASSERT(_InvalidMultipleByteCharError, *iter);
+						nsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+					}
+				}
+				else
+				{
+					m_Size = 0;
+					for (auto iter = begin; iter != end; iter = StringImplement::GetNextMultipleByteChar<T, Trait>(iter))
+					{
+						SGE_ASSERT(_InvalidMultipleByteCharError, iter);
+						nsize += StringImplement::GetMultipleByteCharSize<T, Trait>(iter);
+						m_Size += 1;
+					}
 				}
 				SetRealSize(nsize);
 				m_Storage.SetSize(nsize + 1);
 				*(GetData() + nsize) = 0;
 				SizeType i = 0;
-				for (auto iter = begin; iter != end; ++iter)
+				if constexpr (!std::is_pointer_v<IteratorType>)
 				{
-					using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
-					SGE_ASSERT(_InvalidMultipleByteCharError, *iter);
-					memcpy(GetData() + i, *iter, StringImplement::GetMultipleByteCharSize<T, Trait>(*iter) * sizeof(T));
-					i += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+					for (auto iter = begin; iter != end; ++iter)
+					{
+						memcpy(GetData() + i, *iter, StringImplement::GetMultipleByteCharSize<T, Trait>(*iter) * sizeof(T));
+						i += StringImplement::GetMultipleByteCharSize<T, Trait>(*iter);
+					}
+				}
+				else
+				{
+					for (auto iter = begin; iter != end; iter = StringImplement::GetNextMultipleByteChar<T, Trait>(iter))
+					{
+						memcpy(GetData() + i, iter, StringImplement::GetMultipleByteCharSize<T, Trait>(iter) * sizeof(T));
+						i += StringImplement::GetMultipleByteCharSize<T, Trait>(iter);
+					}
 				}
 			}
 		}
@@ -3018,11 +3046,22 @@ namespace SpaceGameEngine
 			}
 			else
 			{
-				for (auto pbuf = begin; pbuf != end; ++pbuf)
+				using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
+				if constexpr (!std::is_pointer_v<OtherIteratorType>)
 				{
-					using _InvalidMultipleByteCharError = StringImplement::InvalidMultipleByteCharError<T, Trait>;
-					SGE_ASSERT(_InvalidMultipleByteCharError, *pbuf);
-					snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*pbuf);
+					for (auto pbuf = begin; pbuf != end; ++pbuf)
+					{
+						SGE_ASSERT(_InvalidMultipleByteCharError, *pbuf);
+						snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(*pbuf);
+					}
+				}
+				else
+				{
+					for (auto pbuf = begin; pbuf != end; pbuf = StringImplement::GetNextMultipleByteChar<T, Trait>(pbuf))
+					{
+						SGE_ASSERT(_InvalidMultipleByteCharError, pbuf);
+						snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(pbuf);
+					}
 				}
 			}
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -3038,6 +3077,7 @@ namespace SpaceGameEngine
 				m_Storage.CopyOnWrite();
 				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
 				SizeType cnt = 0;
+				SizeType mc_cnt = 0;
 				for (auto i = begin; i != end; ++i)
 				{
 					if constexpr (!Trait::IsMultipleByte)
@@ -3047,11 +3087,25 @@ namespace SpaceGameEngine
 					}
 					else
 					{
-						memcpy(GetData() + index + cnt, *i, StringImplement::GetMultipleByteCharSize<T, Trait>(*i) * sizeof(T));
-						cnt += StringImplement::GetMultipleByteCharSize<T, Trait>(*i);
+						if constexpr (!std::is_pointer_v<OtherIteratorType>)
+						{
+							memcpy(GetData() + index + cnt, *i, StringImplement::GetMultipleByteCharSize<T, Trait>(*i) * sizeof(T));
+							cnt += StringImplement::GetMultipleByteCharSize<T, Trait>(*i);
+						}
+						else
+						{
+							memcpy(GetData() + index + cnt, i, StringImplement::GetMultipleByteCharSize<T, Trait>(i) * sizeof(T));
+							SizeType mc_size = StringImplement::GetMultipleByteCharSize<T, Trait>(i);
+							cnt += mc_size;
+							i += mc_size - 1;
+							mc_cnt += 1;
+						}
 					}
 				}
-				m_Size += (end - begin);
+				if constexpr (Trait::IsMultipleByte && std::is_pointer_v<OtherIteratorType>)
+					m_Size = mc_cnt;
+				else
+					m_Size += (end - begin);
 				m_Storage.SetSize(nsize + 1);
 				return IteratorType(GetData() + index);
 			}
@@ -3084,8 +3138,12 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+					if constexpr (!std::is_pointer_v<OtherIteratorType>)
+						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+					else
+						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(i2);
 				}
+				SizeType mc_cnt = 0;
 				while (i2 != end)
 				{
 					if constexpr (!Trait::IsMultipleByte)
@@ -3096,12 +3154,25 @@ namespace SpaceGameEngine
 					}
 					else
 					{
-						memcpy(*i1, *i2, StringImplement::GetMultipleByteCharSize<T, Trait>(*i2) * sizeof(T));
-						++i2;
-						i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+						if constexpr (!std::is_pointer_v<OtherIteratorType>)
+						{
+							memcpy(*i1, *i2, StringImplement::GetMultipleByteCharSize<T, Trait>(*i2) * sizeof(T));
+							++i2;
+							i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(*i2);
+						}
+						else
+						{
+							memcpy(*i1, i2, StringImplement::GetMultipleByteCharSize<T, Trait>(i2) * sizeof(T));
+							i2 = StringImplement::GetNextMultipleByteChar<T, Trait>(i2);
+							i1.m_pContent -= StringImplement::GetMultipleByteCharSize<T, Trait>(i2);
+							mc_cnt += 1;
+						}
 					}
 				}
-				m_Size += (end - begin);
+				if constexpr (Trait::IsMultipleByte && std::is_pointer_v<OtherIteratorType>)
+					m_Size = mc_cnt;
+				else
+					m_Size += (end - begin);
 				m_Storage.SetSize(nsize + 1);
 				IteratorType re(GetData() + index + snsize);
 				re += 1;
@@ -3800,12 +3871,6 @@ namespace SpaceGameEngine
 #define SGE_STR_TO_UCS2(str) str
 #define SGE_STR_TO_UTF8(str) SpaceGameEngine::UCS2StringToUTF8String(str)
 
-	template<typename T>
-	struct IntegralTypeWrapper
-	{
-		using Type = T;
-	};
-
 	template<typename StringType, typename T>
 	struct ToStringCore
 	{
@@ -3818,7 +3883,7 @@ namespace SpaceGameEngine
 	template<typename StringType, typename T, typename... Args>
 	inline StringType ToString(const T& value, Args&&... args)
 	{
-		return ToStringCore<StringType, std::conditional_t<std::is_integral_v<T>, IntegralTypeWrapper<T>, T>>::Get(value, std::forward<Args>(args)...);
+		return ToStringCore<StringType, T>::Get(value, std::forward<Args>(args)...);
 	}
 
 	enum class NumberBase : UInt8
@@ -3837,8 +3902,8 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator, typename IntegerType>
-	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	template<typename Allocator, std::integral IntegerType>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
 
@@ -3856,16 +3921,16 @@ namespace SpaceGameEngine
 
 		inline static constexpr const Char16 digits16[17] = SGE_WSTR("0123456789abcdef");
 
-		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
+		inline static StringType Get(IntegerType value, SizeType min_length = 0, NumberBase base = NumberBase::Decimal)
 		{
 			SGE_ASSERT(InvalidNumberBaseError, base);
 			if constexpr (std::is_unsigned_v<IntegerType>)
 			{
 				if (base == NumberBase::Decimal)
 				{
-					const SizeType length = Digits<10>(value);
+					const SizeType length = std::max(Digits<10>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
+					StringType re(length, SGE_WSTR('0'));
 					Char16* dst = re.GetData();
 					while (value >= 100)
 					{
@@ -3890,9 +3955,9 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Binary)
 				{
-					const SizeType length = Digits<2>(value);
+					const SizeType length = std::max(Digits<2>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
+					StringType re(length, SGE_WSTR('0'));
 					Char16* dst = re.GetData();
 					while (value >= 2)
 					{
@@ -3906,9 +3971,9 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Hex)
 				{
-					const SizeType length = Digits<16>(value);
+					const SizeType length = std::max(Digits<16>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_WSTR(' '));
+					StringType re(length, SGE_WSTR('0'));
 					Char16* dst = re.GetData();
 					while (value >= 16)
 					{
@@ -3928,9 +3993,9 @@ namespace SpaceGameEngine
 					value *= -1;
 					if (base == NumberBase::Decimal)
 					{
-						const SizeType length = Digits<10>(value) + 1;
+						const SizeType length = std::max(Digits<10>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						dst[0] = SGE_WSTR('-');
 						while (value >= 100)
@@ -3956,9 +4021,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Binary)
 					{
-						const SizeType length = Digits<2>(value) + 1;
+						const SizeType length = std::max(Digits<2>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						dst[0] = SGE_WSTR('-');
 						while (value >= 2)
@@ -3973,9 +4038,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Hex)
 					{
-						const SizeType length = Digits<16>(value) + 1;
+						const SizeType length = std::max(Digits<16>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						dst[0] = SGE_WSTR('-');
 						while (value >= 16)
@@ -3993,9 +4058,9 @@ namespace SpaceGameEngine
 				{
 					if (base == NumberBase::Decimal)
 					{
-						const SizeType length = Digits<10>(value);
+						const SizeType length = std::max(Digits<10>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						while (value >= 100)
 						{
@@ -4020,9 +4085,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Binary)
 					{
-						const SizeType length = Digits<2>(value);
+						const SizeType length = std::max(Digits<2>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						while (value >= 2)
 						{
@@ -4036,9 +4101,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Hex)
 					{
-						const SizeType length = Digits<16>(value);
+						const SizeType length = std::max(Digits<16>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_WSTR(' '));
+						StringType re(length, SGE_WSTR('0'));
 						Char16* dst = re.GetData();
 						while (value >= 16)
 						{
@@ -4119,8 +4184,8 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename Allocator, typename IntegerType>
-	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	template<typename Allocator, std::integral IntegerType>
+	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 
@@ -4138,16 +4203,16 @@ namespace SpaceGameEngine
 
 		inline static constexpr const Char8 digits16[17] = SGE_U8STR("0123456789abcdef");
 
-		inline static StringType Get(IntegerType value, NumberBase base = NumberBase::Decimal)
+		inline static StringType Get(IntegerType value, SizeType min_length = 0, NumberBase base = NumberBase::Decimal)
 		{
 			SGE_ASSERT(InvalidNumberBaseError, base);
 			if constexpr (std::is_unsigned_v<IntegerType>)
 			{
 				if (base == NumberBase::Decimal)
 				{
-					const SizeType length = Digits<10>(value);
+					const SizeType length = std::max(Digits<10>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
+					StringType re(length, SGE_U8STR("0"));
 					Char8* dst = re.GetData();
 					while (value >= 100)
 					{
@@ -4172,9 +4237,9 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Binary)
 				{
-					const SizeType length = Digits<2>(value);
+					const SizeType length = std::max(Digits<2>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
+					StringType re(length, SGE_U8STR("0"));
 					Char8* dst = re.GetData();
 					while (value >= 2)
 					{
@@ -4188,9 +4253,9 @@ namespace SpaceGameEngine
 				}
 				else if (base == NumberBase::Hex)
 				{
-					const SizeType length = Digits<16>(value);
+					const SizeType length = std::max(Digits<16>(value), min_length);
 					SizeType next = length - 1;
-					StringType re(length, SGE_U8STR(" "));
+					StringType re(length, SGE_U8STR("0"));
 					Char8* dst = re.GetData();
 					while (value >= 16)
 					{
@@ -4210,9 +4275,9 @@ namespace SpaceGameEngine
 					value *= -1;
 					if (base == NumberBase::Decimal)
 					{
-						const SizeType length = Digits<10>(value) + 1;
+						const SizeType length = std::max(Digits<10>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 100)
@@ -4238,9 +4303,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Binary)
 					{
-						const SizeType length = Digits<2>(value) + 1;
+						const SizeType length = std::max(Digits<2>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 2)
@@ -4255,9 +4320,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Hex)
 					{
-						const SizeType length = Digits<16>(value) + 1;
+						const SizeType length = std::max(Digits<16>(value) + 1, min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						dst[0] = SGE_U8STR('-');
 						while (value >= 16)
@@ -4275,9 +4340,9 @@ namespace SpaceGameEngine
 				{
 					if (base == NumberBase::Decimal)
 					{
-						const SizeType length = Digits<10>(value);
+						const SizeType length = std::max(Digits<10>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						while (value >= 100)
 						{
@@ -4302,9 +4367,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Binary)
 					{
-						const SizeType length = Digits<2>(value);
+						const SizeType length = std::max(Digits<2>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						while (value >= 2)
 						{
@@ -4318,9 +4383,9 @@ namespace SpaceGameEngine
 					}
 					else if (base == NumberBase::Hex)
 					{
-						const SizeType length = Digits<16>(value);
+						const SizeType length = std::max(Digits<16>(value), min_length);
 						SizeType next = length - 1;
-						StringType re(length, SGE_U8STR(" "));
+						StringType re(length, SGE_U8STR("0"));
 						Char8* dst = re.GetData();
 						while (value >= 16)
 						{
@@ -4611,11 +4676,11 @@ namespace SpaceGameEngine
 	template<typename StringType, typename T>
 	inline T StringTo(const StringType& str)
 	{
-		return StringToCore<StringType, std::conditional_t<std::is_integral_v<T>, IntegralTypeWrapper<T>, T>>::Get(str);
+		return StringToCore<StringType, T>::Get(str);
 	}
 
-	template<typename Allocator, typename IntegerType>
-	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	template<typename Allocator, std::integral IntegerType>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
 
@@ -4736,8 +4801,8 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename Allocator, typename IntegerType>
-	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, IntegralTypeWrapper<IntegerType>>
+	template<typename Allocator, std::integral IntegerType>
+	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
 

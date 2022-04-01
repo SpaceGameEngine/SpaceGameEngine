@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2021 creatorlxd
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "Utility/AutoReleaseBuffer.h"
 #include "Utility/Endian.h"
+#include "Utility/DebugInformation.h"
+#include "Utility/FixedSizeBuffer.hpp"
+#include "SGEString.hpp"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
@@ -209,4 +212,228 @@ TEST(Endian, ChangeEndianTest)
 	UInt32 test_val = 0x12345678;
 	ChangeEndian(test_val, Endian::Big, Endian::Little);
 	ASSERT_EQ(test_val, 0x78563412);
+}
+
+DebugInformation TestDebugInformation()
+{
+	return DebugInformation(SGE_DEBUG_INFORMATION);
+}
+
+TEST(DebugInformation, DebugInformationTest)
+{
+	DebugInformation di = TestDebugInformation();
+	TString<> filename(di.m_pFileName);
+	TString<> funcname(di.m_pFunctionName);
+	ASSERT_NE(filename.Find(SGE_TSTR("TestUtility.hpp"), filename.GetConstBegin(), filename.GetConstEnd()), filename.GetConstEnd());
+	ASSERT_NE(funcname.Find(SGE_TSTR("TestDebugInformation"), funcname.GetConstBegin(), funcname.GetConstEnd()), funcname.GetConstEnd());
+	ASSERT_EQ(di.m_LineNumber, 219);
+}
+
+TEST(FixedSizeBuffer, InstanceTest)
+{
+	FixedSizeBuffer<32> buffer;
+}
+
+TEST(FixedSizeBuffer, AppendTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, SetSizeAndClearTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+	buffer.SetSize(2);
+	ASSERT_EQ(buffer.GetSize(), 2);
+	ASSERT_EQ(buffer.GetFreeSize(), 30);
+	buffer.Clear();
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+}
+
+TEST(FixedSizeBuffer, CopyConstructionTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32> buffer2(buffer);
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, MoveConstructionTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32> buffer2(std::move(buffer));
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, CopyOperatorTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32> buffer2;
+	ASSERT_EQ(buffer2.GetSize(), 0);
+	ASSERT_EQ(buffer2.GetFreeSize(), 32);
+
+	buffer2 = buffer;
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, MoveOperatorTest)
+{
+	FixedSizeBuffer<32> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32> buffer2;
+	ASSERT_EQ(buffer2.GetSize(), 0);
+	ASSERT_EQ(buffer2.GetFreeSize(), 32);
+
+	buffer2 = std::move(buffer);
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, AnotherAllocatorCopyConstructionTest)
+{
+	FixedSizeBuffer<32, MemoryManagerAllocator> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32, StdAllocator> buffer2(buffer);
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, AnotherAllocatorMoveConstructionTest)
+{
+	FixedSizeBuffer<32, MemoryManagerAllocator> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32, StdAllocator> buffer2(std::move(buffer));
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, AnotherAllocatorCopyOperatorTest)
+{
+	FixedSizeBuffer<32, MemoryManagerAllocator> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32, StdAllocator> buffer2;
+	ASSERT_EQ(buffer2.GetSize(), 0);
+	ASSERT_EQ(buffer2.GetFreeSize(), 32);
+
+	buffer2 = buffer;
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
+
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+}
+
+TEST(FixedSizeBuffer, AnotherAllocatorMoveOperatorTest)
+{
+	FixedSizeBuffer<32, MemoryManagerAllocator> buffer;
+	ASSERT_EQ(buffer.GetSize(), 0);
+	ASSERT_EQ(buffer.GetFreeSize(), 32);
+	UInt32 test_data = 123456;
+	buffer.Append(&test_data, sizeof(test_data));
+	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer.GetData(), test_data);
+
+	FixedSizeBuffer<32, StdAllocator> buffer2;
+	ASSERT_EQ(buffer2.GetSize(), 0);
+	ASSERT_EQ(buffer2.GetFreeSize(), 32);
+
+	buffer2 = std::move(buffer);
+
+	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
+	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
+	ASSERT_EQ(*(UInt32*)buffer2.GetData(), test_data);
 }

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2021 creatorlxd
+Copyright 2022 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -465,6 +465,11 @@ namespace SpaceGameEngine
 	COMMON_API Path GetModuleDirectoryPath();
 
 	/*!
+	@todo use ProjectManager to make this function configable and flexiable(use code generation to make config).
+	*/
+	COMMON_API Path GetProjectDirectoryPath();
+
+	/*!
 	@warning the path's parent directory must be existed.
 	*/
 	COMMON_API void CreateFile(const Path& path);
@@ -536,6 +541,12 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(FilePositionOrigin origin);
 	};
 
+	struct IncompleteWriteError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("Write is incomplete.");
+		static COMMON_API bool Judge(SizeType real, SizeType wish);
+	};
+
 	class COMMON_API BinaryFile : public UncopyableAndUnmovable
 	{
 	public:
@@ -547,7 +558,7 @@ namespace SpaceGameEngine
 		void Close();
 		void Flush();
 		SizeType Read(void* pdst, SizeType size);
-		SizeType Write(const void* psrc, SizeType size);
+		void Write(const void* psrc, SizeType size);
 		Int64 MoveFilePosition(FilePositionOrigin origin, Int64 offset);
 		SizeType GetFileSize() const;
 		/*!
@@ -559,10 +570,13 @@ namespace SpaceGameEngine
 		bool IsReadFinished() const;
 		operator bool() const;
 
+		bool IsOpen() const;
+
 	protected:
 		FileHandle m_Handle;
 		FileIOMode m_Mode;
 		bool m_IsReadFinished;
+		bool m_IsOpen;
 	};
 
 	struct FileHandleOccupiedError
@@ -621,7 +635,7 @@ namespace SpaceGameEngine
 		void SetEndian(Endian endian);
 
 		Pair<Char16, bool> ReadChar();
-		bool WriteChar(Char16 c);
+		void WriteChar(Char16 c);
 
 		/*!
 		@note When the file has bom header, the offset is not as same as the
