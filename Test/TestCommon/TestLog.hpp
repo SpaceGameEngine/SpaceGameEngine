@@ -41,10 +41,12 @@ TEST(FileLogWriterCore, InstanceTest)
 	ASSERT_EQ(children_size + 1, children_size2);
 
 	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
-	ASSERT_FALSE(log_path2.IsExist());
-	FileLogWriterCore lw2(log_path2);
-	ASSERT_TRUE(log_path2.IsExist());
-	ASSERT_EQ(log_path2.GetChildPath().GetSize(), 1);
+	{
+		ASSERT_FALSE(log_path2.IsExist());
+		FileLogWriterCore lw2(log_path2);
+		ASSERT_TRUE(log_path2.IsExist());
+		ASSERT_EQ(log_path2.GetChildPath().GetSize(), 1);
+	}
 
 	DeleteDirectory(log_path2);
 	ASSERT_FALSE(log_path2.IsExist());
@@ -81,10 +83,12 @@ TEST(BindConsoleLogWriterCore, InstanceTest)
 	ASSERT_EQ(children_size + 1, children_size2);
 
 	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
-	ASSERT_FALSE(log_path2.IsExist());
-	BindConsoleLogWriterCore<FileLogWriterCore> lw2(log_path2);
-	ASSERT_TRUE(log_path2.IsExist());
-	ASSERT_EQ(log_path2.GetChildPath().GetSize(), 1);
+	{
+		ASSERT_FALSE(log_path2.IsExist());
+		BindConsoleLogWriterCore<FileLogWriterCore> lw2(log_path2);
+		ASSERT_TRUE(log_path2.IsExist());
+		ASSERT_EQ(log_path2.GetChildPath().GetSize(), 1);
+	}
 
 	DeleteDirectory(log_path2);
 	ASSERT_FALSE(log_path2.IsExist());
