@@ -449,6 +449,17 @@ SpaceGameEngine::Path SpaceGameEngine::GetModuleDirectoryPath()
 	return Path(SGE_TSTR_TO_STR(out_buffer)).GetParentPath();
 }
 
+Path SpaceGameEngine::GetProjectDirectoryPath()
+{
+#ifdef SGE_WINDOWS
+	return GetModuleDirectoryPath() / Path(SGE_STR("../../../.."));
+#elif defined(SGE_UNIX)
+	return GetModuleDirectoryPath() / Path(SGE_STR("../../.."));
+#else
+#error this os has not been supported.
+#endif
+}
+
 void SpaceGameEngine::CreateFile(const Path& path)
 {
 	SGE_ASSERT(PathExistError, path);

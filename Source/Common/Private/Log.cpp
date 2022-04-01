@@ -55,7 +55,7 @@ UTF8String SpaceGameEngine::GetLogLevelUTF8String(LogLevelType log_level)
 
 SpaceGameEngine::FileLogWriterCore::FileLogWriterCore()
 {
-	Path dir_path = GetModuleDirectoryPath() / Path(SGE_STR("Log"));
+	Path dir_path = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
 	if (!dir_path.IsExist())
 		CreateDirectory(dir_path);
 	Date date = GetLocalDate();

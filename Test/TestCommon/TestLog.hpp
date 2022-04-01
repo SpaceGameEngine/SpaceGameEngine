@@ -20,6 +20,11 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+TEST(ConsoleLogWriterCore, InstanceTest)
+{
+	ConsoleLogWriterCore lw;
+}
+
 TEST(ConsoleLogWriterCore, WriteLogTest)
 {
 	ConsoleLogWriterCore lw;
@@ -28,7 +33,7 @@ TEST(ConsoleLogWriterCore, WriteLogTest)
 
 TEST(FileLogWriterCore, InstanceTest)
 {
-	Path log_path = GetModuleDirectoryPath() / Path(SGE_STR("Log"));
+	Path log_path = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
 	if (!log_path.IsExist())
 		CreateDirectory(log_path);
 	SizeType children_size = log_path.GetChildPath().GetSize();
@@ -36,7 +41,7 @@ TEST(FileLogWriterCore, InstanceTest)
 	SizeType children_size2 = log_path.GetChildPath().GetSize();
 	ASSERT_EQ(children_size + 1, children_size2);
 
-	Path log_path2 = GetModuleDirectoryPath() / Path(SGE_STR("Log/Test"));
+	Path log_path2 = GetProjectDirectoryPath() / Path(SGE_STR("Log/Test"));
 	ASSERT_FALSE(log_path2.IsExist());
 	FileLogWriterCore lw2(log_path2);
 	ASSERT_TRUE(log_path2.IsExist());
@@ -48,8 +53,8 @@ TEST(FileLogWriterCore, InstanceTest)
 
 TEST(FileLogWriterCore, WriteLogTest)
 {
-	Path log_path = GetModuleDirectoryPath() / Path(SGE_STR("Log"));
-	Path log_path2 = GetModuleDirectoryPath() / Path(SGE_STR("Log/Test"));
+	Path log_path = GetProjectDirectoryPath() / Path(SGE_STR("Log"));
+	Path log_path2 = GetProjectDirectoryPath() / Path(SGE_STR("Log/Test"));
 	if (!log_path.IsExist())
 		CreateDirectory(log_path);
 

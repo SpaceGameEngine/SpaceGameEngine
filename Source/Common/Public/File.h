@@ -465,6 +465,11 @@ namespace SpaceGameEngine
 	COMMON_API Path GetModuleDirectoryPath();
 
 	/*!
+	@todo use ProjectManager to make this function configable and flexiable(use code generation to make config).
+	*/
+	COMMON_API Path GetProjectDirectoryPath();
+
+	/*!
 	@warning the path's parent directory must be existed.
 	*/
 	COMMON_API void CreateFile(const Path& path);

@@ -47,6 +47,8 @@ namespace SpaceGameEngine
 	};
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template struct COMMON_API TimeStamp<Second>;
+	template struct COMMON_API TimeDuration<Second>;
 	template class COMMON_API TimeCounter<Second>;
 #endif
 

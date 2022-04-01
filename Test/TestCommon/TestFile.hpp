@@ -288,6 +288,17 @@ TEST(Path, GetModuleDirectoryPathTest)
 	ASSERT_NE(path_str.Find(SGE_STR("TestCommon"), path_str.GetConstBegin(), path_str.GetConstEnd()), path_str.GetConstEnd());
 }
 
+TEST(Path, GetProjectDirectoryPathTest)
+{
+	Path project_dir = GetProjectDirectoryPath();
+	bool is_project_dir = false;
+	project_dir.VisitChildPath([&is_project_dir](const String& filename, PathType ptype) -> void {
+		if (filename == SGE_STR("SpaceGameEngine.sln") && ptype == PathType::File)
+			is_project_dir = true;
+	});
+	ASSERT_TRUE(is_project_dir);
+}
+
 TEST(Path, CreateAndDeleteFileTest)
 {
 	Path p(SGE_STR("./TestData/TestCommon/TestFile/test_c_d.txt"));
