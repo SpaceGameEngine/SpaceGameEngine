@@ -16,14 +16,15 @@ limitations under the License.
 #include "SpaceLanguageModule.h"
 
 using namespace SpaceGameEngine;
+using namespace SpaceGameEngine::SpaceLanguage;
 
 SGE_MODULE(SpaceLanguage);
 
-void SpaceGameEngine::SpaceLanguageModule::OnLoad()
+void SpaceGameEngine::SpaceLanguage::SpaceLanguageModule::OnLoad()
 {
 	ModuleManager::GetSingleton().LoadModule(SGE_STR("Common"));
 }
 
-void SpaceGameEngine::SpaceLanguageModule::OnUnload()
+void SpaceGameEngine::SpaceLanguage::SpaceLanguageModule::OnUnload()
 {
 }

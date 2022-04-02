@@ -16,7 +16,7 @@ limitations under the License.
 #pragma once
 #include "Module/ModuleManager.h"
 
-namespace SpaceGameEngine
+namespace SpaceGameEngine::SpaceLanguage
 {
 	/*!
 	@ingroup SpaceLanguage
