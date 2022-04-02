@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Public">
+      <UniqueIdentifier>{9c8e2d70-cd16-4429-bb01-a3e2bca5d600}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{2d20cee8-4c25-442f-b8b0-00506ac53079}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Private\DoxygenConfig.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SpaceLanguageAPI.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\SpaceLanguageModule.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Private\SpaceLanguageModule.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,37 +19,36 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{0D07F54C-EFA0-4EF9-82D8-0F98342F1087}</ProjectGuid>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TestCommon</RootNamespace>
-    <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
-    <ProjectName>TestCommon</ProjectName>
+    <ProjectGuid>{6c3e06dd-648f-4f8e-b0bc-fb6bea309a55}</ProjectGuid>
+    <RootNamespace>TestSpaceLanguage</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -77,95 +76,84 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../TestModule</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <DelayLoadDLLs>Common.dll;TestModule.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
-      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../TestModule</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <DelayLoadDLLs>Common.dll;TestModule.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;SpaceLanguage.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../TestModule</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <DelayLoadDLLs>Common.dll;SpaceLanguage.dll</DelayLoadDLLs>
+      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
       <SubSystem>Console</SubSystem>
-      <DelayLoadDLLs>Common.dll;TestModule.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <DelayLoadDLLs>Common.dll;SpaceLanguage.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty;../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../TestModule</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <DelayLoadDLLs>Common.dll;TestModule.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;SpaceLanguage.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Bootstrap\Bootstrap.vcxproj">
       <Project>{84ade34b-02bd-4712-8fed-84b671ca59cd}</Project>
@@ -173,38 +161,15 @@
     <ProjectReference Include="..\..\Source\Common\Common.vcxproj">
       <Project>{3d706382-4b3c-4ebc-ac11-ff05c091e4d4}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Source\SpaceLanguage\SpaceLanguage.vcxproj">
+      <Project>{88fc8d55-ae02-4b8b-a32e-6c5181e8f0f7}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\ThirdParty\GoogleTest\GoogleTest.vcxproj">
       <Project>{d7662b21-f269-400c-95c2-3b498e34de38}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\TestModule\TestModule.vcxproj">
-      <Project>{f39d2a87-13ce-4476-9308-e1d897d12ba5}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestContainerConcept.hpp" />
-    <ClInclude Include="TestDate.hpp" />
-    <ClInclude Include="TestError.hpp" />
-    <ClInclude Include="TestFile.hpp" />
-    <ClInclude Include="TestFormat.hpp" />
-    <ClInclude Include="TestHashMap.hpp" />
-    <ClInclude Include="TestList.hpp" />
-    <ClInclude Include="TestLog.hpp" />
-    <ClInclude Include="TestMap.hpp" />
-    <ClInclude Include="TestMemoryManager.hpp" />
-    <ClInclude Include="TestMeta.hpp" />
-    <ClInclude Include="TestMetaData.hpp" />
-    <ClInclude Include="TestDllLoader.hpp" />
-    <ClInclude Include="TestModule.hpp" />
-    <ClInclude Include="TestPriorityQueue.hpp" />
-    <ClInclude Include="TestQueue.hpp" />
-    <ClInclude Include="TestRange.hpp" />
-    <ClInclude Include="TestStack.hpp" />
-    <ClInclude Include="TestString.hpp" />
-    <ClInclude Include="TestFunction.hpp" />
-    <ClInclude Include="TestTimeCounter.hpp" />
-    <ClInclude Include="TestUtility.hpp" />
-    <ClInclude Include="TestConcurrent.hpp" />
-    <ClInclude Include="TestVector.hpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
