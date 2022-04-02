@@ -19,6 +19,7 @@ add_library(Common SHARED
         Private/File.cpp
         Private/Log.cpp
         )
+add_compile_definitions(COMMON_EXPORTS)
 target_include_directories(Common PUBLIC Public)
 target_link_libraries(Common PUBLIC ${THIRD_PARTY_LIBRARIES})
 if((CMAKE_HOST_UNIX) AND (NOT CMAKE_HOST_APPLE))

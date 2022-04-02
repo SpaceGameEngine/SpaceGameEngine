@@ -1,0 +1,2 @@
+add_executable(TestSpaceLanguage main.cpp)
+target_link_libraries(TestSpaceLanguage Bootstrap Common SpaceLanguage ${THIRD_PARTY_TEST_LIBRARIES})

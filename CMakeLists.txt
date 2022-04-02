@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.12)
 project(SpaceGameEngine VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -69,10 +69,12 @@ set(THIRD_PARTY_TEST_LIBRARIES gtest gmock benchmark)
 # Game Engine Modules
 add_subdirectory(Source/Common)
 add_subdirectory(Source/Bootstrap)
+add_subdirectory(Source/SpaceLanguage)
 
 # Tests
 add_subdirectory(Test/TestCommon)
 add_subdirectory(Test/TestModule)
+add_subdirectory(Test/TestSpaceLanguage)
 
 # Benchmarks
 add_subdirectory(Benchmark/BenchmarkCommon)
