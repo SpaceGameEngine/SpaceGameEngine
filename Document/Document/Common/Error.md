@@ -1,4 +1,4 @@
-﻿# Space Game Engine
+﻿# SpaceGameEngine
 ## 错误处理
 ### 概念
 &emsp;&emsp;错误的检查分为两种:`Assert`和`Check`。两者的区别在于`Assert`只在`Debug`模式下才进行检查，而`Check`是不论`Debug`还是`Release`模式都进行检查的。  

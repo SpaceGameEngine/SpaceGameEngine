@@ -1,4 +1,4 @@
-﻿# Space Game Engine
+﻿# SpaceGameEngine
 ## Project Structure
 > 注：这里的`$(ProjectName)`是VS的宏，在`SpaceGameEngine`中实际上是指**模块**名，而不是**项目**名。
 * **Binary** 存放项目编译出的二进制文件

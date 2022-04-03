@@ -7,6 +7,12 @@
     <Filter Include="Private">
       <UniqueIdentifier>{2d20cee8-4c25-442f-b8b0-00506ac53079}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\VirtualMachine">
+      <UniqueIdentifier>{c72da779-c6be-46e9-8a8d-7e825f09aab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\VirtualMachine">
+      <UniqueIdentifier>{76c7224d-4a3f-4231-878c-080eee2298df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\DoxygenConfig.hpp">

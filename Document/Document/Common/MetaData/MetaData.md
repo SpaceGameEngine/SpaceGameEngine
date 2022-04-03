@@ -1,4 +1,4 @@
-﻿# Space Game Engine
+﻿# SpaceGameEngine
 ## MetaData
 ### 概念
 &emsp;&emsp;`MetaData`是一个用于在运行时储存必要的类型信息的结构体类型，其所储存的类型信息将用于实现反射及相关功能。从某种角度来说，它是`type_info`的升级版，因此也能用于`RTTI`。

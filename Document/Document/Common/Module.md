@@ -1,4 +1,4 @@
-﻿# Space Game Engine
+﻿# SpaceGameEngine
 ## Module
 ### 说明
 `Module`模块是`Space Game Engine`所使用的一种代码组织形式。在某些情况下，模块与模块之间会存在着一些依赖和一些初始化和释放的相关工作需要在各个模块的初始化和释放时进行，同时考虑到在某些平台下，需要有对各个模块所对应的动态库进行按需延迟加载的需求，所以有了一整套模块`Module`和模块管理`ModuleManager`系统。

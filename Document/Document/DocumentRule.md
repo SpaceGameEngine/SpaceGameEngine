@@ -1,4 +1,4 @@
-﻿# Space Game Engine
+﻿# SpaceGameEngine
 ## Document Rule
 1. 文档中不写废话，不重复`API Reference`的内容。
 2. 文档中要详述设计思路。

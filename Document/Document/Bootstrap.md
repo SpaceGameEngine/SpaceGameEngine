@@ -1,4 +1,4 @@
-﻿# Space Game Engine
+﻿# SpaceGameEngine
 ## Bootstrap
 ### 用途
 对于一个使用引擎的可执行程序来说，在某些平台下（如`Windows`）其必须自己在运行时去加载其所要利用到的各个模块，但是因为引擎自带的模块加载功能是在`Common`模块中的，所以其无法利用位于`Common`模块里的模块加载功能来加载`Common`模块自身，所以就有了这个`Bootstrap`模块去利用`Common`模块无关的系统API去先加载`Common`模块。

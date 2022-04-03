@@ -1,4 +1,4 @@
-﻿# Space Game Engine
+﻿# SpaceGameEngine
 ## Code Rule
 ### 函数命名的含义
 &emsp;&emsp;**每个函数都应该符合与其函数名所对应的相应含义**。只有在整个项目中时时刻刻地遵守这个规定，我们才能保证函数的语义的一致性。以下是目前`SpaceGameEngine`中所规定的几种函数名称形式与其所对应的语义：

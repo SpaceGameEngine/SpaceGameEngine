@@ -85,6 +85,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpaceLanguage", "Source\Spa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSpaceLanguage", "Test\TestSpaceLanguage\TestSpaceLanguage.vcxproj", "{6C3E06DD-648F-4F8E-B0BC-FB6BEA309A55}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SpaceLanguage", "SpaceLanguage", "{5B97E2EC-0786-47E2-A683-80BA9F8C59C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VirtualMachine", "VirtualMachine", "{7AD471A5-9F91-4E89-8753-0E94002507F4}"
+	ProjectSection(SolutionItems) = preProject
+		Document\Document\SpaceLanguage\VirtualMachine\Instruction.md = Document\Document\SpaceLanguage\VirtualMachine\Instruction.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -202,6 +209,8 @@ Global
 		{7F5D9099-4CA8-47E1-A754-DEE2C866608C} = {6B44D9C0-3589-476C-8789-6CC132708D99}
 		{88FC8D55-AE02-4B8B-A32E-6C5181E8F0F7} = {72DE90D1-ACF7-4F34-8E54-E28BFDE1018F}
 		{6C3E06DD-648F-4F8E-B0BC-FB6BEA309A55} = {E09406D8-3CBC-473A-8715-05471C55AAFA}
+		{5B97E2EC-0786-47E2-A683-80BA9F8C59C5} = {F93E7284-FB8F-468F-A220-8A4AA2AEC39F}
+		{7AD471A5-9F91-4E89-8753-0E94002507F4} = {5B97E2EC-0786-47E2-A683-80BA9F8C59C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}

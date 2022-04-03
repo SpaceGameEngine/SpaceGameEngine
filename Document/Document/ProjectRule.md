@@ -1,4 +1,4 @@
-﻿# Space Game Engine
+﻿# SpaceGameEngine
 ## Project Rule
 ### ProjectDefaultProperty
 1. 所有项目都要在属性管理器中添加`ProjectCommonProperty.props`属性文件
