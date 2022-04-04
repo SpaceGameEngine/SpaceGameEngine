@@ -5,9 +5,9 @@
 ### Special Register
 |编号|名称|用途|
 |:-|:-|:-|
-|0|Arg0|外部调用参数0|
-|1|Arg1|外部调用参数1|
-|2|Arg2|外部调用参数2|
-|3|PC|程序计数寄存器|
-|4|BP|基址寄存器|
-|5|SP|栈指针寄存器|
+|0|Argument0|外部调用参数0|
+|1|Argument1|外部调用参数1|
+|2|Argument2|外部调用参数2|
+|3|ProgramCounter|程序计数寄存器|
+|4|BasePointer|基址寄存器|
+|5|StackPointer|栈指针寄存器|

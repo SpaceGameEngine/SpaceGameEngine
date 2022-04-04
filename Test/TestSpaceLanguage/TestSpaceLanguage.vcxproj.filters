@@ -3,4 +3,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestVirtualMachine.hpp" />
+  </ItemGroup>
 </Project>

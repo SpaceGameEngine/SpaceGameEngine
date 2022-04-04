@@ -13,17 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+#pragma once
+#include "VirtualMachine/VirtualMachine.h"
 #include "gtest/gtest.h"
-#include "Bootstrap.h"
-#include "SGEString.hpp"
-#include "Module/ModuleManager.h"
-#include "TestVirtualMachine.hpp"
 
-SpaceGameEngine::Bootstrap bootstrap;
+using namespace SpaceGameEngine;
+using namespace SpaceGameEngine::SpaceLanguage;
 
-int main(int argc, char** argv)
+TEST(Registers, Test)
 {
-	SpaceGameEngine::ModuleManager::GetSingleton().LoadModule(SGE_STR("SpaceLanguage"));
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	ASSERT_EQ(Registers::sm_Size, 32);
+	const Registers cregs;
+	ASSERT_EQ(cregs.Get(31), 0);
+	Registers regs;
+	ASSERT_EQ(regs.Get(31), 0);
+	regs.Get(31) = 125;
+	ASSERT_EQ(regs.Get(31), 125);
 }

@@ -163,9 +163,15 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\SpaceLanguageModule.h" />
     <ClInclude Include="Public\SpaceLanguageAPI.h" />
+    <ClInclude Include="Public\VirtualMachine\Instruction.h" />
+    <ClInclude Include="Public\VirtualMachine\Register.h" />
+    <ClInclude Include="Public\VirtualMachine\VirtualMachine.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp" />
+    <ClCompile Include="Private\VirtualMachine\Instruction.cpp" />
+    <ClCompile Include="Private\VirtualMachine\Register.cpp" />
+    <ClCompile Include="Private\VirtualMachine\VirtualMachine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

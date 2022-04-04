@@ -24,10 +24,28 @@
     <ClInclude Include="Private\SpaceLanguageModule.h">
       <Filter>Private</Filter>
     </ClInclude>
+    <ClInclude Include="Public\VirtualMachine\Instruction.h">
+      <Filter>Public\VirtualMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\VirtualMachine\Register.h">
+      <Filter>Public\VirtualMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\VirtualMachine\VirtualMachine.h">
+      <Filter>Public\VirtualMachine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VirtualMachine\VirtualMachine.cpp">
+      <Filter>Private\VirtualMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VirtualMachine\Register.cpp">
+      <Filter>Private\VirtualMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VirtualMachine\Instruction.cpp">
+      <Filter>Private\VirtualMachine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
