@@ -47,9 +47,9 @@ namespace SpaceGameEngine::SpaceLanguage
 		RegisterType m_Registers[sm_Size];
 	};
 
-	struct InvalidRegisterError
+	struct InvalidRegisterIndexError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The Register is invalid.");
+		inline static const TChar sm_pContent[] = SGE_TSTR("The RegisterIndex is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(SizeType reg_index);
 	};
 
