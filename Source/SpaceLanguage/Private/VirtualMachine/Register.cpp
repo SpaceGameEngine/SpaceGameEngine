@@ -26,17 +26,12 @@ SpaceGameEngine::SpaceLanguage::Registers::Registers()
 
 RegisterType& SpaceGameEngine::SpaceLanguage::Registers::Get(SizeType index)
 {
-	SGE_ASSERT(InvalidRegisterIndexError, index);
+	SGE_ASSERT(InvalidValueError, index, 0, sm_Size - 1);
 	return m_Registers[index];
 }
 
 const RegisterType& SpaceGameEngine::SpaceLanguage::Registers::Get(SizeType index) const
 {
-	SGE_ASSERT(InvalidRegisterIndexError, index);
+	SGE_ASSERT(InvalidValueError, index, 0, sm_Size - 1);
 	return m_Registers[index];
-}
-
-bool SpaceGameEngine::SpaceLanguage::InvalidRegisterIndexError::Judge(SizeType reg_index)
-{
-	return reg_index >= Registers::sm_Size;
 }

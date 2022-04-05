@@ -30,3 +30,12 @@ TEST(Registers, Test)
 	regs.Get(31) = 125;
 	ASSERT_EQ(regs.Get(31), 125);
 }
+
+TEST(ExternalCaller, Test)
+{
+	ExternalCaller ec;
+	ASSERT_FALSE(ec.IsHasExternalCallFunction(123));
+	ec.AddExternalCallFunction(123, (ExternalCallFunctionType)456);
+	ASSERT_TRUE(ec.IsHasExternalCallFunction(123));
+	ASSERT_EQ(ec.GetExternalCallFunction(123), (ExternalCallFunctionType)456);
+}

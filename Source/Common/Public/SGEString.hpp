@@ -3353,9 +3353,9 @@ namespace SpaceGameEngine
 				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
 				T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgst);
 
 				return Iterator(res);
 			}
@@ -3387,9 +3387,9 @@ namespace SpaceGameEngine
 				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
 				const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgst);
 
 				return ConstIterator(res);
 			}
@@ -3421,9 +3421,9 @@ namespace SpaceGameEngine
 				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
 				T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgst);
 
 				return Iterator(res);
 			}
@@ -3455,9 +3455,9 @@ namespace SpaceGameEngine
 				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
 				const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgst);
 
 				return ConstIterator(res);
 			}
@@ -3491,9 +3491,9 @@ namespace SpaceGameEngine
 				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
 				T* res = (T*)(StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize));
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgst);
 
 				return Iterator(res);
 			}
@@ -3527,9 +3527,9 @@ namespace SpaceGameEngine
 				StringImplement::BoyerMooreSearchImplement::MakeGoodSuffixTable(pgst, psuff, pstr, nsize);
 				const T* res = StringImplement::BoyerMooreSearchImplement::BoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgst, nsize);
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgst, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgst);
 
 				return ConstIterator(res);
 			}
@@ -3561,9 +3561,9 @@ namespace SpaceGameEngine
 				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
 				T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgpt);
 
 				return Iterator(res);
 			}
@@ -3595,9 +3595,9 @@ namespace SpaceGameEngine
 				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
 				const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgpt);
 
 				return ConstIterator(res);
 			}
@@ -3629,9 +3629,9 @@ namespace SpaceGameEngine
 				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
 				T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgpt);
 
 				return Iterator(res);
 			}
@@ -3663,9 +3663,9 @@ namespace SpaceGameEngine
 				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
 				const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgpt);
 
 				return ConstIterator(res);
 			}
@@ -3699,9 +3699,9 @@ namespace SpaceGameEngine
 				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
 				T* res = (T*)(StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize));
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgpt);
 
 				return Iterator(res);
 			}
@@ -3735,9 +3735,9 @@ namespace SpaceGameEngine
 				StringImplement::ReverseBoyerMooreSearchImplement::MakeGoodPrefixTable(pgpt, psuff, pstr, nsize);
 				const T* res = StringImplement::ReverseBoyerMooreSearchImplement::ReverseBoyerMooreSearch(begin.GetData(), end.GetData(), pstr, pbct, pgpt, nsize);
 
-				Allocator::RawDelete(pbct, (Trait::MaxValue + 1) * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(psuff, nsize * sizeof(SizeType), alignof(SizeType));
-				Allocator::RawDelete(pgpt, nsize * sizeof(SizeType), alignof(SizeType));
+				Allocator::RawDelete(pbct);
+				Allocator::RawDelete(psuff);
+				Allocator::RawDelete(pgpt);
 
 				return ConstIterator(res);
 			}

@@ -436,7 +436,7 @@ namespace SpaceGameEngine
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
 					m_pContent[i].~Bucket();
 
-				Allocator::RawDelete(m_pContent, m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+				Allocator::RawDelete(m_pContent);
 			}
 
 			m_LoadFactor = sm_DefaultLoadFactor;

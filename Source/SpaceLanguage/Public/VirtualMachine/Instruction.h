@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Register.h"
+#include "ExternalCaller.h"
+#include "SGEString.hpp"
 
 namespace SpaceGameEngine::SpaceLanguage
 {
@@ -22,6 +23,34 @@ namespace SpaceGameEngine::SpaceLanguage
 	@ingroup SpaceLanguage
 	@{
 	*/
+
+	using InstructionFunctionType = void (*)(Registers&, void*, const ExternalCaller&);
+
+	struct SPACE_LANGUAGE_API InstructionType
+	{
+		InstructionType();
+		InstructionType(UInt8 index, const String& name, UInt8 size, InstructionFunctionType pfunc);
+
+		UInt8 m_Index;
+		String m_Name;
+		UInt8 m_Size;
+		InstructionFunctionType m_pFunction;
+	};
+
+	class InstructionSet : public UncopyableAndUnmovable
+	{
+	public:
+		inline static constexpr const SizeType sm_Size = 34;
+		inline static constexpr const SizeType sm_MaxInstructionSize = 10;
+
+		SPACE_LANGUAGE_API InstructionSet();
+
+	private:
+		SPACE_LANGUAGE_API static void ExternalCall(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+
+	private:
+		InstructionType m_InstructionTypes[sm_Size];
+	};
 
 	/*!
 	@}

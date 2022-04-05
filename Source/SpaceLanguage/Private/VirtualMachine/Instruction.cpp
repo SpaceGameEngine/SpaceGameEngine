@@ -17,3 +17,25 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
+
+SpaceGameEngine::SpaceLanguage::InstructionType::InstructionType()
+	: m_Index(0), m_Name(), m_Size(0), m_pFunction(nullptr)
+{
+}
+
+SpaceGameEngine::SpaceLanguage::InstructionType::InstructionType(UInt8 index, const String& name, UInt8 size, InstructionFunctionType pfunc)
+	: m_Index(index), m_Name(name), m_Size(size), m_pFunction(pfunc)
+{
+	SGE_ASSERT(InvalidValueError, index, 0, InstructionSet::sm_Size - 1);
+	SGE_ASSERT(String::EmptyStringCoreError, name.GetSize());
+	SGE_ASSERT(InvalidValueError, size, 1, InstructionSet::sm_MaxInstructionSize);
+	SGE_ASSERT(NullPointerError, pfunc);
+}
+
+SpaceGameEngine::SpaceLanguage::InstructionSet::InstructionSet()
+{
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionSet::ExternalCall(Registers& regs, void* pargs, const ExternalCaller& ext_caller)
+{
+}
