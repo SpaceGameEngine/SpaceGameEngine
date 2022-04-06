@@ -46,7 +46,7 @@
 |2|Copy|Reg(Dst) Reg(Src)|复制寄存器的值|
 |3|Goto|Data|指令跳转|
 |4|GotoRegister|Reg|指令跳转|
-|5|If|Reg|条件指令跳转|
+|5|If|Reg Data|条件指令跳转|
 #### Math
 对寄存器的值进行的数学计算
 
@@ -63,25 +63,15 @@
 |14|Not|Reg(Dst) Reg(Arg0)|Dst = ~Arg0|
 |15|ShiftLeft|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = Arg0 << Arg1|
 |16|ShiftRight|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = Arg0 >> Arg1|
-|17|SelfAdd|Reg(Dst) Reg(Arg0)|Dst = Dst + Arg0|
-|18|SelfSubtract|Reg(Dst) Reg(Arg0)|Dst = Dst - Arg0|
-|19|SelfMultiply|Reg(Dst) Reg(Arg0)|Dst = Dst * Arg0|
-|20|SelfDivide|Reg(Dst) Reg(Arg0)|Dst = Dst / Arg0|
-|21|SelfMod|Reg(Dst) Reg(Arg0)|Dst = Dst % Arg0|
-|22|SelfAnd|Reg(Dst) Reg(Arg0)|Dst = Dst & Arg0|
-|23|SelfOr|Reg(Dst) Reg(Arg0)|Dst = Dst \| Arg0|
-|24|SelfXor|Reg(Dst) Reg(Arg0)|Dst = Dst ^ Arg0|
-|25|SelfNot|Reg(Dst)|Dst = ~Dst|
-|26|SelfShiftLeft|Reg(Dst) Reg(Arg0)|Dst = Dst << Arg0|
-|27|SelfShiftRight|Reg(Dst) Reg(Arg0)|Dst = Dst >> Arg0|
+
 #### Judgement
 对寄存器的值进行的判断
 
 |指令编号|指令名称|参数|说明|
 |:-|:-|:-|:-|
-|28|Equal|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 == Arg1)?1:0|
-|29|NotEqual|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 != Arg1)?1:0|
-|30|Less|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 < Arg1)?1:0|
-|31|LessEqual|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 <= Arg1)?1:0|
-|32|Greater|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 > Arg1)?1:0|
-|33|GreaterEqual|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 >= Arg1)?1:0|
+|17|Equal|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 == Arg1)?1:0|
+|18|NotEqual|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 != Arg1)?1:0|
+|19|Less|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 < Arg1)?1:0|
+|20|LessEqual|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 <= Arg1)?1:0|
+|21|Greater|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 > Arg1)?1:0|
+|22|GreaterEqual|Reg(Dst) Reg(Arg0) Reg(Arg1)|Dst = (Arg0 >= Arg1)?1:0|

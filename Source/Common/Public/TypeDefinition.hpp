@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include <cstdint>
+#include "Platform.hpp"
 
 namespace SpaceGameEngine
 {
@@ -76,7 +77,13 @@ namespace SpaceGameEngine
 	/*!
 	@brief address type
 	*/
+#ifdef SGE_X64
 	using AddressType = UInt64;
+#elif defined(SGE_X86)
+	using AddressType = UInt32;
+#else
+#error this arch has not been supported.
+#endif
 
 	/*!
 	@}
