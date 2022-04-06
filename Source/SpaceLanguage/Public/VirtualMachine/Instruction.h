@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "ExternalCaller.h"
 #include "SGEString.hpp"
+#include "Utility/Singleton.hpp"
 
 namespace SpaceGameEngine::SpaceLanguage
 {
@@ -37,70 +38,77 @@ namespace SpaceGameEngine::SpaceLanguage
 		InstructionFunctionType m_pFunction;
 	};
 
-	class InstructionSet : public UncopyableAndUnmovable
+	inline constexpr const SizeType InstructionSetSize = 23;
+	inline constexpr const SizeType MaxInstructionSize = 10;
+
+	namespace InstructionTypeIndex
 	{
+		inline constexpr const UInt8 ExternalCall = 0;
+		inline constexpr const UInt8 Set = 1;
+		inline constexpr const UInt8 Copy = 2;
+		inline constexpr const UInt8 Goto = 3;
+		inline constexpr const UInt8 GotoRegister = 4;
+		inline constexpr const UInt8 If = 5;
+
+		inline constexpr const UInt8 Add = 6;
+		inline constexpr const UInt8 Subtract = 7;
+		inline constexpr const UInt8 Multiply = 8;
+		inline constexpr const UInt8 Divide = 9;
+		inline constexpr const UInt8 Mod = 10;
+		inline constexpr const UInt8 And = 11;
+		inline constexpr const UInt8 Or = 12;
+		inline constexpr const UInt8 Xor = 13;
+		inline constexpr const UInt8 Not = 14;
+		inline constexpr const UInt8 ShiftLeft = 15;
+		inline constexpr const UInt8 ShiftRight = 16;
+
+		inline constexpr const UInt8 Equal = 17;
+		inline constexpr const UInt8 NotEqual = 18;
+		inline constexpr const UInt8 Less = 19;
+		inline constexpr const UInt8 LessEqual = 20;
+		inline constexpr const UInt8 Greater = 21;
+		inline constexpr const UInt8 GreaterEqual = 22;
+	}
+
+	class SPACE_LANGUAGE_API InstructionSet : public UncopyableAndUnmovable, public Singleton<InstructionSet>
+	{
+	private:
+		InstructionSet();
+
 	public:
-		inline static constexpr const SizeType sm_Size = 23;
-		inline static constexpr const SizeType sm_MaxInstructionSize = 10;
+		const InstructionType& Get(UInt8 index) const;
 
-		inline static constexpr const SizeType sm_ExternalCall = 0;
-		inline static constexpr const SizeType sm_Set = 1;
-		inline static constexpr const SizeType sm_Copy = 2;
-		inline static constexpr const SizeType sm_Goto = 3;
-		inline static constexpr const SizeType sm_GotoRegister = 4;
-		inline static constexpr const SizeType sm_If = 5;
-
-		inline static constexpr const SizeType sm_Add = 6;
-		inline static constexpr const SizeType sm_Subtract = 7;
-		inline static constexpr const SizeType sm_Multiply = 8;
-		inline static constexpr const SizeType sm_Divide = 9;
-		inline static constexpr const SizeType sm_Mod = 10;
-		inline static constexpr const SizeType sm_And = 11;
-		inline static constexpr const SizeType sm_Or = 12;
-		inline static constexpr const SizeType sm_Xor = 13;
-		inline static constexpr const SizeType sm_Not = 14;
-		inline static constexpr const SizeType sm_ShiftLeft = 15;
-		inline static constexpr const SizeType sm_ShiftRight = 16;
-
-		inline static constexpr const SizeType sm_Equal = 17;
-		inline static constexpr const SizeType sm_NotEqual = 18;
-		inline static constexpr const SizeType sm_Less = 19;
-		inline static constexpr const SizeType sm_LessEqual = 20;
-		inline static constexpr const SizeType sm_Greater = 21;
-		inline static constexpr const SizeType sm_GreaterEqual = 22;
-
-		SPACE_LANGUAGE_API InstructionSet();
-		SPACE_LANGUAGE_API const InstructionType& Get(SizeType index) const;
+		friend DefaultAllocator;
 
 	private:
-		SPACE_LANGUAGE_API static void ExternalCall(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Set(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Copy(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Goto(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void GotoRegister(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void If(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void ExternalCall(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Set(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Copy(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Goto(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void GotoRegister(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void If(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
 
-		SPACE_LANGUAGE_API static void Add(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Subtract(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Multiply(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Divide(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Mod(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void And(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Or(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Xor(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Not(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void ShiftLeft(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void ShiftRight(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Add(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Subtract(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Multiply(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Divide(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Mod(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void And(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Or(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Xor(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Not(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void ShiftLeft(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void ShiftRight(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
 
-		SPACE_LANGUAGE_API static void Equal(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void NotEqual(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Less(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void LessEqual(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void Greater(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
-		SPACE_LANGUAGE_API static void GreaterEqual(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Equal(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void NotEqual(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Less(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void LessEqual(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void Greater(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
+		static void GreaterEqual(Registers& regs, void* pargs, const ExternalCaller& ext_caller);
 
 	private:
-		InstructionType m_InstructionTypes[sm_Size];
+		InstructionType m_InstructionTypes[InstructionSetSize];
 	};
 
 	/*!

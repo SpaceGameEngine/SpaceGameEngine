@@ -17,3 +17,45 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
+
+bool SpaceGameEngine::SpaceLanguage::InvalidInstructionsError::Judge(void* ptr, SizeType size)
+{
+	if (ptr == nullptr || size == 0)
+		return true;
+	else
+	{
+		SizeType i = 0;
+		while (i < size)
+		{
+			if (*((UInt8*)ptr + i) >= InstructionSetSize)
+				return true;
+			i += InstructionSet::GetSingleton().Get(*((UInt8*)ptr + i)).m_Size;
+		}
+		return i != size;
+	}
+}
+
+void SpaceGameEngine::SpaceLanguage::VirtualMachine::Run(void* ptr, SizeType size)
+{
+	SGE_ASSERT(NullPointerError, ptr);
+	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+	SGE_ASSERT(InvalidInstructionsError, ptr, size);
+
+	RegisterType& pc = m_Registers.Get(SpecialRegister::ProgramCounter);
+	InstructionSet& instr_set = InstructionSet::GetSingleton();
+	while (pc < size)
+	{
+		UInt8* pnow = (UInt8*)ptr + pc;
+		instr_set.Get(*pnow).m_pFunction(m_Registers, pnow + 1, m_ExternalCaller);
+	}
+}
+
+ExternalCaller& SpaceGameEngine::SpaceLanguage::VirtualMachine::GetExternalCaller()
+{
+	return m_ExternalCaller;
+}
+
+const ExternalCaller& SpaceGameEngine::SpaceLanguage::VirtualMachine::GetExternalCaller() const
+{
+	return m_ExternalCaller;
+}

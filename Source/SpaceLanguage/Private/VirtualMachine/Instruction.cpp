@@ -26,9 +26,9 @@ SpaceGameEngine::SpaceLanguage::InstructionType::InstructionType()
 SpaceGameEngine::SpaceLanguage::InstructionType::InstructionType(UInt8 index, const String& name, UInt8 size, InstructionFunctionType pfunc)
 	: m_Index(index), m_Name(name), m_Size(size), m_pFunction(pfunc)
 {
-	SGE_ASSERT(InvalidValueError, index, 0, InstructionSet::sm_Size - 1);
+	SGE_ASSERT(InvalidValueError, index, 0, InstructionSetSize - 1);
 	SGE_ASSERT(String::EmptyStringCoreError, name.GetSize());
-	SGE_ASSERT(InvalidValueError, size, 1, InstructionSet::sm_MaxInstructionSize);
+	SGE_ASSERT(InvalidValueError, size, 1, MaxInstructionSize);
 	SGE_ASSERT(NullPointerError, pfunc);
 }
 
@@ -60,9 +60,9 @@ SpaceGameEngine::SpaceLanguage::InstructionSet::InstructionSet()
 	DEF_INSTR(22, SGE_STR("GreaterEqual"), 4, GreaterEqual);
 }
 
-const InstructionType& SpaceGameEngine::SpaceLanguage::InstructionSet::Get(SizeType index) const
+const InstructionType& SpaceGameEngine::SpaceLanguage::InstructionSet::Get(UInt8 index) const
 {
-	SGE_ASSERT(InvalidValueError, index, 0, sm_Size - 1);
+	SGE_ASSERT(InvalidValueError, index, 0, InstructionSetSize - 1);
 	return m_InstructionTypes[index];
 }
 
@@ -73,10 +73,10 @@ const InstructionType& SpaceGameEngine::SpaceLanguage::InstructionSet::Get(SizeT
 #define DATA0 PARGS_CAST(0, UInt64)
 #define DATA1 PARGS_CAST(1, UInt64)
 
-#define EC_ARG0 regs.Get(Registers::sm_Argument0)
-#define EC_ARG1 regs.Get(Registers::sm_Argument1)
-#define EC_ARG2 regs.Get(Registers::sm_Argument2)
-#define PC regs.Get(Registers::sm_ProgramCounter)
+#define EC_ARG0 regs.Get(SpecialRegister::Argument0)
+#define EC_ARG1 regs.Get(SpecialRegister::Argument1)
+#define EC_ARG2 regs.Get(SpecialRegister::Argument2)
+#define PC regs.Get(SpecialRegister::ProgramCounter)
 #define R_ARG0 regs.Get(ARG0)
 #define R_ARG1 regs.Get(ARG1)
 #define R_ARG2 regs.Get(ARG2)

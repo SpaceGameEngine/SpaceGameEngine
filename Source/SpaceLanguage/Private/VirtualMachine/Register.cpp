@@ -24,14 +24,14 @@ SpaceGameEngine::SpaceLanguage::Registers::Registers()
 	memset(m_Registers, 0, sizeof(m_Registers));
 }
 
-RegisterType& SpaceGameEngine::SpaceLanguage::Registers::Get(SizeType index)
+RegisterType& SpaceGameEngine::SpaceLanguage::Registers::Get(UInt8 index)
 {
-	SGE_ASSERT(InvalidValueError, index, 0, sm_Size - 1);
+	SGE_ASSERT(InvalidValueError, index, 0, RegistersSize - 1);
 	return m_Registers[index];
 }
 
-const RegisterType& SpaceGameEngine::SpaceLanguage::Registers::Get(SizeType index) const
+const RegisterType& SpaceGameEngine::SpaceLanguage::Registers::Get(UInt8 index) const
 {
-	SGE_ASSERT(InvalidValueError, index, 0, sm_Size - 1);
+	SGE_ASSERT(InvalidValueError, index, 0, RegistersSize - 1);
 	return m_Registers[index];
 }
