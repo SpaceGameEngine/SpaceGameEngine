@@ -35,10 +35,16 @@ TEST(Registers, Test)
 TEST(ExternalCaller, Test)
 {
 	ExternalCaller ec;
+
 	ASSERT_FALSE(ec.IsHasExternalCallFunction(123));
 	ec.AddExternalCallFunction(123, (ExternalCallFunctionType)456);
 	ASSERT_TRUE(ec.IsHasExternalCallFunction(123));
 	ASSERT_EQ(ec.GetExternalCallFunction(123), (ExternalCallFunctionType)456);
+
+	ASSERT_FALSE(ec.IsHasExternalCallFunction(127, 789));
+	ec.AddExternalCallFunction(127, 789, (ExternalCallFunctionType)101112);
+	ASSERT_TRUE(ec.IsHasExternalCallFunction(127, 789));
+	ASSERT_EQ(ec.GetExternalCallFunction(127, 789), (ExternalCallFunctionType)101112);
 }
 
 TEST(InstructionSet, ExternalCallTest)
@@ -908,4 +914,76 @@ TEST(InstructionSet, GreaterEqualTest)
 TEST(VirtualMachine, Test)
 {
 	VirtualMachine vm;
+	vm.GetExternalCaller().AddExternalCallFunction(1, 0, [](RegisterType& r1, RegisterType& r2, RegisterType& r3) -> RegisterType {
+		*(UInt64*)r1 = r2;
+		return 1;
+	});
+	UInt8 code[94];
+	UInt64 data;
+	UInt64 result = 0;
+	/*
+	for(i:0->10)
+		sum+=i;
+	*/
+	code[0] = InstructionTypeIndex::Set;
+	code[1] = 6;
+	data = 0;
+	memcpy(code + 2, &data, sizeof(data));
+
+	code[10] = InstructionTypeIndex::Set;
+	code[11] = 7;
+	data = 1;
+	memcpy(code + 12, &data, sizeof(data));
+
+	code[20] = InstructionTypeIndex::Set;
+	code[21] = 8;
+	data = 0;
+	memcpy(code + 22, &data, sizeof(data));
+
+	code[30] = InstructionTypeIndex::Set;
+	code[31] = 9;
+	data = 10;
+	memcpy(code + 32, &data, sizeof(data));
+
+	code[40] = InstructionTypeIndex::Add;
+	code[41] = 6;
+	code[42] = 6;
+	code[43] = 7;
+
+	code[44] = InstructionTypeIndex::Greater;
+	code[45] = 10;
+	code[46] = 6;
+	code[47] = 9;
+
+	code[48] = InstructionTypeIndex::If;
+	code[49] = 10;
+	data = 71;
+	memcpy(code + 50, &data, sizeof(data));
+
+	code[58] = InstructionTypeIndex::Add;
+	code[59] = 8;
+	code[60] = 8;
+	code[61] = 6;
+
+	code[62] = InstructionTypeIndex::Goto;
+	data = 40;
+	memcpy(code + 63, &data, sizeof(data));
+
+	code[71] = InstructionTypeIndex::Set;
+	code[72] = SpecialRegister::Argument0;
+	data = (UInt64)&result;
+	memcpy(code + 73, &data, sizeof(data));
+
+	code[81] = InstructionTypeIndex::Copy;
+	code[82] = SpecialRegister::Argument1;
+	code[83] = 8;
+
+	code[84] = InstructionTypeIndex::ExternalCall;
+	code[85] = 11;
+	data = ExternalCaller::GetIndex(1, 0);
+	memcpy(code + 86, &data, sizeof(data));
+
+	vm.Run(code, sizeof(code));
+
+	ASSERT_EQ(result, 55);
 }

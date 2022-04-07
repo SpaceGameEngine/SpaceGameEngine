@@ -37,6 +37,12 @@ namespace SpaceGameEngine::SpaceLanguage
 		ExternalCallFunctionType GetExternalCallFunction(UInt64 index) const;
 		bool IsHasExternalCallFunction(UInt64 index) const;
 
+		void AddExternalCallFunction(UInt32 module_index, UInt32 func_index, ExternalCallFunctionType pfunc);
+		ExternalCallFunctionType GetExternalCallFunction(UInt32 module_index, UInt32 func_index) const;
+		bool IsHasExternalCallFunction(UInt32 module_index, UInt32 func_index) const;
+
+		static UInt64 GetIndex(UInt32 module_index, UInt32 func_index);
+
 	private:
 		HashMap<UInt64, ExternalCallFunctionType> m_Functions;
 	};

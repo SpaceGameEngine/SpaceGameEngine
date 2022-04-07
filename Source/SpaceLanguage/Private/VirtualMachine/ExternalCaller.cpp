@@ -37,6 +37,31 @@ bool SpaceGameEngine::SpaceLanguage::ExternalCaller::IsHasExternalCallFunction(U
 	return m_Functions.Find(index) != m_Functions.GetConstEnd();
 }
 
+void SpaceGameEngine::SpaceLanguage::ExternalCaller::AddExternalCallFunction(UInt32 module_index, UInt32 func_index, ExternalCallFunctionType pfunc)
+{
+	SGE_ASSERT(NullPointerError, pfunc);
+	UInt64 index = GetIndex(module_index, func_index);
+	SGE_ASSERT(ExternalCallFunctionAlreadyExistError, m_Functions.Find(index), m_Functions);
+	m_Functions.Insert(index, pfunc);
+}
+
+ExternalCallFunctionType SpaceGameEngine::SpaceLanguage::ExternalCaller::GetExternalCallFunction(UInt32 module_index, UInt32 func_index) const
+{
+	auto iter = m_Functions.Find(GetIndex(module_index, func_index));
+	SGE_ASSERT(ExternalCallFunctionNotFoundError, iter, m_Functions);
+	return iter->m_Second;
+}
+
+bool SpaceGameEngine::SpaceLanguage::ExternalCaller::IsHasExternalCallFunction(UInt32 module_index, UInt32 func_index) const
+{
+	return m_Functions.Find(GetIndex(module_index, func_index)) != m_Functions.GetConstEnd();
+}
+
+UInt64 SpaceGameEngine::SpaceLanguage::ExternalCaller::GetIndex(UInt32 module_index, UInt32 func_index)
+{
+	return ((UInt64)(module_index) << 32) | func_index;
+}
+
 bool SpaceGameEngine::SpaceLanguage::ExternalCallFunctionAlreadyExistError::Judge(const HashMap<UInt64, ExternalCallFunctionType>::ConstIterator& iter, const HashMap<UInt64, ExternalCallFunctionType>& hash_map)
 {
 	return iter != hash_map.GetConstEnd();
