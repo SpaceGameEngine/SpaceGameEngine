@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "VirtualMachine/VirtualMachine.h"
+#include "VirtualMachine/ExternalCallerModule/CoreModule.h"
 #include "gtest/gtest.h"
 #include <cstring>
 

@@ -164,6 +164,7 @@
     <ClInclude Include="Private\SpaceLanguageModule.h" />
     <ClInclude Include="Public\SpaceLanguageAPI.h" />
     <ClInclude Include="Public\VirtualMachine\ExternalCaller.h" />
+    <ClInclude Include="Public\VirtualMachine\ExternalCallerModule\CoreModule.h" />
     <ClInclude Include="Public\VirtualMachine\Instruction.h" />
     <ClInclude Include="Public\VirtualMachine\Register.h" />
     <ClInclude Include="Public\VirtualMachine\VirtualMachine.h" />
@@ -171,6 +172,7 @@
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp" />
     <ClCompile Include="Private\VirtualMachine\ExternalCaller.cpp" />
+    <ClCompile Include="Private\VirtualMachine\ExternalCallerModule\CoreModule.cpp" />
     <ClCompile Include="Private\VirtualMachine\Instruction.cpp" />
     <ClCompile Include="Private\VirtualMachine\Register.cpp" />
     <ClCompile Include="Private\VirtualMachine\VirtualMachine.cpp" />
