@@ -33,15 +33,15 @@ namespace SpaceGameEngine::SpaceLanguage
 	class SPACE_LANGUAGE_API ExternalCaller : public UncopyableAndUnmovable
 	{
 	public:
-		void AddExternalCallFunction(UInt64 index, ExternalCallFunctionType pfunc);
-		ExternalCallFunctionType GetExternalCallFunction(UInt64 index) const;
-		bool IsHasExternalCallFunction(UInt64 index) const;
+		void AddExternalCallFunction(UInt64 id, ExternalCallFunctionType pfunc);
+		ExternalCallFunctionType GetExternalCallFunction(UInt64 id) const;
+		bool IsHasExternalCallFunction(UInt64 id) const;
 
-		void AddExternalCallFunction(UInt32 module_index, UInt32 func_index, ExternalCallFunctionType pfunc);
-		ExternalCallFunctionType GetExternalCallFunction(UInt32 module_index, UInt32 func_index) const;
-		bool IsHasExternalCallFunction(UInt32 module_index, UInt32 func_index) const;
+		void AddExternalCallFunction(UInt32 module_id, UInt32 func_id, ExternalCallFunctionType pfunc);
+		ExternalCallFunctionType GetExternalCallFunction(UInt32 module_id, UInt32 func_id) const;
+		bool IsHasExternalCallFunction(UInt32 module_id, UInt32 func_id) const;
 
-		static UInt64 GetIndex(UInt32 module_index, UInt32 func_index);
+		static UInt64 GetIndex(UInt32 module_id, UInt32 func_id);
 
 	private:
 		HashMap<UInt64, ExternalCallFunctionType> m_Functions;

@@ -23,6 +23,13 @@ namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule
 	@{
 	*/
 
+	namespace CoreModule
+	{
+		inline constexpr const UInt32 Id = 0;
+
+		SPACE_LANGUAGE_API void LoadIntoExternalCaller(ExternalCaller& ec);
+	}
+
 	/*!
 	@}
 	*/

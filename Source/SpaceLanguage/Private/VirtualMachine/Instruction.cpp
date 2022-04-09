@@ -241,3 +241,67 @@ void SpaceGameEngine::SpaceLanguage::InstructionSet::GreaterEqual(Registers& reg
 	R_ARG0 = (R_ARG1 >= R_ARG2) ? 1 : 0;
 	PC += 4;
 }
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt8 arg0)
+{
+	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
+
+	SizeType osize = m_Content.GetSize();
+	m_Content.SetSize(osize + 2, 0);
+	m_Content[osize] = instr_idx;
+	m_Content[osize + 1] = arg0;
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt8 arg1)
+{
+	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
+
+	SizeType osize = m_Content.GetSize();
+	m_Content.SetSize(osize + 3, 0);
+	m_Content[osize] = instr_idx;
+	m_Content[osize + 1] = arg0;
+	m_Content[osize + 2] = arg1;
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
+
+	SizeType osize = m_Content.GetSize();
+	m_Content.SetSize(osize + 4, 0);
+	m_Content[osize] = instr_idx;
+	m_Content[osize + 1] = arg0;
+	m_Content[osize + 2] = arg1;
+	m_Content[osize + 3] = arg2;
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt64 data)
+{
+	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
+
+	SizeType osize = m_Content.GetSize();
+	m_Content.SetSize(osize + 9, 0);
+	m_Content[osize] = instr_idx;
+	memcpy(m_Content.GetData() + osize + 1, &data, sizeof(data));
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt64 data)
+{
+	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
+
+	SizeType osize = m_Content.GetSize();
+	m_Content.SetSize(osize + 10, 0);
+	m_Content[osize] = instr_idx;
+	m_Content[osize + 1] = arg0;
+	memcpy(m_Content.GetData() + osize + 2, &data, sizeof(data));
+}
+
+const void* SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GetData() const
+{
+	return m_Content.GetData();
+}
+
+SizeType SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GetSize() const
+{
+	return m_Content.GetSize();
+}

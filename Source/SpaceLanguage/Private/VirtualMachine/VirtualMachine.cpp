@@ -18,7 +18,7 @@ limitations under the License.
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
 
-bool SpaceGameEngine::SpaceLanguage::InvalidInstructionsError::Judge(void* ptr, SizeType size)
+bool SpaceGameEngine::SpaceLanguage::InvalidInstructionsError::Judge(const void* ptr, SizeType size)
 {
 	if (ptr == nullptr || size == 0)
 		return true;
@@ -35,7 +35,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidInstructionsError::Judge(void* ptr, 
 	}
 }
 
-void SpaceGameEngine::SpaceLanguage::VirtualMachine::Run(void* ptr, SizeType size)
+void SpaceGameEngine::SpaceLanguage::VirtualMachine::Run(const void* ptr, SizeType size)
 {
 	SGE_ASSERT(NullPointerError, ptr);
 	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);

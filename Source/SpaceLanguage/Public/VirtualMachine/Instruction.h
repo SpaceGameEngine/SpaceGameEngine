@@ -17,6 +17,7 @@ limitations under the License.
 #include "ExternalCaller.h"
 #include "SGEString.hpp"
 #include "Utility/Singleton.hpp"
+#include "Container/Vector.hpp"
 
 namespace SpaceGameEngine::SpaceLanguage
 {
@@ -109,6 +110,26 @@ namespace SpaceGameEngine::SpaceLanguage
 
 	private:
 		InstructionType m_InstructionTypes[InstructionSetSize];
+	};
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API Vector<UInt8>;
+#endif
+
+	class SPACE_LANGUAGE_API InstructionsGenerator
+	{
+	public:
+		void AddInstruction(UInt8 instr_idx, UInt8 arg0);
+		void AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt8 arg1);
+		void AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void AddInstruction(UInt8 instr_idx, UInt64 data);
+		void AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt64 data);
+
+		const void* GetData() const;
+		SizeType GetSize() const;
+
+	private:
+		Vector<UInt8> m_Content;
 	};
 
 	/*!

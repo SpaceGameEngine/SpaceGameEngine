@@ -912,6 +912,50 @@ TEST(InstructionSet, GreaterEqualTest)
 	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 52);
 }
 
+TEST(InstructionsGenerator, BasicTest)
+{
+	InstructionsGenerator ig;
+
+	SizeType osize = ig.GetSize();
+	ASSERT_EQ(osize, 0);
+
+	ig.AddInstruction(InstructionTypeIndex::GotoRegister, (UInt8)10);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 2);
+	ASSERT_EQ(*(UInt8*)ig.GetData(), InstructionTypeIndex::GotoRegister);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 1), 10);
+
+	ig.AddInstruction(InstructionTypeIndex::Copy, (UInt8)11, (UInt8)12);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 5);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 2), InstructionTypeIndex::Copy);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 3), 11);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 4), 12);
+
+	ig.AddInstruction(InstructionTypeIndex::Add, (UInt8)11, (UInt8)12, (UInt8)13);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 9);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 5), InstructionTypeIndex::Add);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 6), 11);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 7), 12);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 8), 13);
+
+	UInt64 data = 123456;
+	ig.AddInstruction(InstructionTypeIndex::Goto, data);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 18);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 9), InstructionTypeIndex::Goto);
+	ASSERT_EQ(memcmp((UInt8*)ig.GetData() + 10, &data, sizeof(data)), 0);
+
+	data = 654321;
+	ig.AddInstruction(InstructionTypeIndex::Set, 14, data);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 28);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 18), InstructionTypeIndex::Set);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 19), 14);
+	ASSERT_EQ(memcmp((UInt8*)ig.GetData() + 20, &data, sizeof(data)), 0);
+}
+
 TEST(VirtualMachine, Test)
 {
 	VirtualMachine vm;
