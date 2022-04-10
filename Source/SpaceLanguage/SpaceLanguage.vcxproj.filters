@@ -45,6 +45,9 @@
     <ClInclude Include="Public\VirtualMachine\ExternalCallerModule\CoreModule.h">
       <Filter>Public\VirtualMachine\ExternalCallerModule</Filter>
     </ClInclude>
+    <ClInclude Include="Public\VirtualMachine\Assembler.h">
+      <Filter>Public\VirtualMachine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp">
@@ -64,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="Private\VirtualMachine\ExternalCallerModule\CoreModule.cpp">
       <Filter>Private\VirtualMachine\ExternalCallerModule</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VirtualMachine\Assembler.cpp">
+      <Filter>Private\VirtualMachine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

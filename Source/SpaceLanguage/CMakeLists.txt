@@ -5,6 +5,7 @@ add_library(SpaceLanguage SHARED
         Private/VirtualMachine/ExternalCaller.cpp
         Private/VirtualMachine/VirtualMachine.cpp
         Private/VirtualMachine/ExternalCallerModule/CoreModule.cpp
+        Private/VirtualMachine/Assembler.cpp
         )
 add_compile_definitions(SPACE_LANGUAGE_EXPORTS)
 target_include_directories(SpaceLanguage PUBLIC Public)

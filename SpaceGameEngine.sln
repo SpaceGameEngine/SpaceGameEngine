@@ -93,6 +93,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VirtualMachine", "VirtualMa
 		Document\Document\SpaceLanguage\VirtualMachine\Register.md = Document\Document\SpaceLanguage\VirtualMachine\Register.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExternalCallerModule", "ExternalCallerModule", "{7D22DB28-5B9B-4376-80DA-00215E8D41BC}"
+	ProjectSection(SolutionItems) = preProject
+		Document\Document\SpaceLanguage\VirtualMachine\ExternalCallerModule\CoreModule.md = Document\Document\SpaceLanguage\VirtualMachine\ExternalCallerModule\CoreModule.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -212,6 +217,7 @@ Global
 		{6C3E06DD-648F-4F8E-B0BC-FB6BEA309A55} = {E09406D8-3CBC-473A-8715-05471C55AAFA}
 		{5B97E2EC-0786-47E2-A683-80BA9F8C59C5} = {F93E7284-FB8F-468F-A220-8A4AA2AEC39F}
 		{7AD471A5-9F91-4E89-8753-0E94002507F4} = {5B97E2EC-0786-47E2-A683-80BA9F8C59C5}
+		{7D22DB28-5B9B-4376-80DA-00215E8D41BC} = {7AD471A5-9F91-4E89-8753-0E94002507F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}
