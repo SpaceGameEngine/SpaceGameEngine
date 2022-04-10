@@ -1668,7 +1668,35 @@ void SpaceGameEngine::FileCore<Char8, UTF8Trait>::RemoveBomHeader()
 
 bool SpaceGameEngine::UnknownFileLineBreakError::Judge(FileLineBreak flb)
 {
-	return flb == FileLineBreak::Unknown;
+	return flb == FileLineBreak::Unknown || (UInt8)flb > 3;
+}
+
+FileLineBreak SpaceGameEngine::GetFileLineBreakCore<Char16, UCS2Trait>::Get(Char16 c1, Char16 c2)
+{
+	if (c1 == SGE_WSTR('\r') && c2 == SGE_WSTR('\n'))
+		return FileLineBreak::CRLF;
+	else if (c1 == SGE_WSTR('\n'))
+		return FileLineBreak::LF;
+	else if (c1 == SGE_WSTR('\r'))
+		return FileLineBreak::CR;
+	else
+		return FileLineBreak::Unknown;
+}
+
+FileLineBreak SpaceGameEngine::GetFileLineBreakCore<Char8, UTF8Trait>::Get(const Char8* pc1, const Char8* pc2)
+{
+	SGE_ASSERT(NullPointerError, pc1);
+	SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc1);
+	SGE_ASSERT(NullPointerError, pc2);
+	SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc2);
+	if ((*pc1) == SGE_U8STR('\r') && (*pc2) == SGE_U8STR('\n'))
+		return FileLineBreak::CRLF;
+	else if ((*pc1) == SGE_U8STR('\n'))
+		return FileLineBreak::LF;
+	else if ((*pc1) == SGE_U8STR('\r'))
+		return FileLineBreak::CR;
+	else
+		return FileLineBreak::Unknown;
 }
 
 FileLineBreak SpaceGameEngine::GetSystemFileLineBreak()
