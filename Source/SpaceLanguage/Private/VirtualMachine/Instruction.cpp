@@ -305,3 +305,118 @@ SizeType SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GetSize() const
 {
 	return m_Content.GetSize();
 }
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ExternalCall(UInt8 arg0, UInt64 data)
+{
+	AddInstruction(InstructionTypeIndex::ExternalCall, arg0, data);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Set(UInt8 arg0, UInt64 data)
+{
+	AddInstruction(InstructionTypeIndex::Set, arg0, data);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Copy(UInt8 arg0, UInt8 arg1)
+{
+	AddInstruction(InstructionTypeIndex::Copy, arg0, arg1);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Goto(UInt64 data)
+{
+	AddInstruction(InstructionTypeIndex::Goto, data);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GotoRegister(UInt8 arg0)
+{
+	AddInstruction(InstructionTypeIndex::GotoRegister, arg0);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::If(UInt8 arg0, UInt64 data)
+{
+	AddInstruction(InstructionTypeIndex::If, arg0, data);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Add(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Add, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Subtract(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Subtract, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Multiply(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Multiply, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Divide(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Divide, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Mod(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Mod, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::And(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::And, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Or(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Or, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Xor(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Xor, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Not(UInt8 arg0, UInt8 arg1)
+{
+	AddInstruction(InstructionTypeIndex::Not, arg0, arg1);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ShiftLeft(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::ShiftLeft, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ShiftRight(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::ShiftRight, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Equal(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Equal, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::NotEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::NotEqual, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Less(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Less, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::LessEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::LessEqual, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Greater(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::Greater, arg0, arg1, arg2);
+}
+
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GreaterEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+{
+	AddInstruction(InstructionTypeIndex::GreaterEqual, arg0, arg1, arg2);
+}

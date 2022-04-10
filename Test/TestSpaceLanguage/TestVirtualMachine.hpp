@@ -956,6 +956,194 @@ TEST(InstructionsGenerator, BasicTest)
 	ASSERT_EQ(memcmp((UInt8*)ig.GetData() + 20, &data, sizeof(data)), 0);
 }
 
+TEST(InstructionsGenerator, InstructionTest)
+{
+	InstructionsGenerator ig;
+
+	SizeType osize = ig.GetSize();
+	UInt64 data = 0;
+	ASSERT_EQ(osize, 0);
+
+	data = 345;
+	ig.ExternalCall(12, data);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 10);
+	ASSERT_EQ(*(UInt8*)ig.GetData(), InstructionTypeIndex::ExternalCall);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 1), 12);
+	ASSERT_EQ(memcmp((UInt8*)ig.GetData() + 2, &data, sizeof(data)), 0);
+
+	data = 678;
+	ig.Set(13, data);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 20);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 10), InstructionTypeIndex::Set);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 11), 13);
+	ASSERT_EQ(memcmp((UInt8*)ig.GetData() + 12, &data, sizeof(data)), 0);
+
+	ig.Copy(14, 13);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 23);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 20), InstructionTypeIndex::Copy);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 21), 14);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 22), 13);
+
+	data = 32;
+	ig.Goto(32);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 32);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 23), InstructionTypeIndex::Goto);
+	ASSERT_EQ(memcmp((UInt8*)ig.GetData() + 24, &data, sizeof(data)), 0);
+
+	ig.GotoRegister(14);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 34);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 32), InstructionTypeIndex::GotoRegister);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 33), 14);
+
+	data = 32;
+	ig.If(15, data);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 44);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 34), InstructionTypeIndex::If);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 35), 15);
+	ASSERT_EQ(memcmp((UInt8*)ig.GetData() + 36, &data, sizeof(data)), 0);
+
+	ig.Add(16, 17, 18);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 48);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 44), InstructionTypeIndex::Add);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 45), 16);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 46), 17);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 47), 18);
+
+	ig.Subtract(19, 20, 21);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 52);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 48), InstructionTypeIndex::Subtract);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 49), 19);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 50), 20);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 51), 21);
+
+	ig.Multiply(22, 23, 24);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 56);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 52), InstructionTypeIndex::Multiply);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 53), 22);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 54), 23);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 55), 24);
+
+	ig.Divide(25, 26, 27);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 60);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 56), InstructionTypeIndex::Divide);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 57), 25);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 58), 26);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 59), 27);
+
+	ig.Mod(28, 29, 30);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 64);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 60), InstructionTypeIndex::Mod);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 61), 28);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 62), 29);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 63), 30);
+
+	ig.And(29, 30, 31);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 68);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 64), InstructionTypeIndex::And);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 65), 29);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 66), 30);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 67), 31);
+
+	ig.Or(26, 27, 28);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 72);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 68), InstructionTypeIndex::Or);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 69), 26);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 70), 27);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 71), 28);
+
+	ig.Xor(23, 24, 25);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 76);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 72), InstructionTypeIndex::Xor);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 73), 23);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 74), 24);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 75), 25);
+
+	ig.Not(21, 22);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 79);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 76), InstructionTypeIndex::Not);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 77), 21);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 78), 22);
+
+	ig.ShiftLeft(18, 19, 20);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 83);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 79), InstructionTypeIndex::ShiftLeft);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 80), 18);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 81), 19);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 82), 20);
+
+	ig.ShiftRight(15, 16, 17);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 87);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 83), InstructionTypeIndex::ShiftRight);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 84), 15);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 85), 16);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 86), 17);
+
+	ig.Equal(12, 13, 14);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 91);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 87), InstructionTypeIndex::Equal);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 88), 12);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 89), 13);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 90), 14);
+
+	ig.NotEqual(9, 10, 11);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 95);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 91), InstructionTypeIndex::NotEqual);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 92), 9);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 93), 10);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 94), 11);
+
+	ig.Less(6, 7, 8);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 99);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 95), InstructionTypeIndex::Less);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 96), 6);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 97), 7);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 98), 8);
+
+	ig.LessEqual(9, 10, 11);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 103);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 99), InstructionTypeIndex::LessEqual);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 100), 9);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 101), 10);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 102), 11);
+
+	ig.Greater(12, 13, 14);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 107);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 103), InstructionTypeIndex::Greater);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 104), 12);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 105), 13);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 106), 14);
+
+	ig.GreaterEqual(15, 16, 17);
+	osize = ig.GetSize();
+	ASSERT_EQ(osize, 111);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 107), InstructionTypeIndex::GreaterEqual);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 108), 15);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 109), 16);
+	ASSERT_EQ(*((UInt8*)ig.GetData() + 110), 17);
+}
+
 TEST(VirtualMachine, Test)
 {
 	VirtualMachine vm;
@@ -1029,6 +1217,40 @@ TEST(VirtualMachine, Test)
 	memcpy(code + 86, &data, sizeof(data));
 
 	vm.Run(code, sizeof(code));
+
+	ASSERT_EQ(result, 55);
+}
+
+TEST(VirtualMachine, InstructionsGeneratorTest)
+{
+	VirtualMachine vm;
+	vm.GetExternalCaller().AddExternalCallFunction(1, 0, [](RegisterType& r1, RegisterType& r2, RegisterType& r3) -> RegisterType {
+		*(UInt64*)r1 = r2;
+		return 1;
+	});
+	InstructionsGenerator ig;
+	UInt64 result = 0;
+
+	/*
+	for(i:0->10)
+		sum+=i;
+	*/
+	ig.Set(6, 0);
+	ig.Set(7, 1);
+	ig.Set(8, 0);
+	ig.Set(9, 10);
+	ig.Add(6, 6, 7);
+	ig.Greater(10, 6, 9);
+	ig.If(10, 71);
+	ig.Add(8, 8, 6);
+	ig.Goto(40);
+	ig.Set(SpecialRegister::Argument0, (UInt64)&result);
+	ig.Copy(SpecialRegister::Argument1, 8);
+	ig.ExternalCall(11, ExternalCaller::GetIndex(1, 0));
+
+	ASSERT_EQ(ig.GetSize(), 94);
+
+	vm.Run(ig.GetData(), ig.GetSize());
 
 	ASSERT_EQ(result, 55);
 }

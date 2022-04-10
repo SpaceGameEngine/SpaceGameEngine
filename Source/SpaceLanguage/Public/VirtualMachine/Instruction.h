@@ -128,6 +128,32 @@ namespace SpaceGameEngine::SpaceLanguage
 		const void* GetData() const;
 		SizeType GetSize() const;
 
+		void ExternalCall(UInt8 arg0, UInt64 data);
+		void Set(UInt8 arg0, UInt64 data);
+		void Copy(UInt8 arg0, UInt8 arg1);
+		void Goto(UInt64 data);
+		void GotoRegister(UInt8 arg0);
+		void If(UInt8 arg0, UInt64 data);
+
+		void Add(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Subtract(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Multiply(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Divide(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Mod(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void And(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Or(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Xor(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Not(UInt8 arg0, UInt8 arg1);
+		void ShiftLeft(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void ShiftRight(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+
+		void Equal(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void NotEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Less(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void LessEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void Greater(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		void GreaterEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2);
+
 	private:
 		Vector<UInt8> m_Content;
 	};
