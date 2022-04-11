@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\SpaceLanguageModule.h" />
+    <ClInclude Include="Public\Lexer.h" />
     <ClInclude Include="Public\SpaceLanguageAPI.h" />
     <ClInclude Include="Public\VirtualMachine\Assembler.h" />
     <ClInclude Include="Public\VirtualMachine\ExternalCaller.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Public\VirtualMachine\VirtualMachine.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Lexer.cpp" />
     <ClCompile Include="Private\SpaceLanguageModule.cpp" />
     <ClCompile Include="Private\VirtualMachine\Assembler.cpp" />
     <ClCompile Include="Private\VirtualMachine\ExternalCaller.cpp" />

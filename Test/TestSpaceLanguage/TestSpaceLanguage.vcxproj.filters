@@ -6,5 +6,6 @@
   <ItemGroup>
     <ClInclude Include="TestVirtualMachine.hpp" />
     <ClInclude Include="TestAssembler.hpp" />
+    <ClInclude Include="TestLexer.hpp" />
   </ItemGroup>
 </Project>
