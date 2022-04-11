@@ -23,6 +23,24 @@ namespace SpaceGameEngine::SpaceLanguage
 	@{
 	*/
 
+	enum class TokenType : UInt8
+	{
+		Identifier = 0,
+		IntegerLiteral = 1,
+		FloatLiteral = 2,
+		DoubleLiteral = 3,
+		CharacterLiteral = 4,
+		StringLiteral = 5,
+		LineSeparator = 6,
+		WordSeparator = 7
+	};
+
+	struct Token
+	{
+		TokenType m_Type;
+		String m_Content;
+	};
+
 	/*!
 	@}
 	*/

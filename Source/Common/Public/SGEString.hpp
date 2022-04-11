@@ -4466,19 +4466,19 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename T, typename Trait = CharTrait<T>>
+	template<NumberBase Base, typename T, typename Trait = CharTrait<T>>
 	struct IsNumericalCharacterCore
 	{
 	};
 
-	template<typename T, typename Trait = CharTrait<T>, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
+	template<NumberBase Base, typename T, typename Trait = CharTrait<T>, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
 	inline bool IsNumericalCharacter(ArgType c)
 	{
-		return IsNumericalCharacterCore<T, Trait>::Get(c);
+		return IsNumericalCharacterCore<Base, T, Trait>::Get(c);
 	}
 
 	template<>
-	struct IsNumericalCharacterCore<Char16, UCS2Trait>
+	struct IsNumericalCharacterCore<NumberBase::Decimal, Char16, UCS2Trait>
 	{
 		inline static bool Get(Char16 c)
 		{
@@ -4487,13 +4487,53 @@ namespace SpaceGameEngine
 	};
 
 	template<>
-	struct IsNumericalCharacterCore<Char8, UTF8Trait>
+	struct IsNumericalCharacterCore<NumberBase::Binary, Char16, UCS2Trait>
+	{
+		inline static bool Get(Char16 c)
+		{
+			return c == SGE_WSTR('0') || c == SGE_WSTR('1');
+		}
+	};
+
+	template<>
+	struct IsNumericalCharacterCore<NumberBase::Hex, Char16, UCS2Trait>
+	{
+		inline static bool Get(Char16 c)
+		{
+			return (c >= SGE_WSTR('0') && c <= SGE_WSTR('9')) || (c >= SGE_WSTR('a') && c <= SGE_WSTR('f')) || (c >= SGE_WSTR('A') && c <= SGE_WSTR('F'));
+		}
+	};
+
+	template<>
+	struct IsNumericalCharacterCore<NumberBase::Decimal, Char8, UTF8Trait>
 	{
 		inline static bool Get(const Char8* pc)
 		{
 			SGE_ASSERT(NullPointerError, pc);
 			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);
 			return (*pc) >= SGE_U8STR('0') && (*pc) <= SGE_U8STR('9');
+		}
+	};
+
+	template<>
+	struct IsNumericalCharacterCore<NumberBase::Binary, Char8, UTF8Trait>
+	{
+		inline static bool Get(const Char8* pc)
+		{
+			SGE_ASSERT(NullPointerError, pc);
+			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);
+			return (*pc) == SGE_U8STR('0') || (*pc) == SGE_U8STR('1');
+		}
+	};
+
+	template<>
+	struct IsNumericalCharacterCore<NumberBase::Hex, Char8, UTF8Trait>
+	{
+		inline static bool Get(const Char8* pc)
+		{
+			SGE_ASSERT(NullPointerError, pc);
+			SGE_ASSERT(StringImplement::InvalidUTF8CharError, pc);
+			return ((*pc) >= SGE_U8STR('0') && (*pc) <= SGE_U8STR('9')) || ((*pc) >= SGE_U8STR('a') && (*pc) <= SGE_U8STR('f')) || ((*pc) >= SGE_U8STR('A') && (*pc) <= SGE_U8STR('F'));
 		}
 	};
 
@@ -4505,32 +4545,99 @@ namespace SpaceGameEngine
 		if (str.GetSize() == 0)
 			return false;
 
+		bool is_nega = false;
+		NumberBase base = NumberBase::Decimal;
+		auto iter = str.GetConstBegin();
+
 		if constexpr (std::is_same_v<Trait, UCS2Trait>)
 		{
-			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
 			{
 				if (str.GetSize() == 1)
 					return false;
-				else if (str[0] != SGE_WSTR('-'))
+				else if (*iter != SGE_WSTR('-'))
 					return false;
+				else
+				{
+					is_nega = true;
+					++iter;
+				}
+			}
+			if (str.GetSize() > (is_nega ? 3 : 2))
+			{
+				if (*iter == SGE_WSTR('0'))
+				{
+					++iter;
+					if (*iter == SGE_WSTR('b') || *iter == SGE_WSTR('B'))
+					{
+						base = NumberBase::Binary;
+						++iter;
+					}
+					else if (*iter == SGE_WSTR('x') || *iter == SGE_WSTR('X'))
+					{
+						base = NumberBase::Hex;
+						++iter;
+					}
+				}
 			}
 		}
 		else	//UTF8Trait
 		{
 			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
-			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
 			{
 				if (str.GetSize() == 1)
 					return false;
-				else if ((*str[0]) != SGE_U8STR('-'))
+				else if (**iter != SGE_U8STR('-'))
 					return false;
+				else
+				{
+					is_nega = true;
+					++iter;
+				}
+			}
+			if (str.GetSize() > (is_nega ? 3 : 2))
+			{
+				if (**iter == SGE_U8STR('0'))
+				{
+					++iter;
+					if (**iter == SGE_U8STR('b') || **iter == SGE_U8STR('B'))
+					{
+						base = NumberBase::Binary;
+						++iter;
+					}
+					else if (**iter == SGE_U8STR('x') || **iter == SGE_U8STR('X'))
+					{
+						base = NumberBase::Hex;
+						++iter;
+					}
+				}
 			}
 		}
 
-		for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
+		if (base == NumberBase::Decimal)
 		{
-			if (!IsNumericalCharacter<T, Trait>(*iter))
-				return false;
+			for (; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
+					return false;
+			}
+		}
+		else if (base == NumberBase::Binary)
+		{
+			for (; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<NumberBase::Binary, T, Trait>(*iter))
+					return false;
+			}
+		}
+		else if (base == NumberBase::Hex)
+		{
+			for (; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<NumberBase::Hex, T, Trait>(*iter))
+					return false;
+			}
 		}
 
 		return true;
@@ -4544,10 +4651,71 @@ namespace SpaceGameEngine
 		if (str.GetSize() == 0)
 			return false;
 
-		for (auto iter = str.GetConstBegin(); iter != str.GetConstEnd(); ++iter)
+		NumberBase base = NumberBase::Decimal;
+		auto iter = str.GetConstBegin();
+
+		if (str.GetSize() > 2)
 		{
-			if (!IsNumericalCharacter<T, Trait>(*iter))
-				return false;
+			if constexpr (std::is_same_v<Trait, UCS2Trait>)
+			{
+				if (*iter == SGE_WSTR('0'))
+				{
+					++iter;
+					if (*iter == SGE_WSTR('b') || *iter == SGE_WSTR('B'))
+					{
+						base = NumberBase::Binary;
+						++iter;
+					}
+					else if (*iter == SGE_WSTR('x') || *iter == SGE_WSTR('X'))
+					{
+						base = NumberBase::Hex;
+						++iter;
+					}
+				}
+			}
+			else	//UTF8Trait
+			{
+				static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
+				if (**iter == SGE_U8STR('0'))
+				{
+					++iter;
+					if (**iter == SGE_U8STR('b') || **iter == SGE_U8STR('B'))
+					{
+						base = NumberBase::Binary;
+						++iter;
+					}
+					else if (**iter == SGE_U8STR('x') || **iter == SGE_U8STR('X'))
+					{
+						base = NumberBase::Hex;
+						++iter;
+					}
+				}
+			}
+		}
+
+		if (base == NumberBase::Decimal)
+		{
+			for (; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
+					return false;
+			}
+		}
+		else if (base == NumberBase::Binary)
+		{
+			for (; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<NumberBase::Binary, T, Trait>(*iter))
+					return false;
+			}
+		}
+		else if (base == NumberBase::Hex)
+		{
+			for (; iter != str.GetConstEnd(); ++iter)
+			{
+				if (!IsNumericalCharacter<NumberBase::Hex, T, Trait>(*iter))
+					return false;
+			}
 		}
 
 		return true;
@@ -4565,7 +4733,7 @@ namespace SpaceGameEngine
 
 		if constexpr (std::is_same_v<Trait, UCS2Trait>)
 		{
-			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(str[0]))
 			{
 				if (str.GetSize() == 1)
 					return false;
@@ -4575,7 +4743,7 @@ namespace SpaceGameEngine
 
 			for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
 			{
-				if (!IsNumericalCharacter<T, Trait>(*iter))
+				if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
 				{
 					if (*iter != SGE_WSTR('.'))
 						return false;
@@ -4585,7 +4753,7 @@ namespace SpaceGameEngine
 							return false;
 						else if (iter + 1 == str.GetConstEnd())
 							return false;
-						else if (!IsNumericalCharacter<T, Trait>(*(iter - 1)))
+						else if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*(iter - 1)))
 							return false;
 						else
 							has_meet_point = true;
@@ -4596,7 +4764,7 @@ namespace SpaceGameEngine
 		else	//UTF8Trait
 		{
 			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
-			if (!IsNumericalCharacter<T, Trait>(str[0]))
+			if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(str[0]))
 			{
 				if (str.GetSize() == 1)
 					return false;
@@ -4606,7 +4774,7 @@ namespace SpaceGameEngine
 
 			for (auto iter = str.GetConstBegin() + 1; iter != str.GetConstEnd(); ++iter)
 			{
-				if (!IsNumericalCharacter<T, Trait>(*iter))
+				if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
 				{
 					if ((**iter) != SGE_U8STR('.'))
 						return false;
@@ -4616,7 +4784,7 @@ namespace SpaceGameEngine
 							return false;
 						else if (iter + 1 == str.GetConstEnd())
 							return false;
-						else if (!IsNumericalCharacter<T, Trait>(*(iter - 1)))
+						else if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*(iter - 1)))
 							return false;
 						else
 							has_meet_point = true;

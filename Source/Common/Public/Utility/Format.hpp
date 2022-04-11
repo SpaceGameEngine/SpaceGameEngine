@@ -90,7 +90,7 @@ namespace SpaceGameEngine
 							num_cnt = 0;
 							is_in_arg = false;
 						}
-						else if (!IsNumericalCharacter<T, Trait>(*iter))
+						else if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
 							return false;
 						else
 							num_cnt += 1;
@@ -177,7 +177,7 @@ namespace SpaceGameEngine
 							is_in_arg = false;
 							has_opt = false;
 						}
-						else if (!IsNumericalCharacter<T, Trait>(*iter))
+						else if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
 							return false;
 						else
 							num_cnt += 1;
@@ -241,7 +241,7 @@ namespace SpaceGameEngine
 
 			for (auto i = str.GetConstBegin(); i != str.GetConstEnd(); ++i)
 			{
-				if (!IsNumericalCharacter<T, Trait>(*i))
+				if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*i))
 				{
 					if (i != str.GetConstEnd() - 1)
 						return true;
@@ -302,7 +302,7 @@ namespace SpaceGameEngine
 
 				for (auto i = opt.GetConstBegin(); i != opt.GetConstEnd(); ++i)
 				{
-					if (!IsNumericalCharacter<T, Trait>(*i))
+					if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*i))
 					{
 						if (i != opt.GetConstBegin())
 							min_length = StringTo<StringCore<T, Trait, Allocator>, SizeType>(StringCore<T, Trait, Allocator>(opt.GetConstBegin(), i));
