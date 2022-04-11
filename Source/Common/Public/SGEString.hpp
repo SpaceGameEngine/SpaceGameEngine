@@ -4858,29 +4858,113 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NonSignedNumericalStringError, str);
 				bool is_negative = false;
-				typename StringType::ConstIterator next = str.GetConstBegin();
-				if (*next == SGE_WSTR('-'))
+				NumberBase base = NumberBase::Decimal;
+				typename StringType::ConstIterator iter = str.GetConstBegin();
+				if (*iter == SGE_WSTR('-'))
 				{
 					is_negative = true;
-					++next;
+					++iter;
+				}
+				if (str.GetSize() > (is_negative ? 3 : 2))
+				{
+					if (*iter == SGE_WSTR('0'))
+					{
+						++iter;
+						if (*iter == SGE_WSTR('b') || *iter == SGE_WSTR('B'))
+						{
+							base = NumberBase::Binary;
+							++iter;
+						}
+						else if (*iter == SGE_WSTR('x') || *iter == SGE_WSTR('X'))
+						{
+							base = NumberBase::Hex;
+							++iter;
+						}
+					}
 				}
 				IntegerType re = 0;
-				for (; next != str.GetConstEnd(); ++next)
+				if (base == NumberBase::Decimal)
 				{
-					re *= 10;
-					re += (*next) - SGE_WSTR('0');
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 10;
+						re += (*iter) - SGE_WSTR('0');
+					}
+				}
+				else if (base == NumberBase::Binary)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 2;
+						re += (*iter) - SGE_WSTR('0');
+					}
+				}
+				else if (base == NumberBase::Hex)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 16;
+						if (*iter >= SGE_WSTR('0') && *iter <= SGE_WSTR('9'))
+							re += (*iter) - SGE_WSTR('0');
+						else if (*iter >= SGE_WSTR('a') && *iter <= SGE_WSTR('f'))
+							re += (*iter) - SGE_WSTR('a') + 10;
+						else if (*iter >= SGE_WSTR('A') && *iter <= SGE_WSTR('F'))
+							re += (*iter) - SGE_WSTR('A') + 10;
+					}
 				}
 				return (is_negative ? -1 * re : re);
 			}
 			else
 			{
 				SGE_ASSERT(NonUnsignedNumericalStringError, str);
-				typename StringType::ConstIterator next = str.GetConstBegin();
-				IntegerType re = 0;
-				for (; next != str.GetConstEnd(); ++next)
+				NumberBase base = NumberBase::Decimal;
+				typename StringType::ConstIterator iter = str.GetConstBegin();
+				if (str.GetSize() > 2)
 				{
-					re *= 10;
-					re += (*next) - SGE_WSTR('0');
+					if (*iter == SGE_WSTR('0'))
+					{
+						++iter;
+						if (*iter == SGE_WSTR('b') || *iter == SGE_WSTR('B'))
+						{
+							base = NumberBase::Binary;
+							++iter;
+						}
+						else if (*iter == SGE_WSTR('x') || *iter == SGE_WSTR('X'))
+						{
+							base = NumberBase::Hex;
+							++iter;
+						}
+					}
+				}
+				IntegerType re = 0;
+				if (base == NumberBase::Decimal)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 10;
+						re += (*iter) - SGE_WSTR('0');
+					}
+				}
+				else if (base == NumberBase::Binary)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 2;
+						re += (*iter) - SGE_WSTR('0');
+					}
+				}
+				else if (base == NumberBase::Hex)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 16;
+						if (*iter >= SGE_WSTR('0') && *iter <= SGE_WSTR('9'))
+							re += (*iter) - SGE_WSTR('0');
+						else if (*iter >= SGE_WSTR('a') && *iter <= SGE_WSTR('f'))
+							re += (*iter) - SGE_WSTR('a') + 10;
+						else if (*iter >= SGE_WSTR('A') && *iter <= SGE_WSTR('F'))
+							re += (*iter) - SGE_WSTR('A') + 10;
+					}
 				}
 				return re;
 			}
@@ -4897,17 +4981,17 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NonDecimalStringError, str);
 			bool is_negative = false;
 			bool is_after_point = false;
-			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (*next == SGE_WSTR('-'))
+			typename StringType::ConstIterator iter = str.GetConstBegin();
+			if (*iter == SGE_WSTR('-'))
 			{
 				is_negative = true;
-				++next;
+				++iter;
 			}
 			float re = 0.0f;
 			float decimal = 1.0f;
-			for (; next != str.GetConstEnd(); ++next)
+			for (; iter != str.GetConstEnd(); ++iter)
 			{
-				if ((!is_after_point) && (*next) == SGE_WSTR('.'))
+				if ((!is_after_point) && (*iter) == SGE_WSTR('.'))
 				{
 					is_after_point = true;
 					continue;
@@ -4915,12 +4999,12 @@ namespace SpaceGameEngine
 				if (is_after_point)
 				{
 					decimal *= 0.1f;
-					re += decimal * ((float)((*next) - SGE_WSTR('0')));
+					re += decimal * ((float)((*iter) - SGE_WSTR('0')));
 				}
 				else
 				{
 					re *= 10.0f;
-					re += (float)((*next) - SGE_WSTR('0'));
+					re += (float)((*iter) - SGE_WSTR('0'));
 				}
 			}
 			return (is_negative ? -1.0f * re : re);
@@ -4937,17 +5021,17 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NonDecimalStringError, str);
 			bool is_negative = false;
 			bool is_after_point = false;
-			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (*next == SGE_WSTR('-'))
+			typename StringType::ConstIterator iter = str.GetConstBegin();
+			if (*iter == SGE_WSTR('-'))
 			{
 				is_negative = true;
-				++next;
+				++iter;
 			}
 			double re = 0.0;
 			double decimal = 1.0;
-			for (; next != str.GetConstEnd(); ++next)
+			for (; iter != str.GetConstEnd(); ++iter)
 			{
-				if ((!is_after_point) && (*next) == SGE_WSTR('.'))
+				if ((!is_after_point) && (*iter) == SGE_WSTR('.'))
 				{
 					is_after_point = true;
 					continue;
@@ -4955,12 +5039,12 @@ namespace SpaceGameEngine
 				if (is_after_point)
 				{
 					decimal *= 0.1;
-					re += decimal * ((double)((*next) - SGE_WSTR('0')));
+					re += decimal * ((double)((*iter) - SGE_WSTR('0')));
 				}
 				else
 				{
 					re *= 10.0;
-					re += (double)((*next) - SGE_WSTR('0'));
+					re += (double)((*iter) - SGE_WSTR('0'));
 				}
 			}
 			return (is_negative ? -1.0 * re : re);
@@ -4980,29 +5064,113 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(NonSignedNumericalStringError, str);
 				bool is_negative = false;
-				typename StringType::ConstIterator next = str.GetConstBegin();
-				if (**next == SGE_U8STR('-'))
+				NumberBase base = NumberBase::Decimal;
+				typename StringType::ConstIterator iter = str.GetConstBegin();
+				if (**iter == SGE_U8STR('-'))
 				{
 					is_negative = true;
-					++next;
+					++iter;
+				}
+				if (str.GetSize() > (is_negative ? 3 : 2))
+				{
+					if (**iter == SGE_U8STR('0'))
+					{
+						++iter;
+						if (**iter == SGE_U8STR('b') || **iter == SGE_U8STR('B'))
+						{
+							base = NumberBase::Binary;
+							++iter;
+						}
+						else if (**iter == SGE_U8STR('x') || **iter == SGE_U8STR('X'))
+						{
+							base = NumberBase::Hex;
+							++iter;
+						}
+					}
 				}
 				IntegerType re = 0;
-				for (; next != str.GetConstEnd(); ++next)
+				if (base == NumberBase::Decimal)
 				{
-					re *= 10;
-					re += (**next) - SGE_U8STR('0');
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 10;
+						re += (**iter) - SGE_U8STR('0');
+					}
+				}
+				else if (base == NumberBase::Binary)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 2;
+						re += (**iter) - SGE_U8STR('0');
+					}
+				}
+				else if (base == NumberBase::Hex)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 16;
+						if ((**iter) >= SGE_U8STR('0') && (**iter) <= SGE_U8STR('9'))
+							re += (**iter) - SGE_U8STR('0');
+						else if ((**iter) >= SGE_U8STR('a') && (**iter) <= SGE_U8STR('f'))
+							re += (**iter) - SGE_U8STR('a') + 10;
+						else if ((**iter) >= SGE_U8STR('A') && (**iter) <= SGE_U8STR('F'))
+							re += (**iter) - SGE_U8STR('A') + 10;
+					}
 				}
 				return (is_negative ? -1 * re : re);
 			}
 			else
 			{
 				SGE_ASSERT(NonUnsignedNumericalStringError, str);
-				typename StringType::ConstIterator next = str.GetConstBegin();
-				IntegerType re = 0;
-				for (; next != str.GetConstEnd(); ++next)
+				NumberBase base = NumberBase::Decimal;
+				typename StringType::ConstIterator iter = str.GetConstBegin();
+				if (str.GetSize() > 2)
 				{
-					re *= 10;
-					re += (**next) - SGE_U8STR('0');
+					if (**iter == SGE_U8STR('0'))
+					{
+						++iter;
+						if (**iter == SGE_U8STR('b') || **iter == SGE_U8STR('B'))
+						{
+							base = NumberBase::Binary;
+							++iter;
+						}
+						else if (**iter == SGE_U8STR('x') || **iter == SGE_U8STR('X'))
+						{
+							base = NumberBase::Hex;
+							++iter;
+						}
+					}
+				}
+				IntegerType re = 0;
+				if (base == NumberBase::Decimal)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 10;
+						re += (**iter) - SGE_U8STR('0');
+					}
+				}
+				else if (base == NumberBase::Binary)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 2;
+						re += (**iter) - SGE_U8STR('0');
+					}
+				}
+				else if (base == NumberBase::Hex)
+				{
+					for (; iter != str.GetConstEnd(); ++iter)
+					{
+						re *= 16;
+						if ((**iter) >= SGE_U8STR('0') && (**iter) <= SGE_U8STR('9'))
+							re += (**iter) - SGE_U8STR('0');
+						else if ((**iter) >= SGE_U8STR('a') && (**iter) <= SGE_U8STR('f'))
+							re += (**iter) - SGE_U8STR('a') + 10;
+						else if ((**iter) >= SGE_U8STR('A') && (**iter) <= SGE_U8STR('F'))
+							re += (**iter) - SGE_U8STR('A') + 10;
+					}
 				}
 				return re;
 			}
@@ -5019,17 +5187,17 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NonDecimalStringError, str);
 			bool is_negative = false;
 			bool is_after_point = false;
-			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (**next == SGE_U8STR('-'))
+			typename StringType::ConstIterator iter = str.GetConstBegin();
+			if (**iter == SGE_U8STR('-'))
 			{
 				is_negative = true;
-				++next;
+				++iter;
 			}
 			float re = 0.0f;
 			float decimal = 1.0f;
-			for (; next != str.GetConstEnd(); ++next)
+			for (; iter != str.GetConstEnd(); ++iter)
 			{
-				if ((!is_after_point) && (**next) == SGE_U8STR('.'))
+				if ((!is_after_point) && (**iter) == SGE_U8STR('.'))
 				{
 					is_after_point = true;
 					continue;
@@ -5037,12 +5205,12 @@ namespace SpaceGameEngine
 				if (is_after_point)
 				{
 					decimal *= 0.1f;
-					re += decimal * ((float)((**next) - SGE_U8STR('0')));
+					re += decimal * ((float)((**iter) - SGE_U8STR('0')));
 				}
 				else
 				{
 					re *= 10.0f;
-					re += (float)((**next) - SGE_U8STR('0'));
+					re += (float)((**iter) - SGE_U8STR('0'));
 				}
 			}
 			return (is_negative ? -1.0f * re : re);
@@ -5059,17 +5227,17 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NonDecimalStringError, str);
 			bool is_negative = false;
 			bool is_after_point = false;
-			typename StringType::ConstIterator next = str.GetConstBegin();
-			if (**next == SGE_U8STR('-'))
+			typename StringType::ConstIterator iter = str.GetConstBegin();
+			if (**iter == SGE_U8STR('-'))
 			{
 				is_negative = true;
-				++next;
+				++iter;
 			}
 			double re = 0.0;
 			double decimal = 1.0;
-			for (; next != str.GetConstEnd(); ++next)
+			for (; iter != str.GetConstEnd(); ++iter)
 			{
-				if ((!is_after_point) && (**next) == SGE_U8STR('.'))
+				if ((!is_after_point) && (**iter) == SGE_U8STR('.'))
 				{
 					is_after_point = true;
 					continue;
@@ -5077,12 +5245,12 @@ namespace SpaceGameEngine
 				if (is_after_point)
 				{
 					decimal *= 0.1;
-					re += decimal * ((double)((**next) - SGE_U8STR('0')));
+					re += decimal * ((double)((**iter) - SGE_U8STR('0')));
 				}
 				else
 				{
 					re *= 10.0;
-					re += (double)((**next) - SGE_U8STR('0'));
+					re += (double)((**iter) - SGE_U8STR('0'));
 				}
 			}
 			return (is_negative ? -1.0 * re : re);
