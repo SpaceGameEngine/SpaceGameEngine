@@ -19,3 +19,23 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
+
+TEST(Token, Test)
+{
+	Lexer::Token token1;
+	ASSERT_EQ(token1.m_Type, Lexer::TokenType::Unknown);
+	ASSERT_EQ(token1.m_Content.GetSize(), 0);
+
+	Lexer::Token token2(Lexer::TokenType::Identifier, SGE_STR("test"));
+	ASSERT_EQ(token2.m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(token2.m_Content, SGE_STR("test"));
+}
+
+TEST(SymbolSet, Test)
+{
+	auto& ss = Lexer::SymbolSet::GetSingleton();
+	ASSERT_EQ(ss.Get(SGE_STR(';')), Lexer::TokenType::Semicolon);
+	ASSERT_EQ(ss.Get(SGE_STR('A')), Lexer::TokenType::Unknown);
+	ASSERT_TRUE(ss.IsSymbol(SGE_STR(';')));
+	ASSERT_FALSE(ss.IsSymbol(SGE_STR('a')));
+}
