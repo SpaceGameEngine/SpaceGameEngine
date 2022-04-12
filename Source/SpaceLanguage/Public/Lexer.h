@@ -37,34 +37,34 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		StringLiteral = 6,
 		LineSeparator = 7,
 		WordSeparator = 8,
-		Exclamation = 9,		   //!
-		Hash = 10,				   //#
-		Dollar = 11,			   //$
-		Mod = 12,				   //%
-		And = 13,				   //&
-		LeftBracket = 14,		   //(
-		RightBracket = 15,		   //)
-		Multiply = 16,			   //*
-		Add = 17,				   //+
-		Comma = 18,				   //,
-		Subtract = 19,			   //-
-		Dot = 20,				   //.
-		Slash = 21,				   ///
-		Colon = 22,				   //:
-		Semicolon = 23,			   //;
-		Less = 24,				   //<
-		Equal = 25,				   //=
-		Greater = 26,			   //>
-		Question = 27,			   //?
-		At = 28,				   //@
-		LeftSquareBracket = 29,	   //[
-		Backslash = 30,			   //\ 
+		Exclamation = 9,			//!
+		Hash = 10,					//#
+		Dollar = 11,				//$
+		Mod = 12,					//%
+		And = 13,					//&
+		LeftBracket = 14,			//(
+		RightBracket = 15,			//)
+		Multiply = 16,				//*
+		Add = 17,					//+
+		Comma = 18,					//,
+		Subtract = 19,				//-
+		Dot = 20,					//.
+		Slash = 21,					///
+		Colon = 22,					//:
+		Semicolon = 23,				//;
+		Less = 24,					//<
+		Equal = 25,					//=
+		Greater = 26,				//>
+		Question = 27,				//?
+		At = 28,					//@
+		LeftSquareBracket = 29,		//[
+		Backslash = 30,				/*\*/
 		RightSquareBracket = 31,	//]
-		Caret = 32,				   //^
-		LeftCurlyBracket = 33,	   //{
-		Vertical = 34,			   //|
-		RightCurlyBracket = 35,	   //}
-		Tilde = 36,				   //~
+		Caret = 32,					//^
+		LeftCurlyBracket = 33,		//{
+		Vertical = 34,				//|
+		RightCurlyBracket = 35,		//}
+		Tilde = 36,					//~
 	};
 
 	struct SPACE_LANGUAGE_API Token
