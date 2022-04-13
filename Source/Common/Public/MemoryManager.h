@@ -157,7 +157,7 @@ namespace SpaceGameEngine
 		};
 
 		/*
-		class MultiThreadBufferedFixedSizeAllocator : public FixedSizeAllocator
+		class COMMON_API MultiThreadBufferedFixedSizeAllocator : public FixedSizeAllocator
 		{
 		public:
 			MultiThreadBufferedFixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment);
@@ -207,7 +207,7 @@ namespace SpaceGameEngine
 			@note the request_info's size must be less than or equal to 1024,
 			the alignment of it can not be larger than 128.
 			*/
-			static bool Judge(const RequestInformation& request_info);
+			static COMMON_API bool Judge(const RequestInformation& request_info);
 		};
 
 		/*!
