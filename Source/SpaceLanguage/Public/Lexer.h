@@ -65,6 +65,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		Vertical = 34,				//|
 		RightCurlyBracket = 35,		//}
 		Tilde = 36,					//~
+		Quote = 37					//`
 	};
 
 	struct SPACE_LANGUAGE_API Token
@@ -79,7 +80,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	template class SPACE_LANGUAGE_API HashMap<Char, TokenType>;
 #endif
 
-	class SPACE_LANGUAGE_API SymbolSet : public Singleton<SymbolSet>
+	class SPACE_LANGUAGE_API SymbolSet : public UncopyableAndUnmovable, public Singleton<SymbolSet>
 	{
 	private:
 		SymbolSet();
@@ -94,10 +95,65 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		HashMap<Char, TokenType> m_Content;
 	};
 
+	using StateType = UInt8;
+
+	namespace State
+	{
+		inline constexpr const StateType Start = 0;
+		inline constexpr const StateType Identifier = 1;
+		inline constexpr const StateType LineSeparator = 2;
+		inline constexpr const StateType WordSeparator = 3;
+		inline constexpr const StateType ZeroPrefix = 4;
+		inline constexpr const StateType DecimalInteger = 5;
+		inline constexpr const StateType BinaryInteger = 6;
+		inline constexpr const StateType HexInteger = 7;
+		inline constexpr const StateType DoubleDot = 8;
+		inline constexpr const StateType Double = 9;
+		inline constexpr const StateType CharacterBegin = 10;
+		inline constexpr const StateType CharacterEnd = 11;
+		inline constexpr const StateType EscapeCharacter = 12;
+		inline constexpr const StateType String = 13;
+		inline constexpr const StateType StringEscapeCharacter = 14;
+		inline constexpr const StateType RawPrefix = 15;
+		inline constexpr const StateType RawStringBegin = 16;
+		inline constexpr const StateType RawString = 17;
+		inline constexpr const StateType RawStringEnd = 18;
+		inline constexpr const StateType SlashPrefix = 19;
+		inline constexpr const StateType CommentBlock = 20;
+		inline constexpr const StateType CommentBlockEnd = 21;
+		inline constexpr const StateType CommentLine = 22;
+	}
+	inline constexpr const SizeType StateSize = 23;
+	using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType);
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API HashMap<Char, StateType>;
+#endif
+
+	class SPACE_LANGUAGE_API StateMachineForJudge : public UncopyableAndUnmovable, public Singleton<StateMachineForJudge>
+	{
+
+	public:
+		friend DefaultAllocator;
+
+		/*!
+		@param str string which will be judged
+		@param error_info_formatter format string which likes "In line:{} column:{}, {}"
+		*/
+		bool Judge(const String& str, const String& error_info_formatter) const;
+
+	private:
+		StateMachineForJudge();
+
+	private:
+		HashMap<Char, StateType> m_States[StateSize];
+		OtherCharacterJudgeFunctionType m_OtherCharacterJudgeFunctions[StateSize];
+	};
+
 	struct InvalidSourceStringError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The Source string is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(const String& src_str);
+		static SPACE_LANGUAGE_API bool Judge(const String& src_str, const String& error_info_formatter);
 	};
 
 	/*!

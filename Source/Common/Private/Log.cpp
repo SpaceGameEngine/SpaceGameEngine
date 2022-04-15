@@ -85,9 +85,7 @@ void SpaceGameEngine::FileLogWriterCore::DeleteOldLogFile(const Path& dir_path)
 	{
 		auto iter = map.GetConstBegin();
 		for (SizeType i = 0; i < map.GetSize() - 4; ++i, ++iter)
-		{
 			DeleteFile(Path(iter->m_First));
-		}
 	}
 }
 

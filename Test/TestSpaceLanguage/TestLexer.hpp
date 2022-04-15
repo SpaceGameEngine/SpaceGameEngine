@@ -39,3 +39,63 @@ TEST(SymbolSet, Test)
 	ASSERT_TRUE(ss.IsSymbol(SGE_STR(';')));
 	ASSERT_FALSE(ss.IsSymbol(SGE_STR('a')));
 }
+
+TEST(StateMachineForJudge, Test)
+{
+	Lexer::StateMachineForJudge& sm = Lexer::StateMachineForJudge::GetSingleton();
+	String formatter(SGE_STR("line:{} column:{}, {}"));
+
+	ASSERT_FALSE(sm.Judge(SGE_STR(""), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("identifier_ID12"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("123\n234\n"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("123\r234\r"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("123\r\n234\r\n"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("123\r\n234"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("123\r234\r\n"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("123\n234\r\n"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("123\r\n234\r"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("123\r\n234\n"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("123\r\n234\n\r"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("this is test for 1\r\n 3m m4"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("1 - 0\n1-0\n-100"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("01234"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("0b1001"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("0b1234"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("0x1234"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("0x1A2B3c4f"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("123.345"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("123.345f"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("-123.345"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("-123.345f"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("123."), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("123.f"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("123..345"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR(R"('a')"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR(R"('\r')"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR(R"('\a')"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR(R"(')"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR(R"('s)"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR(R"('\)"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR(R"("test string 123.321")"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR(R"("test string\n")"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR(R"("test string\n)"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR(R"("test string\)"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("R\"(test\\a)\""), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("R\""), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("R\"("), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("R\"()"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("R\"()\""), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("/**/"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("/*test*/"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("/*test\ntest2*/"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("//"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("//\n"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("//test"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("//test\n//test\n"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("//test\n//test"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("/*"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("/*\n"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("/**"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("/**\n"), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("?\n/\\"), formatter));
+}

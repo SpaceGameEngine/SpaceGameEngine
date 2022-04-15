@@ -1,5 +1,6 @@
 add_library(SpaceLanguage SHARED
         Private/SpaceLanguageModule.cpp
+        Private/Logger.cpp
         Private/Lexer.cpp
         Private/VirtualMachine/Instruction.cpp
         Private/VirtualMachine/Register.cpp

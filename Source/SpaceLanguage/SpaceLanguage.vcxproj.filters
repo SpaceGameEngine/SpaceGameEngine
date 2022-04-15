@@ -51,6 +51,9 @@
     <ClInclude Include="Public\Lexer.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Private\Logger.h">
+      <Filter>Private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp">
@@ -75,6 +78,9 @@
       <Filter>Private\VirtualMachine</Filter>
     </ClCompile>
     <ClCompile Include="Private\Lexer.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Logger.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
