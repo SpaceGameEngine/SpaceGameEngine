@@ -2043,13 +2043,13 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent;
 			}
 
-			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::NonConstValueType, NonConstValueType>), void>>
 			inline bool operator==(const IteratorType& iter) const
 			{
 				return m_pContent == iter.m_pContent;
 			}
 
-			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::NonConstValueType, NonConstValueType>), void>>
 			inline bool operator!=(const IteratorType& iter) const
 			{
 				return m_pContent != iter.m_pContent;
@@ -2291,13 +2291,13 @@ namespace SpaceGameEngine
 				return m_pContent != iter.m_pContent;
 			}
 
-			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::NonConstValueType, NonConstValueType>), void>>
 			inline bool operator==(const IteratorType& iter) const
 			{
 				return m_pContent == iter.m_pContent;
 			}
 
-			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, NonConstValueType>), void>>
+			template<typename IteratorType, typename = std::enable_if_t<IsStringCoreIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::NonConstValueType, NonConstValueType>), void>>
 			inline bool operator!=(const IteratorType& iter) const
 			{
 				return m_pContent != iter.m_pContent;

@@ -31,6 +31,16 @@ SpaceGameEngine::SpaceLanguage::Lexer::Token::Token(TokenType token_type, const 
 {
 }
 
+bool SpaceGameEngine::SpaceLanguage::Lexer::Token::operator==(const Token& token) const
+{
+	return m_Type == token.m_Type && m_Content == token.m_Content;
+}
+
+bool SpaceGameEngine::SpaceLanguage::Lexer::Token::operator!=(const Token& token) const
+{
+	return m_Type != token.m_Type || m_Content != token.m_Content;
+}
+
 SpaceGameEngine::SpaceLanguage::Lexer::SymbolSet::SymbolSet()
 	: m_Content({Pair<const Char, TokenType>(SGE_STR('!'), TokenType::Exclamation),
 				 Pair<const Char, TokenType>(SGE_STR('#'), TokenType::Hash),
@@ -492,4 +502,40 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 bool SpaceGameEngine::SpaceLanguage::Lexer::InvalidSourceStringError::Judge(const String& src_str, const String& error_info_formatter)
 {
 	return StateMachineForJudge::GetSingleton().Judge(src_str, error_info_formatter);
+}
+
+SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::StateTransfer()
+	: m_NextState(State::Start), m_Signal(StateMachineControlSignal::Forward), m_TokenType(TokenType::Unknown)
+{
+}
+
+SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::StateTransfer(StateType next_state, StateMachineControlSignal sign, TokenType token_type)
+	: m_NextState(next_state), m_Signal(sign), m_TokenType(token_type)
+{
+}
+
+Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const String& str) const
+{
+	Vector<Token> result;
+	StateType state = State::Start;
+	String::ConstIterator word_begin = str.GetConstBegin();
+	String::ConstIterator word_end = str.GetConstBegin();
+	SizeType line = 1;
+	SizeType column = 1;
+
+	while (word_end != str.GetConstEnd())
+	{
+		StateTransfer st;
+		auto state_iter = m_States[state].Find(*word_end);
+		if (state_iter != m_States[state].GetConstEnd())
+			st = state_iter->m_Second;
+		else
+			st = m_OtherCharacterStates[state];
+	}
+
+	return result;
+}
+
+SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::StateMachine()
+{
 }

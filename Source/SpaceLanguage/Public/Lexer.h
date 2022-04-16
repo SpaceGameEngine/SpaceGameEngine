@@ -17,6 +17,7 @@ limitations under the License.
 #include "SGEString.hpp"
 #include "Utility/Singleton.hpp"
 #include "Container/HashMap.hpp"
+#include "Container/Vector.hpp"
 #include "SpaceLanguageAPI.h"
 
 namespace SpaceGameEngine::SpaceLanguage::Lexer
@@ -72,6 +73,10 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	{
 		Token();
 		Token(TokenType token_type, const String& str);
+
+		bool operator==(const Token& token) const;
+		bool operator!=(const Token& token) const;
+
 		TokenType m_Type;
 		String m_Content;
 	};
@@ -124,6 +129,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		inline constexpr const StateType CommentLine = 22;
 	}
 	inline constexpr const SizeType StateSize = 23;
+
 	using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType);
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
@@ -154,6 +160,47 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The Source string is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const String& src_str, const String& error_info_formatter);
+	};
+
+	enum class StateMachineControlSignal : UInt8
+	{
+		Forward = 0,
+		Stay = 1,
+		Submit = 2
+	};
+
+	struct SPACE_LANGUAGE_API StateTransfer
+	{
+		StateType m_NextState;
+		StateMachineControlSignal m_Signal;
+		TokenType m_TokenType;
+
+		StateTransfer();
+		StateTransfer(StateType next_state, StateMachineControlSignal sign, TokenType token_type);
+	};
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API HashMap<Char, StateTransfer>;
+	template class SPACE_LANGUAGE_API Vector<Token>;
+#endif
+
+	class SPACE_LANGUAGE_API StateMachine : public UncopyableAndUnmovable, public Singleton<StateMachine>
+	{
+	public:
+		friend DefaultAllocator;
+
+		/*!
+		@brief Get tokens by giving string.
+		@warning The giving string need to be checked before invoking this function.
+		*/
+		Vector<Token> Run(const String& str) const;
+
+	private:
+		StateMachine();
+
+	private:
+		HashMap<Char, StateTransfer> m_States[StateSize];
+		StateTransfer m_OtherCharacterStates[StateSize];
 	};
 
 	/*!

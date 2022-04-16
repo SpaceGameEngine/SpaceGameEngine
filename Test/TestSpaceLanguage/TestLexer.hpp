@@ -79,7 +79,7 @@ TEST(StateMachineForJudge, Test)
 	ASSERT_FALSE(sm.Judge(SGE_STR(R"("test string 123.321")"), formatter));
 	ASSERT_FALSE(sm.Judge(SGE_STR(R"("test string\n")"), formatter));
 	ASSERT_TRUE(sm.Judge(SGE_STR(R"("test string\n)"), formatter));
-	ASSERT_TRUE(sm.Judge(SGE_STR(R"("test string\)"), formatter));
+	ASSERT_TRUE(sm.Judge(SGE_STR("test string\\"), formatter));
 	ASSERT_FALSE(sm.Judge(SGE_STR("R\"(test\\a)\""), formatter));
 	ASSERT_TRUE(sm.Judge(SGE_STR("R\""), formatter));
 	ASSERT_TRUE(sm.Judge(SGE_STR("R\"("), formatter));
