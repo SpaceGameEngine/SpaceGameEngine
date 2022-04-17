@@ -91,6 +91,32 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::SymbolSet::IsSymbol(Char c) const
 		return false;
 }
 
+SpaceGameEngine::SpaceLanguage::Lexer::EscapeCharacterSet::EscapeCharacterSet()
+	: m_Content({Pair<const Char, Char>(SGE_STR('n'), SGE_STR('\n')),
+				 Pair<const Char, Char>(SGE_STR('r'), SGE_STR('\r')),
+				 Pair<const Char, Char>(SGE_STR('t'), SGE_STR('\t')),
+				 Pair<const Char, Char>(SGE_STR('\''), SGE_STR('\'')),
+				 Pair<const Char, Char>(SGE_STR('"'), SGE_STR('"')),
+				 Pair<const Char, Char>(SGE_STR('0'), SGE_STR('\0'))})
+{
+}
+
+Char SpaceGameEngine::SpaceLanguage::Lexer::EscapeCharacterSet::Translate(Char c) const
+{
+	SGE_ASSERT(InvalidEscapeCharacterError, c);
+	return m_Content.Find(c)->m_Second;
+}
+
+bool SpaceGameEngine::SpaceLanguage::Lexer::EscapeCharacterSet::IsEscapeCharacter(Char c) const
+{
+	return m_Content.Find(c) != m_Content.GetConstEnd();
+}
+
+bool SpaceGameEngine::SpaceLanguage::Lexer::InvalidEscapeCharacterError::Judge(Char c)
+{
+	return c != SGE_STR('n') && c != SGE_STR('r') && c != SGE_STR('t') && c != SGE_STR('\'') && c != SGE_STR('"') && c != SGE_STR('0');
+}
+
 bool SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::Judge(const String& str, const String& error_info_formatter) const
 {
 	StateType state = State::Start;
@@ -371,9 +397,17 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_States[State::CharacterBegin].Insert(SGE_STR('\\'), State::EscapeCharacter);
 
 	m_OtherCharacterJudgeFunctions[State::CharacterBegin] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
-		state = State::CharacterEnd;
-		++iter;
-		return false;
+		if (*iter == SGE_STR('\''))
+		{
+			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need character here"))));
+			return true;
+		}
+		else
+		{
+			state = State::CharacterEnd;
+			++iter;
+			return false;
+		}
 	};
 
 	//CharacterEnd
@@ -385,15 +419,18 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	};
 
 	//EscapeCharacter
-	m_States[State::EscapeCharacter].Insert({Pair<const Char, StateType>(SGE_STR('n'), State::CharacterEnd),
-											 Pair<const Char, StateType>(SGE_STR('r'), State::CharacterEnd),
-											 Pair<const Char, StateType>(SGE_STR('t'), State::CharacterEnd),
-											 Pair<const Char, StateType>(SGE_STR('\''), State::CharacterEnd),
-											 Pair<const Char, StateType>(SGE_STR('0'), State::CharacterEnd)});
-
 	m_OtherCharacterJudgeFunctions[State::EscapeCharacter] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported escape character"))));
-		return true;
+		if (EscapeCharacterSet::GetSingleton().IsEscapeCharacter(*iter))
+		{
+			state = State::CharacterEnd;
+			++iter;
+			return false;
+		}
+		else
+		{
+			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported escape character"))));
+			return true;
+		}
 	};
 
 	//String
@@ -418,15 +455,18 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	};
 
 	//StringEscapeCharacter
-	m_States[State::StringEscapeCharacter].Insert({Pair<const Char, StateType>(SGE_STR('n'), State::String),
-												   Pair<const Char, StateType>(SGE_STR('r'), State::String),
-												   Pair<const Char, StateType>(SGE_STR('t'), State::String),
-												   Pair<const Char, StateType>(SGE_STR('"'), State::String),
-												   Pair<const Char, StateType>(SGE_STR('0'), State::String)});
-
 	m_OtherCharacterJudgeFunctions[State::StringEscapeCharacter] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported escape character"))));
-		return true;
+		if (EscapeCharacterSet::GetSingleton().IsEscapeCharacter(*iter))
+		{
+			state = State::String;
+			++iter;
+			return false;
+		}
+		else
+		{
+			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported escape character"))));
+			return true;
+		}
 	};
 
 	//RawPrefix
@@ -517,20 +557,115 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::StateTransfer(StateType ne
 Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const String& str) const
 {
 	Vector<Token> result;
+	String str_buf;
 	StateType state = State::Start;
-	String::ConstIterator word_begin = str.GetConstBegin();
-	String::ConstIterator word_end = str.GetConstBegin();
-	SizeType line = 1;
-	SizeType column = 1;
+	String::ConstIterator iter = str.GetConstBegin();
+	FileLineBreak flb = FileLineBreak::Unknown;
 
-	while (word_end != str.GetConstEnd())
+	while (iter != str.GetConstEnd())
 	{
 		StateTransfer st;
-		auto state_iter = m_States[state].Find(*word_end);
+		auto state_iter = m_States[state].Find(*iter);
 		if (state_iter != m_States[state].GetConstEnd())
 			st = state_iter->m_Second;
 		else
 			st = m_OtherCharacterStates[state];
+
+		if (st.m_Signal == StateMachineControlSignal::Forward)
+		{
+			str_buf += *iter;
+			++iter;
+		}
+		else if (st.m_Signal == StateMachineControlSignal::Skip)
+			++iter;
+		else if (st.m_Signal == StateMachineControlSignal::Submit)
+		{
+			result.EmplaceBack(st.m_TokenType, str_buf);
+			str_buf.Clear();
+		}
+		else if (st.m_Signal == StateMachineControlSignal::SubmitSymbol)
+		{
+			result.EmplaceBack(st.m_TokenType, String(1, *iter));
+			++iter;
+		}
+		else if (st.m_Signal == StateMachineControlSignal::SubmitLineSeparator)
+		{
+			if (str_buf.GetSize() == 1)
+				result.EmplaceBack(st.m_TokenType, str_buf);
+			else if (str_buf.GetSize() >= 2)
+			{
+				if ((str_buf.GetSize() % 2 == 0) && (GetFileLineBreak<String::CharType, String::ValueTrait>(str_buf[0], str_buf[1]) == FileLineBreak::CRLF))
+				{
+					String crlf = str_buf.Substring(str_buf.GetConstBegin(), 2);
+					for (SizeType i = 0; i < str_buf.GetSize() / 2; ++i)
+						result.EmplaceBack(st.m_TokenType, crlf);
+				}
+				else
+				{
+					String linebreak(1, str_buf[0]);
+					for (SizeType i = 0; i < str_buf.GetSize(); ++i)
+						result.EmplaceBack(st.m_TokenType, linebreak);
+				}
+			}
+			str_buf.Clear();
+		}
+		else if (st.m_Signal == StateMachineControlSignal::SubmitSkip)
+		{
+			result.EmplaceBack(st.m_TokenType, str_buf);
+			str_buf.Clear();
+			++iter;
+		}
+		else if (st.m_Signal == StateMachineControlSignal::EscapeCharacter)
+		{
+			str_buf[str_buf.GetSize() - 1] = EscapeCharacterSet::GetSingleton().Translate(*iter);
+			++iter;
+		}
+		else if (st.m_Signal == StateMachineControlSignal::Clear)
+		{
+			str_buf.Clear();
+			++iter;
+		}
+		else if (st.m_Signal == StateMachineControlSignal::RawStringEndBack)
+			str_buf += SGE_STR(')');
+		else if (st.m_Signal == StateMachineControlSignal::CommentBlockEndBack)
+			str_buf += SGE_STR('*');
+
+		state = st.m_NextState;
+	}
+
+	if (state == State::CommentLine)
+		result.EmplaceBack(TokenType::Comment, str_buf);
+	else
+	{
+		while (state != State::Start)
+		{
+			StateTransfer st = m_OtherCharacterStates[state];
+
+			if (st.m_Signal == StateMachineControlSignal::Submit)
+				result.EmplaceBack(st.m_TokenType, str_buf);
+			else if (st.m_Signal == StateMachineControlSignal::SubmitLineSeparator)
+			{
+				if (str_buf.GetSize() == 1)
+					result.EmplaceBack(st.m_TokenType, str_buf);
+				else if (str_buf.GetSize() >= 2)
+				{
+					if ((str_buf.GetSize() % 2 == 0) && (GetFileLineBreak<String::CharType, String::ValueTrait>(str_buf[0], str_buf[1]) == FileLineBreak::CRLF))
+					{
+						String crlf = str_buf.Substring(str_buf.GetConstBegin(), 2);
+						for (SizeType i = 0; i < str_buf.GetSize() / 2; ++i)
+							result.EmplaceBack(st.m_TokenType, crlf);
+					}
+					else
+					{
+						String linebreak(1, str_buf[0]);
+						for (SizeType i = 0; i < str_buf.GetSize(); ++i)
+							result.EmplaceBack(st.m_TokenType, linebreak);
+					}
+				}
+			}
+
+			state = st.m_NextState;
+		}
 	}
 
 	return result;
@@ -538,4 +673,182 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 
 SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::StateMachine()
 {
+	//Start
+	for (Char c = SGE_STR('1'); c <= SGE_STR('9'); ++c)
+		m_States[State::Start].Insert(c, StateTransfer(State::DecimalInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral));
+	for (Char c = SGE_STR('a'); c <= SGE_STR('z'); ++c)
+		m_States[State::Start].Insert(c, StateTransfer(State::Identifier, StateMachineControlSignal::Forward, TokenType::Identifier));
+	for (Char c = SGE_STR('A'); c <= SGE_STR('Z'); ++c)
+		if (c != SGE_STR('R'))
+			m_States[State::Start].Insert(c, StateTransfer(State::Identifier, StateMachineControlSignal::Forward, TokenType::Identifier));
+
+	m_States[State::Start].Insert({Pair<const Char, StateTransfer>(SGE_STR('0'), StateTransfer(State::ZeroPrefix, StateMachineControlSignal::Forward, TokenType::IntegerLiteral)),
+								   Pair<const Char, StateTransfer>(SGE_STR('\''), StateTransfer(State::CharacterBegin, StateMachineControlSignal::Skip, TokenType::CharacterLiteral)),
+								   Pair<const Char, StateTransfer>(SGE_STR('"'), StateTransfer(State::String, StateMachineControlSignal::Skip, TokenType::StringLiteral)),
+								   Pair<const Char, StateTransfer>(SGE_STR('R'), StateTransfer(State::RawPrefix, StateMachineControlSignal::Forward, TokenType::StringLiteral)),
+								   Pair<const Char, StateTransfer>(SGE_STR('_'), StateTransfer(State::Identifier, StateMachineControlSignal::Forward, TokenType::Identifier)),
+								   Pair<const Char, StateTransfer>(SGE_STR('/'), StateTransfer(State::SlashPrefix, StateMachineControlSignal::Forward, TokenType::Comment)),
+								   Pair<const Char, StateTransfer>(SGE_STR('\r'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Forward, TokenType::LineSeparator)),
+								   Pair<const Char, StateTransfer>(SGE_STR('\n'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Forward, TokenType::LineSeparator)),
+								   Pair<const Char, StateTransfer>(SGE_STR(' '), StateTransfer(State::WordSeparator, StateMachineControlSignal::Forward, TokenType::WordSeparator)),
+								   Pair<const Char, StateTransfer>(SGE_STR('\t'), StateTransfer(State::WordSeparator, StateMachineControlSignal::Forward, TokenType::WordSeparator)),
+								   Pair<const Char, StateTransfer>(SGE_STR('!'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Exclamation)),
+								   Pair<const Char, StateTransfer>(SGE_STR('#'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Hash)),
+								   Pair<const Char, StateTransfer>(SGE_STR('$'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Dollar)),
+								   Pair<const Char, StateTransfer>(SGE_STR('%'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Mod)),
+								   Pair<const Char, StateTransfer>(SGE_STR('&'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::And)),
+								   Pair<const Char, StateTransfer>(SGE_STR('('), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::LeftBracket)),
+								   Pair<const Char, StateTransfer>(SGE_STR(')'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::RightBracket)),
+								   Pair<const Char, StateTransfer>(SGE_STR('*'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Multiply)),
+								   Pair<const Char, StateTransfer>(SGE_STR('+'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Add)),
+								   Pair<const Char, StateTransfer>(SGE_STR(','), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Comma)),
+								   Pair<const Char, StateTransfer>(SGE_STR('-'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Subtract)),
+								   Pair<const Char, StateTransfer>(SGE_STR('.'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Dot)),
+								   Pair<const Char, StateTransfer>(SGE_STR(':'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Colon)),
+								   Pair<const Char, StateTransfer>(SGE_STR(';'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Semicolon)),
+								   Pair<const Char, StateTransfer>(SGE_STR('<'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Less)),
+								   Pair<const Char, StateTransfer>(SGE_STR('='), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Equal)),
+								   Pair<const Char, StateTransfer>(SGE_STR('>'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Greater)),
+								   Pair<const Char, StateTransfer>(SGE_STR('?'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Question)),
+								   Pair<const Char, StateTransfer>(SGE_STR('@'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::At)),
+								   Pair<const Char, StateTransfer>(SGE_STR('['), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::LeftSquareBracket)),
+								   Pair<const Char, StateTransfer>(SGE_STR('\\'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Backslash)),
+								   Pair<const Char, StateTransfer>(SGE_STR(']'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::RightSquareBracket)),
+								   Pair<const Char, StateTransfer>(SGE_STR('^'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Caret)),
+								   Pair<const Char, StateTransfer>(SGE_STR('{'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::LeftCurlyBracket)),
+								   Pair<const Char, StateTransfer>(SGE_STR('|'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Vertical)),
+								   Pair<const Char, StateTransfer>(SGE_STR('}'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::RightCurlyBracket)),
+								   Pair<const Char, StateTransfer>(SGE_STR('~'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Tilde)),
+								   Pair<const Char, StateTransfer>(SGE_STR('`'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSymbol, TokenType::Quote))});
+
+	//Identifier
+	for (Char c = SGE_STR('0'); c <= SGE_STR('9'); ++c)
+		m_States[State::Identifier].Insert(c, StateTransfer(State::Identifier, StateMachineControlSignal::Forward, TokenType::Identifier));
+	for (Char c = SGE_STR('a'); c <= SGE_STR('z'); ++c)
+		m_States[State::Identifier].Insert(c, StateTransfer(State::Identifier, StateMachineControlSignal::Forward, TokenType::Identifier));
+	for (Char c = SGE_STR('A'); c <= SGE_STR('Z'); ++c)
+		m_States[State::Identifier].Insert(c, StateTransfer(State::Identifier, StateMachineControlSignal::Forward, TokenType::Identifier));
+	m_States[State::Identifier].Insert(SGE_STR('_'), StateTransfer(State::Identifier, StateMachineControlSignal::Forward, TokenType::Identifier));
+
+	m_OtherCharacterStates[State::Identifier] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::Identifier);
+
+	//LineSeparator
+	m_States[State::LineSeparator].Insert({Pair<const Char, StateTransfer>(SGE_STR('\r'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Forward, TokenType::LineSeparator)),
+										   Pair<const Char, StateTransfer>(SGE_STR('\n'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Forward, TokenType::LineSeparator))});
+
+	m_OtherCharacterStates[State::LineSeparator] = StateTransfer(State::Start, StateMachineControlSignal::SubmitLineSeparator, TokenType::LineSeparator);
+
+	//WordSeparator
+	m_States[State::WordSeparator].Insert({Pair<const Char, StateTransfer>(SGE_STR(' '), StateTransfer(State::WordSeparator, StateMachineControlSignal::Forward, TokenType::WordSeparator)),
+										   Pair<const Char, StateTransfer>(SGE_STR('\t'), StateTransfer(State::WordSeparator, StateMachineControlSignal::Forward, TokenType::WordSeparator))});
+
+	m_OtherCharacterStates[State::WordSeparator] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::WordSeparator);
+
+	//ZeroPrefix
+	for (Char c = SGE_STR('0'); c <= SGE_STR('9'); ++c)
+		m_States[State::ZeroPrefix].Insert(c, StateTransfer(State::DecimalInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral));
+	m_States[State::ZeroPrefix].Insert({Pair<const Char, StateTransfer>(SGE_STR('b'), StateTransfer(State::BinaryInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral)),
+										Pair<const Char, StateTransfer>(SGE_STR('x'), StateTransfer(State::HexInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral))});
+
+	m_OtherCharacterStates[State::ZeroPrefix] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::IntegerLiteral);
+
+	//DecimalInteger
+	for (Char c = SGE_STR('0'); c <= SGE_STR('9'); ++c)
+		m_States[State::DecimalInteger].Insert(c, StateTransfer(State::DecimalInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral));
+	m_States[State::DecimalInteger].Insert(SGE_STR('.'), StateTransfer(State::DoubleDot, StateMachineControlSignal::Forward, TokenType::DoubleLiteral));
+
+	m_OtherCharacterStates[State::DecimalInteger] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::IntegerLiteral);
+
+	//BinaryInteger
+	m_States[State::BinaryInteger].Insert({Pair<const Char, StateTransfer>(SGE_STR('0'), StateTransfer(State::BinaryInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral)),
+										   Pair<const Char, StateTransfer>(SGE_STR('1'), StateTransfer(State::BinaryInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral))});
+
+	m_OtherCharacterStates[State::BinaryInteger] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::IntegerLiteral);
+
+	//HexInteger
+	for (Char c = SGE_STR('0'); c <= SGE_STR('9'); ++c)
+		m_States[State::HexInteger].Insert(c, StateTransfer(State::HexInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral));
+	for (Char c = SGE_STR('a'); c <= SGE_STR('f'); ++c)
+		m_States[State::HexInteger].Insert(c, StateTransfer(State::HexInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral));
+	for (Char c = SGE_STR('A'); c <= SGE_STR('F'); ++c)
+		m_States[State::HexInteger].Insert(c, StateTransfer(State::HexInteger, StateMachineControlSignal::Forward, TokenType::IntegerLiteral));
+
+	m_OtherCharacterStates[State::HexInteger] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::IntegerLiteral);
+
+	//DoubleDot
+	for (Char c = SGE_STR('0'); c <= SGE_STR('9'); ++c)
+		m_States[State::DoubleDot].Insert(c, StateTransfer(State::Double, StateMachineControlSignal::Forward, TokenType::DoubleLiteral));
+
+	//Double
+	for (Char c = SGE_STR('0'); c <= SGE_STR('9'); ++c)
+		m_States[State::Double].Insert(c, StateTransfer(State::Double, StateMachineControlSignal::Forward, TokenType::DoubleLiteral));
+	m_States[State::Double].Insert(SGE_STR('f'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSkip, TokenType::FloatLiteral));
+
+	m_OtherCharacterStates[State::Double] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::DoubleLiteral);
+
+	//CharacterBegin
+	m_States[State::CharacterBegin].Insert(SGE_STR('\\'), StateTransfer(State::EscapeCharacter, StateMachineControlSignal::Forward, TokenType::CharacterLiteral));
+
+	m_OtherCharacterStates[State::CharacterBegin] = StateTransfer(State::CharacterEnd, StateMachineControlSignal::Forward, TokenType::CharacterLiteral);
+
+	//CharacterEnd
+	m_States[State::CharacterEnd].Insert(SGE_STR('\''), StateTransfer(State::Start, StateMachineControlSignal::SubmitSkip, TokenType::CharacterLiteral));
+
+	//EscapeCharacter
+	m_OtherCharacterStates[State::EscapeCharacter] = StateTransfer(State::CharacterEnd, StateMachineControlSignal::EscapeCharacter, TokenType::CharacterLiteral);
+
+	//String
+	m_States[State::String].Insert({Pair<const Char, StateTransfer>(SGE_STR('\\'), StateTransfer(State::StringEscapeCharacter, StateMachineControlSignal::Forward, TokenType::StringLiteral)),
+									Pair<const Char, StateTransfer>(SGE_STR('"'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSkip, TokenType::StringLiteral))});
+
+	m_OtherCharacterStates[State::String] = StateTransfer(State::String, StateMachineControlSignal::Forward, TokenType::StringLiteral);
+
+	//StringEscapeCharacter
+	m_OtherCharacterStates[State::StringEscapeCharacter] = StateTransfer(State::String, StateMachineControlSignal::EscapeCharacter, TokenType::StringLiteral);
+
+	//RawPrefix
+	m_States[State::RawPrefix].Insert(SGE_STR('"'), StateTransfer(State::RawStringBegin, StateMachineControlSignal::Clear, TokenType::StringLiteral));
+
+	m_OtherCharacterStates[State::RawPrefix] = StateTransfer(State::Identifier, StateMachineControlSignal::Stay, TokenType::Identifier);
+
+	//RawStringBegin
+	m_States[State::RawStringBegin].Insert(SGE_STR('('), StateTransfer(State::RawString, StateMachineControlSignal::Skip, TokenType::StringLiteral));
+
+	//RawString
+	m_States[State::RawString].Insert(SGE_STR(')'), StateTransfer(State::RawStringEnd, StateMachineControlSignal::Skip, TokenType::StringLiteral));
+
+	m_OtherCharacterStates[State::RawString] = StateTransfer(State::RawString, StateMachineControlSignal::Forward, TokenType::StringLiteral);
+
+	//RawStringEnd
+	m_States[State::RawStringEnd].Insert(SGE_STR('"'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSkip, TokenType::StringLiteral));
+
+	m_OtherCharacterStates[State::RawStringEnd] = StateTransfer(State::RawString, StateMachineControlSignal::RawStringEndBack, TokenType::StringLiteral);
+
+	//SlashPrefix
+	m_States[State::SlashPrefix].Insert({Pair<const Char, StateTransfer>(SGE_STR('/'), StateTransfer(State::CommentLine, StateMachineControlSignal::Clear, TokenType::Comment)),
+										 Pair<const Char, StateTransfer>(SGE_STR('*'), StateTransfer(State::CommentBlock, StateMachineControlSignal::Clear, TokenType::Comment))});
+
+	m_OtherCharacterStates[State::SlashPrefix] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::Slash);
+
+	//CommentBlock
+	m_States[State::CommentBlock].Insert(SGE_STR('*'), StateTransfer(State::CommentBlockEnd, StateMachineControlSignal::Skip, TokenType::Comment));
+
+	m_OtherCharacterStates[State::CommentBlock] = StateTransfer(State::CommentBlock, StateMachineControlSignal::Forward, TokenType::Comment);
+
+	//CommentBlockEnd
+	m_States[State::CommentBlockEnd].Insert(SGE_STR('/'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSkip, TokenType::Comment));
+
+	m_OtherCharacterStates[State::CommentBlockEnd] = StateTransfer(State::CommentBlock, StateMachineControlSignal::CommentBlockEndBack, TokenType::Comment);
+
+	//CommentLine
+	m_States[State::CommentLine].Insert({Pair<const Char, StateTransfer>(SGE_STR('\r'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Submit, TokenType::Comment)),
+										 Pair<const Char, StateTransfer>(SGE_STR('\n'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Submit, TokenType::Comment))});
+
+	m_OtherCharacterStates[State::CommentLine] = StateTransfer(State::CommentLine, StateMachineControlSignal::Forward, TokenType::Comment);
+}
+
+Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::GetTokens(const String& str, const String& error_info_formatter)
+{
+	SGE_ASSERT(InvalidSourceStringError, str, error_info_formatter);
+	return StateMachine::GetSingleton().Run(str);
 }

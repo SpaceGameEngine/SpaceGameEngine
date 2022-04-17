@@ -66,7 +66,8 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		Vertical = 34,				//|
 		RightCurlyBracket = 35,		//}
 		Tilde = 36,					//~
-		Quote = 37					//`
+		Quote = 37,					//`
+		Comment = 38
 	};
 
 	struct SPACE_LANGUAGE_API Token
@@ -98,6 +99,31 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 
 	private:
 		HashMap<Char, TokenType> m_Content;
+	};
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API HashMap<Char, Char>;
+#endif
+
+	class SPACE_LANGUAGE_API EscapeCharacterSet : public UncopyableAndUnmovable, public Singleton<EscapeCharacterSet>
+	{
+	private:
+		EscapeCharacterSet();
+
+	public:
+		friend DefaultAllocator;
+
+		Char Translate(Char c) const;
+		bool IsEscapeCharacter(Char c) const;
+
+	private:
+		HashMap<Char, Char> m_Content;
+	};
+
+	struct InvalidEscapeCharacterError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The escape character is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(Char c);
 	};
 
 	using StateType = UInt8;
@@ -166,7 +192,15 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	{
 		Forward = 0,
 		Stay = 1,
-		Submit = 2
+		Skip = 2,
+		Submit = 3,
+		SubmitSymbol = 4,
+		SubmitLineSeparator = 5,
+		SubmitSkip = 6,
+		EscapeCharacter = 7,
+		Clear = 8,
+		RawStringEndBack = 9,
+		CommentBlockEndBack = 10
 	};
 
 	struct SPACE_LANGUAGE_API StateTransfer
@@ -202,6 +236,12 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		HashMap<Char, StateTransfer> m_States[StateSize];
 		StateTransfer m_OtherCharacterStates[StateSize];
 	};
+
+	/*!
+	@brief Get tokens by giving string.
+	@param error_info_formatter format string which likes "In line:{} column:{}, {}"
+	*/
+	SPACE_LANGUAGE_API Vector<Token> GetTokens(const String& str, const String& error_info_formatter);
 
 	/*!
 	@}
