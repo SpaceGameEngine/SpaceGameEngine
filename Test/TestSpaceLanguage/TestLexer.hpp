@@ -174,6 +174,50 @@ TEST(StateMachine, Test)
 	ASSERT_EQ(res5[1].m_Content, SGE_STR("+"));
 	ASSERT_EQ(res5[2].m_Type, Lexer::TokenType::IntegerLiteral);
 	ASSERT_EQ(res5[2].m_Content, SGE_STR("0b1011"));
+
+	auto res6 = sm.Run(SGE_STR("//test comment line"));
+	ASSERT_EQ(res6.GetSize(), 1);
+	ASSERT_EQ(res6[0].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res6[0].m_Content, SGE_STR("test comment line"));
+
+	auto res7 = sm.Run(SGE_STR("/*test comment block*/a"));
+	ASSERT_EQ(res7.GetSize(), 2);
+	ASSERT_EQ(res7[0].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res7[0].m_Content, SGE_STR("test comment block"));
+	ASSERT_EQ(res7[1].m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(res7[1].m_Content, SGE_STR("a"));
+
+	auto res8 = sm.Run(SGE_STR("1/b//"));
+	ASSERT_EQ(res8.GetSize(), 4);
+	ASSERT_EQ(res8[0].m_Type, Lexer::TokenType::IntegerLiteral);
+	ASSERT_EQ(res8[0].m_Content, SGE_STR("1"));
+	ASSERT_EQ(res8[1].m_Type, Lexer::TokenType::Slash);
+	ASSERT_EQ(res8[1].m_Content, SGE_STR("/"));
+	ASSERT_EQ(res8[2].m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(res8[2].m_Content, SGE_STR("b"));
+	ASSERT_EQ(res8[3].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res8[3].m_Content, SGE_STR(""));
+
+	auto res9 = sm.Run(SGE_STR("'a''\n'"));
+	ASSERT_EQ(res9.GetSize(), 2);
+	ASSERT_EQ(res9[0].m_Type, Lexer::TokenType::CharacterLiteral);
+	ASSERT_EQ(res9[0].m_Content, SGE_STR("a"));
+	ASSERT_EQ(res9[1].m_Type, Lexer::TokenType::CharacterLiteral);
+	ASSERT_EQ(res9[1].m_Content, SGE_STR("\n"));
+
+	auto res10 = sm.Run(SGE_STR("\"test string\ttest\"b"));
+	ASSERT_EQ(res10.GetSize(), 2);
+	ASSERT_EQ(res10[0].m_Type, Lexer::TokenType::StringLiteral);
+	ASSERT_EQ(res10[0].m_Content, SGE_STR("test string\ttest"));
+	ASSERT_EQ(res10[1].m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(res10[1].m_Content, SGE_STR("b"));
+
+	auto res11 = sm.Run(SGE_STR("R\"(test string\\ttest)\"R"));
+	ASSERT_EQ(res11.GetSize(), 2);
+	ASSERT_EQ(res11[0].m_Type, Lexer::TokenType::StringLiteral);
+	ASSERT_EQ(res11[0].m_Content, SGE_STR("test string\\ttest"));
+	ASSERT_EQ(res11[1].m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(res11[1].m_Content, SGE_STR("R"));
 }
 
 TEST(GetTokens, Test)
@@ -229,4 +273,48 @@ TEST(GetTokens, Test)
 	ASSERT_EQ(res5[1].m_Content, SGE_STR("+"));
 	ASSERT_EQ(res5[2].m_Type, Lexer::TokenType::IntegerLiteral);
 	ASSERT_EQ(res5[2].m_Content, SGE_STR("0b1011"));
+
+	auto res6 = Lexer::GetTokens(SGE_STR("//test comment line"), formatter);
+	ASSERT_EQ(res6.GetSize(), 1);
+	ASSERT_EQ(res6[0].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res6[0].m_Content, SGE_STR("test comment line"));
+
+	auto res7 = Lexer::GetTokens(SGE_STR("/*test comment block*/a"), formatter);
+	ASSERT_EQ(res7.GetSize(), 2);
+	ASSERT_EQ(res7[0].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res7[0].m_Content, SGE_STR("test comment block"));
+	ASSERT_EQ(res7[1].m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(res7[1].m_Content, SGE_STR("a"));
+
+	auto res8 = Lexer::GetTokens(SGE_STR("1/b//"), formatter);
+	ASSERT_EQ(res8.GetSize(), 4);
+	ASSERT_EQ(res8[0].m_Type, Lexer::TokenType::IntegerLiteral);
+	ASSERT_EQ(res8[0].m_Content, SGE_STR("1"));
+	ASSERT_EQ(res8[1].m_Type, Lexer::TokenType::Slash);
+	ASSERT_EQ(res8[1].m_Content, SGE_STR("/"));
+	ASSERT_EQ(res8[2].m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(res8[2].m_Content, SGE_STR("b"));
+	ASSERT_EQ(res8[3].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res8[3].m_Content, SGE_STR(""));
+
+	auto res9 = Lexer::GetTokens(SGE_STR("'a''\n'"), formatter);
+	ASSERT_EQ(res9.GetSize(), 2);
+	ASSERT_EQ(res9[0].m_Type, Lexer::TokenType::CharacterLiteral);
+	ASSERT_EQ(res9[0].m_Content, SGE_STR("a"));
+	ASSERT_EQ(res9[1].m_Type, Lexer::TokenType::CharacterLiteral);
+	ASSERT_EQ(res9[1].m_Content, SGE_STR("\n"));
+
+	auto res10 = Lexer::GetTokens(SGE_STR("\"test string\ttest\"b"), formatter);
+	ASSERT_EQ(res10.GetSize(), 2);
+	ASSERT_EQ(res10[0].m_Type, Lexer::TokenType::StringLiteral);
+	ASSERT_EQ(res10[0].m_Content, SGE_STR("test string\ttest"));
+	ASSERT_EQ(res10[1].m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(res10[1].m_Content, SGE_STR("b"));
+
+	auto res11 = Lexer::GetTokens(SGE_STR("R\"(test string\\ttest)\"R"), formatter);
+	ASSERT_EQ(res11.GetSize(), 2);
+	ASSERT_EQ(res11[0].m_Type, Lexer::TokenType::StringLiteral);
+	ASSERT_EQ(res11[0].m_Content, SGE_STR("test string\\ttest"));
+	ASSERT_EQ(res11[1].m_Type, Lexer::TokenType::Identifier);
+	ASSERT_EQ(res11[1].m_Content, SGE_STR("R"));
 }

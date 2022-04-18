@@ -89,6 +89,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SpaceLanguage", "SpaceLangu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VirtualMachine", "VirtualMachine", "{7AD471A5-9F91-4E89-8753-0E94002507F4}"
 	ProjectSection(SolutionItems) = preProject
+		Document\Document\SpaceLanguage\VirtualMachine\Assembler.md = Document\Document\SpaceLanguage\VirtualMachine\Assembler.md
 		Document\Document\SpaceLanguage\VirtualMachine\Instruction.md = Document\Document\SpaceLanguage\VirtualMachine\Instruction.md
 		Document\Document\SpaceLanguage\VirtualMachine\Register.md = Document\Document\SpaceLanguage\VirtualMachine\Register.md
 	EndProjectSection
