@@ -185,7 +185,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	struct InvalidSourceStringError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The Source string is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(const String& src_str, const String& error_info_formatter);
+		static SPACE_LANGUAGE_API bool Judge(const String& str, const String& error_info_formatter);
 	};
 
 	enum class StateMachineControlSignal : UInt8

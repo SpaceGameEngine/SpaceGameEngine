@@ -20,3 +20,21 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
+
+TEST(InstructionNameSet, Test)
+{
+	InstructionNameSet& ins = InstructionNameSet::GetSingleton();
+	ASSERT_TRUE(ins.IsInstructionName(SGE_STR("Add")));
+	ASSERT_FALSE(ins.IsInstructionName(SGE_STR("")));
+	ASSERT_FALSE(ins.IsInstructionName(SGE_STR("test")));
+
+	const auto& test_instr = ins.Get(SGE_STR("And"));
+	ASSERT_EQ(test_instr.m_Index, 11);
+	ASSERT_EQ(test_instr.m_Name, SGE_STR("And"));
+	ASSERT_EQ(test_instr.m_Size, 4);
+}
+
+TEST(Assembler, Test)
+{
+	Assembler ab;
+}

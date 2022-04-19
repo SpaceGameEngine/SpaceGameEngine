@@ -539,9 +539,9 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	};
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::InvalidSourceStringError::Judge(const String& src_str, const String& error_info_formatter)
+bool SpaceGameEngine::SpaceLanguage::Lexer::InvalidSourceStringError::Judge(const String& str, const String& error_info_formatter)
 {
-	return StateMachineForJudge::GetSingleton().Judge(src_str, error_info_formatter);
+	return StateMachineForJudge::GetSingleton().Judge(str, error_info_formatter);
 }
 
 SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::StateTransfer()

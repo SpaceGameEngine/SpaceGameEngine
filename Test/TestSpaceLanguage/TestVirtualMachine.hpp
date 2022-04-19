@@ -1144,6 +1144,52 @@ TEST(InstructionsGenerator, InstructionTest)
 	ASSERT_EQ(*((UInt8*)ig.GetData() + 110), 17);
 }
 
+TEST(InstructionsGenerator, CopyTest)
+{
+	InstructionsGenerator ig_src;
+	ig_src.ExternalCall(123, 456);
+	ig_src.Copy(123, 456);
+	ASSERT_EQ(ig_src.GetSize(), 13);
+
+	InstructionsGenerator ig_dst1(ig_src);
+	ASSERT_EQ(ig_dst1.GetSize(), 13);
+	ASSERT_EQ(memcmp(ig_dst1.GetData(), ig_src.GetData(), 13), 0);
+
+	InstructionsGenerator ig_dst2;
+	ig_dst2.Equal(0, 1, 2);
+	ASSERT_EQ(ig_dst2.GetSize(), 4);
+
+	ig_dst2 = ig_src;
+
+	ASSERT_EQ(ig_dst2.GetSize(), 13);
+	ASSERT_EQ(memcmp(ig_dst2.GetData(), ig_src.GetData(), 13), 0);
+}
+
+TEST(InstructionsGenerator, MoveTest)
+{
+	InstructionsGenerator ig_src1;
+	ig_src1.ExternalCall(123, 456);
+	ig_src1.Copy(123, 456);
+	ASSERT_EQ(ig_src1.GetSize(), 13);
+
+	InstructionsGenerator ig_src2(ig_src1);
+	ASSERT_EQ(ig_src2.GetSize(), 13);
+	ASSERT_EQ(memcmp(ig_src2.GetData(), ig_src1.GetData(), 13), 0);
+
+	InstructionsGenerator ig_dst1(std::move(ig_src1));
+	ASSERT_EQ(ig_dst1.GetSize(), 13);
+	ASSERT_EQ(memcmp(ig_dst1.GetData(), ig_src2.GetData(), 13), 0);
+
+	InstructionsGenerator ig_dst2;
+	ig_dst2.Equal(0, 1, 2);
+	ASSERT_EQ(ig_dst2.GetSize(), 4);
+
+	ig_dst2 = std::move(ig_src2);
+
+	ASSERT_EQ(ig_dst2.GetSize(), 13);
+	ASSERT_EQ(memcmp(ig_dst2.GetData(), ig_dst1.GetData(), 13), 0);
+}
+
 TEST(VirtualMachine, Test)
 {
 	VirtualMachine vm;

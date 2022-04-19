@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "Instruction.h"
+#include "Container/HashMap.hpp"
 
 namespace SpaceGameEngine::SpaceLanguage
 {
@@ -23,10 +24,52 @@ namespace SpaceGameEngine::SpaceLanguage
 	@{
 	*/
 
-	namespace AssemblerImplement
-	{
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API HashMap<String, const InstructionType*>;
+#endif
 
-	}
+	class SPACE_LANGUAGE_API InstructionNameSet : public UncopyableAndUnmovable, public Singleton<InstructionNameSet>
+	{
+	private:
+		InstructionNameSet();
+
+	public:
+		friend DefaultAllocator;
+
+		const InstructionType& Get(const String& instr_name) const;
+		bool IsInstructionName(const String& str) const;
+
+	private:
+		HashMap<String, const InstructionType*> m_Content;
+	};
+
+	struct InvalidInstructionNameError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The instruction name is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(const String& str);
+	};
+
+	struct InvalidAssemblerSourceStringError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The Assembler source string is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(const String& str, const String& error_info_formatter);
+	};
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API HashMap<String, UInt32>;
+	template class SPACE_LANGUAGE_API HashMap<String, UInt64>;
+#endif
+
+	class SPACE_LANGUAGE_API Assembler
+	{
+	public:
+		/*!
+		@param error_info_formatter format string which likes "In line:{} column:{}, {}"
+		*/
+		InstructionsGenerator Compile(const String& str, const String& error_info_formatter) const;
+
+	private:
+	};
 
 	/*!
 	@}
