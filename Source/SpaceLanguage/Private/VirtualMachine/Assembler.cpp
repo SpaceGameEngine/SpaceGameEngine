@@ -212,37 +212,46 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 		}
 		else
 		{
-			if (instr_size)
+			if (iter->m_Type != TokenType::WordSeparator)
 			{
-				if (iter->m_Type != TokenType::IntegerLiteral)
+				if (instr_size)
 				{
-					SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need integer here"))));
+					if (iter->m_Type != TokenType::IntegerLiteral)
+					{
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need integer here"))));
+						return true;
+					}
+					if (StringTo<String, UInt8>(iter->m_Content) >= RegistersSize)
+					{
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid register index"))));
+						return true;
+					}
+					instr_size -= 1;
+				}
+				else if (iter->m_Type == TokenType::Identifier)
+				{
+					if (!InstructionNameSet::GetSingleton().IsInstructionName(iter->m_Content))
+					{
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid instruction name"))));
+						return true;
+					}
+					pinstr = &(InstructionNameSet::GetSingleton().Get(iter->m_Content));
+					instr_size = pinstr->m_Size - 1;
+				}
+				else
+				{
+					SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid token type"))));
 					return true;
 				}
-				if (StringTo<String, UInt8>(iter->m_Content) >= RegistersSize)
-				{
-					SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid register index"))));
-					return true;
-				}
-				instr_size -= 1;
-			}
-			else if (iter->m_Type == TokenType::Identifier)
-			{
-				if (!InstructionNameSet::GetSingleton().IsInstructionName(iter->m_Content))
-				{
-					SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid instruction name"))));
-					return true;
-				}
-				pinstr = &(InstructionNameSet::GetSingleton().Get(iter->m_Content));
-				instr_size = pinstr->m_Size - 1;
-			}
-			else if (iter->m_Type != TokenType::WordSeparator)
-			{
-				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid token type"))));
-				return true;
 			}
 			col += iter->m_Content.GetSize();
 		}
+	}
+
+	if (instr_size)
+	{
+		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete instruction"))));
+		return true;
 	}
 
 	if (need_tags.GetSize())
