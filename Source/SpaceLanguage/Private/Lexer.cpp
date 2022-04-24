@@ -634,7 +634,7 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 	}
 
 	if (state == State::CommentLine)
-		result.EmplaceBack(TokenType::Comment, str_buf);
+		result.EmplaceBack(TokenType::CommentLine, str_buf);
 	else
 	{
 		while (state != State::Start)
@@ -687,7 +687,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::StateMachine()
 								   Pair<const Char, StateTransfer>(SGE_STR('"'), StateTransfer(State::String, StateMachineControlSignal::Skip, TokenType::StringLiteral)),
 								   Pair<const Char, StateTransfer>(SGE_STR('R'), StateTransfer(State::RawPrefix, StateMachineControlSignal::Forward, TokenType::StringLiteral)),
 								   Pair<const Char, StateTransfer>(SGE_STR('_'), StateTransfer(State::Identifier, StateMachineControlSignal::Forward, TokenType::Identifier)),
-								   Pair<const Char, StateTransfer>(SGE_STR('/'), StateTransfer(State::SlashPrefix, StateMachineControlSignal::Forward, TokenType::Comment)),
+								   Pair<const Char, StateTransfer>(SGE_STR('/'), StateTransfer(State::SlashPrefix, StateMachineControlSignal::Forward, TokenType::CommentLine)),
 								   Pair<const Char, StateTransfer>(SGE_STR('\r'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Forward, TokenType::LineSeparator)),
 								   Pair<const Char, StateTransfer>(SGE_STR('\n'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Forward, TokenType::LineSeparator)),
 								   Pair<const Char, StateTransfer>(SGE_STR(' '), StateTransfer(State::WordSeparator, StateMachineControlSignal::Forward, TokenType::WordSeparator)),
@@ -825,26 +825,26 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::StateMachine()
 	m_OtherCharacterStates[State::RawStringEnd] = StateTransfer(State::RawString, StateMachineControlSignal::RawStringEndBack, TokenType::StringLiteral);
 
 	//SlashPrefix
-	m_States[State::SlashPrefix].Insert({Pair<const Char, StateTransfer>(SGE_STR('/'), StateTransfer(State::CommentLine, StateMachineControlSignal::Clear, TokenType::Comment)),
-										 Pair<const Char, StateTransfer>(SGE_STR('*'), StateTransfer(State::CommentBlock, StateMachineControlSignal::Clear, TokenType::Comment))});
+	m_States[State::SlashPrefix].Insert({Pair<const Char, StateTransfer>(SGE_STR('/'), StateTransfer(State::CommentLine, StateMachineControlSignal::Clear, TokenType::CommentLine)),
+										 Pair<const Char, StateTransfer>(SGE_STR('*'), StateTransfer(State::CommentBlock, StateMachineControlSignal::Clear, TokenType::CommentBlock))});
 
 	m_OtherCharacterStates[State::SlashPrefix] = StateTransfer(State::Start, StateMachineControlSignal::Submit, TokenType::Slash);
 
 	//CommentBlock
-	m_States[State::CommentBlock].Insert(SGE_STR('*'), StateTransfer(State::CommentBlockEnd, StateMachineControlSignal::Skip, TokenType::Comment));
+	m_States[State::CommentBlock].Insert(SGE_STR('*'), StateTransfer(State::CommentBlockEnd, StateMachineControlSignal::Skip, TokenType::CommentBlock));
 
-	m_OtherCharacterStates[State::CommentBlock] = StateTransfer(State::CommentBlock, StateMachineControlSignal::Forward, TokenType::Comment);
+	m_OtherCharacterStates[State::CommentBlock] = StateTransfer(State::CommentBlock, StateMachineControlSignal::Forward, TokenType::CommentBlock);
 
 	//CommentBlockEnd
-	m_States[State::CommentBlockEnd].Insert(SGE_STR('/'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSkip, TokenType::Comment));
+	m_States[State::CommentBlockEnd].Insert(SGE_STR('/'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSkip, TokenType::CommentBlock));
 
-	m_OtherCharacterStates[State::CommentBlockEnd] = StateTransfer(State::CommentBlock, StateMachineControlSignal::CommentBlockEndBack, TokenType::Comment);
+	m_OtherCharacterStates[State::CommentBlockEnd] = StateTransfer(State::CommentBlock, StateMachineControlSignal::CommentBlockEndBack, TokenType::CommentBlock);
 
 	//CommentLine
-	m_States[State::CommentLine].Insert({Pair<const Char, StateTransfer>(SGE_STR('\r'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Submit, TokenType::Comment)),
-										 Pair<const Char, StateTransfer>(SGE_STR('\n'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Submit, TokenType::Comment))});
+	m_States[State::CommentLine].Insert({Pair<const Char, StateTransfer>(SGE_STR('\r'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Submit, TokenType::CommentLine)),
+										 Pair<const Char, StateTransfer>(SGE_STR('\n'), StateTransfer(State::LineSeparator, StateMachineControlSignal::Submit, TokenType::CommentLine))});
 
-	m_OtherCharacterStates[State::CommentLine] = StateTransfer(State::CommentLine, StateMachineControlSignal::Forward, TokenType::Comment);
+	m_OtherCharacterStates[State::CommentLine] = StateTransfer(State::CommentLine, StateMachineControlSignal::Forward, TokenType::CommentLine);
 }
 
 Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::GetTokens(const String& str, const String& error_info_formatter)

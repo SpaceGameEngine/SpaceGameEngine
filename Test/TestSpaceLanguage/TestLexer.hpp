@@ -177,12 +177,12 @@ TEST(StateMachine, Test)
 
 	auto res6 = sm.Run(SGE_STR("//test comment line"));
 	ASSERT_EQ(res6.GetSize(), 1);
-	ASSERT_EQ(res6[0].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res6[0].m_Type, Lexer::TokenType::CommentLine);
 	ASSERT_EQ(res6[0].m_Content, SGE_STR("test comment line"));
 
 	auto res7 = sm.Run(SGE_STR("/*test comment block*/a"));
 	ASSERT_EQ(res7.GetSize(), 2);
-	ASSERT_EQ(res7[0].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res7[0].m_Type, Lexer::TokenType::CommentBlock);
 	ASSERT_EQ(res7[0].m_Content, SGE_STR("test comment block"));
 	ASSERT_EQ(res7[1].m_Type, Lexer::TokenType::Identifier);
 	ASSERT_EQ(res7[1].m_Content, SGE_STR("a"));
@@ -195,7 +195,7 @@ TEST(StateMachine, Test)
 	ASSERT_EQ(res8[1].m_Content, SGE_STR("/"));
 	ASSERT_EQ(res8[2].m_Type, Lexer::TokenType::Identifier);
 	ASSERT_EQ(res8[2].m_Content, SGE_STR("b"));
-	ASSERT_EQ(res8[3].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res8[3].m_Type, Lexer::TokenType::CommentLine);
 	ASSERT_EQ(res8[3].m_Content, SGE_STR(""));
 
 	auto res9 = sm.Run(SGE_STR("'a''\n'"));
@@ -276,12 +276,12 @@ TEST(GetTokens, Test)
 
 	auto res6 = Lexer::GetTokens(SGE_STR("//test comment line"), formatter);
 	ASSERT_EQ(res6.GetSize(), 1);
-	ASSERT_EQ(res6[0].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res6[0].m_Type, Lexer::TokenType::CommentLine);
 	ASSERT_EQ(res6[0].m_Content, SGE_STR("test comment line"));
 
 	auto res7 = Lexer::GetTokens(SGE_STR("/*test comment block*/a"), formatter);
 	ASSERT_EQ(res7.GetSize(), 2);
-	ASSERT_EQ(res7[0].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res7[0].m_Type, Lexer::TokenType::CommentBlock);
 	ASSERT_EQ(res7[0].m_Content, SGE_STR("test comment block"));
 	ASSERT_EQ(res7[1].m_Type, Lexer::TokenType::Identifier);
 	ASSERT_EQ(res7[1].m_Content, SGE_STR("a"));
@@ -294,7 +294,7 @@ TEST(GetTokens, Test)
 	ASSERT_EQ(res8[1].m_Content, SGE_STR("/"));
 	ASSERT_EQ(res8[2].m_Type, Lexer::TokenType::Identifier);
 	ASSERT_EQ(res8[2].m_Content, SGE_STR("b"));
-	ASSERT_EQ(res8[3].m_Type, Lexer::TokenType::Comment);
+	ASSERT_EQ(res8[3].m_Type, Lexer::TokenType::CommentLine);
 	ASSERT_EQ(res8[3].m_Content, SGE_STR(""));
 
 	auto res9 = Lexer::GetTokens(SGE_STR("'a''\n'"), formatter);

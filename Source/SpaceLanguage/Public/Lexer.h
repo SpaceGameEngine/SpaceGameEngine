@@ -67,7 +67,8 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		RightCurlyBracket = 35,		//}
 		Tilde = 36,					//~
 		Quote = 37,					//`
-		Comment = 38
+		CommentLine = 38,
+		CommentBlock = 39
 	};
 
 	struct SPACE_LANGUAGE_API Token
