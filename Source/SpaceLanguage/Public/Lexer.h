@@ -157,7 +157,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	}
 	inline constexpr const SizeType StateSize = 23;
 
-	using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType);
+	using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType&);
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API HashMap<Char, StateType>;
