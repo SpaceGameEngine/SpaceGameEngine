@@ -1930,6 +1930,186 @@ TEST(List, NotEqualTest)
 	ASSERT_FALSE(l1 != l4_);
 }
 
+TEST(List, SwapTest)
+{
+	const int test_size = 1000;
+	int val_pool[2 * test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	List<test_list_object>* pl = new List<test_list_object>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+	//----------------------------------------------------------
+	List<test_list_object>* pl2 = new List<test_list_object>();
+
+	for (int i = test_size; i < 2 * test_size; ++i)
+	{
+		ASSERT_EQ(pl2->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pl2->GetSize(), test_size);
+	cnt = test_size;
+	for (auto i = pl2->GetConstBegin(); i != pl2->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl2));
+
+	//----------------------------------------------------------
+	List<test_list_object>* pl3 = new List<test_list_object>(std::move(*pl));
+
+	ASSERT_EQ(pl3->GetSize(), test_size);
+	cnt = 0;
+	for (auto i = pl3->GetConstBegin(); i != pl3->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl3));
+
+	*pl = std::move(*pl2);
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	cnt = test_size;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	*pl2 = std::move(*pl3);
+
+	ASSERT_EQ(pl2->GetSize(), test_size);
+	cnt = 0;
+	for (auto i = pl2->GetConstBegin(); i != pl2->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl2));
+
+	//----------------------------------------------------------
+	delete pl;
+	delete pl2;
+	delete pl3;
+	for (int i = 0; i < 2 * test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(List, AnotherAllocatorSwapTest)
+{
+	const int test_size = 1000;
+	int val_pool[2 * test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_list_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	List<test_list_object, MemoryManagerAllocator>* pl = new List<test_list_object, MemoryManagerAllocator>();
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(pl->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	int cnt = 0;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+	//----------------------------------------------------------
+	List<test_list_object, StdAllocator>* pl2 = new List<test_list_object, StdAllocator>();
+
+	for (int i = test_size; i < 2 * test_size; ++i)
+	{
+		ASSERT_EQ(pl2->EmplaceBack(i, val_rel_func).val, i);
+	}
+
+	ASSERT_EQ(pl2->GetSize(), test_size);
+	cnt = test_size;
+	for (auto i = pl2->GetConstBegin(); i != pl2->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl2));
+
+	//----------------------------------------------------------
+	List<test_list_object, MemoryManagerAllocator>* pl3 = new List<test_list_object, MemoryManagerAllocator>(std::move(*pl));
+
+	ASSERT_EQ(pl3->GetSize(), test_size);
+	cnt = 0;
+	for (auto i = pl3->GetConstBegin(); i != pl3->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl3));
+
+	*pl = std::move(*pl2);
+
+	ASSERT_EQ(pl->GetSize(), test_size);
+	cnt = test_size;
+	for (auto i = pl->GetConstBegin(); i != pl->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl));
+
+	*pl2 = std::move(*pl3);
+
+	ASSERT_EQ(pl2->GetSize(), test_size);
+	cnt = 0;
+	for (auto i = pl2->GetConstBegin(); i != pl2->GetConstEnd(); ++i, ++cnt)
+	{
+		ASSERT_EQ(i->val, cnt);
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	ASSERT_TRUE(CheckListConnection(*pl2));
+
+	//----------------------------------------------------------
+	delete pl;
+	delete pl2;
+	delete pl3;
+	for (int i = 0; i < 2 * test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
 	List<int> l({0,

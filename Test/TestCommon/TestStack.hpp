@@ -558,3 +558,159 @@ TEST(Stack, NotEqualTest)
 	ASSERT_FALSE(s1 != s4);
 	ASSERT_FALSE(s1 != s4_);
 }
+
+TEST(Stack, SwapTest)
+{
+	const int test_size = 1000;
+	int val_pool[2 * test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_stack_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	Stack<test_stack_object>* ps = new Stack<test_stack_object>();
+	for (int i = 0; i < test_size; ++i)
+	{
+		ps->Push(test_stack_object(i, val_rel_func));
+		ASSERT_EQ(ps->GetTop().val, i);
+	}
+	ASSERT_EQ(ps->GetSize(), test_size);
+
+	int cnt = 0;
+	for (auto iter = ps->GetImplement().GetConstBegin(); iter != ps->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	Stack<test_stack_object>* ps2 = new Stack<test_stack_object>();
+	for (int i = test_size; i < 2 * test_size; ++i)
+	{
+		ps2->Push(test_stack_object(i, val_rel_func));
+		ASSERT_EQ(ps2->GetTop().val, i);
+	}
+	ASSERT_EQ(ps2->GetSize(), test_size);
+
+	for (auto iter = ps2->GetImplement().GetConstBegin(); iter != ps2->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	Stack<test_stack_object>* ps3 = new Stack<test_stack_object>(std::move(*ps));
+
+	cnt = 0;
+	for (auto iter = ps3->GetImplement().GetConstBegin(); iter != ps3->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	*ps = std::move(*ps2);
+
+	for (auto iter = ps->GetImplement().GetConstBegin(); iter != ps->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	*ps2 = std::move(*ps3);
+
+	cnt = 0;
+	for (auto iter = ps2->GetImplement().GetConstBegin(); iter != ps2->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	delete ps;
+	delete ps2;
+	delete ps3;
+	for (int i = 0; i < 2 * test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(Stack, AnotherAllocatorSwapTest)
+{
+	const int test_size = 1000;
+	int val_pool[2 * test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_stack_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	Stack<test_stack_object, MemoryManagerAllocator>* ps = new Stack<test_stack_object, MemoryManagerAllocator>();
+	for (int i = 0; i < test_size; ++i)
+	{
+		ps->Push(test_stack_object(i, val_rel_func));
+		ASSERT_EQ(ps->GetTop().val, i);
+	}
+	ASSERT_EQ(ps->GetSize(), test_size);
+
+	int cnt = 0;
+	for (auto iter = ps->GetImplement().GetConstBegin(); iter != ps->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	Stack<test_stack_object, StdAllocator>* ps2 = new Stack<test_stack_object, StdAllocator>();
+	for (int i = test_size; i < 2 * test_size; ++i)
+	{
+		ps2->Push(test_stack_object(i, val_rel_func));
+		ASSERT_EQ(ps2->GetTop().val, i);
+	}
+	ASSERT_EQ(ps2->GetSize(), test_size);
+
+	for (auto iter = ps2->GetImplement().GetConstBegin(); iter != ps2->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	Stack<test_stack_object, MemoryManagerAllocator>* ps3 = new Stack<test_stack_object, MemoryManagerAllocator>(std::move(*ps));
+
+	cnt = 0;
+	for (auto iter = ps3->GetImplement().GetConstBegin(); iter != ps3->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	*ps = std::move(*ps2);
+
+	for (auto iter = ps->GetImplement().GetConstBegin(); iter != ps->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	*ps2 = std::move(*ps3);
+
+	cnt = 0;
+	for (auto iter = ps2->GetImplement().GetConstBegin(); iter != ps2->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	delete ps;
+	delete ps2;
+	delete ps3;
+	for (int i = 0; i < 2 * test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}

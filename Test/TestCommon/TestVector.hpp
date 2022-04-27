@@ -1784,6 +1784,110 @@ TEST(Vector, NotEqualTest)
 	ASSERT_FALSE(v1 != v4_);
 }
 
+TEST(Vector, SwapTest)
+{
+	const int test_size = 1000;
+	int val_pool[2 * test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+
+	Vector<test_vector_class>* pv1 = new Vector<test_vector_class>();
+
+	for (int i = 0; i < test_size; ++i)
+		pv1->EmplaceBack(i, [i, &val_pool]() { val_pool[i] += 1; });
+
+	ASSERT_EQ(pv1->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv1)[i].content, i);
+
+	Vector<test_vector_class>* pv2 = new Vector<test_vector_class>();
+
+	for (int i = test_size; i < 2 * test_size; ++i)
+		pv2->EmplaceBack(i, [i, &val_pool]() { val_pool[i] += 1; });
+
+	ASSERT_EQ(pv2->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv2)[i].content, i + test_size);
+
+	Vector<test_vector_class>* pv3 = new Vector<test_vector_class>(std::move(*pv1));
+
+	ASSERT_EQ(pv3->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv3)[i].content, i);
+
+	*pv1 = std::move(*pv2);
+
+	ASSERT_EQ(pv1->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv1)[i].content, i + test_size);
+
+	*pv2 = std::move(*pv3);
+
+	ASSERT_EQ(pv2->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv2)[i].content, i);
+
+	delete pv1;
+	delete pv2;
+	delete pv3;
+
+	for (int i = 0; i < 2 * test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(Vector, AnotherAllocatorSwapTest)
+{
+	const int test_size = 1000;
+	int val_pool[2 * test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+
+	Vector<test_vector_class, MemoryManagerAllocator>* pv1 = new Vector<test_vector_class, MemoryManagerAllocator>();
+
+	for (int i = 0; i < test_size; ++i)
+		pv1->EmplaceBack(i, [i, &val_pool]() { val_pool[i] += 1; });
+
+	ASSERT_EQ(pv1->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv1)[i].content, i);
+
+	Vector<test_vector_class, StdAllocator>* pv2 = new Vector<test_vector_class, StdAllocator>();
+
+	for (int i = test_size; i < 2 * test_size; ++i)
+		pv2->EmplaceBack(i, [i, &val_pool]() { val_pool[i] += 1; });
+
+	ASSERT_EQ(pv2->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv2)[i].content, i + test_size);
+
+	Vector<test_vector_class, MemoryManagerAllocator>* pv3 = new Vector<test_vector_class, MemoryManagerAllocator>(std::move(*pv1));
+
+	ASSERT_EQ(pv3->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv3)[i].content, i);
+
+	*pv1 = std::move(*pv2);
+
+	ASSERT_EQ(pv1->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv1)[i].content, i + test_size);
+
+	*pv2 = std::move(*pv3);
+
+	ASSERT_EQ(pv2->GetSize(), test_size);
+	for (int i = 0; i < test_size; ++i)
+		ASSERT_EQ((*pv2)[i].content, i);
+
+	delete pv1;
+	delete pv2;
+	delete pv3;
+
+	for (int i = 0; i < 2 * test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(VectorIterator, IsVectorIteratorTest)
 {
 	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Value));

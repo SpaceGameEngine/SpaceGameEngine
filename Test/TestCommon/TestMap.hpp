@@ -679,6 +679,146 @@ TEST(RedBlackTree, ReverseForEachTest)
 	}
 }
 
+TEST(RedBlackTree, SwapTest)
+{
+	const int test_size = 1000;
+	int key_pool[2 * test_size];
+	int val_pool[2 * test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValue(test_map_object(i))->val, i);
+	}
+
+	for (int i = test_size; i < 2 * test_size; i++)
+	{
+		pm2->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = 2 * test_size - 1; i >= test_size; i--)
+	{
+		ASSERT_EQ(pm2->FindValue(test_map_object(i))->val, i);
+	}
+
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>* pm3 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object>(std::move(*pm1));
+
+	ASSERT_EQ(pm3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm3->FindValue(test_map_object(i))->val, i);
+	}
+
+	*pm1 = std::move(*pm2);
+
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = 2 * test_size - 1; i >= test_size; i--)
+	{
+		ASSERT_EQ(pm1->FindValue(test_map_object(i))->val, i);
+	}
+
+	*pm2 = std::move(*pm3);
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValue(test_map_object(i))->val, i);
+	}
+
+	delete pm1;
+	delete pm2;
+	delete pm3;
+
+	for (int i = 0; i < 2 * test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(RedBlackTree, AnotherAllocatorSwapTest)
+{
+	const int test_size = 1000;
+	int key_pool[2 * test_size];
+	int val_pool[2 * test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, MemoryManagerAllocator>* pm1 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, MemoryManagerAllocator>();
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->FindValue(test_map_object(i))->val, i);
+	}
+
+	for (int i = test_size; i < 2 * test_size; i++)
+	{
+		pm2->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = 2 * test_size - 1; i >= test_size; i--)
+	{
+		ASSERT_EQ(pm2->FindValue(test_map_object(i))->val, i);
+	}
+
+	SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, MemoryManagerAllocator>* pm3 = new SpaceGameEngine::MapImplement::RedBlackTree<test_map_object, test_map_object, Less<test_map_object>, MemoryManagerAllocator>(std::move(*pm1));
+
+	ASSERT_EQ(pm3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm3->FindValue(test_map_object(i))->val, i);
+	}
+
+	*pm1 = std::move(*pm2);
+
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = 2 * test_size - 1; i >= test_size; i--)
+	{
+		ASSERT_EQ(pm1->FindValue(test_map_object(i))->val, i);
+	}
+
+	*pm2 = std::move(*pm3);
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->FindValue(test_map_object(i))->val, i);
+	}
+
+	delete pm1;
+	delete pm2;
+	delete pm3;
+
+	for (int i = 0; i < 2 * test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
 TEST(Map, InitializerListConstructionTest)
 {
 	Map<int, double> m({{1, 1.0},
@@ -1043,6 +1183,146 @@ TEST(Map, NotEqualTest)
 	ASSERT_TRUE(m1 != m3_);
 	ASSERT_FALSE(m1 != m4);
 	ASSERT_FALSE(m1 != m4_);
+}
+
+TEST(Map, SwapTest)
+{
+	const int test_size = 1000;
+	int key_pool[2 * test_size];
+	int val_pool[2 * test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	Map<test_map_object, test_map_object>* pm1 = new Map<test_map_object, test_map_object>();
+	Map<test_map_object, test_map_object>* pm2 = new Map<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	for (int i = test_size; i < 2 * test_size; i++)
+	{
+		pm2->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = 2 * test_size - 1; i >= test_size; i--)
+	{
+		ASSERT_EQ(pm2->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm3 = new Map<test_map_object, test_map_object>(std::move(*pm1));
+
+	ASSERT_EQ(pm3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm3->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	*pm1 = std::move(*pm2);
+
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = 2 * test_size - 1; i >= test_size; i--)
+	{
+		ASSERT_EQ(pm1->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	*pm2 = std::move(*pm3);
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	delete pm1;
+	delete pm2;
+	delete pm3;
+
+	for (int i = 0; i < 2 * test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(Map, AnotherAllocatorSwapTest)
+{
+	const int test_size = 1000;
+	int key_pool[2 * test_size];
+	int val_pool[2 * test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	Map<test_map_object, test_map_object, Less<test_map_object>, MemoryManagerAllocator>* pm1 = new Map<test_map_object, test_map_object, Less<test_map_object>, MemoryManagerAllocator>();
+	Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>();
+	for (int i = 0; i < test_size; i++)
+	{
+		pm1->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm1->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	for (int i = test_size; i < 2 * test_size; i++)
+	{
+		pm2->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+	}
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = 2 * test_size - 1; i >= test_size; i--)
+	{
+		ASSERT_EQ(pm2->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	Map<test_map_object, test_map_object, Less<test_map_object>, MemoryManagerAllocator>* pm3 = new Map<test_map_object, test_map_object, Less<test_map_object>, MemoryManagerAllocator>(std::move(*pm1));
+
+	ASSERT_EQ(pm3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm3->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	*pm1 = std::move(*pm2);
+
+	ASSERT_EQ(pm1->GetSize(), test_size);
+	for (int i = 2 * test_size - 1; i >= test_size; i--)
+	{
+		ASSERT_EQ(pm1->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	*pm2 = std::move(*pm3);
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pm2->Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	delete pm1;
+	delete pm2;
+	delete pm3;
+
+	for (int i = 0; i < 2 * test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(MapIterator, GetBeginTest)

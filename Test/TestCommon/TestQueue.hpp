@@ -558,3 +558,161 @@ TEST(Queue, NotEqualTest)
 	ASSERT_FALSE(q1 != q4);
 	ASSERT_FALSE(q1 != q4_);
 }
+
+TEST(Queue, SwapTest)
+{
+	const int test_size = 1000;
+	int val_pool[2 * test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	Queue<test_queue_object>* pq = new Queue<test_queue_object>();
+	for (int i = 0; i < test_size; ++i)
+	{
+		pq->Push(test_queue_object(i, val_rel_func));
+		ASSERT_EQ(pq->GetFront().val, 0);
+	}
+	ASSERT_EQ(pq->GetSize(), test_size);
+
+	int cnt = 0;
+	for (auto iter = pq->GetImplement().GetConstBegin(); iter != pq->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	Queue<test_queue_object>* pq2 = new Queue<test_queue_object>();
+
+	for (int i = test_size; i < 2 * test_size; ++i)
+	{
+		pq2->Push(test_queue_object(i, val_rel_func));
+		ASSERT_EQ(pq2->GetFront().val, test_size);
+	}
+	ASSERT_EQ(pq2->GetSize(), test_size);
+
+	for (auto iter = pq2->GetImplement().GetConstBegin(); iter != pq2->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	Queue<test_queue_object>* pq3 = new Queue<test_queue_object>(std::move(*pq));
+
+	cnt = 0;
+	for (auto iter = pq3->GetImplement().GetConstBegin(); iter != pq3->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	*pq = std::move(*pq2);
+
+	for (auto iter = pq->GetImplement().GetConstBegin(); iter != pq->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	*pq2 = std::move(*pq3);
+
+	cnt = 0;
+	for (auto iter = pq2->GetImplement().GetConstBegin(); iter != pq2->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	delete pq;
+	delete pq2;
+	delete pq3;
+	for (int i = 0; i < 2 * test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(Queue, AnotherAllocatorSwapTest)
+{
+	const int test_size = 1000;
+	int val_pool[2 * test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_queue_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	Queue<test_queue_object, MemoryManagerAllocator>* pq = new Queue<test_queue_object, MemoryManagerAllocator>();
+	for (int i = 0; i < test_size; ++i)
+	{
+		pq->Push(test_queue_object(i, val_rel_func));
+		ASSERT_EQ(pq->GetFront().val, 0);
+	}
+	ASSERT_EQ(pq->GetSize(), test_size);
+
+	int cnt = 0;
+	for (auto iter = pq->GetImplement().GetConstBegin(); iter != pq->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	Queue<test_queue_object, StdAllocator>* pq2 = new Queue<test_queue_object, StdAllocator>();
+
+	for (int i = test_size; i < 2 * test_size; ++i)
+	{
+		pq2->Push(test_queue_object(i, val_rel_func));
+		ASSERT_EQ(pq2->GetFront().val, test_size);
+	}
+	ASSERT_EQ(pq2->GetSize(), test_size);
+
+	for (auto iter = pq2->GetImplement().GetConstBegin(); iter != pq2->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	Queue<test_queue_object, MemoryManagerAllocator>* pq3 = new Queue<test_queue_object, MemoryManagerAllocator>(std::move(*pq));
+
+	cnt = 0;
+	for (auto iter = pq3->GetImplement().GetConstBegin(); iter != pq3->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	*pq = std::move(*pq2);
+
+	for (auto iter = pq->GetImplement().GetConstBegin(); iter != pq->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, 2 * test_size);
+
+	*pq2 = std::move(*pq3);
+
+	cnt = 0;
+	for (auto iter = pq2->GetImplement().GetConstBegin(); iter != pq2->GetImplement().GetConstEnd(); ++iter)
+	{
+		ASSERT_EQ(*iter, cnt);
+		++cnt;
+	}
+	ASSERT_EQ(cnt, test_size);
+
+	delete pq;
+	delete pq2;
+	delete pq3;
+	for (int i = 0; i < 2 * test_size; ++i)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}

@@ -902,6 +902,58 @@ TEST(Storage, CopyOnWriteTest)
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s2.GetRealSize()), StringImplement::StringCategory::Large);
 }
 
+TEST(Storage, SwapTest)
+{
+	const Char str1[] = SGE_STR("this is a test for str1");
+	const Char str2[] = SGE_STR("this is a test for str2!");
+
+	StringImplement::Storage<Char> s1(str1, sizeof(str1) - sizeof(char));
+
+	ASSERT_EQ(memcmp(s1.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+
+	StringImplement::Storage<Char> s2(str2, sizeof(str2) - sizeof(char));
+
+	ASSERT_EQ(memcmp(s2.GetData(), str2, sizeof(str2) - sizeof(char)), 0);
+
+	StringImplement::Storage<Char> s3(std::move(s1));
+
+	ASSERT_EQ(memcmp(s3.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+
+	s1 = std::move(s2);
+
+	ASSERT_EQ(memcmp(s1.GetData(), str2, sizeof(str2) - sizeof(char)), 0);
+
+	s2 = std::move(s3);
+
+	ASSERT_EQ(memcmp(s2.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+}
+
+TEST(Storage, AnotherAllocatorSwapTest)
+{
+	const Char str1[] = SGE_STR("this is a test for str1");
+	const Char str2[] = SGE_STR("this is a test for str2!");
+
+	StringImplement::Storage<Char, MemoryManagerAllocator> s1(str1, sizeof(str1) - sizeof(char));
+
+	ASSERT_EQ(memcmp(s1.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+
+	StringImplement::Storage<Char, StdAllocator> s2(str2, sizeof(str2) - sizeof(char));
+
+	ASSERT_EQ(memcmp(s2.GetData(), str2, sizeof(str2) - sizeof(char)), 0);
+
+	StringImplement::Storage<Char, MemoryManagerAllocator> s3(std::move(s1));
+
+	ASSERT_EQ(memcmp(s3.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+
+	s1 = std::move(s2);
+
+	ASSERT_EQ(memcmp(s1.GetData(), str2, sizeof(str2) - sizeof(char)), 0);
+
+	s2 = std::move(s3);
+
+	ASSERT_EQ(memcmp(s2.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+}
+
 TEST(StringImplement, GetNextMultipleByteCharTest)
 {
 	//"这是12345abcde";
@@ -2638,6 +2690,58 @@ TEST(StringCore, PointerAsIteratorTest)
 	utf8_s3.Insert(utf8_s3.GetConstReverseEnd(), (const Char8*)putf8_str, (const Char8*)putf8_str + 12);
 	ASSERT_EQ(utf8_s3.GetSize(), 4);
 	ASSERT_EQ(utf8_s3, putf8_str_r);
+}
+
+TEST(StringCore, SwapTest)
+{
+	const Char str1[] = SGE_STR("this is a test for str1");
+	const Char str2[] = SGE_STR("this is a test for str2!");
+
+	String s1(str1);
+
+	ASSERT_EQ(memcmp(s1.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+
+	String s2(str2);
+
+	ASSERT_EQ(memcmp(s2.GetData(), str2, sizeof(str2) - sizeof(char)), 0);
+
+	String s3(std::move(s1));
+
+	ASSERT_EQ(memcmp(s3.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+
+	s1 = std::move(s2);
+
+	ASSERT_EQ(memcmp(s1.GetData(), str2, sizeof(str2) - sizeof(char)), 0);
+
+	s2 = std::move(s3);
+
+	ASSERT_EQ(memcmp(s2.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+}
+
+TEST(StringCore, AnotherAllocatorSwapTest)
+{
+	const Char str1[] = SGE_STR("this is a test for str1");
+	const Char str2[] = SGE_STR("this is a test for str2!");
+
+	StringCore<Char, String::ValueTrait, MemoryManagerAllocator> s1(str1);
+
+	ASSERT_EQ(memcmp(s1.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+
+	StringCore<Char, String::ValueTrait, StdAllocator> s2(str2);
+
+	ASSERT_EQ(memcmp(s2.GetData(), str2, sizeof(str2) - sizeof(char)), 0);
+
+	StringCore<Char, String::ValueTrait, MemoryManagerAllocator> s3(std::move(s1));
+
+	ASSERT_EQ(memcmp(s3.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
+
+	s1 = std::move(s2);
+
+	ASSERT_EQ(memcmp(s1.GetData(), str2, sizeof(str2) - sizeof(char)), 0);
+
+	s2 = std::move(s3);
+
+	ASSERT_EQ(memcmp(s2.GetData(), str1, sizeof(str1) - sizeof(char)), 0);
 }
 
 TEST(StringCoreIterator, GetBeginTest)
