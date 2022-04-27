@@ -212,6 +212,9 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 
 		StateTransfer();
 		StateTransfer(StateType next_state, StateMachineControlSignal sign, TokenType token_type);
+
+		bool operator==(const StateTransfer& st) const;
+		bool operator!=(const StateTransfer& st) const;
 	};
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)

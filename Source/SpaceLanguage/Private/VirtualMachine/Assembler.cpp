@@ -172,7 +172,8 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 				}
 				else
 				{
-					if (module_functions.Find(iter->m_Content) == module_functions.GetConstEnd())
+					auto mod_iter = module_functions.Find(iter->m_Content);
+					if (mod_iter == module_functions.GetConstEnd())
 					{
 						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unknown module name"))));
 						return true;
@@ -191,7 +192,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need function name here"))));
 						return true;
 					}
-					if (module_functions.Find(next_next->m_Content) == module_functions.GetConstEnd())
+					if (mod_iter->m_Second.m_Second.Find(next_next->m_Content) == mod_iter->m_Second.m_Second.GetConstEnd())
 					{
 						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unknown function name"))));
 						return true;

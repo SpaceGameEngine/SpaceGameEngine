@@ -561,6 +561,16 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::StateTransfer(StateType ne
 {
 }
 
+bool SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::operator==(const StateTransfer& st) const
+{
+	return m_NextState == st.m_NextState && m_Signal == st.m_Signal && m_TokenType == st.m_TokenType;
+}
+
+bool SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::operator!=(const StateTransfer& st) const
+{
+	return m_NextState != st.m_NextState || m_Signal != st.m_Signal || m_TokenType != st.m_TokenType;
+}
+
 Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const String& str) const
 {
 	Vector<Token> result;
