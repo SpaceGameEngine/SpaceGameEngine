@@ -47,7 +47,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidInstructionNameError::Judge(const St
 	return !InstructionNameSet::GetSingleton().IsInstructionName(str);
 }
 
-bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(const String& str, const String& error_info_formatter, const HashMap<String, UInt32>& name_set)
+bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(const String& str, const String& error_info_formatter, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions)
 {
 	SizeType line = 1;
 	SizeType col = 1;
@@ -172,7 +172,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 				}
 				else
 				{
-					if (name_set.Find(iter->m_Content) == name_set.GetConstEnd())
+					if (module_functions.Find(iter->m_Content) == module_functions.GetConstEnd())
 					{
 						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unknown module name"))));
 						return true;
@@ -191,7 +191,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need function name here"))));
 						return true;
 					}
-					if (name_set.Find(next_next->m_Content) == name_set.GetConstEnd())
+					if (module_functions.Find(next_next->m_Content) == module_functions.GetConstEnd())
 					{
 						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unknown function name"))));
 						return true;
@@ -266,7 +266,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 
 InstructionsGenerator SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& str, const String& error_info_formatter) const
 {
-	SGE_ASSERT(InvalidAssemblerSourceStringError, str, error_info_formatter, m_NameSet);
+	SGE_ASSERT(InvalidAssemblerSourceStringError, str, error_info_formatter, m_ModuleFunctions);
 
 	InstructionsGenerator result;
 

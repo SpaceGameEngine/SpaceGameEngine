@@ -522,3 +522,39 @@ TEST(Stack, AnotherAllocatorMoveAssignmentTest)
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
+
+TEST(Stack, EqualTest)
+{
+	const Stack<int, MemoryManagerAllocator> s1({1, 2, 3});
+	const Stack<int, MemoryManagerAllocator> s2({1, 2});
+	const Stack<int, StdAllocator> s2_({1, 2});
+	const Stack<int, MemoryManagerAllocator> s3({1, 4, 3});
+	const Stack<int, StdAllocator> s3_({1, 4, 3});
+	const Stack<int, MemoryManagerAllocator> s4({1, 2, 3});
+	const Stack<int, StdAllocator> s4_({1, 2, 3});
+
+	ASSERT_FALSE(s1 == s2);
+	ASSERT_FALSE(s1 == s2_);
+	ASSERT_FALSE(s1 == s3);
+	ASSERT_FALSE(s1 == s3_);
+	ASSERT_TRUE(s1 == s4);
+	ASSERT_TRUE(s1 == s4_);
+}
+
+TEST(Stack, NotEqualTest)
+{
+	const Stack<int, MemoryManagerAllocator> s1({1, 2, 3});
+	const Stack<int, MemoryManagerAllocator> s2({1, 2});
+	const Stack<int, StdAllocator> s2_({1, 2});
+	const Stack<int, MemoryManagerAllocator> s3({1, 4, 3});
+	const Stack<int, StdAllocator> s3_({1, 4, 3});
+	const Stack<int, MemoryManagerAllocator> s4({1, 2, 3});
+	const Stack<int, StdAllocator> s4_({1, 2, 3});
+
+	ASSERT_TRUE(s1 != s2);
+	ASSERT_TRUE(s1 != s2_);
+	ASSERT_TRUE(s1 != s3);
+	ASSERT_TRUE(s1 != s3_);
+	ASSERT_FALSE(s1 != s4);
+	ASSERT_FALSE(s1 != s4_);
+}

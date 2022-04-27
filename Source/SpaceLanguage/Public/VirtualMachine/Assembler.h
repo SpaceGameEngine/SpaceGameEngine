@@ -51,12 +51,14 @@ namespace SpaceGameEngine::SpaceLanguage
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API HashMap<String, UInt32>;
+	template class SPACE_LANGUAGE_API Pair<UInt32, HashMap<String, UInt32>>;
+	template class SPACE_LANGUAGE_API HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>;
 #endif
 
 	struct InvalidAssemblerSourceStringError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The Assembler source string is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(const String& str, const String& error_info_formatter, const HashMap<String, UInt32>& name_set);
+		static SPACE_LANGUAGE_API bool Judge(const String& str, const String& error_info_formatter, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions);
 	};
 
 	class SPACE_LANGUAGE_API Assembler
@@ -68,7 +70,7 @@ namespace SpaceGameEngine::SpaceLanguage
 		InstructionsGenerator Compile(const String& str, const String& error_info_formatter) const;
 
 	private:
-		HashMap<String, UInt32> m_NameSet;
+		HashMap<String, Pair<UInt32, HashMap<String, UInt32>>> m_ModuleFunctions;
 	};
 
 	/*!

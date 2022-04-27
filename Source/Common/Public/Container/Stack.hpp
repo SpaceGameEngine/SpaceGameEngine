@@ -187,6 +187,28 @@ namespace SpaceGameEngine
 			return *(m_Implement.GetConstReverseBegin());
 		}
 
+		inline bool operator==(const Stack& stack) const
+		{
+			return m_Implement == stack.m_Implement;
+		}
+
+		template<typename OtherAllocator, template<typename, typename> class OtherImplement>
+		inline bool operator==(const Stack<T, OtherAllocator, OtherImplement>& stack) const
+		{
+			return m_Implement == stack.m_Implement;
+		}
+
+		inline bool operator!=(const Stack& stack) const
+		{
+			return m_Implement != stack.m_Implement;
+		}
+
+		template<typename OtherAllocator, template<typename, typename> class OtherImplement>
+		inline bool operator!=(const Stack<T, OtherAllocator, OtherImplement>& stack) const
+		{
+			return m_Implement != stack.m_Implement;
+		}
+
 	private:
 		ImplementType m_Implement;
 	};

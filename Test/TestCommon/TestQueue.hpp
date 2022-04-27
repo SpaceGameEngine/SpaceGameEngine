@@ -522,3 +522,39 @@ TEST(Queue, AnotherAllocatorMoveAssignmentTest)
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
+
+TEST(Queue, EqualTest)
+{
+	const Queue<int, MemoryManagerAllocator> q1({1, 2, 3});
+	const Queue<int, MemoryManagerAllocator> q2({1, 2});
+	const Queue<int, StdAllocator> q2_({1, 2});
+	const Queue<int, MemoryManagerAllocator> q3({1, 4, 3});
+	const Queue<int, StdAllocator> q3_({1, 4, 3});
+	const Queue<int, MemoryManagerAllocator> q4({1, 2, 3});
+	const Queue<int, StdAllocator> q4_({1, 2, 3});
+
+	ASSERT_FALSE(q1 == q2);
+	ASSERT_FALSE(q1 == q2_);
+	ASSERT_FALSE(q1 == q3);
+	ASSERT_FALSE(q1 == q3_);
+	ASSERT_TRUE(q1 == q4);
+	ASSERT_TRUE(q1 == q4_);
+}
+
+TEST(Queue, NotEqualTest)
+{
+	const Queue<int, MemoryManagerAllocator> q1({1, 2, 3});
+	const Queue<int, MemoryManagerAllocator> q2({1, 2});
+	const Queue<int, StdAllocator> q2_({1, 2});
+	const Queue<int, MemoryManagerAllocator> q3({1, 4, 3});
+	const Queue<int, StdAllocator> q3_({1, 4, 3});
+	const Queue<int, MemoryManagerAllocator> q4({1, 2, 3});
+	const Queue<int, StdAllocator> q4_({1, 2, 3});
+
+	ASSERT_TRUE(q1 != q2);
+	ASSERT_TRUE(q1 != q2_);
+	ASSERT_TRUE(q1 != q3);
+	ASSERT_TRUE(q1 != q3_);
+	ASSERT_FALSE(q1 != q4);
+	ASSERT_FALSE(q1 != q4_);
+}

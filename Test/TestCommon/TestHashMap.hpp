@@ -1210,6 +1210,66 @@ TEST(HashMap, AnotherAllocatorMoveAssignmentTest)
 	}
 }
 
+TEST(HashMap, EqualTest)
+{
+	const HashMap<int, int, Hash<int>, MemoryManagerAllocator> hm1({{1, 10},
+																	{2, 20},
+																	{3, 30}});
+	const HashMap<int, int, Hash<int>, MemoryManagerAllocator> hm2({{1, 10},
+																	{2, 20}});
+	const HashMap<int, int, Hash<int>, StdAllocator> hm2_({{1, 10},
+														   {2, 20}});
+	const HashMap<int, int, Hash<int>, MemoryManagerAllocator> hm3({{1, 10},
+																	{2, 21},
+																	{3, 30}});
+	const HashMap<int, int, Hash<int>, StdAllocator> hm3_({{1, 10},
+														   {2, 21},
+														   {3, 30}});
+	const HashMap<int, int, Hash<int>, MemoryManagerAllocator> hm4({{1, 10},
+																	{2, 20},
+																	{3, 30}});
+	const HashMap<int, int, Hash<int>, StdAllocator> hm4_({{1, 10},
+														   {2, 20},
+														   {3, 30}});
+
+	ASSERT_FALSE(hm1 == hm2);
+	ASSERT_FALSE(hm1 == hm2_);
+	ASSERT_FALSE(hm1 == hm3);
+	ASSERT_FALSE(hm1 == hm3_);
+	ASSERT_TRUE(hm1 == hm4);
+	ASSERT_TRUE(hm1 == hm4_);
+}
+
+TEST(HashMap, NotEqualTest)
+{
+	const HashMap<int, int, Hash<int>, MemoryManagerAllocator> hm1({{1, 10},
+																	{2, 20},
+																	{3, 30}});
+	const HashMap<int, int, Hash<int>, MemoryManagerAllocator> hm2({{1, 10},
+																	{2, 20}});
+	const HashMap<int, int, Hash<int>, StdAllocator> hm2_({{1, 10},
+														   {2, 20}});
+	const HashMap<int, int, Hash<int>, MemoryManagerAllocator> hm3({{1, 10},
+																	{2, 21},
+																	{3, 30}});
+	const HashMap<int, int, Hash<int>, StdAllocator> hm3_({{1, 10},
+														   {2, 21},
+														   {3, 30}});
+	const HashMap<int, int, Hash<int>, MemoryManagerAllocator> hm4({{1, 10},
+																	{2, 20},
+																	{3, 30}});
+	const HashMap<int, int, Hash<int>, StdAllocator> hm4_({{1, 10},
+														   {2, 20},
+														   {3, 30}});
+
+	ASSERT_TRUE(hm1 != hm2);
+	ASSERT_TRUE(hm1 != hm2_);
+	ASSERT_TRUE(hm1 != hm3);
+	ASSERT_TRUE(hm1 != hm3_);
+	ASSERT_FALSE(hm1 != hm4);
+	ASSERT_FALSE(hm1 != hm4_);
+}
+
 TEST(HashMapIterator, OutOfRangeErrorTest)
 {
 	HashMap<int, int> hm1({{1, 1}, {2, 2}});

@@ -110,33 +110,39 @@ namespace SpaceGameEngine
 		inline PriorityQueue(const AnotherIteratorType& begin, const AnotherIteratorType& end)
 			: m_Implement(begin, end)
 		{
+			BuildHeap();
 		}
 
 		inline PriorityQueue(std::initializer_list<T> ilist)
 			: m_Implement(ilist)
 		{
+			BuildHeap();
 		}
 
 		inline PriorityQueue(const ImplementType& c)
 			: m_Implement(c)
 		{
+			BuildHeap();
 		}
 
 		inline PriorityQueue(ImplementType&& c)
 			: m_Implement(std::move(c))
 		{
+			BuildHeap();
 		}
 
 		template<typename OtherAllocator>
 		inline PriorityQueue(const Implement<T, OtherAllocator>& c)
 			: m_Implement(c)
 		{
+			BuildHeap();
 		}
 
 		template<typename OtherAllocator>
 		inline PriorityQueue(Implement<T, OtherAllocator>&& c)
 			: m_Implement(std::move(c))
 		{
+			BuildHeap();
 		}
 
 		inline SizeType GetSize() const
@@ -191,6 +197,28 @@ namespace SpaceGameEngine
 			return m_Implement[0];
 		}
 
+		inline bool operator==(const PriorityQueue& priority_queue) const
+		{
+			return m_Implement == priority_queue.m_Implement;
+		}
+
+		template<typename OtherComparer, typename OtherAllocator, template<typename, typename> class OtherImplement>
+		inline bool operator==(const PriorityQueue<T, OtherComparer, OtherAllocator, OtherImplement>& priority_queue) const
+		{
+			return m_Implement == priority_queue.m_Implement;
+		}
+
+		inline bool operator!=(const PriorityQueue& priority_queue) const
+		{
+			return m_Implement != priority_queue.m_Implement;
+		}
+
+		template<typename OtherComparer, typename OtherAllocator, template<typename, typename> class OtherImplement>
+		inline bool operator!=(const PriorityQueue<T, OtherComparer, OtherAllocator, OtherImplement>& priority_queue) const
+		{
+			return m_Implement != priority_queue.m_Implement;
+		}
+
 	private:
 		inline void UpdateFromBottom()
 		{
@@ -223,6 +251,34 @@ namespace SpaceGameEngine
 				else
 					break;
 			}
+		}
+
+		inline void BuildHeap()
+		{
+			SizeType cnt = 0;
+			do
+			{
+				cnt = 0;
+				for (SizeType i = 0; i < m_Implement.GetSize(); ++i)
+				{
+					SizeType child = 2 * i + 1;
+					if (child >= m_Implement.GetSize())
+						break;
+					if (Comparer::Compare(m_Implement[child], m_Implement[i]))
+					{
+						std::swap(m_Implement[child], m_Implement[i]);
+						++cnt;
+					}
+					if ((child += 1) < m_Implement.GetSize())
+					{
+						if (Comparer::Compare(m_Implement[child], m_Implement[i]))
+						{
+							std::swap(m_Implement[child], m_Implement[i]);
+							++cnt;
+						}
+					}
+				}
+			} while (cnt != 0);
 		}
 
 	private:

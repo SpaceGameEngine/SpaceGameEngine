@@ -985,6 +985,66 @@ TEST(Map, OperatorTest)
 	}
 }
 
+TEST(Map, EqualTest)
+{
+	const Map<int, int, Less<int>, MemoryManagerAllocator> m1({{1, 10},
+															   {2, 20},
+															   {3, 30}});
+	const Map<int, int, Less<int>, MemoryManagerAllocator> m2({{1, 10},
+															   {2, 20}});
+	const Map<int, int, Less<int>, StdAllocator> m2_({{1, 10},
+													  {2, 20}});
+	const Map<int, int, Less<int>, MemoryManagerAllocator> m3({{1, 10},
+															   {2, 21},
+															   {3, 30}});
+	const Map<int, int, Less<int>, StdAllocator> m3_({{1, 10},
+													  {2, 21},
+													  {3, 30}});
+	const Map<int, int, Less<int>, MemoryManagerAllocator> m4({{1, 10},
+															   {2, 20},
+															   {3, 30}});
+	const Map<int, int, Less<int>, StdAllocator> m4_({{1, 10},
+													  {2, 20},
+													  {3, 30}});
+
+	ASSERT_FALSE(m1 == m2);
+	ASSERT_FALSE(m1 == m2_);
+	ASSERT_FALSE(m1 == m3);
+	ASSERT_FALSE(m1 == m3_);
+	ASSERT_TRUE(m1 == m4);
+	ASSERT_TRUE(m1 == m4_);
+}
+
+TEST(Map, NotEqualTest)
+{
+	const Map<int, int, Less<int>, MemoryManagerAllocator> m1({{1, 10},
+															   {2, 20},
+															   {3, 30}});
+	const Map<int, int, Less<int>, MemoryManagerAllocator> m2({{1, 10},
+															   {2, 20}});
+	const Map<int, int, Less<int>, StdAllocator> m2_({{1, 10},
+													  {2, 20}});
+	const Map<int, int, Less<int>, MemoryManagerAllocator> m3({{1, 10},
+															   {2, 21},
+															   {3, 30}});
+	const Map<int, int, Less<int>, StdAllocator> m3_({{1, 10},
+													  {2, 21},
+													  {3, 30}});
+	const Map<int, int, Less<int>, MemoryManagerAllocator> m4({{1, 10},
+															   {2, 20},
+															   {3, 30}});
+	const Map<int, int, Less<int>, StdAllocator> m4_({{1, 10},
+													  {2, 20},
+													  {3, 30}});
+
+	ASSERT_TRUE(m1 != m2);
+	ASSERT_TRUE(m1 != m2_);
+	ASSERT_TRUE(m1 != m3);
+	ASSERT_TRUE(m1 != m3_);
+	ASSERT_FALSE(m1 != m4);
+	ASSERT_FALSE(m1 != m4_);
+}
+
 TEST(MapIterator, GetBeginTest)
 {
 	Map<int, double> m({{1, 1.0},

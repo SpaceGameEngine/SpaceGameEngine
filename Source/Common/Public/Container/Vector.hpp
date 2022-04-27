@@ -59,8 +59,6 @@ namespace SpaceGameEngine
 
 		inline static const constexpr SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(T);
 
-		static_assert(IsCopyable<T>, "Vector does not support this type");
-
 		struct EmptyVectorError
 		{
 			inline static const TChar sm_pContent[] = SGE_TSTR("The Vector is empty");
@@ -69,6 +67,9 @@ namespace SpaceGameEngine
 				return size == 0;
 			}
 		};
+
+		template<typename _T, typename _Allocator>
+		friend class Vector;
 
 		/*!
 		@brief Default constructor of Vector.
@@ -2075,6 +2076,80 @@ namespace SpaceGameEngine
 					process_func(*iter);
 				}
 			}
+		}
+
+		inline bool operator==(const Vector& vector) const
+		{
+			if (m_Size != vector.m_Size)
+				return false;
+
+			auto iter = GetConstBegin();
+			auto oiter = vector.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return false;
+				++iter;
+				++oiter;
+			}
+
+			return true;
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator==(const Vector<T, OtherAllocator>& vector) const
+		{
+			if (m_Size != vector.m_Size)
+				return false;
+
+			auto iter = GetConstBegin();
+			auto oiter = vector.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return false;
+				++iter;
+				++oiter;
+			}
+
+			return true;
+		}
+
+		inline bool operator!=(const Vector& vector) const
+		{
+			if (m_Size != vector.m_Size)
+				return true;
+
+			auto iter = GetConstBegin();
+			auto oiter = vector.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return true;
+				++iter;
+				++oiter;
+			}
+
+			return false;
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator!=(const Vector<T, OtherAllocator>& vector) const
+		{
+			if (m_Size != vector.m_Size)
+				return true;
+
+			auto iter = GetConstBegin();
+			auto oiter = vector.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return true;
+				++iter;
+				++oiter;
+			}
+
+			return false;
 		}
 
 	private:

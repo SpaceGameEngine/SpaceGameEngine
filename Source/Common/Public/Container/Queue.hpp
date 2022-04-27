@@ -186,6 +186,28 @@ namespace SpaceGameEngine
 			return *(m_Implement.GetConstBegin());
 		}
 
+		inline bool operator==(const Queue& queue) const
+		{
+			return m_Implement == queue.m_Implement;
+		}
+
+		template<typename OtherAllocator, template<typename, typename> class OtherImplement>
+		inline bool operator==(const Queue<T, OtherAllocator, OtherImplement>& queue) const
+		{
+			return m_Implement == queue.m_Implement;
+		}
+
+		inline bool operator!=(const Queue& queue) const
+		{
+			return m_Implement != queue.m_Implement;
+		}
+
+		template<typename OtherAllocator, template<typename, typename> class OtherImplement>
+		inline bool operator!=(const Queue<T, OtherAllocator, OtherImplement>& queue) const
+		{
+			return m_Implement != queue.m_Implement;
+		}
+
 	private:
 		ImplementType m_Implement;
 	};

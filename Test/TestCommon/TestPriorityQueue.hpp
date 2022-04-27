@@ -84,18 +84,23 @@ struct test_priority_queue_object
 TEST(PriorityQueue, InstanceTest)
 {
 	PriorityQueue<int> pq1;
-	PriorityQueue<int, Less<int>, StdAllocator> pq2({1, 2, 3});
+	PriorityQueue<int, Less<int>, StdAllocator> pq2({3, 2, 1, 8, 5, 7, -2, 3});
 	const PriorityQueue<int, Greater<int>, DefaultAllocator> pq3(10, 1);
 
 	ASSERT_EQ(pq1.GetSize(), 0);
-	ASSERT_EQ(pq2.GetSize(), 3);
+	ASSERT_EQ(pq2.GetSize(), 8);
 	ASSERT_EQ(pq3.GetSize(), 10);
 
 	Vector<int, StdAllocator>& l2 = pq2.GetImplement();
-	ASSERT_EQ(l2.GetSize(), 3);
-	ASSERT_EQ(*l2.GetBegin(), 1);
-	ASSERT_EQ(*(l2.GetBegin() + 1), 2);
-	ASSERT_EQ(*(l2.GetBegin() + 2), 3);
+	ASSERT_EQ(l2.GetSize(), 8);
+	ASSERT_EQ(*l2.GetBegin(), -2);
+	ASSERT_EQ(*(l2.GetBegin() + 1), 3);
+	ASSERT_EQ(*(l2.GetBegin() + 2), 1);
+	ASSERT_EQ(*(l2.GetBegin() + 3), 3);
+	ASSERT_EQ(*(l2.GetBegin() + 4), 5);
+	ASSERT_EQ(*(l2.GetBegin() + 5), 7);
+	ASSERT_EQ(*(l2.GetBegin() + 6), 2);
+	ASSERT_EQ(*(l2.GetBegin() + 7), 8);
 
 	const Vector<int>& v3 = pq3.GetImplement();
 	ASSERT_EQ(v3.GetSize(), 10);
@@ -509,4 +514,40 @@ TEST(PriorityQueue, AnotherAllocatorMoveAssignmentTest)
 	{
 		ASSERT_EQ(val_pool[i], 1);
 	}
+}
+
+TEST(PriorityQueue, EqualTest)
+{
+	const PriorityQueue<int, Less<int>, MemoryManagerAllocator> pq1({1, 2, 3});
+	const PriorityQueue<int, Less<int>, MemoryManagerAllocator> pq2({1, 2});
+	const PriorityQueue<int, Less<int>, StdAllocator> pq2_({1, 2});
+	const PriorityQueue<int, Less<int>, MemoryManagerAllocator> pq3({1, 4, 3});
+	const PriorityQueue<int, Less<int>, StdAllocator> pq3_({1, 4, 3});
+	const PriorityQueue<int, Less<int>, MemoryManagerAllocator> pq4({1, 2, 3});
+	const PriorityQueue<int, Less<int>, StdAllocator> pq4_({1, 2, 3});
+
+	ASSERT_FALSE(pq1 == pq2);
+	ASSERT_FALSE(pq1 == pq2_);
+	ASSERT_FALSE(pq1 == pq3);
+	ASSERT_FALSE(pq1 == pq3_);
+	ASSERT_TRUE(pq1 == pq4);
+	ASSERT_TRUE(pq1 == pq4_);
+}
+
+TEST(PriorityQueue, NotEqualTest)
+{
+	const PriorityQueue<int, Less<int>, MemoryManagerAllocator> pq1({1, 2, 3});
+	const PriorityQueue<int, Less<int>, MemoryManagerAllocator> pq2({1, 2});
+	const PriorityQueue<int, Less<int>, StdAllocator> pq2_({1, 2});
+	const PriorityQueue<int, Less<int>, MemoryManagerAllocator> pq3({1, 4, 3});
+	const PriorityQueue<int, Less<int>, StdAllocator> pq3_({1, 4, 3});
+	const PriorityQueue<int, Less<int>, MemoryManagerAllocator> pq4({1, 2, 3});
+	const PriorityQueue<int, Less<int>, StdAllocator> pq4_({1, 2, 3});
+
+	ASSERT_TRUE(pq1 != pq2);
+	ASSERT_TRUE(pq1 != pq2_);
+	ASSERT_TRUE(pq1 != pq3);
+	ASSERT_TRUE(pq1 != pq3_);
+	ASSERT_FALSE(pq1 != pq4);
+	ASSERT_FALSE(pq1 != pq4_);
 }

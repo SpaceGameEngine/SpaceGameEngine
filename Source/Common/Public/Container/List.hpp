@@ -1432,6 +1432,80 @@ namespace SpaceGameEngine
 			}
 		}
 
+		inline bool operator==(const List& list) const
+		{
+			if (m_Size != list.m_Size)
+				return false;
+
+			auto iter = GetConstBegin();
+			auto oiter = list.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return false;
+				++iter;
+				++oiter;
+			}
+
+			return true;
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator==(const List<T, OtherAllocator>& list) const
+		{
+			if (m_Size != list.m_Size)
+				return false;
+
+			auto iter = GetConstBegin();
+			auto oiter = list.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return false;
+				++iter;
+				++oiter;
+			}
+
+			return true;
+		}
+
+		inline bool operator!=(const List& list) const
+		{
+			if (m_Size != list.m_Size)
+				return true;
+
+			auto iter = GetConstBegin();
+			auto oiter = list.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return true;
+				++iter;
+				++oiter;
+			}
+
+			return false;
+		}
+
+		template<typename OtherAllocator>
+		inline bool operator!=(const List<T, OtherAllocator>& list) const
+		{
+			if (m_Size != list.m_Size)
+				return true;
+
+			auto iter = GetConstBegin();
+			auto oiter = list.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return true;
+				++iter;
+				++oiter;
+			}
+
+			return false;
+		}
+
 	private:
 		inline void RawClear()
 		{

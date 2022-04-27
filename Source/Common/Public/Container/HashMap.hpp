@@ -945,6 +945,76 @@ namespace SpaceGameEngine
 			m_BucketQuantity = new_bucket_quantity;
 		}
 
+		inline bool operator==(const HashMap& hash_map) const
+		{
+			if (m_Size != hash_map.m_Size)
+				return false;
+
+			for (auto iter = GetConstBegin(); iter != GetConstEnd(); ++iter)
+			{
+				auto fiter = hash_map.Find(iter->m_First);
+				if (fiter == hash_map.GetConstEnd())
+					return false;
+				if (iter->m_Second != fiter->m_Second)
+					return false;
+			}
+
+			return true;
+		}
+
+		template<typename OtherHasher, typename OtherAllocator>
+		inline bool operator==(const HashMap<K, V, OtherHasher, OtherAllocator>& hash_map) const
+		{
+			if (m_Size != hash_map.m_Size)
+				return false;
+
+			for (auto iter = GetConstBegin(); iter != GetConstEnd(); ++iter)
+			{
+				auto fiter = hash_map.Find(iter->m_First);
+				if (fiter == hash_map.GetConstEnd())
+					return false;
+				if (iter->m_Second != fiter->m_Second)
+					return false;
+			}
+
+			return true;
+		}
+
+		inline bool operator!=(const HashMap& hash_map) const
+		{
+			if (m_Size != hash_map.m_Size)
+				return true;
+
+			for (auto iter = GetConstBegin(); iter != GetConstEnd(); ++iter)
+			{
+				auto fiter = hash_map.Find(iter->m_First);
+				if (fiter == hash_map.GetConstEnd())
+					return true;
+				if (iter->m_Second != fiter->m_Second)
+					return true;
+			}
+
+			return false;
+		}
+
+		template<typename OtherHasher, typename OtherAllocator>
+		inline bool operator!=(const HashMap<K, V, OtherHasher, OtherAllocator>& hash_map) const
+		{
+			if (m_Size != hash_map.m_Size)
+				return true;
+
+			for (auto iter = GetConstBegin(); iter != GetConstEnd(); ++iter)
+			{
+				auto fiter = hash_map.Find(iter->m_First);
+				if (fiter == hash_map.GetConstEnd())
+					return true;
+				if (iter->m_Second != fiter->m_Second)
+					return true;
+			}
+
+			return false;
+		}
+
 	private:
 		inline void RawClear()
 		{

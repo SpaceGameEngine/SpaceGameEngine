@@ -1894,6 +1894,42 @@ TEST(List, ExternalIteratorErrorTest)
 	ASSERT_TRUE(List<int>::ExternalIteratorError::Judge(l2.GetConstReverseBegin(), l1));
 }
 
+TEST(List, EqualTest)
+{
+	const List<int, MemoryManagerAllocator> l1({1, 2, 3});
+	const List<int, MemoryManagerAllocator> l2({1, 2});
+	const List<int, StdAllocator> l2_({1, 2});
+	const List<int, MemoryManagerAllocator> l3({1, 4, 3});
+	const List<int, StdAllocator> l3_({1, 4, 3});
+	const List<int, MemoryManagerAllocator> l4({1, 2, 3});
+	const List<int, StdAllocator> l4_({1, 2, 3});
+
+	ASSERT_FALSE(l1 == l2);
+	ASSERT_FALSE(l1 == l2_);
+	ASSERT_FALSE(l1 == l3);
+	ASSERT_FALSE(l1 == l3_);
+	ASSERT_TRUE(l1 == l4);
+	ASSERT_TRUE(l1 == l4_);
+}
+
+TEST(List, NotEqualTest)
+{
+	const List<int, MemoryManagerAllocator> l1({1, 2, 3});
+	const List<int, MemoryManagerAllocator> l2({1, 2});
+	const List<int, StdAllocator> l2_({1, 2});
+	const List<int, MemoryManagerAllocator> l3({1, 4, 3});
+	const List<int, StdAllocator> l3_({1, 4, 3});
+	const List<int, MemoryManagerAllocator> l4({1, 2, 3});
+	const List<int, StdAllocator> l4_({1, 2, 3});
+
+	ASSERT_TRUE(l1 != l2);
+	ASSERT_TRUE(l1 != l2_);
+	ASSERT_TRUE(l1 != l3);
+	ASSERT_TRUE(l1 != l3_);
+	ASSERT_FALSE(l1 != l4);
+	ASSERT_FALSE(l1 != l4_);
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
 	List<int> l({0,

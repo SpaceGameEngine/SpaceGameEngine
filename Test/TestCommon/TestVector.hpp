@@ -1560,6 +1560,230 @@ TEST(Vector, FindAllByFunctionTest)
 	ASSERT_EQ(cot2, 4);
 }
 
+TEST(Vector, TrivialInsertTest)
+{
+
+	Vector<int> v1{0, 2};
+	ASSERT_EQ(v1.GetSize(), 2);
+	ASSERT_TRUE((IsTrivial<int>));
+
+	int v = -1;
+
+	v1.Insert(v1.GetEnd() - 1, v);
+	ASSERT_EQ(v1.GetSize(), 3);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], -1);
+	ASSERT_EQ(v1[2], 2);
+
+	v = 1;
+
+	v1.Insert(v1.GetBegin() + 1, v);
+	ASSERT_EQ(v1.GetSize(), 4);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 2);
+
+	v = 3;
+
+	v1.Insert(v1.GetReverseBegin() + 1, v);
+	ASSERT_EQ(v1.GetSize(), 5);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 3);
+	ASSERT_EQ(v1[4], 2);
+
+	v = 4;
+
+	v1.Insert(v1.GetReverseBegin() + 2, v);
+	ASSERT_EQ(v1.GetSize(), 6);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 4);
+	ASSERT_EQ(v1[4], 3);
+	ASSERT_EQ(v1[5], 2);
+
+	Vector<int> v2{0, 2};
+	ASSERT_EQ(v2.GetSize(), 2);
+	ASSERT_TRUE((IsTrivial<int>));
+
+	v2.Insert(v2.GetEnd() - 1, -1);
+	ASSERT_EQ(v2.GetSize(), 3);
+	ASSERT_EQ(v2[0], 0);
+	ASSERT_EQ(v2[1], -1);
+	ASSERT_EQ(v2[2], 2);
+
+	v2.Insert(v2.GetBegin() + 1, 1);
+	ASSERT_EQ(v2.GetSize(), 4);
+	ASSERT_EQ(v2[0], 0);
+	ASSERT_EQ(v2[1], 1);
+	ASSERT_EQ(v2[2], -1);
+	ASSERT_EQ(v2[3], 2);
+
+	v2.Insert(v2.GetReverseBegin() + 1, 3);
+	ASSERT_EQ(v2.GetSize(), 5);
+	ASSERT_EQ(v2[0], 0);
+	ASSERT_EQ(v2[1], 1);
+	ASSERT_EQ(v2[2], -1);
+	ASSERT_EQ(v2[3], 3);
+	ASSERT_EQ(v2[4], 2);
+
+	v2.Insert(v2.GetReverseBegin() + 2, 4);
+	ASSERT_EQ(v2.GetSize(), 6);
+	ASSERT_EQ(v2[0], 0);
+	ASSERT_EQ(v2[1], 1);
+	ASSERT_EQ(v2[2], -1);
+	ASSERT_EQ(v2[3], 4);
+	ASSERT_EQ(v2[4], 3);
+	ASSERT_EQ(v2[5], 2);
+
+	Vector<int> v3({0, 4});
+	ASSERT_EQ(v3.GetSize(), 2);
+
+	v3.Insert(v3.GetBegin() + 1, 3, 1);
+
+	ASSERT_EQ(v3.GetSize(), 5);
+	ASSERT_EQ(v3[0], 0);
+	ASSERT_EQ(v3[1], 1);
+	ASSERT_EQ(v3[2], 1);
+	ASSERT_EQ(v3[3], 1);
+	ASSERT_EQ(v3[4], 4);
+
+	v3.Insert(v3.GetReverseBegin() + 2, 2, 2);
+	ASSERT_EQ(v3.GetSize(), 7);
+	ASSERT_EQ(v3[0], 0);
+	ASSERT_EQ(v3[1], 1);
+	ASSERT_EQ(v3[2], 1);
+	ASSERT_EQ(v3[3], 2);
+	ASSERT_EQ(v3[4], 2);
+	ASSERT_EQ(v3[5], 1);
+	ASSERT_EQ(v3[6], 4);
+
+	Vector<int> v4({0, 4});
+	Vector<int> vdat({1, 2, 3});
+	ASSERT_EQ(v4.GetSize(), 2);
+	ASSERT_EQ(vdat.GetSize(), 3);
+
+	v4.Insert(v4.GetBegin() + 1, vdat.GetReverseBegin(), vdat.GetReverseEnd());
+
+	ASSERT_EQ(v4.GetSize(), 5);
+	ASSERT_EQ(v4[0], 0);
+	ASSERT_EQ(v4[1], 3);
+	ASSERT_EQ(v4[2], 2);
+	ASSERT_EQ(v4[3], 1);
+	ASSERT_EQ(v4[4], 4);
+
+	v4.Insert(v4.GetReverseBegin() + 2, vdat.GetBegin(), vdat.GetEnd());
+
+	ASSERT_EQ(v4.GetSize(), 8);
+	ASSERT_EQ(v4[0], 0);
+	ASSERT_EQ(v4[1], 3);
+	ASSERT_EQ(v4[2], 2);
+	ASSERT_EQ(v4[3], 3);
+	ASSERT_EQ(v4[4], 2);
+	ASSERT_EQ(v4[5], 1);
+	ASSERT_EQ(v4[6], 1);
+	ASSERT_EQ(v4[7], 4);
+
+	Vector<int> v5({0, 4});
+	ASSERT_EQ(v5.GetSize(), 2);
+
+	v5.Insert(v5.GetBegin() + 1, {1, 2, 3});
+
+	ASSERT_EQ(v5.GetSize(), 5);
+	ASSERT_EQ(v5[0], 0);
+	ASSERT_EQ(v5[1], 1);
+	ASSERT_EQ(v5[2], 2);
+	ASSERT_EQ(v5[3], 3);
+	ASSERT_EQ(v5[4], 4);
+
+	v5.Insert(v5.GetReverseBegin() + 2, {1, 2});
+
+	ASSERT_EQ(v5.GetSize(), 7);
+	ASSERT_EQ(v5[0], 0);
+	ASSERT_EQ(v5[1], 1);
+	ASSERT_EQ(v5[2], 2);
+	ASSERT_EQ(v5[3], 2);
+	ASSERT_EQ(v5[4], 1);
+	ASSERT_EQ(v5[5], 3);
+	ASSERT_EQ(v5[6], 4);
+}
+
+TEST(Vector, TrivialEmplaceTest)
+{
+	Vector<int> v1{0, 2};
+	ASSERT_EQ(v1.GetSize(), 2);
+	ASSERT_TRUE((IsTrivial<int>));
+
+	v1.Emplace(v1.GetEnd() - 1, -1);
+	ASSERT_EQ(v1.GetSize(), 3);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], -1);
+	ASSERT_EQ(v1[2], 2);
+
+	v1.Emplace(v1.GetBegin() + 1, 1);
+	ASSERT_EQ(v1.GetSize(), 4);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 2);
+
+	v1.Emplace(v1.GetReverseBegin() + 1, 3);
+	ASSERT_EQ(v1.GetSize(), 5);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 3);
+	ASSERT_EQ(v1[4], 2);
+
+	v1.Emplace(v1.GetReverseBegin() + 2, 4);
+	ASSERT_EQ(v1.GetSize(), 6);
+	ASSERT_EQ(v1[0], 0);
+	ASSERT_EQ(v1[1], 1);
+	ASSERT_EQ(v1[2], -1);
+	ASSERT_EQ(v1[3], 4);
+	ASSERT_EQ(v1[4], 3);
+	ASSERT_EQ(v1[5], 2);
+}
+
+TEST(Vector, EqualTest)
+{
+	const Vector<int, MemoryManagerAllocator> v1({1, 2, 3});
+	const Vector<int, MemoryManagerAllocator> v2({1, 2});
+	const Vector<int, StdAllocator> v2_({1, 2});
+	const Vector<int, MemoryManagerAllocator> v3({1, 4, 3});
+	const Vector<int, StdAllocator> v3_({1, 4, 3});
+	const Vector<int, MemoryManagerAllocator> v4({1, 2, 3});
+	const Vector<int, StdAllocator> v4_({1, 2, 3});
+
+	ASSERT_FALSE(v1 == v2);
+	ASSERT_FALSE(v1 == v2_);
+	ASSERT_FALSE(v1 == v3);
+	ASSERT_FALSE(v1 == v3_);
+	ASSERT_TRUE(v1 == v4);
+	ASSERT_TRUE(v1 == v4_);
+}
+
+TEST(Vector, NotEqualTest)
+{
+	const Vector<int, MemoryManagerAllocator> v1({1, 2, 3});
+	const Vector<int, MemoryManagerAllocator> v2({1, 2});
+	const Vector<int, StdAllocator> v2_({1, 2});
+	const Vector<int, MemoryManagerAllocator> v3({1, 4, 3});
+	const Vector<int, StdAllocator> v3_({1, 4, 3});
+	const Vector<int, MemoryManagerAllocator> v4({1, 2, 3});
+	const Vector<int, StdAllocator> v4_({1, 2, 3});
+
+	ASSERT_TRUE(v1 != v2);
+	ASSERT_TRUE(v1 != v2_);
+	ASSERT_TRUE(v1 != v3);
+	ASSERT_TRUE(v1 != v3_);
+	ASSERT_FALSE(v1 != v4);
+	ASSERT_FALSE(v1 != v4_);
+}
+
 TEST(VectorIterator, IsVectorIteratorTest)
 {
 	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Value));
@@ -2133,192 +2357,4 @@ TEST(VectorIterator, ConvertTest)
 	ASSERT_EQ(*i1_7, 0);
 	Vector<int>::ConstReverseIterator i1_8 = v1.GetConstBegin();
 	ASSERT_EQ(*i1_8, 0);
-}
-
-TEST(Vector, TrivialInsertTest)
-{
-
-	Vector<int> v1{0, 2};
-	ASSERT_EQ(v1.GetSize(), 2);
-	ASSERT_TRUE((IsTrivial<int>));
-
-	int v = -1;
-
-	v1.Insert(v1.GetEnd() - 1, v);
-	ASSERT_EQ(v1.GetSize(), 3);
-	ASSERT_EQ(v1[0], 0);
-	ASSERT_EQ(v1[1], -1);
-	ASSERT_EQ(v1[2], 2);
-
-	v = 1;
-
-	v1.Insert(v1.GetBegin() + 1, v);
-	ASSERT_EQ(v1.GetSize(), 4);
-	ASSERT_EQ(v1[0], 0);
-	ASSERT_EQ(v1[1], 1);
-	ASSERT_EQ(v1[2], -1);
-	ASSERT_EQ(v1[3], 2);
-
-	v = 3;
-
-	v1.Insert(v1.GetReverseBegin() + 1, v);
-	ASSERT_EQ(v1.GetSize(), 5);
-	ASSERT_EQ(v1[0], 0);
-	ASSERT_EQ(v1[1], 1);
-	ASSERT_EQ(v1[2], -1);
-	ASSERT_EQ(v1[3], 3);
-	ASSERT_EQ(v1[4], 2);
-
-	v = 4;
-
-	v1.Insert(v1.GetReverseBegin() + 2, v);
-	ASSERT_EQ(v1.GetSize(), 6);
-	ASSERT_EQ(v1[0], 0);
-	ASSERT_EQ(v1[1], 1);
-	ASSERT_EQ(v1[2], -1);
-	ASSERT_EQ(v1[3], 4);
-	ASSERT_EQ(v1[4], 3);
-	ASSERT_EQ(v1[5], 2);
-
-	Vector<int> v2{0, 2};
-	ASSERT_EQ(v2.GetSize(), 2);
-	ASSERT_TRUE((IsTrivial<int>));
-
-	v2.Insert(v2.GetEnd() - 1, -1);
-	ASSERT_EQ(v2.GetSize(), 3);
-	ASSERT_EQ(v2[0], 0);
-	ASSERT_EQ(v2[1], -1);
-	ASSERT_EQ(v2[2], 2);
-
-	v2.Insert(v2.GetBegin() + 1, 1);
-	ASSERT_EQ(v2.GetSize(), 4);
-	ASSERT_EQ(v2[0], 0);
-	ASSERT_EQ(v2[1], 1);
-	ASSERT_EQ(v2[2], -1);
-	ASSERT_EQ(v2[3], 2);
-
-	v2.Insert(v2.GetReverseBegin() + 1, 3);
-	ASSERT_EQ(v2.GetSize(), 5);
-	ASSERT_EQ(v2[0], 0);
-	ASSERT_EQ(v2[1], 1);
-	ASSERT_EQ(v2[2], -1);
-	ASSERT_EQ(v2[3], 3);
-	ASSERT_EQ(v2[4], 2);
-
-	v2.Insert(v2.GetReverseBegin() + 2, 4);
-	ASSERT_EQ(v2.GetSize(), 6);
-	ASSERT_EQ(v2[0], 0);
-	ASSERT_EQ(v2[1], 1);
-	ASSERT_EQ(v2[2], -1);
-	ASSERT_EQ(v2[3], 4);
-	ASSERT_EQ(v2[4], 3);
-	ASSERT_EQ(v2[5], 2);
-
-	Vector<int> v3({0, 4});
-	ASSERT_EQ(v3.GetSize(), 2);
-
-	v3.Insert(v3.GetBegin() + 1, 3, 1);
-
-	ASSERT_EQ(v3.GetSize(), 5);
-	ASSERT_EQ(v3[0], 0);
-	ASSERT_EQ(v3[1], 1);
-	ASSERT_EQ(v3[2], 1);
-	ASSERT_EQ(v3[3], 1);
-	ASSERT_EQ(v3[4], 4);
-
-	v3.Insert(v3.GetReverseBegin() + 2, 2, 2);
-	ASSERT_EQ(v3.GetSize(), 7);
-	ASSERT_EQ(v3[0], 0);
-	ASSERT_EQ(v3[1], 1);
-	ASSERT_EQ(v3[2], 1);
-	ASSERT_EQ(v3[3], 2);
-	ASSERT_EQ(v3[4], 2);
-	ASSERT_EQ(v3[5], 1);
-	ASSERT_EQ(v3[6], 4);
-
-	Vector<int> v4({0, 4});
-	Vector<int> vdat({1, 2, 3});
-	ASSERT_EQ(v4.GetSize(), 2);
-	ASSERT_EQ(vdat.GetSize(), 3);
-
-	v4.Insert(v4.GetBegin() + 1, vdat.GetReverseBegin(), vdat.GetReverseEnd());
-
-	ASSERT_EQ(v4.GetSize(), 5);
-	ASSERT_EQ(v4[0], 0);
-	ASSERT_EQ(v4[1], 3);
-	ASSERT_EQ(v4[2], 2);
-	ASSERT_EQ(v4[3], 1);
-	ASSERT_EQ(v4[4], 4);
-
-	v4.Insert(v4.GetReverseBegin() + 2, vdat.GetBegin(), vdat.GetEnd());
-
-	ASSERT_EQ(v4.GetSize(), 8);
-	ASSERT_EQ(v4[0], 0);
-	ASSERT_EQ(v4[1], 3);
-	ASSERT_EQ(v4[2], 2);
-	ASSERT_EQ(v4[3], 3);
-	ASSERT_EQ(v4[4], 2);
-	ASSERT_EQ(v4[5], 1);
-	ASSERT_EQ(v4[6], 1);
-	ASSERT_EQ(v4[7], 4);
-
-	Vector<int> v5({0, 4});
-	ASSERT_EQ(v5.GetSize(), 2);
-
-	v5.Insert(v5.GetBegin() + 1, {1, 2, 3});
-
-	ASSERT_EQ(v5.GetSize(), 5);
-	ASSERT_EQ(v5[0], 0);
-	ASSERT_EQ(v5[1], 1);
-	ASSERT_EQ(v5[2], 2);
-	ASSERT_EQ(v5[3], 3);
-	ASSERT_EQ(v5[4], 4);
-
-	v5.Insert(v5.GetReverseBegin() + 2, {1, 2});
-
-	ASSERT_EQ(v5.GetSize(), 7);
-	ASSERT_EQ(v5[0], 0);
-	ASSERT_EQ(v5[1], 1);
-	ASSERT_EQ(v5[2], 2);
-	ASSERT_EQ(v5[3], 2);
-	ASSERT_EQ(v5[4], 1);
-	ASSERT_EQ(v5[5], 3);
-	ASSERT_EQ(v5[6], 4);
-}
-
-TEST(Vector, TrivialEmplaceTest)
-{
-	Vector<int> v1{0, 2};
-	ASSERT_EQ(v1.GetSize(), 2);
-	ASSERT_TRUE((IsTrivial<int>));
-
-	v1.Emplace(v1.GetEnd() - 1, -1);
-	ASSERT_EQ(v1.GetSize(), 3);
-	ASSERT_EQ(v1[0], 0);
-	ASSERT_EQ(v1[1], -1);
-	ASSERT_EQ(v1[2], 2);
-
-	v1.Emplace(v1.GetBegin() + 1, 1);
-	ASSERT_EQ(v1.GetSize(), 4);
-	ASSERT_EQ(v1[0], 0);
-	ASSERT_EQ(v1[1], 1);
-	ASSERT_EQ(v1[2], -1);
-	ASSERT_EQ(v1[3], 2);
-
-	v1.Emplace(v1.GetReverseBegin() + 1, 3);
-	ASSERT_EQ(v1.GetSize(), 5);
-	ASSERT_EQ(v1[0], 0);
-	ASSERT_EQ(v1[1], 1);
-	ASSERT_EQ(v1[2], -1);
-	ASSERT_EQ(v1[3], 3);
-	ASSERT_EQ(v1[4], 2);
-
-	v1.Emplace(v1.GetReverseBegin() + 2, 4);
-	ASSERT_EQ(v1.GetSize(), 6);
-	ASSERT_EQ(v1[0], 0);
-	ASSERT_EQ(v1[1], 1);
-	ASSERT_EQ(v1[2], -1);
-	ASSERT_EQ(v1[3], 4);
-	ASSERT_EQ(v1[4], 3);
-	ASSERT_EQ(v1[5], 2);
 }

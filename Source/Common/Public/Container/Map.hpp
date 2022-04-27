@@ -1481,6 +1481,80 @@ namespace SpaceGameEngine
 			return iter->m_Second;
 		}
 
+		inline bool operator==(const Map& map) const
+		{
+			if (GetSize() != map.GetSize())
+				return false;
+
+			auto iter = GetConstBegin();
+			auto oiter = map.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return false;
+				++iter;
+				++oiter;
+			}
+
+			return true;
+		}
+
+		template<typename OtherLessComparer, typename OtherAllocator>
+		inline bool operator==(const Map<K, V, OtherLessComparer, OtherAllocator>& map) const
+		{
+			if (GetSize() != map.GetSize())
+				return false;
+
+			auto iter = GetConstBegin();
+			auto oiter = map.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return false;
+				++iter;
+				++oiter;
+			}
+
+			return true;
+		}
+
+		inline bool operator!=(const Map& map) const
+		{
+			if (GetSize() != map.GetSize())
+				return true;
+
+			auto iter = GetConstBegin();
+			auto oiter = map.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return true;
+				++iter;
+				++oiter;
+			}
+
+			return false;
+		}
+
+		template<typename OtherLessComparer, typename OtherAllocator>
+		inline bool operator!=(const Map<K, V, OtherLessComparer, OtherAllocator>& map) const
+		{
+			if (GetSize() != map.GetSize())
+				return true;
+
+			auto iter = GetConstBegin();
+			auto oiter = map.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return true;
+				++iter;
+				++oiter;
+			}
+
+			return false;
+		}
+
 	private:
 		MapImplement::RedBlackTree<K, V, LessComparer, Allocator> m_Tree;
 	};
