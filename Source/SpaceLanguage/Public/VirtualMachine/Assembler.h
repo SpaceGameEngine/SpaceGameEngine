@@ -61,13 +61,21 @@ namespace SpaceGameEngine::SpaceLanguage
 		static SPACE_LANGUAGE_API bool Judge(const String& str, const String& error_info_formatter, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions);
 	};
 
+	struct AssemblerExternalCallerModuleAlreadyExistError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The ExternalCallerModule in Assembler has already existed.");
+		static SPACE_LANGUAGE_API bool Judge(const String& module_name, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions);
+	};
+
 	class SPACE_LANGUAGE_API Assembler
 	{
 	public:
+		void RegisterExternalCallerModule(const String& module_name, UInt32 module_id, const HashMap<String, UInt32>& functions);
+
 		/*!
 		@param error_info_formatter format string which likes "In line:{} column:{}, {}"
 		*/
-		InstructionsGenerator Compile(const String& str, const String& error_info_formatter) const;
+		Vector<UInt8> Compile(const String& str, const String& error_info_formatter) const;
 
 	private:
 		HashMap<String, Pair<UInt32, HashMap<String, UInt32>>> m_ModuleFunctions;

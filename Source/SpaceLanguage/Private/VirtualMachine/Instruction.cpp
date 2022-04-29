@@ -306,6 +306,11 @@ SizeType SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GetSize() const
 	return m_Content.GetSize();
 }
 
+const Vector<UInt8>& SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GetVector() const
+{
+	return m_Content;
+}
+
 void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ExternalCall(UInt8 arg0, UInt64 data)
 {
 	AddInstruction(InstructionTypeIndex::ExternalCall, arg0, data);

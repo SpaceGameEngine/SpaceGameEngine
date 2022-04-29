@@ -58,6 +58,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 	const InstructionType* pinstr = nullptr;
 	HashMap<String, Pair<SizeType, SizeType>> need_tags;
 	HashMap<String, bool> tags;
+	bool is_new_instr = true;
 
 	for (auto iter = tokens.GetConstBegin(); iter != tokens.GetConstEnd(); ++iter)
 	{
@@ -78,6 +79,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 			}
 			line += 1;
 			col = 1;
+			is_new_instr = true;
 		}
 		else if (iter->m_Type == TokenType::CommentBlock)
 		{
@@ -104,6 +106,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 						line += 1;
 						col = 3 + (iter->m_Content.GetConstEnd() - citer) - flb_str.GetSize();
 						has_lb = true;
+						is_new_instr = true;
 						break;
 					}
 				}
@@ -122,6 +125,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 					}
 					line += 1;
 					col = 3 + (iter->m_Content.GetConstEnd() - citer) - flb_str.GetSize();
+					is_new_instr = true;
 				}
 				else
 					col += iter->m_Content.GetSize() + 4;
@@ -167,7 +171,10 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 				if (pinstr->m_Index != InstructionTypeIndex::ExternalCall)
 				{
 					if (tags.Find(iter->m_Content) == tags.GetEnd())
-						need_tags.Insert(iter->m_Content, Pair<SizeType, SizeType>(line, col));
+					{
+						if (need_tags.Find(iter->m_Content) == need_tags.GetEnd())
+							need_tags.Insert(iter->m_Content, Pair<SizeType, SizeType>(line, col));
+					}
 					col += iter->m_Content.GetSize();
 				}
 				else
@@ -201,7 +208,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 					iter += 2;
 				}
 			}
-			else if (iter->m_Type != TokenType::IntegerLiteral)
+			else if (iter->m_Type != TokenType::IntegerLiteral && iter->m_Type != TokenType::WordSeparator)
 			{
 				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need integer here"))));
 				return true;
@@ -209,7 +216,8 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 			else
 				col += iter->m_Content.GetSize();
 
-			instr_size = 0;
+			if (iter->m_Type != TokenType::WordSeparator)
+				instr_size = 0;
 		}
 		else
 		{
@@ -231,6 +239,11 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 				}
 				else if (iter->m_Type == TokenType::Identifier)
 				{
+					if (!is_new_instr)
+					{
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need line break here"))));
+						return true;
+					}
 					if (!InstructionNameSet::GetSingleton().IsInstructionName(iter->m_Content))
 					{
 						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid instruction name"))));
@@ -238,6 +251,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 					}
 					pinstr = &(InstructionNameSet::GetSingleton().Get(iter->m_Content));
 					instr_size = pinstr->m_Size - 1;
+					is_new_instr = false;
 				}
 				else
 				{
@@ -265,11 +279,87 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 	return false;
 }
 
-InstructionsGenerator SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& str, const String& error_info_formatter) const
+bool SpaceGameEngine::SpaceLanguage::AssemblerExternalCallerModuleAlreadyExistError::Judge(const String& module_name, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions)
+{
+	return module_functions.Find(module_name) != module_functions.GetConstEnd();
+}
+
+void SpaceGameEngine::SpaceLanguage::Assembler::RegisterExternalCallerModule(const String& module_name, UInt32 module_id, const HashMap<String, UInt32>& functions)
+{
+	SGE_ASSERT(AssemblerExternalCallerModuleAlreadyExistError, module_name, m_ModuleFunctions);
+	m_ModuleFunctions.Insert(module_name, Pair<UInt32, HashMap<String, UInt32>>(module_id, functions));
+}
+
+Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& str, const String& error_info_formatter) const
 {
 	SGE_ASSERT(InvalidAssemblerSourceStringError, str, error_info_formatter, m_ModuleFunctions);
 
-	InstructionsGenerator result;
+	Vector<UInt8> result;
+	Vector<Token> tokens = GetTokens(str, error_info_formatter);
+	SizeType instr_size = 0;
+	const InstructionType* pinstr = nullptr;
+	HashMap<String, Vector<SizeType>> need_tags;
+	HashMap<String, UInt64> tags;
+	SizeType write_idx = 0;
+
+	for (auto iter = tokens.GetConstBegin(); iter != tokens.GetConstEnd(); ++iter)
+	{
+		if (iter->m_Type == TokenType::LineSeparator || iter->m_Type == TokenType::WordSeparator || iter->m_Type == TokenType::CommentBlock || iter->m_Type == TokenType::CommentLine)
+			continue;
+
+		if (instr_size == 8)
+		{
+			if (iter->m_Type == TokenType::IntegerLiteral)
+				*(UInt64*)(&result[write_idx]) = StringTo<String, UInt64>(iter->m_Content);
+			else if (pinstr->m_Index != InstructionTypeIndex::ExternalCall)
+			{
+				auto titer = tags.Find(iter->m_Content);
+				if (titer != tags.GetEnd())
+					*(UInt64*)(&result[write_idx]) = titer->m_Second;
+				else
+					need_tags[iter->m_Content].EmplaceBack(write_idx);
+			}
+			else
+			{
+				auto mod_iter = m_ModuleFunctions.Find(iter->m_Content);
+				iter += 2;
+				auto function_iter = mod_iter->m_Second.m_Second.Find(iter->m_Content);
+				*(UInt64*)(&result[write_idx]) = ExternalCaller::GetIndex(mod_iter->m_Second.m_First, function_iter->m_Second);
+			}
+
+			instr_size = 0;
+			write_idx += 8;
+		}
+		else if (instr_size)
+		{
+			result[write_idx] = StringTo<String, UInt8>(iter->m_Content);
+			instr_size -= 1;
+			++write_idx;
+		}
+		else
+		{
+			if (iter->m_Type == TokenType::Identifier)
+			{
+				pinstr = &InstructionNameSet::GetSingleton().Get(iter->m_Content);
+				instr_size = pinstr->m_Size - 1;
+				result.SetSize(result.GetSize() + pinstr->m_Size, 0);
+				result[write_idx] = pinstr->m_Index;
+				++write_idx;
+			}
+			else if (iter->m_Type == TokenType::Colon)
+			{
+				++iter;
+				tags.Insert(iter->m_Content, result.GetSize());
+				auto ntiter = need_tags.Find(iter->m_Content);
+				if (ntiter != need_tags.GetEnd())
+				{
+					for (auto witer = ntiter->m_Second.GetConstBegin(); witer != ntiter->m_Second.GetConstEnd(); ++witer)
+						*(UInt64*)(&result[*witer]) = result.GetSize();
+					need_tags.Remove(ntiter);
+				}
+			}
+		}
+	}
 
 	return result;
 }

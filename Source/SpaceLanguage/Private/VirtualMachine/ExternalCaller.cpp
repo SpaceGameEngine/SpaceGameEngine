@@ -32,7 +32,7 @@ ExternalCallFunctionType SpaceGameEngine::SpaceLanguage::ExternalCaller::GetExte
 	return iter->m_Second;
 }
 
-bool SpaceGameEngine::SpaceLanguage::ExternalCaller::IsHasExternalCallFunction(UInt64 id) const
+bool SpaceGameEngine::SpaceLanguage::ExternalCaller::HasExternalCallFunction(UInt64 id) const
 {
 	return m_Functions.Find(id) != m_Functions.GetConstEnd();
 }
@@ -52,7 +52,7 @@ ExternalCallFunctionType SpaceGameEngine::SpaceLanguage::ExternalCaller::GetExte
 	return iter->m_Second;
 }
 
-bool SpaceGameEngine::SpaceLanguage::ExternalCaller::IsHasExternalCallFunction(UInt32 module_id, UInt32 func_id) const
+bool SpaceGameEngine::SpaceLanguage::ExternalCaller::HasExternalCallFunction(UInt32 module_id, UInt32 func_id) const
 {
 	return m_Functions.Find(GetIndex(module_id, func_id)) != m_Functions.GetConstEnd();
 }

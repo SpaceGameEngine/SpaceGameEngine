@@ -127,6 +127,7 @@ namespace SpaceGameEngine::SpaceLanguage
 
 		const void* GetData() const;
 		SizeType GetSize() const;
+		const Vector<UInt8>& GetVector() const;
 
 		void ExternalCall(UInt8 arg0, UInt64 data);
 		void Set(UInt8 arg0, UInt64 data);

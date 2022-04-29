@@ -37,14 +37,14 @@ TEST(ExternalCaller, Test)
 {
 	ExternalCaller ec;
 
-	ASSERT_FALSE(ec.IsHasExternalCallFunction(123));
+	ASSERT_FALSE(ec.HasExternalCallFunction(123));
 	ec.AddExternalCallFunction(123, (ExternalCallFunctionType)456);
-	ASSERT_TRUE(ec.IsHasExternalCallFunction(123));
+	ASSERT_TRUE(ec.HasExternalCallFunction(123));
 	ASSERT_EQ(ec.GetExternalCallFunction(123), (ExternalCallFunctionType)456);
 
-	ASSERT_FALSE(ec.IsHasExternalCallFunction(127, 789));
+	ASSERT_FALSE(ec.HasExternalCallFunction(127, 789));
 	ec.AddExternalCallFunction(127, 789, (ExternalCallFunctionType)101112);
-	ASSERT_TRUE(ec.IsHasExternalCallFunction(127, 789));
+	ASSERT_TRUE(ec.HasExternalCallFunction(127, 789));
 	ASSERT_EQ(ec.GetExternalCallFunction(127, 789), (ExternalCallFunctionType)101112);
 }
 
@@ -954,6 +954,9 @@ TEST(InstructionsGenerator, BasicTest)
 	ASSERT_EQ(*((UInt8*)ig.GetData() + 18), InstructionTypeIndex::Set);
 	ASSERT_EQ(*((UInt8*)ig.GetData() + 19), 14);
 	ASSERT_EQ(memcmp((UInt8*)ig.GetData() + 20, &data, sizeof(data)), 0);
+
+	ASSERT_EQ(ig.GetData(), ig.GetVector().GetData());
+	ASSERT_EQ(ig.GetSize(), ig.GetVector().GetSize());
 }
 
 TEST(InstructionsGenerator, InstructionTest)
