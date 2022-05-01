@@ -24,7 +24,7 @@ namespace SpaceGameEngine::SpaceLanguage
 	@{
 	*/
 
-	using ExternalCallFunctionType = RegisterType (*)(RegisterType&, RegisterType&, RegisterType&);
+	using ExternalCallFunctionType = RegisterType (*)(Registers&);
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API HashMap<UInt64, ExternalCallFunctionType>;

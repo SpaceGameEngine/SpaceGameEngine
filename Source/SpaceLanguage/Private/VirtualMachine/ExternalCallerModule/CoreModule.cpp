@@ -22,3 +22,7 @@ using namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule;
 void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoExternalCaller(ExternalCaller& ec)
 {
 }
+
+void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoAssembler(Assembler& assembler)
+{
+}

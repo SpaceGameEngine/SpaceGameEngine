@@ -73,9 +73,6 @@ const InstructionType& SpaceGameEngine::SpaceLanguage::InstructionSet::Get(UInt8
 #define DATA0 PARGS_CAST(0, UInt64)
 #define DATA1 PARGS_CAST(1, UInt64)
 
-#define EC_ARG0 regs.Get(SpecialRegister::Argument0)
-#define EC_ARG1 regs.Get(SpecialRegister::Argument1)
-#define EC_ARG2 regs.Get(SpecialRegister::Argument2)
 #define PC regs.Get(SpecialRegister::ProgramCounter)
 #define R_ARG0 regs.Get(ARG0)
 #define R_ARG1 regs.Get(ARG1)
@@ -84,7 +81,7 @@ const InstructionType& SpaceGameEngine::SpaceLanguage::InstructionSet::Get(UInt8
 void SpaceGameEngine::SpaceLanguage::InstructionSet::ExternalCall(Registers& regs, void* pargs, const ExternalCaller& ext_caller)
 {
 	SGE_ASSERT(NullPointerError, pargs);
-	R_ARG0 = ext_caller.GetExternalCallFunction(DATA1)(EC_ARG0, EC_ARG1, EC_ARG2);
+	R_ARG0 = ext_caller.GetExternalCallFunction(DATA1)(regs);
 	PC += 10;
 }
 
@@ -242,186 +239,171 @@ void SpaceGameEngine::SpaceLanguage::InstructionSet::GreaterEqual(Registers& reg
 	PC += 4;
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt8 arg0)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0)
 {
 	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
 
-	SizeType osize = m_Content.GetSize();
-	m_Content.SetSize(osize + 2, 0);
-	m_Content[osize] = instr_idx;
-	m_Content[osize + 1] = arg0;
+	SizeType osize = vec.GetSize();
+	vec.SetSize(osize + 2, 0);
+	vec[osize] = instr_idx;
+	vec[osize + 1] = arg0;
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt8 arg1)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0, UInt8 arg1)
 {
 	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
 
-	SizeType osize = m_Content.GetSize();
-	m_Content.SetSize(osize + 3, 0);
-	m_Content[osize] = instr_idx;
-	m_Content[osize + 1] = arg0;
-	m_Content[osize + 2] = arg1;
+	SizeType osize = vec.GetSize();
+	vec.SetSize(osize + 3, 0);
+	vec[osize] = instr_idx;
+	vec[osize + 1] = arg0;
+	vec[osize + 2] = arg1;
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
 	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
 
-	SizeType osize = m_Content.GetSize();
-	m_Content.SetSize(osize + 4, 0);
-	m_Content[osize] = instr_idx;
-	m_Content[osize + 1] = arg0;
-	m_Content[osize + 2] = arg1;
-	m_Content[osize + 3] = arg2;
+	SizeType osize = vec.GetSize();
+	vec.SetSize(osize + 4, 0);
+	vec[osize] = instr_idx;
+	vec[osize + 1] = arg0;
+	vec[osize + 2] = arg1;
+	vec[osize + 3] = arg2;
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt64 data)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt64 data)
 {
 	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
 
-	SizeType osize = m_Content.GetSize();
-	m_Content.SetSize(osize + 9, 0);
-	m_Content[osize] = instr_idx;
-	memcpy(m_Content.GetData() + osize + 1, &data, sizeof(data));
+	SizeType osize = vec.GetSize();
+	vec.SetSize(osize + 9, 0);
+	vec[osize] = instr_idx;
+	memcpy(vec.GetData() + osize + 1, &data, sizeof(data));
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt64 data)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0, UInt64 data)
 {
 	SGE_ASSERT(InvalidValueError, instr_idx, 0, InstructionSetSize - 1);
 
-	SizeType osize = m_Content.GetSize();
-	m_Content.SetSize(osize + 10, 0);
-	m_Content[osize] = instr_idx;
-	m_Content[osize + 1] = arg0;
-	memcpy(m_Content.GetData() + osize + 2, &data, sizeof(data));
+	SizeType osize = vec.GetSize();
+	vec.SetSize(osize + 10, 0);
+	vec[osize] = instr_idx;
+	vec[osize + 1] = arg0;
+	memcpy(vec.GetData() + osize + 2, &data, sizeof(data));
 }
 
-const void* SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GetData() const
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ExternalCall(Vector<UInt8>& vec, UInt8 arg0, UInt64 data)
 {
-	return m_Content.GetData();
+	AddInstruction(vec, InstructionTypeIndex::ExternalCall, arg0, data);
 }
 
-SizeType SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GetSize() const
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Set(Vector<UInt8>& vec, UInt8 arg0, UInt64 data)
 {
-	return m_Content.GetSize();
+	AddInstruction(vec, InstructionTypeIndex::Set, arg0, data);
 }
 
-const Vector<UInt8>& SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GetVector() const
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Copy(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1)
 {
-	return m_Content;
+	AddInstruction(vec, InstructionTypeIndex::Copy, arg0, arg1);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ExternalCall(UInt8 arg0, UInt64 data)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Goto(Vector<UInt8>& vec, UInt64 data)
 {
-	AddInstruction(InstructionTypeIndex::ExternalCall, arg0, data);
+	AddInstruction(vec, InstructionTypeIndex::Goto, data);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Set(UInt8 arg0, UInt64 data)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GotoRegister(Vector<UInt8>& vec, UInt8 arg0)
 {
-	AddInstruction(InstructionTypeIndex::Set, arg0, data);
+	AddInstruction(vec, InstructionTypeIndex::GotoRegister, arg0);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Copy(UInt8 arg0, UInt8 arg1)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::If(Vector<UInt8>& vec, UInt8 arg0, UInt64 data)
 {
-	AddInstruction(InstructionTypeIndex::Copy, arg0, arg1);
+	AddInstruction(vec, InstructionTypeIndex::If, arg0, data);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Goto(UInt64 data)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Add(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Goto, data);
+	AddInstruction(vec, InstructionTypeIndex::Add, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GotoRegister(UInt8 arg0)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Subtract(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::GotoRegister, arg0);
+	AddInstruction(vec, InstructionTypeIndex::Subtract, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::If(UInt8 arg0, UInt64 data)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Multiply(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::If, arg0, data);
+	AddInstruction(vec, InstructionTypeIndex::Multiply, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Add(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Divide(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Add, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::Divide, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Subtract(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Mod(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Subtract, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::Mod, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Multiply(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::And(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Multiply, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::And, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Divide(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Or(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Divide, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::Or, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Mod(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Xor(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Mod, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::Xor, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::And(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Not(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1)
 {
-	AddInstruction(InstructionTypeIndex::And, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::Not, arg0, arg1);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Or(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ShiftLeft(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Or, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::ShiftLeft, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Xor(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ShiftRight(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Xor, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::ShiftRight, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Not(UInt8 arg0, UInt8 arg1)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Equal(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Not, arg0, arg1);
+	AddInstruction(vec, InstructionTypeIndex::Equal, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ShiftLeft(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::NotEqual(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::ShiftLeft, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::NotEqual, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::ShiftRight(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Less(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::ShiftRight, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::Less, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Equal(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::LessEqual(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Equal, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::LessEqual, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::NotEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Greater(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::NotEqual, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::Greater, arg0, arg1, arg2);
 }
 
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Less(UInt8 arg0, UInt8 arg1, UInt8 arg2)
+void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GreaterEqual(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2)
 {
-	AddInstruction(InstructionTypeIndex::Less, arg0, arg1, arg2);
-}
-
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::LessEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2)
-{
-	AddInstruction(InstructionTypeIndex::LessEqual, arg0, arg1, arg2);
-}
-
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::Greater(UInt8 arg0, UInt8 arg1, UInt8 arg2)
-{
-	AddInstruction(InstructionTypeIndex::Greater, arg0, arg1, arg2);
-}
-
-void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GreaterEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2)
-{
-	AddInstruction(InstructionTypeIndex::GreaterEqual, arg0, arg1, arg2);
+	AddInstruction(vec, InstructionTypeIndex::GreaterEqual, arg0, arg1, arg2);
 }

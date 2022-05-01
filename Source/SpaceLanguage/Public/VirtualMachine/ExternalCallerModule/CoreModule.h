@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "VirtualMachine/ExternalCaller.h"
+#include "VirtualMachine/Assembler.h"
 
 namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule
 {
@@ -28,6 +29,7 @@ namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule
 		inline constexpr const UInt32 Id = 0;
 
 		SPACE_LANGUAGE_API void LoadIntoExternalCaller(ExternalCaller& ec);
+		SPACE_LANGUAGE_API void LoadIntoAssembler(Assembler& assembler);
 	}
 
 	/*!

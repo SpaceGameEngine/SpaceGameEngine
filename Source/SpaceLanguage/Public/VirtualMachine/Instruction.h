@@ -116,47 +116,39 @@ namespace SpaceGameEngine::SpaceLanguage
 	template class SPACE_LANGUAGE_API Vector<UInt8>;
 #endif
 
-	class SPACE_LANGUAGE_API InstructionsGenerator
+	namespace InstructionsGenerator
 	{
-	public:
-		void AddInstruction(UInt8 instr_idx, UInt8 arg0);
-		void AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt8 arg1);
-		void AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void AddInstruction(UInt8 instr_idx, UInt64 data);
-		void AddInstruction(UInt8 instr_idx, UInt8 arg0, UInt64 data);
+		SPACE_LANGUAGE_API void AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0);
+		SPACE_LANGUAGE_API void AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0, UInt8 arg1);
+		SPACE_LANGUAGE_API void AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt64 data);
+		SPACE_LANGUAGE_API void AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0, UInt64 data);
 
-		const void* GetData() const;
-		SizeType GetSize() const;
-		const Vector<UInt8>& GetVector() const;
+		SPACE_LANGUAGE_API void ExternalCall(Vector<UInt8>& vec, UInt8 arg0, UInt64 data);
+		SPACE_LANGUAGE_API void Set(Vector<UInt8>& vec, UInt8 arg0, UInt64 data);
+		SPACE_LANGUAGE_API void Copy(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1);
+		SPACE_LANGUAGE_API void Goto(Vector<UInt8>& vec, UInt64 data);
+		SPACE_LANGUAGE_API void GotoRegister(Vector<UInt8>& vec, UInt8 arg0);
+		SPACE_LANGUAGE_API void If(Vector<UInt8>& vec, UInt8 arg0, UInt64 data);
 
-		void ExternalCall(UInt8 arg0, UInt64 data);
-		void Set(UInt8 arg0, UInt64 data);
-		void Copy(UInt8 arg0, UInt8 arg1);
-		void Goto(UInt64 data);
-		void GotoRegister(UInt8 arg0);
-		void If(UInt8 arg0, UInt64 data);
+		SPACE_LANGUAGE_API void Add(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Subtract(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Multiply(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Divide(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Mod(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void And(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Or(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Xor(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Not(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1);
+		SPACE_LANGUAGE_API void ShiftLeft(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void ShiftRight(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
 
-		void Add(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Subtract(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Multiply(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Divide(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Mod(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void And(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Or(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Xor(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Not(UInt8 arg0, UInt8 arg1);
-		void ShiftLeft(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void ShiftRight(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-
-		void Equal(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void NotEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Less(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void LessEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void Greater(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-		void GreaterEqual(UInt8 arg0, UInt8 arg1, UInt8 arg2);
-
-	private:
-		Vector<UInt8> m_Content;
+		SPACE_LANGUAGE_API void Equal(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void NotEqual(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Less(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void LessEqual(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void Greater(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
+		SPACE_LANGUAGE_API void GreaterEqual(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
 	};
 
 	/*!
