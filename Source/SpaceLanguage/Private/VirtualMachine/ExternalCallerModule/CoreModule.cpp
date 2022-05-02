@@ -27,6 +27,7 @@ void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoE
 	ec.AddExternalCallFunction(CoreModule::Id, 0, [](Registers& regs) -> RegisterType {
 		return (RegisterType)DefaultAllocator::RawNew(R_ARG(0), R_ARG(1));
 	});
+
 	//Free
 	ec.AddExternalCallFunction(CoreModule::Id, 1, [](Registers& regs) -> RegisterType {
 		DefaultAllocator::RawDelete((void*)R_ARG(0));
