@@ -8,4 +8,3 @@
 |0|ProgramCounter|程序计数寄存器|
 |1|BasePointer|基址寄存器|
 |2|StackPointer|栈指针寄存器|
-|3|MemoryBase|内存基址寄存器|

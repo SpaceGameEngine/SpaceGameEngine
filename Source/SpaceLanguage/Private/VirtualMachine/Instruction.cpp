@@ -73,7 +73,7 @@ const InstructionType& SpaceGameEngine::SpaceLanguage::InstructionSet::Get(UInt8
 #define DATA0 PARGS_CAST(0, UInt64)
 #define DATA1 PARGS_CAST(1, UInt64)
 
-#define PC regs.Get(SpecialRegister::ProgramCounter)
+#define PC regs.Get(Register::ProgramCounter)
 #define R_ARG0 regs.Get(ARG0)
 #define R_ARG1 regs.Get(ARG1)
 #define R_ARG2 regs.Get(ARG2)

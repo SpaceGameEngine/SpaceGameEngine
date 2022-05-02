@@ -173,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestAssembler.hpp" />
+    <ClInclude Include="TestCoreModule.hpp" />
     <ClInclude Include="TestLexer.hpp" />
     <ClInclude Include="TestVirtualMachine.hpp" />
   </ItemGroup>

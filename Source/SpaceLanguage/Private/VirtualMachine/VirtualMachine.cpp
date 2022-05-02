@@ -41,12 +41,13 @@ void SpaceGameEngine::SpaceLanguage::VirtualMachine::Run(const void* ptr, SizeTy
 	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidInstructionsError, ptr, size);
 
-	RegisterType& pc = m_Registers.Get(SpecialRegister::ProgramCounter);
+	Registers registers;
+	RegisterType& pc = registers.Get(Register::ProgramCounter);
 	InstructionSet& instr_set = InstructionSet::GetSingleton();
 	while (pc < size)
 	{
 		UInt8* pnow = (UInt8*)ptr + pc;
-		instr_set.Get(*pnow).m_pFunction(m_Registers, pnow + 1, m_ExternalCaller);
+		instr_set.Get(*pnow).m_pFunction(registers, pnow + 1, m_ExternalCaller);
 	}
 }
 

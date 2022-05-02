@@ -37,7 +37,6 @@ namespace SpaceGameEngine::SpaceLanguage
 		const ExternalCaller& GetExternalCaller() const;
 
 	private:
-		Registers m_Registers;
 		ExternalCaller m_ExternalCaller;
 	};
 

@@ -20,6 +20,7 @@ limitations under the License.
 #include "TestVirtualMachine.hpp"
 #include "TestLexer.hpp"
 #include "TestAssembler.hpp"
+#include "TestCoreModule.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;
 

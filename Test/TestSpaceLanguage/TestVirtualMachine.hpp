@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "VirtualMachine/VirtualMachine.h"
-#include "VirtualMachine/ExternalCallerModule/CoreModule.h"
 #include "gtest/gtest.h"
+#include "VirtualMachine/VirtualMachine.h"
 #include <cstring>
 
 using namespace SpaceGameEngine;
@@ -69,7 +68,7 @@ TEST(InstructionSet, ExternalCallTest)
 	ext_call.m_pFunction(regs, test_args, ec);
 
 	ASSERT_EQ(regs.Get(31), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 }
 
 TEST(InstructionSet, SetTest)
@@ -77,7 +76,7 @@ TEST(InstructionSet, SetTest)
 	ExternalCaller ec;
 	Registers regs;
 	ec.AddExternalCallFunction(123, [](Registers& regs) -> RegisterType {
-		regs.Get(SpecialRegister::Argument(2)) = regs.Get(SpecialRegister::Argument(0)) + regs.Get(SpecialRegister::Argument(1));
+		regs.Get(Register::Argument(2)) = regs.Get(Register::Argument(0)) + regs.Get(Register::Argument(1));
 		return 1;
 	});
 	const auto& set = InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set);
@@ -88,12 +87,12 @@ TEST(InstructionSet, SetTest)
 
 	Byte test_args[9];
 
-	test_args[0] = SpecialRegister::Argument(0);
+	test_args[0] = Register::Argument(0);
 	UInt64 buffer = 2;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	set.m_pFunction(regs, test_args, ec);
 
-	test_args[0] = SpecialRegister::Argument(1);
+	test_args[0] = Register::Argument(1);
 	buffer = 3;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	set.m_pFunction(regs, test_args, ec);
@@ -103,9 +102,9 @@ TEST(InstructionSet, SetTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::ExternalCall).m_pFunction(regs, test_args, ec);
 
-	ASSERT_EQ(regs.Get(SpecialRegister::Argument(2)), 5);
+	ASSERT_EQ(regs.Get(Register::Argument(2)), 5);
 	ASSERT_EQ(regs.Get(31), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 30);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 30);
 }
 
 TEST(InstructionSet, CopyTest)
@@ -133,7 +132,7 @@ TEST(InstructionSet, CopyTest)
 	copy.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 123);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 13);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 13);
 }
 
 TEST(InstructionSet, GotoTest)
@@ -153,7 +152,7 @@ TEST(InstructionSet, GotoTest)
 	memcpy(test_args, &buffer, sizeof(buffer));
 
 	goto_.m_pFunction(regs, test_args, ec);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 123);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 123);
 }
 
 TEST(InstructionSet, GotoRegisterTest)
@@ -174,10 +173,10 @@ TEST(InstructionSet, GotoRegisterTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	goto_reg.m_pFunction(regs, test_args, ec);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 123);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 123);
 }
 
 TEST(InstructionSet, IfTest)
@@ -198,19 +197,19 @@ TEST(InstructionSet, IfTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 456;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	if_.m_pFunction(regs, test_args, ec);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 10;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	if_.m_pFunction(regs, test_args, ec);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 123);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 123);
 }
 
 TEST(InstructionSet, AddTest)
@@ -231,21 +230,21 @@ TEST(InstructionSet, AddTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 456;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	add.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 123 + 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, SubtractTest)
@@ -266,21 +265,21 @@ TEST(InstructionSet, SubtractTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	subtract.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 - 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, MultiplyTest)
@@ -301,21 +300,21 @@ TEST(InstructionSet, MultiplyTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	multiply.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 * 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, DivideTest)
@@ -336,21 +335,21 @@ TEST(InstructionSet, DivideTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	divide.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 / 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, ModTest)
@@ -371,21 +370,21 @@ TEST(InstructionSet, ModTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	mod.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 % 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, AndTest)
@@ -406,21 +405,21 @@ TEST(InstructionSet, AndTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	and_.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 & 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, OrTest)
@@ -441,21 +440,21 @@ TEST(InstructionSet, OrTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	or_.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 | 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, XorTest)
@@ -476,21 +475,21 @@ TEST(InstructionSet, XorTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	xor_.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 ^ 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, NotTest)
@@ -511,13 +510,13 @@ TEST(InstructionSet, NotTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	test_args[1] = 10;
 	not_.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), ~456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 13);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 13);
 }
 
 TEST(InstructionSet, ShiftLeftTest)
@@ -538,21 +537,21 @@ TEST(InstructionSet, ShiftLeftTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 12;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 12);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	shift_left.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 << 12);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, ShiftRightTest)
@@ -573,21 +572,21 @@ TEST(InstructionSet, ShiftRightTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 2;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 2);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	shift_right.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456 >> 2);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 24);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 24);
 }
 
 TEST(InstructionSet, EqualTest)
@@ -608,35 +607,35 @@ TEST(InstructionSet, EqualTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	buffer = 456;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 30);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 30);
 
 	test_args[0] = 13;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 0);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 34);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 34);
 
 	test_args[0] = 13;
 	test_args[1] = 10;
 	test_args[2] = 12;
 	equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 38);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 38);
 }
 
 TEST(InstructionSet, NotEqualTest)
@@ -657,35 +656,35 @@ TEST(InstructionSet, NotEqualTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	buffer = 456;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 30);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 30);
 
 	test_args[0] = 13;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	not_equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 34);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 34);
 
 	test_args[0] = 13;
 	test_args[1] = 10;
 	test_args[2] = 12;
 	not_equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 0);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 38);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 38);
 }
 
 TEST(InstructionSet, LessTest)
@@ -706,35 +705,35 @@ TEST(InstructionSet, LessTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	buffer = 789;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 789);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 30);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 30);
 
 	test_args[0] = 13;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	less.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 0);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 34);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 34);
 
 	test_args[0] = 13;
 	test_args[1] = 10;
 	test_args[2] = 12;
 	less.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 38);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 38);
 }
 
 TEST(InstructionSet, LessEqualTest)
@@ -755,49 +754,49 @@ TEST(InstructionSet, LessEqualTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	buffer = 456;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 30);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 30);
 
 	test_args[0] = 13;
 	buffer = 789;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 789);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 40);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 40);
 
 	test_args[0] = 14;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	less_equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(14), 0);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 44);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 44);
 
 	test_args[0] = 14;
 	test_args[1] = 10;
 	test_args[2] = 12;
 	less_equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(14), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 48);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 48);
 
 	test_args[0] = 15;
 	test_args[1] = 10;
 	test_args[2] = 13;
 	less_equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(15), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 52);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 52);
 }
 
 TEST(InstructionSet, GreaterTest)
@@ -818,35 +817,35 @@ TEST(InstructionSet, GreaterTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	buffer = 789;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 789);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 30);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 30);
 
 	test_args[0] = 13;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	greater.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 34);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 34);
 
 	test_args[0] = 13;
 	test_args[1] = 10;
 	test_args[2] = 12;
 	greater.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 0);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 38);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 38);
 }
 
 TEST(InstructionSet, GreaterEqualTest)
@@ -867,49 +866,49 @@ TEST(InstructionSet, GreaterEqualTest)
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(10), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 10);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 10);
 
 	test_args[0] = 11;
 	buffer = 123;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(11), 123);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 20);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 20);
 
 	test_args[0] = 12;
 	buffer = 456;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(12), 456);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 30);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 30);
 
 	test_args[0] = 13;
 	buffer = 789;
 	memcpy(test_args + 1, &buffer, sizeof(buffer));
 	InstructionSet::GetSingleton().Get(InstructionTypeIndex::Set).m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(13), 789);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 40);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 40);
 
 	test_args[0] = 14;
 	test_args[1] = 10;
 	test_args[2] = 11;
 	greater_equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(14), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 44);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 44);
 
 	test_args[0] = 15;
 	test_args[1] = 10;
 	test_args[2] = 12;
 	greater_equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(15), 1);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 48);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 48);
 
 	test_args[0] = 15;
 	test_args[1] = 10;
 	test_args[2] = 13;
 	greater_equal.m_pFunction(regs, test_args, ec);
 	ASSERT_EQ(regs.Get(15), 0);
-	ASSERT_EQ(regs.Get(SpecialRegister::ProgramCounter), 52);
+	ASSERT_EQ(regs.Get(Register::ProgramCounter), 52);
 }
 
 TEST(InstructionsGenerator, BasicTest)
@@ -1148,7 +1147,7 @@ TEST(VirtualMachine, Test)
 {
 	VirtualMachine vm;
 	vm.GetExternalCaller().AddExternalCallFunction(1, 0, [](Registers& regs) -> RegisterType {
-		*(UInt64*)regs.Get(SpecialRegister::Argument(0)) = regs.Get(SpecialRegister::Argument(1));
+		*(UInt64*)regs.Get(Register::Argument(0)) = regs.Get(Register::Argument(1));
 		return 1;
 	});
 	UInt8 code[94];
@@ -1203,12 +1202,12 @@ TEST(VirtualMachine, Test)
 	memcpy(code + 63, &data, sizeof(data));
 
 	code[71] = InstructionTypeIndex::Set;
-	code[72] = SpecialRegister::Argument(0);
+	code[72] = Register::Argument(0);
 	data = (UInt64)&result;
 	memcpy(code + 73, &data, sizeof(data));
 
 	code[81] = InstructionTypeIndex::Copy;
-	code[82] = SpecialRegister::Argument(1);
+	code[82] = Register::Argument(1);
 	code[83] = 8;
 
 	code[84] = InstructionTypeIndex::ExternalCall;
@@ -1225,7 +1224,7 @@ TEST(VirtualMachine, InstructionsGeneratorTest)
 {
 	VirtualMachine vm;
 	vm.GetExternalCaller().AddExternalCallFunction(1, 0, [](Registers& regs) -> RegisterType {
-		*(UInt64*)regs.Get(SpecialRegister::Argument(0)) = regs.Get(SpecialRegister::Argument(1));
+		*(UInt64*)regs.Get(Register::Argument(0)) = regs.Get(Register::Argument(1));
 		return 1;
 	});
 	Vector<UInt8> code;
@@ -1244,8 +1243,8 @@ TEST(VirtualMachine, InstructionsGeneratorTest)
 	InstructionsGenerator::If(code, 10, 71);
 	InstructionsGenerator::Add(code, 8, 8, 6);
 	InstructionsGenerator::Goto(code, 40);
-	InstructionsGenerator::Set(code, SpecialRegister::Argument(0), (UInt64)&result);
-	InstructionsGenerator::Copy(code, SpecialRegister::Argument(1), 8);
+	InstructionsGenerator::Set(code, Register::Argument(0), (UInt64)&result);
+	InstructionsGenerator::Copy(code, Register::Argument(1), 8);
 	InstructionsGenerator::ExternalCall(code, 11, ExternalCaller::GetIndex(1, 0));
 
 	ASSERT_EQ(code.GetSize(), 94);
