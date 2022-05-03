@@ -36,10 +36,16 @@ namespace SpaceGameEngine::SpaceLanguage
 		inline constexpr const UInt8 StackPointer = 2;
 
 		inline constexpr const UInt8 SpecialRegistersSize = 3;
+		inline constexpr const UInt8 ArgumentRegistersStartIndex = 32;
+
+		inline constexpr UInt8 Common(UInt8 idx)
+		{
+			return SpecialRegistersSize + idx;
+		}
 
 		inline constexpr UInt8 Argument(UInt8 idx)
 		{
-			return 32 + idx;
+			return ArgumentRegistersStartIndex + idx;
 		}
 	}
 

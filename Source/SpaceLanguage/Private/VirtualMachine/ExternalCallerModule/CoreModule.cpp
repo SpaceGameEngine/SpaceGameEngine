@@ -24,12 +24,12 @@ using namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule;
 void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoExternalCaller(ExternalCaller& ec)
 {
 	//Allocate
-	ec.AddExternalCallFunction(CoreModule::Id, 0, [](Registers& regs) -> RegisterType {
+	ec.AddExternalCallFunction(CoreModule::Id, CoreModule::Functions::Allocate, [](Registers& regs) -> RegisterType {
 		return (RegisterType)DefaultAllocator::RawNew(R_ARG(0), R_ARG(1));
 	});
 
 	//Free
-	ec.AddExternalCallFunction(CoreModule::Id, 1, [](Registers& regs) -> RegisterType {
+	ec.AddExternalCallFunction(CoreModule::Id, CoreModule::Functions::Free, [](Registers& regs) -> RegisterType {
 		DefaultAllocator::RawDelete((void*)R_ARG(0));
 		return 0;
 	});
@@ -38,7 +38,7 @@ void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoE
 void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoAssembler(Assembler& assembler)
 {
 	assembler.RegisterExternalCallerModule(SGE_STR("CoreModule"), CoreModule::Id, {
-																					  Pair<const String, UInt32>(SGE_STR("Allocate"), 0),
-																					  Pair<const String, UInt32>(SGE_STR("Free"), 1),
+																					  Pair<const String, UInt32>(SGE_STR("Allocate"), CoreModule::Functions::Allocate),
+																					  Pair<const String, UInt32>(SGE_STR("Free"), CoreModule::Functions::Free),
 																				  });
 }

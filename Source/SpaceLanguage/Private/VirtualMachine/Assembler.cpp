@@ -47,6 +47,34 @@ bool SpaceGameEngine::SpaceLanguage::InvalidInstructionNameError::Judge(const St
 	return !InstructionNameSet::GetSingleton().IsInstructionName(str);
 }
 
+SpaceGameEngine::SpaceLanguage::RegisterNameSet::RegisterNameSet()
+	: m_Content({Pair<const String, UInt8>(SGE_STR("pc"), Register::ProgramCounter),
+				 Pair<const String, UInt8>(SGE_STR("bp"), Register::BasePointer),
+				 Pair<const String, UInt8>(SGE_STR("sp"), Register::StackPointer)})
+{
+	for (UInt8 i = Register::SpecialRegistersSize; i < Register::ArgumentRegistersStartIndex; ++i)
+		m_Content.Insert(Format(String(SGE_STR("c{}")), i - Register::SpecialRegistersSize), i);
+
+	for (UInt8 i = Register::ArgumentRegistersStartIndex; i < RegistersSize; ++i)
+		m_Content.Insert(Format(String(SGE_STR("a{}")), i - Register::ArgumentRegistersStartIndex), i);
+}
+
+UInt8 SpaceGameEngine::SpaceLanguage::RegisterNameSet::Get(const String& register_name) const
+{
+	SGE_ASSERT(InvalidRegisterNameError, register_name);
+	return m_Content.Find(register_name)->m_Second;
+}
+
+bool SpaceGameEngine::SpaceLanguage::RegisterNameSet::IsRegisterName(const String& str) const
+{
+	return m_Content.Find(str) != m_Content.GetConstEnd();
+}
+
+bool SpaceGameEngine::SpaceLanguage::InvalidRegisterNameError::Judge(const String& str)
+{
+	return !RegisterNameSet::GetSingleton().IsRegisterName(str);
+}
+
 bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(const String& str, const String& error_info_formatter, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions)
 {
 	SizeType line = 1;
@@ -225,16 +253,28 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 			{
 				if (instr_size)
 				{
-					if (iter->m_Type != TokenType::IntegerLiteral)
+					if (iter->m_Type == TokenType::IntegerLiteral)
 					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need integer here"))));
+						if (StringTo<String, UInt8>(iter->m_Content) >= RegistersSize)
+						{
+							SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid register index"))));
+							return true;
+						}
+					}
+					else if (iter->m_Type == TokenType::Identifier)
+					{
+						if (!RegisterNameSet::GetSingleton().IsRegisterName(iter->m_Content))
+						{
+							SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid register name"))));
+							return true;
+						}
+					}
+					else
+					{
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need register here"))));
 						return true;
 					}
-					if (StringTo<String, UInt8>(iter->m_Content) >= RegistersSize)
-					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid register index"))));
-						return true;
-					}
+
 					instr_size -= 1;
 				}
 				else if (iter->m_Type == TokenType::Identifier)
@@ -332,7 +372,10 @@ Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& s
 		}
 		else if (instr_size)
 		{
-			result[write_idx] = StringTo<String, UInt8>(iter->m_Content);
+			if (iter->m_Type == TokenType::IntegerLiteral)
+				result[write_idx] = StringTo<String, UInt8>(iter->m_Content);
+			else	//Identifier
+				result[write_idx] = RegisterNameSet::GetSingleton().Get(iter->m_Content);
 			instr_size -= 1;
 			++write_idx;
 		}

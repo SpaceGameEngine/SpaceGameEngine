@@ -46,12 +46,12 @@ TEST(CoreModule, AllocateTest)
 
 	UInt64 result = 0;
 	auto code = assembler.Compile(String(SGE_STR(R"(
-	Set 32 16
-	Set 33 16
-	ExternalCall 33 CoreModule:Allocate
-	Set 32 )")) + ToString<String>((UInt64)(&result)) +
+	Set a0 16
+	Set a1 16
+	ExternalCall a1 CoreModule:Allocate
+	Set a0 )")) + ToString<String>((UInt64)(&result)) +
 									  SGE_STR(R"(
-	ExternalCall 10 TestModule:GetResult
+	ExternalCall c0 TestModule:GetResult
 	)"),
 								  formatter);
 	vm.Run(code.GetData(), code.GetSize());
@@ -71,14 +71,14 @@ TEST(CoreModule, FreeTest)
 
 	UInt64 result = 0;
 	auto code = assembler.Compile(String(SGE_STR(R"(
-	Set 32 16
-	Set 33 16
-	ExternalCall 33 CoreModule:Allocate
-	Set 32 )")) + ToString<String>((UInt64)(&result)) +
+	Set a0 16
+	Set a1 16
+	ExternalCall a1 CoreModule:Allocate
+	Set a0 )")) + ToString<String>((UInt64)(&result)) +
 									  SGE_STR(R"(
-	ExternalCall 10 TestModule:GetResult
-	Copy 32 33
-	ExternalCall 10 CoreModule:Free
+	ExternalCall c0 TestModule:GetResult
+	Copy a0 a1
+	ExternalCall c0 CoreModule:Free
 	)"),
 								  formatter);
 	vm.Run(code.GetData(), code.GetSize());

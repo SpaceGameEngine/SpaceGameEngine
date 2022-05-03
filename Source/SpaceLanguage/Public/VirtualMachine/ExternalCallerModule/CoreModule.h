@@ -28,6 +28,12 @@ namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule
 	{
 		inline constexpr const UInt32 Id = 0;
 
+		namespace Functions
+		{
+			inline constexpr const UInt32 Allocate = 0;
+			inline constexpr const UInt32 Free = 1;
+		}
+
 		SPACE_LANGUAGE_API void LoadIntoExternalCaller(ExternalCaller& ec);
 		SPACE_LANGUAGE_API void LoadIntoAssembler(Assembler& assembler);
 	}

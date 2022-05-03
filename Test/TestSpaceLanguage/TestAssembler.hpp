@@ -14,9 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include "gtest/gtest.h"
 #include "VirtualMachine/Assembler.h"
 #include "VirtualMachine/VirtualMachine.h"
-#include "gtest/gtest.h"
+#include "Utility/Format.hpp"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
@@ -34,24 +35,43 @@ TEST(InstructionNameSet, Test)
 	ASSERT_EQ(test_instr.m_Size, 4);
 }
 
+TEST(RegisterNameSet, Test)
+{
+	RegisterNameSet& rns = RegisterNameSet::GetSingleton();
+	ASSERT_TRUE(rns.IsRegisterName(SGE_STR("pc")));
+	ASSERT_TRUE(rns.IsRegisterName(SGE_STR("bp")));
+	ASSERT_TRUE(rns.IsRegisterName(SGE_STR("sp")));
+	ASSERT_TRUE(rns.IsRegisterName(SGE_STR("c1")));
+	ASSERT_TRUE(rns.IsRegisterName(SGE_STR("a2")));
+	ASSERT_FALSE(rns.IsRegisterName(SGE_STR("test")));
+
+	ASSERT_EQ(rns.Get(SGE_STR("pc")), Register::ProgramCounter);
+	ASSERT_EQ(rns.Get(SGE_STR("bp")), Register::BasePointer);
+	ASSERT_EQ(rns.Get(SGE_STR("sp")), Register::StackPointer);
+	ASSERT_EQ(rns.Get(SGE_STR("c0")), Register::SpecialRegistersSize);
+	ASSERT_EQ(rns.Get(Format(String(SGE_STR("c{}")), Register::ArgumentRegistersStartIndex - 1 - Register::SpecialRegistersSize)), Register::ArgumentRegistersStartIndex - 1);
+	ASSERT_EQ(rns.Get(SGE_STR("a0")), Register::ArgumentRegistersStartIndex);
+	ASSERT_EQ(rns.Get(Format(String(SGE_STR("a{}")), RegistersSize - 1 - Register::ArgumentRegistersStartIndex)), RegistersSize - 1);
+}
+
 TEST(Assembler, Test)
 {
 	Assembler ab;
 	String formatter(SGE_STR("line:{} column:{}, {}"));
 
 	auto res1 = ab.Compile(SGE_STR(R"(
-	Set 11 123456/*test cross line comment block
-	*/Copy 12 11
+	Set c0 123456/*test cross line comment block
+	*/Copy c1 c0
 	//test assembler 1
 	)"),
 						   formatter);
 	ASSERT_EQ(res1.GetSize(), 13);
 	ASSERT_EQ(res1[0], InstructionTypeIndex::Set);
-	ASSERT_EQ(res1[1], 11);
+	ASSERT_EQ(res1[1], Register::Common(0));
 	ASSERT_EQ(*(UInt64*)(&res1[2]), 123456);
 	ASSERT_EQ(res1[10], InstructionTypeIndex::Copy);
-	ASSERT_EQ(res1[11], 12);
-	ASSERT_EQ(res1[12], 11);
+	ASSERT_EQ(res1[11], Register::Common(1));
+	ASSERT_EQ(res1[12], Register::Common(0));
 
 	auto res2 = ab.Compile(SGE_STR(R"(//test label
 	:Start
