@@ -120,4 +120,31 @@ TEST(Assembler, Test)
 	ASSERT_EQ(res3[20], InstructionTypeIndex::ExternalCall);
 	ASSERT_EQ(res3[21], 12);
 	ASSERT_EQ(*(UInt64*)(&res3[22]), ExternalCaller::GetIndex(123, 2));
+
+	ab.RegisterExternalCallerModule(SGE_STR("TestRun"), 1, {{SGE_STR("GetResult"), 0}});
+	VirtualMachine vm;
+	vm.GetExternalCaller().AddExternalCallFunction(1, 0, [](Registers& regs) -> RegisterType {
+		*(UInt64*)regs.Get(Register::Argument(0)) = regs.Get(Register::Argument(1));
+		return 1;
+	});
+	UInt64 result = 0;
+	auto res4 = ab.Compile(Format(String(SGE_STR(R"(
+		Set c0 0
+		Set c1 1
+		Set c2 0
+		Set c3 10
+:Loop	Add c0 c0 c1
+		Greater c4 c0 c3
+		If c4 LoopEnd
+		Add c2 c2 c0
+		Goto Loop
+:LoopEnd
+		Set a0 {}
+		Copy a1 c2
+		ExternalCall c0 TestRun:GetResult
+	)")),
+								  (UInt64)&result),
+						   formatter);
+	vm.Run(res4.GetData(), res4.GetSize());
+	ASSERT_EQ(result, 55);
 }
