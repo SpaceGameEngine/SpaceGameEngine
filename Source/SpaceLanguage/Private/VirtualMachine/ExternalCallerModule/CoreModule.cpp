@@ -111,7 +111,7 @@ void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoE
 	//INTEGER_TYPE_FUNCTIONS(UInt8, UInt8);
 }
 
-#define ASSEMBLER_FUNCTION(func_name) Pair<const String, UInt32>(SGE_STR(#func_name), CoreModule::Functions::##func_name)
+#define ASSEMBLER_FUNCTION(func_name) Pair<const String, UInt32>(SGE_STR(#func_name), CoreModule::Functions::func_name)
 
 #define ASSEMBLER_BASE_TYPE_MATH_OPERATORS(type_name) \
 	ASSEMBLER_FUNCTION(type_name##Add),               \
