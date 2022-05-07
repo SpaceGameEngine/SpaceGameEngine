@@ -32,6 +32,26 @@ namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule
 		{
 			inline constexpr const UInt32 Allocate = 0;
 			inline constexpr const UInt32 Free = 1;
+			inline constexpr const UInt32 Int8Load = 2;
+			inline constexpr const UInt32 Int8Store = 3;
+			inline constexpr const UInt32 Int8Copy = 4;
+			inline constexpr const UInt32 Int8Add = 5;
+			inline constexpr const UInt32 Int8Subtract = 6;
+			inline constexpr const UInt32 Int8Multiply = 7;
+			inline constexpr const UInt32 Int8Divide = 8;
+			inline constexpr const UInt32 Int8Mod = 9;
+			inline constexpr const UInt32 Int8And = 10;
+			inline constexpr const UInt32 Int8Or = 11;
+			inline constexpr const UInt32 Int8Xor = 12;
+			inline constexpr const UInt32 Int8Not = 13;
+			inline constexpr const UInt32 Int8ShiftLeft = 14;
+			inline constexpr const UInt32 Int8ShiftRight = 15;
+			inline constexpr const UInt32 Int8Equal = 16;
+			inline constexpr const UInt32 Int8NotEqual = 17;
+			inline constexpr const UInt32 Int8Less = 18;
+			inline constexpr const UInt32 Int8LessEqual = 19;
+			inline constexpr const UInt32 Int8Greater = 20;
+			inline constexpr const UInt32 Int8GreaterEqual = 21;
 		}
 
 		SPACE_LANGUAGE_API void LoadIntoExternalCaller(ExternalCaller& ec);
