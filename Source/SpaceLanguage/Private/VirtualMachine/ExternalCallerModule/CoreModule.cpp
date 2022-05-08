@@ -108,7 +108,15 @@ void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoE
 	});
 
 	INTEGER_TYPE_FUNCTIONS(Int8, Int8);
-	//INTEGER_TYPE_FUNCTIONS(UInt8, UInt8);
+	INTEGER_TYPE_FUNCTIONS(UInt8, UInt8);
+	INTEGER_TYPE_FUNCTIONS(Int16, Int16);
+	INTEGER_TYPE_FUNCTIONS(UInt16, UInt16);
+	INTEGER_TYPE_FUNCTIONS(Int32, Int32);
+	INTEGER_TYPE_FUNCTIONS(UInt32, UInt32);
+	INTEGER_TYPE_FUNCTIONS(Int64, Int64);
+	INTEGER_TYPE_FUNCTIONS(UInt64, UInt64);
+	DECIMAL_TYPE_FUNCTIONS(float, Float);
+	DECIMAL_TYPE_FUNCTIONS(double, Double);
 }
 
 #define ASSEMBLER_FUNCTION(func_name) Pair<const String, UInt32>(SGE_STR(#func_name), CoreModule::Functions::func_name)
@@ -157,5 +165,14 @@ void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoA
 																					  ASSEMBLER_FUNCTION(Allocate),
 																					  ASSEMBLER_FUNCTION(Free),
 																					  ASSEMBLER_INTEGER_TYPE_FUNCTIONS(Int8),
+																					  ASSEMBLER_INTEGER_TYPE_FUNCTIONS(UInt8),
+																					  ASSEMBLER_INTEGER_TYPE_FUNCTIONS(Int16),
+																					  ASSEMBLER_INTEGER_TYPE_FUNCTIONS(UInt16),
+																					  ASSEMBLER_INTEGER_TYPE_FUNCTIONS(Int32),
+																					  ASSEMBLER_INTEGER_TYPE_FUNCTIONS(UInt32),
+																					  ASSEMBLER_INTEGER_TYPE_FUNCTIONS(Int64),
+																					  ASSEMBLER_INTEGER_TYPE_FUNCTIONS(UInt64),
+																					  ASSEMBLER_DECIMAL_TYPE_FUNCTIONS(Float),
+																					  ASSEMBLER_DECIMAL_TYPE_FUNCTIONS(Double),
 																				  });
 }
