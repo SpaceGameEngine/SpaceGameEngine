@@ -17,4 +17,3 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
-using namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation;

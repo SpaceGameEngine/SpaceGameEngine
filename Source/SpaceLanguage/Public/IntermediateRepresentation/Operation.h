@@ -21,7 +21,7 @@ limitations under the License.
 @{
 */
 
-namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
+namespace SpaceGameEngine::SpaceLanguage
 {
 
 }

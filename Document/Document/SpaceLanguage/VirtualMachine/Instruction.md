@@ -1,4 +1,4 @@
-﻿# SpaceGameEngine/SpaceLanguage 
+﻿# SpaceGameEngine/SpaceLanguage/VirtualMachine
 ## Instruction
 ### Format
 `SpaceLanguage`的指令有5种格式，其大小分别为16位、24位、32位、72位和80位，具体如下：  

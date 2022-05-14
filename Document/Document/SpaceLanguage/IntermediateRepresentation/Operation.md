@@ -1,2 +1,2 @@
-﻿# SpaceGameEngine/SpaceLanguage 
+﻿# SpaceGameEngine/SpaceLanguage/IntermediateRepresentation
 ## Operation
