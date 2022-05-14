@@ -17,12 +17,14 @@ limitations under the License.
 #include "MetaData.h"
 #include "MemoryManager.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
+
 	/*!
 	@brief a wrapper of object which erases its type.
 	*/
@@ -201,7 +203,8 @@ namespace SpaceGameEngine
 			return false;
 	}
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

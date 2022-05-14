@@ -17,12 +17,13 @@ limitations under the License.
 #include "Vector.hpp"
 #include "List.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T, typename Allocator = DefaultAllocator, template<typename, typename> class Implement = List>
 	class Stack
@@ -213,7 +214,8 @@ namespace SpaceGameEngine
 		ImplementType m_Implement;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

@@ -16,14 +16,16 @@ limitations under the License.
 #pragma once
 #include "TypeDefinition.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

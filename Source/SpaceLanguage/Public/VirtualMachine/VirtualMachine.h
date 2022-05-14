@@ -16,12 +16,13 @@ limitations under the License.
 #pragma once
 #include "Instruction.h"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 	struct InvalidInstructionsError
 	{
@@ -40,7 +41,8 @@ namespace SpaceGameEngine::SpaceLanguage
 		ExternalCaller m_ExternalCaller;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

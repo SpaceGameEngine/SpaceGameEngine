@@ -28,12 +28,13 @@ limitations under the License.
 #include <dirent.h>
 #endif
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 #ifdef SGE_WINDOWS
 	struct GetFullPathNameFailError
@@ -1143,7 +1144,9 @@ namespace SpaceGameEngine
 	template class COMMON_API File<Char16, UCS2Trait>;
 	template class COMMON_API File<Char8, UTF8Trait>;
 #endif
-	/*!
-	@}
-	*/
+
 }
+
+/*!
+@}
+*/

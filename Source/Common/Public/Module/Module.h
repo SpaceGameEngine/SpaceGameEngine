@@ -16,12 +16,13 @@ limitations under the License.
 #pragma once
 #include "CommonAPI.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	class COMMON_API Module
 	{
@@ -32,7 +33,8 @@ namespace SpaceGameEngine
 		virtual void OnUnload();
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

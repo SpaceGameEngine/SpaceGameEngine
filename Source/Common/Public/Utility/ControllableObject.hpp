@@ -16,12 +16,14 @@ limitations under the License.
 #pragma once
 #include "MemoryManager.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
+
 	/*!
 	@brief a wrapper of object which the user can control its lifetime.
 	@note the ControllableObject can automatically release its resource if
@@ -182,7 +184,9 @@ namespace SpaceGameEngine
 	private:
 		T* m_pContent;
 	};
-	/*!
-	@}
-	*/
+
 }
+
+/*!
+@}
+*/

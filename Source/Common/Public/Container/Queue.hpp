@@ -16,12 +16,13 @@ limitations under the License.
 #pragma once
 #include "List.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T, typename Allocator = DefaultAllocator, template<typename, typename> class Implement = List>
 	class Queue
@@ -212,7 +213,8 @@ namespace SpaceGameEngine
 		ImplementType m_Implement;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

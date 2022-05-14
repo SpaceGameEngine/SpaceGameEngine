@@ -22,12 +22,13 @@ limitations under the License.
 #include <utility>
 #include <new>
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	/*!
 	@todo add other member functions' information.
@@ -153,7 +154,9 @@ namespace SpaceGameEngine
 		static MetaData instance(typeid(T).name(), sizeof(T), alignof(T), QueryDefaultConstructor<T>(), QueryCopyConstructor<T>(), QueryMoveConstructor<T>(), QueryCopyAssignment<T>(), QueryMoveAssignment<T>(), QueryDestructor<T>(), QueryComparison<T>());
 		return instance;
 	}
-	/*!
-	@}
-	*/
+
 }
+
+/*!
+@}
+*/

@@ -20,12 +20,13 @@ limitations under the License.
 #include "Function.hpp"
 #include "CommonAPI.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API Vector<Function<void()>>;
@@ -61,7 +62,8 @@ namespace SpaceGameEngine
 		Vector<Function<void()>> m_Functions;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

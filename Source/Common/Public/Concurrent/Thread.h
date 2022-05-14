@@ -29,12 +29,13 @@ namespace std	 //declaration for dll export
 }
 #endif
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	/*!
 	@file
@@ -109,9 +110,10 @@ namespace SpaceGameEngine
 		std::thread m_ThreadImpl;
 	};
 
-	/*!
-	@}
-	*/
+	COMMON_API void Swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept;
+
 }
 
-COMMON_API void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept;
+/*!
+@}
+*/

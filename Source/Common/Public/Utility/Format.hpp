@@ -18,12 +18,13 @@ limitations under the License.
 #include "SGEString.hpp"
 #include "Container/Vector.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T, typename Trait, typename Allocator>
 	inline bool IsFormatString(const StringCore<T, Trait, Allocator>& str)
@@ -632,7 +633,8 @@ namespace SpaceGameEngine
 		return re;
 	}
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

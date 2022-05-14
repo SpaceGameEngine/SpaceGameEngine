@@ -16,12 +16,13 @@ limitations under the License.
 #pragma once
 #include <type_traits>
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T>
 	struct RemoveCVRef
@@ -38,7 +39,8 @@ namespace SpaceGameEngine
 		using Type = T;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

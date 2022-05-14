@@ -17,12 +17,13 @@ limitations under the License.
 #include "Vector.hpp"
 #include "Utility/Utility.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T, typename Comparer = Less<T>, typename Allocator = DefaultAllocator, template<typename, typename> class Implement = Vector>
 	class PriorityQueue
@@ -285,7 +286,8 @@ namespace SpaceGameEngine
 		ImplementType m_Implement;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

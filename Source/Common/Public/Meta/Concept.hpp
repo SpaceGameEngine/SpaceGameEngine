@@ -17,12 +17,13 @@ limitations under the License.
 #include <concepts>
 #include "Trait.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T>
 	concept IsDefaultConstructible = std::is_default_constructible_v<T>;
@@ -111,7 +112,8 @@ namespace SpaceGameEngine
 	template<typename T>
 	concept IsTrivial = std::is_trivial_v<T>;
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

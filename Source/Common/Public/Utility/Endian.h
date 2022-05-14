@@ -18,12 +18,13 @@ limitations under the License.
 #include "TypeDefinition.hpp"
 #include "Error.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	enum class Endian : UInt8
 	{
@@ -48,7 +49,9 @@ namespace SpaceGameEngine
 		SGE_ASSERT(InvalidEndianError, src);
 		ChangeEndian(&val, sizeof(T), dst, src);
 	}
-	/*!
-	@}
-	*/
+
 }
+
+/*!
+@}
+*/

@@ -19,12 +19,13 @@ limitations under the License.
 #include "CommonAPI.h"
 #include <utility>
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	struct COMMON_API UncopyableAndUnmovable
 	{
@@ -143,7 +144,8 @@ namespace SpaceGameEngine
 		}
 	}
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

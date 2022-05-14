@@ -20,12 +20,13 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "SGEString.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	using HashType = UInt64;
 
@@ -1034,7 +1035,8 @@ namespace SpaceGameEngine
 		SizeType m_Size;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

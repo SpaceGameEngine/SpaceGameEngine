@@ -17,12 +17,13 @@ limitations under the License.
 #include "CommonAPI.h"
 #include "SGEStringForward.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	struct COMMON_API DebugInformation
 	{
@@ -43,7 +44,8 @@ namespace SpaceGameEngine
 #define SGE_LINE __LINE__
 #define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation((const TChar*)SGE_FILE, (const TChar*)SGE_FUNCTION, SGE_LINE)
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

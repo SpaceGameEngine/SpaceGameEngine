@@ -19,12 +19,13 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Error.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T, typename Allocator = DefaultAllocator>
 	class List
@@ -1526,7 +1527,9 @@ namespace SpaceGameEngine
 		Node* m_pTail;
 		SizeType m_Size;
 	};
-	/*!
-	@}
-	*/
+
 }
+
+/*!
+@}
+*/

@@ -19,12 +19,13 @@ limitations under the License.
 @defgroup Bootstrap Bootstrap Module
 */
 
+/*!
+@ingroup Bootstrap
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Bootstrap
-	@{
-	*/
 
 	/*!
 	@brief do some essential works to bootstrap the whole engine.
@@ -38,7 +39,8 @@ namespace SpaceGameEngine
 		~Bootstrap();
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

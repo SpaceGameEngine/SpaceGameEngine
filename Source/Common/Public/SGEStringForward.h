@@ -21,12 +21,13 @@ limitations under the License.
 #include <cuchar>
 #endif
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 #ifdef SGE_WINDOWS
 	using Char16 = wchar_t;
@@ -87,7 +88,8 @@ namespace SpaceGameEngine
 	@todo use project manager to define utf8 compile option to set runtime character environment as utf8.
 	*/
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

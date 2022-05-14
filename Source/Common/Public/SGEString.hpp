@@ -27,12 +27,13 @@ limitations under the License.
 #include <algorithm>
 #include <concepts>
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T>
 	struct CharTrait
@@ -5337,7 +5338,8 @@ namespace SpaceGameEngine
 		}
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

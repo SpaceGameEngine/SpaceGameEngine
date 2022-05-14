@@ -82,7 +82,7 @@ SpaceGameEngine::ThreadID SpaceGameEngine::Thread::GetCurrentThreadId() noexcept
 	return std::this_thread::get_id();
 }
 
-void swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept
+void SpaceGameEngine::Swap(SpaceGameEngine::Thread& lhs, SpaceGameEngine::Thread& rhs) noexcept
 {
 	lhs.Swap(rhs);
 }

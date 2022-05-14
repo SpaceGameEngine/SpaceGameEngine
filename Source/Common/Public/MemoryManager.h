@@ -22,12 +22,13 @@ limitations under the License.
 #include "Concurrent/Atomic.hpp"
 #include "CommonAPI.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 #ifdef SGE_X86
 #define SGE_MAX_MEMORY_SIZE UINT32_MAX
@@ -249,7 +250,8 @@ namespace SpaceGameEngine
 
 	using DefaultAllocator = MemoryManagerAllocator;
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

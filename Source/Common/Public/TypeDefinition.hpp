@@ -17,12 +17,13 @@ limitations under the License.
 #include <cstdint>
 #include "Platform.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	/*!
 	@brief 8-bit int
@@ -85,7 +86,8 @@ namespace SpaceGameEngine
 #error this arch has not been supported.
 #endif
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

@@ -16,12 +16,13 @@ limitations under the License.
 #pragma once
 #include "SGEString.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	/*!
 	@todo add calendar functions
@@ -44,7 +45,8 @@ namespace SpaceGameEngine
 		static COMMON_API bool Judge(const Date& date);
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

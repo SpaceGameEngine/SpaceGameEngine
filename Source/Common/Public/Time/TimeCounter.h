@@ -18,12 +18,13 @@ limitations under the License.
 #include "TypeDefinition.hpp"
 #include "CommonAPI.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	using TimeType = UInt64;
 
@@ -240,7 +241,8 @@ namespace SpaceGameEngine
 		TimeDurationType m_DeltaTime;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

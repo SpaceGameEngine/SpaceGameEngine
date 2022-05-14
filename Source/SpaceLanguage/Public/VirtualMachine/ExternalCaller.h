@@ -17,12 +17,13 @@ limitations under the License.
 #include "Register.h"
 #include "Container/HashMap.hpp"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 	using ExternalCallFunctionType = RegisterType (*)(Registers&);
 
@@ -59,7 +60,8 @@ namespace SpaceGameEngine::SpaceLanguage
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, ExternalCallFunctionType>::ConstIterator& iter, const HashMap<UInt64, ExternalCallFunctionType>& hash_map);
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

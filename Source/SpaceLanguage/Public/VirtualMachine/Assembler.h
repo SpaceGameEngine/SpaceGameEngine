@@ -17,12 +17,13 @@ limitations under the License.
 #include "Instruction.h"
 #include "Container/HashMap.hpp"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API HashMap<String, const InstructionType*>;
@@ -106,7 +107,8 @@ namespace SpaceGameEngine::SpaceLanguage
 		HashMap<String, Pair<UInt32, HashMap<String, UInt32>>> m_ModuleFunctions;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

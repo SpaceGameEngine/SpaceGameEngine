@@ -28,12 +28,13 @@ limitations under the License.
 #include "File.h"
 #include "GlobalVariable.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename T>
 	concept IsLogWriterCore = requires(T t, const Char8* pstr, SizeType size)
@@ -276,7 +277,8 @@ namespace SpaceGameEngine
 	COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogWriter();
 	COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogger();
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

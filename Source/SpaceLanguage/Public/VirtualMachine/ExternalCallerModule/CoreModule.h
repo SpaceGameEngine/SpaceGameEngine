@@ -17,12 +17,13 @@ limitations under the License.
 #include "VirtualMachine/ExternalCaller.h"
 #include "VirtualMachine/Assembler.h"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 	namespace CoreModule
 	{
@@ -224,7 +225,8 @@ namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule
 		SPACE_LANGUAGE_API void LoadIntoAssembler(Assembler& assembler);
 	}
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

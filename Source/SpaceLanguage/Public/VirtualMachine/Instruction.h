@@ -19,12 +19,13 @@ limitations under the License.
 #include "Utility/Singleton.hpp"
 #include "Container/Vector.hpp"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 	using InstructionFunctionType = void (*)(Registers&, void*, const ExternalCaller&);
 
@@ -151,7 +152,8 @@ namespace SpaceGameEngine::SpaceLanguage
 		SPACE_LANGUAGE_API void GreaterEqual(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

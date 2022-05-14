@@ -21,12 +21,13 @@ limitations under the License.
 #include <sys/time.h>
 #endif
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	namespace TimeImplement
 	{
@@ -47,7 +48,8 @@ namespace SpaceGameEngine
 #endif
 	}
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

@@ -23,12 +23,13 @@ limitations under the License.
 #include "Utility/DebugInformation.h"
 #include <type_traits>
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	COMMON_API void ThrowError(const TChar* error_msg, DebugInformation debug_info);
 
@@ -173,7 +174,8 @@ namespace SpaceGameEngine
 #define SGE_CHECK(error_type, ...) \
 	SpaceGameEngine::Check<error_type>(SGE_DEBUG_INFORMATION, ##__VA_ARGS__)
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

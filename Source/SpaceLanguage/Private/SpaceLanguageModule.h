@@ -16,12 +16,13 @@ limitations under the License.
 #pragma once
 #include "Module/ModuleManager.h"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 	class SpaceLanguageModule : public Module
 	{
@@ -30,7 +31,8 @@ namespace SpaceGameEngine::SpaceLanguage
 		virtual void OnUnload() override;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

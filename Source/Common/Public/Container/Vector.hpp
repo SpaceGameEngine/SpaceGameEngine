@@ -21,12 +21,13 @@ limitations under the License.
 #include "Error.h"
 #include "ContainerConcept.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	/*!
 	@brief Vector is a type of ordered container which is non-thread-safe.
@@ -2157,7 +2158,9 @@ namespace SpaceGameEngine
 		SizeType m_RealSize;
 		SizeType m_Size;
 	};
-	/*!
-	@}
-	*/
+
 }
+
+/*!
+@}
+*/

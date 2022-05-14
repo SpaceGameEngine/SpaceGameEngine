@@ -30,12 +30,13 @@ namespace std	 //declaration for dll export
 }
 #endif
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	/*!
 	@file
@@ -205,7 +206,8 @@ namespace SpaceGameEngine
 		std::call_once(flag, std::forward<Callable>(f), std::forward<Args>(args)...);
 	}
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

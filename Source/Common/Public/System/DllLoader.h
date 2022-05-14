@@ -23,12 +23,13 @@ limitations under the License.
 #error "this platform is not supported"
 #endif
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 #ifdef SGE_WINDOWS
 	using DllHandle = HMODULE;
@@ -96,7 +97,8 @@ namespace SpaceGameEngine
 #include "System/HideWindowsMacro.h"
 #endif
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

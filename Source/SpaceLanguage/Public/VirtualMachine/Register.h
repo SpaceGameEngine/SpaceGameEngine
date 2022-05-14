@@ -18,12 +18,13 @@ limitations under the License.
 #include "TypeDefinition.hpp"
 #include "Error.h"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 	using RegisterType = UInt64;
 
@@ -60,7 +61,8 @@ namespace SpaceGameEngine::SpaceLanguage
 		RegisterType m_Registers[RegistersSize];
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

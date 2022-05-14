@@ -20,12 +20,13 @@ limitations under the License.
 #include "Container/Vector.hpp"
 #include "SpaceLanguageAPI.h"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage::Lexer
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 	enum class TokenType : UInt8
 	{
@@ -247,7 +248,8 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	*/
 	SPACE_LANGUAGE_API Vector<Token> GetTokens(const String& str, const String& error_info_formatter);
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

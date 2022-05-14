@@ -18,12 +18,13 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Utility/Utility.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename K, typename V, typename LessComparer, typename Allocator>
 	class Map;
@@ -1558,7 +1559,9 @@ namespace SpaceGameEngine
 	private:
 		MapImplement::RedBlackTree<K, V, LessComparer, Allocator> m_Tree;
 	};
-	/*!
-	@}
-	*/
+
 }
+
+/*!
+@}
+*/

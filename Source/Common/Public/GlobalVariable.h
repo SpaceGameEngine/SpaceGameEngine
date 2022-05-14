@@ -20,12 +20,13 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "Function.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class COMMON_API ControllableObject<MetaObject<StdAllocator>, StdAllocator>;
@@ -80,7 +81,8 @@ namespace SpaceGameEngine
 		T* m_pContent;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

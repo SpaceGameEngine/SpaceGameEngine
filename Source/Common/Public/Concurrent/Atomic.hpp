@@ -20,12 +20,13 @@ limitations under the License.
 #include <type_traits>
 #include <atomic>
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	/*!
 	@file
@@ -473,7 +474,8 @@ namespace SpaceGameEngine
 		}
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

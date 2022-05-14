@@ -17,17 +17,19 @@ limitations under the License.
 #include "Log.h"
 #include "SpaceLanguageAPI.h"
 
+/*!
+@ingroup SpaceLanguage
+@{
+*/
+
 namespace SpaceGameEngine::SpaceLanguage
 {
-	/*!
-	@ingroup SpaceLanguage
-	@{
-	*/
 
 	SPACE_LANGUAGE_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetSpaceLanguageLogWriter();
 	SPACE_LANGUAGE_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetSpaceLanguageLogger();
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

@@ -23,12 +23,13 @@ limitations under the License.
 #include "System/DllLoader.h"
 #include "Utility/Singleton.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	struct EmptyModuleNameError
 	{
@@ -104,7 +105,9 @@ namespace SpaceGameEngine
 #else
 #define SGE_MODULE(name) SGE_STATIC_MODULE(SGE_STR(#name), name##Module);
 #endif
-	/*!
-	@}
-	*/
+
 }
+
+/*!
+@}
+*/

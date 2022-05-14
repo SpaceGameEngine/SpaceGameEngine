@@ -19,12 +19,13 @@ limitations under the License.
 #include "Meta/Concept.hpp"
 #include "TypeDefinition.hpp"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<typename IteratorType>
 	struct GetIteratorValueType
@@ -94,7 +95,8 @@ namespace SpaceGameEngine
 		t -= 1;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

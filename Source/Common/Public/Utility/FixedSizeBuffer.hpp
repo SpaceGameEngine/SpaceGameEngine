@@ -18,12 +18,13 @@ limitations under the License.
 #include "MemoryManager.h"
 #include "Error.h"
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	template<SizeType MaxSize, typename Allocator = DefaultAllocator>
 	class FixedSizeBuffer
@@ -161,7 +162,8 @@ namespace SpaceGameEngine
 		SizeType m_Size;
 	};
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/

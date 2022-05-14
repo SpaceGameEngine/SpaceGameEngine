@@ -21,12 +21,13 @@ limitations under the License.
 #include <type_traits>
 #include <functional>
 
+/*!
+@ingroup Common
+@{
+*/
+
 namespace SpaceGameEngine
 {
-	/*!
-	@ingroup Common
-	@{
-	*/
 
 	/*!
 	@brief judge a type is a correct funtion type or not.
@@ -270,7 +271,8 @@ namespace SpaceGameEngine
 	@todo add bind and other functional support.
 	*/
 
-	/*!
-	@}
-	*/
 }
+
+/*!
+@}
+*/
