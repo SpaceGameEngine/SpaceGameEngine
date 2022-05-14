@@ -19,6 +19,12 @@
     <Filter Include="Private\VirtualMachine\ExternalCallerModule">
       <UniqueIdentifier>{335f7f7a-29ab-4b0f-993e-3b53b982310a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\IntermediateRepresentation">
+      <UniqueIdentifier>{f229360a-838e-42db-9dfc-17332ab1e5e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\IntermediateRepresentation">
+      <UniqueIdentifier>{83dfa725-a2d3-4d4e-9389-26c6240d6d61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\DoxygenConfig.hpp">
@@ -54,6 +60,9 @@
     <ClInclude Include="Private\Logger.h">
       <Filter>Private</Filter>
     </ClInclude>
+    <ClInclude Include="Public\IntermediateRepresentation\Operation.h">
+      <Filter>Public\IntermediateRepresentation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp">
@@ -82,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="Private\Logger.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\IntermediateRepresentation\Operation.cpp">
+      <Filter>Private\IntermediateRepresentation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

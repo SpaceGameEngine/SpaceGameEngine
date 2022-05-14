@@ -8,5 +8,6 @@
     <ClInclude Include="TestAssembler.hpp" />
     <ClInclude Include="TestLexer.hpp" />
     <ClInclude Include="TestCoreModule.hpp" />
+    <ClInclude Include="TestIntermediateRepresentation.hpp" />
   </ItemGroup>
 </Project>
