@@ -136,7 +136,7 @@ SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
 	if (size >= 16)
 		return 16;
 	else
-		return alignof(std::max_align_t);
+		return alignof(void*);
 }
 
 SpaceGameEngine::MemoryManager::~MemoryManager()

@@ -77,7 +77,7 @@ namespace SpaceGameEngine::SpaceLanguage
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API HashMap<String, UInt32>;
-	template class SPACE_LANGUAGE_API Pair<UInt32, HashMap<String, UInt32>>;
+	template struct SPACE_LANGUAGE_API Pair<UInt32, HashMap<String, UInt32>>;
 	template class SPACE_LANGUAGE_API HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>;
 #endif
 
