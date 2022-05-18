@@ -95,11 +95,28 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		SizeType m_Size;
 	};
 
-	enum class StorageType
+	namespace BaseTypes
 	{
-		Global = 0,
-		Local = 1,
-		Register = 2
+		SPACE_LANGUAGE_API const Type& GetVoidType();
+		SPACE_LANGUAGE_API const Type& GetInt8Type();
+		SPACE_LANGUAGE_API const Type& GetUInt8Type();
+		SPACE_LANGUAGE_API const Type& GetInt16Type();
+		SPACE_LANGUAGE_API const Type& GetUInt16Type();
+		SPACE_LANGUAGE_API const Type& GetInt32Type();
+		SPACE_LANGUAGE_API const Type& GetUInt32Type();
+		SPACE_LANGUAGE_API const Type& GetInt64Type();
+		SPACE_LANGUAGE_API const Type& GetUInt64Type();
+		SPACE_LANGUAGE_API const Type& GetFloatType();
+		SPACE_LANGUAGE_API const Type& GetDoubleType();
+	}
+
+	enum class StorageType : UInt8
+	{
+		Constant = 0,
+		Global = 1,
+		Local = 2,
+		Register = 3,
+		Function = 4
 	};
 
 	class SPACE_LANGUAGE_API Variable
@@ -117,6 +134,31 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	private:
 		const Type& m_Type;
 		StorageType m_StorageType;
+		SizeType m_Index;
+	};
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API Vector<const Type*>;
+#endif
+
+	class SPACE_LANGUAGE_API Function
+	{
+	public:
+		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx);
+
+		const Vector<const Type*>& GetParameterTypes() const;
+		const Type& GetResultType() const;
+		SizeType GetIndex() const;
+
+		Variable ToVariable() const;
+		explicit operator Variable() const;
+
+		bool operator==(const IntermediateRepresentation::Function& func) const;
+		bool operator!=(const IntermediateRepresentation::Function& func) const;
+
+	private:
+		Vector<const Type*> m_ParameterTypes;
+		const Type& m_ResultType;
 		SizeType m_Index;
 	};
 }

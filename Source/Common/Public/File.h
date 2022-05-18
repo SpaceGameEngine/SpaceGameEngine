@@ -569,7 +569,7 @@ namespace SpaceGameEngine
 		FileIOMode GetFileIOMode() const;
 
 		bool IsReadFinished() const;
-		operator bool() const;
+		explicit operator bool() const;
 
 		bool IsOpen() const;
 

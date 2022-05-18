@@ -121,3 +121,32 @@ TEST(IntermediateRepresentation_Variable, Test)
 	ASSERT_EQ(v1, v2);
 	ASSERT_NE(v1, v3);
 }
+
+TEST(IntermediateRepresentation_Function, Test)
+{
+	using namespace IntermediateRepresentation;
+
+	IntermediateRepresentation::Function f1({&BaseTypes::GetInt32Type(),&BaseTypes::GetUInt64Type()},BaseTypes::GetUInt32Type(),1);
+
+	ASSERT_EQ(f1.GetParameterTypes(),Vector<const Type*>({&BaseTypes::GetInt32Type(),&BaseTypes::GetUInt64Type()}));
+	ASSERT_EQ(f1.GetResultType(),BaseTypes::GetUInt32Type());
+	ASSERT_EQ(f1.GetIndex(),1);
+	
+	Variable v1=f1.ToVariable();
+	ASSERT_EQ(v1.GetType(),BaseTypes::GetUInt64Type());
+	ASSERT_EQ(v1.GetStorageType(),StorageType::Function);
+	ASSERT_EQ(v1.GetIndex(),1);
+
+	Variable v2=(Variable)f1;
+	ASSERT_EQ(v2.GetType(),BaseTypes::GetUInt64Type());
+	ASSERT_EQ(v2.GetStorageType(),StorageType::Function);
+	ASSERT_EQ(v2.GetIndex(),1);
+
+	ASSERT_EQ(v1,v2);
+
+	const IntermediateRepresentation::Function f2({&BaseTypes::GetInt32Type(),&BaseTypes::GetUInt64Type()},BaseTypes::GetUInt32Type(),1);
+	const IntermediateRepresentation::Function f3({&BaseTypes::GetInt32Type(),&BaseTypes::GetUInt32Type()},BaseTypes::GetUInt32Type(),1);
+
+	ASSERT_EQ(f1,f2);
+	ASSERT_NE(f1,f3);
+}
