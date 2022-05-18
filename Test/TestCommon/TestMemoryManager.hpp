@@ -82,16 +82,16 @@ TEST(MemoryManager, InvalidAlignmentErrorTest)
 
 TEST(MemoryManager, GetDefaultAlignmentTest)
 {
-	ASSERT_EQ(GetDefaultAlignment(1), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(2), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(3), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(4), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(5), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(6), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(7), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(8), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(9), alignof(std::max_align_t));
-	ASSERT_EQ(GetDefaultAlignment(15), alignof(std::max_align_t));
+	ASSERT_EQ(GetDefaultAlignment(1), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(2), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(3), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(4), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(5), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(6), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(7), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(8), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(9), alignof(void*));
+	ASSERT_EQ(GetDefaultAlignment(15), alignof(void*));
 	ASSERT_EQ(GetDefaultAlignment(16), 16);
 	ASSERT_EQ(GetDefaultAlignment(17), 16);
 }
