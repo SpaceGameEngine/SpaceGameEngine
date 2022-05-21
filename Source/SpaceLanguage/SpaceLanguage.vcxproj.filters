@@ -63,6 +63,9 @@
     <ClInclude Include="Public\IntermediateRepresentation\Operation.h">
       <Filter>Public\IntermediateRepresentation</Filter>
     </ClInclude>
+    <ClInclude Include="Public\IntermediateRepresentation\Translator.h">
+      <Filter>Public\IntermediateRepresentation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp">
@@ -93,6 +96,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\IntermediateRepresentation\Operation.cpp">
+      <Filter>Private\IntermediateRepresentation</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\IntermediateRepresentation\Translator.cpp">
       <Filter>Private\IntermediateRepresentation</Filter>
     </ClCompile>
   </ItemGroup>

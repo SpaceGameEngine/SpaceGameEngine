@@ -122,6 +122,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	class SPACE_LANGUAGE_API Variable
 	{
 	public:
+		Variable() = delete;
 		Variable(const Type& type, StorageType st, SizeType idx);
 
 		const Type& GetType() const;
@@ -132,23 +133,88 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		bool operator!=(const Variable& v) const;
 
 	private:
-		const Type& m_Type;
+		const Type* m_pType;
 		StorageType m_StorageType;
 		SizeType m_Index;
 	};
 
+	enum class OperationType : UInt8
+	{
+		Push = 0,
+		Pop = 1,
+		Copy = 2,
+		//todo
+	};
+
+	inline constexpr const SizeType OperationTypeSetSize = 3;
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API HashMap<OperationType, Pair<SizeType, String>>;
+#endif
+
+	class SPACE_LANGUAGE_API OperationTypeSet : public UncopyableAndUnmovable, public Singleton<OperationTypeSet>
+	{
+	private:
+		OperationTypeSet();
+
+	public:
+		friend DefaultAllocator;
+
+		SizeType GetArgumentsSize(OperationType type) const;
+		const String& GetName(OperationType type) const;
+
+	private:
+		HashMap<OperationType, Pair<SizeType, String>> m_Content;
+	};
+
+	struct InvalidOperationTypeError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The OperationType is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(OperationType ot);
+	};
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API Vector<Variable>;
+#endif
+
+	class SPACE_LANGUAGE_API Operation
+	{
+	public:
+		Operation() = delete;
+		Operation(OperationType type, const Vector<Variable>& arguments);
+
+		OperationType GetType() const;
+		const Vector<Variable>& GetArguments() const;
+
+		bool operator==(const Operation& o) const;
+		bool operator!=(const Operation& o) const;
+
+	private:
+		OperationType m_Type;
+		Vector<Variable> m_Arguments;
+	};
+
+	struct InvalidOperationError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The Operation is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(const Operation& o);
+	};
+
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API Vector<const Type*>;
+	template class SPACE_LANGUAGE_API Vector<Operation>;
 #endif
 
 	class SPACE_LANGUAGE_API Function
 	{
 	public:
-		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx);
+		Function() = delete;
+		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations);
 
 		const Vector<const Type*>& GetParameterTypes() const;
 		const Type& GetResultType() const;
 		SizeType GetIndex() const;
+		const Vector<Operation>& GetOperations() const;
 
 		Variable ToVariable() const;
 		explicit operator Variable() const;
@@ -158,8 +224,9 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	private:
 		Vector<const Type*> m_ParameterTypes;
-		const Type& m_ResultType;
+		const Type* m_pResultType;
 		SizeType m_Index;
+		Vector<Operation> m_Operations;
 	};
 }
 

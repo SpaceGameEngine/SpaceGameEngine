@@ -164,6 +164,7 @@
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Private\SpaceLanguageModule.h" />
     <ClInclude Include="Public\IntermediateRepresentation\Operation.h" />
+    <ClInclude Include="Public\IntermediateRepresentation\Translator.h" />
     <ClInclude Include="Public\Lexer.h" />
     <ClInclude Include="Public\SpaceLanguageAPI.h" />
     <ClInclude Include="Public\VirtualMachine\Assembler.h" />
@@ -175,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\IntermediateRepresentation\Operation.cpp" />
+    <ClCompile Include="Private\IntermediateRepresentation\Translator.cpp" />
     <ClCompile Include="Private\Lexer.cpp" />
     <ClCompile Include="Private\Logger.cpp" />
     <ClCompile Include="Private\SpaceLanguageModule.cpp" />

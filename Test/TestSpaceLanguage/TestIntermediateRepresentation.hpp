@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "IntermediateRepresentation/Operation.h"
+#include "IntermediateRepresentation/Translator.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
@@ -122,31 +123,67 @@ TEST(IntermediateRepresentation_Variable, Test)
 	ASSERT_NE(v1, v3);
 }
 
+TEST(IntermediateRepresentation_OperationTypeSet, Test)
+{
+	using namespace IntermediateRepresentation;
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Push), 1);
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Pop), 1);
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Copy), 2);
+	//todo
+
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Push), SGE_STR("Push"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Pop), SGE_STR("Pop"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Copy), SGE_STR("Copy"));
+	//todo
+}
+
+TEST(IntermediateRepresentation_OperationSet, Test)
+{
+	using namespace IntermediateRepresentation;
+
+	Operation o1(OperationType::Push, {Variable(BaseTypes::GetInt32Type(), StorageType::Local, 0)});
+
+	ASSERT_EQ(o1.GetType(), OperationType::Push);
+	ASSERT_EQ(o1.GetArguments().GetSize(), 1);
+	ASSERT_EQ(o1.GetArguments()[0], Variable(BaseTypes::GetInt32Type(), StorageType::Local, 0));
+
+	Operation o2(OperationType::Push, {Variable(BaseTypes::GetInt32Type(), StorageType::Local, 0)});
+
+	ASSERT_EQ(o1, o2);
+
+	Operation o3(OperationType::Push, {Variable(BaseTypes::GetInt32Type(), StorageType::Global, 0)});
+
+	ASSERT_NE(o1, o3);
+}
+
 TEST(IntermediateRepresentation_Function, Test)
 {
 	using namespace IntermediateRepresentation;
 
-	IntermediateRepresentation::Function f1({&BaseTypes::GetInt32Type(),&BaseTypes::GetUInt64Type()},BaseTypes::GetUInt32Type(),1);
+	Vector<Operation> operations({Operation(OperationType::Push, {Variable(BaseTypes::GetInt32Type(), StorageType::Local, 0)})});
+	IntermediateRepresentation::Function f1({&BaseTypes::GetInt32Type(), &BaseTypes::GetUInt64Type()}, BaseTypes::GetUInt32Type(), 1, operations);
 
-	ASSERT_EQ(f1.GetParameterTypes(),Vector<const Type*>({&BaseTypes::GetInt32Type(),&BaseTypes::GetUInt64Type()}));
-	ASSERT_EQ(f1.GetResultType(),BaseTypes::GetUInt32Type());
-	ASSERT_EQ(f1.GetIndex(),1);
-	
-	Variable v1=f1.ToVariable();
-	ASSERT_EQ(v1.GetType(),BaseTypes::GetUInt64Type());
-	ASSERT_EQ(v1.GetStorageType(),StorageType::Function);
-	ASSERT_EQ(v1.GetIndex(),1);
+	ASSERT_EQ(f1.GetParameterTypes(), Vector<const Type*>({&BaseTypes::GetInt32Type(), &BaseTypes::GetUInt64Type()}));
+	ASSERT_EQ(f1.GetResultType(), BaseTypes::GetUInt32Type());
+	ASSERT_EQ(f1.GetIndex(), 1);
+	ASSERT_EQ(f1.GetOperations().GetSize(), 1);
+	ASSERT_EQ(f1.GetOperations()[0], Operation(OperationType::Push, {Variable(BaseTypes::GetInt32Type(), StorageType::Local, 0)}));
 
-	Variable v2=(Variable)f1;
-	ASSERT_EQ(v2.GetType(),BaseTypes::GetUInt64Type());
-	ASSERT_EQ(v2.GetStorageType(),StorageType::Function);
-	ASSERT_EQ(v2.GetIndex(),1);
+	Variable v1 = f1.ToVariable();
+	ASSERT_EQ(v1.GetType(), BaseTypes::GetUInt64Type());
+	ASSERT_EQ(v1.GetStorageType(), StorageType::Function);
+	ASSERT_EQ(v1.GetIndex(), 1);
 
-	ASSERT_EQ(v1,v2);
+	Variable v2 = (Variable)f1;
+	ASSERT_EQ(v2.GetType(), BaseTypes::GetUInt64Type());
+	ASSERT_EQ(v2.GetStorageType(), StorageType::Function);
+	ASSERT_EQ(v2.GetIndex(), 1);
 
-	const IntermediateRepresentation::Function f2({&BaseTypes::GetInt32Type(),&BaseTypes::GetUInt64Type()},BaseTypes::GetUInt32Type(),1);
-	const IntermediateRepresentation::Function f3({&BaseTypes::GetInt32Type(),&BaseTypes::GetUInt32Type()},BaseTypes::GetUInt32Type(),1);
+	ASSERT_EQ(v1, v2);
 
-	ASSERT_EQ(f1,f2);
-	ASSERT_NE(f1,f3);
+	const IntermediateRepresentation::Function f2({&BaseTypes::GetInt32Type(), &BaseTypes::GetUInt64Type()}, BaseTypes::GetUInt32Type(), 1, operations);
+	const IntermediateRepresentation::Function f3({&BaseTypes::GetInt32Type(), &BaseTypes::GetUInt32Type()}, BaseTypes::GetUInt32Type(), 1, operations);
+
+	ASSERT_EQ(f1, f2);
+	ASSERT_NE(f1, f3);
 }

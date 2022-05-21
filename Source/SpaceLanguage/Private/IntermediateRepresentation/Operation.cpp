@@ -177,13 +177,13 @@ const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseType
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::Variable(const Type& type, StorageType st, SizeType idx)
-	: m_Type(type), m_StorageType(st), m_Index(idx)
+	: m_pType(&type), m_StorageType(st), m_Index(idx)
 {
 }
 
 const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::GetType() const
 {
-	return m_Type;
+	return *m_pType;
 }
 
 StorageType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::GetStorageType() const
@@ -198,19 +198,79 @@ SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::G
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::operator==(const Variable& v) const
 {
-	return m_Type == v.m_Type && m_StorageType == v.m_StorageType && m_Index == v.m_Index;
+	return *m_pType == *(v.m_pType) && m_StorageType == v.m_StorageType && m_Index == v.m_Index;
 }
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::operator!=(const Variable& v) const
 {
-	return m_Type != v.m_Type || m_StorageType != v.m_StorageType || m_Index != v.m_Index;
+	return *m_pType != *(v.m_pType) || m_StorageType != v.m_StorageType || m_Index != v.m_Index;
 }
 
-SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx)
-	: m_ParameterTypes(parameter_types), m_ResultType(result_type), m_Index(idx)
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::OperationTypeSet()
+	: m_Content({
+		  Pair<const OperationType, Pair<SizeType, String>>(OperationType::Push, Pair<SizeType, String>(1, SGE_STR("Push"))),
+		  Pair<const OperationType, Pair<SizeType, String>>(OperationType::Pop, Pair<SizeType, String>(1, SGE_STR("Pop"))),
+		  Pair<const OperationType, Pair<SizeType, String>>(OperationType::Copy, Pair<SizeType, String>(2, SGE_STR("Copy"))),
+		  //todo
+	  })
+{
+}
+
+SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetArgumentsSize(OperationType type) const
+{
+	SGE_ASSERT(InvalidOperationTypeError, type);
+	return m_Content.Find(type)->m_Second.m_First;
+}
+
+const String& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetName(OperationType type) const
+{
+	SGE_ASSERT(InvalidOperationTypeError, type);
+	return m_Content.Find(type)->m_Second.m_Second;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperationTypeError::Judge(OperationType ot)
+{
+	return (UInt8)ot >= OperationTypeSetSize;
+}
+
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::Operation(OperationType type, const Vector<Variable>& arguments)
+	: m_Type(type), m_Arguments(arguments)
+{
+	SGE_ASSERT(InvalidOperationError, *this);
+}
+
+OperationType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::GetType() const
+{
+	return m_Type;
+}
+
+const Vector<Variable>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::GetArguments() const
+{
+	return m_Arguments;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::operator==(const Operation& o) const
+{
+	return m_Type == o.m_Type && m_Arguments == o.m_Arguments;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::operator!=(const Operation& o) const
+{
+	return m_Type != o.m_Type || m_Arguments != o.m_Arguments;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperationError::Judge(const Operation& o)
+{
+	return ((UInt8)o.GetType() >= OperationTypeSetSize) || (o.GetArguments().GetSize() != OperationTypeSet::GetSingleton().GetArgumentsSize(o.GetType()));
+}
+
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations)
+	: m_ParameterTypes(parameter_types), m_pResultType(&result_type), m_Index(idx), m_Operations(operations)
 {
 	for (auto iter = m_ParameterTypes.GetConstBegin(); iter != m_ParameterTypes.GetConstEnd(); ++iter)
 		SGE_ASSERT(NullPointerError, *iter);
+	for (auto iter = m_Operations.GetConstBegin(); iter != m_Operations.GetConstEnd(); ++iter)
+		SGE_ASSERT(InvalidOperationError, *iter);
 }
 
 const SpaceGameEngine::Vector<const Type*>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::GetParameterTypes() const
@@ -220,12 +280,17 @@ const SpaceGameEngine::Vector<const Type*>& SpaceGameEngine::SpaceLanguage::Inte
 
 const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::GetResultType() const
 {
-	return m_ResultType;
+	return *m_pResultType;
 }
 
 SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::GetIndex() const
 {
 	return m_Index;
+}
+
+const Vector<Operation>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::GetOperations() const
+{
+	return m_Operations;
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::ToVariable() const
@@ -240,10 +305,10 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::operator V
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::operator==(const IntermediateRepresentation::Function& func) const
 {
-	return m_ParameterTypes == func.m_ParameterTypes && m_ResultType == func.m_ResultType && m_Index == func.m_Index;
+	return m_ParameterTypes == func.m_ParameterTypes && *m_pResultType == *(func.m_pResultType) && m_Index == func.m_Index && m_Operations == func.m_Operations;
 }
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::operator!=(const IntermediateRepresentation::Function& func) const
 {
-	return m_ParameterTypes != func.m_ParameterTypes || m_ResultType != func.m_ResultType || m_Index != func.m_Index;
+	return m_ParameterTypes != func.m_ParameterTypes || *m_pResultType != *(func.m_pResultType) || m_Index != func.m_Index || m_Operations != func.m_Operations;
 }
