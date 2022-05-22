@@ -26,14 +26,20 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
+	struct COMMON_API Uncopyable
+	{
+		Uncopyable() = default;
+		Uncopyable(const Uncopyable&) = delete;
+		Uncopyable& operator=(const Uncopyable&) = delete;
+	};
 
 	struct COMMON_API UncopyableAndUnmovable
 	{
-		inline UncopyableAndUnmovable() = default;
-		inline UncopyableAndUnmovable(const UncopyableAndUnmovable&) = delete;
-		inline UncopyableAndUnmovable(UncopyableAndUnmovable&&) = delete;
-		inline UncopyableAndUnmovable& operator=(const UncopyableAndUnmovable&) = delete;
-		inline UncopyableAndUnmovable& operator=(UncopyableAndUnmovable&&) = delete;
+		UncopyableAndUnmovable() = default;
+		UncopyableAndUnmovable(const UncopyableAndUnmovable&) = delete;
+		UncopyableAndUnmovable(UncopyableAndUnmovable&&) = delete;
+		UncopyableAndUnmovable& operator=(const UncopyableAndUnmovable&) = delete;
+		UncopyableAndUnmovable& operator=(UncopyableAndUnmovable&&) = delete;
 	};
 
 	template<typename T, typename U>

@@ -54,10 +54,9 @@ TEST(IntermediateRepresentation_BaseTypeSet, Test)
 
 TEST(IntermediateRepresentation_Type, Test)
 {
-	using IntermediateRepresentation::BaseType;
-	using IntermediateRepresentation::Type;
+	using namespace IntermediateRepresentation;
 
-	Type t_void;
+	Type t_void = BaseTypes::GetVoidType();
 	ASSERT_EQ(t_void.GetContent().GetSize(), 1);
 	ASSERT_EQ(t_void.GetContent()[0], BaseType::Void);
 	ASSERT_EQ(t_void.GetSize(), 0);
@@ -126,11 +125,15 @@ TEST(IntermediateRepresentation_Variable, Test)
 TEST(IntermediateRepresentation_OperationTypeSet, Test)
 {
 	using namespace IntermediateRepresentation;
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::NewLocal), 1);
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::DeleteLocal), 1);
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Push), 1);
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Pop), 1);
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Copy), 2);
 	//todo
 
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::NewLocal), SGE_STR("NewLocal"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::DeleteLocal), SGE_STR("DeleteLocal"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Push), SGE_STR("Push"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Pop), SGE_STR("Pop"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Copy), SGE_STR("Copy"));
@@ -186,4 +189,16 @@ TEST(IntermediateRepresentation_Function, Test)
 
 	ASSERT_EQ(f1, f2);
 	ASSERT_NE(f1, f3);
+}
+
+TEST(IntermediateRepresentation_TranslateUnit, Test)
+{
+	using namespace IntermediateRepresentation;
+	TranslateUnit tu;
+	const Type& t1 = tu.NewType({BaseType::Float, BaseType::Int32});
+	const Variable& v1 = tu.NewGlobalVariable(BaseTypes::GetUInt64Type(), 0);
+	const IntermediateRepresentation::Function& f1 = tu.NewFunction({&t1, &BaseTypes::GetUInt64Type()}, t1, 0, {Operation(OperationType::Push, {v1})});
+
+	ASSERT_EQ(tu.GetGlobalVariable(0), v1);
+	ASSERT_EQ(tu.GetFunction(0), f1);
 }

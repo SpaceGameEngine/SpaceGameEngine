@@ -56,21 +56,30 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidBaseType
 	return (UInt8)bt >= BaseTypeSize;
 }
 
-SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type()
-	: m_Content(1, BaseType::Void), m_Size(0)
-{
-}
-
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(BaseType bt)
 	: m_Content(1, bt), m_Size(BaseTypeSet::GetSingleton().GetSize(bt))
 {
+	SGE_ASSERT(InvalidBaseTypeError, bt);
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(std::initializer_list<BaseType> bts)
 	: m_Content(bts), m_Size(0)
 {
 	for (auto i : bts)
+	{
+		SGE_ASSERT(InvalidBaseTypeError, i);
 		m_Size += BaseTypeSet::GetSingleton().GetSize(i);
+	}
+}
+
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(const Vector<BaseType>& bts)
+	: m_Content(bts), m_Size(0)
+{
+	for (auto iter = bts.GetConstBegin(); iter != bts.GetConstEnd(); ++iter)
+	{
+		SGE_ASSERT(InvalidBaseTypeError, *iter);
+		m_Size += BaseTypeSet::GetSingleton().GetSize(*iter);
+	}
 }
 
 const Vector<BaseType>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::GetContent() const
@@ -191,7 +200,7 @@ StorageType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable
 	return m_StorageType;
 }
 
-SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::GetIndex() const
+UInt64 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::GetIndex() const
 {
 	return m_Index;
 }
@@ -206,11 +215,15 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::opera
 	return *m_pType != *(v.m_pType) || m_StorageType != v.m_StorageType || m_Index != v.m_Index;
 }
 
+#define OPERATION_TYPE(type, arg_size) Pair<const OperationType, Pair<SizeType, String>>(OperationType::type, Pair<SizeType, String>(arg_size, SGE_STR(#type)))
+
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::OperationTypeSet()
 	: m_Content({
-		  Pair<const OperationType, Pair<SizeType, String>>(OperationType::Push, Pair<SizeType, String>(1, SGE_STR("Push"))),
-		  Pair<const OperationType, Pair<SizeType, String>>(OperationType::Pop, Pair<SizeType, String>(1, SGE_STR("Pop"))),
-		  Pair<const OperationType, Pair<SizeType, String>>(OperationType::Copy, Pair<SizeType, String>(2, SGE_STR("Copy"))),
+		  OPERATION_TYPE(NewLocal, 1),
+		  OPERATION_TYPE(DeleteLocal, 1),
+		  OPERATION_TYPE(Push, 1),
+		  OPERATION_TYPE(Pop, 1),
+		  OPERATION_TYPE(Copy, 2),
 		  //todo
 	  })
 {
@@ -283,7 +296,7 @@ const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function
 	return *m_pResultType;
 }
 
-SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::GetIndex() const
+UInt64 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::GetIndex() const
 {
 	return m_Index;
 }

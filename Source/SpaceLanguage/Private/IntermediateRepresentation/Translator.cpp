@@ -14,7 +14,76 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "IntermediateRepresentation/Translator.h"
+#include "VirtualMachine/Instruction.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
 using namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation;
+
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::TranslateUnit()
+{
+}
+
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::~TranslateUnit()
+{
+	for (auto iter = m_Types.GetBegin(); iter != m_Types.GetEnd(); ++iter)
+		DefaultAllocator::Delete(*iter);
+	for (auto iter = m_GlobalVariables.GetBegin(); iter != m_GlobalVariables.GetEnd(); ++iter)
+		DefaultAllocator::Delete(iter->m_Second);
+	for (auto iter = m_Functions.GetBegin(); iter != m_Functions.GetEnd(); ++iter)
+		DefaultAllocator::Delete(iter->m_Second);
+}
+
+const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::NewType(std::initializer_list<BaseType> bts)
+{
+	return *(m_Types.EmplaceBack(DefaultAllocator::New<Type>(bts)));
+}
+
+const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::NewType(const Vector<BaseType>& bts)
+{
+	return *(m_Types.EmplaceBack(DefaultAllocator::New<Type>(bts)));
+}
+
+const Variable& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::NewGlobalVariable(const Type& type, SizeType idx)
+{
+	SGE_ASSERT(GlobalVariableAlreadyExistError, m_GlobalVariables.Find(idx), m_GlobalVariables.GetConstEnd());
+	return *(m_GlobalVariables.Insert(idx, DefaultAllocator::New<Variable>(type, StorageType::Global, idx)).m_First->m_Second);
+}
+
+const IntermediateRepresentation::Function& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::NewFunction(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations)
+{
+	SGE_ASSERT(FunctionAlreadyExistError, m_Functions.Find(idx), m_Functions.GetConstEnd());
+	return *(m_Functions.Insert(idx, DefaultAllocator::New<IntermediateRepresentation::Function>(parameter_types, result_type, idx, operations)).m_First->m_Second);
+}
+
+const Variable& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::GetGlobalVariable(UInt64 idx) const
+{
+	SGE_ASSERT(GlobalVariableNotExistError, m_GlobalVariables.Find(idx), m_GlobalVariables.GetConstEnd());
+	return *(m_GlobalVariables.Find(idx)->m_Second);
+}
+
+const IntermediateRepresentation::Function& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::GetFunction(UInt64 idx) const
+{
+	SGE_ASSERT(FunctionNotExistError, m_Functions.Find(idx), m_Functions.GetConstEnd());
+	return *(m_Functions.Find(idx)->m_Second);
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::GlobalVariableAlreadyExistError::Judge(const HashMap<UInt64, Variable*>::ConstIterator& citer, const HashMap<UInt64, Variable*>::ConstIterator& cend)
+{
+	return citer != cend;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::GlobalVariableNotExistError::Judge(const HashMap<UInt64, Variable*>::ConstIterator& citer, const HashMap<UInt64, Variable*>::ConstIterator& cend)
+{
+	return citer == cend;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::FunctionAlreadyExistError::Judge(const HashMap<UInt64, Function*>::ConstIterator& citer, const HashMap<UInt64, Function*>::ConstIterator& cend)
+{
+	return citer != cend;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::FunctionNotExistError::Judge(const HashMap<UInt64, Function*>::ConstIterator& citer, const HashMap<UInt64, Function*>::ConstIterator& cend)
+{
+	return citer == cend;
+}

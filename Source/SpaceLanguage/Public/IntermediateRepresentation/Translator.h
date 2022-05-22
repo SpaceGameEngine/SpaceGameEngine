@@ -24,6 +24,67 @@ limitations under the License.
 namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 {
 
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API Vector<Type*>;
+	template class SPACE_LANGUAGE_API HashMap<UInt64, Variable*>;
+	template class SPACE_LANGUAGE_API HashMap<UInt64, Function*>;
+#endif
+
+	class SPACE_LANGUAGE_API TranslateUnit : public Uncopyable
+	{
+	public:
+		friend struct InvalidTranslateUnitError;
+
+		TranslateUnit();
+		~TranslateUnit();
+
+		const Type& NewType(std::initializer_list<BaseType> bts);
+		const Type& NewType(const Vector<BaseType>& bts);
+		const Variable& NewGlobalVariable(const Type& type, SizeType idx);
+		const Function& NewFunction(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations);
+
+		const Variable& GetGlobalVariable(UInt64 idx) const;
+		const Function& GetFunction(UInt64 idx) const;
+
+	private:
+		Vector<Type*> m_Types;
+		HashMap<UInt64, Variable*> m_GlobalVariables;
+		HashMap<UInt64, Function*> m_Functions;
+	};
+
+	struct GlobalVariableAlreadyExistError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The GlobalVariable has already existed.");
+		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Variable*>::ConstIterator& citer, const HashMap<UInt64, Variable*>::ConstIterator& cend);
+	};
+
+	struct GlobalVariableNotExistError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The GlobalVariable has not existed.");
+		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Variable*>::ConstIterator& citer, const HashMap<UInt64, Variable*>::ConstIterator& cend);
+	};
+
+	struct FunctionAlreadyExistError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The Function has already existed.");
+		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Function*>::ConstIterator& citer, const HashMap<UInt64, Function*>::ConstIterator& cend);
+	};
+
+	struct FunctionNotExistError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The Function has not existed.");
+		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Function*>::ConstIterator& citer, const HashMap<UInt64, Function*>::ConstIterator& cend);
+	};
+
+	SPACE_LANGUAGE_API bool IsValidTranslateUnit(const TranslateUnit& tu);
+
+	struct InvalidTranslateUnitError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The TranslateUnit is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(const TranslateUnit& tu);
+	};
+
+	SPACE_LANGUAGE_API Vector<UInt8> TranslateToInstructions(const TranslateUnit& tu, UInt64 entry_function_index, bool has_entry = true, SizeType stack_size = 0xffffff);
 }
 
 /*!

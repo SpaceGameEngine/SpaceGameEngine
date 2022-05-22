@@ -77,9 +77,10 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	class SPACE_LANGUAGE_API Type
 	{
 	public:
-		Type();
+		Type() = delete;
 		Type(BaseType bt);
 		Type(std::initializer_list<BaseType> bts);
+		Type(const Vector<BaseType>& bts);
 
 		const Vector<BaseType>& GetContent() const;
 		SizeType GetSize() const;
@@ -127,7 +128,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 		const Type& GetType() const;
 		StorageType GetStorageType() const;
-		SizeType GetIndex() const;
+		UInt64 GetIndex() const;
 
 		bool operator==(const Variable& v) const;
 		bool operator!=(const Variable& v) const;
@@ -135,18 +136,20 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	private:
 		const Type* m_pType;
 		StorageType m_StorageType;
-		SizeType m_Index;
+		UInt64 m_Index;
 	};
 
 	enum class OperationType : UInt8
 	{
-		Push = 0,
-		Pop = 1,
-		Copy = 2,
+		NewLocal = 0,
+		DeleteLocal = 1,
+		Push = 2,
+		Pop = 3,
+		Copy = 4,
 		//todo
 	};
 
-	inline constexpr const SizeType OperationTypeSetSize = 3;
+	inline constexpr const SizeType OperationTypeSetSize = 5;
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API HashMap<OperationType, Pair<SizeType, String>>;
@@ -213,7 +216,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 		const Vector<const Type*>& GetParameterTypes() const;
 		const Type& GetResultType() const;
-		SizeType GetIndex() const;
+		UInt64 GetIndex() const;
 		const Vector<Operation>& GetOperations() const;
 
 		Variable ToVariable() const;
@@ -225,7 +228,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	private:
 		Vector<const Type*> m_ParameterTypes;
 		const Type* m_pResultType;
-		SizeType m_Index;
+		UInt64 m_Index;
 		Vector<Operation> m_Operations;
 	};
 }
