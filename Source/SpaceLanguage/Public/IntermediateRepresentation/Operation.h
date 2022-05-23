@@ -116,8 +116,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		Constant = 0,
 		Global = 1,
 		Local = 2,
-		Register = 3,
-		Function = 4
+		Function = 3
 	};
 
 	class SPACE_LANGUAGE_API Variable

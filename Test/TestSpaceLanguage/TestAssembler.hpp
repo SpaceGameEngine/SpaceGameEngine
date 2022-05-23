@@ -48,10 +48,10 @@ TEST(RegisterNameSet, Test)
 	ASSERT_EQ(rns.Get(SGE_STR("pc")), Register::ProgramCounter);
 	ASSERT_EQ(rns.Get(SGE_STR("bp")), Register::BasePointer);
 	ASSERT_EQ(rns.Get(SGE_STR("sp")), Register::StackPointer);
-	ASSERT_EQ(rns.Get(SGE_STR("c0")), Register::SpecialRegistersSize);
-	ASSERT_EQ(rns.Get(Format(String(SGE_STR("c{}")), Register::ArgumentRegistersStartIndex - 1 - Register::SpecialRegistersSize)), Register::ArgumentRegistersStartIndex - 1);
-	ASSERT_EQ(rns.Get(SGE_STR("a0")), Register::ArgumentRegistersStartIndex);
-	ASSERT_EQ(rns.Get(Format(String(SGE_STR("a{}")), RegistersSize - 1 - Register::ArgumentRegistersStartIndex)), RegistersSize - 1);
+	ASSERT_EQ(rns.Get(SGE_STR("c0")), SpecialRegistersSize);
+	ASSERT_EQ(rns.Get(Format(String(SGE_STR("c{}")), ArgumentRegistersStartIndex - 1 - SpecialRegistersSize)), ArgumentRegistersStartIndex - 1);
+	ASSERT_EQ(rns.Get(SGE_STR("a0")), ArgumentRegistersStartIndex);
+	ASSERT_EQ(rns.Get(Format(String(SGE_STR("a{}")), RegistersSize - 1 - ArgumentRegistersStartIndex)), RegistersSize - 1);
 }
 
 TEST(Assembler, Test)

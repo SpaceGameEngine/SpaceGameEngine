@@ -29,15 +29,16 @@ namespace SpaceGameEngine::SpaceLanguage
 	using RegisterType = UInt64;
 
 	inline constexpr const SizeType RegistersSize = 64;
+	inline constexpr const UInt8 SpecialRegistersSize = 3;
+	inline constexpr const UInt8 ArgumentRegistersStartIndex = 32;
+	inline constexpr const UInt8 CommonRegistersSize = ArgumentRegistersStartIndex - SpecialRegistersSize;
+	inline constexpr const UInt8 ArgumentRegistersSize = RegistersSize - ArgumentRegistersStartIndex;
 
 	namespace Register
 	{
 		inline constexpr const UInt8 ProgramCounter = 0;
 		inline constexpr const UInt8 BasePointer = 1;
 		inline constexpr const UInt8 StackPointer = 2;
-
-		inline constexpr const UInt8 SpecialRegistersSize = 3;
-		inline constexpr const UInt8 ArgumentRegistersStartIndex = 32;
 
 		inline constexpr UInt8 Common(UInt8 idx)
 		{

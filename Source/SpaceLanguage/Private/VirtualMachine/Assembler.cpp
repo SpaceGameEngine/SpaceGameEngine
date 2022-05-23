@@ -52,11 +52,11 @@ SpaceGameEngine::SpaceLanguage::RegisterNameSet::RegisterNameSet()
 				 Pair<const String, UInt8>(SGE_STR("bp"), Register::BasePointer),
 				 Pair<const String, UInt8>(SGE_STR("sp"), Register::StackPointer)})
 {
-	for (UInt8 i = Register::SpecialRegistersSize; i < Register::ArgumentRegistersStartIndex; ++i)
-		m_Content.Insert(Format(String(SGE_STR("c{}")), i - Register::SpecialRegistersSize), i);
+	for (UInt8 i = SpecialRegistersSize; i < ArgumentRegistersStartIndex; ++i)
+		m_Content.Insert(Format(String(SGE_STR("c{}")), i - SpecialRegistersSize), i);
 
-	for (UInt8 i = Register::ArgumentRegistersStartIndex; i < RegistersSize; ++i)
-		m_Content.Insert(Format(String(SGE_STR("a{}")), i - Register::ArgumentRegistersStartIndex), i);
+	for (UInt8 i = ArgumentRegistersStartIndex; i < RegistersSize; ++i)
+		m_Content.Insert(Format(String(SGE_STR("a{}")), i - ArgumentRegistersStartIndex), i);
 }
 
 UInt8 SpaceGameEngine::SpaceLanguage::RegisterNameSet::Get(const String& register_name) const
