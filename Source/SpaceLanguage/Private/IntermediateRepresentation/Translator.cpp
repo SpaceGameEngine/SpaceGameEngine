@@ -15,6 +15,7 @@ limitations under the License.
 */
 #include "IntermediateRepresentation/Translator.h"
 #include "VirtualMachine/Instruction.h"
+#include "../Logger.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
@@ -86,4 +87,24 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::FunctionAlready
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::FunctionNotExistError::Judge(const HashMap<UInt64, Function*>::ConstIterator& citer, const HashMap<UInt64, Function*>::ConstIterator& cend)
 {
 	return citer == cend;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslateUnit(const TranslateUnit& tu)
+{
+	//todo
+	return true;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidTranslateUnitError::Judge(const TranslateUnit& tu)
+{
+	return !IsValidTranslateUnit(tu);
+}
+
+Vector<UInt8> SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateToInstructions(const TranslateUnit& tu, UInt64 entry_function_index, bool has_entry, SizeType stack_size)
+{
+	SGE_ASSERT(InvalidTranslateUnitError, tu);
+
+	Vector<UInt8> re;
+	//todo
+	return re;
 }

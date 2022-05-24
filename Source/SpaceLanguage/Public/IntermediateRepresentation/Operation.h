@@ -140,15 +140,16 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	enum class OperationType : UInt8
 	{
-		NewLocal = 0,
-		DeleteLocal = 1,
-		Push = 2,
-		Pop = 3,
-		Copy = 4,
+		Set = 0,
+		NewLocal = 1,
+		DeleteLocal = 2,
+		Push = 3,
+		Pop = 4,
+		Copy = 5,
 		//todo
 	};
 
-	inline constexpr const SizeType OperationTypeSetSize = 5;
+	inline constexpr const SizeType OperationTypeSetSize = 6;
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API HashMap<OperationType, Pair<SizeType, String>>;

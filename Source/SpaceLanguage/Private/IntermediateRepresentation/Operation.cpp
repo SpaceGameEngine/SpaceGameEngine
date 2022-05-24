@@ -219,6 +219,7 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::opera
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::OperationTypeSet()
 	: m_Content({
+		  OPERATION_TYPE(Set, 3),
 		  OPERATION_TYPE(NewLocal, 1),
 		  OPERATION_TYPE(DeleteLocal, 1),
 		  OPERATION_TYPE(Push, 1),

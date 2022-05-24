@@ -685,3 +685,31 @@ TEST(CoreModule, GreaterEqualTest)
 	ASSERT_EQ(result2, 1);
 	ASSERT_EQ(result3, 0);
 }
+
+TEST(CoreModule, FloatTest)
+{
+	VirtualMachine vm;
+	Assembler assembler;
+	String formatter(SGE_STR("line:{} column:{}, {}"));
+
+	CoreModule::LoadIntoExternalCaller(vm.GetExternalCaller());
+	CoreModule::LoadIntoAssembler(assembler);
+
+	LoadTestModule(vm, assembler);
+
+	float result = 0.0f;
+	float data = 123.45f;
+
+	auto code = assembler.Compile(Format(String(SGE_STR(R"(
+		Set a0 {0}
+		Set a1 {1}
+		ExternalCall c0 CoreModule:UInt32Store
+	)")),
+										 (UInt64)(&result), *(UInt64*)(&data)),
+								  formatter);
+	ASSERT_NE(result, data);
+	ASSERT_EQ(result, 0.0f);
+	vm.Run(code.GetData(), code.GetSize());
+	ASSERT_EQ(result, data);
+	ASSERT_EQ(result, 123.45f);
+}

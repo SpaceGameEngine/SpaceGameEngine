@@ -125,6 +125,7 @@ TEST(IntermediateRepresentation_Variable, Test)
 TEST(IntermediateRepresentation_OperationTypeSet, Test)
 {
 	using namespace IntermediateRepresentation;
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Set), 3);
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::NewLocal), 1);
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::DeleteLocal), 1);
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Push), 1);
@@ -132,6 +133,7 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Copy), 2);
 	//todo
 
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Set), SGE_STR("Set"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::NewLocal), SGE_STR("NewLocal"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::DeleteLocal), SGE_STR("DeleteLocal"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Push), SGE_STR("Push"));
