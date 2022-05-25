@@ -185,9 +185,15 @@ const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseType
 	return g_DoubleType.Get();
 }
 
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidStorageTypeError::Judge(StorageType st)
+{
+	return st != StorageType::Constant && st != StorageType::Global && st != StorageType::Local && st != StorageType::Function;
+}
+
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::Variable(const Type& type, StorageType st, SizeType idx)
 	: m_pType(&type), m_StorageType(st), m_Index(idx)
 {
+	SGE_ASSERT(InvalidStorageTypeError, st);
 }
 
 const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::GetType() const
@@ -215,22 +221,27 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::opera
 	return *m_pType != *(v.m_pType) || m_StorageType != v.m_StorageType || m_Index != v.m_Index;
 }
 
-#define OPERATION_TYPE(type, arg_size) Pair<const OperationType, Pair<SizeType, String>>(OperationType::type, Pair<SizeType, String>(arg_size, SGE_STR(#type)))
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperationTypeError::Judge(OperationType ot)
+{
+	return (UInt8)ot >= OperationTypeSetSize;
+}
+
+#define OPERATION_TYPE(type, ...) Pair<const OperationType, Pair<Vector<UInt8>, String>>(OperationType::type, Pair<Vector<UInt8>, String>(Vector<UInt8>({__VA_ARGS__}), SGE_STR(#type)))
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::OperationTypeSet()
 	: m_Content({
-		  OPERATION_TYPE(Set, 3),
-		  OPERATION_TYPE(NewLocal, 1),
-		  OPERATION_TYPE(DeleteLocal, 1),
-		  OPERATION_TYPE(Push, 1),
-		  OPERATION_TYPE(Pop, 1),
-		  OPERATION_TYPE(Copy, 2),
+		  OPERATION_TYPE(Set, StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
+		  OPERATION_TYPE(NewLocal, StorageTypeMasks::Local),
+		  OPERATION_TYPE(DeleteLocal, StorageTypeMasks::Local),
+		  OPERATION_TYPE(Push, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(Pop, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(Copy, StorageTypeMasks::Variable, StorageTypeMasks::Variable),
 		  //todo
 	  })
 {
 }
 
-SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetArgumentsSize(OperationType type) const
+const Vector<UInt8>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetArguments(OperationType type) const
 {
 	SGE_ASSERT(InvalidOperationTypeError, type);
 	return m_Content.Find(type)->m_Second.m_First;
@@ -240,11 +251,6 @@ const String& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operat
 {
 	SGE_ASSERT(InvalidOperationTypeError, type);
 	return m_Content.Find(type)->m_Second.m_Second;
-}
-
-bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperationTypeError::Judge(OperationType ot)
-{
-	return (UInt8)ot >= OperationTypeSetSize;
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::Operation(OperationType type, const Vector<Variable>& arguments)
@@ -275,7 +281,18 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::oper
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperationError::Judge(const Operation& o)
 {
-	return ((UInt8)o.GetType() >= OperationTypeSetSize) || (o.GetArguments().GetSize() != OperationTypeSet::GetSingleton().GetArgumentsSize(o.GetType()));
+	if ((UInt8)o.GetType() >= OperationTypeSetSize)
+		return true;
+	const Vector<UInt8>& args = OperationTypeSet::GetSingleton().GetArguments(o.GetType());
+	if (o.GetArguments().GetSize() != args.GetSize())
+		return true;
+	auto oaiter = o.GetArguments().GetConstBegin();
+	for (auto aiter = args.GetConstBegin(); aiter != args.GetConstEnd(); ++aiter, ++oaiter)
+	{
+		if (!((UInt8)(oaiter->GetStorageType()) & (*aiter)))
+			return true;
+	}
+	return false;
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations)

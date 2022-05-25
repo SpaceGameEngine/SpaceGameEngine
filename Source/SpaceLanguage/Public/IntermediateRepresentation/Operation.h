@@ -113,10 +113,25 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	enum class StorageType : UInt8
 	{
-		Constant = 0,
-		Global = 1,
-		Local = 2,
-		Function = 3
+		Constant = 1,
+		Global = 6,
+		Local = 10,
+		Function = 16
+	};
+
+	namespace StorageTypeMasks
+	{
+		inline constexpr const UInt8 Constant = 1;
+		inline constexpr const UInt8 Variable = 2;
+		inline constexpr const UInt8 Global = 6;
+		inline constexpr const UInt8 Local = 10;
+		inline constexpr const UInt8 Function = 16;
+	}
+
+	struct InvalidStorageTypeError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The StorageType is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(StorageType st);
 	};
 
 	class SPACE_LANGUAGE_API Variable
@@ -151,8 +166,15 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	inline constexpr const SizeType OperationTypeSetSize = 6;
 
+	struct InvalidOperationTypeError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The OperationType is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(OperationType ot);
+	};
+
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<OperationType, Pair<SizeType, String>>;
+	template class SPACE_LANGUAGE_API Pair<Vector<UInt8>, String>;
+	template class SPACE_LANGUAGE_API HashMap<OperationType, Pair<Vector<UInt8>, String>>;
 #endif
 
 	class SPACE_LANGUAGE_API OperationTypeSet : public UncopyableAndUnmovable, public Singleton<OperationTypeSet>
@@ -163,17 +185,11 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	public:
 		friend DefaultAllocator;
 
-		SizeType GetArgumentsSize(OperationType type) const;
+		const Vector<UInt8>& GetArguments(OperationType type) const;
 		const String& GetName(OperationType type) const;
 
 	private:
-		HashMap<OperationType, Pair<SizeType, String>> m_Content;
-	};
-
-	struct InvalidOperationTypeError
-	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The OperationType is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(OperationType ot);
+		HashMap<OperationType, Pair<Vector<UInt8>, String>> m_Content;
 	};
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)

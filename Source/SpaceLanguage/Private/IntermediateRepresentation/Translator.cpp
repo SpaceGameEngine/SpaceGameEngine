@@ -92,6 +92,47 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::FunctionNotExis
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslateUnit(const TranslateUnit& tu)
 {
 	//todo
+	for (auto fiter = tu.m_Functions.GetConstBegin(); fiter != tu.m_Functions.GetConstEnd(); ++fiter)
+	{
+		HashMap<UInt64, Variable> local_map;
+		for (auto oiter = fiter->m_Second->GetOperations().GetConstBegin(); oiter != fiter->m_Second->GetOperations().GetConstEnd(); ++oiter)
+		{
+			if (oiter->GetType() == OperationType::NewLocal)
+			{
+				if (local_map.Find(oiter->GetArguments()[0].GetIndex()) != local_map.GetConstEnd())
+					return false;
+				local_map.Insert(oiter->GetArguments()[0].GetIndex(), oiter->GetArguments()[0]);
+			}
+			else if (oiter->GetType() == OperationType::DeleteLocal)
+			{
+				auto lviter = local_map.Find(oiter->GetArguments()[0].GetIndex());
+				if (lviter == local_map.GetConstEnd())
+					return false;
+				local_map.Remove(lviter);
+			}
+			else
+			{
+				for (auto aiter = oiter->GetArguments().GetConstBegin(); aiter != oiter->GetArguments().GetConstEnd(); ++aiter)
+				{
+					if (aiter->GetStorageType() == StorageType::Global)
+					{
+						auto gviter = tu.m_GlobalVariables.Find(aiter->GetIndex());
+						if ((gviter == tu.m_GlobalVariables.GetConstEnd()) || (aiter->GetType().GetSize() > gviter->m_Second->GetType().GetSize()))
+							return false;
+					}
+					else if (aiter->GetStorageType() == StorageType::Local)
+					{
+						auto lviter = local_map.Find(aiter->GetIndex());
+						if ((lviter == local_map.GetConstEnd()) || (aiter->GetType().GetSize() > lviter->m_Second.GetType().GetSize()))
+							return false;
+					}
+				}
+			}
+		}
+		if (local_map.GetSize())
+			return false;
+	}
+
 	return true;
 }
 

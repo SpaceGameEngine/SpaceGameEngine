@@ -30,10 +30,14 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	template class SPACE_LANGUAGE_API HashMap<UInt64, Function*>;
 #endif
 
+	class TranslateUnit;
+
+	SPACE_LANGUAGE_API bool IsValidTranslateUnit(const TranslateUnit& tu);
+
 	class SPACE_LANGUAGE_API TranslateUnit : public Uncopyable
 	{
 	public:
-		friend struct InvalidTranslateUnitError;
+		friend bool IsValidTranslateUnit(const TranslateUnit& tu);
 
 		TranslateUnit();
 		~TranslateUnit();
@@ -75,8 +79,6 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		inline static const TChar sm_pContent[] = SGE_TSTR("The Function has not existed.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Function*>::ConstIterator& citer, const HashMap<UInt64, Function*>::ConstIterator& cend);
 	};
-
-	SPACE_LANGUAGE_API bool IsValidTranslateUnit(const TranslateUnit& tu);
 
 	struct InvalidTranslateUnitError
 	{

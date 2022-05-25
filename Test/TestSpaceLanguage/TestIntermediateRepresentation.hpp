@@ -125,12 +125,12 @@ TEST(IntermediateRepresentation_Variable, Test)
 TEST(IntermediateRepresentation_OperationTypeSet, Test)
 {
 	using namespace IntermediateRepresentation;
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Set), 3);
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::NewLocal), 1);
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::DeleteLocal), 1);
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Push), 1);
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Pop), 1);
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArgumentsSize(OperationType::Copy), 2);
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Set), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::NewLocal), Vector<UInt8>({StorageTypeMasks::Local}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::DeleteLocal), Vector<UInt8>({StorageTypeMasks::Local}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Push), Vector<UInt8>({StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Pop), Vector<UInt8>({StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Copy), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
 	//todo
 
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Set), SGE_STR("Set"));
@@ -203,4 +203,35 @@ TEST(IntermediateRepresentation_TranslateUnit, Test)
 
 	ASSERT_EQ(tu.GetGlobalVariable(0), v1);
 	ASSERT_EQ(tu.GetFunction(0), f1);
+}
+
+TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
+{
+	using namespace IntermediateRepresentation;
+
+	TranslateUnit tu1;
+	tu1.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::Set, {Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 0), Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 0), Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 0)})});
+	ASSERT_FALSE(IsValidTranslateUnit(tu1));
+	tu1.NewGlobalVariable(BaseTypes::GetUInt64Type(), 0);
+	ASSERT_TRUE(IsValidTranslateUnit(tu1));
+
+	TranslateUnit tu2;
+	tu2.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)})});
+	ASSERT_FALSE(IsValidTranslateUnit(tu2));
+
+	TranslateUnit tu3;
+	tu3.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)})});
+	ASSERT_FALSE(IsValidTranslateUnit(tu3));
+
+	TranslateUnit tu4;
+	tu4.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)})});
+	ASSERT_FALSE(IsValidTranslateUnit(tu4));
+
+	TranslateUnit tu5;
+	tu5.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)})});
+	ASSERT_FALSE(IsValidTranslateUnit(tu5));
+
+	TranslateUnit tu6;
+	tu6.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)})});
+	ASSERT_TRUE(IsValidTranslateUnit(tu6));
 }
