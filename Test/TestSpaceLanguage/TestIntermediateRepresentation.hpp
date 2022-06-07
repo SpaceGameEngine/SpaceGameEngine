@@ -17,11 +17,6 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "IntermediateRepresentation/Operation.h"
 #include "IntermediateRepresentation/Translator.h"
-#include <algorithm>
-
-#ifdef max
-#undef max
-#endif
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
@@ -89,7 +84,7 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_compose.GetContent()[0], BaseType::Int16);
 	ASSERT_EQ(t_compose.GetContent()[1], BaseType::Int32);
 	ASSERT_EQ(t_compose.GetSize(), 6);
-	ASSERT_EQ(t_compose.GetAlignment(), std::max(alignof(Int16), alignof(Int32)));
+	ASSERT_EQ(t_compose.GetAlignment(), Max(alignof(Int16), alignof(Int32)));
 
 	Type t_compose2(BaseType::Int8);
 	Type t_re = t_compose2 + t_compose;
@@ -104,7 +99,7 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_re.GetContent()[1], BaseType::Int16);
 	ASSERT_EQ(t_re.GetContent()[2], BaseType::Int32);
 	ASSERT_EQ(t_re.GetSize(), 7);
-	ASSERT_EQ(t_re.GetAlignment(), std::max(t_compose2.GetAlignment(), t_compose.GetAlignment()));
+	ASSERT_EQ(t_re.GetAlignment(), Max(t_compose2.GetAlignment(), t_compose.GetAlignment()));
 
 	ASSERT_EQ(t_compose2.GetContent().GetSize(), 1);
 	ASSERT_EQ(t_compose2.GetContent()[0], BaseType::Int8);
@@ -118,7 +113,7 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_compose2.GetContent()[1], BaseType::Int16);
 	ASSERT_EQ(t_compose2.GetContent()[2], BaseType::Int32);
 	ASSERT_EQ(t_compose2.GetSize(), 7);
-	ASSERT_EQ(t_compose2.GetAlignment(), std::max<SizeType>(alignof(Int8), t_compose.GetAlignment()));
+	ASSERT_EQ(t_compose2.GetAlignment(), Max<SizeType>(alignof(Int8), t_compose.GetAlignment()));
 
 	ASSERT_EQ(t_compose2, t_re);
 	ASSERT_NE(t_compose2, t_compose);

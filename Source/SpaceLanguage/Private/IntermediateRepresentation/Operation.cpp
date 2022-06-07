@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "IntermediateRepresentation/Operation.h"
-#include <algorithm>
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
@@ -91,7 +90,7 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(std::init
 	{
 		SGE_ASSERT(InvalidBaseTypeError, i);
 		m_Size += BaseTypeSet::GetSingleton().GetSize(i);
-		m_Alignment = std::max(m_Alignment, BaseTypeSet::GetSingleton().GetAlignment(i));
+		m_Alignment = Max(m_Alignment, BaseTypeSet::GetSingleton().GetAlignment(i));
 	}
 }
 
@@ -102,7 +101,7 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(const Vec
 	{
 		SGE_ASSERT(InvalidBaseTypeError, *iter);
 		m_Size += BaseTypeSet::GetSingleton().GetSize(*iter);
-		m_Alignment = std::max(m_Alignment, BaseTypeSet::GetSingleton().GetAlignment(*iter));
+		m_Alignment = Max(m_Alignment, BaseTypeSet::GetSingleton().GetAlignment(*iter));
 	}
 }
 
@@ -127,7 +126,7 @@ Type SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::operator+
 	for (auto iter = t.m_Content.GetConstBegin(); iter != t.m_Content.GetConstEnd(); ++iter)
 		re.m_Content.EmplaceBack(*iter);
 	re.m_Size += t.m_Size;
-	re.m_Alignment = std::max(re.m_Alignment, t.m_Alignment);
+	re.m_Alignment = Max(re.m_Alignment, t.m_Alignment);
 	return re;
 }
 
@@ -136,7 +135,7 @@ Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::operator
 	for (auto iter = t.m_Content.GetConstBegin(); iter != t.m_Content.GetConstEnd(); ++iter)
 		m_Content.EmplaceBack(*iter);
 	m_Size += t.m_Size;
-	m_Alignment = std::max(m_Alignment, t.m_Alignment);
+	m_Alignment = Max(m_Alignment, t.m_Alignment);
 	return *this;
 }
 
