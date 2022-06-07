@@ -118,7 +118,7 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_compose2.GetContent()[1], BaseType::Int16);
 	ASSERT_EQ(t_compose2.GetContent()[2], BaseType::Int32);
 	ASSERT_EQ(t_compose2.GetSize(), 7);
-	ASSERT_EQ(t_compose2.GetAlignment(), std::max(alignof(Int8), t_compose.GetAlignment()));
+	ASSERT_EQ(t_compose2.GetAlignment(), std::max<SizeType>(alignof(Int8), t_compose.GetAlignment()));
 
 	ASSERT_EQ(t_compose2, t_re);
 	ASSERT_NE(t_compose2, t_compose);
