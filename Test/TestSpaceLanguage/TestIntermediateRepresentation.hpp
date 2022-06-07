@@ -17,6 +17,11 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "IntermediateRepresentation/Operation.h"
 #include "IntermediateRepresentation/Translator.h"
+#include <algorithm>
+
+#ifdef max
+#undef max
+#endif
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
@@ -29,26 +34,37 @@ TEST(IntermediateRepresentation_BaseTypeSet, Test)
 	BaseTypeSet& bts = BaseTypeSet::GetSingleton();
 	ASSERT_EQ(bts.GetName(BaseType::Void), SGE_STR("Void"));
 	ASSERT_EQ(bts.GetSize(BaseType::Void), 0);
+	ASSERT_EQ(bts.GetAlignment(BaseType::Void), 0);
 	ASSERT_EQ(bts.GetName(BaseType::Int8), SGE_STR("Int8"));
 	ASSERT_EQ(bts.GetSize(BaseType::Int8), sizeof(Int8));
+	ASSERT_EQ(bts.GetAlignment(BaseType::Int8), alignof(Int8));
 	ASSERT_EQ(bts.GetName(BaseType::UInt8), SGE_STR("UInt8"));
 	ASSERT_EQ(bts.GetSize(BaseType::UInt8), sizeof(UInt8));
+	ASSERT_EQ(bts.GetAlignment(BaseType::UInt8), alignof(UInt8));
 	ASSERT_EQ(bts.GetName(BaseType::Int16), SGE_STR("Int16"));
 	ASSERT_EQ(bts.GetSize(BaseType::Int16), sizeof(Int16));
+	ASSERT_EQ(bts.GetAlignment(BaseType::Int16), alignof(Int16));
 	ASSERT_EQ(bts.GetName(BaseType::UInt16), SGE_STR("UInt16"));
 	ASSERT_EQ(bts.GetSize(BaseType::UInt16), sizeof(UInt16));
+	ASSERT_EQ(bts.GetAlignment(BaseType::UInt16), alignof(UInt16));
 	ASSERT_EQ(bts.GetName(BaseType::Int32), SGE_STR("Int32"));
 	ASSERT_EQ(bts.GetSize(BaseType::Int32), sizeof(Int32));
+	ASSERT_EQ(bts.GetAlignment(BaseType::Int32), alignof(Int32));
 	ASSERT_EQ(bts.GetName(BaseType::UInt32), SGE_STR("UInt32"));
 	ASSERT_EQ(bts.GetSize(BaseType::UInt32), sizeof(UInt32));
+	ASSERT_EQ(bts.GetAlignment(BaseType::UInt32), alignof(UInt32));
 	ASSERT_EQ(bts.GetName(BaseType::Int64), SGE_STR("Int64"));
 	ASSERT_EQ(bts.GetSize(BaseType::Int64), sizeof(Int64));
+	ASSERT_EQ(bts.GetAlignment(BaseType::Int64), alignof(Int64));
 	ASSERT_EQ(bts.GetName(BaseType::UInt64), SGE_STR("UInt64"));
 	ASSERT_EQ(bts.GetSize(BaseType::UInt64), sizeof(UInt64));
+	ASSERT_EQ(bts.GetAlignment(BaseType::UInt64), alignof(UInt64));
 	ASSERT_EQ(bts.GetName(BaseType::Float), SGE_STR("Float"));
 	ASSERT_EQ(bts.GetSize(BaseType::Float), sizeof(float));
+	ASSERT_EQ(bts.GetAlignment(BaseType::Float), alignof(float));
 	ASSERT_EQ(bts.GetName(BaseType::Double), SGE_STR("Double"));
 	ASSERT_EQ(bts.GetSize(BaseType::Double), sizeof(double));
+	ASSERT_EQ(bts.GetAlignment(BaseType::Double), alignof(double));
 	ASSERT_EQ(IntermediateRepresentation::BaseTypeSize, 11);
 }
 
@@ -60,17 +76,20 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_void.GetContent().GetSize(), 1);
 	ASSERT_EQ(t_void.GetContent()[0], BaseType::Void);
 	ASSERT_EQ(t_void.GetSize(), 0);
+	ASSERT_EQ(t_void.GetAlignment(), 0);
 
 	Type t_int16(BaseType::Int16);
 	ASSERT_EQ(t_int16.GetContent().GetSize(), 1);
 	ASSERT_EQ(t_int16.GetContent()[0], BaseType::Int16);
 	ASSERT_EQ(t_int16.GetSize(), 2);
+	ASSERT_EQ(t_int16.GetAlignment(), alignof(Int16));
 
 	Type t_compose({BaseType::Int16, BaseType::Int32});
 	ASSERT_EQ(t_compose.GetContent().GetSize(), 2);
 	ASSERT_EQ(t_compose.GetContent()[0], BaseType::Int16);
 	ASSERT_EQ(t_compose.GetContent()[1], BaseType::Int32);
 	ASSERT_EQ(t_compose.GetSize(), 6);
+	ASSERT_EQ(t_compose.GetAlignment(), std::max(alignof(Int16), alignof(Int32)));
 
 	Type t_compose2(BaseType::Int8);
 	Type t_re = t_compose2 + t_compose;
@@ -78,16 +97,19 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_compose2.GetContent().GetSize(), 1);
 	ASSERT_EQ(t_compose2.GetContent()[0], BaseType::Int8);
 	ASSERT_EQ(t_compose2.GetSize(), 1);
+	ASSERT_EQ(t_compose2.GetAlignment(), alignof(Int8));
 
 	ASSERT_EQ(t_re.GetContent().GetSize(), 3);
 	ASSERT_EQ(t_re.GetContent()[0], BaseType::Int8);
 	ASSERT_EQ(t_re.GetContent()[1], BaseType::Int16);
 	ASSERT_EQ(t_re.GetContent()[2], BaseType::Int32);
 	ASSERT_EQ(t_re.GetSize(), 7);
+	ASSERT_EQ(t_re.GetAlignment(), std::max(t_compose2.GetAlignment(), t_compose.GetAlignment()));
 
 	ASSERT_EQ(t_compose2.GetContent().GetSize(), 1);
 	ASSERT_EQ(t_compose2.GetContent()[0], BaseType::Int8);
 	ASSERT_EQ(t_compose2.GetSize(), 1);
+	ASSERT_EQ(t_compose2.GetAlignment(), alignof(Int8));
 
 	t_compose2 += t_compose;
 
@@ -96,6 +118,7 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_compose2.GetContent()[1], BaseType::Int16);
 	ASSERT_EQ(t_compose2.GetContent()[2], BaseType::Int32);
 	ASSERT_EQ(t_compose2.GetSize(), 7);
+	ASSERT_EQ(t_compose2.GetAlignment(), std::max(alignof(Int8), t_compose.GetAlignment()));
 
 	ASSERT_EQ(t_compose2, t_re);
 	ASSERT_NE(t_compose2, t_compose);

@@ -44,9 +44,20 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	inline constexpr const SizeType BaseTypeSize = 11;
 
+	struct SPACE_LANGUAGE_API BaseTypeInformation
+	{
+		BaseTypeInformation() = delete;
+		BaseTypeInformation(SizeType size, SizeType alignment, const String& name);
+		bool operator==(const BaseTypeInformation& bti) const;
+		bool operator!=(const BaseTypeInformation& bti) const;
+
+		SizeType m_Size;
+		SizeType m_Alignment;
+		String m_Name;
+	};
+
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template struct SPACE_LANGUAGE_API Pair<SizeType, String>;
-	template class SPACE_LANGUAGE_API HashMap<BaseType, Pair<SizeType, String>>;
+	template class SPACE_LANGUAGE_API HashMap<BaseType, BaseTypeInformation>;
 #endif
 
 	class SPACE_LANGUAGE_API BaseTypeSet : public UncopyableAndUnmovable, public Singleton<BaseTypeSet>
@@ -58,10 +69,11 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		friend DefaultAllocator;
 
 		SizeType GetSize(BaseType bt) const;
+		SizeType GetAlignment(BaseType bt) const;
 		const String& GetName(BaseType bt) const;
 
 	private:
-		HashMap<BaseType, Pair<SizeType, String>> m_Content;
+		HashMap<BaseType, BaseTypeInformation> m_Content;
 	};
 
 	struct InvalidBaseTypeError
@@ -84,6 +96,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 		const Vector<BaseType>& GetContent() const;
 		SizeType GetSize() const;
+		SizeType GetAlignment() const;
 
 		Type operator+(const Type& t) const;
 		Type& operator+=(const Type& t);
@@ -94,6 +107,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	private:
 		Vector<BaseType> m_Content;
 		SizeType m_Size;
+		SizeType m_Alignment;
 	};
 
 	namespace BaseTypes
@@ -173,7 +187,8 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	};
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Pair<Vector<UInt8>, String>;
+	template class SPACE_LANGUAGE_API Vector<UInt8>;
+	template struct SPACE_LANGUAGE_API Pair<Vector<UInt8>, String>;
 	template class SPACE_LANGUAGE_API HashMap<OperationType, Pair<Vector<UInt8>, String>>;
 #endif
 

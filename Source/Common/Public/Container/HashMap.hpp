@@ -81,10 +81,6 @@ namespace SpaceGameEngine
 				Node* m_pNext;
 				Node* m_pPrevious;
 
-				inline Node()
-					: m_HashValue(0), m_KeyValuePair(K(), V()), m_pNext(nullptr), m_pPrevious(nullptr)
-				{
-				}
 				template<typename K2, typename V2>
 				inline Node(K2&& key, V2&& val)
 					: m_HashValue(0), m_KeyValuePair(std::forward<K2>(key), std::forward<V2>(val)), m_pNext(nullptr), m_pPrevious(nullptr)

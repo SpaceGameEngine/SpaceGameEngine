@@ -14,18 +14,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "IntermediateRepresentation/Operation.h"
+#include <algorithm>
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
 using namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation;
 
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeInformation::BaseTypeInformation(SizeType size, SizeType alignment, const String& name)
+	: m_Size(size), m_Alignment(alignment), m_Name(name)
+{
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeInformation::operator==(const BaseTypeInformation& bti) const
+{
+	return m_Size == bti.m_Size && m_Alignment == bti.m_Alignment && m_Name == bti.m_Name;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeInformation::operator!=(const BaseTypeInformation& bti) const
+{
+	return m_Size != bti.m_Size || m_Alignment != bti.m_Alignment || m_Name != bti.m_Name;
+}
+
 using Float = float;
 using Double = double;
 
-#define BASE_TYPE(type) Pair<const BaseType, Pair<SizeType, String>>(BaseType::type, Pair<SizeType, String>(sizeof(type), SGE_STR(#type)))
+#define BASE_TYPE(type) Pair<const BaseType, BaseTypeInformation>(BaseType::type, BaseTypeInformation(sizeof(type), alignof(type), SGE_STR(#type)))
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeSet::BaseTypeSet()
-	: m_Content({Pair<const BaseType, Pair<SizeType, String>>(BaseType::Void, Pair<SizeType, String>(0, SGE_STR("Void"))),
+	: m_Content({Pair<const BaseType, BaseTypeInformation>(BaseType::Void, BaseTypeInformation(0, 0, SGE_STR("Void"))),
 				 BASE_TYPE(Int8),
 				 BASE_TYPE(UInt8),
 				 BASE_TYPE(Int16),
@@ -42,13 +58,19 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeSet::BaseTyp
 SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeSet::GetSize(BaseType bt) const
 {
 	SGE_ASSERT(InvalidBaseTypeError, bt);
-	return m_Content.Find(bt)->m_Second.m_First;
+	return m_Content.Find(bt)->m_Second.m_Size;
+}
+
+SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeSet::GetAlignment(BaseType bt) const
+{
+	SGE_ASSERT(InvalidBaseTypeError, bt);
+	return m_Content.Find(bt)->m_Second.m_Alignment;
 }
 
 const String& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeSet::GetName(BaseType bt) const
 {
 	SGE_ASSERT(InvalidBaseTypeError, bt);
-	return m_Content.Find(bt)->m_Second.m_Second;
+	return m_Content.Find(bt)->m_Second.m_Name;
 }
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidBaseTypeError::Judge(BaseType bt)
@@ -57,28 +79,30 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidBaseType
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(BaseType bt)
-	: m_Content(1, bt), m_Size(BaseTypeSet::GetSingleton().GetSize(bt))
+	: m_Content(1, bt), m_Size(BaseTypeSet::GetSingleton().GetSize(bt)), m_Alignment(BaseTypeSet::GetSingleton().GetAlignment(bt))
 {
 	SGE_ASSERT(InvalidBaseTypeError, bt);
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(std::initializer_list<BaseType> bts)
-	: m_Content(bts), m_Size(0)
+	: m_Content(bts), m_Size(0), m_Alignment(0)
 {
 	for (auto i : bts)
 	{
 		SGE_ASSERT(InvalidBaseTypeError, i);
 		m_Size += BaseTypeSet::GetSingleton().GetSize(i);
+		m_Alignment = std::max(m_Alignment, BaseTypeSet::GetSingleton().GetAlignment(i));
 	}
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(const Vector<BaseType>& bts)
-	: m_Content(bts), m_Size(0)
+	: m_Content(bts), m_Size(0), m_Alignment(0)
 {
 	for (auto iter = bts.GetConstBegin(); iter != bts.GetConstEnd(); ++iter)
 	{
 		SGE_ASSERT(InvalidBaseTypeError, *iter);
 		m_Size += BaseTypeSet::GetSingleton().GetSize(*iter);
+		m_Alignment = std::max(m_Alignment, BaseTypeSet::GetSingleton().GetAlignment(*iter));
 	}
 }
 
@@ -92,12 +116,18 @@ SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::GetSi
 	return m_Size;
 }
 
+SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::GetAlignment() const
+{
+	return m_Alignment;
+}
+
 Type SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::operator+(const Type& t) const
 {
 	Type re(*this);
 	for (auto iter = t.m_Content.GetConstBegin(); iter != t.m_Content.GetConstEnd(); ++iter)
 		re.m_Content.EmplaceBack(*iter);
 	re.m_Size += t.m_Size;
+	re.m_Alignment = std::max(re.m_Alignment, t.m_Alignment);
 	return re;
 }
 
@@ -106,17 +136,18 @@ Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::operator
 	for (auto iter = t.m_Content.GetConstBegin(); iter != t.m_Content.GetConstEnd(); ++iter)
 		m_Content.EmplaceBack(*iter);
 	m_Size += t.m_Size;
+	m_Alignment = std::max(m_Alignment, t.m_Alignment);
 	return *this;
 }
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::operator==(const Type& t) const
 {
-	return m_Content == t.m_Content && m_Size == t.m_Size;
+	return m_Content == t.m_Content && m_Size == t.m_Size && m_Alignment == t.m_Alignment;
 }
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::operator!=(const Type& t) const
 {
-	return m_Content != t.m_Content || m_Size != t.m_Size;
+	return m_Content != t.m_Content || m_Size != t.m_Size || m_Alignment != t.m_Alignment;
 }
 
 const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypes::GetVoidType()

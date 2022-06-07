@@ -15,7 +15,6 @@ limitations under the License.
 */
 #include "IntermediateRepresentation/Translator.h"
 #include "VirtualMachine/Instruction.h"
-#include "../Logger.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
