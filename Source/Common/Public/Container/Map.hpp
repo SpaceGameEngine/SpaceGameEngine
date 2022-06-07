@@ -54,11 +54,6 @@ namespace SpaceGameEngine
 				Pair<const K, V> m_KeyValuePair;
 				bool m_IsRed;
 
-				inline Node()
-					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(K(), V()), m_IsRed(false)
-				{
-				}
-
 				template<typename K2, typename V2>
 				inline Node(K2&& key, V2&& val)
 					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(std::forward<K2>(key), std::forward<V2>(val)), m_IsRed(false)
@@ -83,8 +78,9 @@ namespace SpaceGameEngine
 
 		public:
 			inline RedBlackTree()
-				: m_pRoot(&m_NilNode), m_Size(0)
+				: m_NilNode(*(reinterpret_cast<Node*>(&m_NilNodeContent))), m_pRoot(&m_NilNode), m_Size(0)
 			{
+				memset(m_NilNodeContent, 0, sizeof(m_NilNodeContent));
 			}
 
 			inline ~RedBlackTree()
@@ -95,8 +91,9 @@ namespace SpaceGameEngine
 			}
 
 			inline RedBlackTree(const RedBlackTree& t)
-				: m_pRoot(&m_NilNode), m_Size(t.m_Size)
+				: m_NilNode(*(reinterpret_cast<Node*>(&m_NilNodeContent))), m_pRoot(&m_NilNode), m_Size(t.m_Size)
 			{
+				memset(m_NilNodeContent, 0, sizeof(m_NilNodeContent));
 				if (m_Size)
 				{
 					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
@@ -106,8 +103,9 @@ namespace SpaceGameEngine
 			}
 
 			inline RedBlackTree(RedBlackTree&& t)
-				: m_pRoot(&m_NilNode), m_Size(t.m_Size)
+				: m_NilNode(*(reinterpret_cast<Node*>(&m_NilNodeContent))), m_pRoot(&m_NilNode), m_Size(t.m_Size)
 			{
+				memset(m_NilNodeContent, 0, sizeof(m_NilNodeContent));
 				if (m_Size)
 				{
 					m_pRoot = t.m_pRoot;
@@ -150,8 +148,9 @@ namespace SpaceGameEngine
 
 			template<typename OtherAllocator>
 			inline RedBlackTree(const RedBlackTree<K, V, LessComparer, OtherAllocator>& t)
-				: m_pRoot(&m_NilNode), m_Size(t.m_Size)
+				: m_NilNode(*(reinterpret_cast<Node*>(&m_NilNodeContent))), m_pRoot(&m_NilNode), m_Size(t.m_Size)
 			{
+				memset(m_NilNodeContent, 0, sizeof(m_NilNodeContent));
 				if (m_Size)
 				{
 					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
@@ -162,8 +161,9 @@ namespace SpaceGameEngine
 
 			template<typename OtherAllocator>
 			inline RedBlackTree(RedBlackTree<K, V, LessComparer, OtherAllocator>&& t)
-				: m_pRoot(&m_NilNode), m_Size(t.m_Size)
+				: m_NilNode(*(reinterpret_cast<Node*>(&m_NilNodeContent))), m_pRoot(&m_NilNode), m_Size(t.m_Size)
 			{
+				memset(m_NilNodeContent, 0, sizeof(m_NilNodeContent));
 				if (m_Size)
 				{
 					m_pRoot = Allocator::template New<Node>(std::move(t.m_pRoot->m_KeyValuePair));
@@ -818,7 +818,8 @@ namespace SpaceGameEngine
 			}
 
 		private:
-			Node m_NilNode;
+			Node& m_NilNode;
+			alignas(Node) UInt8 m_NilNodeContent[sizeof(Node)];
 			Node* m_pRoot;
 			SizeType m_Size;
 		};
