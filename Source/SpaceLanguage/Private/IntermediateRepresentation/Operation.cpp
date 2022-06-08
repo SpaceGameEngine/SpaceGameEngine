@@ -266,6 +266,14 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::Op
 		  OPERATION_TYPE(Push, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(Pop, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(Copy, StorageTypeMasks::Variable, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(Label, StorageTypeMasks::Constant),
+		  OPERATION_TYPE(Goto, StorageTypeMasks::Constant),
+		  OPERATION_TYPE(If, StorageTypeMasks::Variable, StorageTypeMasks::Constant),
+		  OPERATION_TYPE(Call, StorageTypeMasks::Constant),
+		  OPERATION_TYPE(Return, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(ExternalCallArgument, StorageTypeMasks::Constant, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(ExternalCall, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
+		  OPERATION_TYPE(GetReturnValue, StorageTypeMasks::Variable),
 		  //todo
 	  })
 {

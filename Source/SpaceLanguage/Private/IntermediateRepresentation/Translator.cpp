@@ -94,6 +94,8 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 	for (auto fiter = tu.m_Functions.GetConstBegin(); fiter != tu.m_Functions.GetConstEnd(); ++fiter)
 	{
 		HashMap<UInt64, Variable> local_map;
+		HashMap<UInt64, bool> label_definations;
+		HashMap<UInt64, bool> label_requests;
 		for (auto oiter = fiter->m_Second->GetOperations().GetConstBegin(); oiter != fiter->m_Second->GetOperations().GetConstEnd(); ++oiter)
 		{
 			if (oiter->GetType() == OperationType::NewLocal)
@@ -105,7 +107,7 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 			else if (oiter->GetType() == OperationType::DeleteLocal)
 			{
 				auto lviter = local_map.Find(oiter->GetArguments()[0].GetIndex());
-				if (lviter == local_map.GetConstEnd())
+				if ((lviter == local_map.GetConstEnd()) || (oiter->GetArguments()[0].GetType() != lviter->m_Second.GetType()))
 					return false;
 				local_map.Remove(lviter);
 			}
@@ -127,9 +129,58 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 					}
 				}
 			}
+
+			switch (oiter->GetType())
+			{
+			case OperationType::Set: {
+				if (oiter->GetArguments()[1].GetIndex() >= oiter->GetArguments()[0].GetType().GetContent().GetSize())
+					return false;
+				break;
+			}
+			case OperationType::Copy: {
+				if (oiter->GetArguments()[0] == oiter->GetArguments()[1])
+					return false;
+				break;
+			}
+			case OperationType::Label: {
+				if (label_definations.Find(oiter->GetArguments()[0].GetIndex()) != label_definations.GetConstEnd())
+					return false;
+				label_definations.Insert(oiter->GetArguments()[0].GetIndex(), true);
+				break;
+			}
+			case OperationType::Goto: {
+				if ((label_definations.Find(oiter->GetArguments()[0].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(oiter->GetArguments()[0].GetIndex()) == label_requests.GetConstEnd()))
+					label_requests.Insert(oiter->GetArguments()[0].GetIndex(), true);
+				break;
+			}
+			case OperationType::If: {
+				if ((label_definations.Find(oiter->GetArguments()[1].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(oiter->GetArguments()[1].GetIndex()) == label_requests.GetConstEnd()))
+					label_requests.Insert(oiter->GetArguments()[1].GetIndex(), true);
+				break;
+			}
+			case OperationType::Call: {
+				if (tu.m_Functions.Find(oiter->GetArguments()[0].GetIndex()) == tu.m_Functions.GetConstEnd())
+					return false;
+				break;
+			}
+			case OperationType::ExternalCallArgument: {
+				if (oiter->GetArguments()[0].GetIndex() >= ArgumentRegistersSize)
+					return false;
+				break;
+			}
+				//todo
+			default: {
+				break;
+			}
+			}
 		}
 		if (local_map.GetSize())
 			return false;
+		for (auto liter = label_requests.GetConstBegin(); liter != label_requests.GetConstEnd(); ++liter)
+		{
+			if (label_definations.Find(liter->m_First) == label_definations.GetConstEnd())
+				return false;
+		}
 	}
 
 	return true;

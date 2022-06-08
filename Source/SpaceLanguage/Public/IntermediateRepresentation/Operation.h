@@ -175,10 +175,18 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		Push = 3,
 		Pop = 4,
 		Copy = 5,
+		Label = 6,
+		Goto = 7,
+		If = 8,
+		Call = 9,
+		Return = 10,
+		ExternalCallArgument = 11,
+		ExternalCall = 12,
+		GetReturnValue = 13,
 		//todo
 	};
 
-	inline constexpr const SizeType OperationTypeSetSize = 6;
+	inline constexpr const SizeType OperationTypeSetSize = 14;
 
 	struct InvalidOperationTypeError
 	{

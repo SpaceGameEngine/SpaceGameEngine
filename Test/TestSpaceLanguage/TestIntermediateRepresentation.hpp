@@ -149,6 +149,14 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Push), Vector<UInt8>({StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Pop), Vector<UInt8>({StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Copy), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Label), Vector<UInt8>({StorageTypeMasks::Constant}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Goto), Vector<UInt8>({StorageTypeMasks::Constant}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::If), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Call), Vector<UInt8>({StorageTypeMasks::Constant}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Return), Vector<UInt8>({StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCallArgument), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCall), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetReturnValue), Vector<UInt8>({StorageTypeMasks::Variable}));
 	//todo
 
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Set), SGE_STR("Set"));
@@ -157,6 +165,14 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Push), SGE_STR("Push"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Pop), SGE_STR("Pop"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Copy), SGE_STR("Copy"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Label), SGE_STR("Label"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Goto), SGE_STR("Goto"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::If), SGE_STR("If"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Call), SGE_STR("Call"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Return), SGE_STR("Return"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ExternalCallArgument), SGE_STR("ExternalCallArgument"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ExternalCall), SGE_STR("ExternalCall"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetReturnValue), SGE_STR("GetReturnValue"));
 	//todo
 }
 
@@ -250,6 +266,10 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 	ASSERT_FALSE(IsValidTranslateUnit(tu5));
 
 	TranslateUnit tu6;
-	tu6.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)})});
-	ASSERT_TRUE(IsValidTranslateUnit(tu6));
+	tu6.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetInt64Type(), StorageType::Local, 0)})});
+	ASSERT_FALSE(IsValidTranslateUnit(tu6));
+
+	TranslateUnit tu7;
+	tu7.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)})});
+	ASSERT_TRUE(IsValidTranslateUnit(tu7));
 }
