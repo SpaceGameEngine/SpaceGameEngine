@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "Operation.h"
+#include "RegisterAllocator.h"
 
 /*!
 @ingroup SpaceLanguage
@@ -37,7 +38,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	class SPACE_LANGUAGE_API TranslateUnit : public Uncopyable
 	{
 	public:
-		friend bool IsValidTranslateUnit(const TranslateUnit& tu);
+		friend SPACE_LANGUAGE_API bool IsValidTranslateUnit(const TranslateUnit& tu);
 
 		TranslateUnit();
 		~TranslateUnit();

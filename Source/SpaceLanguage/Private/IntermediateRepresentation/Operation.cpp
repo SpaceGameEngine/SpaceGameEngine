@@ -19,6 +19,11 @@ using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
 using namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation;
 
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidBaseTypeError::Judge(BaseType bt)
+{
+	return (UInt8)bt >= BaseTypeSize;
+}
+
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypeInformation::BaseTypeInformation(SizeType size, SizeType alignment, const String& name)
 	: m_Size(size), m_Alignment(alignment), m_Name(name)
 {
@@ -70,11 +75,6 @@ const String& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTy
 {
 	SGE_ASSERT(InvalidBaseTypeError, bt);
 	return m_Content.Find(bt)->m_Second.m_Name;
-}
-
-bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidBaseTypeError::Judge(BaseType bt)
-{
-	return (UInt8)bt >= BaseTypeSize;
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::Type(BaseType bt)

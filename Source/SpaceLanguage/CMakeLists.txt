@@ -9,6 +9,7 @@ add_library(SpaceLanguage SHARED
         Private/VirtualMachine/ExternalCallerModule/CoreModule.cpp
         Private/VirtualMachine/Assembler.cpp
         Private/IntermediateRepresentation/Operation.cpp
+        Private/IntermediateRepresentation/RegisterAllocator.cpp
         Private/IntermediateRepresentation/Translator.cpp
         )
 add_compile_definitions(SPACE_LANGUAGE_EXPORTS)

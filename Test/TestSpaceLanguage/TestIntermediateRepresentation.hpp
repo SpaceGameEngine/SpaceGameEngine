@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "IntermediateRepresentation/Operation.h"
+#include "IntermediateRepresentation/RegisterAllocator.h"
 #include "IntermediateRepresentation/Translator.h"
 
 using namespace SpaceGameEngine;
@@ -225,6 +226,42 @@ TEST(IntermediateRepresentation_Function, Test)
 
 	ASSERT_EQ(f1, f2);
 	ASSERT_NE(f1, f3);
+}
+
+TEST(IntermediateRepresentation_RegisterAllocationRequests, Test)
+{
+	using namespace IntermediateRepresentation;
+	RegisterAllocationRequests reqs;
+	reqs.AddRegisterAllocationRequest(123, 100);
+	reqs.AddRegisterAllocationRequest(456, 300);
+	reqs.AddRegisterAllocationRequest(123, 500);
+	const auto& reqs_ref = reqs.GetRequests();
+	ASSERT_EQ(reqs_ref.Find(123)->m_Second.GetSize(), 2);
+	ASSERT_EQ(reqs_ref.Find(123)->m_Second.GetConstBegin()->m_First, 100);
+	ASSERT_EQ((reqs_ref.Find(123)->m_Second.GetConstBegin() + 1)->m_First, 500);
+	ASSERT_EQ(reqs_ref.Find(456)->m_Second.GetSize(), 1);
+	ASSERT_EQ(reqs_ref.Find(456)->m_Second.GetConstBegin()->m_First, 300);
+}
+
+TEST(IntermediateRepresentation_RegisterAllocationResults, Test)
+{
+	using namespace IntermediateRepresentation;
+	RegisterAllocationResults results;
+	results.AddRegisterAllocationResult(123, 100, RegisterAllocationResult(RegisterAllocationState::Inactive, 1));
+	results.AddRegisterAllocationResult(456, 300, RegisterAllocationResult(RegisterAllocationState::Active, 2));
+	results.AddRegisterAllocationResult(123, 500, RegisterAllocationResult(RegisterAllocationState::Active, 1));
+	const auto& results_ref = results.GetResults();
+	ASSERT_EQ(results_ref.Find(123)->m_Second.GetSize(), 2);
+	ASSERT_EQ(results_ref.Find(123)->m_Second.GetConstBegin()->m_First, 100);
+	ASSERT_EQ(results_ref.Find(123)->m_Second.GetConstBegin()->m_Second.m_State, RegisterAllocationState::Inactive);
+	ASSERT_EQ(results_ref.Find(123)->m_Second.GetConstBegin()->m_Second.m_CommonRegisterIndex, 1);
+	ASSERT_EQ((results_ref.Find(123)->m_Second.GetConstBegin() + 1)->m_First, 500);
+	ASSERT_EQ((results_ref.Find(123)->m_Second.GetConstBegin() + 1)->m_Second.m_State, RegisterAllocationState::Active);
+	ASSERT_EQ((results_ref.Find(123)->m_Second.GetConstBegin() + 1)->m_Second.m_CommonRegisterIndex, 1);
+	ASSERT_EQ(results_ref.Find(456)->m_Second.GetSize(), 1);
+	ASSERT_EQ(results_ref.Find(456)->m_Second.GetConstBegin()->m_First, 300);
+	ASSERT_EQ(results_ref.Find(456)->m_Second.GetConstBegin()->m_Second.m_State, RegisterAllocationState::Active);
+	ASSERT_EQ(results_ref.Find(456)->m_Second.GetConstBegin()->m_Second.m_CommonRegisterIndex, 2);
 }
 
 TEST(IntermediateRepresentation_TranslateUnit, Test)

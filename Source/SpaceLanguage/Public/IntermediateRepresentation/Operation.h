@@ -44,6 +44,12 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	inline constexpr const SizeType BaseTypeSize = 11;
 
+	struct InvalidBaseTypeError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The BaseType is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(BaseType bt);
+	};
+
 	struct SPACE_LANGUAGE_API BaseTypeInformation
 	{
 		BaseTypeInformation() = delete;
@@ -74,12 +80,6 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	private:
 		HashMap<BaseType, BaseTypeInformation> m_Content;
-	};
-
-	struct InvalidBaseTypeError
-	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The BaseType is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(BaseType bt);
 	};
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
