@@ -167,6 +167,7 @@
     <ClInclude Include="Public\IntermediateRepresentation\RegisterAllocator.h" />
     <ClInclude Include="Public\IntermediateRepresentation\Translator.h" />
     <ClInclude Include="Public\Lexer.h" />
+    <ClInclude Include="Public\Linker\CompiledObject.h" />
     <ClInclude Include="Public\SpaceLanguageAPI.h" />
     <ClInclude Include="Public\VirtualMachine\Assembler.h" />
     <ClInclude Include="Public\VirtualMachine\ExternalCaller.h" />
@@ -180,6 +181,7 @@
     <ClCompile Include="Private\IntermediateRepresentation\RegisterAllocator.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\Translator.cpp" />
     <ClCompile Include="Private\Lexer.cpp" />
+    <ClCompile Include="Private\Linker\CompiledObject.cpp" />
     <ClCompile Include="Private\Logger.cpp" />
     <ClCompile Include="Private\SpaceLanguageModule.cpp" />
     <ClCompile Include="Private\VirtualMachine\Assembler.cpp" />

@@ -11,6 +11,7 @@ add_library(SpaceLanguage SHARED
         Private/IntermediateRepresentation/Operation.cpp
         Private/IntermediateRepresentation/RegisterAllocator.cpp
         Private/IntermediateRepresentation/Translator.cpp
+        Private/Linker/CompiledObject.cpp
         )
 add_compile_definitions(SPACE_LANGUAGE_EXPORTS)
 target_include_directories(SpaceLanguage PUBLIC Public)

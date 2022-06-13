@@ -9,5 +9,6 @@
     <ClInclude Include="TestLexer.hpp" />
     <ClInclude Include="TestCoreModule.hpp" />
     <ClInclude Include="TestIntermediateRepresentation.hpp" />
+    <ClInclude Include="TestLinker.hpp" />
   </ItemGroup>
 </Project>

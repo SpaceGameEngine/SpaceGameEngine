@@ -104,6 +104,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntermediateRepresentation"
 		Document\Document\SpaceLanguage\IntermediateRepresentation\Operation.md = Document\Document\SpaceLanguage\IntermediateRepresentation\Operation.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Linker", "Linker", "{E235EAAA-CCCF-42CA-8AB6-09FC07E99C1A}"
+	ProjectSection(SolutionItems) = preProject
+		Document\Document\SpaceLanguage\Linker\CompiledObject.md = Document\Document\SpaceLanguage\Linker\CompiledObject.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -225,6 +230,7 @@ Global
 		{7AD471A5-9F91-4E89-8753-0E94002507F4} = {5B97E2EC-0786-47E2-A683-80BA9F8C59C5}
 		{7D22DB28-5B9B-4376-80DA-00215E8D41BC} = {7AD471A5-9F91-4E89-8753-0E94002507F4}
 		{44283A7F-AEFC-40FF-8D22-D4C0A2E35129} = {5B97E2EC-0786-47E2-A683-80BA9F8C59C5}
+		{E235EAAA-CCCF-42CA-8AB6-09FC07E99C1A} = {5B97E2EC-0786-47E2-A683-80BA9F8C59C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}

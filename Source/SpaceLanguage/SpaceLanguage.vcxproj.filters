@@ -25,6 +25,12 @@
     <Filter Include="Private\IntermediateRepresentation">
       <UniqueIdentifier>{83dfa725-a2d3-4d4e-9389-26c6240d6d61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Linker">
+      <UniqueIdentifier>{be33796e-f8ea-4ef8-9256-e911bec95c26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Linker">
+      <UniqueIdentifier>{4c9f26e8-c6f3-48fc-9c24-526f84caa8e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\DoxygenConfig.hpp">
@@ -69,6 +75,9 @@
     <ClInclude Include="Public\IntermediateRepresentation\RegisterAllocator.h">
       <Filter>Public\IntermediateRepresentation</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Linker\CompiledObject.h">
+      <Filter>Public\Linker</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp">
@@ -106,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="Private\IntermediateRepresentation\RegisterAllocator.cpp">
       <Filter>Private\IntermediateRepresentation</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Linker\CompiledObject.cpp">
+      <Filter>Private\Linker</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
