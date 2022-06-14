@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "Operation.h"
 #include "RegisterAllocator.h"
+#include "Linker/CompiledObject.h"
 
 /*!
 @ingroup SpaceLanguage
@@ -87,7 +88,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		static SPACE_LANGUAGE_API bool Judge(const TranslateUnit& tu);
 	};
 
-	SPACE_LANGUAGE_API Vector<UInt8> TranslateToInstructions(const TranslateUnit& tu, UInt64 entry_function_index, bool has_entry = true, SizeType stack_size = 0xffffff);
+	SPACE_LANGUAGE_API CompiledObject TranslateToCompiledObject(const TranslateUnit& tu);
 }
 
 /*!

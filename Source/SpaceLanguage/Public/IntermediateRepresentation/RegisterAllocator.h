@@ -51,7 +51,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct SPACE_LANGUAGE_API RegisterAllocationResult
 	{
-		RegisterAllocationResult();
+		RegisterAllocationResult() = delete;
 		RegisterAllocationResult(RegisterAllocationState state, UInt64 cr_idx);
 
 		bool operator==(const RegisterAllocationResult& result) const;

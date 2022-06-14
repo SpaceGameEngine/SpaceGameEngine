@@ -152,6 +152,12 @@ namespace SpaceGameEngine::SpaceLanguage
 		SPACE_LANGUAGE_API void GreaterEqual(Vector<UInt8>& vec, UInt8 arg0, UInt8 arg1, UInt8 arg2);
 	};
 
+	struct InvalidInstructionsError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The Instructions is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(const void* ptr, SizeType size);
+	};
+
 }
 
 /*!

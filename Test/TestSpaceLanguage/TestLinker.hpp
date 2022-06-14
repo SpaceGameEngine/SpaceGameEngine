@@ -19,3 +19,71 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
+
+TEST(CompiledGlobalVariable, Test)
+{
+	CompiledGlobalVariable cgv(8, 4);
+	ASSERT_EQ(cgv.GetSize(), 8);
+	ASSERT_EQ(cgv.GetAlignment(), 4);
+	CompiledGlobalVariable cgv2(8, 4);
+	ASSERT_EQ(cgv, cgv2);
+	CompiledGlobalVariable cgv3(8, 8);
+	ASSERT_NE(cgv, cgv3);
+}
+
+TEST(CompiledFunction, Test)
+{
+	Vector<UInt8> instrs;
+	HashMap<UInt64, Vector<UInt64>> gv_map;
+	HashMap<UInt64, Vector<UInt64>> func_map;
+	InstructionsGenerator::Set(instrs, Register::Common(0), 0);
+	gv_map[0].PushBack(2);
+	InstructionsGenerator::Goto(instrs, 0);
+	func_map[1].PushBack(11);
+	CompiledFunction cfunc(instrs, gv_map, func_map);
+	ASSERT_EQ(cfunc.GetInstructions(), instrs);
+	ASSERT_EQ(cfunc.GetGlobalVariableRequests(), gv_map);
+	ASSERT_EQ(cfunc.GetFunctionRequests(), func_map);
+	CompiledFunction cfunc2(instrs, gv_map, func_map);
+	ASSERT_EQ(cfunc, cfunc2);
+	CompiledFunction cfunc3({}, {}, {});
+	ASSERT_NE(cfunc, cfunc3);
+}
+
+TEST(CompiledObject, Test)
+{
+	CompiledObject cobj;
+	cobj.AddCompiledGlobalVariable(0, CompiledGlobalVariable(8, 4));
+	cobj.AddCompiledGlobalVariable(1, CompiledGlobalVariable(0, 0));
+	Vector<UInt8> instrs;
+	HashMap<UInt64, Vector<UInt64>> gv_map;
+	HashMap<UInt64, Vector<UInt64>> func_map;
+	InstructionsGenerator::Set(instrs, Register::Common(0), 0);
+	gv_map[0].PushBack(2);
+	InstructionsGenerator::Goto(instrs, 0);
+	func_map[1].PushBack(11);
+	cobj.AddCompiledFunction(0, CompiledFunction(instrs, gv_map, func_map));
+	cobj.AddCompiledFunction(1, CompiledFunction({}, {}, {}));
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().GetSize(), 2);
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().Find(0)->m_Second, CompiledGlobalVariable(8, 4));
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().Find(1)->m_Second, CompiledGlobalVariable(0, 0));
+	ASSERT_EQ(cobj.GetCompiledFunctions().GetSize(), 2);
+	ASSERT_EQ(cobj.GetCompiledFunctions().Find(0)->m_Second, CompiledFunction(instrs, gv_map, func_map));
+	ASSERT_EQ(cobj.GetCompiledFunctions().Find(1)->m_Second, CompiledFunction({}, {}, {}));
+	ASSERT_TRUE(IsValidCompiledObject(cobj));
+
+	CompiledObject cobj2;
+	cobj2.AddCompiledGlobalVariable(0, CompiledGlobalVariable(16, 8));
+	cobj2.AddCompiledFunction(0, CompiledFunction(instrs, gv_map, func_map));
+	ASSERT_FALSE(IsValidCompiledObject(cobj2));
+
+	cobj.Replace(cobj2, {{0, 1}}, {{0, 1}});
+
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().GetSize(), 2);
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().Find(0)->m_Second, CompiledGlobalVariable(8, 4));
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().Find(1)->m_Second, CompiledGlobalVariable(16, 8));
+	ASSERT_EQ(cobj.GetCompiledFunctions().GetSize(), 2);
+	ASSERT_EQ(cobj.GetCompiledFunctions().Find(0)->m_Second, CompiledFunction(instrs, gv_map, func_map));
+	ASSERT_EQ(cobj.GetCompiledFunctions().Find(1)->m_Second, CompiledFunction(instrs, gv_map, func_map));
+	ASSERT_TRUE(IsValidCompiledObject(cobj));
+}

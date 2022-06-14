@@ -191,11 +191,11 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidTranslat
 	return !IsValidTranslateUnit(tu);
 }
 
-Vector<UInt8> SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateToInstructions(const TranslateUnit& tu, UInt64 entry_function_index, bool has_entry, SizeType stack_size)
+SpaceGameEngine::SpaceLanguage::CompiledObject SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateToCompiledObject(const TranslateUnit& tu)
 {
 	SGE_ASSERT(InvalidTranslateUnitError, tu);
 
-	Vector<UInt8> re;
+	CompiledObject cobj;
 	//todo
-	return re;
+	return cobj;
 }

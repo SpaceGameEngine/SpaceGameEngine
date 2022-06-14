@@ -407,3 +407,20 @@ void SpaceGameEngine::SpaceLanguage::InstructionsGenerator::GreaterEqual(Vector<
 {
 	AddInstruction(vec, InstructionTypeIndex::GreaterEqual, arg0, arg1, arg2);
 }
+
+bool SpaceGameEngine::SpaceLanguage::InvalidInstructionsError::Judge(const void* ptr, SizeType size)
+{
+	if (ptr == nullptr || size == 0)
+		return true;
+	else
+	{
+		SizeType i = 0;
+		while (i < size)
+		{
+			if (*((UInt8*)ptr + i) >= InstructionSetSize)
+				return true;
+			i += InstructionSet::GetSingleton().Get(*((UInt8*)ptr + i)).m_Size;
+		}
+		return i != size;
+	}
+}

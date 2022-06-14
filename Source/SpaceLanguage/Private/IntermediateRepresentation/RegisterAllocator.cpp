@@ -34,11 +34,6 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocat
 	return state != RegisterAllocationState::Unknown;
 }
 
-SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationResult::RegisterAllocationResult()
-	: m_State(RegisterAllocationState::Unknown), m_CommonRegisterIndex(0)
-{
-}
-
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationResult::RegisterAllocationResult(RegisterAllocationState state, UInt64 cr_idx)
 	: m_State(state), m_CommonRegisterIndex(cr_idx)
 {

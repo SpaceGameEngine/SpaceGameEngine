@@ -24,12 +24,6 @@ limitations under the License.
 namespace SpaceGameEngine::SpaceLanguage
 {
 
-	struct InvalidInstructionsError
-	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The Instructions is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(const void* ptr, SizeType size);
-	};
-
 	class SPACE_LANGUAGE_API VirtualMachine : public UncopyableAndUnmovable
 	{
 	public:

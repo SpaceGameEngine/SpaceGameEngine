@@ -18,23 +18,6 @@ limitations under the License.
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
 
-bool SpaceGameEngine::SpaceLanguage::InvalidInstructionsError::Judge(const void* ptr, SizeType size)
-{
-	if (ptr == nullptr || size == 0)
-		return true;
-	else
-	{
-		SizeType i = 0;
-		while (i < size)
-		{
-			if (*((UInt8*)ptr + i) >= InstructionSetSize)
-				return true;
-			i += InstructionSet::GetSingleton().Get(*((UInt8*)ptr + i)).m_Size;
-		}
-		return i != size;
-	}
-}
-
 void SpaceGameEngine::SpaceLanguage::VirtualMachine::Run(const void* ptr, SizeType size)
 {
 	SGE_ASSERT(NullPointerError, ptr);
