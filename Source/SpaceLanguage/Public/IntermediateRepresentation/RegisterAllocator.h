@@ -104,6 +104,8 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		inline static const TChar sm_pContent[] = SGE_TSTR("The RegisterAllocationResult has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const Map<UInt64, RegisterAllocationResult>::ConstIterator& citer, const Map<UInt64, RegisterAllocationResult>::ConstIterator& cend);
 	};
+
+	SPACE_LANGUAGE_API RegisterAllocationResults SimpleRegisterAllocate(const RegisterAllocationRequests& reqs);
 }
 
 /*!

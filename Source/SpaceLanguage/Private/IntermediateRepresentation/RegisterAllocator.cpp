@@ -83,3 +83,10 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocat
 {
 	return citer != cend;
 }
+
+RegisterAllocationResults SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::SimpleRegisterAllocate(const RegisterAllocationRequests& reqs)
+{
+	RegisterAllocationResults re;
+	//todo
+	return re;
+}
