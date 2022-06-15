@@ -86,6 +86,8 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_compose.GetContent()[1], BaseType::Int32);
 	ASSERT_EQ(t_compose.GetSize(), 6);
 	ASSERT_EQ(t_compose.GetAlignment(), Max(alignof(Int16), alignof(Int32)));
+	ASSERT_TRUE(CanConvert(t_compose, BaseTypes::GetUInt32Type()));
+	ASSERT_FALSE(CanConvert(BaseTypes::GetUInt32Type(), t_compose));
 
 	Type t_compose2(BaseType::Int8);
 	Type t_re = t_compose2 + t_compose;
@@ -158,6 +160,9 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCallArgument), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCall), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetReturnValue), Vector<UInt8>({StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::MakeReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetAddress), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
 	//todo
 
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Set), SGE_STR("Set"));
@@ -174,6 +179,9 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ExternalCallArgument), SGE_STR("ExternalCallArgument"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ExternalCall), SGE_STR("ExternalCall"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetReturnValue), SGE_STR("GetReturnValue"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::MakeReference), SGE_STR("MakeReference"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetAddress), SGE_STR("GetAddress"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetReference), SGE_STR("GetReference"));
 	//todo
 }
 
@@ -305,6 +313,8 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 	TranslateUnit tu6;
 	tu6.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetInt64Type(), StorageType::Local, 0)})});
 	ASSERT_FALSE(IsValidTranslateUnit(tu6));
+
+	//todo add test for: label goto if call externalcallargument makereference getaddress getreference
 
 	TranslateUnit tu7;
 	tu7.NewFunction({}, BaseTypes::GetVoidType(), 0, {Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}), Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)})});

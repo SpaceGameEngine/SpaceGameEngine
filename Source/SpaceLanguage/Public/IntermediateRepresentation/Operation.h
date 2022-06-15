@@ -110,6 +110,8 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		SizeType m_Alignment;
 	};
 
+	SPACE_LANGUAGE_API bool CanConvert(const Type& from, const Type& to);
+
 	namespace BaseTypes
 	{
 		SPACE_LANGUAGE_API const Type& GetVoidType();
@@ -130,7 +132,8 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		Constant = 1,
 		Global = 6,
 		Local = 10,
-		Function = 16
+		Reference = 18,
+		Function = 32
 	};
 
 	namespace StorageTypeMasks
@@ -139,7 +142,8 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		inline constexpr const UInt8 Variable = 2;
 		inline constexpr const UInt8 Global = 6;
 		inline constexpr const UInt8 Local = 10;
-		inline constexpr const UInt8 Function = 16;
+		inline constexpr const UInt8 Reference = 18;
+		inline constexpr const UInt8 Function = 32;
 	}
 
 	struct InvalidStorageTypeError
@@ -183,10 +187,13 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		ExternalCallArgument = 11,
 		ExternalCall = 12,
 		GetReturnValue = 13,
+		MakeReference = 14,
+		GetAddress = 15,
+		GetReference = 16,
 		//todo
 	};
 
-	inline constexpr const SizeType OperationTypeSetSize = 14;
+	inline constexpr const SizeType OperationTypeSetSize = 17;
 
 	struct InvalidOperationTypeError
 	{

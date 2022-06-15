@@ -93,38 +93,72 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 	//todo
 	for (auto fiter = tu.m_Functions.GetConstBegin(); fiter != tu.m_Functions.GetConstEnd(); ++fiter)
 	{
-		HashMap<UInt64, Variable> local_map;
+		HashMap<UInt64, Type> local_map;
 		HashMap<UInt64, bool> label_definations;
 		HashMap<UInt64, bool> label_requests;
+		HashMap<UInt64, Type> reference_map;
 		for (auto oiter = fiter->m_Second->GetOperations().GetConstBegin(); oiter != fiter->m_Second->GetOperations().GetConstEnd(); ++oiter)
 		{
+			const auto& operation_arguments = oiter->GetArguments();
 			if (oiter->GetType() == OperationType::NewLocal)
 			{
-				if (local_map.Find(oiter->GetArguments()[0].GetIndex()) != local_map.GetConstEnd())
+				if (local_map.Find(operation_arguments[0].GetIndex()) != local_map.GetConstEnd())
 					return false;
-				local_map.Insert(oiter->GetArguments()[0].GetIndex(), oiter->GetArguments()[0]);
+				local_map.Insert(operation_arguments[0].GetIndex(), operation_arguments[0].GetType());
 			}
 			else if (oiter->GetType() == OperationType::DeleteLocal)
 			{
-				auto lviter = local_map.Find(oiter->GetArguments()[0].GetIndex());
-				if ((lviter == local_map.GetConstEnd()) || (oiter->GetArguments()[0].GetType() != lviter->m_Second.GetType()))
+				auto lviter = local_map.Find(operation_arguments[0].GetIndex());
+				if ((lviter == local_map.GetConstEnd()) || (operation_arguments[0].GetType() != lviter->m_Second))
 					return false;
 				local_map.Remove(lviter);
 			}
+			else if (oiter->GetType() == OperationType::MakeReference)
+			{
+				if (!CanConvert(operation_arguments[1].GetType(), operation_arguments[0].GetType()))
+					return false;
+				if (reference_map.Find(operation_arguments[0].GetIndex()) != reference_map.GetConstEnd())
+					return false;
+				if (operation_arguments[1].GetStorageType() == StorageType::Reference)
+				{
+					if (reference_map.Find(operation_arguments[1].GetIndex()) == reference_map.GetConstEnd())
+						return false;
+				}
+				reference_map.Insert(operation_arguments[0].GetIndex(), operation_arguments[0].GetType());
+			}
+			else if (oiter->GetType() == OperationType::GetReference)
+			{
+				if (!CanConvert(operation_arguments[1].GetType(), BaseTypes::GetUInt64Type()))
+					return false;
+				if (reference_map.Find(operation_arguments[0].GetIndex()) != reference_map.GetConstEnd())
+					return false;
+				if (operation_arguments[1].GetStorageType() == StorageType::Reference)
+				{
+					if (reference_map.Find(operation_arguments[1].GetIndex()) == reference_map.GetConstEnd())
+						return false;
+				}
+				reference_map.Insert(operation_arguments[0].GetIndex(), operation_arguments[0].GetType());
+			}
 			else
 			{
-				for (auto aiter = oiter->GetArguments().GetConstBegin(); aiter != oiter->GetArguments().GetConstEnd(); ++aiter)
+				for (auto aiter = operation_arguments.GetConstBegin(); aiter != operation_arguments.GetConstEnd(); ++aiter)
 				{
 					if (aiter->GetStorageType() == StorageType::Global)
 					{
 						auto gviter = tu.m_GlobalVariables.Find(aiter->GetIndex());
-						if ((gviter == tu.m_GlobalVariables.GetConstEnd()) || (aiter->GetType().GetSize() > gviter->m_Second->GetType().GetSize()))
+						if ((gviter == tu.m_GlobalVariables.GetConstEnd()) || (!CanConvert(gviter->m_Second->GetType(), aiter->GetType())))
 							return false;
 					}
 					else if (aiter->GetStorageType() == StorageType::Local)
 					{
 						auto lviter = local_map.Find(aiter->GetIndex());
-						if ((lviter == local_map.GetConstEnd()) || (aiter->GetType().GetSize() > lviter->m_Second.GetType().GetSize()))
+						if ((lviter == local_map.GetConstEnd()) || (!CanConvert(lviter->m_Second, aiter->GetType())))
+							return false;
+					}
+					else if (aiter->GetStorageType() == StorageType::Reference)
+					{
+						auto refiter = reference_map.Find(aiter->GetIndex());
+						if ((refiter == reference_map.GetConstEnd()) || (!CanConvert(refiter->m_Second, aiter->GetType())))
 							return false;
 					}
 				}
@@ -133,38 +167,43 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 			switch (oiter->GetType())
 			{
 			case OperationType::Set: {
-				if (oiter->GetArguments()[1].GetIndex() >= oiter->GetArguments()[0].GetType().GetContent().GetSize())
+				if (operation_arguments[1].GetIndex() >= operation_arguments[0].GetType().GetContent().GetSize())
 					return false;
 				break;
 			}
 			case OperationType::Copy: {
-				if (oiter->GetArguments()[0] == oiter->GetArguments()[1])
+				if (operation_arguments[0] == operation_arguments[1])
 					return false;
 				break;
 			}
 			case OperationType::Label: {
-				if (label_definations.Find(oiter->GetArguments()[0].GetIndex()) != label_definations.GetConstEnd())
+				if (label_definations.Find(operation_arguments[0].GetIndex()) != label_definations.GetConstEnd())
 					return false;
-				label_definations.Insert(oiter->GetArguments()[0].GetIndex(), true);
+				label_definations.Insert(operation_arguments[0].GetIndex(), true);
 				break;
 			}
 			case OperationType::Goto: {
-				if ((label_definations.Find(oiter->GetArguments()[0].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(oiter->GetArguments()[0].GetIndex()) == label_requests.GetConstEnd()))
-					label_requests.Insert(oiter->GetArguments()[0].GetIndex(), true);
+				if ((label_definations.Find(operation_arguments[0].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(operation_arguments[0].GetIndex()) == label_requests.GetConstEnd()))
+					label_requests.Insert(operation_arguments[0].GetIndex(), true);
 				break;
 			}
 			case OperationType::If: {
-				if ((label_definations.Find(oiter->GetArguments()[1].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(oiter->GetArguments()[1].GetIndex()) == label_requests.GetConstEnd()))
-					label_requests.Insert(oiter->GetArguments()[1].GetIndex(), true);
+				if ((label_definations.Find(operation_arguments[1].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(operation_arguments[1].GetIndex()) == label_requests.GetConstEnd()))
+					label_requests.Insert(operation_arguments[1].GetIndex(), true);
 				break;
 			}
 			case OperationType::Call: {
-				if (tu.m_Functions.Find(oiter->GetArguments()[0].GetIndex()) == tu.m_Functions.GetConstEnd())
+				if (tu.m_Functions.Find(operation_arguments[0].GetIndex()) == tu.m_Functions.GetConstEnd())
 					return false;
 				break;
 			}
 			case OperationType::ExternalCallArgument: {
-				if (oiter->GetArguments()[0].GetIndex() >= ArgumentRegistersSize)
+				if (operation_arguments[0].GetIndex() >= ArgumentRegistersSize)
+					return false;
+				break;
+			}
+			case OperationType::GetAddress: {
+				if (!CanConvert(operation_arguments[0].GetType(), BaseTypes::GetUInt64Type()))
 					return false;
 				break;
 			}

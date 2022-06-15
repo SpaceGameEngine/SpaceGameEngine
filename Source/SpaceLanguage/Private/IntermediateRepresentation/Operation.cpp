@@ -149,6 +149,11 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::operator!
 	return m_Content != t.m_Content || m_Size != t.m_Size || m_Alignment != t.m_Alignment;
 }
 
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::CanConvert(const Type& from, const Type& to)
+{
+	return (from.GetSize() >= to.GetSize()) && (from.GetAlignment() % to.GetAlignment() == 0);
+}
+
 const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypes::GetVoidType()
 {
 	static GlobalVariable<Type> g_VoidType(BaseType::Void);
@@ -217,7 +222,7 @@ const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseType
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidStorageTypeError::Judge(StorageType st)
 {
-	return st != StorageType::Constant && st != StorageType::Global && st != StorageType::Local && st != StorageType::Function;
+	return st != StorageType::Constant && st != StorageType::Global && st != StorageType::Local && st != StorageType::Reference && st != StorageType::Function;
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::Variable(const Type& type, StorageType st, SizeType idx)
@@ -274,6 +279,9 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::Op
 		  OPERATION_TYPE(ExternalCallArgument, StorageTypeMasks::Constant, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(ExternalCall, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
 		  OPERATION_TYPE(GetReturnValue, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(MakeReference, StorageTypeMasks::Reference, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(GetAddress, StorageTypeMasks::Variable, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(GetReference, StorageTypeMasks::Reference, StorageTypeMasks::Variable),
 		  //todo
 	  })
 {
