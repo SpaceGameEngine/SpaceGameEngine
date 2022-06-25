@@ -65,86 +65,7 @@ namespace SpaceGameEngine
 		enum class StringCategory : UInt8
 		{
 			Small = 0,
-			Medium = 1,
-			Large = 2
-		};
-
-		template<typename T, typename Allocator = DefaultAllocator>
-		struct StorageRef
-		{
-			Atomic<SizeType> m_Count;
-			T m_Barrier;	//avoid reverse iterator for multi-byte char out of range
-			T m_pContent[1];
-
-			using AllocatorType = Allocator;
-
-			inline StorageRef()
-			{
-				m_Count.Store(0, MemoryOrderRelease);
-				m_Barrier = 0;
-				m_pContent[0] = NULL;
-			}
-
-		public:
-			/*!
-			@brief create a new storageref, its all elements have been set to 0, its count is 1. 
-			*/
-			inline static T* Create(const SizeType size)
-			{
-				SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
-				StorageRef& re = *(new (Allocator::RawNew(sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
-				memset(re.m_pContent, NULL, size * sizeof(T));
-				re.m_Count.Store(1, MemoryOrderRelease);
-				return re.m_pContent;
-			}
-
-			/*!
-			@brief create a new storageref, its all elements were copied from the given ptr, its count is 1. 
-			*/
-			inline static T* Create(const T* ptr, const SizeType size)
-			{
-				SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
-				SGE_ASSERT(NullPointerError, ptr);
-				StorageRef& re = *(new (Allocator::RawNew(sizeof(Atomic<SizeType>) + (size + 1) * sizeof(T), alignof(StorageRef))) StorageRef());
-				memcpy(re.m_pContent, ptr, size * sizeof(T));
-				re.m_Count.Store(1, MemoryOrderRelease);
-				return re.m_pContent;
-			}
-
-			inline static void CountIncrease(const T* ptr)
-			{
-				SGE_ASSERT(NullPointerError, ptr);
-				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
-				pcount->FetchAdd(1, MemoryOrderAcquireRelease);
-			}
-
-			inline static void CountDecrease(const T* ptr)
-			{
-				SGE_ASSERT(NullPointerError, ptr);
-				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
-				pcount->FetchSub(1, MemoryOrderAcquireRelease);
-			}
-
-			inline static SizeType GetCount(const T* ptr)
-			{
-				SGE_ASSERT(NullPointerError, ptr);
-				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
-				return pcount->Load(MemoryOrderAcquire);
-			}
-
-			inline static bool TryRelease(const T* ptr, SizeType size)
-			{
-				SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
-				SGE_ASSERT(NullPointerError, ptr);
-				Atomic<SizeType>* pcount = reinterpret_cast<Atomic<SizeType>*>((AddressType)(ptr) - sizeof(Atomic<SizeType>) - sizeof(T));
-				if (pcount->Load(MemoryOrderAcquire) == 1)
-				{
-					Allocator::RawDelete(pcount);
-					return true;
-				}
-				else
-					return false;
-			}
+			Large = 1
 		};
 
 		template<typename T>
@@ -157,15 +78,32 @@ namespace SpaceGameEngine
 		class Storage
 		{
 		private:
-			SizeType m_RealSize;
-			union {
-				struct
-				{
-					SizeType m_Size;
-					T* m_pContent;
-				};
-				T m_Content[(sizeof(SizeType) + sizeof(T*)) / sizeof(T)];
-			};
+			inline static T* Create(SizeType size)
+			{
+				SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				T* re = (T*)Allocator::RawNew((size + 1) * sizeof(T), alignof(T));
+				memset(re, NULL, (size + 1) * sizeof(T));
+				return re + 1;
+			}
+
+			inline static T* Create(const T* ptr, SizeType size)
+			{
+				SGE_ASSERT(NullPointerError, ptr);
+				SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
+
+				T* re = (T*)Allocator::RawNew((size + 1) * sizeof(T), alignof(T));
+				re[0] = NULL;
+				++re;
+				memcpy(re, ptr, size * sizeof(T));
+				return re;
+			}
+
+			inline static void Destroy(T* ptr)
+			{
+				SGE_ASSERT(NullPointerError, ptr);
+				Allocator::RawDelete(ptr - 1);
+			}
 
 		public:
 			using AllocatorType = Allocator;
@@ -181,13 +119,9 @@ namespace SpaceGameEngine
 			{
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
-				{
 					memset(m_Content, NULL, sizeof(m_Content));
-				}
 				else
-				{
-					m_pContent = StorageRef<T, Allocator>::Create(m_RealSize);
-				}
+					m_pContent = Create(m_RealSize);
 			}
 
 			inline Storage(const T* ptr, const SizeType size)
@@ -195,53 +129,33 @@ namespace SpaceGameEngine
 			{
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
-				{
 					memcpy(m_Content, ptr, size * sizeof(T));
-				}
 				else
-				{
-					m_pContent = StorageRef<T, Allocator>::Create(ptr, m_RealSize);
-				}
+					m_pContent = Create(ptr, m_RealSize);
 			}
 
 			inline ~Storage()
 			{
 				if (GetStringCategoryByRealSize<T>(m_RealSize) != StringCategory::Small)
-				{
-					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
-						StorageRef<T, Allocator>::CountDecrease(m_pContent);
-				}
+					Destroy(m_pContent);
 			}
 
 			inline Storage(const Storage& s)
+				: m_RealSize(s.m_RealSize), m_Size(s.m_Size)
 			{
-				m_RealSize = s.m_RealSize;
-				m_Size = s.m_Size;
 				auto category = GetStringCategoryByRealSize<T>(s.m_RealSize);
 				if (category == StringCategory::Small)
-				{
 					memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
-				}
-				else if (category == StringCategory::Medium)
-				{
-					m_pContent = StorageRef<T, Allocator>::Create(s.m_pContent, m_RealSize);
-				}
-				else	//StringCategory::Large
-				{
-					StorageRef<T, Allocator>::CountIncrease(s.m_pContent);
-					m_pContent = s.m_pContent;
-				}
+				else
+					m_pContent = Create(s.m_pContent, m_RealSize);
 			}
 
 			inline Storage(Storage&& s)
+				: m_RealSize(s.m_RealSize), m_Size(s.m_Size)
 			{
-				m_RealSize = s.m_RealSize;
-				m_Size = s.m_Size;
 				auto category = GetStringCategoryByRealSize<T>(s.m_RealSize);
 				if (category == StringCategory::Small)
-				{
 					memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
-				}
 				else
 				{
 					m_pContent = s.m_pContent;
@@ -253,34 +167,24 @@ namespace SpaceGameEngine
 
 			template<typename OtherAllocator>
 			inline Storage(const Storage<T, OtherAllocator>& s)
+				: m_RealSize(s.GetRealSize()), m_Size(s.GetSize())
 			{
-				m_RealSize = s.GetRealSize();
-				m_Size = s.GetSize();
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
-				{
 					memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
-				}
 				else
-				{
-					m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
-				}
+					m_pContent = Create(s.GetData(), m_RealSize);
 			}
 
 			template<typename OtherAllocator>
 			inline Storage(Storage<T, OtherAllocator>&& s)
+				: m_RealSize(s.GetRealSize()), m_Size(s.GetSize())
 			{
-				m_RealSize = s.GetRealSize();
-				m_Size = s.GetSize();
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
-				{
 					memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
-				}
 				else
-				{
-					m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
-				}
+					m_pContent = Create(s.GetData(), m_RealSize);
 			}
 
 			inline Storage& operator=(const Storage& s)
@@ -293,28 +197,19 @@ namespace SpaceGameEngine
 					m_RealSize = s.m_RealSize;
 					m_Size = s.m_Size;
 					if (category_for_s == StringCategory::Small)
-					{
 						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
-					}
-					else if (category_for_s == StringCategory::Medium)
-					{
-						m_pContent = StorageRef<T, Allocator>::Create(s.m_pContent, m_RealSize);
-					}
 					else
-					{
-						StorageRef<T, Allocator>::CountIncrease(s.m_pContent);
-						m_pContent = s.m_pContent;
-					}
+						m_pContent = Create(s.m_pContent, m_RealSize);
 				}
-				else if (category == StringCategory::Medium)
+				else
 				{
 					if (category_for_s == StringCategory::Small)
 					{
-						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+						Destroy(m_pContent);
 						m_RealSize = s.m_RealSize;
 						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
 					}
-					else if (category_for_s == StringCategory::Medium)
+					else
 					{
 						if (m_RealSize >= s.m_RealSize)
 						{
@@ -324,39 +219,11 @@ namespace SpaceGameEngine
 						}
 						else
 						{
-							StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+							Destroy(m_pContent);
 							m_RealSize = s.m_RealSize;
 							m_Size = s.m_Size;
-							m_pContent = StorageRef<T, Allocator>::Create(s.m_pContent, m_RealSize);
+							m_pContent = Create(s.m_pContent, m_RealSize);
 						}
-					}
-					else
-					{
-						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
-						m_RealSize = s.m_RealSize;
-						m_Size = s.m_Size;
-						StorageRef<T, Allocator>::CountIncrease(s.m_pContent);
-						m_pContent = s.m_pContent;
-					}
-				}
-				else
-				{
-					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
-						StorageRef<T, Allocator>::CountDecrease(m_pContent);
-					m_RealSize = s.m_RealSize;
-					m_Size = s.m_Size;
-					if (category_for_s == StringCategory::Small)
-					{
-						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
-					}
-					else if (category_for_s == StringCategory::Medium)
-					{
-						m_pContent = StorageRef<T, Allocator>::Create(s.m_pContent, m_RealSize);
-					}
-					else
-					{
-						StorageRef<T, Allocator>::CountIncrease(s.m_pContent);
-						m_pContent = s.m_pContent;
 					}
 				}
 				return *this;
@@ -372,26 +239,7 @@ namespace SpaceGameEngine
 					m_RealSize = s.m_RealSize;
 					m_Size = s.m_Size;
 					if (category_for_s == StringCategory::Small)
-					{
 						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
-					}
-					else
-					{
-						m_pContent = s.m_pContent;
-						s.m_RealSize = 0;
-						s.m_Size = 0;
-						s.m_pContent = nullptr;
-					}
-				}
-				else if (category == StringCategory::Medium)
-				{
-					StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
-					m_RealSize = s.m_RealSize;
-					m_Size = s.m_Size;
-					if (category_for_s == StringCategory::Small)
-					{
-						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
-					}
 					else
 					{
 						m_pContent = s.m_pContent;
@@ -402,14 +250,11 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
-						StorageRef<T, Allocator>::CountDecrease(m_pContent);
+					Destroy(m_pContent);
 					m_RealSize = s.m_RealSize;
 					m_Size = s.m_Size;
 					if (category_for_s == StringCategory::Small)
-					{
 						memcpy(m_Content, s.m_Content, m_RealSize * sizeof(T));
-					}
 					else
 					{
 						m_pContent = s.m_pContent;
@@ -431,23 +276,19 @@ namespace SpaceGameEngine
 					m_RealSize = s.GetRealSize();
 					m_Size = s.GetSize();
 					if (category_for_s == StringCategory::Small)
-					{
 						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
-					}
 					else
-					{
-						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
-					}
+						m_pContent = Create(s.GetData(), m_RealSize);
 				}
-				else if (category == StringCategory::Medium)
+				else
 				{
 					if (category_for_s == StringCategory::Small)
 					{
-						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+						Destroy(m_pContent);
 						m_RealSize = s.GetRealSize();
 						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
 					}
-					else if (category_for_s == StringCategory::Medium)
+					else
 					{
 						if (m_RealSize >= s.GetRealSize())
 						{
@@ -457,33 +298,11 @@ namespace SpaceGameEngine
 						}
 						else
 						{
-							StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+							Destroy(m_pContent);
 							m_RealSize = s.GetRealSize();
 							m_Size = s.GetSize();
-							m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+							m_pContent = Create(s.GetData(), m_RealSize);
 						}
-					}
-					else
-					{
-						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
-						m_RealSize = s.GetRealSize();
-						m_Size = s.GetSize();
-						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
-					}
-				}
-				else
-				{
-					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
-						StorageRef<T, Allocator>::CountDecrease(m_pContent);
-					m_RealSize = s.GetRealSize();
-					m_Size = s.GetSize();
-					if (category_for_s == StringCategory::Small)
-					{
-						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
-					}
-					else
-					{
-						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
 					}
 				}
 				return *this;
@@ -499,23 +318,19 @@ namespace SpaceGameEngine
 					m_RealSize = s.GetRealSize();
 					m_Size = s.GetSize();
 					if (category_for_s == StringCategory::Small)
-					{
 						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
-					}
 					else
-					{
-						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
-					}
+						m_pContent = Create(s.GetData(), m_RealSize);
 				}
-				else if (category == StringCategory::Medium)
+				else
 				{
 					if (category_for_s == StringCategory::Small)
 					{
-						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+						Destroy(m_pContent);
 						m_RealSize = s.GetRealSize();
 						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
 					}
-					else if (category_for_s == StringCategory::Medium)
+					else
 					{
 						if (m_RealSize >= s.GetRealSize())
 						{
@@ -525,33 +340,11 @@ namespace SpaceGameEngine
 						}
 						else
 						{
-							StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
+							Destroy(m_pContent);
 							m_RealSize = s.GetRealSize();
 							m_Size = s.GetSize();
-							m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
+							m_pContent = Create(s.GetData(), m_RealSize);
 						}
-					}
-					else
-					{
-						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
-						m_RealSize = s.GetRealSize();
-						m_Size = s.GetSize();
-						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
-					}
-				}
-				else
-				{
-					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
-						StorageRef<T, Allocator>::CountDecrease(m_pContent);
-					m_RealSize = s.GetRealSize();
-					m_Size = s.GetSize();
-					if (category_for_s == StringCategory::Small)
-					{
-						memcpy(m_Content, s.GetData(), m_RealSize * sizeof(T));
-					}
-					else
-					{
-						m_pContent = StorageRef<T, Allocator>::Create(s.GetData(), m_RealSize);
 					}
 				}
 				return *this;
@@ -573,35 +366,13 @@ namespace SpaceGameEngine
 				if (category == StringCategory::Small)
 				{
 					if (new_category == StringCategory::Small)
-					{
 						m_RealSize = size;
-					}
 					else
 					{
-						auto pbuf = StorageRef<T, Allocator>::Create(size);
+						auto pbuf = Create(size);
 						memcpy(pbuf, m_Content, m_RealSize * sizeof(T));
 						m_pContent = pbuf;
 						m_Size = m_RealSize;
-						m_RealSize = size;
-					}
-				}
-				else if (category == StringCategory::Medium)
-				{
-					if (new_category == StringCategory::Small)
-					{
-						//see warning
-						auto pre_real_size = m_RealSize;
-						auto pre_p_content = m_pContent;
-						m_RealSize = m_Size;
-						memcpy(m_Content, pre_p_content, m_RealSize * sizeof(T));
-						StorageRef<T, Allocator>::TryRelease(pre_p_content, pre_real_size);
-					}
-					else
-					{
-						auto pbuf = StorageRef<T, Allocator>::Create(size);
-						memcpy(pbuf, m_pContent, m_Size * sizeof(T));
-						StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize);
-						m_pContent = pbuf;
 						m_RealSize = size;
 					}
 				}
@@ -610,19 +381,16 @@ namespace SpaceGameEngine
 					if (new_category == StringCategory::Small)
 					{
 						//see warning
-						auto pre_real_size = m_RealSize;
 						auto pre_p_content = m_pContent;
 						m_RealSize = m_Size;
 						memcpy(m_Content, pre_p_content, m_RealSize * sizeof(T));
-						if (!StorageRef<T, Allocator>::TryRelease(pre_p_content, pre_real_size))
-							StorageRef<T, Allocator>::CountDecrease(pre_p_content);
+						Destroy(pre_p_content);
 					}
 					else
 					{
-						auto pbuf = StorageRef<T, Allocator>::Create(size);
+						auto pbuf = Create(size);
 						memcpy(pbuf, m_pContent, m_Size * sizeof(T));
-						if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
-							StorageRef<T, Allocator>::CountDecrease(m_pContent);
+						Destroy(m_pContent);
 						m_pContent = pbuf;
 						m_RealSize = size;
 					}
@@ -633,30 +401,13 @@ namespace SpaceGameEngine
 			{
 				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
 				if (category == StringCategory::Small)
-				{
 					m_RealSize = 0;
-				}
 				else
 				{
-					if (!StorageRef<T, Allocator>::TryRelease(m_pContent, m_RealSize))
-						StorageRef<T, Allocator>::CountDecrease(m_pContent);
+					Destroy(m_pContent);
 					m_RealSize = 0;
 					m_Size = 0;
 					m_pContent = nullptr;
-				}
-			}
-
-			inline void CopyOnWrite()
-			{
-				auto category = GetStringCategoryByRealSize<T>(m_RealSize);
-				if (category == StringCategory::Large)
-				{
-					if (StorageRef<T, Allocator>::GetCount(m_pContent) > 1)
-					{
-						auto ptr = StorageRef<T, Allocator>::Create(m_pContent, m_RealSize);
-						StorageRef<T, Allocator>::CountDecrease(m_pContent);
-						m_pContent = ptr;
-					}
 				}
 			}
 
@@ -701,15 +452,24 @@ namespace SpaceGameEngine
 				else
 					return m_pContent;
 			}
+
+		private:
+			SizeType m_RealSize;
+			union {
+				struct
+				{
+					SizeType m_Size;
+					T* m_pContent;
+				};
+				T m_Content[(sizeof(SizeType) + sizeof(T*)) / sizeof(T)];
+			};
 		};
 
 		template<typename T>
 		inline constexpr StringCategory GetStringCategoryByRealSize(const SizeType size)
 		{
-			if (size > 255)
+			if (size > ((sizeof(Storage<T>) - sizeof(SizeType)) / sizeof(T)))
 				return StringCategory::Large;
-			else if (size > ((sizeof(Storage<T>) - sizeof(SizeType)) / sizeof(T)))
-				return StringCategory::Medium;
 			else
 				return StringCategory::Small;
 		}
@@ -2388,7 +2148,6 @@ namespace SpaceGameEngine
 			{
 				SetRealSize(2 * nsize);
 			}
-			m_Storage.CopyOnWrite();
 			memcpy(m_Storage.GetData() + osize, str.GetData(), (str.GetNormalSize() + 1) * sizeof(T));
 			m_Size += str.GetSize();
 			m_Storage.SetSize(nsize + 1);
@@ -2405,7 +2164,6 @@ namespace SpaceGameEngine
 			{
 				SetRealSize(2 * nsize);
 			}
-			m_Storage.CopyOnWrite();
 			memcpy(m_Storage.GetData() + osize, str.GetData(), (str.GetNormalSize() + 1) * sizeof(T));
 			m_Size += str.GetSize();
 			m_Storage.SetSize(nsize + 1);
@@ -2437,7 +2195,6 @@ namespace SpaceGameEngine
 			{
 				SetRealSize(2 * nsize);
 			}
-			m_Storage.CopyOnWrite();
 			*(m_Storage.GetData() + osize) = c;
 			*(m_Storage.GetData() + nsize) = 0;
 			m_Size += 1;
@@ -2460,7 +2217,6 @@ namespace SpaceGameEngine
 			{
 				SetRealSize(2 * nsize);
 			}
-			m_Storage.CopyOnWrite();
 			memcpy(m_Storage.GetData() + osize, pstr, (size + 1) * sizeof(T));
 			m_Size += GetCStringSize(pstr);
 			m_Storage.SetSize(nsize + 1);
@@ -2796,7 +2552,6 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				m_Storage.CopyOnWrite();
 				memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
 				memcpy(GetData() + index, str.GetData(), str.GetNormalSize() * sizeof(T));
 				m_Size += str.GetSize();
@@ -2820,7 +2575,6 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				m_Storage.CopyOnWrite();
 				if (index != osize)
 					memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
 
@@ -2880,7 +2634,6 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				m_Storage.CopyOnWrite();
 				memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
 				memcpy(GetData() + index, str.GetData(), str.GetNormalSize() * sizeof(T));
 				m_Size += str.GetSize();
@@ -2904,7 +2657,6 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				m_Storage.CopyOnWrite();
 				if (index != osize)
 					memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
 
@@ -2969,7 +2721,6 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				m_Storage.CopyOnWrite();
 				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
 				memcpy(GetData() + index, pstr, snsize * sizeof(T));
 				m_Size += GetCStringSize(pstr);
@@ -2994,7 +2745,6 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				m_Storage.CopyOnWrite();
 				if (index != osize)
 					memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
 
@@ -3075,7 +2825,6 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				m_Storage.CopyOnWrite();
 				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
 				SizeType cnt = 0;
 				SizeType mc_cnt = 0;
@@ -3127,7 +2876,6 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				m_Storage.CopyOnWrite();
 				if (index != osize)
 					memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
 
@@ -3209,7 +2957,6 @@ namespace SpaceGameEngine
 			}
 			Iterator ni((T*)iter.GetData());
 			ni += 1;
-			m_Storage.CopyOnWrite();
 			memmove((void*)iter.GetData(), ni.GetData(), (GetData() + GetNormalSize() - ni.GetData() + 1) * sizeof(T));
 			m_Size -= 1;
 			m_Storage.SetSize(nsize + 1);
@@ -3280,7 +3027,6 @@ namespace SpaceGameEngine
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, end, GetData(), GetData() + GetNormalSize());
-				m_Storage.CopyOnWrite();
 				memcpy((void*)begin.GetData(), end.GetData(), (GetData() + GetNormalSize() - end.GetData() + 1) * sizeof(T));
 				m_Size -= size;
 				m_Storage.SetSize(nsize + 1);
@@ -3296,7 +3042,6 @@ namespace SpaceGameEngine
 				{
 					SGE_ASSERT(typename IteratorType::OutOfRangeError, end, (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData())), (StringImplement::GetPreviousMultipleByteChar<T, Trait>(GetData() + GetNormalSize())));
 				}
-				m_Storage.CopyOnWrite();
 				auto end2 = end - 1;
 				auto begin2 = begin - 1;
 				memcpy((void*)end2.GetData(), begin2.GetData(), (GetData() + GetNormalSize() - begin2.GetData() + 1) * sizeof(T));
@@ -3309,7 +3054,6 @@ namespace SpaceGameEngine
 		inline std::conditional_t<!Trait::IsMultipleByte, T&, T*> operator[](const SizeType i)
 		{
 			SGE_ASSERT(InvalidValueError, i, 0, m_Size - 1);
-			m_Storage.CopyOnWrite();
 			if constexpr (!Trait::IsMultipleByte)
 			{
 				return *(GetData() + i);
