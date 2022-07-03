@@ -72,16 +72,31 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		CommentBlock = 39
 	};
 
-	struct SPACE_LANGUAGE_API Token
+	struct InvalidTokenTypeError
 	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The TokenType is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(TokenType tt);
+	};
+
+	class SPACE_LANGUAGE_API Token
+	{
+	public:
 		Token();
-		Token(TokenType token_type, const String& str);
+		Token(TokenType token_type, const String& str, SizeType line, SizeType column);
+
+		TokenType GetType() const;
+		const String& GetContent() const;
+		SizeType GetLine() const;
+		SizeType GetColumn() const;
 
 		bool operator==(const Token& token) const;
 		bool operator!=(const Token& token) const;
 
+	private:
 		TokenType m_Type;
 		String m_Content;
+		SizeType m_Line;
+		SizeType m_Column;
 	};
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
@@ -158,7 +173,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	}
 	inline constexpr const SizeType StateSize = 23;
 
-	using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType&);
+	using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType);
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API HashMap<Char, StateType>;
@@ -197,12 +212,12 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		Skip = 2,
 		Submit = 3,
 		SubmitSymbol = 4,
-		SubmitLineSeparator = 5,
+		PartialSubmitLineSeparator = 5,
 		SubmitSkip = 6,
 		EscapeCharacter = 7,
 		Clear = 8,
 		RawStringEndBack = 9,
-		CommentBlockEndBack = 10
+		CommentBlockEndBack = 10,
 	};
 
 	struct SPACE_LANGUAGE_API StateTransfer

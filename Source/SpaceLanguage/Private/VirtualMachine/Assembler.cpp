@@ -77,235 +77,154 @@ bool SpaceGameEngine::SpaceLanguage::InvalidRegisterNameError::Judge(const Strin
 
 bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(const String& str, const String& error_info_formatter, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions)
 {
-	SizeType line = 1;
-	SizeType col = 1;
-	FileLineBreak flb = FileLineBreak::Unknown;
-	String flb_str;
 	Vector<Token> tokens = GetTokens(str, error_info_formatter);
 	SizeType instr_size = 0;
 	const InstructionType* pinstr = nullptr;
 	HashMap<String, Pair<SizeType, SizeType>> need_tags;
 	HashMap<String, bool> tags;
-	bool is_new_instr = true;
+	SizeType instr_line = 0;
 
 	for (auto iter = tokens.GetConstBegin(); iter != tokens.GetConstEnd(); ++iter)
 	{
-		if (iter->m_Type == TokenType::LineSeparator)
+		if (iter->GetType() == TokenType::LineSeparator || iter->GetType() == TokenType::CommentLine || iter->GetType() == TokenType::CommentBlock)
+			continue;
+		else if (iter->GetType() == TokenType::Colon)
 		{
 			if (instr_size)
 			{
-				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid line break here"))));
+				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Invalid : here"))));
 				return true;
 			}
-			if (flb == FileLineBreak::Unknown)
-			{
-				if (iter->m_Content.GetSize() == 1)
-					flb = GetFileLineBreak<String::CharType, String::ValueTrait>(iter->m_Content[0], iter->m_Content[0]);
-				else
-					flb = GetFileLineBreak<String::CharType, String::ValueTrait>(iter->m_Content[0], iter->m_Content[1]);
-				flb_str = iter->m_Content;
-			}
-			line += 1;
-			col = 1;
-			is_new_instr = true;
-		}
-		else if (iter->m_Type == TokenType::CommentBlock)
-		{
-			if (flb == FileLineBreak::Unknown)
-			{
-				bool has_lb = false;
-				for (auto citer = iter->m_Content.GetConstBegin(); citer != iter->m_Content.GetConstEnd(); ++citer)
-				{
-					if (IsLineSeparatorCharacter<String::CharType, String::ValueTrait>(*citer))
-					{
-						if (instr_size)
-						{
-							SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid line break here"))));
-							return true;
-						}
-						flb = GetFileLineBreak<String::CharType, String::ValueTrait>(*citer, *citer);
-						if (flb == FileLineBreak::CR)
-						{
-							auto cnext = citer + 1;
-							if (cnext != iter->m_Content.GetConstEnd() && GetFileLineBreak<String::CharType, String::ValueTrait>(*citer, *cnext) == FileLineBreak::CRLF)
-								flb = FileLineBreak::CRLF;
-						}
-						flb_str = GetFileLineBreakString<String::CharType, String::ValueTrait>(flb);
-						line += 1;
-						col = 3 + (iter->m_Content.GetConstEnd() - citer) - flb_str.GetSize();
-						has_lb = true;
-						is_new_instr = true;
-						break;
-					}
-				}
-				if (!has_lb)
-					col += iter->m_Content.GetSize() + 4;
-			}
-			else
-			{
-				auto citer = iter->m_Content.Find(flb_str, iter->m_Content.GetConstBegin(), iter->m_Content.GetConstEnd());
-				if (citer != iter->m_Content.GetConstEnd())
-				{
-					if (instr_size)
-					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid line break here"))));
-						return true;
-					}
-					line += 1;
-					col = 3 + (iter->m_Content.GetConstEnd() - citer) - flb_str.GetSize();
-					is_new_instr = true;
-				}
-				else
-					col += iter->m_Content.GetSize() + 4;
-			}
-		}
-		else if (iter->m_Type == TokenType::CommentLine)
-			col += iter->m_Content.GetSize() + 2;
-		else if (iter->m_Type == TokenType::Colon)
-		{
-			if (instr_size)
-			{
-				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid : here"))));
-				return true;
-			}
-			col += iter->m_Content.GetSize();
 			auto next = iter + 1;
 			if (next == tokens.GetConstEnd())
 			{
-				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need tag here"))));
+				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need tag here"))));
 				return true;
 			}
-			if (next->m_Type != TokenType::Identifier)
+			if (next->GetType() != TokenType::Identifier)
 			{
-				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid tag name"))));
+				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Invalid tag name"))));
 				return true;
 			}
-			if (tags.Find(next->m_Content) != tags.GetEnd())
+			if (tags.Find(next->GetContent()) != tags.GetEnd())
 			{
-				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Repeated tag name"))));
+				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Repeated tag name"))));
 				return true;
 			}
-			tags.Insert(next->m_Content, true);
-			auto ntiter = need_tags.Find(next->m_Content);
+			tags.Insert(next->GetContent(), true);
+			auto ntiter = need_tags.Find(next->GetContent());
 			if (ntiter != need_tags.GetEnd())
 				need_tags.Remove(ntiter);
-			col += next->m_Content.GetSize();
 			++iter;
 		}
 		else if (instr_size == 8)
 		{
-			if (iter->m_Type == TokenType::Identifier)
+			if (iter->GetType() == TokenType::Identifier)
 			{
 				if (pinstr->m_Index != InstructionTypeIndex::ExternalCall)
 				{
-					if (tags.Find(iter->m_Content) == tags.GetEnd())
+					if (tags.Find(iter->GetContent()) == tags.GetEnd())
 					{
-						if (need_tags.Find(iter->m_Content) == need_tags.GetEnd())
-							need_tags.Insert(iter->m_Content, Pair<SizeType, SizeType>(line, col));
+						if (need_tags.Find(iter->GetContent()) == need_tags.GetEnd())
+							need_tags.Insert(iter->GetContent(), Pair<SizeType, SizeType>(iter->GetLine(), iter->GetColumn()));
 					}
-					col += iter->m_Content.GetSize();
 				}
 				else
 				{
-					auto mod_iter = module_functions.Find(iter->m_Content);
+					auto mod_iter = module_functions.Find(iter->GetContent());
 					if (mod_iter == module_functions.GetConstEnd())
 					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unknown module name"))));
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Unknown module name"))));
 						return true;
 					}
-					col += iter->m_Content.GetSize();
 					auto next = iter + 1;
-					if (next == tokens.GetConstEnd() || next->m_Type != TokenType::Colon)
+					if (next == tokens.GetConstEnd() || next->GetType() != TokenType::Colon)
 					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need : here"))));
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need : here"))));
 						return true;
 					}
-					col += next->m_Content.GetSize();
 					auto next_next = next + 1;
 					if (next_next == tokens.GetConstEnd())
 					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need function name here"))));
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need function name here"))));
 						return true;
 					}
-					if (mod_iter->m_Second.m_Second.Find(next_next->m_Content) == mod_iter->m_Second.m_Second.GetConstEnd())
+					if (mod_iter->m_Second.m_Second.Find(next_next->GetContent()) == mod_iter->m_Second.m_Second.GetConstEnd())
 					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unknown function name"))));
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Unknown function name"))));
 						return true;
 					}
-					col += next_next->m_Content.GetSize();
 					iter += 2;
 				}
 			}
-			else if (iter->m_Type != TokenType::IntegerLiteral && iter->m_Type != TokenType::WordSeparator)
+			else if (iter->GetType() != TokenType::IntegerLiteral && iter->GetType() != TokenType::WordSeparator)
 			{
-				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need integer here"))));
+				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need integer here"))));
 				return true;
 			}
-			else
-				col += iter->m_Content.GetSize();
 
-			if (iter->m_Type != TokenType::WordSeparator)
+			if (iter->GetType() != TokenType::WordSeparator)
 				instr_size = 0;
 		}
 		else
 		{
-			if (iter->m_Type != TokenType::WordSeparator)
+			if (iter->GetType() != TokenType::WordSeparator)
 			{
 				if (instr_size)
 				{
-					if (iter->m_Type == TokenType::IntegerLiteral)
+					if (iter->GetType() == TokenType::IntegerLiteral)
 					{
-						if (StringTo<String, UInt8>(iter->m_Content) >= RegistersSize)
+						if (StringTo<String, UInt8>(iter->GetContent()) >= RegistersSize)
 						{
-							SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid register index"))));
+							SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Invalid register index"))));
 							return true;
 						}
 					}
-					else if (iter->m_Type == TokenType::Identifier)
+					else if (iter->GetType() == TokenType::Identifier)
 					{
-						if (!RegisterNameSet::GetSingleton().IsRegisterName(iter->m_Content))
+						if (!RegisterNameSet::GetSingleton().IsRegisterName(iter->GetContent()))
 						{
-							SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid register name"))));
+							SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Invalid register name"))));
 							return true;
 						}
 					}
 					else
 					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need register here"))));
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need register here"))));
 						return true;
 					}
 
 					instr_size -= 1;
 				}
-				else if (iter->m_Type == TokenType::Identifier)
+				else if (iter->GetType() == TokenType::Identifier)
 				{
-					if (!is_new_instr)
+					if (iter->GetLine() == instr_line)
 					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need line break here"))));
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need line break here"))));
 						return true;
 					}
-					if (!InstructionNameSet::GetSingleton().IsInstructionName(iter->m_Content))
+					if (!InstructionNameSet::GetSingleton().IsInstructionName(iter->GetContent()))
 					{
-						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid instruction name"))));
+						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Invalid instruction name"))));
 						return true;
 					}
-					pinstr = &(InstructionNameSet::GetSingleton().Get(iter->m_Content));
+					pinstr = &(InstructionNameSet::GetSingleton().Get(iter->GetContent()));
 					instr_size = pinstr->m_Size - 1;
-					is_new_instr = false;
+					instr_line = iter->GetLine();
 				}
 				else
 				{
-					SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid token type"))));
+					SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Invalid token type"))));
 					return true;
 				}
 			}
-			col += iter->m_Content.GetSize();
 		}
 	}
 
 	if (instr_size)
 	{
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete instruction"))));
+		auto iter = tokens.GetConstReverseBegin();
+		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need complete instruction"))));
 		return true;
 	}
 
@@ -344,26 +263,26 @@ Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& s
 
 	for (auto iter = tokens.GetConstBegin(); iter != tokens.GetConstEnd(); ++iter)
 	{
-		if (iter->m_Type == TokenType::LineSeparator || iter->m_Type == TokenType::WordSeparator || iter->m_Type == TokenType::CommentBlock || iter->m_Type == TokenType::CommentLine)
+		if (iter->GetType() == TokenType::LineSeparator || iter->GetType() == TokenType::WordSeparator || iter->GetType() == TokenType::CommentBlock || iter->GetType() == TokenType::CommentLine)
 			continue;
 
 		if (instr_size == 8)
 		{
-			if (iter->m_Type == TokenType::IntegerLiteral)
-				*(UInt64*)(&result[write_idx]) = StringTo<String, UInt64>(iter->m_Content);
+			if (iter->GetType() == TokenType::IntegerLiteral)
+				*(UInt64*)(&result[write_idx]) = StringTo<String, UInt64>(iter->GetContent());
 			else if (pinstr->m_Index != InstructionTypeIndex::ExternalCall)
 			{
-				auto titer = tags.Find(iter->m_Content);
+				auto titer = tags.Find(iter->GetContent());
 				if (titer != tags.GetEnd())
 					*(UInt64*)(&result[write_idx]) = titer->m_Second;
 				else
-					need_tags[iter->m_Content].EmplaceBack(write_idx);
+					need_tags[iter->GetContent()].EmplaceBack(write_idx);
 			}
 			else
 			{
-				auto mod_iter = m_ModuleFunctions.Find(iter->m_Content);
+				auto mod_iter = m_ModuleFunctions.Find(iter->GetContent());
 				iter += 2;
-				auto function_iter = mod_iter->m_Second.m_Second.Find(iter->m_Content);
+				auto function_iter = mod_iter->m_Second.m_Second.Find(iter->GetContent());
 				*(UInt64*)(&result[write_idx]) = ExternalCaller::GetIndex(mod_iter->m_Second.m_First, function_iter->m_Second);
 			}
 
@@ -372,28 +291,28 @@ Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& s
 		}
 		else if (instr_size)
 		{
-			if (iter->m_Type == TokenType::IntegerLiteral)
-				result[write_idx] = StringTo<String, UInt8>(iter->m_Content);
+			if (iter->GetType() == TokenType::IntegerLiteral)
+				result[write_idx] = StringTo<String, UInt8>(iter->GetContent());
 			else	//Identifier
-				result[write_idx] = RegisterNameSet::GetSingleton().Get(iter->m_Content);
+				result[write_idx] = RegisterNameSet::GetSingleton().Get(iter->GetContent());
 			instr_size -= 1;
 			++write_idx;
 		}
 		else
 		{
-			if (iter->m_Type == TokenType::Identifier)
+			if (iter->GetType() == TokenType::Identifier)
 			{
-				pinstr = &InstructionNameSet::GetSingleton().Get(iter->m_Content);
+				pinstr = &InstructionNameSet::GetSingleton().Get(iter->GetContent());
 				instr_size = pinstr->m_Size - 1;
 				result.SetSize(result.GetSize() + pinstr->m_Size, 0);
 				result[write_idx] = pinstr->m_Index;
 				++write_idx;
 			}
-			else if (iter->m_Type == TokenType::Colon)
+			else if (iter->GetType() == TokenType::Colon)
 			{
 				++iter;
-				tags.Insert(iter->m_Content, result.GetSize());
-				auto ntiter = need_tags.Find(iter->m_Content);
+				tags.Insert(iter->GetContent(), result.GetSize());
+				auto ntiter = need_tags.Find(iter->GetContent());
 				if (ntiter != need_tags.GetEnd())
 				{
 					for (auto witer = ntiter->m_Second.GetConstBegin(); witer != ntiter->m_Second.GetConstEnd(); ++witer)
