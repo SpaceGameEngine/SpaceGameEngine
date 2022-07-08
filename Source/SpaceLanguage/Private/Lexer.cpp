@@ -583,6 +583,8 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 	FileLineBreak flb = FileLineBreak::Unknown;
 	SizeType line = 1;
 	SizeType col = 1;
+	SizeType word_line = line;
+	SizeType word_col = col;
 	bool is_wait_for_lf = false;
 
 	while (iter != str.GetConstEnd())
@@ -604,13 +606,16 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 			++iter;
 		else if (st.m_Signal == StateMachineControlSignal::Submit)
 		{
-			result.EmplaceBack(st.m_TokenType, str_buf, line, col);
+			result.EmplaceBack(st.m_TokenType, str_buf, word_line, word_col);
 			str_buf.Clear();
+			word_line = line;
+			word_col = col;
 		}
 		else if (st.m_Signal == StateMachineControlSignal::SubmitSymbol)
 		{
-			result.EmplaceBack(st.m_TokenType, String(1, *iter), line, col);
+			result.EmplaceBack(st.m_TokenType, String(1, *iter), word_line, word_col);
 			++iter;
+			++word_col;
 		}
 		else if (st.m_Signal == StateMachineControlSignal::PartialSubmitLineSeparator)
 		{
@@ -626,21 +631,27 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 						else
 						{
 							flb = FileLineBreak::CR;
-							result.EmplaceBack(TokenType::LineSeparator, String(1, *iter), line, col);
+							result.EmplaceBack(TokenType::LineSeparator, String(1, *iter), word_line, word_col);
+							++word_line;
+							word_col = 1;
 						}
 					}
 					else if (*iter == SGE_STR('\n'))
 					{
 						flb = FileLineBreak::LF;
-						result.EmplaceBack(TokenType::LineSeparator, String(1, *iter), line, col);
+						result.EmplaceBack(TokenType::LineSeparator, String(1, *iter), word_line, word_col);
+						++word_line;
+						word_col = 1;
 					}
 				}
 				else
 				{
 					flb = FileLineBreak::CRLF;
 					str_buf += *iter;
-					result.EmplaceBack(TokenType::LineSeparator, str_buf, line, col);
+					result.EmplaceBack(TokenType::LineSeparator, str_buf, word_line, word_col);
 					str_buf.Clear();
+					++word_line;
+					word_col = 1;
 				}
 			}
 			else
@@ -650,20 +661,28 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 					str_buf += *iter;
 					if (str_buf.GetSize() == 2)
 					{
-						result.EmplaceBack(TokenType::LineSeparator, str_buf, line, col);
+						result.EmplaceBack(TokenType::LineSeparator, str_buf, word_line, word_col);
 						str_buf.Clear();
+						++word_line;
+						word_col = 1;
 					}
 				}
 				else
-					result.EmplaceBack(TokenType::LineSeparator, String(1, *iter), line, col);
+				{
+					result.EmplaceBack(TokenType::LineSeparator, String(1, *iter), word_line, word_col);
+					++word_line;
+					word_col = 1;
+				}
 			}
 			++iter;
 		}
 		else if (st.m_Signal == StateMachineControlSignal::SubmitSkip)
 		{
-			result.EmplaceBack(st.m_TokenType, str_buf, line, col);
+			result.EmplaceBack(st.m_TokenType, str_buf, word_line, word_col);
 			str_buf.Clear();
 			++iter;
+			word_line = line;
+			word_col = col + 1;
 		}
 		else if (st.m_Signal == StateMachineControlSignal::EscapeCharacter)
 		{
@@ -717,7 +736,7 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 	}
 
 	if (state == State::CommentLine)
-		result.EmplaceBack(TokenType::CommentLine, str_buf, line, col);
+		result.EmplaceBack(TokenType::CommentLine, str_buf, word_line, word_col);
 	else
 	{
 		while (state != State::Start)
@@ -725,7 +744,7 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 			StateTransfer st = m_OtherCharacterStates[state];
 
 			if (st.m_Signal == StateMachineControlSignal::Submit)
-				result.EmplaceBack(st.m_TokenType, str_buf, line, col);
+				result.EmplaceBack(st.m_TokenType, str_buf, word_line, word_col);
 
 			state = st.m_NextState;
 		}
