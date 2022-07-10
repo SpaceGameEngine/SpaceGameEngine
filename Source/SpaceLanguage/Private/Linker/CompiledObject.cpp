@@ -175,9 +175,9 @@ bool SpaceGameEngine::SpaceLanguage::InvalidCompiledObjectReplacementError::Judg
 	if (&self == &cobj)
 		return true;
 
-	if (cgv_tran.GetSize() != cobj.GetCompiledGlobalVariables().GetSize())
+	if (cgv_tran.GetSize() > cobj.GetCompiledGlobalVariables().GetSize())
 		return true;
-	if (cfunc_tran.GetSize() != cobj.GetCompiledFunctions().GetSize())
+	if (cfunc_tran.GetSize() > cobj.GetCompiledFunctions().GetSize())
 		return true;
 
 	HashMap<UInt64, bool> self_count;

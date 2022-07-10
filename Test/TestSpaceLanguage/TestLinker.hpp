@@ -75,6 +75,10 @@ TEST(CompiledObject, Test)
 	CompiledObject cobj2;
 	cobj2.AddCompiledGlobalVariable(0, CompiledGlobalVariable(16, 8));
 	cobj2.AddCompiledFunction(0, CompiledFunction(instrs, gv_map, func_map));
+	ASSERT_EQ(cobj2.GetCompiledGlobalVariables().GetSize(), 1);
+	ASSERT_EQ(cobj2.GetCompiledGlobalVariables().Get(0), CompiledGlobalVariable(16, 8));
+	ASSERT_EQ(cobj2.GetCompiledFunctions().GetSize(), 1);
+	ASSERT_EQ(cobj2.GetCompiledFunctions().Get(0), CompiledFunction(instrs, gv_map, func_map));
 	ASSERT_FALSE(IsValidCompiledObject(cobj2));
 
 	cobj.Replace(cobj2, {{0, 1}}, {{0, 1}});
@@ -82,6 +86,25 @@ TEST(CompiledObject, Test)
 	ASSERT_EQ(cobj.GetCompiledGlobalVariables().GetSize(), 2);
 	ASSERT_EQ(cobj.GetCompiledGlobalVariables().Find(0)->m_Second, CompiledGlobalVariable(8, 4));
 	ASSERT_EQ(cobj.GetCompiledGlobalVariables().Find(1)->m_Second, CompiledGlobalVariable(16, 8));
+	ASSERT_EQ(cobj.GetCompiledFunctions().GetSize(), 2);
+	ASSERT_EQ(cobj.GetCompiledFunctions().Find(0)->m_Second, CompiledFunction(instrs, gv_map, func_map));
+	ASSERT_EQ(cobj.GetCompiledFunctions().Find(1)->m_Second, CompiledFunction(instrs, gv_map, func_map));
+	ASSERT_TRUE(IsValidCompiledObject(cobj));
+
+	CompiledObject cobj3;
+	cobj3.AddCompiledGlobalVariable(0, CompiledGlobalVariable(32, 8));
+	cobj3.AddCompiledGlobalVariable(1, CompiledGlobalVariable(64, 16));
+	ASSERT_EQ(cobj3.GetCompiledGlobalVariables().GetSize(), 2);
+	ASSERT_EQ(cobj3.GetCompiledGlobalVariables().Get(0), CompiledGlobalVariable(32, 8));
+	ASSERT_EQ(cobj3.GetCompiledGlobalVariables().Get(1), CompiledGlobalVariable(64, 16));
+	ASSERT_EQ(cobj3.GetCompiledFunctions().GetSize(), 0);
+	ASSERT_TRUE(IsValidCompiledObject(cobj3));
+
+	cobj.Replace(cobj3, {{0, 1}}, {});
+
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().GetSize(), 2);
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().Find(0)->m_Second, CompiledGlobalVariable(8, 4));
+	ASSERT_EQ(cobj.GetCompiledGlobalVariables().Find(1)->m_Second, CompiledGlobalVariable(32, 8));
 	ASSERT_EQ(cobj.GetCompiledFunctions().GetSize(), 2);
 	ASSERT_EQ(cobj.GetCompiledFunctions().Find(0)->m_Second, CompiledFunction(instrs, gv_map, func_map));
 	ASSERT_EQ(cobj.GetCompiledFunctions().Find(1)->m_Second, CompiledFunction(instrs, gv_map, func_map));
