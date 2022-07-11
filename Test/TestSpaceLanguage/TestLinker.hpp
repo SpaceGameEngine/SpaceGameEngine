@@ -40,14 +40,20 @@ TEST(CompiledFunction, Test)
 	gv_map[0].PushBack(2);
 	InstructionsGenerator::Goto(instrs, 0);
 	func_map[1].PushBack(11);
+
 	CompiledFunction cfunc(instrs, gv_map, func_map);
 	ASSERT_EQ(cfunc.GetInstructions(), instrs);
 	ASSERT_EQ(cfunc.GetGlobalVariableRequests(), gv_map);
 	ASSERT_EQ(cfunc.GetFunctionRequests(), func_map);
+	ASSERT_TRUE(IsValidCompiledFunction(cfunc));
+
 	CompiledFunction cfunc2(instrs, gv_map, func_map);
 	ASSERT_EQ(cfunc, cfunc2);
+	ASSERT_TRUE(IsValidCompiledFunction(cfunc2));
+
 	CompiledFunction cfunc3({}, {}, {});
 	ASSERT_NE(cfunc, cfunc3);
+	ASSERT_TRUE(IsValidCompiledFunction(cfunc3));
 }
 
 TEST(CompiledObject, Test)

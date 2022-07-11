@@ -64,6 +64,8 @@ namespace SpaceGameEngine::SpaceLanguage
 		HashMap<UInt64, Vector<UInt64>> m_FunctionRequests;
 	};
 
+	SPACE_LANGUAGE_API bool IsValidCompiledFunction(const CompiledFunction& cfunc);
+
 	struct InvalidCompiledFunctionError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The CompiledFunction is invalid.");

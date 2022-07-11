@@ -74,7 +74,7 @@ bool SpaceGameEngine::SpaceLanguage::CompiledFunction::operator!=(const Compiled
 	return m_Instructions != cfunc.m_Instructions || m_GlobalVariableRequests != cfunc.m_GlobalVariableRequests || m_FunctionRequests != cfunc.m_FunctionRequests;
 }
 
-bool SpaceGameEngine::SpaceLanguage::InvalidCompiledFunctionError::Judge(const CompiledFunction& cfunc)
+bool SpaceGameEngine::SpaceLanguage::IsValidCompiledFunction(const CompiledFunction& cfunc)
 {
 	const auto& instrs = cfunc.GetInstructions();
 	const auto& gv_reqs = cfunc.GetGlobalVariableRequests();
@@ -87,7 +87,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidCompiledFunctionError::Judge(const C
 	while (instr_idx < instrs.GetSize())
 	{
 		if (instrs[instr_idx] >= InstructionSetSize)
-			return true;
+			return false;
 		UInt8 instr_size = InstructionSet::GetSingleton().Get(instrs[instr_idx]).m_Size;
 		if (instr_size == 9)
 		{
@@ -104,14 +104,14 @@ bool SpaceGameEngine::SpaceLanguage::InvalidCompiledFunctionError::Judge(const C
 		instr_idx += instr_size;
 	}
 	if (instr_idx != instrs.GetSize())
-		return true;
+		return false;
 
 	for (auto iter = gv_reqs.GetConstBegin(); iter != gv_reqs.GetConstEnd(); ++iter)
 	{
 		for (auto iiter = iter->m_Second.GetConstBegin(); iiter != iter->m_Second.GetConstEnd(); ++iiter)
 		{
 			if (val_map.Find(*iiter) == val_map.GetConstEnd())
-				return true;
+				return false;
 		}
 	}
 
@@ -120,11 +120,16 @@ bool SpaceGameEngine::SpaceLanguage::InvalidCompiledFunctionError::Judge(const C
 		for (auto iiter = iter->m_Second.GetConstBegin(); iiter != iter->m_Second.GetConstEnd(); ++iiter)
 		{
 			if ((goto_map.Find(*iiter) == goto_map.GetConstEnd()) && (val_map.Find(*iiter) == val_map.GetConstEnd()))
-				return true;
+				return false;
 		}
 	}
 
-	return false;
+	return true;
+}
+
+bool SpaceGameEngine::SpaceLanguage::InvalidCompiledFunctionError::Judge(const CompiledFunction& cfunc)
+{
+	return !IsValidCompiledFunction(cfunc);
 }
 
 void SpaceGameEngine::SpaceLanguage::CompiledObject::AddCompiledGlobalVariable(UInt64 id, const CompiledGlobalVariable& cgv)
