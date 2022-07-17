@@ -1,28 +1,28 @@
 pool:
-  vmImage: 'macos-latest'
+    vmImage: "macos-latest"
 
 jobs:
-  - job: 'MacOS_Debug'
-    steps:
-      - template: cmake-template.yml
-        parameters:
-          toolchain: CC=$(brew --prefix llvm@13)/bin/clang CXX=$(brew --prefix llvm@13)/bin/clang++
-          buildType: Debug
-  - job: 'MacOS_Release'
-    steps:
-      - template: cmake-template.yml
-        parameters:
-          toolchain: CC=$(brew --prefix llvm@13)/bin/clang CXX=$(brew --prefix llvm@13)/bin/clang++
-          buildType: Release
-  - job: 'MacOS_RelWithDebInfo'
-    steps:
-      - template: cmake-template.yml
-        parameters:
-          toolchain: CC=$(brew --prefix llvm@13)/bin/clang CXX=$(brew --prefix llvm@13)/bin/clang++
-          buildType: RelWithDebInfo
-  - job: 'MacOS_MinSizeRel'
-    steps:
-      - template: cmake-template.yml
-        parameters:
-          toolchain: CC=$(brew --prefix llvm@13)/bin/clang CXX=$(brew --prefix llvm@13)/bin/clang++
-          buildType: MinSizeRel
+    - job: "MacOS_Debug"
+      steps:
+          - template: cmake-template.yml
+            parameters:
+                toolchain: CC=$(brew --prefix llvm)/bin/clang CXX=$(brew --prefix llvm)/bin/clang++
+                buildType: Debug
+    - job: "MacOS_Release"
+      steps:
+          - template: cmake-template.yml
+            parameters:
+                toolchain: CC=$(brew --prefix llvm)/bin/clang CXX=$(brew --prefix llvm)/bin/clang++
+                buildType: Release
+    - job: "MacOS_RelWithDebInfo"
+      steps:
+          - template: cmake-template.yml
+            parameters:
+                toolchain: CC=$(brew --prefix llvm)/bin/clang CXX=$(brew --prefix llvm)/bin/clang++
+                buildType: RelWithDebInfo
+    - job: "MacOS_MinSizeRel"
+      steps:
+          - template: cmake-template.yml
+            parameters:
+                toolchain: CC=$(brew --prefix llvm)/bin/clang CXX=$(brew --prefix llvm)/bin/clang++
+                buildType: MinSizeRel
