@@ -259,12 +259,22 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	{
 	public:
 		Function() = delete;
+
+		/*!
+		@brief create a external function without operations; 
+		*/
+		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx);
+
+		/*!
+		@brief create a internal function with operations; 
+		*/
 		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations);
 
 		const Vector<const Type*>& GetParameterTypes() const;
 		const Type& GetResultType() const;
 		UInt64 GetIndex() const;
 		const Vector<Operation>& GetOperations() const;
+		bool IsExternal() const;
 
 		Variable ToVariable() const;
 		explicit operator Variable() const;
@@ -277,6 +287,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		const Type* m_pResultType;
 		UInt64 m_Index;
 		Vector<Operation> m_Operations;
+		bool m_IsExternal;
 	};
 }
 

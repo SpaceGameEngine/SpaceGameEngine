@@ -218,6 +218,7 @@ TEST(IntermediateRepresentation_Function, Test)
 	ASSERT_EQ(f1.GetIndex(), 1);
 	ASSERT_EQ(f1.GetOperations().GetSize(), 1);
 	ASSERT_EQ(f1.GetOperations()[0], Operation(OperationType::Push, {Variable(BaseTypes::GetInt32Type(), StorageType::Local, 0)}));
+	ASSERT_FALSE(f1.IsExternal());
 
 	Variable v1 = f1.ToVariable();
 	ASSERT_EQ(v1.GetType(), BaseTypes::GetUInt64Type());
@@ -235,7 +236,14 @@ TEST(IntermediateRepresentation_Function, Test)
 	const IntermediateRepresentation::Function f3({&BaseTypes::GetInt32Type(), &BaseTypes::GetUInt32Type()}, BaseTypes::GetUInt32Type(), 1, operations);
 
 	ASSERT_EQ(f1, f2);
+	ASSERT_FALSE(f2.IsExternal());
 	ASSERT_NE(f1, f3);
+	ASSERT_FALSE(f3.IsExternal());
+
+	const IntermediateRepresentation::Function f4({&BaseTypes::GetInt32Type(), &BaseTypes::GetUInt64Type()}, BaseTypes::GetUInt32Type(), 1);
+
+	ASSERT_NE(f1, f4);
+	ASSERT_TRUE(f4.IsExternal());
 }
 
 TEST(IntermediateRepresentation_RegisterAllocationRequests, Test)
@@ -307,10 +315,15 @@ TEST(IntermediateRepresentation_TranslateUnit, Test)
 	TranslateUnit tu;
 	const Type& t1 = tu.NewType({BaseType::Float, BaseType::Int32});
 	const Variable& v1 = tu.NewGlobalVariable(BaseTypes::GetUInt64Type(), 0);
-	const IntermediateRepresentation::Function& f1 = tu.NewFunction({&t1, &BaseTypes::GetUInt64Type()}, t1, 0, {Operation(OperationType::Push, {v1})});
+	const IntermediateRepresentation::Function& f1 = tu.NewInternalFunction({&t1, &BaseTypes::GetUInt64Type()}, t1, 0, {Operation(OperationType::Push, {v1})});
+	const IntermediateRepresentation::Function& f2 = tu.NewExternalFunction({&t1, &BaseTypes::GetUInt64Type()}, t1, 1);
 
 	ASSERT_EQ(tu.GetGlobalVariable(0), v1);
 	ASSERT_EQ(tu.GetFunction(0), f1);
+	ASSERT_EQ(tu.GetFunction(1), f2);
+
+	ASSERT_FALSE(f1.IsExternal());
+	ASSERT_TRUE(f2.IsExternal());
 }
 
 TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
@@ -318,252 +331,252 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 	using namespace IntermediateRepresentation;
 
 	TranslateUnit tu1;
-	tu1.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::Set, {Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 0), Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 0), Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 0)}),
-													 });
+	tu1.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::Set, {Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 0), Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 0), Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 0)}),
+															 });
 	ASSERT_FALSE(IsValidTranslateUnit(tu1));
 	tu1.NewGlobalVariable(BaseTypes::GetUInt64Type(), 0);
 	ASSERT_TRUE(IsValidTranslateUnit(tu1));
 
 	TranslateUnit tu2;
-	tu2.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-													 });
+	tu2.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+															 });
 	ASSERT_FALSE(IsValidTranslateUnit(tu2));
 
 	TranslateUnit tu3;
-	tu3.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-														 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-													 });
+	tu3.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+																 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+															 });
 	ASSERT_FALSE(IsValidTranslateUnit(tu3));
 
 	TranslateUnit tu4;
-	tu4.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-													 });
+	tu4.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+															 });
 	ASSERT_FALSE(IsValidTranslateUnit(tu4));
 
 	TranslateUnit tu5;
-	tu5.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-													 });
+	tu5.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+															 });
 	ASSERT_FALSE(IsValidTranslateUnit(tu5));
 
 	TranslateUnit tu6;
-	tu6.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-														 Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-														 Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetInt64Type(), StorageType::Local, 0)}),
-													 });
+	tu6.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+																 Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+																 Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetInt64Type(), StorageType::Local, 0)}),
+															 });
 	ASSERT_FALSE(IsValidTranslateUnit(tu6));
 
 	TranslateUnit tu7;
-	tu7.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-														 Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-														 Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
-													 });
+	tu7.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::NewLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+																 Operation(OperationType::Push, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+																 Operation(OperationType::DeleteLocal, {Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0)}),
+															 });
 	ASSERT_TRUE(IsValidTranslateUnit(tu7));
 
 	TranslateUnit tu8;
-	tu8.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-														 Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-														 Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
-														 Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
-													 });
+	tu8.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+																 Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+																 Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
+																 Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
+															 });
 	ASSERT_TRUE(IsValidTranslateUnit(tu8));
 
 	TranslateUnit tu9;
-	tu9.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														 Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-														 Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
-													 });
+	tu9.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																 Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+																 Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
+															 });
 	ASSERT_FALSE(IsValidTranslateUnit(tu9));
 
 	TranslateUnit tu10;
-	tu10.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-														  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-														  Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-													  });
+	tu10.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+																  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+																  Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu10));
 
 	TranslateUnit tu11;
 	tu11.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu11.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-														  Operation(OperationType::If, {Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0), Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-														  Operation(OperationType::If, {Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0), Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
-														  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
-													  });
+	tu11.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+																  Operation(OperationType::If, {Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0), Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+																  Operation(OperationType::If, {Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0), Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
+																  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
+															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu11));
 
 	TranslateUnit tu12;
 	tu12.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu12.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
-														  Operation(OperationType::If, {Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0), Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
-													  });
+	tu12.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
+																  Operation(OperationType::If, {Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0), Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu12));
 
 	TranslateUnit tu13;
-	tu13.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::Call, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
-													  });
-	tu13.NewFunction({}, BaseTypes::GetVoidType(), 1, {});
+	tu13.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::Call, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
+															  });
+	tu13.NewInternalFunction({}, BaseTypes::GetVoidType(), 1, {});
 	ASSERT_TRUE(IsValidTranslateUnit(tu13));
 
 	TranslateUnit tu14;
-	tu14.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::Call, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
-													  });
+	tu14.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::Call, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu14));
 
 	TranslateUnit tu15;
 	tu15.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu15.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::ExternalCallArgument, {
-																											 Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0),
-																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
-																										 }),
-													  });
+	tu15.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::ExternalCallArgument, {
+																													 Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0),
+																													 Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																												 }),
+															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu15));
 
 	TranslateUnit tu16;
 	tu16.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu16.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::ExternalCallArgument, {
-																											 Variable(BaseTypes::GetVoidType(), StorageType::Constant, 456),
-																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
-																										 }),
-													  });
+	tu16.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::ExternalCallArgument, {
+																													 Variable(BaseTypes::GetVoidType(), StorageType::Constant, 456),
+																													 Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																												 }),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu16));
 
 	TranslateUnit tu17;
 	tu17.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu17.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::MakeReference, {
-																									  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
-																									  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
-																								  }),
-														  Operation(OperationType::Push, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
-													  });
+	tu17.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu17));
 
 	TranslateUnit tu18;
 	tu18.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu18.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::MakeReference, {
-																									  Variable(BaseTypes::GetInt16Type(), StorageType::Reference, 0),
-																									  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
-																								  }),
-														  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
-													  });
+	tu18.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt16Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu18));
 
 	TranslateUnit tu19;
 	tu19.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu19.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::MakeReference, {
-																									  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
-																									  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
-																								  }),
-														  Operation(OperationType::MakeReference, {
-																									  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
-																									  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
-																								  }),
-														  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
-													  });
+	tu19.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu19));
 
 	TranslateUnit tu20;
 	tu20.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu20.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::MakeReference, {
-																									  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
-																									  Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 1),
-																								  }),
-														  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
-													  });
+	tu20.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 1),
+																										  }),
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu20));
 
 	TranslateUnit tu21;
 	tu21.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu21.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
-													  });
+	tu21.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu21));
 
 	TranslateUnit tu22;
 	tu22.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
 	tu22.NewGlobalVariable(BaseTypes::GetUInt64Type(), 1);
-	tu22.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::GetAddress, {
-																								   Variable(BaseTypes::GetInt64Type(), StorageType::Global, 1),
-																								   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
-																							   }),
-													  });
+	tu22.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::GetAddress, {
+																										   Variable(BaseTypes::GetInt64Type(), StorageType::Global, 1),
+																										   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
+																									   }),
+															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu22));
 
 	TranslateUnit tu23;
 	tu23.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
 	tu23.NewGlobalVariable(BaseTypes::GetUInt64Type(), 1);
-	tu23.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::GetAddress, {
-																								   Variable(BaseTypes::GetUInt32Type(), StorageType::Global, 1),
-																								   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
-																							   }),
-													  });
+	tu23.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::GetAddress, {
+																										   Variable(BaseTypes::GetUInt32Type(), StorageType::Global, 1),
+																										   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
+																									   }),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu23));
 
 	TranslateUnit tu24;
 	tu24.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
 	tu24.NewGlobalVariable(BaseTypes::GetUInt64Type(), 1);
-	tu24.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::GetAddress, {
-																								   Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
-																								   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
-																							   }),
-														  Operation(OperationType::GetReference, {
-																									 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
-																									 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
-																								 }),
-													  });
+	tu24.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::GetAddress, {
+																										   Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
+																									   }),
+																  Operation(OperationType::GetReference, {
+																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
+																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										 }),
+															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu24));
 
 	TranslateUnit tu25;
 	tu25.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
 	tu25.NewGlobalVariable(BaseTypes::GetUInt64Type(), 1);
-	tu25.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::GetAddress, {
-																								   Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
-																								   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
-																							   }),
-														  Operation(OperationType::GetReference, {
-																									 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
-																									 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
-																								 }),
-														  Operation(OperationType::GetReference, {
-																									 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
-																									 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
-																								 }),
-													  });
+	tu25.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::GetAddress, {
+																										   Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
+																									   }),
+																  Operation(OperationType::GetReference, {
+																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
+																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										 }),
+																  Operation(OperationType::GetReference, {
+																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
+																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										 }),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu25));
 
 	TranslateUnit tu26;
 	tu26.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
 	tu26.NewGlobalVariable(BaseTypes::GetUInt64Type(), 1);
-	tu26.NewFunction({}, BaseTypes::GetVoidType(), 0, {
-														  Operation(OperationType::GetAddress, {
-																								   Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
-																								   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
-																							   }),
-														  Operation(OperationType::GetReference, {
-																									 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
-																									 Variable(BaseTypes::GetUInt64Type(), StorageType::Reference, 1),
-																								 }),
-													  });
+	tu26.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::GetAddress, {
+																										   Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
+																									   }),
+																  Operation(OperationType::GetReference, {
+																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
+																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Reference, 1),
+																										 }),
+															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu26));
 }

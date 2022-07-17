@@ -342,8 +342,17 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperatio
 	return false;
 }
 
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx)
+	: m_ParameterTypes(parameter_types), m_pResultType(&result_type), m_Index(idx), m_IsExternal(true)
+{
+	for (auto iter = m_ParameterTypes.GetConstBegin(); iter != m_ParameterTypes.GetConstEnd(); ++iter)
+		SGE_ASSERT(NullPointerError, *iter);
+	for (auto iter = m_Operations.GetConstBegin(); iter != m_Operations.GetConstEnd(); ++iter)
+		SGE_ASSERT(InvalidOperationError, *iter);
+}
+
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations)
-	: m_ParameterTypes(parameter_types), m_pResultType(&result_type), m_Index(idx), m_Operations(operations)
+	: m_ParameterTypes(parameter_types), m_pResultType(&result_type), m_Index(idx), m_Operations(operations), m_IsExternal(false)
 {
 	for (auto iter = m_ParameterTypes.GetConstBegin(); iter != m_ParameterTypes.GetConstEnd(); ++iter)
 		SGE_ASSERT(NullPointerError, *iter);
@@ -371,6 +380,11 @@ const Vector<Operation>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentat
 	return m_Operations;
 }
 
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::IsExternal() const
+{
+	return m_IsExternal;
+}
+
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::ToVariable() const
 {
 	return Variable(BaseTypes::GetUInt64Type(), StorageType::Function, m_Index);
@@ -383,10 +397,10 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::operator V
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::operator==(const IntermediateRepresentation::Function& func) const
 {
-	return m_ParameterTypes == func.m_ParameterTypes && *m_pResultType == *(func.m_pResultType) && m_Index == func.m_Index && m_Operations == func.m_Operations;
+	return m_ParameterTypes == func.m_ParameterTypes && *m_pResultType == *(func.m_pResultType) && m_Index == func.m_Index && m_Operations == func.m_Operations && m_IsExternal == func.m_IsExternal;
 }
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::operator!=(const IntermediateRepresentation::Function& func) const
 {
-	return m_ParameterTypes != func.m_ParameterTypes || *m_pResultType != *(func.m_pResultType) || m_Index != func.m_Index || m_Operations != func.m_Operations;
+	return m_ParameterTypes != func.m_ParameterTypes || *m_pResultType != *(func.m_pResultType) || m_Index != func.m_Index || m_Operations != func.m_Operations || m_IsExternal != func.m_IsExternal;
 }

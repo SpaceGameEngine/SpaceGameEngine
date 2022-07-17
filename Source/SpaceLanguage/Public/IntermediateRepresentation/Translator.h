@@ -47,7 +47,8 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		const Type& NewType(std::initializer_list<BaseType> bts);
 		const Type& NewType(const Vector<BaseType>& bts);
 		const Variable& NewGlobalVariable(const Type& type, SizeType idx);
-		const Function& NewFunction(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations);
+		const Function& NewInternalFunction(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations);
+		const Function& NewExternalFunction(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx);
 
 		const Variable& GetGlobalVariable(UInt64 idx) const;
 		const Function& GetFunction(UInt64 idx) const;

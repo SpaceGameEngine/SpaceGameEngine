@@ -50,10 +50,16 @@ const Variable& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Tran
 	return *(m_GlobalVariables.Insert(idx, DefaultAllocator::New<Variable>(type, StorageType::Global, idx)).m_First->m_Second);
 }
 
-const IntermediateRepresentation::Function& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::NewFunction(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations)
+const IntermediateRepresentation::Function& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::NewInternalFunction(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations)
 {
 	SGE_ASSERT(FunctionAlreadyExistError, m_Functions.Find(idx), m_Functions.GetConstEnd());
 	return *(m_Functions.Insert(idx, DefaultAllocator::New<IntermediateRepresentation::Function>(parameter_types, result_type, idx, operations)).m_First->m_Second);
+}
+
+const IntermediateRepresentation::Function& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::NewExternalFunction(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx)
+{
+	SGE_ASSERT(FunctionAlreadyExistError, m_Functions.Find(idx), m_Functions.GetConstEnd());
+	return *(m_Functions.Insert(idx, DefaultAllocator::New<IntermediateRepresentation::Function>(parameter_types, result_type, idx)).m_First->m_Second);
 }
 
 const Variable& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::TranslateUnit::GetGlobalVariable(UInt64 idx) const
