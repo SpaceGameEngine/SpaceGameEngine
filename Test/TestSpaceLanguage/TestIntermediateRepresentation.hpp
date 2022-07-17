@@ -242,15 +242,42 @@ TEST(IntermediateRepresentation_RegisterAllocationRequests, Test)
 {
 	using namespace IntermediateRepresentation;
 	RegisterAllocationRequests reqs;
-	reqs.AddRegisterAllocationRequest(123, 100);
-	reqs.AddRegisterAllocationRequest(456, 300);
-	reqs.AddRegisterAllocationRequest(123, 500);
+	reqs.AddRegisterAllocationRequest(0, 100, 123);
+	reqs.AddRegisterAllocationRequest(0, 300, 456);
+	reqs.AddRegisterAllocationRequest(0, 500, 123);
+	reqs.AddFunctionCall(0, 200, FunctionCallType::Internal, 1);
+	reqs.AddFunctionCall(0, 400, FunctionCallType::External, 2);
+	reqs.AddFunctionCall(0, 600, FunctionCallType::FunctionPointer, 0);
+
 	const auto& reqs_ref = reqs.GetRequests();
-	ASSERT_EQ(reqs_ref.Find(123)->m_Second.GetSize(), 2);
-	ASSERT_EQ(reqs_ref.Find(123)->m_Second.GetConstBegin()->m_First, 100);
-	ASSERT_EQ((reqs_ref.Find(123)->m_Second.GetConstBegin() + 1)->m_First, 500);
-	ASSERT_EQ(reqs_ref.Find(456)->m_Second.GetSize(), 1);
-	ASSERT_EQ(reqs_ref.Find(456)->m_Second.GetConstBegin()->m_First, 300);
+	ASSERT_EQ(reqs_ref.GetSize(), 1);
+	ASSERT_EQ(reqs_ref.Find(0)->m_Second.Find(123)->m_Second.GetSize(), 2);
+	ASSERT_EQ(reqs_ref.Find(0)->m_Second.Find(123)->m_Second.GetConstBegin()->m_First, 100);
+	ASSERT_EQ((reqs_ref.Find(0)->m_Second.Find(123)->m_Second.GetConstBegin() + 1)->m_First, 500);
+	ASSERT_EQ(reqs_ref.Find(0)->m_Second.Find(456)->m_Second.GetSize(), 1);
+	ASSERT_EQ(reqs_ref.Find(0)->m_Second.Find(456)->m_Second.GetConstBegin()->m_First, 300);
+	ASSERT_EQ(reqs_ref.Find(1), reqs_ref.GetConstEnd());
+
+	const auto& func_call_record_ref = reqs.GetFunctionCallRecords();
+	ASSERT_EQ(func_call_record_ref.GetSize(), 1);
+	ASSERT_EQ(func_call_record_ref.Find(0)->m_Second.GetSize(), 3);
+	ASSERT_EQ(func_call_record_ref.Find(0)->m_Second.GetConstBegin()->m_First, 200);
+	ASSERT_EQ(func_call_record_ref.Find(0)->m_Second.GetConstBegin()->m_Second.m_First, FunctionCallType::Internal);
+	ASSERT_EQ(func_call_record_ref.Find(0)->m_Second.GetConstBegin()->m_Second.m_Second, 1);
+	ASSERT_EQ((func_call_record_ref.Find(0)->m_Second.GetConstBegin() + 1)->m_First, 400);
+	ASSERT_EQ((func_call_record_ref.Find(0)->m_Second.GetConstBegin() + 1)->m_Second.m_First, FunctionCallType::External);
+	ASSERT_EQ((func_call_record_ref.Find(0)->m_Second.GetConstBegin() + 1)->m_Second.m_Second, 2);
+	ASSERT_EQ((func_call_record_ref.Find(0)->m_Second.GetConstBegin() + 2)->m_First, 600);
+	ASSERT_EQ((func_call_record_ref.Find(0)->m_Second.GetConstBegin() + 2)->m_Second.m_First, FunctionCallType::FunctionPointer);
+	ASSERT_EQ((func_call_record_ref.Find(0)->m_Second.GetConstBegin() + 2)->m_Second.m_Second, 0);
+	ASSERT_EQ(func_call_record_ref.Find(1), func_call_record_ref.GetConstEnd());
+
+	const auto& internal_func_relation_ref = reqs.GetInternalFunctionCallRelationships();
+	ASSERT_EQ(internal_func_relation_ref.GetSize(), 1);
+	ASSERT_EQ(internal_func_relation_ref.Find(0)->m_Second.GetSize(), 1);
+	ASSERT_EQ(internal_func_relation_ref.Find(0)->m_Second.Find(1)->m_First, 1);
+	ASSERT_EQ(internal_func_relation_ref.Find(0)->m_Second.Find(1)->m_Second, true);
+	ASSERT_EQ(internal_func_relation_ref.Find(1), internal_func_relation_ref.GetConstEnd());
 }
 
 TEST(IntermediateRepresentation_RegisterAllocationResults, Test)

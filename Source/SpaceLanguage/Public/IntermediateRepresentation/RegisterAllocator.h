@@ -61,26 +61,63 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		UInt64 m_CommonRegisterIndex;
 	};
 
+	enum class FunctionCallType : UInt8
+	{
+		Internal = 0,
+		External = 1,
+		FunctionPointer = 2
+	};
+
+	struct InvalidFunctionCallTypeError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The FunctionCallType is invalid.");
+		static SPACE_LANGUAGE_API bool Judge(FunctionCallType fc_type);
+	};
+
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API MapImplement::RedBlackTree<UInt64, bool>;
 	template class SPACE_LANGUAGE_API Map<UInt64, bool>;
 	template class SPACE_LANGUAGE_API HashMap<UInt64, Map<UInt64, bool>>;
+	template class SPACE_LANGUAGE_API HashMap<UInt64, HashMap<UInt64, Map<UInt64, bool>>>;
+
+	template struct SPACE_LANGUAGE_API Pair<FunctionCallType, UInt64>;
+	template class SPACE_LANGUAGE_API MapImplement::RedBlackTree<UInt64, Pair<FunctionCallType, UInt64>>;
+	template class SPACE_LANGUAGE_API Map<UInt64, Pair<FunctionCallType, UInt64>>;
+	template class SPACE_LANGUAGE_API HashMap<UInt64, Map<UInt64, Pair<FunctionCallType, UInt64>>>;
+
+	template class SPACE_LANGUAGE_API HashMap<UInt64, bool>;
+	template class SPACE_LANGUAGE_API HashMap<UInt64, HashMap<UInt64, bool>>;
 #endif
 
 	class SPACE_LANGUAGE_API RegisterAllocationRequests
 	{
 	public:
-		void AddRegisterAllocationRequest(UInt64 virtual_register_id, UInt64 operation_id);
-		const HashMap<UInt64, Map<UInt64, bool>>& GetRequests() const;
+		void AddRegisterAllocationRequest(UInt64 func_id, UInt64 operation_id, UInt64 virtual_register_id);
+		const HashMap<UInt64, HashMap<UInt64, Map<UInt64, bool>>>& GetRequests() const;
+
+		/*!
+		@note when fc_type is FunctionCallType::FunctionPointer, the parameter target_func_id is useless.
+		*/
+		void AddFunctionCall(UInt64 func_id, UInt64 operation_id, FunctionCallType fc_type, UInt64 target_func_id);
+		const HashMap<UInt64, Map<UInt64, Pair<FunctionCallType, UInt64>>>& GetFunctionCallRecords() const;
+		const HashMap<UInt64, HashMap<UInt64, bool>>& GetInternalFunctionCallRelationships() const;
 
 	private:
-		HashMap<UInt64, Map<UInt64, bool>> m_Content;
+		HashMap<UInt64, HashMap<UInt64, Map<UInt64, bool>>> m_Content;						   //func_id, virtual_register_id, operation_id
+		HashMap<UInt64, Map<UInt64, Pair<FunctionCallType, UInt64>>> m_FunctionCallRecords;	   //func_id, operation_id, <func_call_type, func_id(target)>
+		HashMap<UInt64, HashMap<UInt64, bool>> m_InternalFunctionCallRelationships;			   //func_id, func_id(target)
 	};
 
 	struct RegisterAllocationRequestAlreadyExistError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The RegisterAllocationRequest has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const Map<UInt64, bool>::ConstIterator& citer, const Map<UInt64, bool>::ConstIterator& cend);
+	};
+
+	struct FunctionCallRecordAlreadyExistError
+	{
+		inline static const TChar sm_pContent[] = SGE_TSTR("The FunctionCallRecord has already existed.");
+		static SPACE_LANGUAGE_API bool Judge(const Map<UInt64, Pair<FunctionCallType, UInt64>>::ConstIterator& citer, const Map<UInt64, Pair<FunctionCallType, UInt64>>::ConstIterator& cend);
 	};
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)

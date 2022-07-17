@@ -49,19 +49,52 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocat
 	return m_State != result.m_State || m_CommonRegisterIndex != result.m_CommonRegisterIndex;
 }
 
-void SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationRequests::AddRegisterAllocationRequest(UInt64 virtual_register_id, UInt64 operation_id)
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidFunctionCallTypeError::Judge(FunctionCallType fc_type)
 {
-	Map<UInt64, bool>& map = m_Content[virtual_register_id];
+	return (UInt8)fc_type > 2;
+}
+
+void SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationRequests::AddRegisterAllocationRequest(UInt64 func_id, UInt64 operation_id, UInt64 virtual_register_id)
+{
+	Map<UInt64, bool>& map = m_Content[func_id][virtual_register_id];
 	SGE_ASSERT(RegisterAllocationRequestAlreadyExistError, map.Find(operation_id), map.GetConstEnd());
 	map.Insert(operation_id, true);
 }
 
-const HashMap<UInt64, Map<UInt64, bool>>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationRequests::GetRequests() const
+const HashMap<UInt64, HashMap<UInt64, Map<UInt64, bool>>>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationRequests::GetRequests() const
 {
 	return m_Content;
 }
 
+void SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationRequests::AddFunctionCall(UInt64 func_id, UInt64 operation_id, FunctionCallType fc_type, UInt64 target_func_id)
+{
+	Map<UInt64, Pair<FunctionCallType, UInt64>>& map = m_FunctionCallRecords[func_id];
+	SGE_ASSERT(FunctionCallRecordAlreadyExistError, map.Find(operation_id), map.GetConstEnd());
+	map.Insert(operation_id, Pair<FunctionCallType, UInt64>(fc_type, target_func_id));
+	if (fc_type == FunctionCallType::Internal)
+	{
+		HashMap<UInt64, bool>& relation_map = m_InternalFunctionCallRelationships[func_id];
+		if (relation_map.Find(target_func_id) == relation_map.GetConstEnd())
+			relation_map.Insert(target_func_id, true);
+	}
+}
+
+const HashMap<UInt64, Map<UInt64, Pair<FunctionCallType, UInt64>>>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationRequests::GetFunctionCallRecords() const
+{
+	return m_FunctionCallRecords;
+}
+
+const HashMap<UInt64, HashMap<UInt64, bool>>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationRequests::GetInternalFunctionCallRelationships() const
+{
+	return m_InternalFunctionCallRelationships;
+}
+
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocationRequestAlreadyExistError::Judge(const Map<UInt64, bool>::ConstIterator& citer, const Map<UInt64, bool>::ConstIterator& cend)
+{
+	return citer != cend;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::FunctionCallRecordAlreadyExistError::Judge(const Map<UInt64, Pair<FunctionCallType, UInt64>>::ConstIterator& citer, const Map<UInt64, Pair<FunctionCallType, UInt64>>::ConstIterator& cend)
 {
 	return citer != cend;
 }
