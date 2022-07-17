@@ -156,6 +156,7 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Goto), Vector<UInt8>({StorageTypeMasks::Constant}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::If), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Call), Vector<UInt8>({StorageTypeMasks::Constant}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::CallFunctionPointer), Vector<UInt8>({StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Return), Vector<UInt8>({StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCallArgument), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCall), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
@@ -175,6 +176,7 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Goto), SGE_STR("Goto"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::If), SGE_STR("If"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Call), SGE_STR("Call"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::CallFunctionPointer), SGE_STR("CallFunctionPointer"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Return), SGE_STR("Return"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ExternalCallArgument), SGE_STR("ExternalCallArgument"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ExternalCall), SGE_STR("ExternalCall"));

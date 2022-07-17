@@ -275,6 +275,7 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::Op
 		  OPERATION_TYPE(Goto, StorageTypeMasks::Constant),
 		  OPERATION_TYPE(If, StorageTypeMasks::Variable, StorageTypeMasks::Constant),
 		  OPERATION_TYPE(Call, StorageTypeMasks::Constant),
+		  OPERATION_TYPE(CallFunctionPointer, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(Return, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(ExternalCallArgument, StorageTypeMasks::Constant, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(ExternalCall, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
