@@ -145,6 +145,13 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 				}
 				reference_map.Insert(operation_arguments[0].GetIndex(), operation_arguments[0].GetType());
 			}
+			else if (oiter->GetType() == OperationType::ReleaseReference)
+			{
+				auto riter = reference_map.Find(operation_arguments[0].GetIndex());
+				if ((riter == reference_map.GetConstEnd()) || (operation_arguments[0].GetType() != riter->m_Second))
+					return false;
+				reference_map.Remove(riter);
+			}
 			else
 			{
 				for (auto aiter = operation_arguments.GetConstBegin(); aiter != operation_arguments.GetConstEnd(); ++aiter)
@@ -220,6 +227,8 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 			}
 		}
 		if (local_map.GetSize())
+			return false;
+		if (reference_map.GetSize())
 			return false;
 		for (auto liter = label_requests.GetConstBegin(); liter != label_requests.GetConstEnd(); ++liter)
 		{

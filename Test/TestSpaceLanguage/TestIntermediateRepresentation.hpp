@@ -164,6 +164,7 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::MakeReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetAddress), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ReleaseReference), Vector<UInt8>({StorageTypeMasks::Reference}));
 	//todo
 
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Set), SGE_STR("Set"));
@@ -184,6 +185,7 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::MakeReference), SGE_STR("MakeReference"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetAddress), SGE_STR("GetAddress"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetReference), SGE_STR("GetReference"));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ReleaseReference), SGE_STR("ReleaseReference"));
 	//todo
 }
 
@@ -462,6 +464,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
 																										  }),
 																  Operation(OperationType::Push, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
 															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu17));
 
@@ -473,6 +476,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
 																										  }),
 																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt16Type(), StorageType::Reference, 0)}),
 															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu18));
 
@@ -488,6 +492,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
 																										  }),
 																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
 															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu19));
 
@@ -499,6 +504,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 1),
 																										  }),
 																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
 															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu20));
 
@@ -506,6 +512,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 	tu21.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
 	tu21.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
 																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
 															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu21));
 
@@ -543,6 +550,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
 																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
 																										 }),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
 															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu24));
 
@@ -562,6 +570,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
 																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
 																										 }),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
 															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu25));
 
@@ -577,6 +586,82 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
 																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Reference, 1),
 																										 }),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetUInt64Type(), StorageType::Reference, 1)}),
 															  });
 	ASSERT_FALSE(IsValidTranslateUnit(tu26));
+
+	TranslateUnit tu27;
+	tu27.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
+	tu27.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+															  });
+	ASSERT_FALSE(IsValidTranslateUnit(tu27));
+
+	TranslateUnit tu28;
+	tu28.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
+	tu28.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+															  });
+	ASSERT_FALSE(IsValidTranslateUnit(tu28));
+
+	TranslateUnit tu29;
+	tu29.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
+	tu29.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+															  });
+	ASSERT_FALSE(IsValidTranslateUnit(tu29));
+
+	TranslateUnit tu30;
+	tu30.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
+	tu30.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::MakeReference, {
+																											  Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0),
+																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
+																										  }),
+																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
+															  });
+	ASSERT_TRUE(IsValidTranslateUnit(tu30));
+
+	TranslateUnit tu31;
+	tu31.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
+	tu31.NewGlobalVariable(BaseTypes::GetUInt64Type(), 1);
+	tu31.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
+																  Operation(OperationType::GetAddress, {
+																										   Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
+																									   }),
+																  Operation(OperationType::GetReference, {
+																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
+																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										 }),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+																  Operation(OperationType::GetReference, {
+																											 Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0),
+																											 Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+																										 }),
+																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetUInt8Type(), StorageType::Reference, 0)}),
+															  });
+	ASSERT_TRUE(IsValidTranslateUnit(tu31));
 }

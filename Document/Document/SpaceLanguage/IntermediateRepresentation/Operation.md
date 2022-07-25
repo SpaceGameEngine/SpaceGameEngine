@@ -24,3 +24,4 @@
 |MakeReference|Reference(dst) Variable(src)|创建一个引用与给定变量绑定|
 |GetAddress|Variable(dst) Variable(src)|获取一个变量的地址|
 |GetReference|Reference(dst) Variable(src)|创建一个引用与给定变量所指向的变量绑定|
+|ReleaseReference|Reference|释放一个引用|

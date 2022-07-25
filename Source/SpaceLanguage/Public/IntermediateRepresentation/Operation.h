@@ -191,10 +191,11 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		MakeReference = 15,
 		GetAddress = 16,
 		GetReference = 17,
+		ReleaseReference = 18,
 		//todo
 	};
 
-	inline constexpr const SizeType OperationTypeSetSize = 18;
+	inline constexpr const SizeType OperationTypeSetSize = 19;
 
 	struct InvalidOperationTypeError
 	{

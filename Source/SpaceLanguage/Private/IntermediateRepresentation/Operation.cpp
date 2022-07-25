@@ -283,6 +283,7 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::Op
 		  OPERATION_TYPE(MakeReference, StorageTypeMasks::Reference, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(GetAddress, StorageTypeMasks::Variable, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(GetReference, StorageTypeMasks::Reference, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(ReleaseReference, StorageTypeMasks::Reference),
 		  //todo
 	  })
 {
