@@ -18,6 +18,7 @@
 |Call|Const(function)|调用函数，函数参数需要用Push提前推入栈中|
 |CallFunctionPointer|Variable(function pointer)|用函数指针调用函数，函数参数需要用Push提前推入栈中|
 |Return|Variable(value)|函数返回返回值|
+|ReturnVoid||函数返回空|
 |ExternalCallArgument|Const(i) Variable(value)|设置外部调用的第i个参数|
 |ExternalCall|Const(module) Const(function)|进行外部调用|
 |GetReturnValue|Variable(dst)|获取函数(包括外部调用)返回值|
