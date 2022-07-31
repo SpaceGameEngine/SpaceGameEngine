@@ -115,23 +115,27 @@ namespace SpaceGameEngine
 		}
 
 		inline List(std::initializer_list<T> ilist)
+			: m_pHead(nullptr), m_pTail(nullptr), m_Size(0)
 		{
-			SGE_ASSERT(InvalidValueError, ilist.size(), 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, ilist.size(), 0, sm_MaxSize);
 
-			auto aiter = ilist.begin();
-			m_pHead = Allocator::template New<Node>(*aiter);
-			m_pTail = m_pHead;
-			++aiter;
-
-			for (; aiter != ilist.end(); ++aiter)
+			if (ilist.size())
 			{
-				Node* pnb = Allocator::template New<Node>(*aiter);
-				m_pTail->m_pNext = pnb;
-				pnb->m_pPrevious = m_pTail;
-				m_pTail = pnb;
-			}
+				auto aiter = ilist.begin();
+				m_pHead = Allocator::template New<Node>(*aiter);
+				m_pTail = m_pHead;
+				++aiter;
 
-			m_Size = ilist.size();
+				for (; aiter != ilist.end(); ++aiter)
+				{
+					Node* pnb = Allocator::template New<Node>(*aiter);
+					m_pTail->m_pNext = pnb;
+					pnb->m_pPrevious = m_pTail;
+					m_pTail = pnb;
+				}
+
+				m_Size = ilist.size();
+			}
 		}
 
 		inline List(const List& l)
@@ -1127,65 +1131,68 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, std::initializer_list<T> ilist)
 		{
-			SGE_ASSERT(InvalidValueError, ilist.size(), 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, ilist.size(), 0, sm_MaxSize);
 
-			auto aiter = ilist.begin();
-			Node* pnhead = Allocator::template New<Node>(*aiter);
-			Node* pntail = pnhead;
-			++aiter;
-
-			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+			if (ilist.size())
 			{
-				for (; aiter != ilist.end(); ++aiter)
+				auto aiter = ilist.begin();
+				Node* pnhead = Allocator::template New<Node>(*aiter);
+				Node* pntail = pnhead;
+				++aiter;
+
+				if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 				{
-					Node* pnb = Allocator::template New<Node>(*aiter);
-					pntail->m_pNext = pnb;
-					pnb->m_pPrevious = pntail;
-					pntail = pnb;
+					for (; aiter != ilist.end(); ++aiter)
+					{
+						Node* pnb = Allocator::template New<Node>(*aiter);
+						pntail->m_pNext = pnb;
+						pnb->m_pPrevious = pntail;
+						pntail = pnb;
+					}
 				}
-			}
-			else	//reverse
-			{
-				for (; aiter != ilist.end(); ++aiter)
+				else	//reverse
 				{
-					Node* pnb = Allocator::template New<Node>(*aiter);
-					pnhead->m_pPrevious = pnb;
-					pnb->m_pNext = pnhead;
-					pnhead = pnb;
+					for (; aiter != ilist.end(); ++aiter)
+					{
+						Node* pnb = Allocator::template New<Node>(*aiter);
+						pnhead->m_pPrevious = pnb;
+						pnb->m_pNext = pnhead;
+						pnhead = pnb;
+					}
 				}
+
+				m_Size += ilist.size();
+				IteratorType biter = iter - 1;
+				Node* pfwd = nullptr;
+				Node* pbck = nullptr;
+				if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+				{
+					pfwd = (Node*)iter.m_pNode;
+					pbck = (Node*)biter.m_pNode;
+				}
+				else	//Reverse
+				{
+					pfwd = (Node*)biter.m_pNode;
+					pbck = (Node*)iter.m_pNode;
+				}
+				pntail->m_pNext = pfwd;
+				pnhead->m_pPrevious = pbck;
+
+				if (pfwd)
+					pfwd->m_pPrevious = pntail;
+				else
+					m_pTail = pntail;
+
+				if (pbck)
+					pbck->m_pNext = pnhead;
+				else
+					m_pHead = pnhead;
+
+				if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
+					return IteratorType(pnhead, m_pHead, m_pTail);
+				else	//reverse
+					return IteratorType(pntail, m_pHead, m_pTail);
 			}
-
-			m_Size += ilist.size();
-			IteratorType biter = iter - 1;
-			Node* pfwd = nullptr;
-			Node* pbck = nullptr;
-			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
-			{
-				pfwd = (Node*)iter.m_pNode;
-				pbck = (Node*)biter.m_pNode;
-			}
-			else	//Reverse
-			{
-				pfwd = (Node*)biter.m_pNode;
-				pbck = (Node*)iter.m_pNode;
-			}
-			pntail->m_pNext = pfwd;
-			pnhead->m_pPrevious = pbck;
-
-			if (pfwd)
-				pfwd->m_pPrevious = pntail;
-			else
-				m_pTail = pntail;
-
-			if (pbck)
-				pbck->m_pNext = pnhead;
-			else
-				m_pHead = pnhead;
-
-			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
-				return IteratorType(pnhead, m_pHead, m_pTail);
-			else	//reverse
-				return IteratorType(pntail, m_pHead, m_pTail);
 		}
 
 		inline void PopBack()

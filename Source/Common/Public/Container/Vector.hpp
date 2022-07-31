@@ -533,20 +533,31 @@ namespace SpaceGameEngine
 
 		inline Vector(std::initializer_list<T> ilist)
 		{
-			m_Size = ilist.size();
-			m_RealSize = ilist.size() * 2;
-			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
-			if constexpr (IsTrivial<T>)
+			SGE_ASSERT(InvalidValueError, ilist.size(), 0, sm_MaxSize);
+
+			if (ilist.size())
 			{
-				std::memcpy(m_pContent, ilist.begin(), m_Size * sizeof(T));
+				m_Size = ilist.size();
+				m_RealSize = ilist.size() * 2;
+				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
+				if constexpr (IsTrivial<T>)
+				{
+					std::memcpy(m_pContent, ilist.begin(), m_Size * sizeof(T));
+				}
+				else
+				{
+					auto iter = ilist.begin();
+					for (SizeType i = 0; i < m_Size; i++, ++iter)
+					{
+						new ((T*)(m_pContent) + i) T(*iter);
+					}
+				}
 			}
 			else
 			{
-				auto iter = ilist.begin();
-				for (SizeType i = 0; i < m_Size; i++, ++iter)
-				{
-					new ((T*)(m_pContent) + i) T(*iter);
-				}
+				m_RealSize = 4;
+				m_Size = 0;
+				m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
 			}
 		}
 
@@ -1664,126 +1675,131 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsVectorIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, std::initializer_list<T> ilist)
 		{
+			SizeType size = ilist.size();
+			SGE_ASSERT(InvalidValueError, m_Size + size, m_Size, sm_MaxSize);
+
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
-				SizeType size = ilist.size();
-				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
-				SizeType index = iter - IteratorType::GetBegin(*this);
-				if (index == m_Size)
+				if (size)
 				{
-					if (m_Size + size > m_RealSize)
+					SizeType index = iter - IteratorType::GetBegin(*this);
+					if (index == m_Size)
 					{
-						SetRealSize(2 * (m_Size + size));
-					}
+						if (m_Size + size > m_RealSize)
+						{
+							SetRealSize(2 * (m_Size + size));
+						}
 
-					auto aiter = ilist.begin();
-					for (SizeType i = m_Size; i < m_Size + size; i++, aiter += 1)
-					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
-					}
-					m_Size += size;
+						auto aiter = ilist.begin();
+						for (SizeType i = m_Size; i < m_Size + size; i++, aiter += 1)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+						}
+						m_Size += size;
 
-					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
-				}
-				else
-				{
-					if (m_Size + size > m_RealSize)
-					{
-						SetRealSize(2 * (m_Size + size));
-					}
-
-					if constexpr (IsTrivial<T>)
-					{
-						memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
+						return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
 					}
 					else
 					{
-						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+						if (m_Size + size > m_RealSize)
 						{
-							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+							SetRealSize(2 * (m_Size + size));
 						}
-						for (SizeType i = m_Size - 1; i >= index + size; i--)
-						{
-							GetObject(i) = std::move(GetObject(i - size));
-						}
-					}
-					auto aiter = ilist.begin();
-					for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
-					{
-						GetObject(i) = *aiter;
-					}
-					for (SizeType i = m_Size; i < index + size; i++, aiter += 1)
-					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
-					}
-					m_Size += size;
 
-					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+						if constexpr (IsTrivial<T>)
+						{
+							memmove((T*)(m_pContent) + index + size, (T*)(m_pContent) + index, (m_Size - index) * sizeof(T));
+						}
+						else
+						{
+							for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, index + size); i--)
+							{
+								new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+							}
+							for (SizeType i = m_Size - 1; i >= index + size; i--)
+							{
+								GetObject(i) = std::move(GetObject(i - size));
+							}
+						}
+						auto aiter = ilist.begin();
+						for (SizeType i = index; i < std::min(index + size, m_Size); i++, aiter += 1)
+						{
+							GetObject(i) = *aiter;
+						}
+						for (SizeType i = m_Size; i < index + size; i++, aiter += 1)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+						}
+						m_Size += size;
+
+						return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
+					}
 				}
 			}
 			else	//reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-				SizeType size = ilist.size();
-				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
-				SizeType index = iter - IteratorType::GetBegin(*this);
-				if (index == 0)
+				if (size)
 				{
-					if (m_Size + size > m_RealSize)
+					SizeType index = iter - IteratorType::GetBegin(*this);
+					if (index == 0)
 					{
-						SetRealSize(2 * (m_Size + size));
-					}
+						if (m_Size + size > m_RealSize)
+						{
+							SetRealSize(2 * (m_Size + size));
+						}
 
-					auto aiter = ilist.begin();
-					for (SizeType i = m_Size + size - 1; i >= m_Size; i--, aiter += 1)
-					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
-						if (i == 0)
-							break;
-					}
-					m_Size += size;
+						auto aiter = ilist.begin();
+						for (SizeType i = m_Size + size - 1; i >= m_Size; i--, aiter += 1)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+							if (i == 0)
+								break;
+						}
+						m_Size += size;
 
-					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-				}
-				else
-				{
-					if (m_Size + size > m_RealSize)
-					{
-						SetRealSize(2 * (m_Size + size));
-					}
-
-					if constexpr (IsTrivial<T>)
-					{
-						memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
+						return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 					}
 					else
 					{
-						for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+						if (m_Size + size > m_RealSize)
 						{
-							new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+							SetRealSize(2 * (m_Size + size));
 						}
-						for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
-						{
-							GetObject(i) = std::move(GetObject(i - size));
-						}
-					}
-					auto aiter = ilist.begin();
-					for (SizeType i = m_Size - index + size - 1; i >= m_Size; i--, aiter += 1)
-					{
-						new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
-						if (i == 0)
-							break;
-					}
-					for (SizeType i = std::min(m_Size - index + size, m_Size) - 1; i >= m_Size - index; i--, aiter += 1)
-					{
-						GetObject(i) = *aiter;
-						if (i == 0)
-							break;
-					}
-					m_Size += size;
 
-					return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - index - 1);
+						if constexpr (IsTrivial<T>)
+						{
+							memmove((T*)(m_pContent) + m_Size - index + size, (T*)(m_pContent) + m_Size - index, index * sizeof(T));
+						}
+						else
+						{
+							for (SizeType i = m_Size + size - 1; i >= std::max(m_Size, m_Size - index + size); i--)
+							{
+								new (reinterpret_cast<T*>(m_pContent) + i) T(std::move(GetObject(i - size)));
+							}
+							for (SizeType i = m_Size - 1; i >= m_Size - index + size; i--)
+							{
+								GetObject(i) = std::move(GetObject(i - size));
+							}
+						}
+						auto aiter = ilist.begin();
+						for (SizeType i = m_Size - index + size - 1; i >= m_Size; i--, aiter += 1)
+						{
+							new (reinterpret_cast<T*>(m_pContent) + i) T(*aiter);
+							if (i == 0)
+								break;
+						}
+						for (SizeType i = std::min(m_Size - index + size, m_Size) - 1; i >= m_Size - index; i--, aiter += 1)
+						{
+							GetObject(i) = *aiter;
+							if (i == 0)
+								break;
+						}
+						m_Size += size;
+
+						return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - index - 1);
+					}
 				}
 			}
 		}
