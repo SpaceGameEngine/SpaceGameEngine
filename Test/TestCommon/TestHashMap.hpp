@@ -1434,6 +1434,27 @@ TEST(HashMap, AnotherAllocatorSwapTest)
 	}
 }
 
+TEST(HashMap, ConstructByEmptyListTest)
+{
+	HashMap<int, int> hm({});
+	ASSERT_EQ(hm.GetSize(), 0);
+
+	hm.Insert(1, 2);
+	ASSERT_EQ(hm.GetSize(), 1);
+	ASSERT_EQ(hm[1], 2);
+}
+
+TEST(HashMap, InsertEmptyListTest)
+{
+	HashMap<int, int> hm({{1, 2}});
+	ASSERT_EQ(hm.GetSize(), 1);
+	ASSERT_EQ(hm[1], 2);
+
+	hm.Insert({});
+	ASSERT_EQ(hm.GetSize(), 1);
+	ASSERT_EQ(hm[1], 2);
+}
+
 TEST(HashMapIterator, OutOfRangeErrorTest)
 {
 	HashMap<int, int> hm1({{1, 1}, {2, 2}});

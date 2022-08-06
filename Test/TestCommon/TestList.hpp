@@ -2110,6 +2110,34 @@ TEST(List, AnotherAllocatorSwapTest)
 	}
 }
 
+TEST(List, ConstructByEmptyListTest)
+{
+	List<int> l({});
+	ASSERT_EQ(l.GetSize(), 0);
+
+	l.Insert(l.GetConstEnd(), {1, 2, 3});
+	ASSERT_EQ(l.GetSize(), 3);
+	ASSERT_EQ(*(l.GetConstBegin()), 1);
+	ASSERT_EQ(*(l.GetConstBegin() + 1), 2);
+	ASSERT_EQ(*(l.GetConstBegin() + 2), 3);
+}
+
+TEST(List, InsertEmptyListTest)
+{
+	List<int> l({1, 2, 3});
+	ASSERT_EQ(l.GetSize(), 3);
+	ASSERT_EQ(*(l.GetConstBegin()), 1);
+	ASSERT_EQ(*(l.GetConstBegin() + 1), 2);
+	ASSERT_EQ(*(l.GetConstBegin() + 2), 3);
+
+	l.Insert(l.GetConstBegin() + 1, {});
+
+	ASSERT_EQ(l.GetSize(), 3);
+	ASSERT_EQ(*(l.GetConstBegin()), 1);
+	ASSERT_EQ(*(l.GetConstBegin() + 1), 2);
+	ASSERT_EQ(*(l.GetConstBegin() + 2), 3);
+}
+
 TEST(ListIterator, OutOfRangeErrorTest)
 {
 	List<int> l({0,

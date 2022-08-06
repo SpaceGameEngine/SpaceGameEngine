@@ -1888,6 +1888,34 @@ TEST(Vector, AnotherAllocatorSwapTest)
 	}
 }
 
+TEST(Vector, ConstructByEmptyListTest)
+{
+	Vector<int> v({});
+	ASSERT_EQ(v.GetSize(), 0);
+
+	v.Insert(v.GetConstEnd(), {1, 2, 3});
+	ASSERT_EQ(v.GetSize(), 3);
+	ASSERT_EQ(v[0], 1);
+	ASSERT_EQ(v[1], 2);
+	ASSERT_EQ(v[2], 3);
+}
+
+TEST(Vector, InsertEmptyListTest)
+{
+	Vector<int> v({1, 2, 3});
+	ASSERT_EQ(v.GetSize(), 3);
+	ASSERT_EQ(v[0], 1);
+	ASSERT_EQ(v[1], 2);
+	ASSERT_EQ(v[2], 3);
+
+	v.Insert(v.GetConstBegin() + 1, {});
+
+	ASSERT_EQ(v.GetSize(), 3);
+	ASSERT_EQ(v[0], 1);
+	ASSERT_EQ(v[1], 2);
+	ASSERT_EQ(v[2], 3);
+}
+
 TEST(VectorIterator, IsVectorIteratorTest)
 {
 	ASSERT_TRUE((Vector<int>::IsVectorIterator<Vector<int>::Iterator>::Value));

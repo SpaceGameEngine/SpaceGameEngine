@@ -1325,6 +1325,27 @@ TEST(Map, AnotherAllocatorSwapTest)
 	}
 }
 
+TEST(Map, ConstructByEmptyListTest)
+{
+	Map<int, int> m({});
+	ASSERT_EQ(m.GetSize(), 0);
+
+	m.Insert(1, 2);
+	ASSERT_EQ(m.GetSize(), 1);
+	ASSERT_EQ(m[1], 2);
+}
+
+TEST(Map, InsertEmptyListTest)
+{
+	Map<int, int> m({{1, 2}});
+	ASSERT_EQ(m.GetSize(), 1);
+	ASSERT_EQ(m[1], 2);
+
+	m.Insert({});
+	ASSERT_EQ(m.GetSize(), 1);
+	ASSERT_EQ(m[1], 2);
+}
+
 TEST(MapIterator, GetBeginTest)
 {
 	Map<int, double> m({{1, 1.0},
