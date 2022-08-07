@@ -185,18 +185,17 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		Call = 9,
 		CallFunctionPointer = 10,
 		Return = 11,
-		ReturnVoid = 12,
-		ExternalCallArgument = 13,
-		ExternalCall = 14,
-		GetReturnValue = 15,
-		MakeReference = 16,
-		GetAddress = 17,
-		GetReference = 18,
-		ReleaseReference = 19,
+		ExternalCallArgument = 12,
+		ExternalCall = 13,
+		GetReturnValue = 14,
+		MakeReference = 15,
+		GetAddress = 16,
+		GetReference = 17,
+		ReleaseReference = 18,
 		//todo
 	};
 
-	inline constexpr const SizeType OperationTypeSetSize = 20;
+	inline constexpr const SizeType OperationTypeSetSize = 19;
 
 	struct InvalidOperationTypeError
 	{
