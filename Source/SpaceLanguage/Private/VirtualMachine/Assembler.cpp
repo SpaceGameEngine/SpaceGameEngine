@@ -48,9 +48,13 @@ bool SpaceGameEngine::SpaceLanguage::InvalidInstructionNameError::Judge(const St
 }
 
 SpaceGameEngine::SpaceLanguage::RegisterNameSet::RegisterNameSet()
-	: m_Content({Pair<const String, UInt8>(SGE_STR("pc"), Register::ProgramCounter),
-				 Pair<const String, UInt8>(SGE_STR("bp"), Register::BasePointer),
-				 Pair<const String, UInt8>(SGE_STR("sp"), Register::StackPointer)})
+	: m_Content({
+		  Pair<const String, UInt8>(SGE_STR("pc"), Register::ProgramCounter),
+		  Pair<const String, UInt8>(SGE_STR("bp"), Register::BasePointer),
+		  Pair<const String, UInt8>(SGE_STR("sp"), Register::StackPointer),
+		  Pair<const String, UInt8>(SGE_STR("gp"), Register::GlobalPointer),
+		  Pair<const String, UInt8>(SGE_STR("rv"), Register::ReturnValue),
+	  })
 {
 	for (UInt8 i = SpecialRegistersSize; i < ArgumentRegistersStartIndex; ++i)
 		m_Content.Insert(Format(String(SGE_STR("c{}")), i - SpecialRegistersSize), i);
