@@ -45,6 +45,10 @@ TEST(ExternalCaller, Test)
 	ec.AddExternalCallFunction(127, 789, (ExternalCallFunctionType)101112);
 	ASSERT_TRUE(ec.HasExternalCallFunction(127, 789));
 	ASSERT_EQ(ec.GetExternalCallFunction(127, 789), (ExternalCallFunctionType)101112);
+
+	ASSERT_EQ(ec.GetIndex(321, 654), (321ull << 32ull) | 654ull);
+
+	ASSERT_EQ(ec.GetExternalCallFunction(ec.GetIndex(127, 789)), (ExternalCallFunctionType)101112);
 }
 
 TEST(InstructionSet, ExternalCallTest)
