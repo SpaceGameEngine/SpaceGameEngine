@@ -24,5 +24,5 @@ jobs:
       steps:
           - template: cmake-template.yml
             parameters:
-                toolchain: CC=$(brew --prefix llvm@14)/bin/clang CXX=$(brew --prefix llvm)/bin/clang++
+                toolchain: CC=$(brew --prefix llvm@14)/bin/clang CXX=$(brew --prefix llvm@14)/bin/clang++
                 buildType: MinSizeRel
