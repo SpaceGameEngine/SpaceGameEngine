@@ -78,6 +78,15 @@
     <ClInclude Include="Public\Linker\CompiledObject.h">
       <Filter>Public\Linker</Filter>
     </ClInclude>
+    <ClInclude Include="Public\IntermediateRepresentation\Type.h">
+      <Filter>Public\IntermediateRepresentation</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\IntermediateRepresentation\Variable.h">
+      <Filter>Public\IntermediateRepresentation</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\IntermediateRepresentation\Function.h">
+      <Filter>Public\IntermediateRepresentation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp">
@@ -118,6 +127,15 @@
     </ClCompile>
     <ClCompile Include="Private\Linker\CompiledObject.cpp">
       <Filter>Private\Linker</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\IntermediateRepresentation\Type.cpp">
+      <Filter>Private\IntermediateRepresentation</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\IntermediateRepresentation\Variable.cpp">
+      <Filter>Private\IntermediateRepresentation</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\IntermediateRepresentation\Function.cpp">
+      <Filter>Private\IntermediateRepresentation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

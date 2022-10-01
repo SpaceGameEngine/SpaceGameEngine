@@ -8,7 +8,10 @@ add_library(SpaceLanguage SHARED
         Private/VirtualMachine/VirtualMachine.cpp
         Private/VirtualMachine/ExternalCallerModule/CoreModule.cpp
         Private/VirtualMachine/Assembler.cpp
+        Private/IntermediateRepresentation/Type.cpp
+        Private/IntermediateRepresentation/Variable.cpp
         Private/IntermediateRepresentation/Operation.cpp
+        Private/IntermediateRepresentation/Function.cpp
         Private/IntermediateRepresentation/RegisterAllocator.cpp
         Private/IntermediateRepresentation/Translator.cpp
         Private/Linker/CompiledObject.cpp
