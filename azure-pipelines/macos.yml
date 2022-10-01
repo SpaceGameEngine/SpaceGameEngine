@@ -6,19 +6,19 @@ jobs:
       steps:
           - template: cmake-template.yml
             parameters:
-                toolchain: CC=$(brew --prefix llvm@14)/bin/clang CXX=$(brew --prefix llvm)/bin/clang++
+                toolchain: CC=$(brew --prefix llvm@14)/bin/clang CXX=$(brew --prefix llvm@14)/bin/clang++
                 buildType: Debug
     - job: "MacOS_Release"
       steps:
           - template: cmake-template.yml
             parameters:
-                toolchain: CC=$(brew --prefix llvm@14)/bin/clang CXX=$(brew --prefix llvm)/bin/clang++
+                toolchain: CC=$(brew --prefix llvm@14)/bin/clang CXX=$(brew --prefix llvm@14)/bin/clang++
                 buildType: Release
     - job: "MacOS_RelWithDebInfo"
       steps:
           - template: cmake-template.yml
             parameters:
-                toolchain: CC=$(brew --prefix llvm@14)/bin/clang CXX=$(brew --prefix llvm)/bin/clang++
+                toolchain: CC=$(brew --prefix llvm@14)/bin/clang CXX=$(brew --prefix llvm@14)/bin/clang++
                 buildType: RelWithDebInfo
     - job: "MacOS_MinSizeRel"
       steps:
