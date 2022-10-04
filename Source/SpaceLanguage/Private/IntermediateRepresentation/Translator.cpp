@@ -100,7 +100,6 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 	for (auto fiter = tu.m_Functions.GetConstBegin(); fiter != tu.m_Functions.GetConstEnd(); ++fiter)
 	{
 		HashMap<UInt64, Type> local_map;
-		HashMap<UInt64, bool> label_definations;
 		HashMap<UInt64, bool> label_requests;
 		HashMap<UInt64, Type> reference_map;
 		for (auto oiter = fiter->m_Second->GetOperations().GetConstBegin(); oiter != fiter->m_Second->GetOperations().GetConstEnd(); ++oiter)
@@ -121,8 +120,6 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 			}
 			else if (oiter->GetType() == OperationType::MakeReference)
 			{
-				if (!CanConvert(operation_arguments[1].GetType(), operation_arguments[0].GetType()))
-					return false;
 				if (reference_map.Find(operation_arguments[0].GetIndex()) != reference_map.GetConstEnd())
 					return false;
 				if (operation_arguments[1].GetStorageType() == StorageType::Reference)
@@ -134,8 +131,6 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 			}
 			else if (oiter->GetType() == OperationType::GetReference)
 			{
-				if (!CanConvert(operation_arguments[1].GetType(), BaseTypes::GetUInt64Type()))
-					return false;
 				if (reference_map.Find(operation_arguments[0].GetIndex()) != reference_map.GetConstEnd())
 					return false;
 				if (operation_arguments[1].GetStorageType() == StorageType::Reference)
@@ -179,38 +174,8 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 
 			switch (oiter->GetType())
 			{
-			case OperationType::Set: {
-				if (operation_arguments[1].GetIndex() >= operation_arguments[0].GetType().GetContent().GetSize())
-					return false;
-				break;
-			}
-			case OperationType::Copy: {
-				if (operation_arguments[0] == operation_arguments[1])
-					return false;
-				break;
-			}
-			case OperationType::Goto: {
-				if ((label_definations.Find(operation_arguments[0].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(operation_arguments[0].GetIndex()) == label_requests.GetConstEnd()))
-					label_requests.Insert(operation_arguments[0].GetIndex(), true);
-				break;
-			}
-			case OperationType::If: {
-				if ((label_definations.Find(operation_arguments[1].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(operation_arguments[1].GetIndex()) == label_requests.GetConstEnd()))
-					label_requests.Insert(operation_arguments[1].GetIndex(), true);
-				break;
-			}
 			case OperationType::Call: {
 				if (tu.m_Functions.Find(operation_arguments[0].GetIndex()) == tu.m_Functions.GetConstEnd())
-					return false;
-				break;
-			}
-			case OperationType::ExternalCallArgument: {
-				if (operation_arguments[0].GetIndex() >= ArgumentRegistersSize)
-					return false;
-				break;
-			}
-			case OperationType::GetAddress: {
-				if (!CanConvert(operation_arguments[0].GetType(), BaseTypes::GetUInt64Type()))
 					return false;
 				break;
 			}
@@ -224,11 +189,6 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 			return false;
 		if (reference_map.GetSize())
 			return false;
-		for (auto liter = label_requests.GetConstBegin(); liter != label_requests.GetConstEnd(); ++liter)
-		{
-			if (label_definations.Find(liter->m_First) == label_definations.GetConstEnd())
-				return false;
-		}
 	}
 
 	return true;

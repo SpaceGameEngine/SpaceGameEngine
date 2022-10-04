@@ -151,7 +151,7 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Type::operator!
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::CanConvert(const Type& from, const Type& to)
 {
-	return (from.GetSize() >= to.GetSize()) && (from.GetAlignment() % to.GetAlignment() == 0);
+	return (from.GetSize() == to.GetSize()) && (from.GetAlignment() % to.GetAlignment() == 0);
 }
 
 const Type& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BaseTypes::GetVoidType()

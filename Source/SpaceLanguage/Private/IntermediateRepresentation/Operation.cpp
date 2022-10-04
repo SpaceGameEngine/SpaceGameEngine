@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "IntermediateRepresentation/Operation.h"
+#include "VirtualMachine/Register.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
@@ -29,28 +30,79 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsTerminatorOpe
 	return ot == OperationType::Goto || ot == OperationType::If || ot == OperationType::Return;
 }
 
-#define OPERATION_TYPE(type, ...) Pair<const OperationType, Pair<Vector<UInt8>, String>>(OperationType::type, Pair<Vector<UInt8>, String>(Vector<UInt8>({__VA_ARGS__}), SGE_STR(#type)))
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeInformation::OperationTypeInformation(const Vector<UInt8>& argument_storage_type_masks, const String& name, OperationJudgementFunctionType judgement_function)
+	: m_ArgumentStorageTypeMasks(argument_storage_type_masks), m_Name(name), m_JudgementFunction(judgement_function)
+{
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeInformation::operator==(const OperationTypeInformation& ot_info) const
+{
+	return m_ArgumentStorageTypeMasks == ot_info.m_ArgumentStorageTypeMasks && m_Name == ot_info.m_Name && m_JudgementFunction == ot_info.m_JudgementFunction;
+}
+
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeInformation::operator!=(const OperationTypeInformation& ot_info) const
+{
+	return m_ArgumentStorageTypeMasks != ot_info.m_ArgumentStorageTypeMasks || m_Name != ot_info.m_Name || m_JudgementFunction != ot_info.m_JudgementFunction;
+}
+
+#define OPERATION_TYPE(type, argument_storage_type_masks, judgement_function) Pair<const OperationType, OperationTypeInformation>(OperationType::type, OperationTypeInformation(Vector<UInt8>(argument_storage_type_masks), SGE_STR(#type), judgement_function))
+#define ARGUMENTS(...) \
+	{                  \
+		__VA_ARGS__    \
+	}
+#define JUDGEMENT [](const Vector<Variable>& operation_arguments) -> bool
+#define EMPTY_JUDGEMENT \
+	JUDGEMENT           \
+	{                   \
+		return false;   \
+	}
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::OperationTypeSet()
 	: m_Content({
-		  OPERATION_TYPE(Set, StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
-		  OPERATION_TYPE(NewLocal, StorageTypeMasks::Local),
-		  OPERATION_TYPE(DeleteLocal, StorageTypeMasks::Local),
-		  OPERATION_TYPE(Push, StorageTypeMasks::Value),
-		  OPERATION_TYPE(Pop, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(Copy, StorageTypeMasks::Variable, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(Goto, StorageTypeMasks::Constant),
-		  OPERATION_TYPE(If, StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
-		  OPERATION_TYPE(Call, StorageTypeMasks::Constant),
-		  OPERATION_TYPE(CallFunctionPointer, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(Return, StorageTypeMasks::Value),
-		  OPERATION_TYPE(ExternalCallArgument, StorageTypeMasks::Constant, StorageTypeMasks::Value),
-		  OPERATION_TYPE(ExternalCall, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
-		  OPERATION_TYPE(GetReturnValue, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(MakeReference, StorageTypeMasks::Reference, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(GetAddress, StorageTypeMasks::Variable, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(GetReference, StorageTypeMasks::Reference, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(ReleaseReference, StorageTypeMasks::Reference),
+		  OPERATION_TYPE(
+			  Set, ARGUMENTS(StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
+			  JUDGEMENT {
+				  return operation_arguments[1].GetIndex() >= operation_arguments[0].GetType().GetContent().GetSize();
+			  }),
+		  OPERATION_TYPE(NewLocal, ARGUMENTS(StorageTypeMasks::Local), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(DeleteLocal, ARGUMENTS(StorageTypeMasks::Local), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(Push, ARGUMENTS(StorageTypeMasks::Value), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(Pop, ARGUMENTS(StorageTypeMasks::Variable), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(
+			  Copy, ARGUMENTS(StorageTypeMasks::Variable, StorageTypeMasks::Variable),
+			  JUDGEMENT {
+				  return operation_arguments[0] == operation_arguments[1];
+			  }),
+		  OPERATION_TYPE(Goto, ARGUMENTS(StorageTypeMasks::Constant), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(If, ARGUMENTS(StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(Call, ARGUMENTS(StorageTypeMasks::Constant), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(CallFunctionPointer, ARGUMENTS(StorageTypeMasks::Variable), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(Return, ARGUMENTS(StorageTypeMasks::Value), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(
+			  ExternalCallArgument, ARGUMENTS(StorageTypeMasks::Constant, StorageTypeMasks::Value),
+			  JUDGEMENT {
+				  if (operation_arguments[0].GetIndex() >= ArgumentRegistersSize)
+					  return true;
+				  return operation_arguments[1].GetType().GetSize() > sizeof(RegisterType);
+			  }),
+		  OPERATION_TYPE(ExternalCall, ARGUMENTS(StorageTypeMasks::Constant, StorageTypeMasks::Constant), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(GetReturnValue, ARGUMENTS(StorageTypeMasks::Variable), EMPTY_JUDGEMENT),
+		  OPERATION_TYPE(
+			  MakeReference, ARGUMENTS(StorageTypeMasks::Reference, StorageTypeMasks::Variable),
+			  JUDGEMENT {
+				  return !CanConvert(operation_arguments[1].GetType(), operation_arguments[0].GetType());
+			  }),
+		  OPERATION_TYPE(
+			  GetAddress, ARGUMENTS(StorageTypeMasks::Variable, StorageTypeMasks::Variable),
+			  JUDGEMENT {
+				  return !CanConvert(operation_arguments[0].GetType(), BaseTypes::GetUInt64Type());
+			  }),
+		  OPERATION_TYPE(
+			  GetReference, ARGUMENTS(StorageTypeMasks::Reference, StorageTypeMasks::Variable),
+			  JUDGEMENT {
+				  return !CanConvert(operation_arguments[1].GetType(), BaseTypes::GetUInt64Type());
+			  }),
+		  OPERATION_TYPE(ReleaseReference, ARGUMENTS(StorageTypeMasks::Reference), EMPTY_JUDGEMENT),
 		  //todo
 	  })
 {
@@ -59,13 +111,19 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::Op
 const Vector<UInt8>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetArguments(OperationType type) const
 {
 	SGE_ASSERT(InvalidOperationTypeError, type);
-	return m_Content.Find(type)->m_Second.m_First;
+	return m_Content.Find(type)->m_Second.m_ArgumentStorageTypeMasks;
 }
 
 const String& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetName(OperationType type) const
 {
 	SGE_ASSERT(InvalidOperationTypeError, type);
-	return m_Content.Find(type)->m_Second.m_Second;
+	return m_Content.Find(type)->m_Second.m_Name;
+}
+
+OperationJudgementFunctionType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetJudgementFunction(OperationType type) const
+{
+	SGE_ASSERT(InvalidOperationTypeError, type);
+	return m_Content.Find(type)->m_Second.m_JudgementFunction;
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::Operation(OperationType type, const Vector<Variable>& arguments)
@@ -107,5 +165,5 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperatio
 		if (!((UInt8)(oaiter->GetStorageType()) & (*aiter)))
 			return true;
 	}
-	return false;
+	return OperationTypeSet::GetSingleton().GetJudgementFunction(o.GetType())(o.GetArguments());
 }

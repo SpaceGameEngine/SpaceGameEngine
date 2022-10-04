@@ -57,9 +57,30 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	SPACE_LANGUAGE_API bool IsTerminatorOperationType(OperationType ot);
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API Vector<Variable>;
+#endif
+
+	using OperationJudgementFunctionType = bool (*)(const Vector<Variable>&);
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API Vector<UInt8>;
-	template struct SPACE_LANGUAGE_API Pair<Vector<UInt8>, String>;
-	template class SPACE_LANGUAGE_API HashMap<OperationType, Pair<Vector<UInt8>, String>>;
+#endif
+
+	struct SPACE_LANGUAGE_API OperationTypeInformation
+	{
+		Vector<UInt8> m_ArgumentStorageTypeMasks;
+		String m_Name;
+		OperationJudgementFunctionType m_JudgementFunction;
+
+		OperationTypeInformation() = delete;
+		OperationTypeInformation(const Vector<UInt8>& argument_storage_type_masks, const String& name, OperationJudgementFunctionType judgement_function);
+
+		bool operator==(const OperationTypeInformation& ot_info) const;
+		bool operator!=(const OperationTypeInformation& ot_info) const;
+	};
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+	template class SPACE_LANGUAGE_API HashMap<OperationType, OperationTypeInformation>;
 #endif
 
 	class SPACE_LANGUAGE_API OperationTypeSet : public UncopyableAndUnmovable, public Singleton<OperationTypeSet>
@@ -72,14 +93,11 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 		const Vector<UInt8>& GetArguments(OperationType type) const;
 		const String& GetName(OperationType type) const;
+		OperationJudgementFunctionType GetJudgementFunction(OperationType type) const;
 
 	private:
-		HashMap<OperationType, Pair<Vector<UInt8>, String>> m_Content;
+		HashMap<OperationType, OperationTypeInformation> m_Content;
 	};
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Vector<Variable>;
-#endif
 
 	class SPACE_LANGUAGE_API Operation
 	{

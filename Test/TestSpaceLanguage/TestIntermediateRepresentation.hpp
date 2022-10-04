@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "gtest/gtest.h"
+#include "VirtualMachine/Register.h"
 #include "IntermediateRepresentation/Operation.h"
 #include "IntermediateRepresentation/RegisterAllocator.h"
 #include "IntermediateRepresentation/Translator.h"
@@ -86,8 +87,6 @@ TEST(IntermediateRepresentation_Type, Test)
 	ASSERT_EQ(t_compose.GetContent()[1], BaseType::Int32);
 	ASSERT_EQ(t_compose.GetSize(), 6);
 	ASSERT_EQ(t_compose.GetAlignment(), Max(alignof(Int16), alignof(Int32)));
-	ASSERT_TRUE(CanConvert(t_compose, BaseTypes::GetUInt32Type()));
-	ASSERT_FALSE(CanConvert(BaseTypes::GetUInt32Type(), t_compose));
 
 	Type t_compose2(BaseType::Int8);
 	Type t_re = t_compose2 + t_compose;
@@ -120,6 +119,16 @@ TEST(IntermediateRepresentation_Type, Test)
 
 	ASSERT_EQ(t_compose2, t_re);
 	ASSERT_NE(t_compose2, t_compose);
+}
+
+TEST(IntermediateRepresentation_CanConvert, Test)
+{
+	using namespace IntermediateRepresentation;
+	ASSERT_TRUE(CanConvert(BaseTypes::GetUInt64Type(), BaseTypes::GetInt64Type()));
+	ASSERT_TRUE(CanConvert(BaseTypes::GetInt64Type(), BaseTypes::GetUInt64Type()));
+
+	ASSERT_FALSE(CanConvert(BaseTypes::GetUInt32Type(), BaseTypes::GetInt64Type()));
+	ASSERT_FALSE(CanConvert(BaseTypes::GetInt64Type(), BaseTypes::GetUInt32Type()));
 }
 
 TEST(IntermediateRepresentation_Variable, Test)
@@ -158,44 +167,102 @@ TEST(IntermediateRepresentation_IsTerminatorOperationType, Test)
 TEST(IntermediateRepresentation_OperationTypeSet, Test)
 {
 	using namespace IntermediateRepresentation;
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Set), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::NewLocal), Vector<UInt8>({StorageTypeMasks::Local}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::DeleteLocal), Vector<UInt8>({StorageTypeMasks::Local}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Push), Vector<UInt8>({StorageTypeMasks::Value}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Pop), Vector<UInt8>({StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Copy), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Goto), Vector<UInt8>({StorageTypeMasks::Constant}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::If), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Call), Vector<UInt8>({StorageTypeMasks::Constant}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::CallFunctionPointer), Vector<UInt8>({StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Return), Vector<UInt8>({StorageTypeMasks::Value}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCallArgument), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Value}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCall), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetReturnValue), Vector<UInt8>({StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::MakeReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetAddress), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ReleaseReference), Vector<UInt8>({StorageTypeMasks::Reference}));
+	const OperationTypeSet& ots = OperationTypeSet::GetSingleton();
+
+	ASSERT_EQ(ots.GetArguments(OperationType::Set), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
+	ASSERT_EQ(ots.GetArguments(OperationType::NewLocal), Vector<UInt8>({StorageTypeMasks::Local}));
+	ASSERT_EQ(ots.GetArguments(OperationType::DeleteLocal), Vector<UInt8>({StorageTypeMasks::Local}));
+	ASSERT_EQ(ots.GetArguments(OperationType::Push), Vector<UInt8>({StorageTypeMasks::Value}));
+	ASSERT_EQ(ots.GetArguments(OperationType::Pop), Vector<UInt8>({StorageTypeMasks::Variable}));
+	ASSERT_EQ(ots.GetArguments(OperationType::Copy), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
+	ASSERT_EQ(ots.GetArguments(OperationType::Goto), Vector<UInt8>({StorageTypeMasks::Constant}));
+	ASSERT_EQ(ots.GetArguments(OperationType::If), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
+	ASSERT_EQ(ots.GetArguments(OperationType::Call), Vector<UInt8>({StorageTypeMasks::Constant}));
+	ASSERT_EQ(ots.GetArguments(OperationType::CallFunctionPointer), Vector<UInt8>({StorageTypeMasks::Variable}));
+	ASSERT_EQ(ots.GetArguments(OperationType::Return), Vector<UInt8>({StorageTypeMasks::Value}));
+	ASSERT_EQ(ots.GetArguments(OperationType::ExternalCallArgument), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Value}));
+	ASSERT_EQ(ots.GetArguments(OperationType::ExternalCall), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
+	ASSERT_EQ(ots.GetArguments(OperationType::GetReturnValue), Vector<UInt8>({StorageTypeMasks::Variable}));
+	ASSERT_EQ(ots.GetArguments(OperationType::MakeReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
+	ASSERT_EQ(ots.GetArguments(OperationType::GetAddress), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
+	ASSERT_EQ(ots.GetArguments(OperationType::GetReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
+	ASSERT_EQ(ots.GetArguments(OperationType::ReleaseReference), Vector<UInt8>({StorageTypeMasks::Reference}));
 	//todo
 
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Set), SGE_STR("Set"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::NewLocal), SGE_STR("NewLocal"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::DeleteLocal), SGE_STR("DeleteLocal"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Push), SGE_STR("Push"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Pop), SGE_STR("Pop"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Copy), SGE_STR("Copy"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Goto), SGE_STR("Goto"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::If), SGE_STR("If"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Call), SGE_STR("Call"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::CallFunctionPointer), SGE_STR("CallFunctionPointer"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Return), SGE_STR("Return"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ExternalCallArgument), SGE_STR("ExternalCallArgument"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ExternalCall), SGE_STR("ExternalCall"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetReturnValue), SGE_STR("GetReturnValue"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::MakeReference), SGE_STR("MakeReference"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetAddress), SGE_STR("GetAddress"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::GetReference), SGE_STR("GetReference"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::ReleaseReference), SGE_STR("ReleaseReference"));
+	ASSERT_EQ(ots.GetName(OperationType::Set), SGE_STR("Set"));
+	ASSERT_EQ(ots.GetName(OperationType::NewLocal), SGE_STR("NewLocal"));
+	ASSERT_EQ(ots.GetName(OperationType::DeleteLocal), SGE_STR("DeleteLocal"));
+	ASSERT_EQ(ots.GetName(OperationType::Push), SGE_STR("Push"));
+	ASSERT_EQ(ots.GetName(OperationType::Pop), SGE_STR("Pop"));
+	ASSERT_EQ(ots.GetName(OperationType::Copy), SGE_STR("Copy"));
+	ASSERT_EQ(ots.GetName(OperationType::Goto), SGE_STR("Goto"));
+	ASSERT_EQ(ots.GetName(OperationType::If), SGE_STR("If"));
+	ASSERT_EQ(ots.GetName(OperationType::Call), SGE_STR("Call"));
+	ASSERT_EQ(ots.GetName(OperationType::CallFunctionPointer), SGE_STR("CallFunctionPointer"));
+	ASSERT_EQ(ots.GetName(OperationType::Return), SGE_STR("Return"));
+	ASSERT_EQ(ots.GetName(OperationType::ExternalCallArgument), SGE_STR("ExternalCallArgument"));
+	ASSERT_EQ(ots.GetName(OperationType::ExternalCall), SGE_STR("ExternalCall"));
+	ASSERT_EQ(ots.GetName(OperationType::GetReturnValue), SGE_STR("GetReturnValue"));
+	ASSERT_EQ(ots.GetName(OperationType::MakeReference), SGE_STR("MakeReference"));
+	ASSERT_EQ(ots.GetName(OperationType::GetAddress), SGE_STR("GetAddress"));
+	ASSERT_EQ(ots.GetName(OperationType::GetReference), SGE_STR("GetReference"));
+	ASSERT_EQ(ots.GetName(OperationType::ReleaseReference), SGE_STR("ReleaseReference"));
+	//todo
+
+	ASSERT_FALSE(ots.GetJudgementFunction(OperationType::Set)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, 123),
+	}));
+	ASSERT_TRUE(ots.GetJudgementFunction(OperationType::Set)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, 1),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, 123),
+	}));
+	ASSERT_FALSE(ots.GetJudgementFunction(OperationType::Copy)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 1),
+	}));
+	ASSERT_TRUE(ots.GetJudgementFunction(OperationType::Copy)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+	}));
+	ASSERT_FALSE(ots.GetJudgementFunction(OperationType::ExternalCallArgument)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 1),
+	}));
+	ASSERT_TRUE(ots.GetJudgementFunction(OperationType::ExternalCallArgument)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, ArgumentRegistersSize),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+	}));
+	ASSERT_TRUE(ots.GetJudgementFunction(OperationType::ExternalCallArgument)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, 0),
+		Variable(Type({BaseType::UInt64, BaseType::UInt64}), StorageType::Local, 0),
+	}));
+	ASSERT_FALSE(ots.GetJudgementFunction(OperationType::MakeReference)({
+		Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetInt64Type(), StorageType::Local, 1),
+	}));
+	ASSERT_TRUE(ots.GetJudgementFunction(OperationType::MakeReference)({
+		Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetInt32Type(), StorageType::Local, 1),
+	}));
+	ASSERT_FALSE(ots.GetJudgementFunction(OperationType::GetAddress)({
+		Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 1),
+	}));
+	ASSERT_TRUE(ots.GetJudgementFunction(OperationType::GetAddress)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 1),
+	}));
+	ASSERT_FALSE(ots.GetJudgementFunction(OperationType::GetReference)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetUInt64Type(), StorageType::Local, 1),
+	}));
+	ASSERT_TRUE(ots.GetJudgementFunction(OperationType::GetReference)({
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
+		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 1),
+	}));
 	//todo
 }
 
@@ -483,16 +550,6 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu15));
 
-	TranslateUnit tu16;
-	tu16.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu16.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
-																  Operation(OperationType::ExternalCallArgument, {
-																													 Variable(BaseTypes::GetVoidType(), StorageType::Constant, 456),
-																													 Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
-																												 }),
-															  });
-	ASSERT_FALSE(IsValidTranslateUnit(tu16));
-
 	TranslateUnit tu17;
 	tu17.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
 	tu17.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
@@ -504,18 +561,6 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
 															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu17));
-
-	TranslateUnit tu18;
-	tu18.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu18.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
-																  Operation(OperationType::MakeReference, {
-																											  Variable(BaseTypes::GetInt16Type(), StorageType::Reference, 0),
-																											  Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0),
-																										  }),
-																  Operation(OperationType::Push, {Variable(BaseTypes::GetInt8Type(), StorageType::Reference, 0)}),
-																  Operation(OperationType::ReleaseReference, {Variable(BaseTypes::GetInt16Type(), StorageType::Reference, 0)}),
-															  });
-	ASSERT_FALSE(IsValidTranslateUnit(tu18));
 
 	TranslateUnit tu19;
 	tu19.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
@@ -563,17 +608,6 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																									   }),
 															  });
 	ASSERT_TRUE(IsValidTranslateUnit(tu22));
-
-	TranslateUnit tu23;
-	tu23.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
-	tu23.NewGlobalVariable(BaseTypes::GetUInt64Type(), 1);
-	tu23.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
-																  Operation(OperationType::GetAddress, {
-																										   Variable(BaseTypes::GetUInt32Type(), StorageType::Global, 1),
-																										   Variable(BaseTypes::GetInt8Type(), StorageType::Global, 0),
-																									   }),
-															  });
-	ASSERT_FALSE(IsValidTranslateUnit(tu23));
 
 	TranslateUnit tu24;
 	tu24.NewGlobalVariable(BaseTypes::GetUInt8Type(), 0);
