@@ -143,22 +143,33 @@ TEST(IntermediateRepresentation_Variable, Test)
 	ASSERT_NE(v1, v3);
 }
 
+TEST(IntermediateRepresentation_IsTerminatorOperationType, Test)
+{
+	using namespace IntermediateRepresentation;
+	for (UInt8 ot = 0; ot < OperationTypeSetSize; ++ot)
+	{
+		if ((OperationType)ot == OperationType::Goto || (OperationType)ot == OperationType::If || (OperationType)ot == OperationType::Return)
+			ASSERT_TRUE(IsTerminatorOperationType((OperationType)ot));
+		else
+			ASSERT_FALSE(IsTerminatorOperationType((OperationType)ot));
+	}
+}
+
 TEST(IntermediateRepresentation_OperationTypeSet, Test)
 {
 	using namespace IntermediateRepresentation;
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Set), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::NewLocal), Vector<UInt8>({StorageTypeMasks::Local}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::DeleteLocal), Vector<UInt8>({StorageTypeMasks::Local}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Push), Vector<UInt8>({StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Push), Vector<UInt8>({StorageTypeMasks::Value}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Pop), Vector<UInt8>({StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Copy), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Label), Vector<UInt8>({StorageTypeMasks::Constant}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Goto), Vector<UInt8>({StorageTypeMasks::Constant}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::If), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::If), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Call), Vector<UInt8>({StorageTypeMasks::Constant}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::CallFunctionPointer), Vector<UInt8>({StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Return), Vector<UInt8>({StorageTypeMasks::Variable}));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCallArgument), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Variable}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::Return), Vector<UInt8>({StorageTypeMasks::Value}));
+	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCallArgument), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Value}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::ExternalCall), Vector<UInt8>({StorageTypeMasks::Constant, StorageTypeMasks::Constant}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::GetReturnValue), Vector<UInt8>({StorageTypeMasks::Variable}));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetArguments(OperationType::MakeReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
@@ -173,7 +184,6 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Push), SGE_STR("Push"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Pop), SGE_STR("Pop"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Copy), SGE_STR("Copy"));
-	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Label), SGE_STR("Label"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Goto), SGE_STR("Goto"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::If), SGE_STR("If"));
 	ASSERT_EQ(OperationTypeSet::GetSingleton().GetName(OperationType::Call), SGE_STR("Call"));
@@ -189,7 +199,7 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	//todo
 }
 
-TEST(IntermediateRepresentation_OperationSet, Test)
+TEST(IntermediateRepresentation_Operation, Test)
 {
 	using namespace IntermediateRepresentation;
 
@@ -206,6 +216,33 @@ TEST(IntermediateRepresentation_OperationSet, Test)
 	Operation o3(OperationType::Push, {Variable(BaseTypes::GetInt32Type(), StorageType::Global, 0)});
 
 	ASSERT_NE(o1, o3);
+}
+
+TEST(IntermediateRepresentation_BasicBlock, Test)
+{
+	using namespace IntermediateRepresentation;
+	Operation o1(OperationType::Return, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)});
+	Operation o2(OperationType::Return, {Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, 0)});
+
+	BasicBlock bb1({o1});
+
+	ASSERT_EQ(bb1.GetContent().GetSize(), 1);
+	ASSERT_EQ(*bb1.GetContent().GetConstBegin(), o1);
+
+	BasicBlock bb2({o1});
+
+	ASSERT_EQ(bb2.GetContent().GetSize(), 1);
+	ASSERT_EQ(*bb2.GetContent().GetConstBegin(), o1);
+
+	ASSERT_EQ(bb1, bb2);
+
+	BasicBlock bb3({o2});
+
+	ASSERT_EQ(bb3.GetContent().GetSize(), 1);
+	ASSERT_EQ(*bb3.GetContent().GetConstBegin(), o2);
+
+	ASSERT_NE(bb1, bb3);
+	ASSERT_NE(bb2, bb3);
 }
 
 TEST(IntermediateRepresentation_Function, Test)
@@ -381,7 +418,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 															 });
 	ASSERT_TRUE(IsValidTranslateUnit(tu7));
 
-	TranslateUnit tu8;
+	/*TranslateUnit tu8;
 	tu8.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {
 																 Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
 																 Operation(OperationType::Goto, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
@@ -421,7 +458,7 @@ TEST(IntermediateRepresentation_IsValidTranslateUnit, Test)
 																  Operation(OperationType::Label, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)}),
 																  Operation(OperationType::If, {Variable(BaseTypes::GetUInt8Type(), StorageType::Global, 0), Variable(BaseTypes::GetVoidType(), StorageType::Constant, 1)}),
 															  });
-	ASSERT_FALSE(IsValidTranslateUnit(tu12));
+	ASSERT_FALSE(IsValidTranslateUnit(tu12));*/
 
 	TranslateUnit tu13;
 	tu13.NewInternalFunction({}, BaseTypes::GetVoidType(), 0, {

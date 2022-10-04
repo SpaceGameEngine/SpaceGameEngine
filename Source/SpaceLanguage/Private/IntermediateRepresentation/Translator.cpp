@@ -189,12 +189,6 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 					return false;
 				break;
 			}
-			case OperationType::Label: {
-				if (label_definations.Find(operation_arguments[0].GetIndex()) != label_definations.GetConstEnd())
-					return false;
-				label_definations.Insert(operation_arguments[0].GetIndex(), true);
-				break;
-			}
 			case OperationType::Goto: {
 				if ((label_definations.Find(operation_arguments[0].GetIndex()) == label_definations.GetConstEnd()) && (label_requests.Find(operation_arguments[0].GetIndex()) == label_requests.GetConstEnd()))
 					label_requests.Insert(operation_arguments[0].GetIndex(), true);

@@ -31,29 +31,30 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		Push = 3,
 		Pop = 4,
 		Copy = 5,
-		Label = 6,
-		Goto = 7,
-		If = 8,
-		Call = 9,
-		CallFunctionPointer = 10,
-		Return = 11,
-		ExternalCallArgument = 12,
-		ExternalCall = 13,
-		GetReturnValue = 14,
-		MakeReference = 15,
-		GetAddress = 16,
-		GetReference = 17,
-		ReleaseReference = 18,
+		Goto = 6,
+		If = 7,
+		Call = 8,
+		CallFunctionPointer = 9,
+		Return = 10,
+		ExternalCallArgument = 11,
+		ExternalCall = 12,
+		GetReturnValue = 13,
+		MakeReference = 14,
+		GetAddress = 15,
+		GetReference = 16,
+		ReleaseReference = 17,
 		//todo
 	};
 
-	inline constexpr const SizeType OperationTypeSetSize = 19;
+	inline constexpr const SizeType OperationTypeSetSize = 18;
 
 	struct InvalidOperationTypeError
 	{
 		inline static const TChar sm_pContent[] = SGE_TSTR("The OperationType is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(OperationType ot);
 	};
+
+	SPACE_LANGUAGE_API bool IsTerminatorOperationType(OperationType ot);
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
 	template class SPACE_LANGUAGE_API Vector<UInt8>;
@@ -102,7 +103,6 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		inline static const TChar sm_pContent[] = SGE_TSTR("The Operation is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const Operation& o);
 	};
-
 }
 
 /*!

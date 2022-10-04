@@ -163,6 +163,7 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Private\SpaceLanguageModule.h" />
+    <ClInclude Include="Public\IntermediateRepresentation\BasicBlock.h" />
     <ClInclude Include="Public\IntermediateRepresentation\Function.h" />
     <ClInclude Include="Public\IntermediateRepresentation\Operation.h" />
     <ClInclude Include="Public\IntermediateRepresentation\RegisterAllocator.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="Public\VirtualMachine\VirtualMachine.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\IntermediateRepresentation\BasicBlock.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\Function.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\Operation.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\RegisterAllocator.cpp" />

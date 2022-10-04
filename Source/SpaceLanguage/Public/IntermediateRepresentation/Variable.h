@@ -36,6 +36,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	{
 		inline constexpr const UInt8 Constant = 1;
 		inline constexpr const UInt8 Variable = 2;
+		inline constexpr const UInt8 Value = 3;
 		inline constexpr const UInt8 Global = 6;
 		inline constexpr const UInt8 Local = 10;
 		inline constexpr const UInt8 Reference = 18;

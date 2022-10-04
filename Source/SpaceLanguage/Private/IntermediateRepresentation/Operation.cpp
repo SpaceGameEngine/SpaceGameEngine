@@ -24,6 +24,11 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperatio
 	return (UInt8)ot >= OperationTypeSetSize;
 }
 
+bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsTerminatorOperationType(OperationType ot)
+{
+	return ot == OperationType::Goto || ot == OperationType::If || ot == OperationType::Return;
+}
+
 #define OPERATION_TYPE(type, ...) Pair<const OperationType, Pair<Vector<UInt8>, String>>(OperationType::type, Pair<Vector<UInt8>, String>(Vector<UInt8>({__VA_ARGS__}), SGE_STR(#type)))
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::OperationTypeSet()
@@ -31,16 +36,15 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::Op
 		  OPERATION_TYPE(Set, StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
 		  OPERATION_TYPE(NewLocal, StorageTypeMasks::Local),
 		  OPERATION_TYPE(DeleteLocal, StorageTypeMasks::Local),
-		  OPERATION_TYPE(Push, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(Push, StorageTypeMasks::Value),
 		  OPERATION_TYPE(Pop, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(Copy, StorageTypeMasks::Variable, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(Label, StorageTypeMasks::Constant),
 		  OPERATION_TYPE(Goto, StorageTypeMasks::Constant),
-		  OPERATION_TYPE(If, StorageTypeMasks::Variable, StorageTypeMasks::Constant),
+		  OPERATION_TYPE(If, StorageTypeMasks::Variable, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
 		  OPERATION_TYPE(Call, StorageTypeMasks::Constant),
 		  OPERATION_TYPE(CallFunctionPointer, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(Return, StorageTypeMasks::Variable),
-		  OPERATION_TYPE(ExternalCallArgument, StorageTypeMasks::Constant, StorageTypeMasks::Variable),
+		  OPERATION_TYPE(Return, StorageTypeMasks::Value),
+		  OPERATION_TYPE(ExternalCallArgument, StorageTypeMasks::Constant, StorageTypeMasks::Value),
 		  OPERATION_TYPE(ExternalCall, StorageTypeMasks::Constant, StorageTypeMasks::Constant),
 		  OPERATION_TYPE(GetReturnValue, StorageTypeMasks::Variable),
 		  OPERATION_TYPE(MakeReference, StorageTypeMasks::Reference, StorageTypeMasks::Variable),
