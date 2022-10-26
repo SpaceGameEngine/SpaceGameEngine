@@ -760,7 +760,7 @@ namespace SpaceGameEngine
 		inline const T& GetObject(SizeType index) const
 		{
 			SGE_ASSERT(InvalidValueError, index, 0, m_Size - 1);
-			return *reinterpret_cast<T*>((AddressType)(m_pContent) + index * sizeof(T));
+			return *reinterpret_cast<const T*>((AddressType)(m_pContent) + index * sizeof(T));
 		}
 
 		inline T& operator[](SizeType index)

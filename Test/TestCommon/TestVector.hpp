@@ -493,9 +493,15 @@ TEST(Vector, SetRealSizeTest)
 TEST(Vector, GetObjectTest)
 {
 	Vector<int> v = {0, 1, 2};
-	ASSERT_TRUE(v.GetObject(1) == 1);
+	ASSERT_EQ(v.GetObject(1), 1);
 	v.GetObject(1) = 3;
-	ASSERT_TRUE(v.GetObject(1) == 3);
+	ASSERT_EQ(v.GetObject(1), 3);
+	ASSERT_TRUE((std::is_same_v<decltype(v.GetObject(0)), int&>));
+
+	const Vector<int> cv = {2, 1, 0};
+	ASSERT_EQ(cv.GetObject(1), 1);
+	ASSERT_EQ(cv.GetObject(2), 0);
+	ASSERT_TRUE((std::is_same_v<decltype(cv.GetObject(0)), const int&>));
 }
 
 TEST(Vector, GetDataTest)
