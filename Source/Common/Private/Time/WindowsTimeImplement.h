@@ -36,7 +36,7 @@ namespace SpaceGameEngine
 		{
 			struct GetQPCFrequencyFailedError
 			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("Can not get the qpc frequency");
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Can not get the qpc frequency");
 				static COMMON_API bool Judge(BOOL re_code);
 			};
 
@@ -44,7 +44,7 @@ namespace SpaceGameEngine
 
 			struct GetQPCCounterFailedError
 			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("Can not get the qpc counter");
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Can not get the qpc counter");
 				static COMMON_API bool Judge(BOOL re_code);
 			};
 

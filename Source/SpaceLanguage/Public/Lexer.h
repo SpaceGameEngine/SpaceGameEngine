@@ -74,7 +74,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 
 	struct InvalidTokenTypeError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The TokenType is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The TokenType is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(TokenType tt);
 	};
 
@@ -139,7 +139,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 
 	struct InvalidEscapeCharacterError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The escape character is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The escape character is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(Char c);
 	};
 
@@ -201,7 +201,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 
 	struct InvalidSourceStringError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The Source string is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Source string is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const String& str, const String& error_info_formatter);
 	};
 

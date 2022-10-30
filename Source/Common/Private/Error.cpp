@@ -22,9 +22,9 @@ limitations under the License.
 #include <Windows.h>
 #endif
 
-void SpaceGameEngine::ThrowError(const TChar* error_msg, DebugInformation debug_info)
+void SpaceGameEngine::ThrowError(const ErrorMessageChar* error_msg, DebugInformation debug_info)
 {
-	SGE_LOG(GetDefaultLogger(), LogLevel::Error, SGE_TSTR_TO_UTF8(error_msg));
+	SGE_LOG(GetDefaultLogger(), LogLevel::Error, SGE_ESTR_TO_UTF8(error_msg));
 #if defined(SGE_DEBUG) && defined(SGE_WINDOWS)
 	DebugBreak();
 #endif

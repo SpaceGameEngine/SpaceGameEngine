@@ -399,7 +399,7 @@ namespace SpaceGameEngine
 
 		struct ZeroLoadFactorError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The load factor can not be zero.");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The load factor can not be zero.");
 
 			inline static bool Judge(double load_factor)
 			{
@@ -570,7 +570,7 @@ namespace SpaceGameEngine
 
 			struct OutOfRangeError
 			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const IteratorImpl& iter)
 				{
 					return iter.m_pBucket == iter.m_pBucketEnd || iter.m_pNode == nullptr;
@@ -754,7 +754,7 @@ namespace SpaceGameEngine
 
 		struct ExternalIteratorError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator does not belong to this HashMap.");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this HashMap.");
 
 			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value, void>>
 			inline static bool Judge(const IteratorType& iter, const HashMap& hm)

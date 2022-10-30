@@ -61,31 +61,31 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct GlobalVariableAlreadyExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The GlobalVariable has already existed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The GlobalVariable has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Variable*>::ConstIterator& citer, const HashMap<UInt64, Variable*>::ConstIterator& cend);
 	};
 
 	struct GlobalVariableNotExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The GlobalVariable has not existed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The GlobalVariable has not existed.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Variable*>::ConstIterator& citer, const HashMap<UInt64, Variable*>::ConstIterator& cend);
 	};
 
 	struct FunctionAlreadyExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The Function has already existed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Function has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Function*>::ConstIterator& citer, const HashMap<UInt64, Function*>::ConstIterator& cend);
 	};
 
 	struct FunctionNotExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The Function has not existed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Function has not existed.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, Function*>::ConstIterator& citer, const HashMap<UInt64, Function*>::ConstIterator& cend);
 	};
 
 	struct InvalidTranslateUnitError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The TranslateUnit is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The TranslateUnit is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const TranslateUnit& tu);
 	};
 

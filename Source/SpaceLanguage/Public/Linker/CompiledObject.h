@@ -68,7 +68,7 @@ namespace SpaceGameEngine::SpaceLanguage
 
 	struct InvalidCompiledFunctionError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The CompiledFunction is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The CompiledFunction is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const CompiledFunction& cfunc);
 	};
 
@@ -96,19 +96,19 @@ namespace SpaceGameEngine::SpaceLanguage
 
 	struct CompiledGlobalVariableAlreadyExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The CompiledGlobalVariable has already existed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The CompiledGlobalVariable has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, CompiledGlobalVariable>::ConstIterator& citer, const HashMap<UInt64, CompiledGlobalVariable>::ConstIterator& cend);
 	};
 
 	struct CompiledFunctionAlreadyExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The CompiledFunction has already existed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The CompiledFunction has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, CompiledFunction>::ConstIterator& citer, const HashMap<UInt64, CompiledFunction>::ConstIterator& cend);
 	};
 
 	struct InvalidCompiledObjectReplacementError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The CompiledObject's replacement is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The CompiledObject's replacement is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const CompiledObject& self, const CompiledObject& cobj, const HashMap<UInt64, UInt64>& cgv_tran, const HashMap<UInt64, UInt64>& cfunc_tran);
 	};
 
@@ -116,7 +116,7 @@ namespace SpaceGameEngine::SpaceLanguage
 
 	struct InvalidCompiledObjectError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The CompiledObject is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The CompiledObject is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const CompiledObject& cobj);
 	};
 }

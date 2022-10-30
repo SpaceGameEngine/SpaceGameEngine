@@ -45,7 +45,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct InvalidStorageTypeError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The StorageType is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The StorageType is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(StorageType st);
 	};
 

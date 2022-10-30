@@ -209,7 +209,7 @@ namespace SpaceGameEngine
 
 	struct InvalidLogLevelError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The LogLevel is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The LogLevel is invalid.");
 		static COMMON_API bool Judge(LogLevelType log_level);
 	};
 

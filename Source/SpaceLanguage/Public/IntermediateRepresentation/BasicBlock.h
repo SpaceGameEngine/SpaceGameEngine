@@ -45,7 +45,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct InvalidBasicBlockError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The BasicBlock is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The BasicBlock is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const BasicBlock& bb);
 	};
 }

@@ -38,7 +38,7 @@ namespace SpaceGameEngine
 
 	struct InvalidAlignmentError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The alignment is invalid");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The alignment is invalid");
 		/*!
 		@note only the alignment which is 0 or 2^n can pass the judgment.
 		*/
@@ -203,7 +203,7 @@ namespace SpaceGameEngine
 
 		struct InvalidRequestInformationError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The RequestInformation is invalid");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The RequestInformation is invalid");
 			/*!
 			@note the request_info's size must be less than or equal to 1024,
 			the alignment of it can not be larger than 128.

@@ -62,7 +62,7 @@ namespace SpaceGameEngine
 
 		struct EmptyVectorError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The Vector is empty");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Vector is empty");
 			inline static bool Judge(SizeType size)
 			{
 				return size == 0;
@@ -784,7 +784,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const IteratorImpl& iter, _T* begin, _T* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
@@ -943,7 +943,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const ReverseIteratorImpl& iter, _T* begin, _T* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);

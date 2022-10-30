@@ -41,43 +41,43 @@ namespace SpaceGameEngine
 
 	struct EmptyDllNameError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Dll's name is empty.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Dll's name is empty.");
 		static COMMON_API bool Judge(const String& name);
 	};
 
 	struct EmptyDllPathError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Dll's path is empty.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Dll's path is empty.");
 		static COMMON_API bool Judge(const String& dll_path);
 	};
 
 	struct EmptySymbolError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Symbol's string is empty.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Symbol's string is empty.");
 		static COMMON_API bool Judge(const String& symbol);
 	};
 
 	struct LoadDllFailedError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Loading dll is failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Loading dll is failed.");
 		static COMMON_API bool Judge(const DllHandle& re);
 	};
 
 	struct GetAddressFromDllFailedError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Getting address from dll is failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Getting address from dll is failed.");
 		static COMMON_API bool Judge(void* re);
 	};
 
 	struct UnloadDllFailedError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Unloading dll is failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Unloading dll is failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct NullDllHandleError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Dll's handle is null.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Dll's handle is null.");
 		static COMMON_API bool Judge(const DllHandle& handle);
 	};
 

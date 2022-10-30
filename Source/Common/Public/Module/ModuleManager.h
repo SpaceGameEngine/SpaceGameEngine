@@ -33,13 +33,13 @@ namespace SpaceGameEngine
 
 	struct EmptyModuleNameError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Module's name is empty.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Module's name is empty.");
 		static COMMON_API bool Judge(const String& name);
 	};
 
 	struct ConflictingModuleNameError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Module's name is conflicting.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Module's name is conflicting.");
 		static COMMON_API bool Judge(const Map<String, Module*>& m, const String& name);
 	};
 

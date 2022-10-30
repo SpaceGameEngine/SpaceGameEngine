@@ -39,242 +39,242 @@ namespace SpaceGameEngine
 #ifdef SGE_WINDOWS
 	struct GetFullPathNameFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("GetFullPathName failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("GetFullPathName failed.");
 		static COMMON_API bool Judge(DWORD re, SizeType buf_size);
 	};
 
 	struct GetCurrentDirectoryFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("GetCurrentDirectory failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("GetCurrentDirectory failed.");
 		static COMMON_API bool Judge(DWORD re, SizeType buf_size);
 	};
 
 	struct GetModuleFileNameFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("GetModuleFileName failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("GetModuleFileName failed.");
 		static COMMON_API bool Judge(DWORD re, SizeType buf_size);
 	};
 
 	struct FindFirstFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FindFirstFile failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FindFirstFile failed.");
 		static COMMON_API bool Judge(HANDLE handle);
 	};
 
 	struct FindNextFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FindNextFile failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FindNextFile failed.");
 		static COMMON_API bool Judge(DWORD last_error);
 	};
 
 	struct FindCloseFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FindClose failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FindClose failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct SetCurrentDirectoryFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("SetCurrentDirectory failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("SetCurrentDirectory failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct CreateFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("CreateFile failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("CreateFile failed.");
 		static COMMON_API bool Judge(HANDLE handle);
 	};
 
 	struct CloseHandleFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("CloseHandle failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("CloseHandle failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct GetFileInformationByHandleExFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("GetFileInformationByHandleEx failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("GetFileInformationByHandleEx failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct DeleteFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("DeleteFile failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("DeleteFile failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct CopyFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("CopyFile failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("CopyFile failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct MoveFileExFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("MoveFileEx failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("MoveFileEx failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct CreateDirectoryFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("CreateDirectory failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("CreateDirectory failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct RemoveDirectoryFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("RemoveDirectory failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("RemoveDirectory failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct FlushFileBuffersFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FlushFileBuffers failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FlushFileBuffers failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct ReadFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("ReadFile failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("ReadFile failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct WriteFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("WriteFile failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("WriteFile failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct SetFilePointerExFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("SetFilePointerEx failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("SetFilePointerEx failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct GetFileSizeExFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("GetFileSizeEx failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("GetFileSizeEx failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 	struct SetEndOfFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("SetEndOfFile failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("SetEndOfFile failed.");
 		static COMMON_API bool Judge(BOOL re);
 	};
 
 #elif defined(SGE_POSIX)
 	struct GetCWDFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("getcwd failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("getcwd failed.");
 		static COMMON_API bool Judge(char* re);
 	};
 
 	struct ChDirFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("chdir failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("chdir failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct StatFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("stat failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("stat failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct OpenDirFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("opendir failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("opendir failed.");
 		static COMMON_API bool Judge(DIR* re);
 	};
 
 	struct CloseDirFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("closedir failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("closedir failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct CreatFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("creat failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("creat failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct OpenFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("open failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("open failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct CloseFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("close failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("close failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct UnlinkFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("unlink failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("unlink failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct STLCopyFileFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("STL copy_file failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("STL copy_file failed.");
 		static COMMON_API bool Judge(bool re);
 	};
 
 	struct RenameFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("rename failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("rename failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct MkdirFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("mkdir failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("mkdir failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct RmdirFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("rmdir failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("rmdir failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct FsyncFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("fsync failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("fsync failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct ReadFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("read failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("read failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct WriteFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("write failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("write failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct LSeekFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("lseek failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("lseek failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct FStatFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("fstat failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("fstat failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct FTruncateFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("ftruncate failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("ftruncate failed.");
 		static COMMON_API bool Judge(int re);
 	};
 #endif
@@ -282,19 +282,19 @@ namespace SpaceGameEngine
 #ifdef SGE_LINUX
 	struct ReadLinkFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("readlink failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("readlink failed.");
 		static COMMON_API bool Judge(ssize_t re);
 	};
 #elif defined(SGE_MACOS)
 	struct NSGetExecutablePathFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("NSGetExecutablePath failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("NSGetExecutablePath failed.");
 		static COMMON_API bool Judge(int re);
 	};
 
 	struct RealPathFailError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("NSGetExecutablePath failed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("NSGetExecutablePath failed.");
 		static COMMON_API bool Judge(char* re);
 	};
 #endif
@@ -424,37 +424,37 @@ namespace SpaceGameEngine
 
 	struct AbsolutePathAdditionError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Absolute path can not be added to another path.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Absolute path can not be added to another path.");
 		static COMMON_API bool Judge(const Path& path);
 	};
 
 	struct PathExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Path has been existed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Path has been existed.");
 		static COMMON_API bool Judge(const Path& path);
 	};
 
 	struct PathNotExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Path does not exist.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Path does not exist.");
 		static COMMON_API bool Judge(const Path& path);
 	};
 
 	struct PathNotDirectoryError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Path is not a directory.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Path is not a directory.");
 		static COMMON_API bool Judge(const Path& path);
 	};
 
 	struct PathNotFileError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Path is not a file.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Path is not a file.");
 		static COMMON_API bool Judge(const Path& path);
 	};
 
 	struct PathNotFileOrDirectoryError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Path is not a file or a directory.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Path is not a file or a directory.");
 		static COMMON_API bool Judge(const Path& path);
 		static COMMON_API bool Judge(PathType ptype);
 	};
@@ -525,7 +525,7 @@ namespace SpaceGameEngine
 
 	struct InvalidFileIOModeError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FileIOMode is invalid.");
 		static COMMON_API bool Judge(FileIOMode mode);
 	};
 
@@ -538,13 +538,13 @@ namespace SpaceGameEngine
 
 	struct InvalidFilePositionOriginError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FilePositionOrigin is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FilePositionOrigin is invalid.");
 		static COMMON_API bool Judge(FilePositionOrigin origin);
 	};
 
 	struct IncompleteWriteError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Write is incomplete.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Write is incomplete.");
 		static COMMON_API bool Judge(SizeType real, SizeType wish);
 	};
 
@@ -582,31 +582,31 @@ namespace SpaceGameEngine
 
 	struct FileHandleOccupiedError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FileHandle is occupied.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FileHandle is occupied.");
 		static COMMON_API bool Judge(FileHandle handle);
 	};
 
 	struct FileHandleReleasedError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FileHandle is released.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FileHandle is released.");
 		static COMMON_API bool Judge(FileHandle handle);
 	};
 
 	struct FileIOModeUnknownError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is unknown.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FileIOMode is unknown.");
 		static COMMON_API bool Judge(FileIOMode mode);
 	};
 
 	struct FileIOModeNotReadError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is not Read.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FileIOMode is not Read.");
 		static COMMON_API bool Judge(FileIOMode mode);
 	};
 
 	struct FileIOModeNotWriteError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("FileIOMode is not Write.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("FileIOMode is not Write.");
 		static COMMON_API bool Judge(FileIOMode mode);
 	};
 
@@ -662,7 +662,7 @@ namespace SpaceGameEngine
 
 	struct InvalidUCS2FileSizeError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The UCS2File's size is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UCS2File's size is invalid.");
 		static COMMON_API bool Judge(SizeType size);
 	};
 
@@ -715,7 +715,7 @@ namespace SpaceGameEngine
 
 	struct UnknownFileLineBreakError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The FileLineBreak is unknown.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The FileLineBreak is unknown.");
 		static COMMON_API bool Judge(FileLineBreak flb);
 	};
 

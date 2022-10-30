@@ -50,13 +50,13 @@ namespace SpaceGameEngine::SpaceLanguage
 
 	struct ExternalCallFunctionAlreadyExistError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The ExternalCallFunction has already existed.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The ExternalCallFunction has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, ExternalCallFunctionType>::ConstIterator& iter, const HashMap<UInt64, ExternalCallFunctionType>& hash_map);
 	};
 
 	struct ExternalCallFunctionNotFoundError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The ExternalCallFunction can not be found.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The ExternalCallFunction can not be found.");
 		static SPACE_LANGUAGE_API bool Judge(const HashMap<UInt64, ExternalCallFunctionType>::ConstIterator& iter, const HashMap<UInt64, ExternalCallFunctionType>& hash_map);
 	};
 

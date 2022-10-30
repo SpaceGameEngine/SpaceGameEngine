@@ -35,7 +35,7 @@ namespace SpaceGameEngine
 
 		struct EmptyStackError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The Stack is empty");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Stack is empty");
 			inline static bool Judge(SizeType size)
 			{
 				return size == 0;

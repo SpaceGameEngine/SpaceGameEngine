@@ -46,7 +46,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct InvalidBaseTypeError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The BaseType is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The BaseType is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(BaseType bt);
 	};
 

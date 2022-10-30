@@ -36,7 +36,7 @@ namespace SpaceGameEngine
 
 		struct EmptyListError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The List is empty");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The List is empty");
 			inline static bool Judge(SizeType size)
 			{
 				return size == 0;
@@ -351,7 +351,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const IteratorImpl& iter)
 				{
 					return iter.m_pNode == nullptr;
@@ -549,7 +549,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const TChar sm_pContent[] = SGE_TSTR("The iterator is out of range.");
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const ReverseIteratorImpl& iter)
 				{
 					return iter.m_pNode == nullptr;
@@ -754,7 +754,7 @@ namespace SpaceGameEngine
 
 		struct ExternalIteratorError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The iterator does not belong to this List.");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this List.");
 
 			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, void>>
 			inline static bool Judge(const IteratorType& iter, const List& l)

@@ -217,7 +217,7 @@ namespace SpaceGameEngine
 
 	struct NonFormatStringError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The string is not format string.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not format string.");
 		template<typename T, typename Trait, typename Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
@@ -229,7 +229,7 @@ namespace SpaceGameEngine
 
 	struct InvalidNumberBaseOptionError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The option for the number base is invalid, only B/D/H can be chosen.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The option for the number base is invalid, only B/D/H can be chosen.");
 		template<typename T, typename Trait, typename Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{

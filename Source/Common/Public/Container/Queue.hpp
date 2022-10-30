@@ -34,7 +34,7 @@ namespace SpaceGameEngine
 
 		struct EmptyQueueError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The Queue is empty");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Queue is empty");
 			inline static bool Judge(SizeType size)
 			{
 				return size == 0;

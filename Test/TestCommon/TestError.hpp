@@ -21,9 +21,9 @@ using namespace SpaceGameEngine;
 
 TEST(IsError, CorrectnessTest)
 {
-	ASSERT_TRUE((IsError<NullPointerError, const void*>::Value == true));
-	ASSERT_TRUE((IsError<InvalidValueError, SizeType, SizeType, SizeType>::Value == true));
-	ASSERT_TRUE((IsError<int>::Value == false));
+	ASSERT_TRUE((IsError<NullPointerError, const void*> == true));
+	ASSERT_TRUE((IsError<InvalidValueError, SizeType, SizeType, SizeType> == true));
+	ASSERT_TRUE((IsError<int> == false));
 }
 
 #ifdef SGE_DEBUG

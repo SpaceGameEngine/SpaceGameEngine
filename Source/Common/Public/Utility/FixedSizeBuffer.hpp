@@ -34,7 +34,7 @@ namespace SpaceGameEngine
 
 		struct BufferOverflowError
 		{
-			inline static const TChar sm_pContent[] = SGE_TSTR("The buffer is overflow.");
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The buffer is overflow.");
 			inline static bool Judge(SizeType size)
 			{
 				return size > MaxSize;

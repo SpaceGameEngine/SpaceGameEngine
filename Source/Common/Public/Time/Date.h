@@ -41,7 +41,7 @@ namespace SpaceGameEngine
 
 	struct InvalidDateError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Date is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Date is invalid.");
 		static COMMON_API bool Judge(const Date& date);
 	};
 

@@ -22,6 +22,8 @@ limitations under the License.
 #include "CommonAPI.h"
 #include "Utility/DebugInformation.h"
 #include <type_traits>
+#include <string>
+#include <concepts>
 
 /*!
 @ingroup Common
@@ -30,39 +32,32 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
+	using ErrorMessageChar = Char8;
+	using ErrorMessageString = std::u8string;
+#define SGE_ESTR SGE_U8STR
+#define SGE_ESTR_TO_UTF8(str) str
 
-	COMMON_API void ThrowError(const TChar* error_msg, DebugInformation debug_info);
+	COMMON_API void ThrowError(const ErrorMessageChar* error_msg, DebugInformation debug_info);
 
 	/*!
 	@brief Can check whether a type is a error type or not.But need to specify the Judge function's arguments' types.
 	*/
 	template<typename T, typename... Args>
-	struct IsError
+	concept IsError = requires(Args... args)
 	{
-	private:
-		template<typename _T, typename... _Args>
-		inline static constexpr std::enable_if_t<
-			std::is_same_v<decltype(static_cast<const TChar*>(_T::sm_pContent)), const TChar*> &&
-				std::is_same_v<decltype(_T::Judge(std::declval<_Args>()...)), bool>,
-			bool>
-		Check(int)
 		{
-			return true;
+			T::sm_pContent
 		}
-
-		template<typename _T, typename... _Args>
-		inline static constexpr bool Check(...)
+		->std::convertible_to<const ErrorMessageChar*>;
 		{
-			return false;
+			T::Judge(args...)
 		}
-
-	public:
-		inline static constexpr const bool Value = Check<RemoveCVRefType<T>, Args...>(0);
+		->std::same_as<bool>;
 	};
 
 	struct NullPointerError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Pointer can not be null");
 		template<typename T>
 		inline static bool Judge(const T ptr)
 		{
@@ -72,7 +67,7 @@ namespace SpaceGameEngine
 
 	struct InvalidValueError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The value is invalid");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The value is invalid");
 		template<typename T1, typename T2, typename T3>
 		inline static bool Judge(T1&& val, T2&& min_val, T3&& max_val)
 		{
@@ -82,7 +77,7 @@ namespace SpaceGameEngine
 
 	struct SelfAssignmentError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("a self assignment has occured");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("a self assignment has occured");
 		template<typename T>
 		inline static bool Judge(const T* pthis, const T* ptr)
 		{

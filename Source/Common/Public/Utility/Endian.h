@@ -34,7 +34,7 @@ namespace SpaceGameEngine
 
 	struct InvalidEndianError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("Endian is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Endian is invalid.");
 		static COMMON_API bool Judge(Endian endian);
 	};
 

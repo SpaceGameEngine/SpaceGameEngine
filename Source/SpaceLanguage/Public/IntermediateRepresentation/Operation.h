@@ -50,7 +50,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct InvalidOperationTypeError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The OperationType is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The OperationType is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(OperationType ot);
 	};
 
@@ -118,7 +118,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct InvalidOperationError
 	{
-		inline static const TChar sm_pContent[] = SGE_TSTR("The Operation is invalid.");
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Operation is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const Operation& o);
 	};
 }
