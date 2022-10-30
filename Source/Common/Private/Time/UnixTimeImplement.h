@@ -34,10 +34,10 @@ namespace SpaceGameEngine
 #ifdef SGE_UNIX
 		namespace UnixTimeImplement
 		{
-			struct COMMON_API GetTimeOfDayFailedError
+			struct GetTimeOfDayFailedError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("Can not get the time of day");
-				static bool Judge(int re_code);
+				static COMMON_API bool Judge(int re_code);
 			};
 		}
 

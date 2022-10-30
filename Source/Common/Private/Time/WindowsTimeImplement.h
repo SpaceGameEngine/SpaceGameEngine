@@ -34,18 +34,18 @@ namespace SpaceGameEngine
 #ifdef SGE_WINDOWS
 		namespace WindowsTimeImplement
 		{
-			struct COMMON_API GetQPCFrequencyFailedError
+			struct GetQPCFrequencyFailedError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("Can not get the qpc frequency");
-				static bool Judge(BOOL re_code);
+				static COMMON_API bool Judge(BOOL re_code);
 			};
 
 			COMMON_API TimeType GetQPCFrequency();
 
-			struct COMMON_API GetQPCCounterFailedError
+			struct GetQPCCounterFailedError
 			{
 				inline static const TChar sm_pContent[] = SGE_TSTR("Can not get the qpc counter");
-				static bool Judge(BOOL re_code);
+				static COMMON_API bool Judge(BOOL re_code);
 			};
 
 			COMMON_API TimeType GetQPCCounter();
