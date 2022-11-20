@@ -34,7 +34,7 @@ namespace SpaceGameEngine
 {
 	using ErrorMessageChar = Char8;
 	using ErrorMessageString = std::u8string;
-#define SGE_ESTR SGE_U8STR
+#define SGE_ESTR(str) SGE_U8STR(str)
 #define SGE_ESTR_TO_UTF8(str) str
 
 	COMMON_API void ThrowError(const ErrorMessageChar* error_msg, DebugInformation debug_info);

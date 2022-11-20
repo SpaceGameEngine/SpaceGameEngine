@@ -22,7 +22,7 @@
 &emsp;&emsp;`Error`不是某个具体类，而是一个概念，代表着一系列类。一个`Error`类应有以下内容:
 ```c++
 public:
-	static const TChar sm_pContent[] = SGE_TSTR("错误消息内容");//错误消息内容
+	static const ErrorMessageChar sm_pContent[] = SGE_ESTR("错误消息内容");//错误消息内容
 
 	static bool Judge();//通过检验其参数来判断是否出错，参数随意，返回true表示有错误发生，返回false表示无错误发生
 ```
@@ -37,22 +37,30 @@ public:
 #### 样例
 ```c++
 struct NullPointerError
-{
-	inline static const TChar sm_pContent[] = SGE_TSTR("Pointer can not be null");
-	static bool Judge(const void* ptr);
-};
+	{
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Pointer can not be null");
+		template<typename T>
+		inline static bool Judge(const T ptr)
+		{
+			return ptr == nullptr;
+		}
+	};
 
-struct InvalidSizeError
-{
-	inline static const TChar sm_pContent[] = SGE_TSTR("The size is invalid");
-	static bool Judge(SizeType size, SizeType min_size, SizeType max_size);
-};
+	struct InvalidValueError
+	{
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The value is invalid");
+		template<typename T1, typename T2, typename T3>
+		inline static bool Judge(T1&& val, T2&& min_val, T3&& max_val)
+		{
+			return !(val >= min_val && val <= max_val);
+		}
+	};
 ```
 ```c++
-SGE_ASSERT(NullPointerError,(void*)1);
-SGE_ASSERT(InvalidSizeError, 5, 1, 10);
+SGE_ASSERT(NullPointerError, (void*)1);
+SGE_ASSERT(InvalidValueError, 5, 1, 10);
 ```
 ```c++
 int test = 0;
-SGE_ASSERT(TestError).Handle([&]() {test = 1; });
+SGE_ASSERT(TestError).Handle([&]() { test = 1; });
 ```
