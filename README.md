@@ -91,3 +91,22 @@ We use [Azure Pipeline](https://azure.microsoft.com/en-us/services/devops/pipeli
     <td><img src="https://dev.azure.com/xsun2001/SpaceGameEngine/_apis/build/status/SpaceGameEngine.MacOS?branchName=master&jobName=MacOS_MinSizeRel"></td>
   </tr>
 </table>
+
+## User Guide
+
+### Installation
+```bash
+git clone git@github.com:SpaceGameEngine/SpaceGameEngine.git
+cd SpaceGameEngine
+# windows
+powershell ./setup.ps1
+# unix
+sh ./setup.sh
+```
+
+### Test
+
+run test projects like ./Test/TestXXX...
+
+must set the working directory to this location(`$(SolutionDir)` in Visual Studio)
+before running the test program

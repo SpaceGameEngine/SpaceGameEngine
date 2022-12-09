@@ -213,7 +213,7 @@ namespace SpaceGameEngine
 					{
 						if (m_RealSize >= s.m_RealSize)
 						{
-							//no need for re-allocate
+							// no need for re-allocate
 							m_Size = s.m_Size;
 							memcpy(m_pContent, s.m_pContent, m_Size * sizeof(T));
 						}
@@ -292,7 +292,7 @@ namespace SpaceGameEngine
 					{
 						if (m_RealSize >= s.GetRealSize())
 						{
-							//no need for re-allocate
+							// no need for re-allocate
 							m_Size = s.GetSize();
 							memcpy(m_pContent, s.GetData(), m_Size * sizeof(T));
 						}
@@ -334,7 +334,7 @@ namespace SpaceGameEngine
 					{
 						if (m_RealSize >= s.GetRealSize())
 						{
-							//no need for re-allocate
+							// no need for re-allocate
 							m_Size = s.GetSize();
 							memcpy(m_pContent, s.GetData(), m_Size * sizeof(T));
 						}
@@ -380,7 +380,7 @@ namespace SpaceGameEngine
 				{
 					if (new_category == StringCategory::Small)
 					{
-						//see warning
+						// see warning
 						auto pre_p_content = m_pContent;
 						m_RealSize = m_Size;
 						memcpy(m_Content, pre_p_content, m_RealSize * sizeof(T));
@@ -714,7 +714,7 @@ namespace SpaceGameEngine
 			else if (static_cast<const UInt8>(*ptr) <= 0b11101111)
 				return ((*(ptr + 2)) & 0b00111111) | (((*(ptr + 1)) & 0b00111111) << 6) | (((*ptr) & 0b00001111) << 12);
 			else if (static_cast<const UInt8>(*ptr) <= 0b11110111)
-				return ((*(ptr + 3)) & 0b00111111) | (((*(ptr + 2)) & 0b00111111) << 6) | (((*(ptr + 1)) & 0b00111111) << 12) | (((*ptr) & 0b00000111) << 18);	  //out of ucs2
+				return ((*(ptr + 3)) & 0b00111111) | (((*(ptr + 2)) & 0b00111111) << 6) | (((*(ptr + 1)) & 0b00111111) << 12) | (((*ptr) & 0b00000111) << 18);	  // out of ucs2
 		}
 
 		inline SizeType GetUCS2CharToUTF8CharSize(const Char16 c)
@@ -725,7 +725,7 @@ namespace SpaceGameEngine
 				return 2;
 			else if (c <= 0xffff)
 				return 3;
-			else if (c <= 0x10ffff)	   //out of ucs2
+			else if (c <= 0x10ffff)	   // out of ucs2
 				return 4;
 		}
 
@@ -754,7 +754,7 @@ namespace SpaceGameEngine
 				*pdst = 0b11100000 | ((c >> 12) & 0b00001111);
 				return pdst + 3;
 			}
-			else if (c <= 0x10ffff)	   //out of ucs2
+			else if (c <= 0x10ffff)	   // out of ucs2
 			{
 				*(pdst + 3) = 0b10000000 | (0b00111111 & c);
 				*(pdst + 2) = 0b10000000 | (0b00111111 & (c >> 6));
@@ -2142,7 +2142,7 @@ namespace SpaceGameEngine
 		inline StringCore& operator+=(const StringCore& str)
 		{
 			SizeType nsize = GetNormalSize() + str.GetNormalSize();
-			//normal size can be changed by setrealsize when the string is small string.
+			// normal size can be changed by setrealsize when the string is small string.
 			SizeType osize = GetNormalSize();
 			if (GetRealSize() < nsize)
 			{
@@ -2158,7 +2158,7 @@ namespace SpaceGameEngine
 		inline StringCore& operator+=(const StringCore<T, Trait, OtherAllocator>& str)
 		{
 			SizeType nsize = GetNormalSize() + str.GetNormalSize();
-			//normal size can be changed by setrealsize when the string is small string.
+			// normal size can be changed by setrealsize when the string is small string.
 			SizeType osize = GetNormalSize();
 			if (GetRealSize() < nsize)
 			{
@@ -2552,13 +2552,13 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
+				memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 // include '\0'
 				memcpy(GetData() + index, str.GetData(), str.GetNormalSize() * sizeof(T));
 				m_Size += str.GetSize();
 				m_Storage.SetSize(nsize + 1);
 				return IteratorType(GetData() + index);
 			}
-			else	//reverse
+			else	// reverse
 			{
 				if constexpr (!Trait::IsMultipleByte)
 				{
@@ -2576,7 +2576,7 @@ namespace SpaceGameEngine
 					SetRealSize(2 * nsize);
 				}
 				if (index != osize)
-					memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
+					memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 // include '\0'
 
 				ReverseIterator i1(GetData() + index + str.GetNormalSize());
 				auto i2 = str.GetConstBegin();
@@ -2634,13 +2634,13 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
+				memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 // include '\0'
 				memcpy(GetData() + index, str.GetData(), str.GetNormalSize() * sizeof(T));
 				m_Size += str.GetSize();
 				m_Storage.SetSize(nsize + 1);
 				return IteratorType(GetData() + index);
 			}
-			else	//reverse
+			else	// reverse
 			{
 				if constexpr (!Trait::IsMultipleByte)
 				{
@@ -2658,7 +2658,7 @@ namespace SpaceGameEngine
 					SetRealSize(2 * nsize);
 				}
 				if (index != osize)
-					memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 //include '\0'
+					memmove(GetData() + index + str.GetNormalSize(), GetData() + index, (osize - index + 1) * sizeof(T));	 // include '\0'
 
 				ReverseIterator i1(GetData() + index + str.GetNormalSize());
 				auto i2 = str.GetConstBegin();
@@ -2721,13 +2721,13 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
+				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	// include '\0'
 				memcpy(GetData() + index, pstr, snsize * sizeof(T));
 				m_Size += GetCStringSize(pstr);
 				m_Storage.SetSize(nsize + 1);
 				return IteratorType(GetData() + index);
 			}
-			else	//reverse
+			else	// reverse
 			{
 				if constexpr (!Trait::IsMultipleByte)
 				{
@@ -2746,7 +2746,7 @@ namespace SpaceGameEngine
 					SetRealSize(2 * nsize);
 				}
 				if (index != osize)
-					memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
+					memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	// include '\0'
 
 				ReverseIterator i1(GetData() + index + snsize);
 				const T* i2 = pstr;
@@ -2825,7 +2825,7 @@ namespace SpaceGameEngine
 				{
 					SetRealSize(2 * nsize);
 				}
-				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
+				memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	// include '\0'
 				SizeType cnt = 0;
 				SizeType mc_cnt = 0;
 				for (auto i = begin; i != end; ++i)
@@ -2859,7 +2859,7 @@ namespace SpaceGameEngine
 				m_Storage.SetSize(nsize + 1);
 				return IteratorType(GetData() + index);
 			}
-			else	//reverse
+			else	// reverse
 			{
 				if constexpr (!Trait::IsMultipleByte)
 				{
@@ -2877,7 +2877,7 @@ namespace SpaceGameEngine
 					SetRealSize(2 * nsize);
 				}
 				if (index != osize)
-					memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	//include '\0'
+					memmove(GetData() + index + snsize, GetData() + index, (osize - index + 1) * sizeof(T));	// include '\0'
 
 				ReverseIterator i1(GetData() + index + snsize);
 				auto i2 = begin;
@@ -2964,7 +2964,7 @@ namespace SpaceGameEngine
 			{
 				return iter;
 			}
-			else	//reverse
+			else	// reverse
 			{
 				return iter + 1;
 			}
@@ -3032,7 +3032,7 @@ namespace SpaceGameEngine
 				m_Storage.SetSize(nsize + 1);
 				return begin;
 			}
-			else	//reverse
+			else	// reverse
 			{
 				if constexpr (!Trait::IsMultipleByte)
 				{
@@ -3614,7 +3614,9 @@ namespace SpaceGameEngine
 #define SGE_STR_TO_TSTR(str) SGE_UCS2_TO_TSTR(str)
 #define SGE_TSTR_TO_STR(str) SGE_TSTR_TO_UCS2(str)
 #define SGE_STR_TO_UCS2(str) str
+#define SGE_UCS2_TO_STR(str) str
 #define SGE_STR_TO_UTF8(str) SpaceGameEngine::UCS2StringToUTF8String(str)
+#define SGE_UTF8_TO_STR(str) SpaceGameEngine::UTF8StringToUCS2String(str)
 
 	template<typename StringType, typename T>
 	struct ToStringCore
@@ -4326,7 +4328,7 @@ namespace SpaceGameEngine
 				}
 			}
 		}
-		else	//UTF8Trait
+		else	// UTF8Trait
 		{
 			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
 			if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(*iter))
@@ -4418,7 +4420,7 @@ namespace SpaceGameEngine
 					}
 				}
 			}
-			else	//UTF8Trait
+			else	// UTF8Trait
 			{
 				static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
 				if (**iter == SGE_U8STR('0'))
@@ -4506,7 +4508,7 @@ namespace SpaceGameEngine
 				}
 			}
 		}
-		else	//UTF8Trait
+		else	// UTF8Trait
 		{
 			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
 			if (!IsNumericalCharacter<NumberBase::Decimal, T, Trait>(str[0]))
