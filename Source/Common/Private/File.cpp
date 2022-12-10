@@ -519,7 +519,7 @@ void SpaceGameEngine::CopyFile(const Path& dst, const Path& src, bool can_overwr
 	SGE_CHECK(CopyFileFailError, CopyFile(SGE_STR_TO_TSTR(sstr).GetData(), SGE_STR_TO_TSTR(dstr).GetData(), !can_overwrite));
 #include "System/HideWindowsMacro.h"
 #elif defined(SGE_POSIX)
-	//no portable solution for unix platform to copy file, so use STL
+	// no portable solution for unix platform to copy file, so use STL
 	SGE_CHECK(STLCopyFileFailError, std::filesystem::copy_file(std::filesystem::path((const char*)SGE_STR_TO_UTF8(sstr).GetData()), std::filesystem::path((const char*)SGE_STR_TO_UTF8(dstr).GetData()), (can_overwrite ? std::filesystem::copy_options::overwrite_existing : std::filesystem::copy_options::none)));
 #else
 #error this os has not been supported.
@@ -1399,8 +1399,9 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::ReadBomHeader()
 	}
 	else
 	{
-		m_Endian = GetSystemEndian();	 //can not judge, so use system endian
+		m_Endian = GetSystemEndian();	 // can not judge, so use system endian
 		m_HasBomHeader = false;
+		m_IsReadFinished = false;
 		MoveFilePosition(FilePositionOrigin::Begin, 0);
 	}
 }
@@ -1416,7 +1417,7 @@ void SpaceGameEngine::FileCore<Char16, UCS2Trait>::AddBomHeader()
 		bom[0] = 0xff;
 		bom[1] = 0xfe;
 	}
-	else	//big endian
+	else	// big endian
 	{
 		bom[0] = 0xfe;
 		bom[1] = 0xff;
@@ -1609,6 +1610,7 @@ void SpaceGameEngine::FileCore<Char8, UTF8Trait>::ReadBomHeader()
 	else
 	{
 		m_HasBomHeader = false;
+		m_IsReadFinished = false;
 		MoveFilePosition(FilePositionOrigin::Begin, 0);
 	}
 }
@@ -1703,9 +1705,9 @@ FileLineBreak SpaceGameEngine::GetSystemFileLineBreak()
 {
 #ifdef SGE_WINDOWS
 	return FileLineBreak::CRLF;
-//#elif defined(SGE_MACOS)
+// #elif defined(SGE_MACOS)
 //	return FileLineBreak::CR;
-//#elif defined(SGE_LINUX)
+// #elif defined(SGE_LINUX)
 //	return FileLineBreak::LF;
 #elif defined(SGE_UNIX)
 	return FileLineBreak::LF;

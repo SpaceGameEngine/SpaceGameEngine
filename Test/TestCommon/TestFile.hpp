@@ -923,7 +923,7 @@ TEST(BinaryFile, AppendTest)
 	BinaryFile bf_append(path, FileIOMode::Append);
 	bf_append.Write(test_data_output, sizeof(int) * 2);
 	bf_append.Close();
-	bf_append.Open(path, FileIOMode::Append);	 //test open append
+	bf_append.Open(path, FileIOMode::Append);	 // test open append
 	bf_append.Write(test_data_output + 2, sizeof(int) * 2);
 	bf_append.Close();
 
@@ -1834,6 +1834,14 @@ TEST(UCS2File, OpenTest)
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
 	file.Close();
 
+	file.Open(p_nbk, FileIOMode::Read | FileIOMode::Write);
+	ASSERT_EQ(file.GetEndian(), Endian::Little);
+	ASSERT_EQ(file.GetFileLineBreak(), GetSystemFileLineBreak());
+	memset(test_input, 0, sizeof(test_input));
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
+	file.Close();
+
 	DeleteFile(p_cr);
 	ASSERT_FALSE(p_cr.IsExist());
 	DeleteFile(p_lf);
@@ -2411,6 +2419,37 @@ TEST(UCS2File, WriteOperatorTest)
 	ASSERT_FALSE(p_crlf.IsExist());
 }
 
+TEST(UCS2File, IsReadFinishedTest)
+{
+	Path p_byte(SGE_STR("./TestData/TestCommon/TestFile/test_ucs2_byte.txt"));
+	ASSERT_FALSE(p_byte.IsExist());
+	Path p_line(SGE_STR("./TestData/TestCommon/TestFile/test_ucs2_line.txt"));
+	ASSERT_FALSE(p_line.IsExist());
+
+	BinaryFile output_bf(p_byte, FileIOMode::Write);
+	output_bf.Close();
+	ASSERT_TRUE(p_byte.IsExist());
+
+	output_bf.Open(p_line, FileIOMode::Write);
+	UCS2String output_content = SGE_WSTR("this is a test");
+	output_bf.Write(output_content.GetData(), output_content.GetNormalSize() * sizeof(Char16));
+	output_bf.Close();
+	ASSERT_TRUE(p_line.IsExist());
+
+	UCS2File input_byte(p_byte, FileIOMode::Read);
+	ASSERT_FALSE(input_byte.IsReadFinished());
+	input_byte.Close();
+
+	UCS2File input_line(p_line, FileIOMode::Read);
+	ASSERT_FALSE(input_line.IsReadFinished());
+	input_line.Close();
+
+	DeleteFile(p_byte);
+	ASSERT_FALSE(p_byte.IsExist());
+	DeleteFile(p_line);
+	ASSERT_FALSE(p_line.IsExist());
+}
+
 TEST(UTF8File, InstanceTest)
 {
 	UTF8File file;
@@ -2489,6 +2528,14 @@ TEST(UTF8File, OpenTest)
 	file.Open(p_nbk, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
 	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::Unknown);
+	memset(test_input, 0, sizeof(test_input));
+	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
+	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
+	file.Close();
+
+	file.Open(p_nbk, FileIOMode::Read | FileIOMode::Write);
+	ASSERT_TRUE(file.IsHasBomHeader());
+	ASSERT_EQ(file.GetFileLineBreak(), GetSystemFileLineBreak());
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
@@ -3070,4 +3117,37 @@ TEST(UTF8File, WriteOperatorTest)
 	ASSERT_FALSE(p_lf.IsExist());
 	DeleteFile(p_crlf);
 	ASSERT_FALSE(p_crlf.IsExist());
+}
+
+TEST(UTF8File, IsReadFinishedTest)
+{
+	Path p_byte(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_byte.txt"));
+	ASSERT_FALSE(p_byte.IsExist());
+	Path p_line(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_line.txt"));
+	ASSERT_FALSE(p_line.IsExist());
+
+	BinaryFile output_bf(p_byte, FileIOMode::Write);
+	Byte output_byte = 123;
+	output_bf.Write(&output_byte, sizeof(Byte));
+	output_bf.Close();
+	ASSERT_TRUE(p_byte.IsExist());
+
+	output_bf.Open(p_line, FileIOMode::Write);
+	UTF8String output_content = SGE_U8STR("this is a test");
+	output_bf.Write(output_content.GetData(), output_content.GetNormalSize() * sizeof(Char8));
+	output_bf.Close();
+	ASSERT_TRUE(p_line.IsExist());
+
+	UTF8File input_byte(p_byte, FileIOMode::Read);
+	ASSERT_FALSE(input_byte.IsReadFinished());
+	input_byte.Close();
+
+	UTF8File input_line(p_line, FileIOMode::Read);
+	ASSERT_FALSE(input_line.IsReadFinished());
+	input_line.Close();
+
+	DeleteFile(p_byte);
+	ASSERT_FALSE(p_byte.IsExist());
+	DeleteFile(p_line);
+	ASSERT_FALSE(p_line.IsExist());
 }

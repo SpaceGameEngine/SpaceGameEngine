@@ -1108,7 +1108,7 @@ namespace SpaceGameEngine
 					if (!buffer.m_Second)
 						break;
 				} while ((m_FileLineBreak = SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer.m_First)) == FileLineBreak::Unknown);
-				if (m_FileLineBreak == FileLineBreak::CR)	 //CRLF judge
+				if (m_FileLineBreak == FileLineBreak::CR)	 // CRLF judge
 				{
 					auto buffer2 = FileCore<T, Trait>::ReadChar();
 					if (buffer2.m_Second)
@@ -1123,13 +1123,17 @@ namespace SpaceGameEngine
 					if (!FileCore<T, Trait>::ReadChar(buffer))
 						break;
 				} while ((m_FileLineBreak = SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer)) == FileLineBreak::Unknown);
-				if (m_FileLineBreak == FileLineBreak::CR)	 //CRLF judge
+				if (m_FileLineBreak == FileLineBreak::CR)	 // CRLF judge
 				{
 					T buffer2[Trait::MaxMultipleByteSize];
 					if (FileCore<T, Trait>::ReadChar(buffer2))
 						m_FileLineBreak = SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer2);
 				}
 			}
+
+			if (((UInt8)(BinaryFile::m_Mode & FileIOMode::Write)) && m_FileLineBreak == FileLineBreak::Unknown)	   // write need file line break
+				m_FileLineBreak = GetSystemFileLineBreak();														   // can not judge, use system file line break
+			FileCore<T, Trait>::m_IsReadFinished = false;
 			FileCore<T, Trait>::Seek(FilePositionOrigin::Begin, 0);
 		}
 
