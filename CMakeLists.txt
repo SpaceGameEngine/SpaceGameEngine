@@ -17,7 +17,7 @@ add_compile_options(-Wno-unused-but-set-variable)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 add_compile_options(-fexec-charset=UTF-8 -finput-charset=UTF-8)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-add_compile_options(/utf-8)
+add_compile_options(/bigobj /utf-8)
 endif()
 
 # cmake_policy(SET CMP0054 OLD)
