@@ -157,22 +157,27 @@ TEST(ControllableObject, EqualityTest)
 	ASSERT_FALSE(test == test2);
 	ASSERT_TRUE(test == test3);
 	ASSERT_FALSE(test == 2);
+	ASSERT_FALSE(2 == test);
 	ASSERT_TRUE(test2 == 2);
+	ASSERT_TRUE(2 == test2);
 
 	ASSERT_TRUE(test != test2);
 	ASSERT_FALSE(test != test3);
 	ASSERT_TRUE(test != 2);
+	ASSERT_TRUE(2 != test);
 	ASSERT_FALSE(test2 != 2);
+	ASSERT_FALSE(2 != test2);
 
 	ControllableObject<int> test4, test5;
 
 	ASSERT_FALSE(test4 == test);
 	ASSERT_TRUE(test4 == test5);
 	ASSERT_FALSE(test4 == 0);
+	ASSERT_FALSE(0 == test4);
 
 	ASSERT_TRUE(test4 != test);
 	ASSERT_FALSE(test4 != test5);
-	ASSERT_TRUE(test4 != 0);
+	ASSERT_TRUE(0 != test4);
 }
 
 TEST(AutoReleaseBuffer, InstanceAndNewObjectTest)
@@ -652,17 +657,25 @@ TEST(Optional, EqualityTest)
 
 	ASSERT_TRUE(opt1 == opt1);
 	ASSERT_TRUE(opt2 == opt2);
+	ASSERT_TRUE(opt3 == 1);
+	ASSERT_TRUE(1 == opt3);
 
 	ASSERT_FALSE(opt1 == opt2);
 	ASSERT_FALSE(opt2 == opt1);
 	ASSERT_FALSE(opt2 == opt3);
 	ASSERT_FALSE(opt3 == opt2);
+	ASSERT_FALSE(opt2 == 1);
+	ASSERT_FALSE(1 == opt2);
 
 	ASSERT_TRUE(opt1 != opt2);
 	ASSERT_TRUE(opt2 != opt1);
 	ASSERT_TRUE(opt2 != opt3);
 	ASSERT_TRUE(opt3 != opt2);
+	ASSERT_TRUE(opt2 != 1);
+	ASSERT_TRUE(1 != opt2);
 
 	ASSERT_FALSE(opt1 != opt1);
 	ASSERT_FALSE(opt2 != opt2);
+	ASSERT_FALSE(opt3 != 1);
+	ASSERT_FALSE(1 != opt3);
 }

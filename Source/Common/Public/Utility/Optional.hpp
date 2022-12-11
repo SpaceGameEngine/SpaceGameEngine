@@ -190,6 +190,58 @@ namespace SpaceGameEngine
 		Byte m_Value[sizeof(T)];
 	};
 
+	template<typename T>
+	struct IsOptional
+	{
+		inline static constexpr const bool Value = false;
+	};
+
+	template<typename T>
+	struct IsOptional<Optional<T>>
+	{
+		inline static constexpr const bool Value = true;
+	};
+
+	template<typename T, typename U,
+			 typename = std::enable_if_t<!IsOptional<U>::Value, void>>
+	inline bool operator==(const Optional<T>& opt, const U& value)
+	{
+		if (opt.HasValue())
+			return opt.Get() == value;
+		else
+			return false;
+	}
+
+	template<typename T, typename U,
+			 typename = std::enable_if_t<!IsOptional<U>::Value, void>>
+	inline bool operator==(const U& value, const Optional<T>& opt)
+	{
+		if (opt.HasValue())
+			return opt.Get() == value;
+		else
+			return false;
+	}
+
+	template<typename T, typename U,
+			 typename = std::enable_if_t<!IsOptional<U>::Value, void>>
+	inline bool operator!=(const Optional<T>& opt, const U& value)
+	{
+		if (opt.HasValue())
+			return opt.Get() != value;
+		else
+			return true;
+	}
+
+	template<typename T, typename U,
+			 typename = std::enable_if_t<!IsOptional<U>::Value, void>>
+	inline bool operator!=(const U& value, const Optional<T>& opt)
+	{
+		if (opt.HasValue())
+			return opt.Get() != value;
+		else
+			return true;
+	}
+
 	struct OptionalIsEmptyError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Optional is empty");

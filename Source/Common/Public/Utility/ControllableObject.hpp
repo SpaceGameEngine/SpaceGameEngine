@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "MemoryManager.h"
+#include "Meta/Trait.hpp"
 
 /*!
 @ingroup Common
@@ -174,14 +175,6 @@ namespace SpaceGameEngine
 				return true;
 		}
 
-		inline bool operator==(const T& obj) const
-		{
-			if (IsInitialized())
-				return *m_pContent == obj;
-			else
-				return false;
-		}
-
 		template<typename U, typename OtherAllocator>
 		inline bool operator!=(const ControllableObject<U, OtherAllocator>& obj) const
 		{
@@ -193,18 +186,61 @@ namespace SpaceGameEngine
 				return false;
 		}
 
-		inline bool operator!=(const T& obj) const
-		{
-			if (IsInitialized())
-				return *m_pContent != obj;
-			else
-				return true;
-		}
-
 	private:
 		T* m_pContent;
 	};
 
+	template<typename T>
+	struct IsControllableObject
+	{
+		inline static constexpr const bool Value = false;
+	};
+
+	template<typename T, typename Allocator>
+	struct IsControllableObject<ControllableObject<T, Allocator>>
+	{
+		inline static constexpr const bool Value = true;
+	};
+
+	template<typename T, typename Allocator, typename U,
+			 typename = std::enable_if_t<!IsControllableObject<U>::Value, void>>
+	inline bool operator==(const ControllableObject<T, Allocator>& obj, const U& value)
+	{
+		if (obj.IsInitialized())
+			return obj.Get() == value;
+		else
+			return false;
+	}
+
+	template<typename T, typename Allocator, typename U,
+			 typename = std::enable_if_t<!IsControllableObject<U>::Value, void>>
+	inline bool operator==(const U& value, const ControllableObject<T, Allocator>& obj)
+	{
+		if (obj.IsInitialized())
+			return obj.Get() == value;
+		else
+			return false;
+	}
+
+	template<typename T, typename Allocator, typename U,
+			 typename = std::enable_if_t<!IsControllableObject<U>::Value, void>>
+	inline bool operator!=(const ControllableObject<T, Allocator>& obj, const U& value)
+	{
+		if (obj.IsInitialized())
+			return obj.Get() != value;
+		else
+			return true;
+	}
+
+	template<typename T, typename Allocator, typename U,
+			 typename = std::enable_if_t<!IsControllableObject<U>::Value, void>>
+	inline bool operator!=(const U& value, const ControllableObject<T, Allocator>& obj)
+	{
+		if (obj.IsInitialized())
+			return obj.Get() != value;
+		else
+			return true;
+	}
 }
 
 /*!
