@@ -173,12 +173,32 @@ namespace SpaceGameEngine
 			else
 				return true;
 		}
+
 		inline bool operator==(const T& obj) const
 		{
 			if (IsInitialized())
 				return *m_pContent == obj;
 			else
 				return false;
+		}
+
+		template<typename U, typename OtherAllocator>
+		inline bool operator!=(const ControllableObject<U, OtherAllocator>& obj) const
+		{
+			if (IsInitialized() != obj.IsInitialized())
+				return true;
+			else if (IsInitialized())
+				return *m_pContent != *obj.m_pContent;
+			else
+				return false;
+		}
+
+		inline bool operator!=(const T& obj) const
+		{
+			if (IsInitialized())
+				return *m_pContent != obj;
+			else
+				return true;
 		}
 
 	private:

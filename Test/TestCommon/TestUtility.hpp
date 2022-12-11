@@ -16,17 +16,32 @@ limitations under the License.
 #pragma once
 #include <random>
 #include <cmath>
+#include "Utility/DebugInformation.h"
 #include "Utility/ControllableObject.hpp"
 #include "Utility/Utility.hpp"
 #include "Utility/AutoReleaseBuffer.h"
 #include "Utility/Endian.h"
-#include "Utility/DebugInformation.h"
 #include "Utility/FixedSizeBuffer.hpp"
 #include "Utility/Optional.hpp"
 #include "SGEString.hpp"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
+
+DebugInformation TestDebugInformation()
+{
+	return DebugInformation(SGE_DEBUG_INFORMATION);
+}
+
+TEST(DebugInformation, DebugInformationTest)
+{
+	DebugInformation di = TestDebugInformation();
+	TString<> filename(di.m_pFileName);
+	TString<> funcname(di.m_pFunctionName);
+	ASSERT_NE(filename.Find(SGE_TSTR("TestUtility.hpp"), filename.GetConstBegin(), filename.GetConstEnd()), filename.GetConstEnd());
+	ASSERT_NE(funcname.Find(SGE_TSTR("TestDebugInformation"), funcname.GetConstBegin(), funcname.GetConstEnd()), funcname.GetConstEnd());
+	ASSERT_EQ(di.m_LineNumber, 33);
+}
 
 class test_cmp
 {
@@ -138,14 +153,26 @@ TEST(ControllableObject, CopyTest)
 TEST(ControllableObject, EqualityTest)
 {
 	ControllableObject<int> test(1), test2(2), test3(1);
+
 	ASSERT_FALSE(test == test2);
 	ASSERT_TRUE(test == test3);
 	ASSERT_FALSE(test == 2);
 	ASSERT_TRUE(test2 == 2);
+
+	ASSERT_TRUE(test != test2);
+	ASSERT_FALSE(test != test3);
+	ASSERT_TRUE(test != 2);
+	ASSERT_FALSE(test2 != 2);
+
 	ControllableObject<int> test4, test5;
+
 	ASSERT_FALSE(test4 == test);
 	ASSERT_TRUE(test4 == test5);
 	ASSERT_FALSE(test4 == 0);
+
+	ASSERT_TRUE(test4 != test);
+	ASSERT_FALSE(test4 != test5);
+	ASSERT_TRUE(test4 != 0);
 }
 
 TEST(AutoReleaseBuffer, InstanceAndNewObjectTest)
@@ -213,21 +240,6 @@ TEST(Endian, ChangeEndianTest)
 	UInt32 test_val = 0x12345678;
 	ChangeEndian(test_val, Endian::Big, Endian::Little);
 	ASSERT_EQ(test_val, 0x78563412);
-}
-
-DebugInformation TestDebugInformation()
-{
-	return DebugInformation(SGE_DEBUG_INFORMATION);
-}
-
-TEST(DebugInformation, DebugInformationTest)
-{
-	DebugInformation di = TestDebugInformation();
-	TString<> filename(di.m_pFileName);
-	TString<> funcname(di.m_pFunctionName);
-	ASSERT_NE(filename.Find(SGE_TSTR("TestUtility.hpp"), filename.GetConstBegin(), filename.GetConstEnd()), filename.GetConstEnd());
-	ASSERT_NE(funcname.Find(SGE_TSTR("TestDebugInformation"), funcname.GetConstBegin(), funcname.GetConstEnd()), funcname.GetConstEnd());
-	ASSERT_EQ(di.m_LineNumber, 220);
 }
 
 TEST(FixedSizeBuffer, InstanceTest)
