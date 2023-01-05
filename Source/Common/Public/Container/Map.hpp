@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -531,7 +531,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, pu);
 				SGE_ASSERT(NullPointerError, pv);
 				SGE_ASSERT(NilNodeError, pu, &m_NilNode);
-				//even the pv is nil node, it also can be transplanted(see the Introduction to Algorithm).
+				// even the pv is nil node, it also can be transplanted(see the Introduction to Algorithm).
 
 				if (pu->m_pParent == &m_NilNode)
 					m_pRoot = pv;

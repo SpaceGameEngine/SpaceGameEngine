@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::FunctionNotExis
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslateUnit(const TranslateUnit& tu)
 {
-	//todo
+	// todo
 	for (auto fiter = tu.m_Functions.GetConstBegin(); fiter != tu.m_Functions.GetConstEnd(); ++fiter)
 	{
 		HashMap<UInt64, Type> local_map;
@@ -179,7 +179,7 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::IsValidTranslat
 					return false;
 				break;
 			}
-				//todo
+				// todo
 			default: {
 				break;
 			}
@@ -204,6 +204,6 @@ SpaceGameEngine::SpaceLanguage::CompiledObject SpaceGameEngine::SpaceLanguage::I
 	SGE_ASSERT(InvalidTranslateUnitError, tu);
 
 	CompiledObject cobj;
-	//todo
+	// todo
 	return cobj;
 }

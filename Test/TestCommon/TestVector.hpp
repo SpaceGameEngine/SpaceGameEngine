@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -973,7 +973,7 @@ TEST(Vector, InsertTest)
 
 	ASSERT_EQ(pv->GetSize(), 0);
 
-	{	 //to make tbuf release
+	{	 // to make tbuf release
 		test_vector_class tbuf(1, gen_func(1));
 		pv->Insert(pv->GetBegin(), test_size, tbuf);
 	}
@@ -1014,7 +1014,7 @@ TEST(Vector, InsertTest)
 	delete pv;
 	for (int i = 0; i < 5; i++)
 	{
-		ASSERT_EQ(val_pool[i], 2);	  //initializer_list's element can not be moved
+		ASSERT_EQ(val_pool[i], 2);	  // initializer_list's element can not be moved
 	}
 	for (int i = 5; i < test_size; i++)
 	{

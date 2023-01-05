@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		LineSeparator = 7,
 		WordSeparator = 8,
 		Exclamation = 9,			//!
-		Hash = 10,					//#
+		Hash = 10,					// #
 		Dollar = 11,				//$
 		Mod = 12,					//%
 		And = 13,					//&

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -174,9 +174,9 @@ TEST(LogWriter, WriteLogTest)
 {
 	TestStringType test_output;
 	{
-		//test LogWriterCore construction
+		// test LogWriterCore construction
 		LogWriter<TestLogWriterCore> lw(test_output);
-		//test LogWriterCore method
+		// test LogWriterCore method
 		lw.SetOutput(test_output);
 		Mutex mutex;
 		Condition end_cond;
@@ -189,7 +189,7 @@ TEST(LogWriter, WriteLogTest)
 				for (auto j = 0; j < 64; ++j)
 				{
 					lw.WriteLog(str_buf.GetData(), str_buf.GetNormalSize());
-					//SleepFor(MakeTimeDuration<Microsecond, TimeType>(100));
+					// SleepFor(MakeTimeDuration<Microsecond, TimeType>(100));
 				}
 				RecursiveLock locker(mutex);
 				locker.Lock();

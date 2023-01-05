@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ SpaceGameEngine::MemoryManager::FixedSizeAllocator::FixedSizeAllocator(SizeType 
 SpaceGameEngine::MemoryManager::FixedSizeAllocator::~FixedSizeAllocator()
 {
 
-	//only need to release pages' memory
+	// only need to release pages' memory
 	MemoryPageHeader* pPage = m_pMemoryPages;
 	MemoryPageHeader* pb;
 	while (pPage)

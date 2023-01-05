@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,12 +34,12 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		Function() = delete;
 
 		/*!
-		@brief create a external function without operations; 
+		@brief create a external function without operations;
 		*/
 		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx);
 
 		/*!
-		@brief create a internal function with operations; 
+		@brief create a internal function with operations;
 		*/
 		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations);
 

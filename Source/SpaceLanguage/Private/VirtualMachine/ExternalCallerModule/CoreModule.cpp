@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -96,12 +96,12 @@ using namespace SpaceGameEngine::SpaceLanguage::ExternalCallerModule;
 
 void SpaceGameEngine::SpaceLanguage::ExternalCallerModule::CoreModule::LoadIntoExternalCaller(ExternalCaller& ec)
 {
-	//Allocate
+	// Allocate
 	ec.AddExternalCallFunction(CoreModule::Id, CoreModule::Functions::Allocate, [](Registers& regs) -> RegisterType {
 		return (RegisterType)DefaultAllocator::RawNew(R_ARG(0), R_ARG(1));
 	});
 
-	//Free
+	// Free
 	ec.AddExternalCallFunction(CoreModule::Id, CoreModule::Functions::Free, [](Registers& regs) -> RegisterType {
 		DefaultAllocator::RawDelete((void*)R_ARG(0));
 		return 0;

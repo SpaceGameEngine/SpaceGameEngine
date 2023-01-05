@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -715,7 +715,7 @@ namespace SpaceGameEngine
 			inline IteratorImpl(BucketPointerType pbucket, NodePointerType pnode, BucketPointerType pbucket_end)
 			{
 				SGE_ASSERT(NullPointerError, pbucket);
-				//SGE_ASSERT(NullPointerError, pnode);	pnode can be nullptr as the end iterator
+				// SGE_ASSERT(NullPointerError, pnode);	pnode can be nullptr as the end iterator
 				SGE_ASSERT(NullPointerError, pbucket_end);
 				m_pBucket = pbucket;
 				m_pNode = pnode;

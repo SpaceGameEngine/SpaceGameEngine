@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -476,7 +476,7 @@ TEST(RedBlackTree, AnotherAllocatorMoveConstructionTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);	  //because const key can not be moved
+		ASSERT_EQ(key_pool[i], 2);	  // because const key can not be moved
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
@@ -574,7 +574,7 @@ TEST(RedBlackTree, AnotherAllocatorMoveAssignmentTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 2);	  //because const key can not be moved
+		ASSERT_EQ(key_pool[i], 2);	  // because const key can not be moved
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }

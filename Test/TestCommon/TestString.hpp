@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -180,9 +180,9 @@ TEST(Storage, CopyAssignmentTest)
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize()), StringImplement::StringCategory::Large);
 
 	const Char* pcstr_s = SGE_WSTR("S");
-	//63
+	// 63
 	const Char* pcstr_m = SGE_WSTR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
-	//403
+	// 403
 	const Char* pcstr_l = SGE_WSTR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
@@ -308,9 +308,9 @@ TEST(Storage, MoveAssignmentTest)
 	ASSERT_EQ(StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize()), StringImplement::StringCategory::Large);
 
 	const Char* pcstr_s = SGE_WSTR("S");
-	//63
+	// 63
 	const Char* pcstr_m = SGE_WSTR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
-	//403
+	// 403
 	const Char* pcstr_l = SGE_WSTR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
@@ -449,9 +449,9 @@ TEST(Storage, CopyAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s4.GetRealSize())), (StringImplement::StringCategory::Large));
 
 	const Char* pcstr_s = SGE_WSTR("S");
-	//63
+	// 63
 	const Char* pcstr_m = SGE_WSTR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
-	//403
+	// 403
 	const Char* pcstr_l = SGE_WSTR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
@@ -611,9 +611,9 @@ TEST(Storage, MoveAssignmentForAnotherAllocatorTest)
 	ASSERT_EQ((StringImplement::GetStringCategoryByRealSize<Char>(s4_3.GetRealSize())), (StringImplement::StringCategory::Large));
 
 	const Char* pcstr_s = SGE_WSTR("S");
-	//63
+	// 63
 	const Char* pcstr_m = SGE_WSTR("测试一下中等长度的字符串的拷贝，to see whether it can work correctly, 能不能过16/2");
-	//403
+	// 403
 	const Char* pcstr_l = SGE_WSTR("测试一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890一二三四五六七八九十1234567890");
 
 	StringImplement::Storage<Char> ss_s(pcstr_s, 2);
@@ -1311,7 +1311,7 @@ TEST(ReverseBoyerMooreSearchImplement, MakePrefixTest)
 	ASSERT_EQ(v2[9], 0);
 	ASSERT_EQ(v2[8], 0);
 	ASSERT_EQ(v2[7], 0);
-	ASSERT_EQ(v2[6], 7);	//same reason
+	ASSERT_EQ(v2[6], 7);	// same reason
 	ASSERT_EQ(v2[5], 0);
 	ASSERT_EQ(v2[4], 0);
 	ASSERT_EQ(v2[3], 0);

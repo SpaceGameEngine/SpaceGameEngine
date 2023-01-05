@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,10 +37,9 @@ namespace SpaceGameEngine
 {
 
 	template<typename T>
-	concept IsLogWriterCore = requires(T t, const Char8* pstr, SizeType size)
-	{
-		t.WriteLog(pstr, size);
-	};
+	concept IsLogWriterCore = requires(T t, const Char8* pstr, SizeType size) {
+								  t.WriteLog(pstr, size);
+							  };
 
 	class COMMON_API ConsoleLogWriterCore
 	{
@@ -77,7 +76,8 @@ namespace SpaceGameEngine
 	};
 
 	template<IsLogWriterCore OtherLogWriterCore>
-	requires(!std::is_same_v<OtherLogWriterCore, ConsoleLogWriterCore>) class BindConsoleLogWriterCore : public ConsoleLogWriterCore, public OtherLogWriterCore
+		requires(!std::is_same_v<OtherLogWriterCore, ConsoleLogWriterCore>)
+	class BindConsoleLogWriterCore : public ConsoleLogWriterCore, public OtherLogWriterCore
 	{
 	public:
 		inline BindConsoleLogWriterCore()
@@ -216,13 +216,12 @@ namespace SpaceGameEngine
 	COMMON_API UTF8String GetLogLevelUTF8String(LogLevelType log_level);
 
 	template<typename T>
-	concept IsLogFormatter = requires(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str)
-	{
-		{
-			T::Format(date, debug_info, log_level, str)
-		}
-		->std::convertible_to<UTF8String>;
-	};
+	concept IsLogFormatter = requires(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str) {
+								 {
+									 T::Format(date, debug_info, log_level, str)
+									 }
+									 -> std::convertible_to<UTF8String>;
+							 };
 
 	struct COMMON_API DefaultLogFormatter
 	{

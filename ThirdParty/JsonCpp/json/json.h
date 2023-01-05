@@ -6,28 +6,28 @@
 // //////////////////////////////////////////////////////////////////////
 
 /*
-The JsonCpp library's source code, including accompanying documentation, 
+The JsonCpp library's source code, including accompanying documentation,
 tests and demonstration applications, are licensed under the following
 conditions...
 
-Baptiste Lepilleur and The JsonCpp Authors explicitly disclaim copyright in all 
-jurisdictions which recognize such a disclaimer. In such jurisdictions, 
+Baptiste Lepilleur and The JsonCpp Authors explicitly disclaim copyright in all
+jurisdictions which recognize such a disclaimer. In such jurisdictions,
 this software is released into the Public Domain.
 
 In jurisdictions which do not recognize Public Domain property (e.g. Germany as of
 2010), this software is Copyright (c) 2007-2010 by Baptiste Lepilleur and
 The JsonCpp Authors, and is released under the terms of the MIT License (see below).
 
-In jurisdictions which recognize Public Domain property, the user of this 
-software may choose to accept it either as 1) Public Domain, 2) under the 
-conditions of the MIT License (see below), or 3) under the terms of dual 
+In jurisdictions which recognize Public Domain property, the user of this
+software may choose to accept it either as 1) Public Domain, 2) under the
+conditions of the MIT License (see below), or 3) under the terms of dual
 Public Domain/MIT License conditions described here, as they choose.
 
 The MIT License is about as close to Public Domain as a license can get, and is
 described in clear, concise terms at:
 
    http://en.wikipedia.org/wiki/MIT_License
-   
+
 The full text of the MIT License follows:
 
 ========================================================================
@@ -119,14 +119,14 @@ license you like.
 #include <stdint.h>	   //typedef int64_t, uint64_t
 
 /// If defined, indicates that json library is embedded in CppTL library.
-//# define JSON_IN_CPPTL 1
+// # define JSON_IN_CPPTL 1
 
 /// If defined, indicates that json may leverage CppTL library
-//#  define JSON_USE_CPPTL 1
+// #  define JSON_USE_CPPTL 1
 /// If defined, indicates that cpptl vector based map should be used instead of
 /// std::map
 /// as Value container.
-//#  define JSON_USE_CPPTL_SMALLMAP 1
+// #  define JSON_USE_CPPTL_SMALLMAP 1
 
 // If non-zero, the library uses exceptions to report bad input instead of C
 // assertion macros. The default is to use exceptions.
@@ -369,30 +369,30 @@ namespace Json
 {
 
 	/** \brief Configuration passed to reader and writer.
- * This configuration object can be used to force the Reader or Writer
- * to behave in a standard conforming way.
- */
+	 * This configuration object can be used to force the Reader or Writer
+	 * to behave in a standard conforming way.
+	 */
 	class JSON_API Features
 	{
 	public:
 		/** \brief A configuration that allows all features and assumes all strings
-   * are UTF-8.
-   * - C & C++ comments are allowed
-   * - Root object can be any JSON value
-   * - Assumes Value strings are encoded in UTF-8
-   */
+		 * are UTF-8.
+		 * - C & C++ comments are allowed
+		 * - Root object can be any JSON value
+		 * - Assumes Value strings are encoded in UTF-8
+		 */
 		static Features all();
 
 		/** \brief A configuration that is strictly compatible with the JSON
-   * specification.
-   * - Comments are forbidden.
-   * - Root object must be either an array or an object value.
-   * - Assumes Value strings are encoded in UTF-8
-   */
+		 * specification.
+		 * - Comments are forbidden.
+		 * - Root object must be either an array or an object value.
+		 * - Assumes Value strings are encoded in UTF-8
+		 */
 		static Features strictMode();
 
 		/** \brief Initialize the configuration like JsonConfig::allFeatures;
-   */
+		 */
 		Features();
 
 		/// \c true if comments are allowed. Default: \c true.
@@ -447,9 +447,9 @@ namespace Json
 #include <cpptl/forwards.h>
 #endif
 
-//Conditional NORETURN attribute on the throw functions would:
-// a) suppress false positives from static code analysis
-// b) possibly improve optimization opportunities.
+// Conditional NORETURN attribute on the throw functions would:
+//  a) suppress false positives from static code analysis
+//  b) possibly improve optimization opportunities.
 #if !defined(JSONCPP_NORETURN)
 #if defined(_MSC_VER)
 #define JSONCPP_NORETURN __declspec(noreturn)
@@ -475,9 +475,9 @@ namespace Json
 {
 
 	/** Base class for all exceptions we throw.
- *
- * We use nothing but these internally. Of course, STL can throw others.
- */
+	 *
+	 * We use nothing but these internally. Of course, STL can throw others.
+	 */
 	class JSON_API Exception : public std::exception
 	{
 	public:
@@ -490,11 +490,11 @@ namespace Json
 	};
 
 	/** Exceptions which the user cannot easily avoid.
- *
- * E.g. out-of-memory (when we use malloc), stack-overflow, malicious input
- *
- * \remark derived from Json::Exception
- */
+	 *
+	 * E.g. out-of-memory (when we use malloc), stack-overflow, malicious input
+	 *
+	 * \remark derived from Json::Exception
+	 */
 	class JSON_API RuntimeError : public Exception
 	{
 	public:
@@ -502,11 +502,11 @@ namespace Json
 	};
 
 	/** Exceptions thrown by JSON_ASSERT/JSON_FAIL macros.
- *
- * These are precondition-violations (user bugs) and internal errors (our bugs).
- *
- * \remark derived from Json::Exception
- */
+	 *
+	 * These are precondition-violations (user bugs) and internal errors (our bugs).
+	 *
+	 * \remark derived from Json::Exception
+	 */
 	class JSON_API LogicError : public Exception
 	{
 	public:
@@ -519,7 +519,7 @@ namespace Json
 	JSONCPP_NORETURN void throwLogicError(JSONCPP_STRING const& msg);
 
 	/** \brief Type of the value held by a Value object.
- */
+	 */
 	enum ValueType
 	{
 		nullValue = 0,	  ///< 'null' value
@@ -541,25 +541,25 @@ namespace Json
 		numberOfCommentPlacement
 	};
 
-	//# ifdef JSON_USE_CPPTL
-	//   typedef CppTL::AnyEnumerator<const char *> EnumMemberNames;
-	//   typedef CppTL::AnyEnumerator<const Value &> EnumValues;
-	//# endif
+	// # ifdef JSON_USE_CPPTL
+	//    typedef CppTL::AnyEnumerator<const char *> EnumMemberNames;
+	//    typedef CppTL::AnyEnumerator<const Value &> EnumValues;
+	// # endif
 
 	/** \brief Lightweight wrapper to tag static string.
- *
- * Value constructor and objectValue member assignment takes advantage of the
- * StaticString and avoid the cost of string duplication when storing the
- * string or the member name.
- *
- * Example of usage:
- * \code
- * Json::Value aValue( StaticString("some text") );
- * Json::Value object;
- * static const StaticString code("code");
- * object[code] = 1234;
- * \endcode
- */
+	 *
+	 * Value constructor and objectValue member assignment takes advantage of the
+	 * StaticString and avoid the cost of string duplication when storing the
+	 * string or the member name.
+	 *
+	 * Example of usage:
+	 * \code
+	 * Json::Value aValue( StaticString("some text") );
+	 * Json::Value object;
+	 * static const StaticString code("code");
+	 * object[code] = 1234;
+	 * \endcode
+	 */
 	class JSON_API StaticString
 	{
 	public:
@@ -583,39 +583,39 @@ namespace Json
 	};
 
 	/** \brief Represents a <a HREF="http://www.json.org">JSON</a> value.
- *
- * This class is a discriminated union wrapper that can represents a:
- * - signed integer [range: Value::minInt - Value::maxInt]
- * - unsigned integer (range: 0 - Value::maxUInt)
- * - double
- * - UTF-8 string
- * - boolean
- * - 'null'
- * - an ordered list of Value
- * - collection of name/value pairs (javascript object)
- *
- * The type of the held value is represented by a #ValueType and
- * can be obtained using type().
- *
- * Values of an #objectValue or #arrayValue can be accessed using operator[]()
- * methods.
- * Non-const methods will automatically create the a #nullValue element
- * if it does not exist.
- * The sequence of an #arrayValue will be automatically resized and initialized
- * with #nullValue. resize() can be used to enlarge or truncate an #arrayValue.
- *
- * The get() methods can be used to obtain default value in the case the
- * required element does not exist.
- *
- * It is possible to iterate over the list of a #objectValue values using
- * the getMemberNames() method.
- *
- * \note #Value string-length fit in size_t, but keys must be < 2^30.
- * (The reason is an implementation detail.) A #CharReader will raise an
- * exception if a bound is exceeded to avoid security holes in your app,
- * but the Value API does *not* check bounds. That is the responsibility
- * of the caller.
- */
+	 *
+	 * This class is a discriminated union wrapper that can represents a:
+	 * - signed integer [range: Value::minInt - Value::maxInt]
+	 * - unsigned integer (range: 0 - Value::maxUInt)
+	 * - double
+	 * - UTF-8 string
+	 * - boolean
+	 * - 'null'
+	 * - an ordered list of Value
+	 * - collection of name/value pairs (javascript object)
+	 *
+	 * The type of the held value is represented by a #ValueType and
+	 * can be obtained using type().
+	 *
+	 * Values of an #objectValue or #arrayValue can be accessed using operator[]()
+	 * methods.
+	 * Non-const methods will automatically create the a #nullValue element
+	 * if it does not exist.
+	 * The sequence of an #arrayValue will be automatically resized and initialized
+	 * with #nullValue. resize() can be used to enlarge or truncate an #arrayValue.
+	 *
+	 * The get() methods can be used to obtain default value in the case the
+	 * required element does not exist.
+	 *
+	 * It is possible to iterate over the list of a #objectValue values using
+	 * the getMemberNames() method.
+	 *
+	 * \note #Value string-length fit in size_t, but keys must be < 2^30.
+	 * (The reason is an implementation detail.) A #CharReader will raise an
+	 * exception if a bound is exceeded to avoid security holes in your app,
+	 * but the Value API does *not* check bounds. That is the responsibility
+	 * of the caller.
+	 */
 	class JSON_API Value
 	{
 		friend class ValueIteratorBase;
@@ -691,7 +691,7 @@ namespace Json
 			bool operator<(CZString const& other) const;
 			bool operator==(CZString const& other) const;
 			ArrayIndex index() const;
-			//const char* c_str() const; ///< \deprecated
+			// const char* c_str() const; ///< \deprecated
 			char const* data() const;
 			unsigned length() const;
 			bool isStaticString() const;
@@ -723,13 +723,13 @@ namespace Json
 	public:
 		/** \brief Create a default Value of the given type.
 
-    This is a very useful constructor.
-    To create an empty array, pass arrayValue.
-    To create an empty object, pass objectValue.
-    Another Value can then be set to this one by assignment.
+	This is a very useful constructor.
+	To create an empty array, pass arrayValue.
+	To create an empty object, pass objectValue.
+	Another Value can then be set to this one by assignment.
 This is useful since clear() and resize() will not alter types.
 
-    Examples:
+	Examples:
 \code
 Json::Value null_value; // null
 Json::Value arr_value(Json::arrayValue); // []
@@ -802,12 +802,12 @@ Json::Value obj_value(Json::objectValue); // {}
 
 		const char* asCString() const;	  ///< Embedded zeroes could cause you trouble!
 #if JSONCPP_USING_SECURE_MEMORY
-		unsigned getCStringLength() const;	  //Allows you to understand the length of the CString
+		unsigned getCStringLength() const;	  // Allows you to understand the length of the CString
 #endif
 		JSONCPP_STRING asString() const;	///< Embedded zeroes are possible.
 		/** Get raw char* of string-value.
-   *  \return false if !string. (Seg-fault if str or end are NULL.)
-   */
+		 *  \return false if !string. (Seg-fault if str or end are NULL.)
+		 */
 		bool getString(
 			char const** begin, char const** end) const;
 #ifdef JSON_USE_CPPTL
@@ -978,18 +978,18 @@ Json::Value obj_value(Json::objectValue); // {}
 		bool removeMember(const char* key, Value* removed);
 		/** \brief Remove the named map member.
 
-      Update 'removed' iff removed.
-      \param key may contain embedded nulls.
-      \return true iff removed (no exceptions)
+	  Update 'removed' iff removed.
+	  \param key may contain embedded nulls.
+	  \return true iff removed (no exceptions)
   */
 		bool removeMember(JSONCPP_STRING const& key, Value* removed);
 		/// Same as removeMember(JSONCPP_STRING const& key, Value* removed)
 		bool removeMember(const char* begin, const char* end, Value* removed);
 		/** \brief Remove the indexed array element.
 
-      O(n) expensive operations.
-      Update 'removed' iff removed.
-      \return true iff removed (no exceptions)
+	  O(n) expensive operations.
+	  Update 'removed' iff removed.
+	  \return true iff removed (no exceptions)
   */
 		bool removeIndex(ArrayIndex i, Value* removed);
 
@@ -1013,10 +1013,10 @@ Json::Value obj_value(Json::objectValue); // {}
 		/// \post if type() was nullValue, it remains nullValue
 		Members getMemberNames() const;
 
-		//# ifdef JSON_USE_CPPTL
-		//      EnumMemberNames enumMemberNames() const;
-		//      EnumValues enumValues() const;
-		//# endif
+		// # ifdef JSON_USE_CPPTL
+		//       EnumMemberNames enumMemberNames() const;
+		//       EnumValues enumValues() const;
+		// # endif
 
 		/// \deprecated Always pass len.
 		JSONCPP_DEPRECATED("Use setComment(JSONCPP_STRING const&) instead.")
@@ -1089,8 +1089,8 @@ Json::Value obj_value(Json::objectValue); // {}
 	};
 
 	/** \brief Experimental and untested: represents an element of the "path" to
- * access a node.
- */
+	 * access a node.
+	 */
 	class JSON_API PathArgument
 	{
 	public:
@@ -1114,16 +1114,16 @@ Json::Value obj_value(Json::objectValue); // {}
 	};
 
 	/** \brief Experimental and untested: represents a "path" to access a node.
- *
- * Syntax:
- * - "." => root node
- * - ".[n]" => elements at index 'n' of root node (an array value)
- * - ".name" => member named 'name' of root node (an object value)
- * - ".name1.name2.name3"
- * - ".[0][1][2].name1[3]"
- * - ".%" => member name is provided as parameter
- * - ".[%]" => index is provied as parameter
- */
+	 *
+	 * Syntax:
+	 * - "." => root node
+	 * - ".[n]" => elements at index 'n' of root node (an array value)
+	 * - ".name" => member named 'name' of root node (an object value)
+	 * - ".name1.name2.name3"
+	 * - ".[0][1][2].name1[3]"
+	 * - ".%" => member name is provided as parameter
+	 * - ".[%]" => index is provied as parameter
+	 */
 	class JSON_API Path
 	{
 	public:
@@ -1155,8 +1155,8 @@ Json::Value obj_value(Json::objectValue); // {}
 	};
 
 	/** \brief base class for Value iterators.
- *
- */
+	 *
+	 */
 	class JSON_API ValueIteratorBase
 	{
 	public:
@@ -1228,16 +1228,16 @@ Json::Value obj_value(Json::objectValue); // {}
 	};
 
 	/** \brief const iterator for object and array value.
- *
- */
+	 *
+	 */
 	class JSON_API ValueConstIterator : public ValueIteratorBase
 	{
 		friend class Value;
 
 	public:
 		typedef const Value value_type;
-		//typedef unsigned int size_t;
-		//typedef int difference_type;
+		// typedef unsigned int size_t;
+		// typedef int difference_type;
 		typedef const Value& reference;
 		typedef const Value* pointer;
 		typedef ValueConstIterator SelfType;
@@ -1247,7 +1247,7 @@ Json::Value obj_value(Json::objectValue); // {}
 
 	private:
 		/*! \internal Use by Value to create an iterator.
- */
+		 */
 		explicit ValueConstIterator(const Value::ObjectValues::iterator& current);
 
 	public:
@@ -1291,7 +1291,7 @@ Json::Value obj_value(Json::objectValue); // {}
 	};
 
 	/** \brief Iterator for object and array value.
- */
+	 */
 	class JSON_API ValueIterator : public ValueIteratorBase
 	{
 		friend class Value;
@@ -1310,7 +1310,7 @@ Json::Value obj_value(Json::objectValue); // {}
 
 	private:
 		/*! \internal Use by Value to create an iterator.
- */
+		 */
 		explicit ValueIterator(const Value::ObjectValues::iterator& current);
 
 	public:
@@ -1412,10 +1412,10 @@ namespace Json
 {
 
 	/** \brief Unserialize a <a HREF="http://www.json.org">JSON</a> document into a
- *Value.
- *
- * \deprecated Use CharReader and CharReaderBuilder.
- */
+	 *Value.
+	 *
+	 * \deprecated Use CharReader and CharReaderBuilder.
+	 */
 	class JSONCPP_DEPRECATED("Use CharReader and CharReaderBuilder instead") JSON_API Reader
 	{
 	public:
@@ -1423,11 +1423,11 @@ namespace Json
 		typedef const Char* Location;
 
 		/** \brief An error tagged with where in the JSON text it was encountered.
-   *
-   * The offsets give the [start, limit) range of bytes within the text. Note
-   * that this is bytes, not codepoints.
-   *
-   */
+		 *
+		 * The offsets give the [start, limit) range of bytes within the text. Note
+		 * that this is bytes, not codepoints.
+		 *
+		 */
 		struct StructuredError
 		{
 			ptrdiff_t offset_start;
@@ -1436,29 +1436,29 @@ namespace Json
 		};
 
 		/** \brief Constructs a Reader allowing all features
-   * for parsing.
-   */
+		 * for parsing.
+		 */
 		Reader();
 
 		/** \brief Constructs a Reader allowing the specified feature set
-   * for parsing.
-   */
+		 * for parsing.
+		 */
 		Reader(const Features& features);
 
 		/** \brief Read a Value from a <a HREF="http://www.json.org">JSON</a>
-   * document.
-   * \param document UTF-8 encoded string containing the document to read.
-   * \param root [out] Contains the root value of the document if it was
-   *             successfully parsed.
-   * \param collectComments \c true to collect comment and allow writing them
-   * back during
-   *                        serialization, \c false to discard comments.
-   *                        This parameter is ignored if
-   * Features::allowComments_
-   *                        is \c false.
-   * \return \c true if the document was successfully parsed, \c false if an
-   * error occurred.
-   */
+		 * document.
+		 * \param document UTF-8 encoded string containing the document to read.
+		 * \param root [out] Contains the root value of the document if it was
+		 *             successfully parsed.
+		 * \param collectComments \c true to collect comment and allow writing them
+		 * back during
+		 *                        serialization, \c false to discard comments.
+		 *                        This parameter is ignored if
+		 * Features::allowComments_
+		 *                        is \c false.
+		 * \return \c true if the document was successfully parsed, \c false if an
+		 * error occurred.
+		 */
 		bool
 		parse(const std::string& document, Value& root, bool collectComments = true);
 
@@ -1490,57 +1490,57 @@ namespace Json
 		bool parse(JSONCPP_ISTREAM& is, Value& root, bool collectComments = true);
 
 		/** \brief Returns a user friendly string that list errors in the parsed
-   * document.
-   * \return Formatted error message with the list of errors with their location
-   * in
-   *         the parsed document. An empty string is returned if no error
-   * occurred
-   *         during parsing.
-   * \deprecated Use getFormattedErrorMessages() instead (typo fix).
-   */
+		 * document.
+		 * \return Formatted error message with the list of errors with their location
+		 * in
+		 *         the parsed document. An empty string is returned if no error
+		 * occurred
+		 *         during parsing.
+		 * \deprecated Use getFormattedErrorMessages() instead (typo fix).
+		 */
 		JSONCPP_DEPRECATED("Use getFormattedErrorMessages() instead.")
 		JSONCPP_STRING getFormatedErrorMessages() const;
 
 		/** \brief Returns a user friendly string that list errors in the parsed
-   * document.
-   * \return Formatted error message with the list of errors with their location
-   * in
-   *         the parsed document. An empty string is returned if no error
-   * occurred
-   *         during parsing.
-   */
+		 * document.
+		 * \return Formatted error message with the list of errors with their location
+		 * in
+		 *         the parsed document. An empty string is returned if no error
+		 * occurred
+		 *         during parsing.
+		 */
 		JSONCPP_STRING getFormattedErrorMessages() const;
 
 		/** \brief Returns a vector of structured erros encounted while parsing.
-   * \return A (possibly empty) vector of StructuredError objects. Currently
-   *         only one error can be returned, but the caller should tolerate
-   * multiple
-   *         errors.  This can occur if the parser recovers from a non-fatal
-   *         parse error and then encounters additional errors.
-   */
+		 * \return A (possibly empty) vector of StructuredError objects. Currently
+		 *         only one error can be returned, but the caller should tolerate
+		 * multiple
+		 *         errors.  This can occur if the parser recovers from a non-fatal
+		 *         parse error and then encounters additional errors.
+		 */
 		std::vector<StructuredError> getStructuredErrors() const;
 
 		/** \brief Add a semantic error message.
-   * \param value JSON Value location associated with the error
-   * \param message The error message.
-   * \return \c true if the error was successfully added, \c false if the
-   * Value offset exceeds the document size.
-   */
+		 * \param value JSON Value location associated with the error
+		 * \param message The error message.
+		 * \return \c true if the error was successfully added, \c false if the
+		 * Value offset exceeds the document size.
+		 */
 		bool pushError(const Value& value, const JSONCPP_STRING& message);
 
 		/** \brief Add a semantic error message with extra context.
-   * \param value JSON Value location associated with the error
-   * \param message The error message.
-   * \param extra Additional JSON Value location to contextualize the error
-   * \return \c true if the error was successfully added, \c false if either
-   * Value offset exceeds the document size.
-   */
+		 * \param value JSON Value location associated with the error
+		 * \param message The error message.
+		 * \param extra Additional JSON Value location to contextualize the error
+		 * \return \c true if the error was successfully added, \c false if either
+		 * Value offset exceeds the document size.
+		 */
 		bool pushError(const Value& value, const JSONCPP_STRING& message, const Value& extra);
 
 		/** \brief Return whether there are any errors.
-   * \return \c true if there are no errors to report \c false if
-   * errors have occurred.
-   */
+		 * \return \c true if there are no errors to report \c false if
+		 * errors have occurred.
+		 */
 		bool good() const;
 
 	private:
@@ -1637,7 +1637,7 @@ namespace Json
 	};	  // Reader
 
 	/** Interface for reading JSON from a char array.
- */
+	 */
 	class JSON_API CharReader
 	{
 	public:
@@ -1672,8 +1672,8 @@ namespace Json
 			{
 			}
 			/** \brief Allocate a CharReader via operator new().
-     * \throw std::exception if something goes wrong (e.g. invalid settings)
-     */
+			 * \throw std::exception if something goes wrong (e.g. invalid settings)
+			 */
 			virtual CharReader* newCharReader() const = 0;
 		};	  // Factory
 	};		  // CharReader
@@ -1696,41 +1696,41 @@ Usage:
 		// Note: We use a Json::Value so that we can add data-members to this class
 		// without a major version bump.
 		/** Configuration of this builder.
-    These are case-sensitive.
-    Available settings (case-sensitive):
-    - `"collectComments": false or true`
-      - true to collect comment and allow writing them
-        back during serialization, false to discard comments.
-        This parameter is ignored if allowComments is false.
-    - `"allowComments": false or true`
-      - true if comments are allowed.
-    - `"strictRoot": false or true`
-      - true if root must be either an array or an object value
-    - `"allowDroppedNullPlaceholders": false or true`
-      - true if dropped null placeholders are allowed. (See StreamWriterBuilder.)
-    - `"allowNumericKeys": false or true`
-      - true if numeric object keys are allowed.
-    - `"allowSingleQuotes": false or true`
-      - true if '' are allowed for strings (both keys and values)
-    - `"stackLimit": integer`
-      - Exceeding stackLimit (recursive depth of `readValue()`) will
-        cause an exception.
-      - This is a security issue (seg-faults caused by deeply nested JSON),
-        so the default is low.
-    - `"failIfExtra": false or true`
-      - If true, `parse()` returns false when extra non-whitespace trails
-        the JSON value in the input string.
-    - `"rejectDupKeys": false or true`
-      - If true, `parse()` returns false when a key is duplicated within an object.
-    - `"allowSpecialFloats": false or true`
-      - If true, special float values (NaNs and infinities) are allowed 
-        and their values are lossfree restorable.
+	These are case-sensitive.
+	Available settings (case-sensitive):
+	- `"collectComments": false or true`
+	  - true to collect comment and allow writing them
+		back during serialization, false to discard comments.
+		This parameter is ignored if allowComments is false.
+	- `"allowComments": false or true`
+	  - true if comments are allowed.
+	- `"strictRoot": false or true`
+	  - true if root must be either an array or an object value
+	- `"allowDroppedNullPlaceholders": false or true`
+	  - true if dropped null placeholders are allowed. (See StreamWriterBuilder.)
+	- `"allowNumericKeys": false or true`
+	  - true if numeric object keys are allowed.
+	- `"allowSingleQuotes": false or true`
+	  - true if '' are allowed for strings (both keys and values)
+	- `"stackLimit": integer`
+	  - Exceeding stackLimit (recursive depth of `readValue()`) will
+		cause an exception.
+	  - This is a security issue (seg-faults caused by deeply nested JSON),
+		so the default is low.
+	- `"failIfExtra": false or true`
+	  - If true, `parse()` returns false when extra non-whitespace trails
+		the JSON value in the input string.
+	- `"rejectDupKeys": false or true`
+	  - If true, `parse()` returns false when a key is duplicated within an object.
+	- `"allowSpecialFloats": false or true`
+	  - If true, special float values (NaNs and infinities) are allowed
+		and their values are lossfree restorable.
 
-    You can examine 'settings_` yourself
-    to see the defaults. You can also write and read them just like any
-    JSON Value.
-    \sa setDefaults()
-    */
+	You can examine 'settings_` yourself
+	to see the defaults. You can also write and read them just like any
+	JSON Value.
+	\sa setDefaults()
+	*/
 		Json::Value settings_;
 
 		CharReaderBuilder();
@@ -1739,32 +1739,32 @@ Usage:
 		CharReader* newCharReader() const JSONCPP_OVERRIDE;
 
 		/** \return true if 'settings' are legal and consistent;
-   *   otherwise, indicate bad settings via 'invalid'.
-   */
+		 *   otherwise, indicate bad settings via 'invalid'.
+		 */
 		bool validate(Json::Value* invalid) const;
 
 		/** A simple way to update a specific setting.
-   */
+		 */
 		Value& operator[](JSONCPP_STRING key);
 
 		/** Called by ctor, but you can use this to reset settings_.
-   * \pre 'settings' != NULL (but Json::null is fine)
-   * \remark Defaults:
-   * \snippet src/lib_json/json_reader.cpp CharReaderBuilderDefaults
-   */
+		 * \pre 'settings' != NULL (but Json::null is fine)
+		 * \remark Defaults:
+		 * \snippet src/lib_json/json_reader.cpp CharReaderBuilderDefaults
+		 */
 		static void setDefaults(Json::Value* settings);
 		/** Same as old Features::strictMode().
-   * \pre 'settings' != NULL (but Json::null is fine)
-   * \remark Defaults:
-   * \snippet src/lib_json/json_reader.cpp CharReaderBuilderStrictMode
-   */
+		 * \pre 'settings' != NULL (but Json::null is fine)
+		 * \remark Defaults:
+		 * \snippet src/lib_json/json_reader.cpp CharReaderBuilderStrictMode
+		 */
 		static void strictMode(Json::Value* settings);
 	};
 
 	/** Consume entire stream and use its begin/end.
-  * Someday we might have a real StreamReader, but for now this
-  * is convenient.
-  */
+	 * Someday we might have a real StreamReader, but for now this
+	 * is convenient.
+	 */
 	bool JSON_API parseFromStream(
 		CharReader::Factory const&,
 		JSONCPP_ISTREAM&,
@@ -1785,9 +1785,9 @@ Usage:
  \verbatim
  {
  "dir": {
-     "file": {
-     // The input stream JSON would be nested here.
-     }
+	 "file": {
+	 // The input stream JSON would be nested here.
+	 }
  }
  }
  \endverbatim
@@ -1849,10 +1849,10 @@ Usage:
 \code
   using namespace Json;
   void writeToStdout(StreamWriter::Factory const& factory, Value const& value) {
-    std::unique_ptr<StreamWriter> const writer(
-      factory.newStreamWriter());
-    writer->write(value, &std::cout);
-    std::cout << std::endl;  // add lf and flush
+	std::unique_ptr<StreamWriter> const writer(
+	  factory.newStreamWriter());
+	writer->write(value, &std::cout);
+	std::cout << std::endl;  // add lf and flush
   }
 \endcode
 */
@@ -1864,29 +1864,29 @@ Usage:
 		StreamWriter();
 		virtual ~StreamWriter();
 		/** Write Value into document as configured in sub-class.
-      Do not take ownership of sout, but maintain a reference during function.
-      \pre sout != NULL
-      \return zero on success (For now, we always return zero, so check the stream instead.)
-      \throw std::exception possibly, depending on configuration
+	  Do not take ownership of sout, but maintain a reference during function.
+	  \pre sout != NULL
+	  \return zero on success (For now, we always return zero, so check the stream instead.)
+	  \throw std::exception possibly, depending on configuration
    */
 		virtual int write(Value const& root, JSONCPP_OSTREAM* sout) = 0;
 
 		/** \brief A simple abstract factory.
-   */
+		 */
 		class JSON_API Factory
 		{
 		public:
 			virtual ~Factory();
 			/** \brief Allocate a CharReader via operator new().
-     * \throw std::exception if something goes wrong (e.g. invalid settings)
-     */
+			 * \throw std::exception if something goes wrong (e.g. invalid settings)
+			 */
 			virtual StreamWriter* newStreamWriter() const = 0;
 		};	  // Factory
 	};		  // StreamWriter
 
 	/** \brief Write into stringstream, then return string, for convenience.
- * A StreamWriter will be created from the factory, used, and then deleted.
- */
+	 * A StreamWriter will be created from the factory, used, and then deleted.
+	 */
 	JSONCPP_STRING JSON_API writeString(StreamWriter::Factory const& factory, Value const& root);
 
 	/** \brief Build a StreamWriter implementation.
@@ -1899,7 +1899,7 @@ Usage:
   builder["commentStyle"] = "None";
   builder["indentation"] = "   ";  // or whatever you like
   std::unique_ptr<Json::StreamWriter> writer(
-      builder.newStreamWriter());
+	  builder.newStreamWriter());
   writer->write(value, &std::cout);
   std::cout << std::endl;  // add lf and flush
 \endcode
@@ -1910,55 +1910,55 @@ Usage:
 		// Note: We use a Json::Value so that we can add data-members to this class
 		// without a major version bump.
 		/** Configuration of this builder.
-    Available settings (case-sensitive):
-    - "commentStyle": "None" or "All"
-    - "indentation":  "<anything>"
-    - "enableYAMLCompatibility": false or true
-      - slightly change the whitespace around colons
-    - "dropNullPlaceholders": false or true
-      - Drop the "null" string from the writer's output for nullValues.
-        Strictly speaking, this is not valid JSON. But when the output is being
-        fed to a browser's JavaScript, it makes for smaller output and the
-        browser can handle the output just fine.
-    - "useSpecialFloats": false or true
-      - If true, outputs non-finite floating point values in the following way:
-        NaN values as "NaN", positive infinity as "Infinity", and negative infinity
-        as "-Infinity".
+	Available settings (case-sensitive):
+	- "commentStyle": "None" or "All"
+	- "indentation":  "<anything>"
+	- "enableYAMLCompatibility": false or true
+	  - slightly change the whitespace around colons
+	- "dropNullPlaceholders": false or true
+	  - Drop the "null" string from the writer's output for nullValues.
+		Strictly speaking, this is not valid JSON. But when the output is being
+		fed to a browser's JavaScript, it makes for smaller output and the
+		browser can handle the output just fine.
+	- "useSpecialFloats": false or true
+	  - If true, outputs non-finite floating point values in the following way:
+		NaN values as "NaN", positive infinity as "Infinity", and negative infinity
+		as "-Infinity".
 
-    You can examine 'settings_` yourself
-    to see the defaults. You can also write and read them just like any
-    JSON Value.
-    \sa setDefaults()
-    */
+	You can examine 'settings_` yourself
+	to see the defaults. You can also write and read them just like any
+	JSON Value.
+	\sa setDefaults()
+	*/
 		Json::Value settings_;
 
 		StreamWriterBuilder();
 		~StreamWriterBuilder() JSONCPP_OVERRIDE;
 
 		/**
-   * \throw std::exception if something goes wrong (e.g. invalid settings)
-   */
+		 * \throw std::exception if something goes wrong (e.g. invalid settings)
+		 */
 		StreamWriter* newStreamWriter() const JSONCPP_OVERRIDE;
 
 		/** \return true if 'settings' are legal and consistent;
-   *   otherwise, indicate bad settings via 'invalid'.
-   */
+		 *   otherwise, indicate bad settings via 'invalid'.
+		 */
 		bool validate(Json::Value* invalid) const;
 		/** A simple way to update a specific setting.
-   */
+		 */
 		Value& operator[](JSONCPP_STRING key);
 
 		/** Called by ctor, but you can use this to reset settings_.
-   * \pre 'settings' != NULL (but Json::null is fine)
-   * \remark Defaults:
-   * \snippet src/lib_json/json_writer.cpp StreamWriterBuilderDefaults
-   */
+		 * \pre 'settings' != NULL (but Json::null is fine)
+		 * \remark Defaults:
+		 * \snippet src/lib_json/json_writer.cpp StreamWriterBuilderDefaults
+		 */
 		static void setDefaults(Json::Value* settings);
 	};
 
 	/** \brief Abstract class for writers.
- * \deprecated Use StreamWriter. (And really, this is an implementation detail.)
- */
+	 * \deprecated Use StreamWriter. (And really, this is an implementation detail.)
+	 */
 	class JSONCPP_DEPRECATED("Use StreamWriter instead") JSON_API Writer
 	{
 	public:
@@ -1991,10 +1991,10 @@ Usage:
 		void enableYAMLCompatibility();
 
 		/** \brief Drop the "null" string from the writer's output for nullValues.
-   * Strictly speaking, this is not valid JSON. But when the output is being
-   * fed to a browser's JavaScript, it makes for smaller output and the
-   * browser can handle the output just fine.
-   */
+		 * Strictly speaking, this is not valid JSON. But when the output is being
+		 * fed to a browser's JavaScript, it makes for smaller output and the
+		 * browser can handle the output just fine.
+		 */
 		void dropNullPlaceholders();
 
 		void omitEndingLineFeed();
@@ -2052,9 +2052,9 @@ Usage:
 
 	public:	   // overridden from Writer
 		/** \brief Serialize a Value in <a HREF="http://www.json.org">JSON</a> format.
-   * \param root Value to serialize.
-   * \return String containing the JSON document that represents the root value.
-   */
+		 * \param root Value to serialize.
+		 * \return String containing the JSON document that represents the root value.
+		 */
 		JSONCPP_STRING write(const Value& root) JSONCPP_OVERRIDE;
 
 	private:
@@ -2086,7 +2086,7 @@ Usage:
 
 /** \brief Writes a Value in <a HREF="http://www.json.org">JSON</a> format in a
  human friendly way,
-     to a stream rather than to a string.
+	 to a stream rather than to a string.
  *
  * The rules for line break and indent are as follow:
  * - Object value:
@@ -2117,8 +2117,8 @@ Usage:
 	{
 	public:
 		/**
- * \param indentation Each level will be indented by this amount extra.
- */
+		 * \param indentation Each level will be indented by this amount extra.
+		 */
 		StyledStreamWriter(JSONCPP_STRING indentation = "\t");
 		~StyledStreamWriter()
 		{
@@ -2126,11 +2126,11 @@ Usage:
 
 	public:
 		/** \brief Serialize a Value in <a HREF="http://www.json.org">JSON</a> format.
-   * \param out Stream to write to. (Can be ostringstream, e.g.)
-   * \param root Value to serialize.
-   * \note There is no point in deriving from Writer, since write() should not
-   * return a value.
-   */
+		 * \param out Stream to write to. (Can be ostringstream, e.g.)
+		 * \param root Value to serialize.
+		 * \note There is no point in deriving from Writer, since write() should not
+		 * return a value.
+		 */
 		void write(JSONCPP_OSTREAM& out, const Value& root);
 
 	private:
@@ -2259,4 +2259,4 @@ Usage:
 // End of content of file: include/json/assertions.h
 // //////////////////////////////////////////////////////////////////////
 
-#endif	  //ifndef JSON_AMALGAMATED_H_INCLUDED
+#endif	  // ifndef JSON_AMALGAMATED_H_INCLUDED

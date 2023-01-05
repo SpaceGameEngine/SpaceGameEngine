@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -848,7 +848,7 @@ TEST(List, RemoveTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove front
+	// remove front
 	for (int i = 0; i < test_size; ++i)
 	{
 		ASSERT_EQ(pl->GetBegin()->val, i);
@@ -889,7 +889,7 @@ TEST(List, RemoveTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove end
+	// remove end
 	for (int i = 0; i < test_size; ++i)
 	{
 		ASSERT_EQ((pl->GetConstEnd() - 1)->val, test_size - 1 - i);
@@ -928,7 +928,7 @@ TEST(List, RemoveTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove rbegin
+	// remove rbegin
 	for (int i = 0; i < test_size; ++i)
 	{
 		ASSERT_EQ(pl->GetReverseBegin()->val, test_size - 1 - i);
@@ -969,7 +969,7 @@ TEST(List, RemoveTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove rend
+	// remove rend
 	for (int i = 0; i < test_size; ++i)
 	{
 		ASSERT_EQ((pl->GetReverseEnd() - 1)->val, i);
@@ -1008,7 +1008,7 @@ TEST(List, RemoveTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove mid
+	// remove mid
 	for (int i = 0; i < test_size - 2; ++i)
 	{
 		ASSERT_EQ((pl->GetBegin() + 1)->val, i + 1);
@@ -1047,7 +1047,7 @@ TEST(List, RemoveTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove rmid
+	// remove rmid
 	for (int i = 0; i < test_size - 2; ++i)
 	{
 		ASSERT_EQ((pl->GetReverseBegin() + 1)->val, test_size - 2 - i);
@@ -1095,7 +1095,7 @@ TEST(List, RemoveRangeTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove [mid,end)
+	// remove [mid,end)
 	auto iter1 = pl->Remove(pl->GetConstBegin() + 1, pl->GetConstEnd());
 	ASSERT_TRUE((std::is_same_v<decltype(iter1), List<test_list_object>::ConstIterator>));
 	ASSERT_EQ(pl->GetSize(), 1);
@@ -1127,7 +1127,7 @@ TEST(List, RemoveRangeTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove [beg,mid)
+	// remove [beg,mid)
 	auto iter2 = pl->Remove(pl->GetBegin(), pl->GetEnd() - 1);
 	ASSERT_TRUE((std::is_same_v<decltype(iter2), List<test_list_object>::Iterator>));
 	ASSERT_EQ(pl->GetSize(), 1);
@@ -1159,7 +1159,7 @@ TEST(List, RemoveRangeTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove [beg,end)
+	// remove [beg,end)
 	auto iter3 = pl->Remove(pl->GetBegin(), pl->GetEnd());
 	ASSERT_TRUE((std::is_same_v<decltype(iter3), List<test_list_object>::Iterator>));
 	ASSERT_EQ(pl->GetSize(), 0);
@@ -1189,7 +1189,7 @@ TEST(List, RemoveRangeTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove [mid,mid)
+	// remove [mid,mid)
 	auto iter4 = pl->Remove(pl->GetBegin() + 1, pl->GetEnd() - 1);
 	ASSERT_TRUE((std::is_same_v<decltype(iter4), List<test_list_object>::Iterator>));
 	ASSERT_EQ(pl->GetSize(), 2);
@@ -1222,7 +1222,7 @@ TEST(List, RemoveRangeTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove [rmid,rend)
+	// remove [rmid,rend)
 	auto iter5 = pl->Remove(pl->GetConstReverseBegin() + 1, pl->GetConstReverseEnd());
 	ASSERT_TRUE((std::is_same_v<decltype(iter5), List<test_list_object>::ConstReverseIterator>));
 	ASSERT_EQ(pl->GetSize(), 1);
@@ -1254,7 +1254,7 @@ TEST(List, RemoveRangeTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove [rbeg,rmid)
+	// remove [rbeg,rmid)
 	auto iter6 = pl->Remove(pl->GetReverseBegin(), pl->GetReverseEnd() - 1);
 	ASSERT_TRUE((std::is_same_v<decltype(iter6), List<test_list_object>::ReverseIterator>));
 	ASSERT_EQ(pl->GetSize(), 1);
@@ -1286,7 +1286,7 @@ TEST(List, RemoveRangeTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove [rbeg,rend)
+	// remove [rbeg,rend)
 	auto iter7 = pl->Remove(pl->GetReverseBegin(), pl->GetReverseEnd());
 	ASSERT_TRUE((std::is_same_v<decltype(iter7), List<test_list_object>::ReverseIterator>));
 	ASSERT_EQ(pl->GetSize(), 0);
@@ -1316,7 +1316,7 @@ TEST(List, RemoveRangeTest)
 	ASSERT_EQ(cnt, test_size);
 
 	ASSERT_TRUE(CheckListConnection(*pl));
-	//remove [rmid,rmid)
+	// remove [rmid,rmid)
 	auto iter8 = pl->Remove(pl->GetReverseBegin() + 1, pl->GetReverseEnd() - 1);
 	ASSERT_TRUE((std::is_same_v<decltype(iter8), List<test_list_object>::ReverseIterator>));
 	ASSERT_EQ(pl->GetSize(), 2);

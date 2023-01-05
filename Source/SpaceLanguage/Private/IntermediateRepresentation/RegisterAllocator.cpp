@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -120,6 +120,6 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::RegisterAllocat
 RegisterAllocationResults SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::SimpleRegisterAllocate(const RegisterAllocationRequests& reqs)
 {
 	RegisterAllocationResults re;
-	//todo
+	// todo
 	return re;
 }

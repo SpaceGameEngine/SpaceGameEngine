@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -64,13 +64,13 @@ TEST(Module, InstanceTest)
 	ASSERT_EQ(Test1Module::sm_instance_count, 0);
 }
 
-//same as SGE_MODULE when SGE_USE_DLL is not defined.
+// same as SGE_MODULE when SGE_USE_DLL is not defined.
 #define SGE_TEST_STATIC_MODULE(name) SGE_STATIC_MODULE(SGE_STR(#name), name##Module);
 
 TEST(ModuleManager, StaticModuleTest)
 {
 	SGE_TEST_STATIC_MODULE(Test1);
-	//SGE_STATIC_MODULE(SGE_STR("Test1"), Test1Module);
+	// SGE_STATIC_MODULE(SGE_STR("Test1"), Test1Module);
 
 	ASSERT_EQ(Test1Module::sm_instance_count, 1);
 	ASSERT_EQ(Test1Module::sm_load_count, 0);

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ void BM_SgeFixedSizeAllocatorFixedSizeAllocate(benchmark::State& state)
 	}
 }
 
-//void BM_SgeMultiThreadBufferedFixedSizeAllocatorFixedSizeAllocate(benchmark::State& state)
+// void BM_SgeMultiThreadBufferedFixedSizeAllocatorFixedSizeAllocate(benchmark::State& state)
 //{
 //	static SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator test(fixed_allocate_size, 0xffff, 4);
 //	void* buffer[max_buffer_size];
@@ -59,11 +59,11 @@ void BM_SgeFixedSizeAllocatorFixedSizeAllocate(benchmark::State& state)
 //		for (int i = 0; i < size; i++)
 //			test.Free(buffer[i]);
 //	}
-//}
+// }
 
 BENCHMARK(BM_StdAllocatorFixedSizeAllocate)->ThreadRange(1, 8)->RangeMultiplier(2)->Range(1, max_buffer_size);
 BENCHMARK(BM_SgeFixedSizeAllocatorFixedSizeAllocate)->ThreadRange(1, 8)->RangeMultiplier(2)->Range(1, max_buffer_size);
-//BENCHMARK(BM_SgeMultiThreadBufferedFixedSizeAllocatorFixedSizeAllocate)->ThreadRange(1, 8)->RangeMultiplier(2)->Range(1, max_buffer_size);
+// BENCHMARK(BM_SgeMultiThreadBufferedFixedSizeAllocatorFixedSizeAllocate)->ThreadRange(1, 8)->RangeMultiplier(2)->Range(1, max_buffer_size);
 
 template<typename Allocator>
 void BM_AllocatorAllocate(benchmark::State& state)

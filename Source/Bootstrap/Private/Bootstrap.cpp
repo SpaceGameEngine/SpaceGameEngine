@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ SpaceGameEngine::Bootstrap::~Bootstrap()
 	}
 	else
 	{
-		//make sure the global variables which are stored in dll can be destructed before the executable exiting.
+		// make sure the global variables which are stored in dll can be destructed before the executable exiting.
 		GlobalVariableManager::GetSingleton().~GlobalVariableManager();
 		FreeLibrary(g_CommonModule);
 	}

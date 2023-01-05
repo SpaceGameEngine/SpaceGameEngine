@@ -7,28 +7,28 @@
 // //////////////////////////////////////////////////////////////////////
 
 /*
-The JsonCpp library's source code, including accompanying documentation, 
+The JsonCpp library's source code, including accompanying documentation,
 tests and demonstration applications, are licensed under the following
 conditions...
 
-Baptiste Lepilleur and The JsonCpp Authors explicitly disclaim copyright in all 
-jurisdictions which recognize such a disclaimer. In such jurisdictions, 
+Baptiste Lepilleur and The JsonCpp Authors explicitly disclaim copyright in all
+jurisdictions which recognize such a disclaimer. In such jurisdictions,
 this software is released into the Public Domain.
 
 In jurisdictions which do not recognize Public Domain property (e.g. Germany as of
 2010), this software is Copyright (c) 2007-2010 by Baptiste Lepilleur and
 The JsonCpp Authors, and is released under the terms of the MIT License (see below).
 
-In jurisdictions which recognize Public Domain property, the user of this 
-software may choose to accept it either as 1) Public Domain, 2) under the 
-conditions of the MIT License (see below), or 3) under the terms of dual 
+In jurisdictions which recognize Public Domain property, the user of this
+software may choose to accept it either as 1) Public Domain, 2) under the
+conditions of the MIT License (see below), or 3) under the terms of dual
 Public Domain/MIT License conditions described here, as they choose.
 
 The MIT License is about as close to Public Domain as a license can get, and is
 described in clear, concise terms at:
 
    http://en.wikipedia.org/wiki/MIT_License
-   
+
 The full text of the MIT License follows:
 
 ========================================================================
@@ -91,14 +91,14 @@ license you like.
 #include <stdint.h>	   //typedef int64_t, uint64_t
 
 /// If defined, indicates that json library is embedded in CppTL library.
-//# define JSON_IN_CPPTL 1
+// # define JSON_IN_CPPTL 1
 
 /// If defined, indicates that json may leverage CppTL library
-//#  define JSON_USE_CPPTL 1
+// #  define JSON_USE_CPPTL 1
 /// If defined, indicates that cpptl vector based map should be used instead of
 /// std::map
 /// as Value container.
-//#  define JSON_USE_CPPTL_SMALLMAP 1
+// #  define JSON_USE_CPPTL_SMALLMAP 1
 
 // If non-zero, the library uses exceptions to report bad input instead of C
 // assertion macros. The default is to use exceptions.
@@ -319,4 +319,4 @@ namespace Json
 // End of content of file: include/json/forwards.h
 // //////////////////////////////////////////////////////////////////////
 
-#endif	  //ifndef JSON_FORWARD_AMALGAMATED_H_INCLUDED
+#endif	  // ifndef JSON_FORWARD_AMALGAMATED_H_INCLUDED

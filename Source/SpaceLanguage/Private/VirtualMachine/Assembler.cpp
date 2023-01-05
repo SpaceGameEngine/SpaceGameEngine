@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -297,7 +297,7 @@ Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& s
 		{
 			if (iter->GetType() == TokenType::IntegerLiteral)
 				result[write_idx] = StringTo<String, UInt8>(iter->GetContent());
-			else	//Identifier
+			else	// Identifier
 				result[write_idx] = RegisterNameSet::GetSingleton().Get(iter->GetContent());
 			instr_size -= 1;
 			++write_idx;

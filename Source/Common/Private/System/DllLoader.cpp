@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -141,12 +141,12 @@ SpaceGameEngine::String SpaceGameEngine::GetDllPath(const String& dll_name)
 	dll_path += SGE_STR(".dll");
 
 	return dll_path;
-#elif defined(SGE_MACOS)	//CMake support @rpath
+#elif defined(SGE_MACOS)	// CMake support @rpath
 	String re(SGE_STR("lib"));
 	re += dll_name;
 	re += SGE_STR(".dylib");
 	return re;
-#elif defined(SGE_LINUX)	//CMake support rpath
+#elif defined(SGE_LINUX)	// CMake support rpath
 	String re(SGE_STR("lib"));
 	re += dll_name;
 	re += SGE_STR(".so");

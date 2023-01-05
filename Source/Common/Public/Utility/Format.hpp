@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace SpaceGameEngine
 
 		bool is_in_arg = false;
 		bool has_opt = false;
-		UInt8 idx_status = 0;	 //0 : unknown ; 1 : no idx ; 2 : has idx
+		UInt8 idx_status = 0;	 // 0 : unknown ; 1 : no idx ; 2 : has idx
 		SizeType num_cnt = 0;
 
 		if constexpr (std::is_same_v<Trait, UCS2Trait>)
@@ -76,14 +76,14 @@ namespace SpaceGameEngine
 						{
 							if (num_cnt)
 							{
-								if (idx_status == 1)	//1 mean no idx
+								if (idx_status == 1)	// 1 mean no idx
 									return false;
 								else
 									idx_status = 2;
 							}
 							else
 							{
-								if (idx_status == 2)	//2 mean has idx
+								if (idx_status == 2)	// 2 mean has idx
 									return false;
 								else
 									idx_status = 1;
@@ -102,14 +102,14 @@ namespace SpaceGameEngine
 						{
 							if (num_cnt)
 							{
-								if (idx_status == 1)	//1 mean no idx
+								if (idx_status == 1)	// 1 mean no idx
 									return false;
 								else
 									idx_status = 2;
 							}
 							else
 							{
-								if (idx_status == 2)	//2 mean has idx
+								if (idx_status == 2)	// 2 mean has idx
 									return false;
 								else
 									idx_status = 1;
@@ -124,7 +124,7 @@ namespace SpaceGameEngine
 			if (is_in_arg)
 				return false;
 		}
-		else	//UTF8Trait
+		else	// UTF8Trait
 		{
 			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
 			for (auto iter = str.GetConstBegin(); iter != str.GetConstEnd(); ++iter)
@@ -162,14 +162,14 @@ namespace SpaceGameEngine
 						{
 							if (num_cnt)
 							{
-								if (idx_status == 1)	//1 mean no idx
+								if (idx_status == 1)	// 1 mean no idx
 									return false;
 								else
 									idx_status = 2;
 							}
 							else
 							{
-								if (idx_status == 2)	//2 mean has idx
+								if (idx_status == 2)	// 2 mean has idx
 									return false;
 								else
 									idx_status = 1;
@@ -189,14 +189,14 @@ namespace SpaceGameEngine
 						{
 							if (num_cnt)
 							{
-								if (idx_status == 1)	//1 mean no idx
+								if (idx_status == 1)	// 1 mean no idx
 									return false;
 								else
 									idx_status = 2;
 							}
 							else
 							{
-								if (idx_status == 2)	//2 mean has idx
+								if (idx_status == 2)	// 2 mean has idx
 									return false;
 								else
 									idx_status = 1;
@@ -264,7 +264,7 @@ namespace SpaceGameEngine
 				{
 					return base_char != SGE_WSTR('B') && base_char != SGE_WSTR('D') && base_char != SGE_WSTR('H');
 				}
-				else	//UTF8Trait
+				else	// UTF8Trait
 				{
 					static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
 
@@ -325,7 +325,7 @@ namespace SpaceGameEngine
 						else if (base_char == SGE_WSTR('H'))
 							base = NumberBase::Hex;
 					}
-					else	//UTF8Trait
+					else	// UTF8Trait
 					{
 						static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
 
@@ -525,7 +525,7 @@ namespace SpaceGameEngine
 				}
 			}
 		}
-		else	//UTF8Trait
+		else	// UTF8Trait
 		{
 			static_assert(std::is_same_v<Trait, UTF8Trait>, "unsupported CharTrait");
 

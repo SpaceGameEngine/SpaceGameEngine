@@ -6,28 +6,28 @@
 // //////////////////////////////////////////////////////////////////////
 
 /*
-The JsonCpp library's source code, including accompanying documentation, 
+The JsonCpp library's source code, including accompanying documentation,
 tests and demonstration applications, are licensed under the following
 conditions...
 
-Baptiste Lepilleur and The JsonCpp Authors explicitly disclaim copyright in all 
-jurisdictions which recognize such a disclaimer. In such jurisdictions, 
+Baptiste Lepilleur and The JsonCpp Authors explicitly disclaim copyright in all
+jurisdictions which recognize such a disclaimer. In such jurisdictions,
 this software is released into the Public Domain.
 
 In jurisdictions which do not recognize Public Domain property (e.g. Germany as of
 2010), this software is Copyright (c) 2007-2010 by Baptiste Lepilleur and
 The JsonCpp Authors, and is released under the terms of the MIT License (see below).
 
-In jurisdictions which recognize Public Domain property, the user of this 
-software may choose to accept it either as 1) Public Domain, 2) under the 
-conditions of the MIT License (see below), or 3) under the terms of dual 
+In jurisdictions which recognize Public Domain property, the user of this
+software may choose to accept it either as 1) Public Domain, 2) under the
+conditions of the MIT License (see below), or 3) under the terms of dual
 Public Domain/MIT License conditions described here, as they choose.
 
 The MIT License is about as close to Public Domain as a license can get, and is
 described in clear, concise terms at:
 
    http://en.wikipedia.org/wiki/MIT_License
-   
+
 The full text of the MIT License follows:
 
 ========================================================================
@@ -161,10 +161,10 @@ namespace Json
 	typedef char UIntToStringBuffer[uintToStringBufferSize];
 
 	/** Converts an unsigned integer to string.
- * @param value Unsigned integer to convert to string
- * @param current Input/Output string buffer.
- *        Must have at least uintToStringBufferSize chars free.
- */
+	 * @param value Unsigned integer to convert to string
+	 * @param current Input/Output string buffer.
+	 *        Must have at least uintToStringBufferSize chars free.
+	 */
 	static inline void uintToString(LargestUInt value, char*& current)
 	{
 		*--current = 0;
@@ -176,10 +176,10 @@ namespace Json
 	}
 
 	/** Change ',' to '.' everywhere in buffer.
- *
- * We had a sophisticated way, but it did not work in WinCE.
- * @see https://github.com/open-source-parsers/jsoncpp/pull/9
- */
+	 *
+	 * We had a sophisticated way, but it did not work in WinCE.
+	 * @see https://github.com/open-source-parsers/jsoncpp/pull/9
+	 */
 	static inline void fixNumericLocale(char* begin, char* end)
 	{
 		while (begin < end)
@@ -2772,10 +2772,10 @@ namespace Json
 #else
 #define ALIGNAS(byte_alignment)
 #endif
-	//static const unsigned char ALIGNAS(8) kNull[sizeof(Value)] = { 0 };
-	//const unsigned char& kNullRef = kNull[0];
-	//const Value& Value::null = reinterpret_cast<const Value&>(kNullRef);
-	//const Value& Value::nullRef = null;
+	// static const unsigned char ALIGNAS(8) kNull[sizeof(Value)] = { 0 };
+	// const unsigned char& kNullRef = kNull[0];
+	// const Value& Value::null = reinterpret_cast<const Value&>(kNullRef);
+	// const Value& Value::nullRef = null;
 
 	// static
 	Value const& Value::nullSingleton()
@@ -2811,7 +2811,7 @@ namespace Json
 	{
 		// The casts can lose precision, but we are looking only for
 		// an approximate range. Might fail on edge cases though. ~cdunn
-		//return d >= static_cast<double>(min) && d <= static_cast<double>(max);
+		// return d >= static_cast<double>(min) && d <= static_cast<double>(max);
 		return d >= min && d <= max;
 	}
 #else	  // if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
@@ -2834,12 +2834,12 @@ namespace Json
 #endif	  // if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
 
 	/** Duplicates the specified string value.
- * @param value Pointer to the string to duplicate. Must be zero-terminated if
- *              length is "unknown".
- * @param length Length of the value. if equals to unknown, then it will be
- *               computed using strlen(value).
- * @return Pointer on the duplicate instance of string.
- */
+	 * @param value Pointer to the string to duplicate. Must be zero-terminated if
+	 *              length is "unknown".
+	 * @param length Length of the value. if equals to unknown, then it will be
+	 *               computed using strlen(value).
+	 * @return Pointer on the duplicate instance of string.
+	 */
 	static inline char* duplicateStringValue(const char* value,
 											 size_t length)
 	{
@@ -2861,7 +2861,7 @@ namespace Json
 	}
 
 	/* Record the length as a prefix.
- */
+	 */
 	static inline char* duplicateAndPrefixStringValue(
 		const char* value,
 		unsigned int length)
@@ -3089,8 +3089,8 @@ namespace Json
 	{
 		if (!cstr_)
 			return index_ < other.index_;
-		//return strcmp(cstr_, other.cstr_) < 0;
-		// Assume both are strings.
+		// return strcmp(cstr_, other.cstr_) < 0;
+		//  Assume both are strings.
 		unsigned this_len = this->storage_.length_;
 		unsigned other_len = other.storage_.length_;
 		unsigned min_len = std::min<unsigned>(this_len, other_len);
@@ -3107,8 +3107,8 @@ namespace Json
 	{
 		if (!cstr_)
 			return index_ == other.index_;
-		//return strcmp(cstr_, other.cstr_) == 0;
-		// Assume both are strings.
+		// return strcmp(cstr_, other.cstr_) == 0;
+		//  Assume both are strings.
 		unsigned this_len = this->storage_.length_;
 		unsigned other_len = other.storage_.length_;
 		if (this_len != other_len)
@@ -3123,7 +3123,7 @@ namespace Json
 		return index_;
 	}
 
-	//const char* Value::CZString::c_str() const { return cstr_; }
+	// const char* Value::CZString::c_str() const { return cstr_; }
 	const char* Value::CZString::data() const
 	{
 		return cstr_;
@@ -3146,9 +3146,9 @@ namespace Json
 	// //////////////////////////////////////////////////////////////////
 
 	/*! \internal Default constructor initialization must be equivalent to:
- * memset( this, 0, sizeof(Value) )
- * This optimization is used in ValueInternalMap fast allocator.
- */
+	 * memset( this, 0, sizeof(Value) )
+	 * This optimization is used in ValueInternalMap fast allocator.
+	 */
 	Value::Value(ValueType vtype)
 	{
 		static char const emptyString[] = "";
@@ -4190,7 +4190,7 @@ namespace Json
 		return members;
 	}
 	//
-	//# ifdef JSON_USE_CPPTL
+	// # ifdef JSON_USE_CPPTL
 	// EnumMemberNames
 	// Value::enumMemberNames() const
 	//{
@@ -4213,7 +4213,7 @@ namespace Json
 	//   return EnumValues();
 	//}
 	//
-	//# endif
+	// # endif
 
 	static bool IsIntegral(double d)
 	{
@@ -4716,7 +4716,7 @@ namespace Json
 #if defined(_MSC_VER) && _MSC_VER >= 1200 && _MSC_VER < 1800	// Between VC++ 6.0 and VC++ 11.0
 #include <float.h>
 #define isfinite _finite
-#elif defined(__sun) && defined(__SVR4)	   //Solaris
+#elif defined(__sun) && defined(__SVR4)	   // Solaris
 #if !defined(isfinite)
 #include <ieeefp.h>
 #define isfinite finite

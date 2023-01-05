@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -103,9 +103,9 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		const HashMap<UInt64, HashMap<UInt64, bool>>& GetInternalFunctionCallRelationships() const;
 
 	private:
-		HashMap<UInt64, HashMap<UInt64, Map<UInt64, bool>>> m_Content;						   //func_id, virtual_register_id, operation_id
-		HashMap<UInt64, Map<UInt64, Pair<FunctionCallType, UInt64>>> m_FunctionCallRecords;	   //func_id, operation_id, <func_call_type, func_id(target)>
-		HashMap<UInt64, HashMap<UInt64, bool>> m_InternalFunctionCallRelationships;			   //func_id, func_id(target)
+		HashMap<UInt64, HashMap<UInt64, Map<UInt64, bool>>> m_Content;						   // func_id, virtual_register_id, operation_id
+		HashMap<UInt64, Map<UInt64, Pair<FunctionCallType, UInt64>>> m_FunctionCallRecords;	   // func_id, operation_id, <func_call_type, func_id(target)>
+		HashMap<UInt64, HashMap<UInt64, bool>> m_InternalFunctionCallRelationships;			   // func_id, func_id(target)
 	};
 
 	struct RegisterAllocationRequestAlreadyExistError

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,73 +41,70 @@ namespace SpaceGameEngine
 	concept IsMoveAssignable = std::is_move_assignable_v<T>;
 
 	template<typename T>
-	concept IsMovable = IsMoveConstructible<T>&& IsMoveAssignable<T>;
+	concept IsMovable = IsMoveConstructible<T> && IsMoveAssignable<T>;
 
 	template<typename T>
-	concept IsCopyable = IsMovable<T>&& IsCopyConstructible<T>&& IsCopyAssignable<T>;
+	concept IsCopyable = IsMovable<T> && IsCopyConstructible<T> && IsCopyAssignable<T>;
 
 	template<typename T, typename U = T>
-	concept IsWeakEqualityComparable = requires(T t, U u)
-	{
-		{
-			t == u
-		}
-		->std::same_as<bool>;
-		{
-			u == t
-		}
-		->std::same_as<bool>;
-	};
+	concept IsWeakEqualityComparable = requires(T t, U u) {
+										   {
+											   t == u
+											   }
+											   -> std::same_as<bool>;
+										   {
+											   u == t
+											   }
+											   -> std::same_as<bool>;
+									   };
 
 	template<typename T, typename U = T>
-	concept IsEqualityComparable = IsWeakEqualityComparable<T, U>&& requires(T t, U u)
-	{
-		{
-			t != u
-		}
-		->std::same_as<bool>;
-		{
-			u != t
-		}
-		->std::same_as<bool>;
-	};
+	concept IsEqualityComparable = IsWeakEqualityComparable<T, U> && requires(T t, U u) {
+																		 {
+																			 t != u
+																			 }
+																			 -> std::same_as<bool>;
+																		 {
+																			 u != t
+																			 }
+																			 -> std::same_as<bool>;
+																	 };
 
 	template<typename T, typename U = T>
-	concept IsTotallyOrdered = IsEqualityComparable<T, U>&& requires(T t, U u)
-	{
-		{
-			t < u
-		}
-		->std::same_as<bool>;
-		{
-			t > u
-		}
-		->std::same_as<bool>;
-		{
-			t <= u
-		}
-		->std::same_as<bool>;
-		{
-			t >= u
-		}
-		->std::same_as<bool>;
-		{
-			u < t
-		}
-		->std::same_as<bool>;
-		{
-			u > t
-		}
-		->std::same_as<bool>;
-		{
-			u <= t
-		}
-		->std::same_as<bool>;
-		{
-			u >= t
-		}
-		->std::same_as<bool>;
-	};
+	concept IsTotallyOrdered = IsEqualityComparable<T, U> && requires(T t, U u) {
+																 {
+																	 t < u
+																	 }
+																	 -> std::same_as<bool>;
+																 {
+																	 t > u
+																	 }
+																	 -> std::same_as<bool>;
+																 {
+																	 t <= u
+																	 }
+																	 -> std::same_as<bool>;
+																 {
+																	 t >= u
+																	 }
+																	 -> std::same_as<bool>;
+																 {
+																	 u < t
+																	 }
+																	 -> std::same_as<bool>;
+																 {
+																	 u > t
+																	 }
+																	 -> std::same_as<bool>;
+																 {
+																	 u <= t
+																	 }
+																	 -> std::same_as<bool>;
+																 {
+																	 u >= t
+																	 }
+																	 -> std::same_as<bool>;
+															 };
 
 	template<typename T>
 	concept IsTrivial = std::is_trivial_v<T>;

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,17 +43,16 @@ namespace SpaceGameEngine
 	@brief Can check whether a type is a error type or not.But need to specify the Judge function's arguments' types.
 	*/
 	template<typename T, typename... Args>
-	concept IsError = requires(Args... args)
-	{
-		{
-			T::sm_pContent
-		}
-		->std::convertible_to<const ErrorMessageChar*>;
-		{
-			T::Judge(args...)
-		}
-		->std::same_as<bool>;
-	};
+	concept IsError = requires(Args... args) {
+						  {
+							  T::sm_pContent
+							  }
+							  -> std::convertible_to<const ErrorMessageChar*>;
+						  {
+							  T::Judge(args...)
+							  }
+							  -> std::same_as<bool>;
+					  };
 
 	struct NullPointerError
 	{

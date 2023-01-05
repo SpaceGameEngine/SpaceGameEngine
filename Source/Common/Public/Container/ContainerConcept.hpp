@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -63,37 +63,33 @@ namespace SpaceGameEngine
 	using IteratorValueType = typename GetIteratorValueType<IteratorType>::Type;
 
 	template<typename T>
-	concept IsBaseIterator = IsCopyable<T>&& IsEqualityComparable<T>&& requires(T t)
-	{
-		++t;
-		t++;
-		*t;
-	};
+	concept IsBaseIterator = IsCopyable<T> && IsEqualityComparable<T> && requires(T t) {
+																			 ++t;
+																			 t++;
+																			 *t;
+																		 };
 
 	template<typename T>
-	concept IsBidirectionalBaseIterator = IsBaseIterator<T>&& requires(T t)
-	{
-		--t;
-		t--;
-	};
+	concept IsBidirectionalBaseIterator = IsBaseIterator<T> && requires(T t) {
+																   --t;
+																   t--;
+															   };
 
 	template<typename T>
-	concept IsSequentialIterator = IsBaseIterator<T>&& requires(T t, T t2)
-	{
-		t + 1;
-		t += 1;
-		{
-			t - t2
-		}
-		->std::convertible_to<SizeType>;
-	};
+	concept IsSequentialIterator = IsBaseIterator<T> && requires(T t, T t2) {
+															t + 1;
+															t += 1;
+															{
+																t - t2
+																}
+																-> std::convertible_to<SizeType>;
+														};
 
 	template<typename T>
-	concept IsBidirectionalSequentialIterator = IsBidirectionalBaseIterator<T>&& IsSequentialIterator<T>&& requires(T t)
-	{
-		t - 1;
-		t -= 1;
-	};
+	concept IsBidirectionalSequentialIterator = IsBidirectionalBaseIterator<T> && IsSequentialIterator<T> && requires(T t) {
+																												 t - 1;
+																												 t -= 1;
+																											 };
 
 }
 

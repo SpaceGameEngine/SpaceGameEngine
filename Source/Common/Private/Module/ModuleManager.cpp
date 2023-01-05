@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ void SpaceGameEngine::ModuleManager::AddModule(const String& name, Module* pmod)
 	SGE_ASSERT(ConflictingModuleNameError, m_ModuleMap, name);
 	SGE_ASSERT(NullPointerError, pmod);
 
-	m_ModuleMap.Insert(name, pmod);	   //avoid pmod adding itself again when call its OnLoad()
+	m_ModuleMap.Insert(name, pmod);	   // avoid pmod adding itself again when call its OnLoad()
 	pmod->OnLoad();
 	m_Modules.Push(pmod);
 }
@@ -69,10 +69,10 @@ void SpaceGameEngine::ModuleManager::LoadModule(const String& name)
 {
 	SGE_ASSERT(EmptyModuleNameError, name);
 
-	if (m_ModuleMap.Find(name) != m_ModuleMap.GetEnd())	   //already loaded
+	if (m_ModuleMap.Find(name) != m_ModuleMap.GetEnd())	   // already loaded
 		return;
 
-	//load from static
+	// load from static
 	auto siter = m_StaticModules.Find(name);
 	if (siter != m_StaticModules.GetEnd())
 	{
@@ -80,13 +80,13 @@ void SpaceGameEngine::ModuleManager::LoadModule(const String& name)
 		m_StaticModules.Remove(siter);
 		return;
 	}
-	//load from dynamic
-#ifdef SGE_WINDOWS	  //unix platform do not use this solution
+	// load from dynamic
+#ifdef SGE_WINDOWS	  // unix platform do not use this solution
 	DllHandle dll = LoadDll(GetDllPath(name));
 	Module* (*pget_module)() = nullptr;
 	pget_module = decltype(pget_module)(GetAddressFromDll(dll, SGE_STR("GetModule")));
 	AddModule(name, pget_module());
 	m_DllHandles.Push(dll);
 #endif
-	//do not throw error here, because if the module can not be founded, the LoadDll will throw the error.
+	// do not throw error here, because if the module can not be founded, the LoadDll will throw the error.
 }

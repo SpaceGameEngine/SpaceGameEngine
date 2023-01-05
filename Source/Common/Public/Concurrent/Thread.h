@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ limitations under the License.
 #include <atomic>
 
 #if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-namespace std	 //declaration for dll export
+namespace std	 // declaration for dll export
 {
 	class COMMON_API thread;
 }

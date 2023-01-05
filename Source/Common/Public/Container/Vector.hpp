@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ namespace SpaceGameEngine
 		/*!
 		@brief Copy constructor of Vector.
 		@note The Vector first allocates the needed memory and then calls the every object's
-		copy constructor by using another Vector's objects.	
+		copy constructor by using another Vector's objects.
 		*/
 		inline Vector(const Vector& v)
 		{
@@ -1245,7 +1245,7 @@ namespace SpaceGameEngine
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
 				}
 			}
-			else	//reverse
+			else	// reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SizeType index = iter - IteratorType::GetBegin(*this);
@@ -1312,7 +1312,7 @@ namespace SpaceGameEngine
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
 				}
 			}
-			else	//reverse
+			else	// reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SizeType index = iter - IteratorType::GetBegin(*this);
@@ -1376,7 +1376,7 @@ namespace SpaceGameEngine
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
 				}
 			}
-			else	//reverse
+			else	// reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SizeType index = iter - IteratorType::GetBegin(*this);
@@ -1471,7 +1471,7 @@ namespace SpaceGameEngine
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
 				}
 			}
-			else	//reverse
+			else	// reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
@@ -1598,7 +1598,7 @@ namespace SpaceGameEngine
 					return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
 				}
 			}
-			else	//reverse
+			else	// reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SizeType size = end - begin;
@@ -1737,7 +1737,7 @@ namespace SpaceGameEngine
 					}
 				}
 			}
-			else	//reverse
+			else	// reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				if (size)
@@ -1855,7 +1855,7 @@ namespace SpaceGameEngine
 				m_Size -= 1;
 				return iter;
 			}
-			else	//reverse
+			else	// reverse
 			{
 				if constexpr (IsTrivial<T>)
 				{
@@ -1892,7 +1892,7 @@ namespace SpaceGameEngine
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, begin, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, end, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 			}
-			else	//reverse
+			else	// reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, begin, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, end, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
@@ -1935,7 +1935,7 @@ namespace SpaceGameEngine
 				m_Size -= size;
 				return begin;
 			}
-			else	//reverse
+			else	// reverse
 			{
 				if constexpr (IsTrivial<T>)
 				{

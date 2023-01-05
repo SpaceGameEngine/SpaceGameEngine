@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -926,7 +926,7 @@ namespace SpaceGameEngine
 				pfwd = (Node*)iter.m_pNode;
 				pbck = (Node*)biter.m_pNode;
 			}
-			else	//Reverse
+			else	// Reverse
 			{
 				pfwd = (Node*)biter.m_pNode;
 				pbck = (Node*)iter.m_pNode;
@@ -960,7 +960,7 @@ namespace SpaceGameEngine
 				pfwd = (Node*)iter.m_pNode;
 				pbck = (Node*)biter.m_pNode;
 			}
-			else	//Reverse
+			else	// Reverse
 			{
 				pfwd = (Node*)biter.m_pNode;
 				pbck = (Node*)iter.m_pNode;
@@ -994,7 +994,7 @@ namespace SpaceGameEngine
 				pfwd = (Node*)iter.m_pNode;
 				pbck = (Node*)biter.m_pNode;
 			}
-			else	//Reverse
+			else	// Reverse
 			{
 				pfwd = (Node*)biter.m_pNode;
 				pbck = (Node*)iter.m_pNode;
@@ -1039,7 +1039,7 @@ namespace SpaceGameEngine
 				pfwd = (Node*)iter.m_pNode;
 				pbck = (Node*)biter.m_pNode;
 			}
-			else	//Reverse
+			else	// Reverse
 			{
 				pfwd = (Node*)biter.m_pNode;
 				pbck = (Node*)iter.m_pNode;
@@ -1059,7 +1059,7 @@ namespace SpaceGameEngine
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 				return IteratorType(pnhead, m_pHead, m_pTail);
-			else	//reverse
+			else	// reverse
 				return IteratorType(pntail, m_pHead, m_pTail);
 		}
 
@@ -1084,7 +1084,7 @@ namespace SpaceGameEngine
 					pntail = pnb;
 				}
 			}
-			else	//reverse
+			else	// reverse
 			{
 				for (; aiter != end; ++aiter)
 				{
@@ -1104,7 +1104,7 @@ namespace SpaceGameEngine
 				pfwd = (Node*)iter.m_pNode;
 				pbck = (Node*)biter.m_pNode;
 			}
-			else	//Reverse
+			else	// Reverse
 			{
 				pfwd = (Node*)biter.m_pNode;
 				pbck = (Node*)iter.m_pNode;
@@ -1124,7 +1124,7 @@ namespace SpaceGameEngine
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 				return IteratorType(pnhead, m_pHead, m_pTail);
-			else	//reverse
+			else	// reverse
 				return IteratorType(pntail, m_pHead, m_pTail);
 		}
 
@@ -1150,7 +1150,7 @@ namespace SpaceGameEngine
 						pntail = pnb;
 					}
 				}
-				else	//reverse
+				else	// reverse
 				{
 					for (; aiter != ilist.end(); ++aiter)
 					{
@@ -1170,7 +1170,7 @@ namespace SpaceGameEngine
 					pfwd = (Node*)iter.m_pNode;
 					pbck = (Node*)biter.m_pNode;
 				}
-				else	//Reverse
+				else	// Reverse
 				{
 					pfwd = (Node*)biter.m_pNode;
 					pbck = (Node*)iter.m_pNode;
@@ -1190,7 +1190,7 @@ namespace SpaceGameEngine
 
 				if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 					return IteratorType(pnhead, m_pHead, m_pTail);
-				else	//reverse
+				else	// reverse
 					return IteratorType(pntail, m_pHead, m_pTail);
 			}
 		}
@@ -1255,7 +1255,7 @@ namespace SpaceGameEngine
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 				return IteratorType(pfwd, m_pHead, m_pTail);
-			else	//reverse
+			else	// reverse
 				return IteratorType(pbck, m_pHead, m_pTail);
 		}
 
@@ -1275,7 +1275,7 @@ namespace SpaceGameEngine
 				pbck = beg.m_pNode->m_pPrevious;
 				pfwd = (Node*)end.m_pNode;
 			}
-			else	//reverse
+			else	// reverse
 			{
 				pbck = (Node*)end.m_pNode;
 				pfwd = beg.m_pNode->m_pNext;
@@ -1302,7 +1302,7 @@ namespace SpaceGameEngine
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 				return IteratorType(pfwd, m_pHead, m_pTail);
-			else	//reverse
+			else	// reverse
 				return IteratorType(pbck, m_pHead, m_pTail);
 		}
 

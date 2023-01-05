@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2022 creatorlxd
+Copyright 2023 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -156,7 +156,7 @@ TEST(HashMap, ListConstructionTest)
 	delete phm;
 	for (int i = 0; i < test_size; i++)
 	{
-		//initializer_list can only return const variable, so move is useless
+		// initializer_list can only return const variable, so move is useless
 		ASSERT_EQ(key_pool[i], 2);
 		ASSERT_EQ(val_pool[i], 2);
 	}
@@ -358,12 +358,12 @@ TEST(HashMap, InsertListTest)
 		val_pool[o.val] += 1;
 	};
 
-	//test repeat insert
+	// test repeat insert
 	phm->Insert(test_hashmap_object(0, key_rel_func), test_hashmap_object(-1));
 	ASSERT_EQ(phm->GetSize(), 1);
 	ASSERT_EQ((*phm)[test_hashmap_object(0)].val, -1);
 
-	//have 11 elements, test repeat insert
+	// have 11 elements, test repeat insert
 	phm->Insert({Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(0, key_rel_func), test_hashmap_object(0, val_rel_func)),
 				 Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(1, key_rel_func), test_hashmap_object(0)),
 				 Pair<const test_hashmap_object, test_hashmap_object>(test_hashmap_object(1), test_hashmap_object(1, val_rel_func)),
@@ -385,7 +385,7 @@ TEST(HashMap, InsertListTest)
 	delete phm;
 	for (int i = 0; i < test_size; i++)
 	{
-		//initializer_list can only return const variable, so move is useless
+		// initializer_list can only return const variable, so move is useless
 		ASSERT_EQ(key_pool[i], 2);
 		ASSERT_EQ(val_pool[i], 2);
 	}
