@@ -187,7 +187,7 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(ots.GetArguments(OperationType::GetAddress), Vector<UInt8>({StorageTypeMasks::Variable, StorageTypeMasks::Variable}));
 	ASSERT_EQ(ots.GetArguments(OperationType::GetReference), Vector<UInt8>({StorageTypeMasks::Reference, StorageTypeMasks::Variable}));
 	ASSERT_EQ(ots.GetArguments(OperationType::ReleaseReference), Vector<UInt8>({StorageTypeMasks::Reference}));
-	//todo
+	// todo
 
 	ASSERT_EQ(ots.GetName(OperationType::Set), SGE_STR("Set"));
 	ASSERT_EQ(ots.GetName(OperationType::NewLocal), SGE_STR("NewLocal"));
@@ -207,7 +207,47 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 	ASSERT_EQ(ots.GetName(OperationType::GetAddress), SGE_STR("GetAddress"));
 	ASSERT_EQ(ots.GetName(OperationType::GetReference), SGE_STR("GetReference"));
 	ASSERT_EQ(ots.GetName(OperationType::ReleaseReference), SGE_STR("ReleaseReference"));
-	//todo
+	// todo
+
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::Set), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::NewLocal), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::DeleteLocal), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::Push), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::Pop), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::Copy), 2);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::Goto), 0);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::If), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::Call), 0);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::CallFunctionPointer), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::Return), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::ExternalCallArgument), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::ExternalCall), 0);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::GetReturnValue), 1);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::MakeReference), 2);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::GetAddress), 2);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::GetReference), 2);
+	ASSERT_EQ(ots.GetVariableRegistersSize(OperationType::ReleaseReference), 1);
+	// todo
+
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::Set), 2);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::NewLocal), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::DeleteLocal), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::Push), 1);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::Pop), 1);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::Copy), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::Goto), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::If), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::Call), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::CallFunctionPointer), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::Return), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::ExternalCallArgument), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::ExternalCall), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::GetReturnValue), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::MakeReference), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::GetAddress), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::GetReference), 0);
+	ASSERT_EQ(ots.GetAdditionalRegistersSize(OperationType::ReleaseReference), 0);
+	// todo
 
 	ASSERT_FALSE(ots.GetJudgementFunction(OperationType::Set)({
 		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
@@ -263,7 +303,7 @@ TEST(IntermediateRepresentation_OperationTypeSet, Test)
 		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 0),
 		Variable(BaseTypes::GetUInt32Type(), StorageType::Local, 1),
 	}));
-	//todo
+	// todo
 }
 
 TEST(IntermediateRepresentation_Operation, Test)

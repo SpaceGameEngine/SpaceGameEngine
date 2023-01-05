@@ -43,7 +43,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		GetAddress = 15,
 		GetReference = 16,
 		ReleaseReference = 17,
-		//todo
+		// todo
 	};
 
 	inline constexpr const SizeType OperationTypeSetSize = 18;
@@ -70,10 +70,12 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	{
 		Vector<UInt8> m_ArgumentStorageTypeMasks;
 		String m_Name;
+		SizeType m_VariableRegistersSize;
+		SizeType m_AdditionalRegistersSize;
 		OperationJudgementFunctionType m_JudgementFunction;
 
 		OperationTypeInformation() = delete;
-		OperationTypeInformation(const Vector<UInt8>& argument_storage_type_masks, const String& name, OperationJudgementFunctionType judgement_function);
+		OperationTypeInformation(const Vector<UInt8>& argument_storage_type_masks, const String& name, SizeType variable_registers_size, SizeType additional_registers_size, OperationJudgementFunctionType judgement_function);
 
 		bool operator==(const OperationTypeInformation& ot_info) const;
 		bool operator!=(const OperationTypeInformation& ot_info) const;
@@ -93,6 +95,8 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 		const Vector<UInt8>& GetArguments(OperationType type) const;
 		const String& GetName(OperationType type) const;
+		SizeType GetVariableRegistersSize(OperationType type) const;
+		SizeType GetAdditionalRegistersSize(OperationType type) const;
 		OperationJudgementFunctionType GetJudgementFunction(OperationType type) const;
 
 	private:
