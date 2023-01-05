@@ -93,11 +93,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	public:
 		friend DefaultAllocator;
 
-		const Vector<UInt8>& GetArguments(OperationType type) const;
-		const String& GetName(OperationType type) const;
-		SizeType GetVariableRegistersSize(OperationType type) const;
-		SizeType GetAdditionalRegistersSize(OperationType type) const;
-		OperationJudgementFunctionType GetJudgementFunction(OperationType type) const;
+		const OperationTypeInformation& Get(OperationType type) const;
 
 	private:
 		HashMap<OperationType, OperationTypeInformation> m_Content;

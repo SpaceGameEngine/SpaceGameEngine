@@ -108,34 +108,10 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::Op
 {
 }
 
-const Vector<UInt8>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetArguments(OperationType type) const
+const OperationTypeInformation& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::Get(OperationType type) const
 {
 	SGE_ASSERT(InvalidOperationTypeError, type);
-	return m_Content.Find(type)->m_Second.m_ArgumentStorageTypeMasks;
-}
-
-const String& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetName(OperationType type) const
-{
-	SGE_ASSERT(InvalidOperationTypeError, type);
-	return m_Content.Find(type)->m_Second.m_Name;
-}
-
-SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetVariableRegistersSize(OperationType type) const
-{
-	SGE_ASSERT(InvalidOperationTypeError, type);
-	return m_Content.Find(type)->m_Second.m_VariableRegistersSize;
-}
-
-SizeType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetAdditionalRegistersSize(OperationType type) const
-{
-	SGE_ASSERT(InvalidOperationTypeError, type);
-	return m_Content.Find(type)->m_Second.m_AdditionalRegistersSize;
-}
-
-OperationJudgementFunctionType SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::OperationTypeSet::GetJudgementFunction(OperationType type) const
-{
-	SGE_ASSERT(InvalidOperationTypeError, type);
-	return m_Content.Find(type)->m_Second.m_JudgementFunction;
+	return m_Content.Find(type)->m_Second;
 }
 
 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Operation::Operation(OperationType type, const Vector<Variable>& arguments)
@@ -168,7 +144,8 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperatio
 {
 	if ((UInt8)o.GetType() >= OperationTypeSetSize)
 		return true;
-	const Vector<UInt8>& args = OperationTypeSet::GetSingleton().GetArguments(o.GetType());
+	const OperationTypeInformation& otype = OperationTypeSet::GetSingleton().Get(o.GetType());
+	const Vector<UInt8>& args = otype.m_ArgumentStorageTypeMasks;
 	if (o.GetArguments().GetSize() != args.GetSize())
 		return true;
 	auto oaiter = o.GetArguments().GetConstBegin();
@@ -177,5 +154,5 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidOperatio
 		if (!((UInt8)(oaiter->GetStorageType()) & (*aiter)))
 			return true;
 	}
-	return OperationTypeSet::GetSingleton().GetJudgementFunction(o.GetType())(o.GetArguments());
+	return otype.m_JudgementFunction(o.GetArguments());
 }
