@@ -117,6 +117,16 @@ namespace SpaceGameEngine
 #endif
 		}
 
+		template<typename Func, typename... Args>
+		inline Assert& Run(Func&& func, Args&&... args)
+		{
+#ifdef SGE_DEBUG
+			if (m_Result)
+				func(std::forward<Args>(args)...);
+#endif
+			return *this;
+		}
+
 	private:
 		bool m_IsDefault;
 		bool m_Result;
@@ -148,6 +158,14 @@ namespace SpaceGameEngine
 			m_IsDefault = false;
 			if (m_Result)
 				func(std::forward<Args>(args)...);
+		}
+
+		template<typename Func, typename... Args>
+		inline Check& Run(Func&& func, Args&&... args)
+		{
+			if (m_Result)
+				func(std::forward<Args>(args)...);
+			return *this;
 		}
 
 	private:

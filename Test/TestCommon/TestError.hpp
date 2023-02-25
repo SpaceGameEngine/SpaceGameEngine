@@ -33,11 +33,25 @@ TEST(Assert, HandleTest)
 	SGE_ASSERT(NullPointerError, nullptr).Handle([&]() { test = 1; });
 	ASSERT_EQ(test, 1);
 }
+
+TEST(Assert, RunTest)
+{
+	int test = 0;
+	SGE_ASSERT(NullPointerError, nullptr).Run([&]() { test = 1; }).Handle([]() {});
+	ASSERT_EQ(test, 1);
+}
 #endif
 
 TEST(Check, HandleTest)
 {
 	int test = 0;
 	SGE_CHECK(NullPointerError, nullptr).Handle([&]() { test = 1; });
+	ASSERT_EQ(test, 1);
+}
+
+TEST(Check, RunTest)
+{
+	int test = 0;
+	SGE_CHECK(NullPointerError, nullptr).Run([&]() { test = 1; }).Handle([]() {});
 	ASSERT_EQ(test, 1);
 }

@@ -34,6 +34,7 @@ public:
 #### 自定义错误处理方式
 &emsp;&emsp;一般情况下，出错会直接导致程序强制退出，这是`SpaceGameEngine`默认的错误处理方式。然而，当你需要自定义错误处理方式时，你可以直接在`SGE_ASSERT`、`SGE_CHECK`这两个宏后调用其`Handle`方法，传入一个可调用对象和若干用于调用该可调用对象的实际参数以实现自定义该`SGE_ASSERT`或是`SGE_CHECK`的错误处理方式。
 
+&emsp;&emsp;当你即希望使用`SpaceGameEngine`默认的错误处理方式，又希望在错误发生时进行一些自定义的额外的操作时，你可以在`SGE_ASSERT`、`SGE_CHECK`这两个宏后调用其`Run`方法，其使用方式与`Handle`类似，且额外支持链式调用（后接其他`Run`或是`Handle`）。
 #### 样例
 ```c++
 struct NullPointerError
