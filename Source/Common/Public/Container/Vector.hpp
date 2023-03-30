@@ -1736,6 +1736,8 @@ namespace SpaceGameEngine
 						return IteratorType(reinterpret_cast<T*>(m_pContent) + index);
 					}
 				}
+				else
+					return iter;
 			}
 			else	// reverse
 			{
@@ -1801,6 +1803,8 @@ namespace SpaceGameEngine
 						return IteratorType(reinterpret_cast<T*>(m_pContent) + m_Size - index - 1);
 					}
 				}
+				else
+					return iter;
 			}
 		}
 

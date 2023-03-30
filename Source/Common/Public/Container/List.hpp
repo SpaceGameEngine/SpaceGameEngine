@@ -1193,6 +1193,8 @@ namespace SpaceGameEngine
 				else	// reverse
 					return IteratorType(pntail, m_pHead, m_pTail);
 			}
+			else
+				return iter;
 		}
 
 		inline void PopBack()
