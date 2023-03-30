@@ -120,6 +120,12 @@ UTF8String SpaceGameEngine::DefaultLogFormatter::Format(const Date& date, const 
 	return SpaceGameEngine::Format(UTF8String(SGE_U8STR("{:4}-{:2}-{:2} {:2}:{:2}:{:2} {}:{}:{} {} {}\n")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second, SGE_TSTR_TO_UTF8(debug_info.m_pFileName), SGE_TSTR_TO_UTF8(debug_info.m_pFunctionName), debug_info.m_LineNumber, GetLogLevelUTF8String(log_level), str);
 }
 
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+template class SGE_DLL_EXPORT BindConsoleLogWriterCore<FileLogWriterCore>;
+template class SGE_DLL_EXPORT LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
+template class SGE_DLL_EXPORT Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
+#endif
+
 LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::GetDefaultLogWriter()
 {
 	static GlobalVariable<LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>> g_DefaultLogWriter(GetDefaultLogDirectoryPath() / Path(SGE_STR("Default")));

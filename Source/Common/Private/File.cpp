@@ -1715,3 +1715,8 @@ FileLineBreak SpaceGameEngine::GetSystemFileLineBreak()
 #error this os has not been supported.
 #endif
 }
+
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+template class SGE_DLL_EXPORT File<Char16, UCS2Trait>;
+template class SGE_DLL_EXPORT File<Char8, UTF8Trait>;
+#endif

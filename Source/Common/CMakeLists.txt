@@ -1,4 +1,5 @@
 add_library(Common SHARED
+        Private/SGEString.cpp
         Private/Error.cpp
         Private/MemoryManager.cpp
         Private/Concurrent/Thread.cpp

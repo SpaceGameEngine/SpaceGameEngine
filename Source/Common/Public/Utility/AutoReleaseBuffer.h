@@ -27,11 +27,6 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class COMMON_API Vector<Function<void()>>;
-#endif
-
 	/*!
 	@brief a buffer which can release the temporary objects created by it when
 	it is destructed.

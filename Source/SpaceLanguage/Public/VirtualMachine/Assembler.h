@@ -24,11 +24,6 @@ limitations under the License.
 
 namespace SpaceGameEngine::SpaceLanguage
 {
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<String, const InstructionType*>;
-#endif
-
 	class SPACE_LANGUAGE_API InstructionNameSet : public UncopyableAndUnmovable, public Singleton<InstructionNameSet>
 	{
 	private:
@@ -50,10 +45,6 @@ namespace SpaceGameEngine::SpaceLanguage
 		static SPACE_LANGUAGE_API bool Judge(const String& str);
 	};
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<String, UInt8>;
-#endif
-
 	class SPACE_LANGUAGE_API RegisterNameSet : public UncopyableAndUnmovable, public Singleton<RegisterNameSet>
 	{
 	private:
@@ -74,12 +65,6 @@ namespace SpaceGameEngine::SpaceLanguage
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The register name is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const String& str);
 	};
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<String, UInt32>;
-	template struct SPACE_LANGUAGE_API Pair<UInt32, HashMap<String, UInt32>>;
-	template class SPACE_LANGUAGE_API HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>;
-#endif
 
 	struct InvalidAssemblerSourceStringError
 	{

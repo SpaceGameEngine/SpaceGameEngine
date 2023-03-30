@@ -40,11 +40,6 @@ namespace SpaceGameEngine::SpaceLanguage
 		SizeType m_Alignment;
 	};
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Vector<UInt64>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, Vector<UInt64>>;
-#endif
-
 	class SPACE_LANGUAGE_API CompiledFunction
 	{
 	public:
@@ -71,12 +66,6 @@ namespace SpaceGameEngine::SpaceLanguage
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The CompiledFunction is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const CompiledFunction& cfunc);
 	};
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<UInt64, CompiledGlobalVariable>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, CompiledFunction>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, UInt64>;
-#endif
 
 	class SPACE_LANGUAGE_API CompiledObject
 	{

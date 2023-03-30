@@ -574,6 +574,10 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::operator!=(const Stat
 	return m_NextState != st.m_NextState || m_Signal != st.m_Signal || m_TokenType != st.m_TokenType;
 }
 
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
+template class SGE_DLL_EXPORT Vector<Token>;
+#endif
+
 Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const String& str) const
 {
 	Vector<Token> result;

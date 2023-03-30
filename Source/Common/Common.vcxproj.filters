@@ -254,5 +254,8 @@
     <ClCompile Include="Private\Log.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Private\SGEString.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -99,10 +99,6 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		SizeType m_Column;
 	};
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<Char, TokenType>;
-#endif
-
 	class SPACE_LANGUAGE_API SymbolSet : public UncopyableAndUnmovable, public Singleton<SymbolSet>
 	{
 	private:
@@ -117,10 +113,6 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	private:
 		HashMap<Char, TokenType> m_Content;
 	};
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<Char, Char>;
-#endif
 
 	class SPACE_LANGUAGE_API EscapeCharacterSet : public UncopyableAndUnmovable, public Singleton<EscapeCharacterSet>
 	{
@@ -174,10 +166,6 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	inline constexpr const SizeType StateSize = 23;
 
 	using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType);
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<Char, StateType>;
-#endif
 
 	class SPACE_LANGUAGE_API StateMachineForJudge : public UncopyableAndUnmovable, public Singleton<StateMachineForJudge>
 	{
@@ -233,9 +221,8 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		bool operator!=(const StateTransfer& st) const;
 	};
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<Char, StateTransfer>;
-	template class SPACE_LANGUAGE_API Vector<Token>;
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL) && (!defined(SPACE_LANGUAGE_EXPORTS))
+	extern template class SGE_DLL_IMPORT Vector<Token>;
 #endif
 
 	class SPACE_LANGUAGE_API StateMachine : public UncopyableAndUnmovable, public Singleton<StateMachine>

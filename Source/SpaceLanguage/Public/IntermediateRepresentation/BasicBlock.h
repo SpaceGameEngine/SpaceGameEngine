@@ -23,10 +23,6 @@ limitations under the License.
 
 namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 {
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Vector<Operation>;
-#endif
-
 	class SPACE_LANGUAGE_API BasicBlock
 	{
 	public:

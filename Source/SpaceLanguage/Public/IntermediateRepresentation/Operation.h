@@ -56,15 +56,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	SPACE_LANGUAGE_API bool IsTerminatorOperationType(OperationType ot);
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Vector<Variable>;
-#endif
-
 	using OperationJudgementFunctionType = bool (*)(const Vector<Variable>&);
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Vector<UInt8>;
-#endif
 
 	struct SPACE_LANGUAGE_API OperationTypeInformation
 	{
@@ -80,10 +72,6 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		bool operator==(const OperationTypeInformation& ot_info) const;
 		bool operator!=(const OperationTypeInformation& ot_info) const;
 	};
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<OperationType, OperationTypeInformation>;
-#endif
 
 	class SPACE_LANGUAGE_API OperationTypeSet : public UncopyableAndUnmovable, public Singleton<OperationTypeSet>
 	{

@@ -53,12 +53,6 @@ namespace SpaceGameEngine
 	*/
 	COMMON_API Path GetDefaultLogDirectoryPath();
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template struct COMMON_API TimeStamp<Second>;
-	template struct COMMON_API TimeDuration<Second>;
-	template class COMMON_API TimeCounter<Second>;
-#endif
-
 	class COMMON_API FileLogWriterCore : public UncopyableAndUnmovable
 	{
 	public:
@@ -104,10 +98,6 @@ namespace SpaceGameEngine
 	using DefaultLogWriterCore = ConsoleLogWriterCore;
 
 	inline static constexpr const SizeType LogWriterBufferSize = 4194304;
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class COMMON_API FixedSizeBuffer<LogWriterBufferSize>;
-#endif
 
 	template<IsLogWriterCore LogWriterCore = DefaultLogWriterCore>
 	class LogWriter : public UncopyableAndUnmovable, public LogWriterCore
@@ -267,10 +257,10 @@ namespace SpaceGameEngine
 
 #define SGE_LOG(logger, level, str, ...) logger.WriteLog(SpaceGameEngine::GetLocalDate(), SGE_DEBUG_INFORMATION, level, str, ##__VA_ARGS__);
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class COMMON_API BindConsoleLogWriterCore<FileLogWriterCore>;
-	template class COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
-	template class COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL) && (!defined(COMMON_EXPORTS))
+	extern template class SGE_DLL_IMPORT BindConsoleLogWriterCore<FileLogWriterCore>;
+	extern template class SGE_DLL_IMPORT LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
+	extern template class SGE_DLL_IMPORT Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
 #endif
 
 	COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogWriter();

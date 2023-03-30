@@ -74,21 +74,6 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		static SPACE_LANGUAGE_API bool Judge(FunctionCallType fc_type);
 	};
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API MapImplement::RedBlackTree<UInt64, bool>;
-	template class SPACE_LANGUAGE_API Map<UInt64, bool>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, Map<UInt64, bool>>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, HashMap<UInt64, Map<UInt64, bool>>>;
-
-	template struct SPACE_LANGUAGE_API Pair<FunctionCallType, UInt64>;
-	template class SPACE_LANGUAGE_API MapImplement::RedBlackTree<UInt64, Pair<FunctionCallType, UInt64>>;
-	template class SPACE_LANGUAGE_API Map<UInt64, Pair<FunctionCallType, UInt64>>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, Map<UInt64, Pair<FunctionCallType, UInt64>>>;
-
-	template class SPACE_LANGUAGE_API HashMap<UInt64, bool>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, HashMap<UInt64, bool>>;
-#endif
-
 	class SPACE_LANGUAGE_API RegisterAllocationRequests
 	{
 	public:
@@ -119,12 +104,6 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The FunctionCallRecord has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const Map<UInt64, Pair<FunctionCallType, UInt64>>::ConstIterator& citer, const Map<UInt64, Pair<FunctionCallType, UInt64>>::ConstIterator& cend);
 	};
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API MapImplement::RedBlackTree<UInt64, RegisterAllocationResult>;
-	template class SPACE_LANGUAGE_API Map<UInt64, RegisterAllocationResult>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, Map<UInt64, RegisterAllocationResult>>;
-#endif
 
 	class SPACE_LANGUAGE_API RegisterAllocationResults
 	{

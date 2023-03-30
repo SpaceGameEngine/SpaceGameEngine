@@ -113,10 +113,6 @@ namespace SpaceGameEngine::SpaceLanguage
 		InstructionType m_InstructionTypes[InstructionSetSize];
 	};
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Vector<UInt8>;
-#endif
-
 	namespace InstructionsGenerator
 	{
 		SPACE_LANGUAGE_API void AddInstruction(Vector<UInt8>& vec, UInt8 instr_idx, UInt8 arg0);

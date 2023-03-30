@@ -219,6 +219,7 @@
     <ClCompile Include="Private\Module\CommonModule.cpp" />
     <ClCompile Include="Private\Module\Module.cpp" />
     <ClCompile Include="Private\Module\ModuleManager.cpp" />
+    <ClCompile Include="Private\SGEString.cpp" />
     <ClCompile Include="Private\System\DllLoader.cpp" />
     <ClCompile Include="Private\Time\Date.cpp" />
     <ClCompile Include="Private\Time\TimeCounter.cpp" />

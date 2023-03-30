@@ -3502,11 +3502,11 @@ namespace SpaceGameEngine
 	using UTF8String = StringCore<Char8, UTF8Trait, DefaultAllocator>;
 	using String = UCS2String;
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class COMMON_API StringImplement::Storage<Char16, DefaultAllocator>;
-	template class COMMON_API StringImplement::Storage<Char8, DefaultAllocator>;
-	template class COMMON_API StringCore<Char16, UCS2Trait, DefaultAllocator>;
-	template class COMMON_API StringCore<Char8, UTF8Trait, DefaultAllocator>;
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL) && (!defined(COMMON_EXPORTS))
+	extern template class SGE_DLL_IMPORT StringImplement::Storage<Char16, DefaultAllocator>;
+	extern template class SGE_DLL_IMPORT StringImplement::Storage<Char8, DefaultAllocator>;
+	extern template class SGE_DLL_IMPORT StringCore<Char16, UCS2Trait, DefaultAllocator>;
+	extern template class SGE_DLL_IMPORT StringCore<Char8, UTF8Trait, DefaultAllocator>;
 #endif
 
 	template<typename Allocator>

@@ -1144,9 +1144,9 @@ namespace SpaceGameEngine
 	using UCS2File = File<Char16, UCS2Trait>;
 	using UTF8File = File<Char8, UTF8Trait>;
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class COMMON_API File<Char16, UCS2Trait>;
-	template class COMMON_API File<Char8, UTF8Trait>;
+#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL) && (!defined(COMMON_EXPORTS))
+	extern template class SGE_DLL_IMPORT File<Char16, UCS2Trait>;
+	extern template class SGE_DLL_IMPORT File<Char8, UTF8Trait>;
 #endif
 
 }

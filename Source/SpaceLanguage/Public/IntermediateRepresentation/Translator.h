@@ -25,13 +25,6 @@ limitations under the License.
 
 namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 {
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Vector<Type*>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, Variable*>;
-	template class SPACE_LANGUAGE_API HashMap<UInt64, Function*>;
-#endif
-
 	class TranslateUnit;
 
 	SPACE_LANGUAGE_API bool IsValidTranslateUnit(const TranslateUnit& tu);

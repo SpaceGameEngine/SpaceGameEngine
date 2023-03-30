@@ -24,12 +24,7 @@ limitations under the License.
 
 namespace SpaceGameEngine::SpaceLanguage
 {
-
 	using ExternalCallFunctionType = RegisterType (*)(Registers&);
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<UInt64, ExternalCallFunctionType>;
-#endif
 
 	class SPACE_LANGUAGE_API ExternalCaller : public UncopyableAndUnmovable
 	{

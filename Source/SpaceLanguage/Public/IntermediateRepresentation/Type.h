@@ -62,10 +62,6 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		String m_Name;
 	};
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API HashMap<BaseType, BaseTypeInformation>;
-#endif
-
 	class SPACE_LANGUAGE_API BaseTypeSet : public UncopyableAndUnmovable, public Singleton<BaseTypeSet>
 	{
 	private:
@@ -81,10 +77,6 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	private:
 		HashMap<BaseType, BaseTypeInformation> m_Content;
 	};
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-	template class SPACE_LANGUAGE_API Vector<BaseType>;
-#endif
 
 	class SPACE_LANGUAGE_API Type
 	{
