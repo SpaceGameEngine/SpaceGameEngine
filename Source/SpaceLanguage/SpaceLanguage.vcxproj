@@ -164,7 +164,6 @@
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Private\SpaceLanguageModule.h" />
     <ClInclude Include="Public\IntermediateRepresentation\BasicBlock.h" />
-    <ClInclude Include="Public\IntermediateRepresentation\BasicBlockGraph.h" />
     <ClInclude Include="Public\IntermediateRepresentation\Function.h" />
     <ClInclude Include="Public\IntermediateRepresentation\Operation.h" />
     <ClInclude Include="Public\IntermediateRepresentation\RegisterAllocator.h" />
@@ -183,7 +182,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\IntermediateRepresentation\BasicBlock.cpp" />
-    <ClCompile Include="Private\IntermediateRepresentation\BasicBlockGraph.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\Function.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\Operation.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\RegisterAllocator.cpp" />

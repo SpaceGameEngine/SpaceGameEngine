@@ -90,9 +90,6 @@
     <ClInclude Include="Public\IntermediateRepresentation\BasicBlock.h">
       <Filter>Public\IntermediateRepresentation</Filter>
     </ClInclude>
-    <ClInclude Include="Public\IntermediateRepresentation\BasicBlockGraph.h">
-      <Filter>Public\IntermediateRepresentation</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SpaceLanguageModule.cpp">
@@ -144,9 +141,6 @@
       <Filter>Private\IntermediateRepresentation</Filter>
     </ClCompile>
     <ClCompile Include="Private\IntermediateRepresentation\BasicBlock.cpp">
-      <Filter>Private\IntermediateRepresentation</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\IntermediateRepresentation\BasicBlockGraph.cpp">
       <Filter>Private\IntermediateRepresentation</Filter>
     </ClCompile>
   </ItemGroup>

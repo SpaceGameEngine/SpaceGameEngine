@@ -12,7 +12,6 @@ add_library(SpaceLanguage SHARED
         Private/IntermediateRepresentation/Variable.cpp
         Private/IntermediateRepresentation/Operation.cpp
         Private/IntermediateRepresentation/BasicBlock.cpp
-        Private/IntermediateRepresentation/BasicBlockGraph.cpp
         Private/IntermediateRepresentation/Function.cpp
         Private/IntermediateRepresentation/RegisterAllocator.cpp
         Private/IntermediateRepresentation/Translator.cpp
