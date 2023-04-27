@@ -24,7 +24,7 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidStorageT
 	return st != StorageType::Constant && st != StorageType::Global && st != StorageType::Local && st != StorageType::Reference && st != StorageType::Function;
 }
 
-SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::Variable(const Type& type, StorageType st, SizeType idx)
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Variable::Variable(const Type& type, StorageType st, UInt64 idx)
 	: m_pType(&type), m_StorageType(st), m_Index(idx)
 {
 	SGE_ASSERT(InvalidStorageTypeError, st);

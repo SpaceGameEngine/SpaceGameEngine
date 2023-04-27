@@ -19,7 +19,7 @@ using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
 using namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation;
 
-SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx)
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, UInt64 idx)
 	: m_ParameterTypes(parameter_types), m_pResultType(&result_type), m_Index(idx), m_IsExternal(true)
 {
 	for (auto iter = m_ParameterTypes.GetConstBegin(); iter != m_ParameterTypes.GetConstEnd(); ++iter)
@@ -28,7 +28,7 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(c
 		SGE_ASSERT(InvalidOperationError, *iter);
 }
 
-SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations)
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::Function::Function(const Vector<const Type*>& parameter_types, const Type& result_type, UInt64 idx, const Vector<Operation>& operations)
 	: m_ParameterTypes(parameter_types), m_pResultType(&result_type), m_Index(idx), m_Operations(operations), m_IsExternal(false)
 {
 	for (auto iter = m_ParameterTypes.GetConstBegin(); iter != m_ParameterTypes.GetConstEnd(); ++iter)

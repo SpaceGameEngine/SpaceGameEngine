@@ -28,14 +28,18 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	public:
 		BasicBlock() = delete;
 
-		BasicBlock(const Vector<Operation>& operations);
+		BasicBlock(UInt64 idx, const Vector<Operation>& operations);
 
+		UInt64 GetIndex() const;
+		const Vector<UInt64>& GetToIndices() const;
 		const Vector<Operation>& GetContent() const;
 
 		bool operator==(const BasicBlock& bb) const;
 		bool operator!=(const BasicBlock& bb) const;
 
 	private:
+		UInt64 m_Index;
+		Vector<UInt64> m_ToIndices;
 		Vector<Operation> m_Content;
 	};
 

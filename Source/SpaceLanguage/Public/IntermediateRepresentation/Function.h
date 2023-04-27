@@ -31,12 +31,12 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		/*!
 		@brief create a external function without operations;
 		*/
-		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx);
+		Function(const Vector<const Type*>& parameter_types, const Type& result_type, UInt64 idx);
 
 		/*!
 		@brief create a internal function with operations;
 		*/
-		Function(const Vector<const Type*>& parameter_types, const Type& result_type, SizeType idx, const Vector<Operation>& operations);
+		Function(const Vector<const Type*>& parameter_types, const Type& result_type, UInt64 idx, const Vector<Operation>& operations);
 
 		const Vector<const Type*>& GetParameterTypes() const;
 		const Type& GetResultType() const;

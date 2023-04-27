@@ -340,26 +340,53 @@ TEST(IntermediateRepresentation_BasicBlock, Test)
 	using namespace IntermediateRepresentation;
 	Operation o1(OperationType::Return, {Variable(BaseTypes::GetVoidType(), StorageType::Constant, 0)});
 	Operation o2(OperationType::Return, {Variable(BaseTypes::GetUInt32Type(), StorageType::Constant, 0)});
+	Operation o3(OperationType::Goto, {Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 1)});
+	Operation o4(OperationType::If, {Variable(BaseTypes::GetUInt64Type(), StorageType::Global, 1),
+									 Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 2),
+									 Variable(BaseTypes::GetUInt64Type(), StorageType::Constant, 3)});
 
-	BasicBlock bb1({o1});
+	BasicBlock bb1(0, {o1});
 
+	ASSERT_EQ(bb1.GetIndex(), 0);
+	ASSERT_EQ(bb1.GetToIndices().GetSize(), 0);
 	ASSERT_EQ(bb1.GetContent().GetSize(), 1);
 	ASSERT_EQ(*bb1.GetContent().GetConstBegin(), o1);
 
-	BasicBlock bb2({o1});
+	BasicBlock bb2(0, {o1});
 
+	ASSERT_EQ(bb2.GetIndex(), 0);
+	ASSERT_EQ(bb2.GetToIndices().GetSize(), 0);
 	ASSERT_EQ(bb2.GetContent().GetSize(), 1);
 	ASSERT_EQ(*bb2.GetContent().GetConstBegin(), o1);
 
 	ASSERT_EQ(bb1, bb2);
 
-	BasicBlock bb3({o2});
+	BasicBlock bb3(0, {o2});
 
+	ASSERT_EQ(bb3.GetIndex(), 0);
+	ASSERT_EQ(bb3.GetToIndices().GetSize(), 0);
 	ASSERT_EQ(bb3.GetContent().GetSize(), 1);
 	ASSERT_EQ(*bb3.GetContent().GetConstBegin(), o2);
 
 	ASSERT_NE(bb1, bb3);
 	ASSERT_NE(bb2, bb3);
+
+	BasicBlock bb4(1, {o3});
+
+	ASSERT_EQ(bb4.GetIndex(), 1);
+	ASSERT_EQ(bb4.GetToIndices().GetSize(), 1);
+	ASSERT_EQ(bb4.GetToIndices()[0], 1);
+	ASSERT_EQ(bb4.GetContent().GetSize(), 1);
+	ASSERT_EQ(*bb4.GetContent().GetConstBegin(), o3);
+
+	BasicBlock bb5(2, {o4});
+
+	ASSERT_EQ(bb5.GetIndex(), 2);
+	ASSERT_EQ(bb5.GetToIndices().GetSize(), 2);
+	ASSERT_EQ(bb5.GetToIndices()[0], 2);
+	ASSERT_EQ(bb5.GetToIndices()[1], 3);
+	ASSERT_EQ(bb5.GetContent().GetSize(), 1);
+	ASSERT_EQ(*bb5.GetContent().GetConstBegin(), o4);
 }
 
 TEST(IntermediateRepresentation_Function, Test)

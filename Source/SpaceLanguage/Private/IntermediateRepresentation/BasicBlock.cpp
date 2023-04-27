@@ -19,10 +19,28 @@ using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
 using namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation;
 
-SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::BasicBlock(const Vector<Operation>& operations)
-	: m_Content(operations)
+SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::BasicBlock(UInt64 idx, const Vector<Operation>& operations)
+	: m_Index(idx), m_Content(operations)
 {
 	SGE_ASSERT(InvalidBasicBlockError, *this);
+	const Operation& last_operation = *m_Content.GetConstReverseBegin();
+	if (last_operation.GetType() == OperationType::Goto)
+		m_ToIndices.EmplaceBack(last_operation.GetArguments()[0].GetIndex());
+	else if (last_operation.GetType() == OperationType::If)
+	{
+		m_ToIndices.EmplaceBack(last_operation.GetArguments()[1].GetIndex());
+		m_ToIndices.EmplaceBack(last_operation.GetArguments()[2].GetIndex());
+	}
+}
+
+UInt64 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::GetIndex() const
+{
+	return m_Index;
+}
+
+const Vector<UInt64>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::GetToIndices() const
+{
+	return m_ToIndices;
 }
 
 const Vector<Operation>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::GetContent() const
@@ -32,12 +50,12 @@ const Vector<Operation>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentat
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::operator==(const BasicBlock& bb) const
 {
-	return m_Content == bb.m_Content;
+	return m_Index == bb.m_Index && m_ToIndices == bb.m_ToIndices && m_Content == bb.m_Content;
 }
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::operator!=(const BasicBlock& bb) const
 {
-	return m_Content != bb.m_Content;
+	return m_Index != bb.m_Index || m_ToIndices != bb.m_ToIndices || m_Content != bb.m_Content;
 }
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidBasicBlockError::Judge(const BasicBlock& bb)

@@ -53,7 +53,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 	{
 	public:
 		Variable() = delete;
-		Variable(const Type& type, StorageType st, SizeType idx);
+		Variable(const Type& type, StorageType st, UInt64 idx);
 
 		const Type& GetType() const;
 		StorageType GetStorageType() const;
