@@ -127,9 +127,6 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		/*!
-		@todo add support for custom constructors
-		*/
 		explicit inline MetaObject(const MetaData& meta_data)
 		{
 			SGE_ASSERT(ImproperMetaDataError, meta_data);
@@ -138,23 +135,15 @@ namespace SpaceGameEngine
 			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
 			m_pMetaData->m_pDefaultConstructor(m_pContent);
 		}
-		template<typename T>
-		inline MetaObject(const MetaData& meta_data, T&& obj)
+		template<typename T, typename... Args>
+		inline MetaObject(TypeWrapper<T>, Args&&... args)
 		{
+			const MetaData& meta_data = SpaceGameEngine::GetMetaData<std::decay_t<T>>();
 			SGE_ASSERT(ImproperMetaDataError, meta_data);
 			SGE_ASSERT(DifferentMetaDataError, meta_data, SpaceGameEngine::GetMetaData<std::decay_t<T>>());
 			m_pMetaData = &meta_data;
 			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
-			if constexpr (std::is_same_v<std::remove_reference_t<T>, T>)
-			{
-				SGE_ASSERT(NullPointerError, m_pMetaData->m_pMoveConstructor);
-				m_pMetaData->m_pMoveConstructor(m_pContent, &obj);
-			}
-			else
-			{
-				SGE_ASSERT(NullPointerError, m_pMetaData->m_pCopyConstructor);
-				m_pMetaData->m_pCopyConstructor(m_pContent, &obj);
-			}
+			new (m_pContent) std::decay_t<T>(std::forward<Args>(args)...);
 		}
 
 		inline const MetaData& GetMetaData() const

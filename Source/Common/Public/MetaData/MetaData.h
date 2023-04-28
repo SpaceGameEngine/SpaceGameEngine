@@ -54,6 +54,7 @@ namespace SpaceGameEngine
 	};
 
 	COMMON_API bool operator==(const MetaData& meta_data1, const MetaData& meta_data2);
+	COMMON_API bool operator!=(const MetaData& meta_data1, const MetaData& meta_data2);
 
 	template<typename T>
 	inline void (*QueryDefaultConstructor())(void*)

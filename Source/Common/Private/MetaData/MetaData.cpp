@@ -40,3 +40,8 @@ bool SpaceGameEngine::operator==(const MetaData& meta_data1, const MetaData& met
 {
 	return (strcmp(meta_data1.m_pName, meta_data2.m_pName) == 0) && (meta_data1.m_Size == meta_data2.m_Size) && (meta_data1.m_Alignment == meta_data2.m_Alignment);
 }
+
+bool SpaceGameEngine::operator!=(const MetaData& meta_data1, const MetaData& meta_data2)
+{
+	return (strcmp(meta_data1.m_pName, meta_data2.m_pName) != 0) || (meta_data1.m_Size != meta_data2.m_Size) || (meta_data1.m_Alignment != meta_data2.m_Alignment);
+}

@@ -199,7 +199,7 @@ namespace SpaceGameEngine
 			m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
 				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 			};
-			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
+			m_Content.Init(TypeWrapperValue<std::decay_t<T>>, std::forward<T>(func));
 		}
 
 		template<typename T,
@@ -216,7 +216,7 @@ namespace SpaceGameEngine
 					return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 				};
 				m_Content.Release();
-				m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
+				m_Content.Init(TypeWrapperValue<std::decay_t<T>>, std::forward<T>(func));
 			}
 			return *this;
 		}
@@ -229,7 +229,7 @@ namespace SpaceGameEngine
 				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 			};
 			m_Content.Release();
-			m_Content.Init(SpaceGameEngine::GetMetaData<std::decay_t<T>>(), std::forward<T>(func));
+			m_Content.Init(TypeWrapperValue<std::decay_t<T>>, std::forward<T>(func));
 			return *this;
 		}
 

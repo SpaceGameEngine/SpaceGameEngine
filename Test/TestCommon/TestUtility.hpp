@@ -56,31 +56,31 @@ class test_cmp2
 };
 bool operator==(const test_cmp2&, const test_cmp2&) = delete;
 
-struct test_controllable_object_class
+struct test_utility_object_class
 {
-	test_controllable_object_class()
+	test_utility_object_class()
 	{
 		i = 1;
 	}
-	~test_controllable_object_class()
+	~test_utility_object_class()
 	{
 		i = 0;
 	}
-	test_controllable_object_class(const test_controllable_object_class& obj)
+	test_utility_object_class(const test_utility_object_class& obj)
 	{
 		i = 2;
 	}
-	test_controllable_object_class(test_controllable_object_class&& obj)
+	test_utility_object_class(test_utility_object_class&& obj)
 	{
 		i = 3;
 	}
 
-	test_controllable_object_class& operator=(const test_controllable_object_class& obj)
+	test_utility_object_class& operator=(const test_utility_object_class& obj)
 	{
 		i = 4;
 		return *this;
 	}
-	test_controllable_object_class& operator=(test_controllable_object_class&& obj)
+	test_utility_object_class& operator=(test_utility_object_class&& obj)
 	{
 		i = 5;
 		return *this;
@@ -116,27 +116,27 @@ TEST(ControllableObject, InstanceTest)
 
 TEST(ControllableObject, CopyTest)
 {
-	ControllableObject<test_controllable_object_class> test;
+	ControllableObject<test_utility_object_class> test;
 	test.Init();
 	ASSERT_EQ(test.Get().i, 1);
-	ControllableObject<test_controllable_object_class> test2(test);
+	ControllableObject<test_utility_object_class> test2(test);
 	ASSERT_EQ(test2.Get().i, 2);
-	ControllableObject<test_controllable_object_class> test3(std::move(test2));
+	ControllableObject<test_utility_object_class> test3(std::move(test2));
 	ASSERT_EQ(test3.Get().i, 3);
-	ControllableObject<test_controllable_object_class> test4;
+	ControllableObject<test_utility_object_class> test4;
 	test4.Init();
 	test4 = test;
 	ASSERT_EQ(test4.Get().i, 4);
-	ControllableObject<test_controllable_object_class> test5;
+	ControllableObject<test_utility_object_class> test5;
 	test5.Init();
 	test5 = std::move(test);
 	ASSERT_EQ(test5.Get().i, 5);
-	test_controllable_object_class _test, _test2;
-	ControllableObject<test_controllable_object_class> test6(_test);
+	test_utility_object_class _test, _test2;
+	ControllableObject<test_utility_object_class> test6(_test);
 	ASSERT_EQ(test6.Get().i, 2);
-	ControllableObject<test_controllable_object_class> test7(std::move(_test));
+	ControllableObject<test_utility_object_class> test7(std::move(_test));
 	ASSERT_EQ(test7.Get().i, 3);
-	ControllableObject<test_controllable_object_class> test8;
+	ControllableObject<test_utility_object_class> test8;
 	test8.Init();
 	test8 = _test2;
 	ASSERT_EQ(test8.Get().i, 4);
@@ -458,10 +458,10 @@ TEST(FixedSizeBuffer, AnotherAllocatorMoveOperatorTest)
 
 TEST(Optional, InstanceTest)
 {
-	Optional<test_controllable_object_class> empty_opt;
+	Optional<test_utility_object_class> empty_opt;
 	ASSERT_FALSE(empty_opt.HasValue());
 
-	Optional<test_controllable_object_class> opt1{test_controllable_object_class()};
+	Optional<test_utility_object_class> opt1{test_utility_object_class()};
 	ASSERT_TRUE(opt1.HasValue());
 	ASSERT_EQ(opt1.Get().i, 3);
 
@@ -475,28 +475,28 @@ TEST(Optional, InstanceTest)
 	}
 	ASSERT_TRUE(has_destruct);
 
-	Optional<test_controllable_object_class> opt3(OptionalTag::EmptyOptional);
+	Optional<test_utility_object_class> opt3(OptionalTag::EmptyOptional);
 	ASSERT_FALSE(opt3.HasValue());
 
-	Optional<test_controllable_object_class> opt4(OptionalTag::DefaultValue);
+	Optional<test_utility_object_class> opt4(OptionalTag::DefaultValue);
 	ASSERT_TRUE(opt4.HasValue());
 	ASSERT_EQ(opt4.Get().i, 1);
 }
 
 TEST(Optional, CopyConstructionTest)
 {
-	Optional<test_controllable_object_class> opt1;
+	Optional<test_utility_object_class> opt1;
 	ASSERT_FALSE(opt1.HasValue());
 
-	Optional<test_controllable_object_class> opt2(OptionalTag::DefaultValue);
+	Optional<test_utility_object_class> opt2(OptionalTag::DefaultValue);
 	ASSERT_TRUE(opt2.HasValue());
 	ASSERT_EQ(opt2.Get().i, 1);
 
-	Optional<test_controllable_object_class> opt3(opt1);
+	Optional<test_utility_object_class> opt3(opt1);
 	ASSERT_FALSE(opt3.HasValue());
 	ASSERT_FALSE(opt1.HasValue());
 
-	Optional<test_controllable_object_class> opt4(opt2);
+	Optional<test_utility_object_class> opt4(opt2);
 	ASSERT_TRUE(opt4.HasValue());
 	ASSERT_EQ(opt4.Get().i, 2);
 	ASSERT_TRUE(opt2.HasValue());
@@ -505,18 +505,18 @@ TEST(Optional, CopyConstructionTest)
 
 TEST(Optional, MoveConstructionTest)
 {
-	Optional<test_controllable_object_class> opt1;
+	Optional<test_utility_object_class> opt1;
 	ASSERT_FALSE(opt1.HasValue());
 
-	Optional<test_controllable_object_class> opt2(OptionalTag::DefaultValue);
+	Optional<test_utility_object_class> opt2(OptionalTag::DefaultValue);
 	ASSERT_TRUE(opt2.HasValue());
 	ASSERT_EQ(opt2.Get().i, 1);
 
-	Optional<test_controllable_object_class> opt3(std::move(opt1));
+	Optional<test_utility_object_class> opt3(std::move(opt1));
 	ASSERT_FALSE(opt3.HasValue());
 	ASSERT_FALSE(opt1.HasValue());
 
-	Optional<test_controllable_object_class> opt4(std::move(opt2));
+	Optional<test_utility_object_class> opt4(std::move(opt2));
 	ASSERT_TRUE(opt4.HasValue());
 	ASSERT_EQ(opt4.Get().i, 3);
 	ASSERT_FALSE(opt2.HasValue());
@@ -524,17 +524,17 @@ TEST(Optional, MoveConstructionTest)
 
 TEST(Optional, CopyAssignmentTest)
 {
-	Optional<test_controllable_object_class> opt1;
+	Optional<test_utility_object_class> opt1;
 	ASSERT_FALSE(opt1.HasValue());
 
-	Optional<test_controllable_object_class> opt2(OptionalTag::DefaultValue);
+	Optional<test_utility_object_class> opt2(OptionalTag::DefaultValue);
 	ASSERT_TRUE(opt2.HasValue());
 	ASSERT_EQ(opt2.Get().i, 1);
 
-	Optional<test_controllable_object_class> opt3;
+	Optional<test_utility_object_class> opt3;
 	ASSERT_FALSE(opt3.HasValue());
 
-	Optional<test_controllable_object_class> opt4;
+	Optional<test_utility_object_class> opt4;
 	ASSERT_FALSE(opt4.HasValue());
 
 	opt4 = opt1;
@@ -564,21 +564,21 @@ TEST(Optional, CopyAssignmentTest)
 
 TEST(Optional, MoveAssignmentTest)
 {
-	Optional<test_controllable_object_class> opt1;
+	Optional<test_utility_object_class> opt1;
 	ASSERT_FALSE(opt1.HasValue());
 
-	Optional<test_controllable_object_class> opt2(OptionalTag::DefaultValue);
+	Optional<test_utility_object_class> opt2(OptionalTag::DefaultValue);
 	ASSERT_TRUE(opt2.HasValue());
 	ASSERT_EQ(opt2.Get().i, 1);
 
-	Optional<test_controllable_object_class> opt3(OptionalTag::DefaultValue);
+	Optional<test_utility_object_class> opt3(OptionalTag::DefaultValue);
 	ASSERT_TRUE(opt3.HasValue());
 	ASSERT_EQ(opt3.Get().i, 1);
 
-	Optional<test_controllable_object_class> opt4;
+	Optional<test_utility_object_class> opt4;
 	ASSERT_FALSE(opt4.HasValue());
 
-	Optional<test_controllable_object_class> opt5;
+	Optional<test_utility_object_class> opt5;
 	ASSERT_FALSE(opt5.HasValue());
 
 	opt5 = std::move(opt1);
@@ -617,7 +617,7 @@ TEST(Optional, GetTest)
 
 TEST(Optional, SetTest)
 {
-	Optional<test_controllable_object_class> opt;
+	Optional<test_utility_object_class> opt;
 	ASSERT_FALSE(opt.HasValue());
 
 	opt.Set();
@@ -628,7 +628,7 @@ TEST(Optional, SetTest)
 
 TEST(Optional, ClearTest)
 {
-	Optional<test_controllable_object_class> opt(OptionalTag::DefaultValue);
+	Optional<test_utility_object_class> opt(OptionalTag::DefaultValue);
 	ASSERT_TRUE(opt.HasValue());
 	ASSERT_EQ(opt.Get().i, 1);
 
@@ -636,7 +636,7 @@ TEST(Optional, ClearTest)
 
 	ASSERT_FALSE(opt.HasValue());
 
-	opt.Set(test_controllable_object_class());
+	opt.Set(test_utility_object_class());
 
 	ASSERT_TRUE(opt.HasValue());
 	ASSERT_EQ(opt.Get().i, 3);

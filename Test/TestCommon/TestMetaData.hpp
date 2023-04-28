@@ -100,8 +100,19 @@ TEST(MetaData, ComparisionTest)
 	MetaData test1 = GetMetaData<int>();
 	MetaData test2 = test1;
 	MetaData test3 = GetMetaData<char>();
-	ASSERT_TRUE(test1 == test2);
-	ASSERT_FALSE(test1 == test3);
+	ASSERT_EQ(test1, test2);
+	ASSERT_NE(test1, test3);
+}
+
+TEST(MetaObject, TypeWrapperConstructionTest)
+{
+	MetaObject test(TypeWrapperValue<test_metadata_class>);
+	ASSERT_EQ(test.Get<test_metadata_class>().i, 1);
+	test_metadata_class _test;
+	MetaObject test2(TypeWrapperValue<test_metadata_class>, _test);
+	ASSERT_EQ(test2.Get<test_metadata_class>().i, 2);
+	MetaObject test3(TypeWrapperValue<test_metadata_class>, std::move(_test));
+	ASSERT_EQ(test3.Get<test_metadata_class>().i, 3);
 }
 
 TEST(MetaObject, CopyConstructionTest)
@@ -115,11 +126,6 @@ TEST(MetaObject, CopyConstructionTest)
 	ASSERT_EQ(test2.Get<test_metadata_class>().i, 4);
 	test2 = std::move(test3);
 	ASSERT_EQ(test2.Get<test_metadata_class>().i, 5);
-	test_metadata_class _test;
-	MetaObject test4(GetMetaData<test_metadata_class>(), _test);
-	ASSERT_EQ(test4.Get<test_metadata_class>().i, 2);
-	MetaObject test5(GetMetaData<test_metadata_class>(), std::move(_test));
-	ASSERT_EQ(test5.Get<test_metadata_class>().i, 3);
 }
 
 TEST(MetaObject, GetMetaDataTest)

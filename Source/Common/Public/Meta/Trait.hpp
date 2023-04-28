@@ -39,6 +39,8 @@ namespace SpaceGameEngine
 		using Type = T;
 	};
 
+	template<typename T>
+	inline constexpr const TypeWrapper<T> TypeWrapperValue;
 }
 
 /*!
