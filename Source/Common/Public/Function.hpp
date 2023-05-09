@@ -77,6 +77,110 @@ namespace SpaceGameEngine
 		inline static constexpr const bool Value = Judge<T, Ret, Args...>(0);
 	};
 
+	namespace FunctionImplement
+	{
+		template<typename Ret, typename... Args>
+		class FunctionCoreBase
+		{
+		public:
+			FunctionCoreBase() = delete;
+
+			inline virtual ~FunctionCoreBase()
+			{
+			}
+
+			inline FunctionCoreBase(const MetaData& meta_data)
+				: m_MetaData(meta_data)
+			{
+			}
+
+			inline FunctionCoreBase& operator=(const FunctionCoreBase& other)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &other);
+				SGE_ASSERT(DifferentMetaDataError, m_MetaData, other.GetMetaData());
+				SGE_ASSERT(NullPointerError, m_MetaData.m_pCopyAssignment);
+				m_MetaData.m_pCopyAssignment(GetData(), other.GetData());
+				return *this;
+			}
+
+			inline FunctionCoreBase& operator=(FunctionCoreBase&& other)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &other);
+				SGE_ASSERT(DifferentMetaDataError, m_MetaData, other.GetMetaData());
+				SGE_ASSERT(NullPointerError, m_MetaData.m_pMoveAssignment);
+				m_MetaData.m_pMoveAssignment(GetData(), other.GetData());
+				return *this;
+			}
+
+			inline const MetaData& GetMetaData() const
+			{
+				return m_MetaData;
+			}
+
+			virtual void* GetData() = 0;
+
+			virtual const void* GetData() const = 0;
+
+			virtual Ret operator()(Args... args) const = 0;
+
+		private:
+			const MetaData& m_MetaData;
+		};
+
+		template<typename T, typename Ret, typename... Args>
+		class FunctionCore : public FunctionCoreBase<Ret, Args...>
+		{
+		public:
+			FunctionCore() = delete;
+
+			inline virtual ~FunctionCore()
+			{
+			}
+
+			inline FunctionCore(const T& value)
+				: FunctionCoreBase<Ret, Args...>(SpaceGameEngine::GetMetaData<T>()), m_Content(value)
+			{
+			}
+
+			inline FunctionCore(T&& value)
+				: FunctionCoreBase<Ret, Args...>(SpaceGameEngine::GetMetaData<T>()), m_Content(std::move(value))
+			{
+			}
+
+			inline FunctionCore(const FunctionCoreBase<Ret, Args...>& other_base)
+				: FunctionCoreBase<Ret, Args...>(SpaceGameEngine::GetMetaData<T>()), m_Content(*reinterpret_cast<const T*>(other_base->GetData()))
+			{
+				SGE_ASSERT(DifferentMetaDataError, FunctionCoreBase<Ret, Args...>::m_MetaData, other_base.GetMetaData());
+			}
+
+			inline FunctionCore(FunctionCoreBase<Ret, Args...>&& other_base)
+				: FunctionCoreBase<Ret, Args...>(SpaceGameEngine::GetMetaData<T>()), m_Content(std::move(*reinterpret_cast<T*>(other_base->GetData())))
+			{
+				SGE_ASSERT(DifferentMetaDataError, FunctionCoreBase<Ret, Args...>::m_MetaData, other_base.GetMetaData());
+			}
+
+			inline virtual void* GetData() override
+			{
+				return &m_Content;
+			}
+
+			inline virtual const void* GetData() override
+			{
+				return &m_Content;
+			}
+
+			inline virtual Ret operator()(Args... args) const override
+			{
+				return std::invoke(const_cast<T&>(m_Content), static_cast<Args>(args)...);
+			}
+
+		private:
+			T m_Content;
+		};
+
+		inline constexpr const SizeType MinimalSizeOfFunctionCore = sizeof(FunctionCore<void (*)(), void>);
+	}
+
 	/*!
 	@brief a callable object wrapper.
 	*/
@@ -197,7 +301,7 @@ namespace SpaceGameEngine
 		{
 			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
 			m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
-				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
+				return std::invoke((std::decay_t<T>&)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 			};
 			m_Content.Init(TypeWrapperValue<std::decay_t<T>>, std::forward<T>(func));
 		}
@@ -213,7 +317,7 @@ namespace SpaceGameEngine
 			else
 			{
 				m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
-					return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
+					return std::invoke((std::decay_t<T>&)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 				};
 				m_Content.Release();
 				m_Content.Init(TypeWrapperValue<std::decay_t<T>>, std::forward<T>(func));
@@ -226,7 +330,7 @@ namespace SpaceGameEngine
 		{
 			static_assert(IsCorrectFunction<std::decay_t<T>, Ret(Args...)>::Value, "Function can only be constructed by callable object");
 			m_pInvoke = [](const MetaObject<Allocator>& obj, Args... args) -> Ret {
-				return std::invoke((std::decay_t<T>)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
+				return std::invoke((std::decay_t<T>&)(obj.template Get<std::decay_t<T>>()), static_cast<Args>(args)...);
 			};
 			m_Content.Release();
 			m_Content.Init(TypeWrapperValue<std::decay_t<T>>, std::forward<T>(func));

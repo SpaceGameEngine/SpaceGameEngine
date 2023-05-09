@@ -24,6 +24,14 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
+	struct DifferentMetaDataError
+	{
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The two MetaDatas are different");
+		inline static bool Judge(const MetaData& meta_data1, const MetaData& meta_data2)
+		{
+			return !(meta_data1 == meta_data2);
+		}
+	};
 
 	/*!
 	@brief a wrapper of object which erases its type.
@@ -32,24 +40,6 @@ namespace SpaceGameEngine
 	class MetaObject
 	{
 	public:
-		struct ImproperMetaDataError
-		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The MetaData is improper for the MetaObject");
-			inline static bool Judge(const MetaData& meta_data)
-			{
-				return !(meta_data.m_pName != nullptr && InvalidValueError::Judge(meta_data.m_Size, 1, SGE_MAX_MEMORY_SIZE) == false && ((meta_data.m_Alignment & (meta_data.m_Alignment - 1)) == 0 && meta_data.m_Alignment != 0) && meta_data.m_pDestructor != nullptr);
-			}
-		};
-
-		struct DifferentMetaDataError
-		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The two MetaDatas are different");
-			inline static bool Judge(const MetaData& meta_data1, const MetaData& meta_data2)
-			{
-				return !(meta_data1 == meta_data2);
-			}
-		};
-
 		using AllocatorType = Allocator;
 
 	public:
@@ -129,7 +119,7 @@ namespace SpaceGameEngine
 
 		explicit inline MetaObject(const MetaData& meta_data)
 		{
-			SGE_ASSERT(ImproperMetaDataError, meta_data);
+			SGE_ASSERT(InvalidMetaDataError, meta_data);
 			SGE_ASSERT(NullPointerError, meta_data.m_pDefaultConstructor);
 			m_pMetaData = &meta_data;
 			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
@@ -139,7 +129,7 @@ namespace SpaceGameEngine
 		inline MetaObject(TypeWrapper<T>, Args&&... args)
 		{
 			const MetaData& meta_data = SpaceGameEngine::GetMetaData<std::decay_t<T>>();
-			SGE_ASSERT(ImproperMetaDataError, meta_data);
+			SGE_ASSERT(InvalidMetaDataError, meta_data);
 			SGE_ASSERT(DifferentMetaDataError, meta_data, SpaceGameEngine::GetMetaData<std::decay_t<T>>());
 			m_pMetaData = &meta_data;
 			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);

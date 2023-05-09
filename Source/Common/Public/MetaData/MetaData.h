@@ -156,6 +156,14 @@ namespace SpaceGameEngine
 		return instance;
 	}
 
+	struct InvalidMetaDataError
+	{
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The MetaData is invalid");
+		inline static bool Judge(const MetaData& meta_data)
+		{
+			return !(meta_data.m_pName != nullptr && InvalidValueError::Judge(meta_data.m_Size, 1, SGE_MAX_MEMORY_SIZE) == false && ((meta_data.m_Alignment & (meta_data.m_Alignment - 1)) == 0 && meta_data.m_Alignment != 0) && meta_data.m_pDestructor != nullptr);
+		}
+	};
 }
 
 /*!

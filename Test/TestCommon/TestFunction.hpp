@@ -62,12 +62,14 @@ TEST(Function, IsCorrectFunctionTest)
 	ASSERT_TRUE((IsCorrectFunction<decltype(&test_func_class::test), int(test_func_class*)>::Value));
 	ASSERT_TRUE((IsCorrectFunction<decltype(&test_func_class::test2), int(const test_func_class*)>::Value));
 }
+
 TEST(Function, IsFunctionTest)
 {
 	Function<void()> func([]() {});
 	ASSERT_TRUE(Function<void()>::IsFunction<decltype(func)>::Value);
 	ASSERT_TRUE(!Function<void()>::IsFunction<int>::Value);
 }
+
 TEST(Function, ConstructionTest)
 {
 	auto lambda = [](void) -> int { return 1; };
@@ -90,17 +92,43 @@ TEST(Function, ConstructionTest)
 	Function<int(int)> func8 = [](int i) { return i; };
 	ASSERT_TRUE(func8(1) == 1);
 }
+
+TEST(Function, InvokeTest)
+{
+	Function<int()> func([]() {
+		return 1;
+	});
+	const Function<int()>& cfunc_ref = func;
+
+	ASSERT_EQ(func(), 1);
+	ASSERT_EQ(cfunc_ref(), 1);
+
+	int i = 0;
+	Function<int()> func2([i]() mutable {
+		++i;
+		return i;
+	});
+	const Function<int()>& cfunc_ref2 = func2;
+
+	ASSERT_EQ(func2(), 1);
+	ASSERT_EQ(func2(), 2);
+	ASSERT_EQ(cfunc_ref2(), 3);
+	ASSERT_EQ(cfunc_ref2(), 4);
+}
+
 TEST(Function, MetaDataTest)
 {
 	Function<void(int)> func(&func_);
 	ASSERT_TRUE(func.GetMetaData() == GetMetaData<decltype(&func_)>());
 }
+
 TEST(Function, ComparisionTest)
 {
 	Function<void(int)> func(&func_);
 	Function<void(int)> func2 = func;
 	ASSERT_EQ(func, func2);
 }
+
 TEST(Function, CopyTest)
 {
 	Function<void(int)> func(&func_);
