@@ -20,7 +20,7 @@ limitations under the License.
 
 // ----------
 
-void BM_StdFunctionCreate(benchmark::State& state)
+void BM_StdFunctionCreate1(benchmark::State& state)
 {
 	for (auto _ : state)
 	{
@@ -28,7 +28,7 @@ void BM_StdFunctionCreate(benchmark::State& state)
 	}
 }
 
-void BM_SgeFunctionCreate(benchmark::State& state)
+void BM_SgeFunctionCreate1(benchmark::State& state)
 {
 	for (auto _ : state)
 	{
@@ -36,8 +36,38 @@ void BM_SgeFunctionCreate(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_StdFunctionCreate)->Iterations(1000000);
-BENCHMARK(BM_SgeFunctionCreate)->Iterations(1000000);
+BENCHMARK(BM_StdFunctionCreate1)->Iterations(1000000);
+BENCHMARK(BM_SgeFunctionCreate1)->Iterations(1000000);
+
+// ----------
+
+struct bm_large_callable
+{
+	int content[16];
+
+	void operator()()
+	{
+	}
+};
+
+void BM_StdFunctionCreate2(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		std::function<void()> func = bm_large_callable();
+	}
+}
+
+void BM_SgeFunctionCreate2(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		SpaceGameEngine::Function<void()> func = bm_large_callable();
+	}
+}
+
+BENCHMARK(BM_StdFunctionCreate2)->Iterations(1000000);
+BENCHMARK(BM_SgeFunctionCreate2)->Iterations(1000000);
 
 // ----------
 
