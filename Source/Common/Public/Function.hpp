@@ -556,14 +556,20 @@ namespace SpaceGameEngine
 		inline T& Get()
 		{
 			SGE_ASSERT(InvalidFunctionError, *this);
-			return *reinterpret_cast<T*>(GetData());
+			if constexpr (FunctionImplement::CanStoreInBuffer<T, decltype(m_pBuffer)>())
+				return *reinterpret_cast<T*>(&m_pBuffer);
+			else
+				return *reinterpret_cast<T*>(m_pBuffer);
 		}
 
 		template<typename T>
 		inline const T& Get() const
 		{
 			SGE_ASSERT(InvalidFunctionError, *this);
-			return *reinterpret_cast<const T*>(GetData());
+			if constexpr (FunctionImplement::CanStoreInBuffer<T, decltype(m_pBuffer)>())
+				return *reinterpret_cast<T*>(&m_pBuffer);
+			else
+				return *reinterpret_cast<T*>(m_pBuffer);
 		}
 
 		inline const MetaData& GetMetaData() const
