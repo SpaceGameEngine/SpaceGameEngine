@@ -128,12 +128,12 @@ namespace SpaceGameEngine
 		template<typename T, typename... Args>
 		inline MetaObject(TypeWrapper<T>, Args&&... args)
 		{
-			const MetaData& meta_data = SpaceGameEngine::GetMetaData<std::decay_t<T>>();
+			const MetaData& meta_data = SpaceGameEngine::GetMetaData<std::remove_cvref_t<T>>();
 			SGE_ASSERT(InvalidMetaDataError, meta_data);
-			SGE_ASSERT(DifferentMetaDataError, meta_data, SpaceGameEngine::GetMetaData<std::decay_t<T>>());
+			SGE_ASSERT(DifferentMetaDataError, meta_data, SpaceGameEngine::GetMetaData<std::remove_cvref_t<T>>());
 			m_pMetaData = &meta_data;
 			m_pContent = Allocator::RawNew(m_pMetaData->m_Size, m_pMetaData->m_Alignment);
-			new (m_pContent) std::decay_t<T>(std::forward<Args>(args)...);
+			new (m_pContent) std::remove_cvref_t<T>(std::forward<Args>(args)...);
 		}
 
 		inline const MetaData& GetMetaData() const
@@ -155,13 +155,13 @@ namespace SpaceGameEngine
 		template<typename T>
 		inline T& Get()
 		{
-			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, SpaceGameEngine::GetMetaData<std::decay_t<T>>());
+			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, SpaceGameEngine::GetMetaData<std::remove_cvref_t<T>>());
 			return *reinterpret_cast<T*>(m_pContent);
 		}
 		template<typename T>
 		inline const T& Get() const
 		{
-			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, SpaceGameEngine::GetMetaData<std::decay_t<T>>());
+			SGE_ASSERT(DifferentMetaDataError, *m_pMetaData, SpaceGameEngine::GetMetaData<std::remove_cvref_t<T>>());
 			return *reinterpret_cast<T*>(m_pContent);
 		}
 

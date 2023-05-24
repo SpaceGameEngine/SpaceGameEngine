@@ -618,7 +618,7 @@ namespace SpaceGameEngine
 		if (str_buf.GetSize())
 			normal_strs.PushBack(std::move(str_buf));
 
-		FormatCore::DoFormat(arg_strs, arg_strs.GetSize(), 0, (std::decay_t<Args>)args...);
+		FormatCore::DoFormat(arg_strs, arg_strs.GetSize(), 0, args...);
 
 		auto iter_a = arg_strs.GetConstBegin();
 		auto iter_n = normal_strs.GetConstBegin();
