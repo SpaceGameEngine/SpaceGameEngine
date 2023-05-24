@@ -92,12 +92,15 @@ namespace SpaceGameEngine
 		}
 
 		template<typename Ret, typename... Args>
-		using InvokeFunction = Ret (*)(void*, Args...);
+		using InvokeFunction = Ret (*)(void*&, Args...);
 
 		template<typename T, typename Ret, typename... Args>
-		inline Ret Invoke(void* ptr, Args... args)
+		inline Ret Invoke(void*& ptr, Args... args)
 		{
-			return std::invoke(*reinterpret_cast<T*>(ptr), static_cast<Args>(args)...);
+			if constexpr (CanStoreInBuffer<T, decltype(ptr)>())
+				return std::invoke(*reinterpret_cast<T*>(&ptr), static_cast<Args>(args)...);
+			else
+				return std::invoke(*reinterpret_cast<T*>(ptr), static_cast<Args>(args)...);
 		}
 
 		template<typename T>
@@ -571,7 +574,7 @@ namespace SpaceGameEngine
 
 		inline Ret operator()(Args... args) const
 		{
-			return m_pInvokeFunction(const_cast<void*>(GetData()), static_cast<Args>(args)...);
+			return m_pInvokeFunction(const_cast<void*&>(m_pBuffer), static_cast<Args>(args)...);
 		}
 
 	private:

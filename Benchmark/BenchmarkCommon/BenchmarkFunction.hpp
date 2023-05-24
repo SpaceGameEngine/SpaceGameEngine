@@ -56,7 +56,7 @@ void BM_DirectInvoke1(benchmark::State& state)
 
 void BM_StdFunction1(benchmark::State& state)
 {
-	static auto stdFunction1 = &bm_add;
+	static std::function stdFunction1 = &bm_add;
 	for (auto _ : state)
 	{
 		stdFunction1(1, 1);
@@ -121,5 +121,48 @@ void BM_SgeFunction2(benchmark::State& state)
 BENCHMARK(BM_DirectInvoke2)->Iterations(1000000);
 BENCHMARK(BM_StdFunction2)->Iterations(1000000);
 BENCHMARK(BM_SgeFunction2)->Iterations(1000000);
+
+// ----------
+
+struct bm_add3_functor
+{
+	int c, d;
+	int operator()(int a, int b)
+	{
+		return a + b;
+	}
+};
+
+void BM_DirectInvoke3(benchmark::State& state)
+{
+	bm_add3_functor bm_add3;
+	for (auto _ : state)
+	{
+		bm_add3(1, 2);
+	}
+}
+
+void BM_StdFunction3(benchmark::State& state)
+{
+	static std::function stdFunction3 = bm_add3_functor();
+	for (auto _ : state)
+	{
+		stdFunction3(1, 1);
+	}
+}
+
+void BM_SgeFunction3(benchmark::State& state)
+{
+	static SpaceGameEngine::Function<int(int, int)> sgeFunc3 = bm_add3_functor();
+
+	for (auto _ : state)
+	{
+		sgeFunc3(1, 2);
+	}
+}
+
+BENCHMARK(BM_DirectInvoke3)->Iterations(1000000);
+BENCHMARK(BM_StdFunction3)->Iterations(1000000);
+BENCHMARK(BM_SgeFunction3)->Iterations(1000000);
 
 // ----------
