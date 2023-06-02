@@ -36,6 +36,9 @@ struct functor
 	{
 		return 1;
 	}
+
+private:
+	int array_content[32];
 };
 
 struct test_func_class
@@ -48,6 +51,55 @@ struct test_func_class
 	{
 		return 2;
 	}
+};
+
+struct test_func_class2
+{
+	test_func_class2()
+		: mi(0)
+	{
+	}
+	test_func_class2(const test_func_class2& t)
+		: mi(1)
+	{
+	}
+	test_func_class2& operator=(const test_func_class2& t)
+	{
+		mi = 2;
+		return *this;
+	}
+	test_func_class2(test_func_class2&& t)
+		: mi(3)
+	{
+	}
+	test_func_class2& operator=(test_func_class2&& t)
+	{
+		mi = 4;
+		return *this;
+	}
+	~test_func_class2()
+	{
+		++destruction_count;
+		mi = -1;
+	}
+	int operator()() const
+	{
+		return mi;
+	}
+
+	int mi;
+	static int destruction_count;
+};
+
+int test_func_class2::destruction_count = 0;
+
+class test_func_class3 : public test_func_class2
+{
+public:
+	using test_func_class2::operator=;
+
+private:
+	int array_content[32];
 };
 
 TEST(Function, IsCorrectFunctionTest)
@@ -67,35 +119,97 @@ TEST(Function, IsFunctionTest)
 {
 	Function<void()> func([]() {});
 	ASSERT_TRUE(Function<void()>::IsFunction<decltype(func)>::Value);
-	ASSERT_TRUE(!Function<void()>::IsFunction<int>::Value);
+	ASSERT_FALSE(Function<void()>::IsFunction<int>::Value);
 }
 
 TEST(Function, ConstructionTest)
 {
 	auto lambda = [](void) -> int { return 1; };
-	Function<int(void)> func(lambda);
-	ASSERT_TRUE((int (*)(void))lambda == (int (*)(void))func.Get<decltype(lambda)>());
-	ASSERT_TRUE(lambda() == func());
-	Function<int(void)> func2 = func;
-	ASSERT_TRUE((int (*)(void))func2.Get<decltype(lambda)>() ==
-				(int (*)(void))func.Get<decltype(lambda)>());
-	Function<int(void)> func3([]() -> int { return 2; });
-	func3 = func2;
-	ASSERT_TRUE(func3() == func2());
-	Function<void(int)> func5 = &func_;	   // use function pointer
-	ASSERT_TRUE(func5.Get<decltype(&func_)>() == &func_);
-	Function<int(test_func_class*)> func6 = &test_func_class::test;
+	Function<int(void)> func(lambda);	 // use lambda
+	ASSERT_EQ((int (*)(void))lambda, (int (*)(void))func.Get<decltype(lambda)>());
+	ASSERT_EQ(lambda(), func());
+
+	auto mutable_lambda = [i = 0](void) mutable -> int { return ++i; };
+	Function<int(void)> func2(mutable_lambda);	  // use mutable lambda
+	ASSERT_EQ(memcmp(&mutable_lambda, &(func2.Get<decltype(mutable_lambda)>()), sizeof(mutable_lambda)), 0);
+	ASSERT_EQ(mutable_lambda(), func2());
+
+	Function<void(int)> func3(&func_);	  // use function pointer
+	ASSERT_EQ(func3.Get<decltype(&func_)>(), &func_);
+
+	Function<int(test_func_class*)> func4 = &test_func_class::test;	   // use member function pointer
 	test_func_class tc;
-	ASSERT_TRUE(func6(&tc) == tc.test());
-	Function<int(void)> func7 = functor();
-	ASSERT_TRUE(func7() == functor()());	// use functor
-	Function<int(int)> func8 = [](int i) { return i; };
-	ASSERT_TRUE(func8(1) == 1);
+	ASSERT_EQ(func4(&tc), tc.test());
+
+	Function<int(void)> func5 = functor();	  // use functor
+	ASSERT_EQ(func5(), functor()());
+
+	Function<int(void)> func6((int (*)(void)) nullptr);	   // use nullptr
+	ASSERT_FALSE(func6.IsValid());
+}
+
+TEST(Function, AssignmentTest)
+{
+	auto lambda = [](void) -> int { return 1; };
+	Function<int(void)> func;
+	func = lambda;	  // use lambda
+	ASSERT_EQ((int (*)(void))lambda, (int (*)(void))func.Get<decltype(lambda)>());
+	ASSERT_EQ(lambda(), func());
+
+	auto mutable_lambda = [i = 0](void) mutable -> int { return ++i; };
+	Function<int(void)> func2;
+	func2 = mutable_lambda;	   // use mutable lambda
+	ASSERT_EQ(memcmp(&mutable_lambda, &(func2.Get<decltype(mutable_lambda)>()), sizeof(mutable_lambda)), 0);
+	ASSERT_EQ(mutable_lambda(), func2());
+
+	Function<void(int)> func3;
+	func3 = &func_;	   // use function pointer
+	ASSERT_EQ(func3.Get<decltype(&func_)>(), &func_);
+
+	Function<int(test_func_class*)> func4;
+	func4 = &test_func_class::test;	   // use member function pointer
+	test_func_class tc;
+	ASSERT_EQ(func4(&tc), tc.test());
+
+	Function<int(void)> func5;
+	func5 = functor();	  // use functor
+	ASSERT_EQ(func5(), functor()());
+
+	Function<int(void)> func6;
+	func6 = ((int (*)(void)) nullptr);	  // use nullptr
+	ASSERT_FALSE(func6.IsValid());
+
+	Function<int(void)> func7 = test_func_class2();	   // test assignment with small size content
+	ASSERT_EQ(func7(), 3);
+	func7 = test_func_class2();
+	ASSERT_EQ(func7(), 4);
+	ASSERT_FALSE((std::is_assignable_v<test_func_class2, decltype(mutable_lambda)>));
+	int destruction_count = test_func_class2::destruction_count;
+	func7 = mutable_lambda;	   // assign with small unassignable content
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	ASSERT_EQ(func7(), 2);	  // 2 because of the calling of mutable_lambda above
+	func7 = mutable_lambda;
+	ASSERT_EQ(func7(), 2);	  // new mutable lambda
+	auto mutable_lambda2 = [i = 0, j = 0, k = 0]() mutable -> int {
+		return ++i + ++j + ++k;
+	};
+	func7 = mutable_lambda2;	// assign with large unassignable content
+	ASSERT_EQ(func7(), 3);
+	func7 = mutable_lambda2;
+	ASSERT_EQ(func7(), 3);		   // new mutable lambda
+	func7 = test_func_class3();	   // assign with large content
+	ASSERT_EQ(func7(), 3);
+	func7 = test_func_class3();
+	ASSERT_EQ(func7(), 4);
+	destruction_count = test_func_class2::destruction_count;
+	func7 = []() { return 1; };	   // assign with small content;
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	ASSERT_EQ(func7(), 1);
 }
 
 TEST(Function, InvokeTest)
 {
-	Function<int()> func([]() {
+	Function<int()> func([]() {	   // use lambda
 		return 1;
 	});
 	const Function<int()>& cfunc_ref = func;
@@ -103,10 +217,8 @@ TEST(Function, InvokeTest)
 	ASSERT_EQ(func(), 1);
 	ASSERT_EQ(cfunc_ref(), 1);
 
-	int i = 0;
-	Function<int()> func2([i]() mutable {
-		++i;
-		return i;
+	Function<int()> func2([i = 0]() mutable {	 // use mutable lambda
+		return ++i;
 	});
 	const Function<int()>& cfunc_ref2 = func2;
 
@@ -114,28 +226,29 @@ TEST(Function, InvokeTest)
 	ASSERT_EQ(func2(), 2);
 	ASSERT_EQ(cfunc_ref2(), 3);
 	ASSERT_EQ(cfunc_ref2(), 4);
+
+	Function<int(int, int)> func3(&func_3);	   // use function pointer
+	const Function<int(int, int)>& cfunc_ref3 = func3;
+
+	ASSERT_EQ(func3(0, 0), 0);
+	ASSERT_EQ(cfunc_ref3(0, 0), 0);
+
+	Function<int(test_func_class*)> func4(&test_func_class::test);	  // use member function pointer
+	const Function<int(test_func_class*)>& cfunc_ref4 = func4;
+	test_func_class tc;
+
+	ASSERT_EQ(func4(&tc), 1);
+	ASSERT_EQ(cfunc_ref4(&tc), 1);
+
+	Function<int(void)> func5 = functor();	  // use functor
+	const Function<int(void)>& cfunc_ref5 = func5;
+
+	ASSERT_EQ(func5(), 1);
+	ASSERT_EQ(cfunc_ref5(), 1);
 }
 
-TEST(Function, MetaDataTest)
+TEST(Function, GetMetaDataTest)
 {
 	Function<void(int)> func(&func_);
-	ASSERT_TRUE(func.GetMetaData() == GetMetaData<decltype(&func_)>());
-}
-
-// TEST(Function, ComparisionTest)
-//{
-//	Function<void(int)> func(&func_);
-//	Function<void(int)> func2 = func;
-//	ASSERT_EQ(func, func2);
-// }
-
-TEST(Function, CopyTest)
-{
-	Function<void(int)> func(&func_);
-	Function<void(int), MemoryManagerAllocator> func2([](int) -> void {});
-	Function<void(int), StdAllocator> func3([](int) -> void {});
-	func2 = func;
-	func3 = func2;
-	// ASSERT_EQ(func, func2);
-	// ASSERT_EQ(func2, func3);
+	ASSERT_EQ(func.GetMetaData(), GetMetaData<decltype(&func_)>());
 }
