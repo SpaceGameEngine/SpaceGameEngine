@@ -207,6 +207,97 @@ TEST(Function, AssignmentTest)
 	ASSERT_EQ(func7(), 1);
 }
 
+TEST(Function, CopyConstructionTest)
+{
+	Function<int(void)> func = test_func_class2();
+	Function<int(void)> func2(func);
+	ASSERT_EQ(func2(), 1);
+
+	Function<int(void)> func3 = test_func_class3();
+	Function<int(void)> func4(func3);
+	ASSERT_EQ(func4(), 1);
+}
+
+TEST(Function, MoveConstructionTest)
+{
+	Function<int(void)> func = test_func_class2();
+	int destruction_count = test_func_class2::destruction_count;
+	Function<int(void)> func2(std::move(func));
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	ASSERT_EQ(func2(), 3);
+
+	Function<int(void)> func3 = test_func_class3();
+	destruction_count = test_func_class2::destruction_count;
+	Function<int(void)> func4(std::move(func3));
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 0);
+	ASSERT_EQ(func4(), 3);
+}
+
+TEST(Function, CopyAssignmentTest)
+{
+	Function<int(void)> func = test_func_class2();
+	Function<int(void)> func2 = test_func_class2();
+	func = func2;
+	ASSERT_EQ(func(), 2);	 // same type
+	Function<int(void)> func3 = test_func_class3();
+	func = func3;
+	ASSERT_EQ(func(), 1);	 // small to large
+	func = func2;
+	ASSERT_EQ(func(), 1);	 // large to small
+	Function<int(void)> func4;
+	int destruction_count = test_func_class2::destruction_count;
+	func = func4;	 // small to empty
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	ASSERT_FALSE(func.IsValid());
+	func = func3;	 // empty to large
+	ASSERT_EQ(func(), 1);
+	destruction_count = test_func_class2::destruction_count;
+	func = func4;	 // large to empty
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	ASSERT_FALSE(func.IsValid());
+	func = func2;	 // empty to small
+	ASSERT_EQ(func(), 1);
+}
+
+TEST(Function, MoveAssignmentTest)
+{
+	Function<int(void)> func = test_func_class2();
+	int destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void)>(test_func_class2());	   // same type small
+	ASSERT_EQ(func(), 4);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void)>(test_func_class3());	   // small to large
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void)>(test_func_class3());	   // same type large
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void)>(test_func_class2());	   // large to small
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 3);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void)>();	 // small to empty
+	ASSERT_FALSE(func.IsValid());
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void)>(test_func_class3());	   // empty to large
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void)>();	 // large to empty
+	ASSERT_FALSE(func.IsValid());
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void)>(test_func_class2());	   // empty to small
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
+}
+
+// todo
+
 TEST(Function, InvokeTest)
 {
 	Function<int()> func([]() {	   // use lambda
