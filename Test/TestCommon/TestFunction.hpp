@@ -401,6 +401,60 @@ TEST(Function, AnotherAllocatorMoveAssignmentTest)
 	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
 }
 
+TEST(Function, ClearTest)
+{
+	test_func_class2 test_func_class2_obj;
+	Function<int(void)> func = test_func_class2_obj;
+	ASSERT_EQ(func(), 1);
+	ASSERT_TRUE(func.IsValid());
+
+	func.Clear();
+	ASSERT_FALSE(func.IsValid());
+
+	func = test_func_class2_obj;
+	ASSERT_EQ(func(), 1);
+	ASSERT_TRUE(func.IsValid());
+
+	test_func_class3 test_func_class3_obj;
+	Function<int(void)> func2 = test_func_class3_obj;
+	ASSERT_EQ(func2(), 1);
+	ASSERT_TRUE(func2.IsValid());
+
+	func2.Clear();
+	ASSERT_FALSE(func2.IsValid());
+
+	func2 = test_func_class3_obj;
+	ASSERT_EQ(func2(), 1);
+	ASSERT_TRUE(func2.IsValid());
+}
+
+TEST(Function, IsValidTest)
+{
+	Function<void(int)> func = &func_;
+	ASSERT_TRUE(func.IsValid());
+
+	Function<void(int)> func2;
+	ASSERT_FALSE(func2.IsValid());
+}
+
+TEST(Function, GetTest)
+{
+	Function<int(void)> func = test_func_class2();
+	ASSERT_EQ(func.Get<test_func_class2>().mi, 3);
+
+	const Function<int(void)> cfunc = test_func_class3();
+	ASSERT_EQ(cfunc.Get<test_func_class3>().mi, 3);
+}
+
+TEST(Function, GetMetaDataTest)
+{
+	Function<void(int)> func(&func_);
+	ASSERT_EQ(func.GetMetaData(), GetMetaData<decltype(&func_)>());
+
+	const Function<void(int)> cfunc(&func_);
+	ASSERT_EQ(cfunc.GetMetaData(), GetMetaData<decltype(&func_)>());
+}
+
 TEST(Function, InvokeTest)
 {
 	Function<int()> func([]() {	   // use lambda
@@ -439,10 +493,4 @@ TEST(Function, InvokeTest)
 
 	ASSERT_EQ(func5(), 1);
 	ASSERT_EQ(cfunc_ref5(), 1);
-}
-
-TEST(Function, GetMetaDataTest)
-{
-	Function<void(int)> func(&func_);
-	ASSERT_EQ(func.GetMetaData(), GetMetaData<decltype(&func_)>());
 }
