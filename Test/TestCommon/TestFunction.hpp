@@ -216,6 +216,10 @@ TEST(Function, CopyConstructionTest)
 	Function<int(void)> func3 = test_func_class3();
 	Function<int(void)> func4(func3);
 	ASSERT_EQ(func4(), 1);
+
+	Function<int(void)> func5;
+	Function<int(void)> func6(func5);
+	ASSERT_FALSE(func6.IsValid());
 }
 
 TEST(Function, MoveConstructionTest)
@@ -231,6 +235,10 @@ TEST(Function, MoveConstructionTest)
 	Function<int(void)> func4(std::move(func3));
 	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 0);
 	ASSERT_EQ(func4(), 3);
+
+	Function<int(void)> func5;
+	Function<int(void)> func6(std::move(func5));
+	ASSERT_FALSE(func6.IsValid());
 }
 
 TEST(Function, CopyAssignmentTest)
@@ -296,7 +304,102 @@ TEST(Function, MoveAssignmentTest)
 	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
 }
 
-// todo
+TEST(Function, AnotherAllocatorCopyConstructionTest)
+{
+	Function<int(void), MemoryManagerAllocator> func = test_func_class2();
+	Function<int(void), StdAllocator> func2(func);
+	ASSERT_EQ(func2(), 1);
+
+	Function<int(void), MemoryManagerAllocator> func3 = test_func_class3();
+	Function<int(void), StdAllocator> func4(func3);
+	ASSERT_EQ(func4(), 1);
+
+	Function<int(void), MemoryManagerAllocator> func5;
+	Function<int(void), StdAllocator> func6(func5);
+	ASSERT_FALSE(func6.IsValid());
+}
+
+TEST(Function, AnotherAllocatorMoveConstructionTest)
+{
+	Function<int(void), MemoryManagerAllocator> func = test_func_class2();
+	int destruction_count = test_func_class2::destruction_count;
+	Function<int(void), StdAllocator> func2(std::move(func));
+	ASSERT_EQ(destruction_count, test_func_class2::destruction_count);
+	ASSERT_EQ(func2(), 3);
+
+	Function<int(void), MemoryManagerAllocator> func3 = test_func_class3();
+	destruction_count = test_func_class2::destruction_count;
+	Function<int(void), StdAllocator> func4(std::move(func3));
+	ASSERT_EQ(destruction_count, test_func_class2::destruction_count);
+	ASSERT_EQ(func4(), 3);
+
+	Function<int(void), MemoryManagerAllocator> func5;
+	Function<int(void), StdAllocator> func6(std::move(func5));
+	ASSERT_FALSE(func6.IsValid());
+}
+
+TEST(Function, AnotherAllocatorCopyAssignmentTest)
+{
+	Function<int(void), MemoryManagerAllocator> func = test_func_class2();
+	Function<int(void), StdAllocator> func2 = test_func_class2();
+	func = func2;
+	ASSERT_EQ(func(), 2);	 // same type
+	Function<int(void), StdAllocator> func3 = test_func_class3();
+	func = func3;
+	ASSERT_EQ(func(), 1);	 // small to large
+	func = func2;
+	ASSERT_EQ(func(), 1);	 // large to small
+	Function<int(void), StdAllocator> func4;
+	int destruction_count = test_func_class2::destruction_count;
+	func = func4;	 // small to empty
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	ASSERT_FALSE(func.IsValid());
+	func = func3;	 // empty to large
+	ASSERT_EQ(func(), 1);
+	destruction_count = test_func_class2::destruction_count;
+	func = func4;	 // large to empty
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	ASSERT_FALSE(func.IsValid());
+	func = func2;	 // empty to small
+	ASSERT_EQ(func(), 1);
+}
+
+TEST(Function, AnotherAllocatorMoveAssignmentTest)
+{
+	Function<int(void), MemoryManagerAllocator> func = test_func_class2();
+	int destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void), StdAllocator>(test_func_class2());	 // same type small
+	ASSERT_EQ(func(), 4);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void), StdAllocator>(test_func_class3());	 // small to large
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 3);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void), StdAllocator>(test_func_class3());	 // same type large
+	ASSERT_EQ(func(), 4);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void), StdAllocator>(test_func_class2());	 // large to small
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 3);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void), StdAllocator>();	   // small to empty
+	ASSERT_FALSE(func.IsValid());
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void), StdAllocator>(test_func_class3());	 // empty to large
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void), StdAllocator>();	   // large to empty
+	ASSERT_FALSE(func.IsValid());
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 1);
+	destruction_count = test_func_class2::destruction_count;
+	func = Function<int(void), StdAllocator>(test_func_class2());	 // empty to small
+	ASSERT_EQ(func(), 3);
+	ASSERT_EQ(test_func_class2::destruction_count - destruction_count, 2);
+}
 
 TEST(Function, InvokeTest)
 {

@@ -202,20 +202,20 @@ namespace SpaceGameEngine
 		inline Function(Function&& func)
 			: m_pInvokeFunction(func.m_pInvokeFunction), m_pMetaData(func.m_pMetaData)
 		{
-			if (IsStoreInBuffer())
+			if (m_pInvokeFunction)
 			{
-				if (m_pInvokeFunction)
+				if (IsStoreInBuffer())
 				{
 					SGE_ASSERT(NullPointerError, m_pMetaData->m_pMoveConstructor);
 					m_pMetaData->m_pMoveConstructor(&m_pBuffer, &(func.m_pBuffer));
 					m_pMetaData->m_pDestructor(&(func.m_pBuffer));
 				}
 				else
-					m_pBuffer = nullptr;
+					m_pBuffer = func.m_pBuffer;
+				func.m_pInvokeFunction = nullptr;
 			}
 			else
-				m_pBuffer = func.m_pBuffer;
-			func.m_pInvokeFunction = nullptr;
+				m_pBuffer = nullptr;
 		}
 
 		inline Function& operator=(const Function& func)
