@@ -60,5 +60,5 @@ bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::ope
 
 bool SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::InvalidBasicBlockError::Judge(const BasicBlock& bb)
 {
-	return !IsTerminatorOperationType(bb.GetContent().GetConstReverseBegin()->GetType());
+	return bb.GetContent().GetSize() == 0 || !IsTerminatorOperationType(bb.GetContent().GetConstReverseBegin()->GetType());
 }
