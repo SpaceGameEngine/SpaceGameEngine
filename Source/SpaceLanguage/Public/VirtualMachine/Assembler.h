@@ -66,6 +66,9 @@ namespace SpaceGameEngine::SpaceLanguage
 		static SPACE_LANGUAGE_API bool Judge(const String& str);
 	};
 
+	/*!
+	@note include checking for whether source string is valid for getting tokens or not.
+	*/
 	struct InvalidAssemblerSourceStringError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Assembler source string is invalid.");

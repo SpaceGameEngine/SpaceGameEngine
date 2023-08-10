@@ -81,6 +81,9 @@ bool SpaceGameEngine::SpaceLanguage::InvalidRegisterNameError::Judge(const Strin
 
 bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(const String& str, const String& error_info_formatter, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions)
 {
+	if (InvalidSourceStringError::Judge(str, error_info_formatter))
+		return true;
+
 	Vector<Token> tokens = GetTokens(str, error_info_formatter);
 	SizeType instr_size = 0;
 	const InstructionType* pinstr = nullptr;
