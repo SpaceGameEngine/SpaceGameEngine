@@ -153,6 +153,7 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::Judge(const St
 	SizeType line = 1;
 	SizeType col = 1;
 	bool is_wait_for_lf = false;
+	AdditionalContextForJudge additional_context;
 
 	while (iter != str.GetConstEnd())
 	{
@@ -163,7 +164,7 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::Judge(const St
 			state = next->m_Second;
 			++iter;
 		}
-		else if (m_OtherCharacterJudgeFunctions[state](iter, state, error_info_formatter, line, col))
+		else if (m_OtherCharacterJudgeFunctions[state](iter, state, error_info_formatter, line, col, additional_context))
 			return true;
 
 		if (iter != old_iter)
@@ -294,7 +295,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 								   Pair<const Char, StateType>(SGE_STR('~'), State::Start),
 								   Pair<const Char, StateType>(SGE_STR('`'), State::Start)});
 
-	m_OtherCharacterJudgeFunctions[State::Start] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::Start] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported character"))));
 		return true;
 	};
@@ -309,7 +310,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 
 	m_States[State::Identifier].Insert(SGE_STR('_'), State::Identifier);
 
-	m_OtherCharacterJudgeFunctions[State::Identifier] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::Identifier] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Start;
 		return false;
 	};
@@ -318,7 +319,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_States[State::LineSeparator].Insert({Pair<const Char, StateType>(SGE_STR('\r'), State::LineSeparator),
 										   Pair<const Char, StateType>(SGE_STR('\n'), State::LineSeparator)});
 
-	m_OtherCharacterJudgeFunctions[State::LineSeparator] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::LineSeparator] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Start;
 		return false;
 	};
@@ -327,7 +328,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_States[State::WordSeparator].Insert({Pair<const Char, StateType>(SGE_STR(' '), State::WordSeparator),
 										   Pair<const Char, StateType>(SGE_STR('\t'), State::WordSeparator)});
 
-	m_OtherCharacterJudgeFunctions[State::WordSeparator] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::WordSeparator] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Start;
 		return false;
 	};
@@ -338,7 +339,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_States[State::ZeroPrefix].Insert({Pair<const Char, StateType>(SGE_STR('b'), State::BinaryInteger),
 										Pair<const Char, StateType>(SGE_STR('x'), State::HexInteger)});
 
-	m_OtherCharacterJudgeFunctions[State::ZeroPrefix] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::ZeroPrefix] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Start;
 		return false;
 	};
@@ -348,7 +349,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		m_States[State::DecimalInteger].Insert(c, State::DecimalInteger);
 	m_States[State::DecimalInteger].Insert(SGE_STR('.'), State::DoubleDot);
 
-	m_OtherCharacterJudgeFunctions[State::DecimalInteger] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::DecimalInteger] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Start;
 		return false;
 	};
@@ -357,7 +358,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_States[State::BinaryInteger].Insert(SGE_STR('0'), State::BinaryInteger);
 	m_States[State::BinaryInteger].Insert(SGE_STR('1'), State::BinaryInteger);
 
-	m_OtherCharacterJudgeFunctions[State::BinaryInteger] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::BinaryInteger] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		Char c = *iter;
 		if (c >= SGE_STR('2') && c <= SGE_STR('9'))
 		{
@@ -379,7 +380,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	for (Char c = SGE_STR('A'); c <= SGE_STR('F'); ++c)
 		m_States[State::HexInteger].Insert(c, State::HexInteger);
 
-	m_OtherCharacterJudgeFunctions[State::HexInteger] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::HexInteger] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Start;
 		return false;
 	};
@@ -388,7 +389,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	for (Char c = SGE_STR('0'); c <= SGE_STR('9'); ++c)
 		m_States[State::DoubleDot].Insert(c, State::Double);
 
-	m_OtherCharacterJudgeFunctions[State::DoubleDot] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::DoubleDot] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete double decimal here"))));
 		return true;
 	};
@@ -398,7 +399,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		m_States[State::Double].Insert(c, State::Double);
 	m_States[State::Double].Insert(SGE_STR('f'), State::Start);
 
-	m_OtherCharacterJudgeFunctions[State::Double] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::Double] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Start;
 		return false;
 	};
@@ -406,7 +407,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	// CharacterBegin
 	m_States[State::CharacterBegin].Insert(SGE_STR('\\'), State::EscapeCharacter);
 
-	m_OtherCharacterJudgeFunctions[State::CharacterBegin] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::CharacterBegin] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		if (*iter == SGE_STR('\''))
 		{
 			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need character here"))));
@@ -423,13 +424,13 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	// CharacterEnd
 	m_States[State::CharacterEnd].Insert(SGE_STR('\''), State::Start);
 
-	m_OtherCharacterJudgeFunctions[State::CharacterEnd] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::CharacterEnd] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need \' here"))));
 		return true;
 	};
 
 	// EscapeCharacter
-	m_OtherCharacterJudgeFunctions[State::EscapeCharacter] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::EscapeCharacter] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		if (EscapeCharacterSet::GetSingleton().IsEscapeCharacter(*iter))
 		{
 			state = State::CharacterEnd;
@@ -449,7 +450,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		Pair<const Char, StateType>(SGE_STR('"'), State::Start),
 	});
 
-	m_OtherCharacterJudgeFunctions[State::String] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::String] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		Char c = *iter;
 		if (c == SGE_STR('\r') || c == SGE_STR('\n'))
 		{
@@ -465,7 +466,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	};
 
 	// StringEscapeCharacter
-	m_OtherCharacterJudgeFunctions[State::StringEscapeCharacter] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::StringEscapeCharacter] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		if (EscapeCharacterSet::GetSingleton().IsEscapeCharacter(*iter))
 		{
 			state = State::String;
@@ -482,7 +483,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	// RawPrefix
 	m_States[State::RawPrefix].Insert(SGE_STR('"'), State::RawStringBegin);
 
-	m_OtherCharacterJudgeFunctions[State::RawPrefix] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::RawPrefix] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Identifier;
 		return false;
 	};
@@ -490,25 +491,51 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	// RawStringBegin
 	m_States[State::RawStringBegin].Insert(SGE_STR('('), State::RawString);
 
-	m_OtherCharacterJudgeFunctions[State::RawStringBegin] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need ( here"))));
-		return true;
+	m_OtherCharacterJudgeFunctions[State::RawStringBegin] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
+		Char c = *iter;
+		if (c != SGE_STR('"'))	  // can not contain " for easier comparation of suffix
+		{
+			additional_context.m_RawStringPrefix += c;
+			// state not change
+			++iter;
+			return false;
+		}
+		else
+		{
+			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need prefix or ( here"))));
+			return true;
+		}
 	};
 
 	// RawString
 	m_States[State::RawString].Insert(SGE_STR(')'), State::RawStringEnd);
 
-	m_OtherCharacterJudgeFunctions[State::RawString] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::RawString] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		// state not change
 		++iter;
 		return false;
 	};
 
 	// RawStringEnd
-	m_States[State::RawStringEnd].Insert(SGE_STR('"'), State::Start);
-
-	m_OtherCharacterJudgeFunctions[State::RawStringEnd] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
-		state = State::RawString;
+	m_OtherCharacterJudgeFunctions[State::RawStringEnd] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
+		Char c = *iter;
+		if (c == SGE_STR('"'))
+		{
+			if (additional_context.m_RawStringSuffix == additional_context.m_RawStringPrefix)
+			{
+				additional_context.m_RawStringPrefix.Clear();
+				additional_context.m_RawStringSuffix.Clear();
+				state = State::Start;
+			}
+			else
+			{
+				additional_context.m_RawStringSuffix.Clear();
+				state = State::RawString;
+			}
+		}
+		else
+			additional_context.m_RawStringSuffix += c;
+		++iter;
 		return false;
 	};
 
@@ -516,7 +543,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_States[State::SlashPrefix].Insert({Pair<const Char, StateType>(SGE_STR('/'), State::CommentLine),
 										 Pair<const Char, StateType>(SGE_STR('*'), State::CommentBlock)});
 
-	m_OtherCharacterJudgeFunctions[State::SlashPrefix] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::SlashPrefix] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::Start;
 		return false;
 	};
@@ -524,7 +551,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	// CommentBlock
 	m_States[State::CommentBlock].Insert(SGE_STR('*'), State::CommentBlockEnd);
 
-	m_OtherCharacterJudgeFunctions[State::CommentBlock] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::CommentBlock] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		// state not change
 		++iter;
 		return false;
@@ -533,7 +560,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	// CommentBlockEnd
 	m_States[State::CommentBlockEnd].Insert(SGE_STR('/'), State::Start);
 
-	m_OtherCharacterJudgeFunctions[State::CommentBlockEnd] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::CommentBlockEnd] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		state = State::CommentBlock;
 		return false;
 	};
@@ -542,7 +569,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_States[State::CommentLine].Insert({Pair<const Char, StateType>(SGE_STR('\r'), State::LineSeparator),
 										 Pair<const Char, StateType>(SGE_STR('\n'), State::LineSeparator)});
 
-	m_OtherCharacterJudgeFunctions[State::CommentLine] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col) -> bool {
+	m_OtherCharacterJudgeFunctions[State::CommentLine] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		// state not change
 		++iter;
 		return false;

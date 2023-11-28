@@ -165,8 +165,6 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	}
 	inline constexpr const SizeType StateSize = 23;
 
-	using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType);
-
 	class SPACE_LANGUAGE_API StateMachineForJudge : public UncopyableAndUnmovable, public Singleton<StateMachineForJudge>
 	{
 
@@ -178,6 +176,15 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		@param error_info_formatter format string which likes "In line:{} column:{}, {}"
 		*/
 		bool Judge(const String& str, const String& error_info_formatter) const;
+
+	private:
+		struct AdditionalContextForJudge
+		{
+			String m_RawStringPrefix;
+			String m_RawStringSuffix;
+		};
+
+		using OtherCharacterJudgeFunctionType = bool (*)(String::ConstIterator&, StateType&, const String&, SizeType, SizeType, AdditionalContextForJudge&);
 
 	private:
 		StateMachineForJudge();
