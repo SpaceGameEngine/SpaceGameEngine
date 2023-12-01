@@ -17,7 +17,7 @@ add_library(SpaceLanguage SHARED
         Private/IntermediateRepresentation/Translator.cpp
         Private/Linker/CompiledObject.cpp
         )
-add_compile_definitions(SPACE_LANGUAGE_EXPORTS)
+target_compile_definitions(SpaceLanguage PRIVATE SPACE_LANGUAGE_EXPORTS)
 target_include_directories(SpaceLanguage PUBLIC Public)
 target_link_libraries(SpaceLanguage PUBLIC Common)
 if((CMAKE_HOST_UNIX) AND (NOT CMAKE_HOST_APPLE))
