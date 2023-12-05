@@ -533,6 +533,8 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 				state = State::RawString;
 			}
 		}
+		else if (c == SGE_STR(')'))
+			additional_context.m_RawStringSuffix.Clear();
 		else
 			additional_context.m_RawStringSuffix += c;
 		++iter;
@@ -617,6 +619,8 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 	SizeType word_line = line;
 	SizeType word_col = col;
 	bool is_wait_for_lf = false;
+	String raw_string_prefix;
+	String raw_string_suffix;
 
 	while (iter != str.GetConstEnd())
 	{
@@ -725,8 +729,53 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 			str_buf.Clear();
 			++iter;
 		}
-		else if (st.m_Signal == StateMachineControlSignal::RawStringEndBack)
+		else if (st.m_Signal == StateMachineControlSignal::RawStringPrefixSubmit)
+		{
+			raw_string_prefix = str_buf;
+			str_buf.Clear();
+			++iter;
+		}
+		else if (st.m_Signal == StateMachineControlSignal::RawStringSuffixForward)
+		{
+			raw_string_suffix += *iter;
+			++iter;
+		}
+		else if (st.m_Signal == StateMachineControlSignal::RawStringSuffixClear)
+		{
 			str_buf += SGE_STR(')');
+			str_buf += raw_string_suffix;
+			raw_string_suffix.Clear();
+			++iter;
+		}
+		else if (st.m_Signal == StateMachineControlSignal::RawStringSuffixSubmit)
+		{
+			if (raw_string_suffix == raw_string_prefix)
+			{
+				// submit skip
+				result.EmplaceBack(st.m_TokenType, str_buf, word_line, word_col);
+				str_buf.Clear();
+				++iter;
+				word_line = line;
+				word_col = col + 1;
+
+				raw_string_prefix.Clear();
+				raw_string_suffix.Clear();
+
+				st.m_NextState = State::Start;
+			}
+			else
+			{
+				// add previous suffix to str buf as raw string
+				str_buf += SGE_STR(')');
+				str_buf += raw_string_suffix;
+				str_buf += SGE_STR('"');
+				++iter;
+
+				raw_string_suffix.Clear();
+
+				st.m_NextState = State::RawString;
+			}
+		}
 		else if (st.m_Signal == StateMachineControlSignal::CommentBlockEndBack)
 			str_buf += SGE_STR('*');
 
@@ -925,7 +974,9 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::StateMachine()
 	m_OtherCharacterStates[State::RawPrefix] = StateTransfer(State::Identifier, StateMachineControlSignal::Stay, TokenType::Identifier);
 
 	// RawStringBegin
-	m_States[State::RawStringBegin].Insert(SGE_STR('('), StateTransfer(State::RawString, StateMachineControlSignal::Skip, TokenType::StringLiteral));
+	m_States[State::RawStringBegin].Insert(SGE_STR('('), StateTransfer(State::RawString, StateMachineControlSignal::RawStringPrefixSubmit, TokenType::StringLiteral));
+
+	m_OtherCharacterStates[State::RawStringBegin] = StateTransfer(State::RawStringBegin, StateMachineControlSignal::Forward, TokenType::StringLiteral);
 
 	// RawString
 	m_States[State::RawString].Insert(SGE_STR(')'), StateTransfer(State::RawStringEnd, StateMachineControlSignal::Skip, TokenType::StringLiteral));
@@ -933,9 +984,10 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::StateMachine()
 	m_OtherCharacterStates[State::RawString] = StateTransfer(State::RawString, StateMachineControlSignal::Forward, TokenType::StringLiteral);
 
 	// RawStringEnd
-	m_States[State::RawStringEnd].Insert(SGE_STR('"'), StateTransfer(State::Start, StateMachineControlSignal::SubmitSkip, TokenType::StringLiteral));
+	m_States[State::RawStringEnd].Insert(SGE_STR('"'), StateTransfer(State::Start, StateMachineControlSignal::RawStringSuffixSubmit, TokenType::StringLiteral));
+	m_States[State::RawStringEnd].Insert(SGE_STR(')'), StateTransfer(State::RawStringEnd, StateMachineControlSignal::RawStringSuffixClear, TokenType::StringLiteral));
 
-	m_OtherCharacterStates[State::RawStringEnd] = StateTransfer(State::RawString, StateMachineControlSignal::RawStringEndBack, TokenType::StringLiteral);
+	m_OtherCharacterStates[State::RawStringEnd] = StateTransfer(State::RawStringEnd, StateMachineControlSignal::RawStringSuffixForward, TokenType::StringLiteral);
 
 	// SlashPrefix
 	m_States[State::SlashPrefix].Insert({Pair<const Char, StateTransfer>(SGE_STR('/'), StateTransfer(State::CommentLine, StateMachineControlSignal::Clear, TokenType::CommentLine)),

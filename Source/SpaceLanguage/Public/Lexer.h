@@ -211,8 +211,11 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		SubmitSkip = 6,
 		EscapeCharacter = 7,
 		Clear = 8,
-		RawStringEndBack = 9,
-		CommentBlockEndBack = 10,
+		RawStringPrefixSubmit = 9,
+		RawStringSuffixForward = 10,
+		RawStringSuffixClear = 11,
+		RawStringSuffixSubmit = 12,
+		CommentBlockEndBack = 13,
 	};
 
 	struct SPACE_LANGUAGE_API StateTransfer

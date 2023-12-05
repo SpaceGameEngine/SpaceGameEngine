@@ -107,6 +107,7 @@ TEST(StateMachineForJudge, Test)
 	ASSERT_FALSE(sm.Judge(SGE_STR("R\"1_/a*(test)1_/a*\""), formatter));
 	ASSERT_FALSE(sm.Judge(SGE_STR("R\"abc(test)bbc\")abc\""), formatter));
 	ASSERT_FALSE(sm.Judge(SGE_STR("R\"abc(\"bbc(test)bbc\")abc\""), formatter));
+	ASSERT_FALSE(sm.Judge(SGE_STR("R\"abc()123)abc\""), formatter));
 	ASSERT_TRUE(sm.Judge(SGE_STR("R\""), formatter));
 	ASSERT_TRUE(sm.Judge(SGE_STR("R\"\""), formatter));
 	ASSERT_TRUE(sm.Judge(SGE_STR("R\"("), formatter));
@@ -287,6 +288,13 @@ TEST(StateMachine, Test)
 	ASSERT_EQ(res11[1].GetContent(), SGE_STR("R"));
 	ASSERT_EQ(res11[1].GetLine(), 1);
 	ASSERT_EQ(res11[1].GetColumn(), 23);
+
+	auto res12 = sm.Run(SGE_STR("R\"test_@#'(1(2(3)123__abc)ttt)aaa\"bbb)ccc)ddd\")test_@#'\""));
+	ASSERT_EQ(res12.GetSize(), 1);
+	ASSERT_EQ(res12[0].GetType(), Lexer::TokenType::StringLiteral);
+	ASSERT_EQ(res12[0].GetContent(), SGE_STR("1(2(3)123__abc)ttt)aaa\"bbb)ccc)ddd\""));
+	ASSERT_EQ(res12[0].GetLine(), 1);
+	ASSERT_EQ(res12[0].GetColumn(), 1);
 }
 
 TEST(GetTokens, Test)
