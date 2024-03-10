@@ -231,9 +231,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		bool operator!=(const StateTransfer& st) const;
 	};
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL) && (!defined(SPACE_LANGUAGE_EXPORTS))
-	extern template class SGE_DLL_IMPORT Vector<Token>;
-#endif
+	SPACE_LANGUAGE_API_TEMPLATE template class SPACE_LANGUAGE_API Vector<Token>;
 
 	class SPACE_LANGUAGE_API StateMachine : public UncopyableAndUnmovable, public Singleton<StateMachine>
 	{

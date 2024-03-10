@@ -43,11 +43,14 @@ limitations under the License.
 #ifdef SGE_USE_DLL
 #ifdef COMMON_EXPORTS
 #define COMMON_API SGE_DLL_EXPORT
+#define COMMON_API_TEMPLATE
 #else
 #define COMMON_API SGE_DLL_IMPORT
+#define COMMON_API_TEMPLATE extern
 #endif
 #else
 #define COMMON_API
+#define COMMON_API_TEMPLATE
 #endif
 
 /*!

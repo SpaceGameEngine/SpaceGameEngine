@@ -24,11 +24,14 @@ limitations under the License.
 #ifdef SGE_USE_DLL
 #ifdef SPACE_LANGUAGE_EXPORTS
 #define SPACE_LANGUAGE_API SGE_DLL_EXPORT
+#define SPACE_LANGUAGE_API_TEMPLATE
 #else
 #define SPACE_LANGUAGE_API SGE_DLL_IMPORT
+#define SPACE_LANGUAGE_API_TEMPLATE extern
 #endif
 #else
 #define SPACE_LANGUAGE_API
+#define SPACE_LANGUAGE_API_TEMPLATE
 #endif
 
 /*!

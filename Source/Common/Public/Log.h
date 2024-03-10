@@ -38,8 +38,8 @@ namespace SpaceGameEngine
 
 	template<typename T>
 	concept IsLogWriterCore = requires(T t, const Char8* pstr, SizeType size) {
-								  t.WriteLog(pstr, size);
-							  };
+		t.WriteLog(pstr, size);
+	};
 
 	class COMMON_API ConsoleLogWriterCore
 	{
@@ -207,11 +207,11 @@ namespace SpaceGameEngine
 
 	template<typename T>
 	concept IsLogFormatter = requires(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str) {
-								 {
-									 T::Format(date, debug_info, log_level, str)
-									 }
-									 -> std::convertible_to<UTF8String>;
-							 };
+		{
+			T::Format(date, debug_info, log_level, str)
+		}
+		-> std::convertible_to<UTF8String>;
+	};
 
 	struct COMMON_API DefaultLogFormatter
 	{
@@ -257,11 +257,9 @@ namespace SpaceGameEngine
 
 #define SGE_LOG(logger, level, str, ...) logger.WriteLog(SpaceGameEngine::GetLocalDate(), SGE_DEBUG_INFORMATION, level, str, ##__VA_ARGS__);
 
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL) && (!defined(COMMON_EXPORTS))
-	extern template class SGE_DLL_IMPORT BindConsoleLogWriterCore<FileLogWriterCore>;
-	extern template class SGE_DLL_IMPORT LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
-	extern template class SGE_DLL_IMPORT Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
-#endif
+	COMMON_API_TEMPLATE template class COMMON_API BindConsoleLogWriterCore<FileLogWriterCore>;
+	COMMON_API_TEMPLATE template class COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
+	COMMON_API_TEMPLATE template class COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
 
 	COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogWriter();
 	COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogger();

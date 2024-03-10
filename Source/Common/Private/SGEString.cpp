@@ -16,10 +16,3 @@ limitations under the License.
 #include "SGEString.hpp"
 
 using namespace SpaceGameEngine;
-
-#if defined(SGE_WINDOWS) && defined(SGE_MSVC) && defined(SGE_USE_DLL)
-template class SGE_DLL_EXPORT StringImplement::Storage<Char16, DefaultAllocator>;
-template class SGE_DLL_EXPORT StringImplement::Storage<Char8, DefaultAllocator>;
-template class SGE_DLL_EXPORT StringCore<Char16, UCS2Trait, DefaultAllocator>;
-template class SGE_DLL_EXPORT StringCore<Char8, UTF8Trait, DefaultAllocator>;
-#endif
