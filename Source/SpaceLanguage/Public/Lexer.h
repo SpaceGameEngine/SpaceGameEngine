@@ -230,9 +230,15 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		bool operator==(const StateTransfer& st) const;
 		bool operator!=(const StateTransfer& st) const;
 	};
+}
 
-	SPACE_LANGUAGE_API_TEMPLATE template class SPACE_LANGUAGE_API Vector<Token>;
+namespace SpaceGameEngine
+{
+	SPACE_LANGUAGE_API_TEMPLATE template class SPACE_LANGUAGE_API Vector<SpaceGameEngine::SpaceLanguage::Lexer::Token>;
+}
 
+namespace SpaceGameEngine::SpaceLanguage::Lexer
+{
 	class SPACE_LANGUAGE_API StateMachine : public UncopyableAndUnmovable, public Singleton<StateMachine>
 	{
 	public:
