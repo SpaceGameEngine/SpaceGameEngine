@@ -1715,3 +1715,9 @@ FileLineBreak SpaceGameEngine::GetSystemFileLineBreak()
 #error this os has not been supported.
 #endif
 }
+
+namespace SpaceGameEngine
+{
+	template class COMMON_API_TEMPLATE_DEFINE File<Char16, UCS2Trait>;
+	template class COMMON_API_TEMPLATE_DEFINE File<Char8, UTF8Trait>;
+}

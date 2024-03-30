@@ -603,6 +603,11 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::operator!=(const Stat
 	return m_NextState != st.m_NextState || m_Signal != st.m_Signal || m_TokenType != st.m_TokenType;
 }
 
+namespace SpaceGameEngine
+{
+	template class SPACE_LANGUAGE_API_TEMPLATE_DEFINE Vector<SpaceGameEngine::SpaceLanguage::Lexer::Token>;
+}
+
 Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const String& str) const
 {
 	Vector<Token> result;

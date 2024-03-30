@@ -3502,10 +3502,10 @@ namespace SpaceGameEngine
 	using UTF8String = StringCore<Char8, UTF8Trait, DefaultAllocator>;
 	using String = UCS2String;
 
-	COMMON_API_TEMPLATE template class COMMON_API StringImplement::Storage<Char16, DefaultAllocator>;
-	COMMON_API_TEMPLATE template class COMMON_API StringImplement::Storage<Char8, DefaultAllocator>;
-	COMMON_API_TEMPLATE template class COMMON_API StringCore<Char16, UCS2Trait, DefaultAllocator>;
-	COMMON_API_TEMPLATE template class COMMON_API StringCore<Char8, UTF8Trait, DefaultAllocator>;
+	extern template class COMMON_API_TEMPLATE_DECLARE StringImplement::Storage<Char16, DefaultAllocator>;
+	extern template class COMMON_API_TEMPLATE_DECLARE StringImplement::Storage<Char8, DefaultAllocator>;
+	extern template class COMMON_API_TEMPLATE_DECLARE StringCore<Char16, UCS2Trait, DefaultAllocator>;
+	extern template class COMMON_API_TEMPLATE_DECLARE StringCore<Char8, UTF8Trait, DefaultAllocator>;
 
 	template<typename Allocator>
 	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const StringCore<Char8, UTF8Trait, Allocator>& str)

@@ -1144,8 +1144,8 @@ namespace SpaceGameEngine
 	using UCS2File = File<Char16, UCS2Trait>;
 	using UTF8File = File<Char8, UTF8Trait>;
 
-	COMMON_API_TEMPLATE template class COMMON_API File<Char16, UCS2Trait>;
-	COMMON_API_TEMPLATE template class COMMON_API File<Char8, UTF8Trait>;
+	extern template class COMMON_API_TEMPLATE_DECLARE File<Char16, UCS2Trait>;
+	extern template class COMMON_API_TEMPLATE_DECLARE File<Char8, UTF8Trait>;
 
 }
 

@@ -234,7 +234,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 
 namespace SpaceGameEngine
 {
-	SPACE_LANGUAGE_API_TEMPLATE template class SPACE_LANGUAGE_API Vector<SpaceGameEngine::SpaceLanguage::Lexer::Token>;
+	extern template class SPACE_LANGUAGE_API_TEMPLATE_DECLARE Vector<SpaceGameEngine::SpaceLanguage::Lexer::Token>;
 }
 
 namespace SpaceGameEngine::SpaceLanguage::Lexer

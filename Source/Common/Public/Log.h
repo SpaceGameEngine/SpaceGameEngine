@@ -257,9 +257,9 @@ namespace SpaceGameEngine
 
 #define SGE_LOG(logger, level, str, ...) logger.WriteLog(SpaceGameEngine::GetLocalDate(), SGE_DEBUG_INFORMATION, level, str, ##__VA_ARGS__);
 
-	COMMON_API_TEMPLATE template class COMMON_API BindConsoleLogWriterCore<FileLogWriterCore>;
-	COMMON_API_TEMPLATE template class COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
-	COMMON_API_TEMPLATE template class COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
+	extern template class COMMON_API_TEMPLATE_DECLARE BindConsoleLogWriterCore<FileLogWriterCore>;
+	extern template class COMMON_API_TEMPLATE_DECLARE LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
+	extern template class COMMON_API_TEMPLATE_DECLARE Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
 
 	COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogWriter();
 	COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogger();

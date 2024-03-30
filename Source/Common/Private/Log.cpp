@@ -131,3 +131,10 @@ Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::GetDefault
 	static GlobalVariable<Logger<BindConsoleLogWriterCore<FileLogWriterCore>>> g_DefaultLogger(GetDefaultLogWriter(), LogLevel::All);
 	return g_DefaultLogger.Get();
 }
+
+namespace SpaceGameEngine
+{
+	template class COMMON_API_TEMPLATE_DEFINE BindConsoleLogWriterCore<FileLogWriterCore>;
+	template class COMMON_API_TEMPLATE_DEFINE LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
+	template class COMMON_API_TEMPLATE_DEFINE Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
+}
