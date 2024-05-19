@@ -166,6 +166,7 @@
     <ClInclude Include="Public\CommonAPI.h" />
     <ClInclude Include="Public\Concurrent\Atomic.hpp" />
     <ClInclude Include="Public\Container\ContainerConcept.hpp" />
+    <ClInclude Include="Public\Container\Detail\RedBlackTree.hpp" />
     <ClInclude Include="Public\Container\HashMap.hpp" />
     <ClInclude Include="Public\Container\List.hpp" />
     <ClInclude Include="Public\Container\Map.hpp" />

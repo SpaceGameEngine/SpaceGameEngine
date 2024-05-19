@@ -27,14 +27,6 @@ void BM_StdMapCreate(benchmark::State& state)
 	}
 }
 
-void BM_SgeRedBlackTreeCreate(benchmark::State& state)
-{
-	for (auto _ : state)
-	{
-		SpaceGameEngine::MapImplement::RedBlackTree<int, double> m;
-	}
-}
-
 void BM_SgeMapCreate(benchmark::State& state)
 {
 	for (auto _ : state)
@@ -44,7 +36,6 @@ void BM_SgeMapCreate(benchmark::State& state)
 }
 
 BENCHMARK(BM_StdMapCreate)->Iterations(1000000);
-BENCHMARK(BM_SgeRedBlackTreeCreate)->Iterations(1000000);
 BENCHMARK(BM_SgeMapCreate)->Iterations(1000000);
 
 int bm_map_seq[] = {63, 82, 17, 99, 3, 26, 31, 59, 74, 23, 6, 94, 38, 36, 23, 19, 5, 64, 52, 17, 53, 21, 78, 2, 95};
@@ -62,18 +53,6 @@ void BM_StdMapInsert(benchmark::State& state)
 	}
 }
 
-void BM_SgeRedBlackTreeInsert(benchmark::State& state)
-{
-	for (auto _ : state)
-	{
-		SpaceGameEngine::MapImplement::RedBlackTree<int, double> m;
-		for (int i = 0; i < bm_map_seq_size; i++)
-		{
-			m.Insert(bm_map_seq[i], (double)bm_map_seq[i]);
-		}
-	}
-}
-
 void BM_SgeMapInsert(benchmark::State& state)
 {
 	for (auto _ : state)
@@ -87,7 +66,6 @@ void BM_SgeMapInsert(benchmark::State& state)
 }
 
 BENCHMARK(BM_StdMapInsert)->Iterations(1000000);
-BENCHMARK(BM_SgeRedBlackTreeInsert)->Iterations(1000000);
 BENCHMARK(BM_SgeMapInsert)->Iterations(1000000);
 
 void BM_StdMapFind(benchmark::State& state)
@@ -103,23 +81,6 @@ void BM_StdMapFind(benchmark::State& state)
 		{
 			auto re = m.find(bm_map_seq[i]);
 			assert(re->second == (double)bm_map_seq[i]);
-		}
-	}
-}
-
-void BM_SgeRedBlackTreeFind(benchmark::State& state)
-{
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m;
-	for (int i = 0; i < bm_map_seq_size; i++)
-	{
-		m.Insert(bm_map_seq[i], (double)bm_map_seq[i]);
-	}
-	for (auto _ : state)
-	{
-		for (int i = 0; i < bm_map_seq_size; i++)
-		{
-			auto re = m.FindValue(bm_map_seq[i]);
-			assert(*re == (double)bm_map_seq[i]);
 		}
 	}
 }
@@ -142,7 +103,6 @@ void BM_SgeMapFind(benchmark::State& state)
 }
 
 BENCHMARK(BM_StdMapFind)->Iterations(1000000);
-BENCHMARK(BM_SgeRedBlackTreeFind)->Iterations(1000000);
 BENCHMARK(BM_SgeMapFind)->Iterations(1000000);
 
 void BM_StdMapRemove(benchmark::State& state)
@@ -157,22 +117,6 @@ void BM_StdMapRemove(benchmark::State& state)
 		for (int i = 0; i < bm_map_seq_size; i++)
 		{
 			m.erase(bm_map_seq[i]);
-		}
-	}
-}
-
-void BM_SgeRedBlackTreeRemove(benchmark::State& state)
-{
-	SpaceGameEngine::MapImplement::RedBlackTree<int, double> m;
-	for (int i = 0; i < bm_map_seq_size; i++)
-	{
-		m.Insert(bm_map_seq[i], (double)bm_map_seq[i]);
-	}
-	for (auto _ : state)
-	{
-		for (int i = 0; i < bm_map_seq_size; i++)
-		{
-			m.RemoveByKey(bm_map_seq[i]);
 		}
 	}
 }
@@ -194,5 +138,4 @@ void BM_SgeMapRemove(benchmark::State& state)
 }
 
 BENCHMARK(BM_StdMapRemove)->Iterations(1000000);
-BENCHMARK(BM_SgeRedBlackTreeRemove)->Iterations(1000000);
 BENCHMARK(BM_SgeMapRemove)->Iterations(1000000);

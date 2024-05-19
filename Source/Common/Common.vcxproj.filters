@@ -52,6 +52,9 @@
     <Filter Include="Private\Module">
       <UniqueIdentifier>{b6e246fb-0db4-4c2b-bc21-bcffe85e889b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Container\Detail">
+      <UniqueIdentifier>{374d7dba-337a-44d6-b841-ecac62159b4f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -194,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="Public\Utility\Optional.hpp">
       <Filter>Public\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\Detail\RedBlackTree.hpp">
+      <Filter>Public\Container\Detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

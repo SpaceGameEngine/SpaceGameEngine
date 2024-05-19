@@ -28,5 +28,6 @@
     <ClInclude Include="TestFile.hpp" />
     <ClInclude Include="TestDate.hpp" />
     <ClInclude Include="TestLog.hpp" />
+    <ClInclude Include="TestRedBlackTree.hpp" />
   </ItemGroup>
 </Project>

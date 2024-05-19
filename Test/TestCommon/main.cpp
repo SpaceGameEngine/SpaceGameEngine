@@ -27,6 +27,7 @@ limitations under the License.
 #include "TestRange.hpp"
 #include "TestMeta.hpp"
 #include "TestTimeCounter.hpp"
+#include "TestRedBlackTree.hpp"
 #include "TestMap.hpp"
 #include "TestHashMap.hpp"
 #include "TestList.hpp"
