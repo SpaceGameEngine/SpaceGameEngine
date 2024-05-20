@@ -35,6 +35,14 @@ namespace SpaceGameEngine
 		template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
 		friend class Map;
 
+	private:
+		template<typename T>
+		class IteratorImpl;
+
+		template<typename T>
+		class ReverseIteratorImpl;
+
+	public:
 		inline Map()
 			: m_Tree()
 		{
@@ -98,7 +106,7 @@ namespace SpaceGameEngine
 		{
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)
 			{
-				m_Tree.InternalInsert(i->m_First, i->m_Second);
+				m_Tree.InternalInsert(*i);
 			}
 		}
 
@@ -112,8 +120,230 @@ namespace SpaceGameEngine
 			return m_Tree.GetSize();
 		}
 
+		using Iterator = IteratorImpl<Pair<const K, V>>;
+		using ConstIterator = IteratorImpl<const Pair<const K, V>>;
+		using ReverseIterator = ReverseIteratorImpl<Pair<const K, V>>;
+		using ConstReverseIterator = ReverseIteratorImpl<const Pair<const K, V>>;
+
 		template<typename IteratorType>
-		struct IsMapIterator;
+		struct IsMapIterator
+		{
+			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
+		};
+
+		struct ExternalIteratorError
+		{
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this Map.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const Map& m)
+			{
+				return iter.m_pTree != &(m.m_Tree);
+			}
+		};
+
+		struct KeyNotFoundError
+		{
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The key can not be found in this Map.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const IteratorType& end)
+			{
+				return iter == end;
+			}
+		};
+
+		struct NilNodeIteratorError
+		{
+			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator which pointing to the nil node is invalid.");
+
+			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
+			inline static bool Judge(const IteratorType& iter, const IteratorType& end)
+			{
+				return iter == end;
+			}
+		};
+
+		inline Iterator GetBegin()
+		{
+			return Iterator::GetBegin(*this);
+		}
+
+		inline Iterator GetEnd()
+		{
+			return Iterator::GetEnd(*this);
+		}
+
+		inline ConstIterator GetConstBegin() const
+		{
+			return ConstIterator::GetBegin(*this);
+		}
+
+		inline ConstIterator GetConstEnd() const
+		{
+			return ConstIterator::GetEnd(*this);
+		}
+
+		inline ReverseIterator GetReverseBegin()
+		{
+			return ReverseIterator::GetBegin(*this);
+		}
+
+		inline ReverseIterator GetReverseEnd()
+		{
+			return ReverseIterator::GetEnd(*this);
+		}
+
+		inline ConstReverseIterator GetConstReverseBegin() const
+		{
+			return ConstReverseIterator::GetBegin(*this);
+		}
+
+		inline ConstReverseIterator GetConstReverseEnd() const
+		{
+			return ConstReverseIterator::GetEnd(*this);
+		}
+
+		template<typename K2, typename V2>
+		inline Pair<Iterator, bool> Insert(K2&& key, V2&& val)
+		{
+			auto re = m_Tree.InternalInsert(MakePair(std::forward<K2>(key), std::forward<V2>(val)));
+			return Pair<Iterator, bool>(Iterator(re.m_First, &m_Tree), re.m_Second);
+		}
+
+		inline void Insert(std::initializer_list<Pair<const K, V>> ilist)
+		{
+			for (auto i = ilist.begin(); i != ilist.end(); ++i)
+			{
+				m_Tree.InternalInsert(*i);
+			}
+		}
+
+		template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
+		inline IteratorType Remove(const IteratorType& iter)
+		{
+			SGE_ASSERT(ExternalIteratorError, iter, *this);
+			SGE_ASSERT(NilNodeIteratorError, iter, IteratorType::GetEnd(*this));
+			IteratorType re = iter;
+			++re;
+			m_Tree.RemoveNode((typename RedBlackTreeType::Node*)iter.m_pContent);
+			return re;
+		}
+
+		inline bool RemoveByKey(const K& key)
+		{
+			return m_Tree.Remove(key);
+		}
+
+		inline Iterator Find(const K& key)
+		{
+			return Iterator(m_Tree.FindNode(key), &m_Tree);
+		}
+
+		inline ConstIterator Find(const K& key) const
+		{
+			return ConstIterator(m_Tree.FindNode(key), &m_Tree);
+		}
+
+		inline V& Get(const K& key)
+		{
+			Iterator iter = Find(key);
+			SGE_CHECK(KeyNotFoundError, iter, GetEnd());
+			return iter->m_Second;
+		}
+
+		inline const V& Get(const K& key) const
+		{
+			ConstIterator iter = Find(key);
+			SGE_CHECK(KeyNotFoundError, iter, GetConstEnd());
+			return iter->m_Second;
+		}
+
+		template<typename K2>
+		inline V& operator[](K2&& key)
+		{
+			Iterator iter = Find(key);
+			if (iter == GetEnd())
+				iter = Insert(std::forward<K2>(key), V()).m_First;
+			return iter->m_Second;
+		}
+
+		inline bool operator==(const Map& map) const
+		{
+			if (GetSize() != map.GetSize())
+				return false;
+
+			auto iter = GetConstBegin();
+			auto oiter = map.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return false;
+				++iter;
+				++oiter;
+			}
+
+			return true;
+		}
+
+		template<typename OtherLessComparer, typename OtherAllocator>
+		inline bool operator==(const Map<K, V, OtherLessComparer, OtherAllocator>& map) const
+		{
+			if (GetSize() != map.GetSize())
+				return false;
+
+			auto iter = GetConstBegin();
+			auto oiter = map.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return false;
+				++iter;
+				++oiter;
+			}
+
+			return true;
+		}
+
+		inline bool operator!=(const Map& map) const
+		{
+			if (GetSize() != map.GetSize())
+				return true;
+
+			auto iter = GetConstBegin();
+			auto oiter = map.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return true;
+				++iter;
+				++oiter;
+			}
+
+			return false;
+		}
+
+		template<typename OtherLessComparer, typename OtherAllocator>
+		inline bool operator!=(const Map<K, V, OtherLessComparer, OtherAllocator>& map) const
+		{
+			if (GetSize() != map.GetSize())
+				return true;
+
+			auto iter = GetConstBegin();
+			auto oiter = map.GetConstBegin();
+			while (iter != GetConstEnd())
+			{
+				if (*iter != *oiter)
+					return true;
+				++iter;
+				++oiter;
+			}
+
+			return false;
+		}
+
+	private:
+		using RedBlackTreeType = Detail::RedBlackTree<Pair<const K, V>, KeyLess<Pair<const K, V>, LessComparer>, KeyEqual<Pair<const K, V>>, Allocator>;
 
 		template<typename T>
 		class IteratorImpl
@@ -272,13 +502,13 @@ namespace SpaceGameEngine
 			inline T* operator->() const
 			{
 				SGE_ASSERT(OutOfRangeError, *this);
-				return &(m_pContent->m_KeyValuePair);
+				return &(m_pContent->m_Value);
 			}
 
 			inline T& operator*() const
 			{
 				SGE_ASSERT(OutOfRangeError, *this);
-				return m_pContent->m_KeyValuePair;
+				return m_pContent->m_Value;
 			}
 
 			inline bool operator==(const IteratorImpl& iter) const
@@ -305,12 +535,12 @@ namespace SpaceGameEngine
 
 			inline T* GetData() const
 			{
-				return &(m_pContent->m_KeyValuePair);
+				return &(m_pContent->m_Value);
 			}
 
 		private:
-			using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const typename Detail::RedBlackTree<K, V, LessComparer, Allocator>::Node*, typename Detail::RedBlackTree<K, V, LessComparer, Allocator>::Node*>;
-			using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const Detail::RedBlackTree<K, V, LessComparer, Allocator>*, Detail::RedBlackTree<K, V, LessComparer, Allocator>*>;
+			using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const typename RedBlackTreeType::Node*, typename RedBlackTreeType::Node*>;
+			using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const RedBlackTreeType*, RedBlackTreeType*>;
 			inline IteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
@@ -481,13 +711,13 @@ namespace SpaceGameEngine
 			inline T* operator->() const
 			{
 				SGE_ASSERT(OutOfRangeError, *this);
-				return &(m_pContent->m_KeyValuePair);
+				return &(m_pContent->m_Value);
 			}
 
 			inline T& operator*() const
 			{
 				SGE_ASSERT(OutOfRangeError, *this);
-				return m_pContent->m_KeyValuePair;
+				return m_pContent->m_Value;
 			}
 
 			inline bool operator==(const ReverseIteratorImpl& iter) const
@@ -514,12 +744,12 @@ namespace SpaceGameEngine
 
 			inline T* GetData() const
 			{
-				return &(m_pContent->m_KeyValuePair);
+				return &(m_pContent->m_Value);
 			}
 
 		private:
-			using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const typename Detail::RedBlackTree<K, V, LessComparer, Allocator>::Node*, typename Detail::RedBlackTree<K, V, LessComparer, Allocator>::Node*>;
-			using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const Detail::RedBlackTree<K, V, LessComparer, Allocator>*, Detail::RedBlackTree<K, V, LessComparer, Allocator>*>;
+			using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const typename RedBlackTreeType::Node*, typename RedBlackTreeType::Node*>;
+			using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const RedBlackTreeType*, RedBlackTreeType*>;
 			inline ReverseIteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
 			{
 				SGE_ASSERT(NullPointerError, ptr);
@@ -533,232 +763,9 @@ namespace SpaceGameEngine
 			InternalRedBlackTreePointerType m_pTree;
 		};
 
-		using Iterator = IteratorImpl<Pair<const K, V>>;
-		using ConstIterator = IteratorImpl<const Pair<const K, V>>;
-		using ReverseIterator = ReverseIteratorImpl<Pair<const K, V>>;
-		using ConstReverseIterator = ReverseIteratorImpl<const Pair<const K, V>>;
-
-		template<typename IteratorType>
-		struct IsMapIterator
-		{
-			inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
-		};
-
-		struct ExternalIteratorError
-		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this Map.");
-
-			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
-			inline static bool Judge(const IteratorType& iter, const Map& m)
-			{
-				return iter.m_pTree != &(m.m_Tree);
-			}
-		};
-
-		struct KeyNotFoundError
-		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The key can not be found in this Map.");
-
-			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
-			inline static bool Judge(const IteratorType& iter, const IteratorType& end)
-			{
-				return iter == end;
-			}
-		};
-
-		struct NilNodeIteratorError
-		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator which pointing to the nil node is invalid.");
-
-			template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
-			inline static bool Judge(const IteratorType& iter, const IteratorType& end)
-			{
-				return iter == end;
-			}
-		};
-
-		inline Iterator GetBegin()
-		{
-			return Iterator::GetBegin(*this);
-		}
-
-		inline Iterator GetEnd()
-		{
-			return Iterator::GetEnd(*this);
-		}
-
-		inline ConstIterator GetConstBegin() const
-		{
-			return ConstIterator::GetBegin(*this);
-		}
-
-		inline ConstIterator GetConstEnd() const
-		{
-			return ConstIterator::GetEnd(*this);
-		}
-
-		inline ReverseIterator GetReverseBegin()
-		{
-			return ReverseIterator::GetBegin(*this);
-		}
-
-		inline ReverseIterator GetReverseEnd()
-		{
-			return ReverseIterator::GetEnd(*this);
-		}
-
-		inline ConstReverseIterator GetConstReverseBegin() const
-		{
-			return ConstReverseIterator::GetBegin(*this);
-		}
-
-		inline ConstReverseIterator GetConstReverseEnd() const
-		{
-			return ConstReverseIterator::GetEnd(*this);
-		}
-
-		template<typename K2, typename V2>
-		inline Pair<Iterator, bool> Insert(K2&& key, V2&& val)
-		{
-			auto re = m_Tree.InternalInsert(std::forward<K2>(key), std::forward<V2>(val));
-			return Pair<Iterator, bool>(Iterator(re.m_First, &m_Tree), re.m_Second);
-		}
-
-		inline void Insert(std::initializer_list<Pair<const K, V>> ilist)
-		{
-			for (auto i = ilist.begin(); i != ilist.end(); ++i)
-			{
-				m_Tree.InternalInsert(i->m_First, i->m_Second);
-			}
-		}
-
-		template<typename IteratorType, typename = std::enable_if_t<IsMapIterator<IteratorType>::Value, void>>
-		inline IteratorType Remove(const IteratorType& iter)
-		{
-			SGE_ASSERT(ExternalIteratorError, iter, *this);
-			SGE_ASSERT(NilNodeIteratorError, iter, IteratorType::GetEnd(*this));
-			IteratorType re = iter;
-			++re;
-			m_Tree.RemoveNode((typename Detail::RedBlackTree<K, V, LessComparer, Allocator>::Node*)iter.m_pContent);
-			return re;
-		}
-
-		inline bool RemoveByKey(const K& key)
-		{
-			return m_Tree.RemoveByKey(key);
-		}
-
-		inline Iterator Find(const K& key)
-		{
-			return Iterator(m_Tree.FindNode(key), &m_Tree);
-		}
-
-		inline ConstIterator Find(const K& key) const
-		{
-			return ConstIterator(m_Tree.FindNode(key), &m_Tree);
-		}
-
-		inline V& Get(const K& key)
-		{
-			Iterator iter = Find(key);
-			SGE_CHECK(KeyNotFoundError, iter, GetEnd());
-			return iter->m_Second;
-		}
-
-		inline const V& Get(const K& key) const
-		{
-			ConstIterator iter = Find(key);
-			SGE_CHECK(KeyNotFoundError, iter, GetConstEnd());
-			return iter->m_Second;
-		}
-
-		template<typename K2>
-		inline V& operator[](K2&& key)
-		{
-			Iterator iter = Find(key);
-			if (iter == GetEnd())
-				iter = Insert(std::forward<K2>(key), V()).m_First;
-			return iter->m_Second;
-		}
-
-		inline bool operator==(const Map& map) const
-		{
-			if (GetSize() != map.GetSize())
-				return false;
-
-			auto iter = GetConstBegin();
-			auto oiter = map.GetConstBegin();
-			while (iter != GetConstEnd())
-			{
-				if (*iter != *oiter)
-					return false;
-				++iter;
-				++oiter;
-			}
-
-			return true;
-		}
-
-		template<typename OtherLessComparer, typename OtherAllocator>
-		inline bool operator==(const Map<K, V, OtherLessComparer, OtherAllocator>& map) const
-		{
-			if (GetSize() != map.GetSize())
-				return false;
-
-			auto iter = GetConstBegin();
-			auto oiter = map.GetConstBegin();
-			while (iter != GetConstEnd())
-			{
-				if (*iter != *oiter)
-					return false;
-				++iter;
-				++oiter;
-			}
-
-			return true;
-		}
-
-		inline bool operator!=(const Map& map) const
-		{
-			if (GetSize() != map.GetSize())
-				return true;
-
-			auto iter = GetConstBegin();
-			auto oiter = map.GetConstBegin();
-			while (iter != GetConstEnd())
-			{
-				if (*iter != *oiter)
-					return true;
-				++iter;
-				++oiter;
-			}
-
-			return false;
-		}
-
-		template<typename OtherLessComparer, typename OtherAllocator>
-		inline bool operator!=(const Map<K, V, OtherLessComparer, OtherAllocator>& map) const
-		{
-			if (GetSize() != map.GetSize())
-				return true;
-
-			auto iter = GetConstBegin();
-			auto oiter = map.GetConstBegin();
-			while (iter != GetConstEnd())
-			{
-				if (*iter != *oiter)
-					return true;
-				++iter;
-				++oiter;
-			}
-
-			return false;
-		}
-
 	private:
-		Detail::RedBlackTree<K, V, LessComparer, Allocator> m_Tree;
+		RedBlackTreeType m_Tree;
 	};
-
 }
 
 /*!

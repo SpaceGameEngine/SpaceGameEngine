@@ -130,11 +130,20 @@ TEST(Map, InsertTest)
 	}
 	ASSERT_EQ(pm->GetSize(), test_size);
 
+	for (int i = 0; i < test_size; i++)
+	{
+		auto re = pm->Insert(test_map_object(i, key_rel_func), test_map_object(test_size - 1 - i));
+		ASSERT_EQ(re.m_First->m_First.val, i);
+		ASSERT_EQ(re.m_First->m_Second.val, i);
+		ASSERT_FALSE(re.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+
 	delete pm;
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(key_pool[i], 2);
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }

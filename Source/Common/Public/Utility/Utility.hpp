@@ -77,6 +77,34 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
+		template<typename T2, typename U2>
+		inline Pair(const Pair<T2, U2>& c)
+			: Pair(c.m_First, c.m_Second)
+		{
+		}
+
+		template<typename T2, typename U2>
+		inline Pair(Pair<T2, U2>&& c)
+			: Pair(std::move(c.m_First), std::move(c.m_Second))
+		{
+		}
+
+		template<typename T2, typename U2>
+		inline Pair<T, U>& operator=(const Pair<T2, U2>& c)
+		{
+			m_First = c.m_First;
+			m_Second = c.m_Second;
+			return *this;
+		}
+
+		template<typename T2, typename U2>
+		inline Pair<T, U>& operator=(Pair<T2, U2>&& c)
+		{
+			m_First = std::move(c.m_First);
+			m_Second = std::move(c.m_Second);
+			return *this;
+		}
+
 		inline bool operator==(const Pair<T, U>& c) const
 		{
 			return c.m_First == m_First && c.m_Second == m_Second;
@@ -89,6 +117,12 @@ namespace SpaceGameEngine
 		T m_First;
 		U m_Second;
 	};
+
+	template<typename T, typename U>
+	inline constexpr Pair<std::decay_t<T>, std::decay_t<U>> MakePair(T&& first, U&& second)
+	{
+		return Pair<std::decay_t<T>, std::decay_t<U>>(std::forward<T>(first), std::forward<U>(second));
+	}
 
 	template<typename T>
 	inline T Min(const T& a, const T& b)
@@ -112,11 +146,80 @@ namespace SpaceGameEngine
 	};
 
 	template<typename T>
+	struct Equal
+	{
+		inline static constexpr bool Compare(const T& lhs, const T& rhs)
+		{
+			return lhs == rhs;
+		}
+	};
+
+	template<typename T>
 	struct Greater
 	{
 		inline static constexpr bool Compare(const T& lhs, const T& rhs)
 		{
 			return lhs > rhs;
+		}
+	};
+
+	template<typename T, typename LessComparer = Less<decltype(std::declval<T>().m_First)>>
+	struct KeyLess : public LessComparer
+	{
+	};
+
+	template<typename K, typename V, typename LessComparer>
+	struct KeyLess<Pair<const K, V>, LessComparer>
+	{
+		template<typename K2, typename V2, typename K3, typename V3>
+			requires std::is_convertible_v<Pair<K2, V2>, Pair<const K, V>> && std::is_constructible_v<Pair<K3, V3>, Pair<const K, V>>
+		inline static constexpr bool Compare(const Pair<K2, V2>& lhs, const Pair<K3, V3>& rhs)
+		{
+			return LessComparer::Compare(lhs.m_First, rhs.m_First);
+		}
+
+		template<typename K2, typename V2>
+			requires std::is_convertible_v<Pair<K2, V2>, Pair<const K, V>>
+		inline static constexpr bool Compare(const K& key, const Pair<K2, V2>& pair)
+		{
+			return LessComparer::Compare(key, pair.m_First);
+		}
+
+		template<typename K2, typename V2>
+			requires std::is_convertible_v<Pair<K2, V2>, Pair<const K, V>>
+		inline static constexpr bool Compare(const Pair<K2, V2>& pair, const K& key)
+		{
+			return LessComparer::Compare(pair.m_First, key);
+		}
+	};
+
+	template<typename T, typename EqualCompare = Equal<decltype(std::declval<T>().m_First)>>
+	struct KeyEqual : public EqualCompare
+	{
+	};
+
+	template<typename K, typename V, typename EqualCompare>
+	struct KeyEqual<Pair<const K, V>, EqualCompare>
+	{
+		template<typename K2, typename V2, typename K3, typename V3>
+			requires std::is_convertible_v<Pair<K2, V2>, Pair<const K, V>> && std::is_constructible_v<Pair<K3, V3>, Pair<const K, V>>
+		inline static constexpr bool Compare(const Pair<K2, V2>& lhs, const Pair<K3, V3>& rhs)
+		{
+			return EqualCompare::Compare(lhs.m_First, rhs.m_First);
+		}
+
+		template<typename K2, typename V2>
+			requires std::is_convertible_v<Pair<K2, V2>, Pair<const K, V>>
+		inline static constexpr bool Compare(const K& key, const Pair<K2, V2>& pair)
+		{
+			return EqualCompare::Compare(key, pair.m_First);
+		}
+
+		template<typename K2, typename V2>
+			requires std::is_convertible_v<Pair<K2, V2>, Pair<const K, V>>
+		inline static constexpr bool Compare(const Pair<K2, V2>& pair, const K& key)
+		{
+			return EqualCompare::Compare(pair.m_First, key);
 		}
 	};
 

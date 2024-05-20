@@ -30,19 +30,24 @@ namespace SpaceGameEngine
 
 	namespace Detail
 	{
-		template<typename K, typename V, typename LessComparer = Less<K>, typename Allocator = DefaultAllocator>
+		/*!
+		Red-black tree implement
+		@warning Do not change the node's value which will impact the node's order judgement
+		*/
+		template<typename V, typename LessComparer = Less<V>, typename EqualComparer = Equal<V>, typename Allocator = DefaultAllocator>
 		class RedBlackTree
 		{
 		public:
-			using KeyType = const K;
 			using ValueType = V;
 			using AllocatorType = Allocator;
 			using LessComparerType = LessComparer;
+			using EqualComparerType = EqualComparer;
 
-			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
+			template<typename _V, typename _LessComparer, typename _EqualComparer, typename _Allocator>
 			friend class RedBlackTree;
 
-			friend class Map<K, V, LessComparer, Allocator>;
+			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
+			friend class Map;
 
 		private:
 			struct Node
@@ -50,18 +55,12 @@ namespace SpaceGameEngine
 				Node* m_pParent;
 				Node* m_pLeftChild;
 				Node* m_pRightChild;
-				Pair<const K, V> m_KeyValuePair;
+				ValueType m_Value;
 				bool m_IsRed;
 
-				template<typename K2, typename V2>
-				inline Node(K2&& key, V2&& val)
-					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(std::forward<K2>(key), std::forward<V2>(val)), m_IsRed(false)
-				{
-				}
-
-				template<typename P>
-				inline explicit Node(P&& p)
-					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_KeyValuePair(std::forward<P>(p)), m_IsRed(false)
+				template<typename V2>
+				inline Node(V2&& val)
+					: m_pParent(nullptr), m_pLeftChild(nullptr), m_pRightChild(nullptr), m_Value(std::forward<V2>(val)), m_IsRed(false)
 				{
 				}
 			};
@@ -95,7 +94,7 @@ namespace SpaceGameEngine
 				memset(m_NilNodeContent, 0, sizeof(m_NilNodeContent));
 				if (m_Size)
 				{
-					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
+					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_Value);
 					m_pRoot->m_pParent = &m_NilNode;
 					CopyNode<Allocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
 				}
@@ -122,7 +121,7 @@ namespace SpaceGameEngine
 				m_Size = t.m_Size;
 				if (m_Size)
 				{
-					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
+					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_Value);
 					m_pRoot->m_pParent = &m_NilNode;
 					CopyNode<Allocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
 				}
@@ -146,39 +145,39 @@ namespace SpaceGameEngine
 			}
 
 			template<typename OtherAllocator>
-			inline RedBlackTree(const RedBlackTree<K, V, LessComparer, OtherAllocator>& t)
+			inline RedBlackTree(const RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>& t)
 				: m_NilNode(*(reinterpret_cast<Node*>(&m_NilNodeContent))), m_pRoot(&m_NilNode), m_Size(t.m_Size)
 			{
 				memset(m_NilNodeContent, 0, sizeof(m_NilNodeContent));
 				if (m_Size)
 				{
-					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
+					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_Value);
 					m_pRoot->m_pParent = &m_NilNode;
 					CopyNode<OtherAllocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
 				}
 			}
 
 			template<typename OtherAllocator>
-			inline RedBlackTree(RedBlackTree<K, V, LessComparer, OtherAllocator>&& t)
+			inline RedBlackTree(RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>&& t)
 				: m_NilNode(*(reinterpret_cast<Node*>(&m_NilNodeContent))), m_pRoot(&m_NilNode), m_Size(t.m_Size)
 			{
 				memset(m_NilNodeContent, 0, sizeof(m_NilNodeContent));
 				if (m_Size)
 				{
-					m_pRoot = Allocator::template New<Node>(std::move(t.m_pRoot->m_KeyValuePair));
+					m_pRoot = Allocator::template New<Node>(std::move(t.m_pRoot->m_Value));
 					m_pRoot->m_pParent = &m_NilNode;
 					MoveNode<OtherAllocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
 				}
 			}
 
 			template<typename OtherAllocator>
-			inline RedBlackTree& operator=(const RedBlackTree<K, V, LessComparer, OtherAllocator>& t)
+			inline RedBlackTree& operator=(const RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>& t)
 			{
 				RawClear();
 				m_Size = t.m_Size;
 				if (m_Size)
 				{
-					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_KeyValuePair);
+					m_pRoot = Allocator::template New<Node>(t.m_pRoot->m_Value);
 					m_pRoot->m_pParent = &m_NilNode;
 					CopyNode<OtherAllocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
 				}
@@ -186,13 +185,13 @@ namespace SpaceGameEngine
 			}
 
 			template<typename OtherAllocator>
-			inline RedBlackTree& operator=(RedBlackTree<K, V, LessComparer, OtherAllocator>&& t)
+			inline RedBlackTree& operator=(RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>&& t)
 			{
 				RawClear();
 				m_Size = t.m_Size;
 				if (m_Size)
 				{
-					m_pRoot = Allocator::template New<Node>(std::move(t.m_pRoot->m_KeyValuePair));
+					m_pRoot = Allocator::template New<Node>(std::move(t.m_pRoot->m_Value));
 					m_pRoot->m_pParent = &m_NilNode;
 					MoveNode<OtherAllocator>(m_pRoot, t.m_pRoot, &(t.m_NilNode));
 				}
@@ -213,34 +212,41 @@ namespace SpaceGameEngine
 				return m_Size;
 			}
 
-			inline V* FindValue(const K& key)
+			template<typename V2>
+			inline V* Find(const V2& val)
 			{
-				Node* re = FindNode(key);
+				Node* re = FindNode(val);
 				if (re != &m_NilNode)
-					return &(re->m_KeyValuePair.m_Second);
+					return &(re->m_Value);
 				else
 					return nullptr;
 			}
 
-			inline const V* FindValue(const K& key) const
+			template<typename V2>
+			inline const V* Find(const V2& val) const
 			{
-				const Node* re = FindNode(key);
+				const Node* re = FindNode(val);
 				if (re != &m_NilNode)
-					return &(re->m_KeyValuePair.m_Second);
+					return &(re->m_Value);
 				else
 					return nullptr;
 			}
 
-			template<typename K2, typename V2>
-			inline Pair<Pair<const K, V>*, bool> Insert(K2&& key, V2&& val)
+			/*!
+			@warning Insert same value will fail so that the second part of return value is false
+			@return Pair of pointer to node's value and inserted or not
+			*/
+			template<typename V2>
+			inline Pair<V*, bool> Insert(V2&& val)
 			{
-				auto re = InternalInsert(std::forward<K2>(key), std::forward<V2>(val));
-				return Pair<Pair<const K, V>*, bool>(&(re.m_First->m_KeyValuePair), re.m_Second);
+				auto re = InternalInsert(std::forward<V2>(val));
+				return Pair<V*, bool>(&(re.m_First->m_Value), re.m_Second);
 			}
 
-			inline bool RemoveByKey(const K& key)
+			template<typename V2>
+			inline bool Remove(const V2& val)
 			{
-				auto pnode = FindNode(key);
+				auto pnode = FindNode(val);
 				if (pnode == &m_NilNode)
 					return false;
 				else
@@ -258,7 +264,7 @@ namespace SpaceGameEngine
 					Node* p = GetMinimumNode(m_pRoot);
 					while (p != &m_NilNode)
 					{
-						func(p->m_KeyValuePair);
+						func(p->m_Value);
 						p = GetNextNode(p);
 					}
 				}
@@ -272,7 +278,7 @@ namespace SpaceGameEngine
 					const Node* p = GetMinimumNode(m_pRoot);
 					while (p != &m_NilNode)
 					{
-						func(p->m_KeyValuePair);
+						func(p->m_Value);
 						p = GetNextNode(p);
 					}
 				}
@@ -286,7 +292,7 @@ namespace SpaceGameEngine
 					Node* p = GetMaximumNode(m_pRoot);
 					while (p != &m_NilNode)
 					{
-						func(p->m_KeyValuePair);
+						func(p->m_Value);
 						p = GetPreviousNode(p);
 					}
 				}
@@ -300,7 +306,7 @@ namespace SpaceGameEngine
 					const Node* p = GetMaximumNode(m_pRoot);
 					while (p != &m_NilNode)
 					{
-						func(p->m_KeyValuePair);
+						func(p->m_Value);
 						p = GetPreviousNode(p);
 					}
 				}
@@ -325,12 +331,13 @@ namespace SpaceGameEngine
 				Allocator::template Delete(p);
 			}
 
-			inline Node* FindNode(const K& key)
+			template<typename V2>
+			inline Node* FindNode(const V2& val)
 			{
 				Node* p = m_pRoot;
-				while (p != &m_NilNode && p->m_KeyValuePair.m_First != key)
+				while (p != &m_NilNode && (!EqualComparer::Compare(p->m_Value, val)))
 				{
-					if (LessComparer::Compare(key, p->m_KeyValuePair.m_First))
+					if (LessComparer::Compare(val, p->m_Value))
 						p = p->m_pLeftChild;
 					else
 						p = p->m_pRightChild;
@@ -338,12 +345,13 @@ namespace SpaceGameEngine
 				return p;
 			}
 
-			inline const Node* FindNode(const K& key) const
+			template<typename V2>
+			inline const Node* FindNode(const V2& val) const
 			{
 				const Node* p = m_pRoot;
-				while (p != &m_NilNode && p->m_KeyValuePair.m_First != key)
+				while (p != &m_NilNode && (!EqualComparer::Compare(p->m_Value, val)))
 				{
-					if (LessComparer::Compare(key, p->m_KeyValuePair.m_First))
+					if (LessComparer::Compare(val, p->m_Value))
 						p = p->m_pLeftChild;
 					else
 						p = p->m_pRightChild;
@@ -393,28 +401,32 @@ namespace SpaceGameEngine
 				px->m_pParent = py;
 			}
 
-			template<typename K2, typename V2>
-			inline Pair<Node*, bool> InternalInsert(K2&& key, V2&& val)
+			/*!
+			@warning Insert same value will fail so that the second part of return value is false
+			@return Pair of pointer to node and inserted or not
+			*/
+			template<typename V2>
+			inline Pair<Node*, bool> InternalInsert(V2&& val)
 			{
 				Node* py = &m_NilNode;
 				Node* px = m_pRoot;
-				while (px != &m_NilNode && px->m_KeyValuePair.m_First != key)
+				while (px != &m_NilNode && (!EqualComparer::Compare(px->m_Value, val)))
 				{
 					py = px;
-					if (LessComparer::Compare(key, px->m_KeyValuePair.m_First))
+					if (LessComparer::Compare(val, px->m_Value))
 						px = px->m_pLeftChild;
 					else
 						px = px->m_pRightChild;
 				}
 				if (px == &m_NilNode)
 				{
-					Node* pz = Allocator::template New<Node>(std::forward<K2>(key), std::forward<V2>(val));
+					Node* pz = Allocator::template New<Node>(std::forward<V2>(val));
 					m_Size += 1;
 
 					pz->m_pParent = py;
 					if (py == &m_NilNode)
 						m_pRoot = pz;
-					else if (LessComparer::Compare(pz->m_KeyValuePair.m_First, py->m_KeyValuePair.m_First))
+					else if (LessComparer::Compare(pz->m_Value, py->m_Value))
 						py->m_pLeftChild = pz;
 					else
 						py->m_pRightChild = pz;
@@ -426,7 +438,6 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					px->m_KeyValuePair.m_Second = std::forward<V2>(val);
 					return Pair<Node*, bool>(px, false);
 				}
 			}
@@ -671,18 +682,18 @@ namespace SpaceGameEngine
 			}
 
 			template<typename OtherAllocator>
-			inline void CopyNode(Node* pnow, const typename RedBlackTree<K, V, LessComparer, OtherAllocator>::Node* pother, const typename RedBlackTree<K, V, LessComparer, OtherAllocator>::Node* pother_nil)
+			inline void CopyNode(Node* pnow, const typename RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>::Node* pother, const typename RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>::Node* pother_nil)
 			{
 				SGE_ASSERT(NullPointerError, pnow);
 				SGE_ASSERT(NullPointerError, pother);
 				SGE_ASSERT(NullPointerError, pother_nil);
 				SGE_ASSERT(NilNodeError, pnow, &m_NilNode);
-				using AnotherNilNodeError = typename SpaceGameEngine::Detail::RedBlackTree<K, V, LessComparer, OtherAllocator>::NilNodeError;
+				using AnotherNilNodeError = typename SpaceGameEngine::Detail::RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>::NilNodeError;
 				SGE_ASSERT(AnotherNilNodeError, pother, pother_nil);
 
 				if (pother->m_pLeftChild != pother_nil)
 				{
-					Node* pleft = Allocator::template New<Node>(pother->m_pLeftChild->m_KeyValuePair);
+					Node* pleft = Allocator::template New<Node>(pother->m_pLeftChild->m_Value);
 					pleft->m_pParent = pnow;
 					pnow->m_pLeftChild = pleft;
 					CopyNode<OtherAllocator>(pleft, pother->m_pLeftChild, pother_nil);
@@ -692,7 +703,7 @@ namespace SpaceGameEngine
 
 				if (pother->m_pRightChild != pother_nil)
 				{
-					Node* pright = Allocator::template New<Node>(pother->m_pRightChild->m_KeyValuePair);
+					Node* pright = Allocator::template New<Node>(pother->m_pRightChild->m_Value);
 					pright->m_pParent = pnow;
 					pnow->m_pRightChild = pright;
 					CopyNode<OtherAllocator>(pright, pother->m_pRightChild, pother_nil);
@@ -702,18 +713,18 @@ namespace SpaceGameEngine
 			}
 
 			template<typename OtherAllocator>
-			inline void MoveNode(Node* pnow, const typename RedBlackTree<K, V, LessComparer, OtherAllocator>::Node* pother, const typename RedBlackTree<K, V, LessComparer, OtherAllocator>::Node* pother_nil)
+			inline void MoveNode(Node* pnow, const typename RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>::Node* pother, const typename RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>::Node* pother_nil)
 			{
 				SGE_ASSERT(NullPointerError, pnow);
 				SGE_ASSERT(NullPointerError, pother);
 				SGE_ASSERT(NullPointerError, pother_nil);
 				SGE_ASSERT(NilNodeError, pnow, &m_NilNode);
-				using AnotherNilNodeError = typename SpaceGameEngine::Detail::RedBlackTree<K, V, LessComparer, OtherAllocator>::NilNodeError;
+				using AnotherNilNodeError = typename SpaceGameEngine::Detail::RedBlackTree<V, LessComparer, EqualComparer, OtherAllocator>::NilNodeError;
 				SGE_ASSERT(AnotherNilNodeError, pother, pother_nil);
 
 				if (pother->m_pLeftChild != pother_nil)
 				{
-					Node* pleft = Allocator::template New<Node>(std::move(pother->m_pLeftChild->m_KeyValuePair));
+					Node* pleft = Allocator::template New<Node>(std::move(pother->m_pLeftChild->m_Value));
 					pleft->m_pParent = pnow;
 					pnow->m_pLeftChild = pleft;
 					MoveNode<OtherAllocator>(pleft, pother->m_pLeftChild, pother_nil);
@@ -723,7 +734,7 @@ namespace SpaceGameEngine
 
 				if (pother->m_pRightChild != pother_nil)
 				{
-					Node* pright = Allocator::template New<Node>(std::move(pother->m_pRightChild->m_KeyValuePair));
+					Node* pright = Allocator::template New<Node>(std::move(pother->m_pRightChild->m_Value));
 					pright->m_pParent = pnow;
 					pnow->m_pRightChild = pright;
 					MoveNode<OtherAllocator>(pright, pother->m_pRightChild, pother_nil);

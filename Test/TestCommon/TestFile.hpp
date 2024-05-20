@@ -184,7 +184,7 @@ TEST(Path, GetAbsolutePathTest)
 	ASSERT_FALSE(p.IsAbsolute());
 	Path ap = p.GetAbsolutePath();
 	ASSERT_TRUE(ap.IsAbsolute());
-	StdTCout << (const char*)SGE_STR_TO_TSTR(ap.GetString()).GetData() << std::endl;
+	StdTCout << SGE_STR_TO_TSTR(ap.GetString()).GetData() << std::endl;
 #ifdef SGE_WINDOWS
 	Path p2(SGE_STR("C:/test"));
 	ASSERT_TRUE(p2.IsAbsolute());
@@ -268,7 +268,7 @@ TEST(Path, GetCurrentDirectoryPathTest)
 {
 	Path p = GetCurrentDirectoryPath();
 	ASSERT_TRUE(p.IsAbsolute());
-	StdTCout << (const char*)SGE_STR_TO_TSTR(p.GetString()).GetData() << std::endl;
+	StdTCout << SGE_STR_TO_TSTR(p.GetString()).GetData() << std::endl;
 }
 
 TEST(Path, SetCurrentDirectoryPathTest)
@@ -284,7 +284,7 @@ TEST(Path, SetCurrentDirectoryPathTest)
 TEST(Path, GetModuleDirectoryPathTest)
 {
 	String path_str = GetModuleDirectoryPath().GetString();
-	StdTCout << (const char*)SGE_STR_TO_TSTR(path_str).GetData() << std::endl;
+	StdTCout << SGE_STR_TO_TSTR(path_str).GetData() << std::endl;
 	ASSERT_NE(path_str.Find(SGE_STR("TestCommon"), path_str.GetConstBegin(), path_str.GetConstEnd()), path_str.GetConstEnd());
 }
 
