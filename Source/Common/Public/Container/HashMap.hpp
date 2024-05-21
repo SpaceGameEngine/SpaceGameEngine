@@ -428,6 +428,9 @@ namespace SpaceGameEngine
 			}
 		};
 
+		template<typename T>
+		class IteratorImpl;
+
 	public:
 		inline HashMap()
 			: m_LoadFactor(sm_DefaultLoadFactor), m_BucketQuantity(sm_DefaultBucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(0)
@@ -577,192 +580,6 @@ namespace SpaceGameEngine
 
 			return *this;
 		}
-
-		template<typename IteratorType>
-		struct IsHashMapIterator;
-
-		template<typename T>
-		class IteratorImpl
-		{
-		public:
-			using ValueType = T;
-
-			friend class HashMap<K, V, Hasher, Allocator>;
-
-			struct OutOfRangeError
-			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
-				inline static bool Judge(const IteratorImpl& iter)
-				{
-					return iter.m_pBucket == iter.m_pBucketEnd || iter.m_pNode == nullptr;
-				}
-			};
-
-		public:
-			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const HashMap&, HashMap&> hm)
-			{
-				IteratorImpl re(hm.m_pContent, hm.m_pContent->m_pHead, hm.m_pContent + hm.m_BucketQuantity);
-
-				while (re.m_pNode == nullptr && re.m_pBucket != re.m_pBucketEnd)
-				{
-					re.m_pBucket += 1;
-					re.m_pNode = re.m_pBucket->m_pHead;
-				}
-				if (re.m_pBucket == re.m_pBucketEnd)
-					re.m_pNode = nullptr;
-
-				return re;
-			}
-
-			inline static IteratorImpl GetEnd(std::conditional_t<std::is_const_v<T>, const HashMap&, HashMap&> hm)
-			{
-				return IteratorImpl(hm.m_pContent + hm.m_BucketQuantity, nullptr, hm.m_pContent + hm.m_BucketQuantity);
-			}
-
-			inline IteratorImpl(const IteratorImpl& iter)
-				: m_pBucket(iter.m_pBucket), m_pNode(iter.m_pNode), m_pBucketEnd(iter.m_pBucketEnd)
-			{
-			}
-
-			inline IteratorImpl& operator=(const IteratorImpl& iter)
-			{
-				SGE_ASSERT(SelfAssignmentError, this, &iter);
-				m_pBucket = iter.m_pBucket;
-				m_pNode = iter.m_pNode;
-				m_pBucketEnd = iter.m_pBucketEnd;
-				return *this;
-			}
-
-			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
-			inline IteratorImpl(const IteratorType& iter)
-				: m_pBucket((BucketPointerType)iter.m_pBucket), m_pNode((NodePointerType)iter.m_pNode), m_pBucketEnd((BucketPointerType)iter.m_pBucketEnd)
-			{
-			}
-
-			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
-			inline IteratorImpl& operator=(const IteratorType& iter)
-			{
-				m_pBucket = (BucketPointerType)iter.m_pBucket;
-				m_pNode = (NodePointerType)iter.m_pNode;
-				m_pBucketEnd = (BucketPointerType)iter.m_pBucketEnd;
-				return *this;
-			}
-
-			inline IteratorImpl& operator++()
-			{
-				MoveForward();
-				return *this;
-			}
-
-			inline const IteratorImpl operator++(int)
-			{
-				IteratorImpl re(*this);
-				MoveForward();
-				return re;
-			}
-
-			inline IteratorImpl& operator+=(SizeType i)
-			{
-				for (SizeType j = 0; j < i; ++j)
-				{
-					MoveForward();
-				}
-				return *this;
-			}
-
-			inline IteratorImpl operator+(SizeType i) const
-			{
-				IteratorImpl re(*this);
-				re += i;
-				return re;
-			}
-
-			inline SizeType operator-(const IteratorImpl& iter) const
-			{
-				SizeType re = 0;
-				IteratorImpl i = iter;
-				while (i != *this)
-				{
-					i.MoveForward();
-					re += 1;
-				}
-				return re;
-			}
-
-			inline T* operator->() const
-			{
-				SGE_ASSERT(OutOfRangeError, *this);
-				return &(m_pNode->m_KeyValuePair);
-			}
-
-			inline T& operator*() const
-			{
-				SGE_ASSERT(OutOfRangeError, *this);
-				return m_pNode->m_KeyValuePair;
-			}
-
-			inline bool operator==(const IteratorImpl& iter) const
-			{
-				return m_pBucket == iter.m_pBucket && m_pNode == iter.m_pNode && m_pBucketEnd == iter.m_pBucketEnd;
-			}
-
-			inline bool operator!=(const IteratorImpl& iter) const
-			{
-				return m_pBucket != iter.m_pBucket || m_pNode != iter.m_pNode || m_pBucketEnd != iter.m_pBucketEnd;
-			}
-
-			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<std::remove_const_t<typename IteratorType::ValueType>, std::remove_const_t<ValueType>>), void>>
-			inline bool operator==(const IteratorType& iter) const
-			{
-				return m_pBucket == iter.m_pBucket && m_pNode == iter.m_pNode && m_pBucketEnd == iter.m_pBucketEnd;
-			}
-
-			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<std::remove_const_t<typename IteratorType::ValueType>, std::remove_const_t<ValueType>>), void>>
-			inline bool operator!=(const IteratorType& iter) const
-			{
-				return m_pBucket != iter.m_pBucket || m_pNode != iter.m_pNode || m_pBucketEnd != iter.m_pBucketEnd;
-			}
-
-			inline T* GetData() const
-			{
-				SGE_ASSERT(OutOfRangeError, *this);
-				return &(m_pNode->m_KeyValuePair);
-			}
-
-		private:
-			using BucketPointerType = std::conditional_t<std::is_const_v<T>, const Bucket*, Bucket*>;
-			using NodePointerType = std::conditional_t<std::is_const_v<T>, const typename Bucket::Node*, typename Bucket::Node*>;
-
-			inline IteratorImpl(BucketPointerType pbucket, NodePointerType pnode, BucketPointerType pbucket_end)
-			{
-				SGE_ASSERT(NullPointerError, pbucket);
-				// SGE_ASSERT(NullPointerError, pnode);	pnode can be nullptr as the end iterator
-				SGE_ASSERT(NullPointerError, pbucket_end);
-				m_pBucket = pbucket;
-				m_pNode = pnode;
-				m_pBucketEnd = pbucket_end;
-			}
-
-			inline void MoveForward()
-			{
-				if (m_pBucket != m_pBucketEnd)
-				{
-					m_pNode = m_pNode->m_pNext;
-					while (m_pNode == nullptr && m_pBucket != m_pBucketEnd)
-					{
-						m_pBucket += 1;
-						m_pNode = m_pBucket->m_pHead;
-					}
-					if (m_pBucket == m_pBucketEnd)
-						m_pNode = nullptr;
-				}
-			}
-
-		private:
-			BucketPointerType m_pBucket;
-			NodePointerType m_pNode;
-			BucketPointerType m_pBucketEnd;
-		};
 
 		using Iterator = IteratorImpl<Pair<const K, V>>;
 		using ConstIterator = IteratorImpl<const Pair<const K, V>>;
@@ -1072,6 +889,189 @@ namespace SpaceGameEngine
 				Allocator::RawDelete(m_pContent);
 			}
 		}
+
+		template<typename T>
+		class IteratorImpl
+		{
+		public:
+			using ValueType = T;
+
+			friend class HashMap<K, V, Hasher, Allocator>;
+
+			struct OutOfRangeError
+			{
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+				inline static bool Judge(const IteratorImpl& iter)
+				{
+					return iter.m_pBucket == iter.m_pBucketEnd || iter.m_pNode == nullptr;
+				}
+			};
+
+		public:
+			inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const HashMap&, HashMap&> hm)
+			{
+				IteratorImpl re(hm.m_pContent, hm.m_pContent->m_pHead, hm.m_pContent + hm.m_BucketQuantity);
+
+				while (re.m_pNode == nullptr && re.m_pBucket != re.m_pBucketEnd)
+				{
+					re.m_pBucket += 1;
+					re.m_pNode = re.m_pBucket->m_pHead;
+				}
+				if (re.m_pBucket == re.m_pBucketEnd)
+					re.m_pNode = nullptr;
+
+				return re;
+			}
+
+			inline static IteratorImpl GetEnd(std::conditional_t<std::is_const_v<T>, const HashMap&, HashMap&> hm)
+			{
+				return IteratorImpl(hm.m_pContent + hm.m_BucketQuantity, nullptr, hm.m_pContent + hm.m_BucketQuantity);
+			}
+
+			inline IteratorImpl(const IteratorImpl& iter)
+				: m_pBucket(iter.m_pBucket), m_pNode(iter.m_pNode), m_pBucketEnd(iter.m_pBucketEnd)
+			{
+			}
+
+			inline IteratorImpl& operator=(const IteratorImpl& iter)
+			{
+				SGE_ASSERT(SelfAssignmentError, this, &iter);
+				m_pBucket = iter.m_pBucket;
+				m_pNode = iter.m_pNode;
+				m_pBucketEnd = iter.m_pBucketEnd;
+				return *this;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline IteratorImpl(const IteratorType& iter)
+				: m_pBucket((BucketPointerType)iter.m_pBucket), m_pNode((NodePointerType)iter.m_pNode), m_pBucketEnd((BucketPointerType)iter.m_pBucketEnd)
+			{
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+			inline IteratorImpl& operator=(const IteratorType& iter)
+			{
+				m_pBucket = (BucketPointerType)iter.m_pBucket;
+				m_pNode = (NodePointerType)iter.m_pNode;
+				m_pBucketEnd = (BucketPointerType)iter.m_pBucketEnd;
+				return *this;
+			}
+
+			inline IteratorImpl& operator++()
+			{
+				MoveForward();
+				return *this;
+			}
+
+			inline const IteratorImpl operator++(int)
+			{
+				IteratorImpl re(*this);
+				MoveForward();
+				return re;
+			}
+
+			inline IteratorImpl& operator+=(SizeType i)
+			{
+				for (SizeType j = 0; j < i; ++j)
+				{
+					MoveForward();
+				}
+				return *this;
+			}
+
+			inline IteratorImpl operator+(SizeType i) const
+			{
+				IteratorImpl re(*this);
+				re += i;
+				return re;
+			}
+
+			inline SizeType operator-(const IteratorImpl& iter) const
+			{
+				SizeType re = 0;
+				IteratorImpl i = iter;
+				while (i != *this)
+				{
+					i.MoveForward();
+					re += 1;
+				}
+				return re;
+			}
+
+			inline T* operator->() const
+			{
+				SGE_ASSERT(OutOfRangeError, *this);
+				return &(m_pNode->m_KeyValuePair);
+			}
+
+			inline T& operator*() const
+			{
+				SGE_ASSERT(OutOfRangeError, *this);
+				return m_pNode->m_KeyValuePair;
+			}
+
+			inline bool operator==(const IteratorImpl& iter) const
+			{
+				return m_pBucket == iter.m_pBucket && m_pNode == iter.m_pNode && m_pBucketEnd == iter.m_pBucketEnd;
+			}
+
+			inline bool operator!=(const IteratorImpl& iter) const
+			{
+				return m_pBucket != iter.m_pBucket || m_pNode != iter.m_pNode || m_pBucketEnd != iter.m_pBucketEnd;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<std::remove_const_t<typename IteratorType::ValueType>, std::remove_const_t<ValueType>>), void>>
+			inline bool operator==(const IteratorType& iter) const
+			{
+				return m_pBucket == iter.m_pBucket && m_pNode == iter.m_pNode && m_pBucketEnd == iter.m_pBucketEnd;
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsHashMapIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<std::remove_const_t<typename IteratorType::ValueType>, std::remove_const_t<ValueType>>), void>>
+			inline bool operator!=(const IteratorType& iter) const
+			{
+				return m_pBucket != iter.m_pBucket || m_pNode != iter.m_pNode || m_pBucketEnd != iter.m_pBucketEnd;
+			}
+
+			inline T* GetData() const
+			{
+				SGE_ASSERT(OutOfRangeError, *this);
+				return &(m_pNode->m_KeyValuePair);
+			}
+
+		private:
+			using BucketPointerType = std::conditional_t<std::is_const_v<T>, const Bucket*, Bucket*>;
+			using NodePointerType = std::conditional_t<std::is_const_v<T>, const typename Bucket::Node*, typename Bucket::Node*>;
+
+			inline IteratorImpl(BucketPointerType pbucket, NodePointerType pnode, BucketPointerType pbucket_end)
+			{
+				SGE_ASSERT(NullPointerError, pbucket);
+				// SGE_ASSERT(NullPointerError, pnode);	pnode can be nullptr as the end iterator
+				SGE_ASSERT(NullPointerError, pbucket_end);
+				m_pBucket = pbucket;
+				m_pNode = pnode;
+				m_pBucketEnd = pbucket_end;
+			}
+
+			inline void MoveForward()
+			{
+				if (m_pBucket != m_pBucketEnd)
+				{
+					m_pNode = m_pNode->m_pNext;
+					while (m_pNode == nullptr && m_pBucket != m_pBucketEnd)
+					{
+						m_pBucket += 1;
+						m_pNode = m_pBucket->m_pHead;
+					}
+					if (m_pBucket == m_pBucketEnd)
+						m_pNode = nullptr;
+				}
+			}
+
+		private:
+			BucketPointerType m_pBucket;
+			NodePointerType m_pNode;
+			BucketPointerType m_pBucketEnd;
+		};
 
 	private:
 		double m_LoadFactor;
