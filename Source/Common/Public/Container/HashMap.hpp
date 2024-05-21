@@ -313,6 +313,27 @@ namespace SpaceGameEngine
 				{
 					if (p->m_HashValue == hash_value && p->m_KeyValuePair.m_First == key)
 					{
+						return Pair<Node*, bool>(p, false);
+					}
+					p = p->m_pNext;
+				}
+				p = Allocator::template New<Node>(std::forward<K2>(key), std::forward<V2>(val));
+				p->m_HashValue = hash_value;
+				p->m_pNext = m_pHead;
+				if (m_pHead)
+					m_pHead->m_pPrevious = p;
+				m_pHead = p;
+				return Pair<Node*, bool>(p, true);
+			}
+
+			template<typename K2, typename V2>
+			inline Pair<Node*, bool> Upsert(HashType hash_value, K2&& key, V2&& val)
+			{
+				Node* p = m_pHead;
+				while (p != nullptr)
+				{
+					if (p->m_HashValue == hash_value && p->m_KeyValuePair.m_First == key)
+					{
 						p->m_KeyValuePair.m_Second = std::forward<V2>(val);
 						return Pair<Node*, bool>(p, false);
 					}
@@ -839,6 +860,20 @@ namespace SpaceGameEngine
 			return Pair<Iterator, bool>(Iterator(m_pContent + (hash & (m_BucketQuantity - 1)), re.m_First, m_pContent + m_BucketQuantity), re.m_Second);
 		}
 
+		template<typename K2, typename V2>
+		inline Pair<Iterator, bool> Upsert(K2&& key, V2&& val)
+		{
+			SizeType new_bucket_size = GetCorrectBucketQuantity(m_LoadFactor, m_Size + 1);
+			if (m_BucketQuantity < new_bucket_size)
+				Rehash(new_bucket_size);
+
+			HashType hash = Hasher::GetHash(key);
+			auto re = m_pContent[hash & (m_BucketQuantity - 1)].Upsert(hash, std::forward<K2>(key), std::forward<V2>(val));
+			if (re.m_Second)
+				m_Size += 1;
+			return Pair<Iterator, bool>(Iterator(m_pContent + (hash & (m_BucketQuantity - 1)), re.m_First, m_pContent + m_BucketQuantity), re.m_Second);
+		}
+
 		inline void Insert(std::initializer_list<Pair<const K, V>> ilist)
 		{
 			SizeType new_bucket_size = GetCorrectBucketQuantity(m_LoadFactor, m_Size + ilist.size());
@@ -849,6 +884,20 @@ namespace SpaceGameEngine
 			{
 				HashType hash = Hasher::GetHash(i->m_First);
 				if (m_pContent[hash & (m_BucketQuantity - 1)].Insert(hash, i->m_First, i->m_Second).m_Second)
+					m_Size += 1;
+			}
+		}
+
+		inline void Upsert(std::initializer_list<Pair<const K, V>> ilist)
+		{
+			SizeType new_bucket_size = GetCorrectBucketQuantity(m_LoadFactor, m_Size + ilist.size());
+			if (m_BucketQuantity < new_bucket_size)
+				Rehash(new_bucket_size);
+
+			for (auto i = ilist.begin(); i != ilist.end(); ++i)
+			{
+				HashType hash = Hasher::GetHash(i->m_First);
+				if (m_pContent[hash & (m_BucketQuantity - 1)].Upsert(hash, i->m_First, i->m_Second).m_Second)
 					m_Size += 1;
 			}
 		}
