@@ -211,6 +211,15 @@ namespace SpaceGameEngine
 			return Pair<Iterator, bool>(Iterator(re.m_First, &m_Tree), re.m_Second);
 		}
 
+		template<typename K2, typename V2>
+		inline Pair<Iterator, bool> Upsert(K2&& key, V2&& val)
+		{
+			auto re = m_Tree.InternalInsert(MakePair(std::forward<K2>(key), std::forward<V2>(val)));
+			if (!re.m_Second)
+				re.m_First->m_Value.m_Second = std::forward<V2>(val);
+			return Pair<Iterator, bool>(Iterator(re.m_First, &m_Tree), re.m_Second);
+		}
+
 		inline void Insert(std::initializer_list<Pair<const K, V>> ilist)
 		{
 			for (auto i = ilist.begin(); i != ilist.end(); ++i)

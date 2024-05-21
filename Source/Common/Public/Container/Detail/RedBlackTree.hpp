@@ -47,7 +47,7 @@ namespace SpaceGameEngine
 			friend class RedBlackTree;
 
 			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
-			friend class Map;
+			friend class SpaceGameEngine::Map;
 
 		private:
 			struct Node

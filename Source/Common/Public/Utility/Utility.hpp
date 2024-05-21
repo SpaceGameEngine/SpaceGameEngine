@@ -114,6 +114,19 @@ namespace SpaceGameEngine
 		{
 			return c.m_First != m_First || c.m_Second != m_Second;
 		}
+
+		template<typename T2, typename U2>
+		inline bool operator==(const Pair<T2, U2>& c) const
+		{
+			return c.m_First == m_First && c.m_Second == m_Second;
+		}
+
+		template<typename T2, typename U2>
+		inline bool operator!=(const Pair<T2, U2>& c) const
+		{
+			return c.m_First != m_First || c.m_Second != m_Second;
+		}
+
 		T m_First;
 		U m_Second;
 	};
