@@ -201,6 +201,9 @@
     <ClInclude Include="Public\Container\Detail\RedBlackTree.hpp">
       <Filter>Public\Container\Detail</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Container\Detail\HashTable.hpp">
+      <Filter>Public\Container\Detail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

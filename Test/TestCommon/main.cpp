@@ -29,6 +29,7 @@ limitations under the License.
 #include "TestTimeCounter.hpp"
 #include "TestRedBlackTree.hpp"
 #include "TestMap.hpp"
+#include "TestHashTable.hpp"
 #include "TestHashMap.hpp"
 #include "TestList.hpp"
 #include "TestStack.hpp"

@@ -31,7 +31,7 @@ namespace SpaceGameEngine
 	namespace Detail
 	{
 		/*!
-		Red-black tree implement
+		@brief Red-black tree implement
 		@warning Do not change the node's value which will impact the node's order judgement
 		*/
 		template<typename V, typename LessComparer = Less<V>, typename EqualComparer = Equal<V>, typename Allocator = DefaultAllocator>

@@ -187,6 +187,7 @@
     <ClInclude Include="TestFile.hpp" />
     <ClInclude Include="TestFormat.hpp" />
     <ClInclude Include="TestHashMap.hpp" />
+    <ClInclude Include="TestHashTable.hpp" />
     <ClInclude Include="TestList.hpp" />
     <ClInclude Include="TestLog.hpp" />
     <ClInclude Include="TestMap.hpp" />
