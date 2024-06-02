@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2023 creatorlxd
+Copyright 2024 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ limitations under the License.
 #include "Utility/Endian.h"
 #include "Utility/FixedSizeBuffer.hpp"
 #include "Utility/Optional.hpp"
+#include "Utility/Hash.hpp"
 #include "SGEString.hpp"
 #include "gtest/gtest.h"
 
@@ -40,7 +41,7 @@ TEST(DebugInformation, DebugInformationTest)
 	TString<> funcname(di.m_pFunctionName);
 	ASSERT_NE(filename.Find(SGE_TSTR("TestUtility.hpp"), filename.GetConstBegin(), filename.GetConstEnd()), filename.GetConstEnd());
 	ASSERT_NE(funcname.Find(SGE_TSTR("TestDebugInformation"), funcname.GetConstBegin(), funcname.GetConstEnd()), funcname.GetConstEnd());
-	ASSERT_EQ(di.m_LineNumber, 33);
+	ASSERT_EQ(di.m_LineNumber, 34);
 }
 
 class test_cmp
@@ -678,4 +679,29 @@ TEST(Optional, EqualityTest)
 	ASSERT_FALSE(opt2 != opt2);
 	ASSERT_FALSE(opt3 != 1);
 	ASSERT_FALSE(1 != opt3);
+}
+
+TEST(Hash, HashTest)
+{
+	HashType std_hash_re = std::hash<int>()(12345);
+	HashType sge_hash_re = SpaceGameEngine::Hash<int>::GetHash(12345);
+	ASSERT_EQ(std_hash_re, sge_hash_re);
+}
+
+TEST(Hash, StringHashTest)
+{
+	ASSERT_EQ(Hash<UCS2String>::GetHash(UCS2String(SGE_STR(""))), 0);
+	ASSERT_EQ(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR(""))), 0);
+
+	ASSERT_TRUE(Hash<UCS2String>::GetHash(UCS2String(SGE_STR("this is a test"))) != 0);
+	ASSERT_TRUE(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("this is a test"))) != 0);
+
+	ASSERT_TRUE(Hash<UCS2String>::GetHash(UCS2String(SGE_STR("这是测试"))) != 0);
+	ASSERT_TRUE(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("这是测试"))) != 0);
+
+	ASSERT_EQ(Hash<UCS2String>::GetHash(UCS2String(SGE_STR("a"))), Hash<UCS2String>::GetHash(UCS2String(SGE_STR("a"))));
+	ASSERT_TRUE(Hash<UCS2String>::GetHash(UCS2String(SGE_STR("a"))) != Hash<UCS2String>::GetHash(UCS2String(SGE_STR("b"))));
+
+	ASSERT_EQ(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))), Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))));
+	ASSERT_TRUE(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))) != Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("b"))));
 }

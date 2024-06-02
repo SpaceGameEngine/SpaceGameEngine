@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2023 creatorlxd
+Copyright 2024 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@ limitations under the License.
 #pragma once
 #include <initializer_list>
 #include <cmath>
-#include "MemoryManager.h"
 #include "Utility/Utility.hpp"
-#include "SGEString.hpp"
+#include "Utility/Hash.hpp"
 
 /*!
 @ingroup Common
@@ -27,34 +26,6 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-
-	using HashType = UInt64;
-
-	template<typename T>
-	struct Hash
-	{
-		inline static HashType GetHash(const T& val)
-		{
-			return std::hash<T>()(val);
-		}
-	};
-
-	template<typename T, typename Trait, typename Allocator>
-	struct Hash<StringCore<T, Trait, Allocator>>
-	{
-		inline static HashType GetHash(const StringCore<T, Trait, Allocator>& val)
-		{
-			HashType re = 0;
-			HashType seed = 131;
-			const T* str = val.GetData();
-			while (*str)
-			{
-				re = re * seed + *(str++);
-			}
-			return re;
-		}
-	};
-
 	template<typename K, typename V, typename Hasher = Hash<K>, typename Allocator = DefaultAllocator>
 	class HashMap
 	{

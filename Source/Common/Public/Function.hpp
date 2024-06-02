@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2023 creatorlxd
+Copyright 2024 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -105,10 +105,10 @@ namespace SpaceGameEngine
 
 		template<typename T>
 			requires requires(const T& t) {
-						 {
-							 t == nullptr
-							 } -> std::same_as<bool>;
-					 }
+				{
+					t == nullptr
+				} -> std::same_as<bool>;
+			}
 		inline constexpr bool IsNullPointer(const T& value)
 		{
 			return value == nullptr;

@@ -14,20 +14,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Log.h"
-#include "SpaceLanguageAPI.h"
+#include "TypeDefinition.hpp"
+#include "SGEString.hpp"
 
 /*!
-@ingroup SpaceLanguage
+@ingroup Common
 @{
 */
 
-namespace SpaceGameEngine::SpaceLanguage
+namespace SpaceGameEngine
 {
+	using HashType = UInt64;
 
-	SPACE_LANGUAGE_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetSpaceLanguageLogWriter();
-	SPACE_LANGUAGE_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetSpaceLanguageLogger();
+	template<typename T>
+	struct Hash
+	{
+		inline static HashType GetHash(const T& val)
+		{
+			return std::hash<T>()(val);
+		}
+	};
 
+	template<typename T, typename Trait, typename Allocator>
+	struct Hash<StringCore<T, Trait, Allocator>>
+	{
+		inline static HashType GetHash(const StringCore<T, Trait, Allocator>& val)
+		{
+			HashType re = 0;
+			HashType seed = 131;
+			const T* str = val.GetData();
+			while (*str)
+			{
+				re = re * seed + *(str++);
+			}
+			return re;
+		}
+	};
 }
 
 /*!
