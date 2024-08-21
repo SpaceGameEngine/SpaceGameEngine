@@ -863,9 +863,9 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, pstr);
 				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
-				for (SizeType i = 0; i <= Trait::MaxValue; i++)
+				for (SizeType i = 0; i <= Trait::MaxValue; ++i)
 					pdst[i] = nsize;
-				for (SizeType i = 0; i < nsize - 1; i++)
+				for (SizeType i = 0; i < nsize - 1; ++i)
 					pdst[(typename MakeCharTypeUnsigned<T>::Type)pstr[i]] = nsize - 1 - i;
 			}
 
@@ -914,10 +914,10 @@ namespace SpaceGameEngine
 				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType j = 0;
-				for (SizeType i = 0; i < nsize; i++)
+				for (SizeType i = 0; i < nsize; ++i)
 					pdst[i] = nsize;
 
-				for (SizeType i = nsize - 1; i >= 0; i--)
+				for (SizeType i = nsize - 1; i >= 0; --i)
 				{
 					if (psuff[i] == i + 1)
 					{
@@ -931,7 +931,7 @@ namespace SpaceGameEngine
 						break;
 				}
 
-				for (SizeType i = 0; i < nsize - 1; i++)
+				for (SizeType i = 0; i < nsize - 1; ++i)
 				{
 					pdst[nsize - 1 - psuff[i]] = nsize - 1 - i;
 				}
@@ -963,9 +963,7 @@ namespace SpaceGameEngine
 						for (i = nsize - 1; i >= 0 && ppat[i] == ptext_begin[i + j]; --i)
 						{
 							if (i == 0)
-							{
 								return ptext_begin + j;
-							}
 						}
 						if (pbct[(typename MakeCharTypeUnsigned<T>::Type)ptext_begin[i + j]] > (nsize - 1 - i))
 							j += Max((pbct[(typename MakeCharTypeUnsigned<T>::Type)ptext_begin[i + j]] + 1 + i) - nsize, pgst[i]);
@@ -987,9 +985,9 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, pstr);
 				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
-				for (SizeType i = 0; i <= Trait::MaxValue; i++)
+				for (SizeType i = 0; i <= Trait::MaxValue; ++i)
 					pdst[i] = nsize;
-				for (SizeType i = nsize - 1; i >= 1; i--)
+				for (SizeType i = nsize - 1; i >= 1; --i)
 					pdst[(typename MakeCharTypeUnsigned<T>::Type)pstr[i]] = i;
 			}
 
@@ -1027,10 +1025,10 @@ namespace SpaceGameEngine
 				SGE_ASSERT(InvalidValueError, nsize, 1, SGE_MAX_MEMORY_SIZE / sizeof(T));
 
 				SizeType j = nsize - 1;
-				for (SizeType i = 0; i < nsize; i++)
+				for (SizeType i = 0; i < nsize; ++i)
 					pdst[i] = nsize;
 
-				for (SizeType i = 0; i < nsize; i++)
+				for (SizeType i = 0; i < nsize; ++i)
 				{
 					if (ppref[i] == nsize - i)
 					{
@@ -1042,7 +1040,7 @@ namespace SpaceGameEngine
 					}
 				}
 
-				for (SizeType i = nsize - 1; i >= 1; i--)
+				for (SizeType i = nsize - 1; i >= 1; --i)
 				{
 					pdst[ppref[i]] = i;
 				}
@@ -3514,7 +3512,7 @@ namespace SpaceGameEngine
 		StringCore<Char16, UCS2Trait, Allocator> re(size, 0);
 		auto pdst = re.GetData();
 		auto psrc = str.GetData();
-		for (SizeType i = 0; i < size; i++)
+		for (SizeType i = 0; i < size; ++i)
 		{
 			*pdst = StringImplement::UTF8CharToUCS2Char(psrc);
 			pdst += 1;
@@ -3533,7 +3531,7 @@ namespace SpaceGameEngine
 		StringCore<Char16, UCS2Trait, Allocator> re(size, 0);
 		auto pdst = re.GetData();
 		auto psrc = pstr;
-		for (SizeType i = 0; i < size; i++)
+		for (SizeType i = 0; i < size; ++i)
 		{
 			*pdst = StringImplement::UTF8CharToUCS2Char(psrc);
 			pdst += 1;
@@ -3548,7 +3546,7 @@ namespace SpaceGameEngine
 		SizeType nsize = 0;
 		SizeType size = str.GetSize();
 		auto psrc = str.GetData();
-		for (SizeType i = 0; i < size; i++)
+		for (SizeType i = 0; i < size; ++i)
 		{
 			nsize += StringImplement::GetUCS2CharToUTF8CharSize(*psrc);
 			psrc += 1;
@@ -3556,7 +3554,7 @@ namespace SpaceGameEngine
 		StringCore<Char8, UTF8Trait, Allocator> re(nsize, SGE_U8STR(" "));
 		auto pdst = re.GetData();
 		psrc = str.GetData();
-		for (SizeType i = 0; i < size; i++)
+		for (SizeType i = 0; i < size; ++i)
 		{
 			pdst = StringImplement::UCS2CharToUTF8Char(*psrc, pdst);
 			psrc += 1;
@@ -3572,7 +3570,7 @@ namespace SpaceGameEngine
 		SizeType nsize = 0;
 		SizeType size = StringCore<Char16, UCS2Trait, Allocator>::GetCStringSize(pstr);
 		auto psrc = pstr;
-		for (SizeType i = 0; i < size; i++)
+		for (SizeType i = 0; i < size; ++i)
 		{
 			nsize += StringImplement::GetUCS2CharToUTF8CharSize(*psrc);
 			psrc += 1;
@@ -3580,7 +3578,7 @@ namespace SpaceGameEngine
 		StringCore<Char8, UTF8Trait, Allocator> re(nsize, SGE_U8STR(" "));
 		auto pdst = re.GetData();
 		psrc = pstr;
-		for (SizeType i = 0; i < size; i++)
+		for (SizeType i = 0; i < size; ++i)
 		{
 			pdst = StringImplement::UCS2CharToUTF8Char(*psrc, pdst);
 			psrc += 1;

@@ -39,9 +39,9 @@ namespace SpaceGameEngine
 		{
 		public:
 			using ValueType = V;
-			using AllocatorType = Allocator;
 			using LessComparerType = LessComparer;
 			using EqualComparerType = EqualComparer;
+			using AllocatorType = Allocator;
 
 			template<typename _V, typename _LessComparer, typename _EqualComparer, typename _Allocator>
 			friend class RedBlackTree;

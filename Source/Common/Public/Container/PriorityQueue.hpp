@@ -256,30 +256,35 @@ namespace SpaceGameEngine
 
 		inline void BuildHeap()
 		{
-			SizeType cnt = 0;
-			do
+			if (m_Implement.GetSize() > 1)
 			{
-				cnt = 0;
-				for (SizeType i = 0; i < m_Implement.GetSize(); ++i)
+				SizeType cnt = 0;
+				do
 				{
-					SizeType child = 2 * i + 1;
-					if (child >= m_Implement.GetSize())
-						break;
-					if (Comparer::Compare(m_Implement[child], m_Implement[i]))
+					cnt = 0;
+					for (SizeType i = m_Implement.GetSize() / 2 - 1; i >= 0; --i)
 					{
-						std::swap(m_Implement[child], m_Implement[i]);
-						++cnt;
-					}
-					if ((child += 1) < m_Implement.GetSize())
-					{
+						SizeType child = 2 * i + 1;
+						if (child >= m_Implement.GetSize())
+							continue;
 						if (Comparer::Compare(m_Implement[child], m_Implement[i]))
 						{
 							std::swap(m_Implement[child], m_Implement[i]);
 							++cnt;
 						}
+						if ((child += 1) < m_Implement.GetSize())
+						{
+							if (Comparer::Compare(m_Implement[child], m_Implement[i]))
+							{
+								std::swap(m_Implement[child], m_Implement[i]);
+								++cnt;
+							}
+						}
+						if (i == 0)
+							break;
 					}
-				}
-			} while (cnt != 0);
+				} while (cnt != 0);
+			}
 		}
 
 	private:
