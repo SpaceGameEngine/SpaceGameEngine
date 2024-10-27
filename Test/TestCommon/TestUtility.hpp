@@ -707,11 +707,11 @@ TEST(Hash, StringHashTest)
 	ASSERT_TRUE(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))) != Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("b"))));
 }
 
-TEST(isPair, isPairTest)
+TEST(IsPair, IsPairTest)
 {
-	ASSERT_TRUE((isPair<Pair<int, int>>));
-	ASSERT_FALSE((isPair<int>));
-	ASSERT_TRUE((isPair<const Pair<int, int>>));
-	ASSERT_TRUE((isPair<const Pair<int, int>&>));
-	ASSERT_TRUE((isPair<Pair<int, int>&&>));
+	ASSERT_TRUE((IsPair<Pair<int, int>>));
+	ASSERT_FALSE((IsPair<int>));
+	ASSERT_TRUE((IsPair<const Pair<int, int>>));
+	ASSERT_TRUE((IsPair<const Pair<int, int>&>));
+	ASSERT_TRUE((IsPair<Pair<int, int>&&>));
 }

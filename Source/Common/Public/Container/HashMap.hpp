@@ -47,7 +47,7 @@ namespace SpaceGameEngine
 		{
 		}
 
-		template<isPair P = Pair<K, V>>	   // not Pair<const K, V> to make key movable
+		template<IsPair P = Pair<K, V>>	   // not Pair<const K, V> to make key movable
 		inline HashMap(std::initializer_list<P> ilist)
 			: Detail::HashTable<Detail::KeyValuePair<const K, V>,
 								KeyHash<Hasher>,

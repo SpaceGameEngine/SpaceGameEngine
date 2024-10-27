@@ -51,30 +51,6 @@ namespace SpaceGameEngine
 		}
 	};
 
-	// template<typename T, typename Hasher = Hash<decltype(std::declval<T>().m_First)>>
-	// struct KeyHash : public Hasher
-	//{
-	// };
-
-	// template<template<typename, typename> class P, typename K, typename V, typename Hasher>
-	//	requires isPair<P<const K, V>>
-	// struct KeyHash<P<const K, V>, Hasher>
-	//{
-	//	template<typename K2>
-	//		requires std::is_convertible_v<K2, K>
-	//	inline static HashType GetHash(const K2& value)
-	//	{
-	//		return Hasher::GetHash(value);
-	//	}
-
-	//	template<typename K2, typename V2>
-	//		requires std::is_convertible_v<P<K2, V2>, P<const K, V>>
-	//	inline static HashType GetHash(const P<K2, V2>& value)
-	//	{
-	//		return Hasher::GetHash(value.m_First);
-	//	}
-	//};
-
 	template<typename Hasher>
 	struct KeyHash
 	{
@@ -84,7 +60,7 @@ namespace SpaceGameEngine
 			return Hasher::GetHash(value);
 		}
 
-		template<isPair P>
+		template<IsPair P>
 		inline static HashType GetHash(const P& value)
 		{
 			return Hasher::GetHash(value.m_First);

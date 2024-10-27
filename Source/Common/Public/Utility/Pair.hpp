@@ -121,7 +121,7 @@ namespace SpaceGameEngine
 	}
 
 	template<typename T>
-	concept isPair = requires(typename std::remove_cvref_t<T> pair) {
+	concept IsPair = requires(typename std::remove_cvref_t<T> pair) {
 		pair.m_First;
 		pair.m_Second;
 		{
@@ -164,7 +164,7 @@ namespace SpaceGameEngine
 				return *this;
 			}
 
-			template<isPair P>
+			template<IsPair P>
 			inline KeyValuePair<T, U>& operator=(P&& c)
 			{
 				if constexpr (std::is_same_v<P, std::remove_reference_t<P>>)
@@ -179,19 +179,19 @@ namespace SpaceGameEngine
 	template<typename Comparer>
 	struct KeyComparer
 	{
-		template<isPair P1, isPair P2>
+		template<IsPair P1, IsPair P2>
 		inline static constexpr bool Compare(const P1& lhs, const P2& rhs)
 		{
 			return Comparer::Compare(lhs.m_First, rhs.m_First);
 		}
 
-		template<isPair P, typename K>
+		template<IsPair P, typename K>
 		inline static constexpr bool Compare(const K& key, const P& pair)
 		{
 			return Comparer::Compare(key, pair.m_First);
 		}
 
-		template<isPair P, typename K>
+		template<IsPair P, typename K>
 		inline static constexpr bool Compare(const P& pair, const K& key)
 		{
 			return Comparer::Compare(pair.m_First, key);
