@@ -186,12 +186,14 @@ namespace SpaceGameEngine
 		}
 
 		template<IsPair P, typename K>
+			requires std::is_convertible_v<std::remove_cvref_t<K>, std::remove_cvref_t<decltype(std::declval<P>().m_First)>>
 		inline static constexpr bool Compare(const K& key, const P& pair)
 		{
 			return Comparer::Compare(key, pair.m_First);
 		}
 
 		template<IsPair P, typename K>
+			requires std::is_convertible_v<std::remove_cvref_t<K>, std::remove_cvref_t<decltype(std::declval<P>().m_First)>>
 		inline static constexpr bool Compare(const P& pair, const K& key)
 		{
 			return Comparer::Compare(pair.m_First, key);
