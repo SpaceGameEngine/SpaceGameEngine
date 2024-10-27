@@ -94,7 +94,7 @@ struct test_hashtable_object
 };
 
 template<>
-struct Equal<test_hashtable_object>
+struct SpaceGameEngine::Equal<test_hashtable_object>
 {
 	inline static constexpr bool Compare(const test_hashtable_object& lhs, const test_hashtable_object& rhs)
 	{
@@ -479,7 +479,7 @@ TEST(HashTable, RemoveTest)
 	}
 }
 
-TEST(HashTable, RemoveByKeyTest)
+TEST(HashTable, RemoveByValueTest)
 {
 	Detail::HashTable<test_hashtable_object>* pht = new Detail::HashTable<test_hashtable_object>();
 	const int test_size = 1000;
@@ -505,7 +505,7 @@ TEST(HashTable, RemoveByKeyTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_TRUE(pht->RemoveByKey(test_hashtable_object(i)));
+		ASSERT_TRUE(pht->RemoveByValue(test_hashtable_object(i)));
 	}
 
 	ASSERT_EQ(pht->GetSize(), 0);
@@ -543,7 +543,7 @@ TEST(HashTable, ShrinkToFitTest)
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_TRUE(pht->RemoveByKey(test_hashtable_object(i)));
+		ASSERT_TRUE(pht->RemoveByValue(test_hashtable_object(i)));
 	}
 
 	ASSERT_EQ(pht->GetSize(), 0);
@@ -1363,7 +1363,7 @@ TEST(HashTable, AnotherAllocatorSwapTest)
 
 TEST(HashTable, ConstructByEmptyListTest)
 {
-	Detail::HashTable<int> ht({});
+	Detail::HashTable<int> ht(std::initializer_list<int>{});
 	ASSERT_EQ(ht.GetSize(), 0);
 
 	ht.Insert(2);

@@ -106,7 +106,7 @@ TEST(RedBlackTree, FindTest)
 
 TEST(RedBlackTree, InsertTest)
 {
-	Detail::RedBlackTree<Pair<const int, double>, KeyLess<Pair<const int, double>>, KeyEqual<Pair<const int, double>>> rbt1;
+	Detail::RedBlackTree<Pair<const int, double>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> rbt1;
 	auto res1 = rbt1.Insert(MakePair(1, 1.0));
 	ASSERT_EQ(*(res1.m_First), MakePair(1, 1.0));
 	ASSERT_TRUE(res1.m_Second);
@@ -551,7 +551,7 @@ TEST(RedBlackTree, ForEachTest)
 	{
 		test_cnt[i] = 0;
 	}
-	Detail::RedBlackTree<Pair<const int, double>, KeyLess<Pair<const int, double>>, KeyEqual<Pair<const int, double>>> m1;
+	Detail::RedBlackTree<Pair<const int, double>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> m1;
 	ASSERT_EQ(m1.GetSize(), 0);
 	for (int i = 0; i < test_size; i++)
 	{
@@ -572,7 +572,7 @@ TEST(RedBlackTree, ForEachTest)
 		ASSERT_EQ(m1.Find(i)->m_Second, (double)i);
 	}
 
-	const Detail::RedBlackTree<Pair<const int, double>, KeyLess<Pair<const int, double>>, KeyEqual<Pair<const int, double>>> m2(m1);
+	const Detail::RedBlackTree<Pair<const int, double>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> m2(m1);
 	ASSERT_EQ(m2.GetSize(), test_size);
 	for (int i = 0; i < test_size; i++)
 	{
@@ -607,7 +607,7 @@ TEST(RedBlackTree, ReverseForEachTest)
 	{
 		test_cnt[i] = 0;
 	}
-	Detail::RedBlackTree<Pair<const int, double>, KeyLess<Pair<const int, double>>, KeyEqual<Pair<const int, double>>> m1;
+	Detail::RedBlackTree<Pair<const int, double>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> m1;
 	ASSERT_EQ(m1.GetSize(), 0);
 	for (int i = 0; i < test_size; i++)
 	{
@@ -628,7 +628,7 @@ TEST(RedBlackTree, ReverseForEachTest)
 		ASSERT_EQ(m1.Find(i)->m_Second, (double)i);
 	}
 
-	const Detail::RedBlackTree<Pair<const int, double>, KeyLess<Pair<const int, double>>, KeyEqual<Pair<const int, double>>> m2(m1);
+	const Detail::RedBlackTree<Pair<const int, double>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> m2(m1);
 	ASSERT_EQ(m2.GetSize(), test_size);
 	for (int i = 0; i < test_size; i++)
 	{

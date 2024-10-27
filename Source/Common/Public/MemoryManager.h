@@ -20,6 +20,7 @@ limitations under the License.
 #include "Concurrent/Thread.h"
 #include "Concurrent/Lock.h"
 #include "Concurrent/Atomic.hpp"
+#include "Utility/Pair.hpp"
 #include "CommonAPI.h"
 
 /*!

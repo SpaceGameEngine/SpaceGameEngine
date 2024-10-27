@@ -1504,7 +1504,7 @@ TEST(HashMap, AnotherAllocatorSwapTest)
 
 TEST(HashMap, ConstructByEmptyListTest)
 {
-	HashMap<int, int> hm({});
+	HashMap<int, int> hm(std::initializer_list<Pair<int, int>>{});
 	ASSERT_EQ(hm.GetSize(), 0);
 
 	hm.Insert(1, 2);
@@ -1518,7 +1518,7 @@ TEST(HashMap, InsertEmptyListTest)
 	ASSERT_EQ(hm.GetSize(), 1);
 	ASSERT_EQ(hm[1], 2);
 
-	hm.Insert({});
+	hm.Insert(std::initializer_list<Pair<const int, int>>{});
 	ASSERT_EQ(hm.GetSize(), 1);
 	ASSERT_EQ(hm[1], 2);
 }

@@ -207,6 +207,9 @@
     <ClInclude Include="Public\Utility\Hash.hpp">
       <Filter>Public\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\Pair.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

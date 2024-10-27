@@ -24,6 +24,7 @@ limitations under the License.
 #include "Utility/FixedSizeBuffer.hpp"
 #include "Utility/Optional.hpp"
 #include "Utility/Hash.hpp"
+#include "Utility/Pair.hpp"
 #include "SGEString.hpp"
 #include "gtest/gtest.h"
 
@@ -41,7 +42,7 @@ TEST(DebugInformation, DebugInformationTest)
 	TString<> funcname(di.m_pFunctionName);
 	ASSERT_NE(filename.Find(SGE_TSTR("TestUtility.hpp"), filename.GetConstBegin(), filename.GetConstEnd()), filename.GetConstEnd());
 	ASSERT_NE(funcname.Find(SGE_TSTR("TestDebugInformation"), funcname.GetConstBegin(), funcname.GetConstEnd()), funcname.GetConstEnd());
-	ASSERT_EQ(di.m_LineNumber, 34);
+	ASSERT_EQ(di.m_LineNumber, 35);
 }
 
 class test_cmp
@@ -704,4 +705,13 @@ TEST(Hash, StringHashTest)
 
 	ASSERT_EQ(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))), Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))));
 	ASSERT_TRUE(Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("a"))) != Hash<UTF8String>::GetHash(UTF8String(SGE_U8STR("b"))));
+}
+
+TEST(isPair, isPairTest)
+{
+	ASSERT_TRUE((isPair<Pair<int, int>>));
+	ASSERT_FALSE((isPair<int>));
+	ASSERT_TRUE((isPair<const Pair<int, int>>));
+	ASSERT_TRUE((isPair<const Pair<int, int>&>));
+	ASSERT_TRUE((isPair<Pair<int, int>&&>));
 }

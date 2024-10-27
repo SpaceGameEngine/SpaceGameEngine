@@ -446,7 +446,8 @@ namespace SpaceGameEngine
 				m_LoadFactor = load_factor;
 			}
 
-			inline HashTable(std::initializer_list<V> ilist)
+			template<typename V2>
+			inline HashTable(std::initializer_list<V2> ilist)
 				: m_LoadFactor(sm_DefaultLoadFactor), m_BucketQuantity(GetCorrectBucketQuantity(m_LoadFactor, ilist.size())), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(ilist.size())
 			{
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
@@ -706,11 +707,13 @@ namespace SpaceGameEngine
 			}
 
 			template<typename V2>
-			inline bool RemoveByKey(const V2& val)
+			inline bool RemoveByValue(const V2& val)
 			{
 				HashType hash = Hasher::GetHash(val);
-				m_Size -= 1;
-				return m_pContent[hash & (m_BucketQuantity - 1)].Remove(hash, val);
+				bool result = m_pContent[hash & (m_BucketQuantity - 1)].Remove(hash, val);
+				if (result)
+					m_Size -= 1;
+				return result;
 			}
 
 			inline void ShrinkToFit()

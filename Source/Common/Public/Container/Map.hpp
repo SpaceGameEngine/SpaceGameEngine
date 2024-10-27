@@ -352,7 +352,7 @@ namespace SpaceGameEngine
 		}
 
 	private:
-		using RedBlackTreeType = Detail::RedBlackTree<Pair<const K, V>, KeyLess<Pair<const K, V>, LessComparer>, KeyEqual<Pair<const K, V>>, Allocator>;
+		using RedBlackTreeType = Detail::RedBlackTree<Pair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>;
 
 		template<typename T>
 		class IteratorImpl
