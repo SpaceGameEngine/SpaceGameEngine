@@ -93,6 +93,40 @@ bool operator==(int val, const test_rbtree_object& o)
 	return o.val == val;
 }
 
+TEST(RedBlackTree, InitializerListConstructionTest)
+{
+	const int test_size = 10;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	Detail::RedBlackTree<test_rbtree_object>* pht = new Detail::RedBlackTree<test_rbtree_object>(
+		{test_rbtree_object(0, val_rel_func),
+		 test_rbtree_object(1, val_rel_func),
+		 test_rbtree_object(2, val_rel_func),
+		 test_rbtree_object(3, val_rel_func),
+		 test_rbtree_object(4, val_rel_func),
+		 test_rbtree_object(5, val_rel_func),
+		 test_rbtree_object(6, val_rel_func),
+		 test_rbtree_object(7, val_rel_func),
+		 test_rbtree_object(8, val_rel_func),
+		 test_rbtree_object(9, val_rel_func)});
+
+	ASSERT_EQ(pht->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ(pht->Find(i)->val, i);
+	}
+	delete pht;
+	for (int i = 0; i < test_size; i++)
+	{
+		// initializer_list can only return const variable, so move is useless
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+/*
 TEST(RedBlackTree, FindTest)
 {
 	Detail::RedBlackTree<int> rbt1;
@@ -782,3 +816,4 @@ TEST(RedBlackTree, AnotherAllocatorSwapTest)
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
+*/

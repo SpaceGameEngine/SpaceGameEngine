@@ -85,10 +85,42 @@ struct test_map_object
 
 TEST(Map, InitializerListConstructionTest)
 {
-	Map<int, double> m({{1, 1.0},
-						{2, 2.0},
-						{3, 3.0}});
-	ASSERT_EQ(m.GetSize(), 3);
+	const int test_size = 10;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	Map<test_map_object, test_map_object>* phm = new Map<test_map_object, test_map_object>(
+		{Pair<const test_map_object, test_map_object>(test_map_object(0, key_rel_func), test_map_object(0, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(1, key_rel_func), test_map_object(1, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(2, key_rel_func), test_map_object(2, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(3, key_rel_func), test_map_object(3, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(4, key_rel_func), test_map_object(4, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(5, key_rel_func), test_map_object(5, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(6, key_rel_func), test_map_object(6, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(7, key_rel_func), test_map_object(7, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(8, key_rel_func), test_map_object(8, val_rel_func)),
+		 Pair<const test_map_object, test_map_object>(test_map_object(9, key_rel_func), test_map_object(9, val_rel_func))});
+
+	ASSERT_EQ(phm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*phm)[test_map_object(i)].val, i);
+	}
+	delete phm;
+	for (int i = 0; i < test_size; i++)
+	{
+		// initializer_list can only return const variable, so move is useless
+		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(val_pool[i], 2);
+	}
 }
 
 TEST(Map, ClearTest)
@@ -192,9 +224,9 @@ TEST(Map, UpsertTest)
 TEST(Map, InsertListTest)
 {
 	Map<int, double> m;
-	m.Insert({{1, 1.0},
-			  {2, 2.0},
-			  {3, 3.0}});
+	m.Insert({Pair<int, double>(1, 1.0),
+			  Pair<int, double>(2, 2.0),
+			  Pair<int, double>(3, 3.0)});
 	ASSERT_EQ(m.GetSize(), 3);
 	auto iter = m.GetConstBegin();
 	ASSERT_EQ(iter->m_First, 1);
@@ -655,7 +687,7 @@ TEST(Map, InsertEmptyListTest)
 	ASSERT_EQ(m.GetSize(), 1);
 	ASSERT_EQ(m[1], 2);
 
-	m.Insert({});
+	m.Insert(std::initializer_list<Pair<const int, int>>{});
 	ASSERT_EQ(m.GetSize(), 1);
 	ASSERT_EQ(m[1], 2);
 }

@@ -25,9 +25,6 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-	template<typename K, typename V, typename LessComparer, typename Allocator>
-	class Map;
-
 	namespace Detail
 	{
 		/*!
@@ -46,8 +43,12 @@ namespace SpaceGameEngine
 			template<typename _V, typename _LessComparer, typename _EqualComparer, typename _Allocator>
 			friend class RedBlackTree;
 
-			template<typename _K, typename _V, typename _LessComparer, typename _Allocator>
-			friend class SpaceGameEngine::Map;
+		private:
+			template<typename T>
+			class IteratorImpl;
+
+			template<typename T>
+			class ReverseIteratorImpl;
 
 		private:
 			struct Node
@@ -86,6 +87,14 @@ namespace SpaceGameEngine
 				SGE_ASSERT(NullPointerError, m_pRoot);
 				if (m_pRoot != &m_NilNode)
 					ReleaseNode(m_pRoot);
+			}
+
+			template<typename V2>
+			inline RedBlackTree(std::initializer_list<V2> ilist)
+				: RedBlackTree()
+			{
+				for (auto i = ilist.begin(); i != ilist.end(); ++i)
+					InternalInsert(*i);
 			}
 
 			inline RedBlackTree(const RedBlackTree& t)
@@ -212,39 +221,141 @@ namespace SpaceGameEngine
 				return m_Size;
 			}
 
-			template<typename V2>
-			inline V* Find(const V2& val)
+			using Iterator = IteratorImpl<V>;
+			using ConstIterator = IteratorImpl<const V>;
+			using ReverseIterator = ReverseIteratorImpl<V>;
+			using ConstReverseIterator = ReverseIteratorImpl<const V>;
+
+			template<typename IteratorType>
+			struct IsRedBlackTreeIterator
 			{
-				Node* re = FindNode(val);
-				if (re != &m_NilNode)
-					return &(re->m_Value);
-				else
-					return nullptr;
+				inline static constexpr const bool Value = std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator> || std::is_same_v<IteratorType, ReverseIterator> || std::is_same_v<IteratorType, ConstReverseIterator>;
+			};
+
+			struct ExternalIteratorError
+			{
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this RedBlackTree.");
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value, void>>
+				inline static bool Judge(const IteratorType& iter, const RedBlackTree& m)
+				{
+					return iter.m_pTree != &m;
+				}
+			};
+
+			struct KeyNotFoundError
+			{
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The key can not be found in this RedBlackTree.");
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value, void>>
+				inline static bool Judge(const IteratorType& iter, const IteratorType& end)
+				{
+					return iter == end;
+				}
+			};
+
+			struct NilNodeIteratorError
+			{
+				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator which pointing to the nil node is invalid.");
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value, void>>
+				inline static bool Judge(const IteratorType& iter, const IteratorType& end)
+				{
+					return iter == end;
+				}
+			};
+
+			inline Iterator GetBegin()
+			{
+				return Iterator::GetBegin(*this);
 			}
 
-			template<typename V2>
-			inline const V* Find(const V2& val) const
+			inline Iterator GetEnd()
 			{
-				const Node* re = FindNode(val);
-				if (re != &m_NilNode)
-					return &(re->m_Value);
-				else
-					return nullptr;
+				return Iterator::GetEnd(*this);
+			}
+
+			inline ConstIterator GetConstBegin() const
+			{
+				return ConstIterator::GetBegin(*this);
+			}
+
+			inline ConstIterator GetConstEnd() const
+			{
+				return ConstIterator::GetEnd(*this);
+			}
+
+			inline ReverseIterator GetReverseBegin()
+			{
+				return ReverseIterator::GetBegin(*this);
+			}
+
+			inline ReverseIterator GetReverseEnd()
+			{
+				return ReverseIterator::GetEnd(*this);
+			}
+
+			inline ConstReverseIterator GetConstReverseBegin() const
+			{
+				return ConstReverseIterator::GetBegin(*this);
+			}
+
+			inline ConstReverseIterator GetConstReverseEnd() const
+			{
+				return ConstReverseIterator::GetEnd(*this);
 			}
 
 			/*!
 			@warning Insert same value will fail so that the second part of return value is false
-			@return Pair of pointer to node's value and inserted or not
+			@return Pair of iterator and inserted or not
 			*/
 			template<typename V2>
-			inline Pair<V*, bool> Insert(V2&& val)
+			inline Pair<Iterator, bool> Insert(V2&& val)
 			{
 				auto re = InternalInsert(std::forward<V2>(val));
-				return Pair<V*, bool>(&(re.m_First->m_Value), re.m_Second);
+				return Pair<Iterator, bool>(Iterator(re.m_First, this), re.m_Second);
 			}
 
 			template<typename V2>
-			inline bool Remove(const V2& val)
+			inline Pair<Iterator, bool> Upsert(V2&& val)
+			{
+				auto re = InternalInsert(std::forward<V2>(val));
+				if (!re.m_Second)
+					re.m_First->m_Value = std::forward<V2>(val);
+				return Pair<Iterator, bool>(Iterator(re.m_First, this), re.m_Second);
+			}
+
+			template<typename V2>
+			inline void Insert(std::initializer_list<V2> ilist)
+			{
+				for (auto i = ilist.begin(); i != ilist.end(); ++i)
+					InternalInsert(*i);
+			}
+
+			template<typename V2>
+			inline void Upsert(std::initializer_list<V2> ilist)
+			{
+				for (auto i = ilist.begin(); i != ilist.end(); ++i)
+				{
+					auto re = InternalInsert(*i);
+					if (!re.m_Second)
+						re.m_First->m_Value = *i;
+				}
+			}
+
+			template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value, void>>
+			inline IteratorType Remove(const IteratorType& iter)
+			{
+				SGE_ASSERT(ExternalIteratorError, iter, *this);
+				SGE_ASSERT(NilNodeIteratorError, iter, IteratorType::GetEnd(*this));
+				IteratorType re = iter;
+				++re;
+				RemoveNode((Node*)iter.m_pContent);
+				return re;
+			}
+
+			template<typename V2>
+			inline bool RemoveByValue(const V2& val)
 			{
 				auto pnode = FindNode(val);
 				if (pnode == &m_NilNode)
@@ -254,6 +365,43 @@ namespace SpaceGameEngine
 					RemoveNode(pnode);
 					return true;
 				}
+			}
+
+			template<typename V2>
+			inline Iterator Find(const V2& val)
+			{
+				return Iterator(FindNode(val), this);
+			}
+
+			template<typename V2>
+			inline ConstIterator Find(const V2& val) const
+			{
+				return ConstIterator(FindNode(val), this);
+			}
+
+			template<typename V2>
+			inline V& Get(const V2& val)
+			{
+				Iterator iter = Find(val);
+				SGE_CHECK(typename Iterator::OutOfRangeError, iter);
+				return *iter;
+			}
+
+			template<typename V2>
+			inline const V& Get(const V2& val) const
+			{
+				ConstIterator iter = Find(val);
+				SGE_CHECK(typename ConstIterator::OutOfRangeError, iter);
+				return *iter;
+			}
+
+			template<typename V2>
+			inline V& operator[](V2&& val)
+			{
+				Iterator iter = Find(val);
+				if (iter == GetEnd())
+					iter = Insert(std::forward<V2>(val)).m_First;
+				return *iter;
 			}
 
 			template<typename Callable>
@@ -311,6 +459,499 @@ namespace SpaceGameEngine
 					}
 				}
 			}
+
+			inline bool operator==(const RedBlackTree& rbtree) const
+			{
+				if (GetSize() != rbtree.GetSize())
+					return false;
+
+				auto iter = GetConstBegin();
+				auto oiter = rbtree.GetConstBegin();
+				while (iter != GetConstEnd())
+				{
+					if (*iter != *oiter)
+						return false;
+					++iter;
+					++oiter;
+				}
+
+				return true;
+			}
+
+			template<typename OtherLessComparer, typename OtherAllocator>
+			inline bool operator==(const RedBlackTree<V, OtherLessComparer, EqualComparer, OtherAllocator>& rbtree) const
+			{
+				if (GetSize() != rbtree.GetSize())
+					return false;
+
+				auto iter = GetConstBegin();
+				auto oiter = rbtree.GetConstBegin();
+				while (iter != GetConstEnd())
+				{
+					if (*iter != *oiter)
+						return false;
+					++iter;
+					++oiter;
+				}
+
+				return true;
+			}
+
+			inline bool operator!=(const RedBlackTree& rbtree) const
+			{
+				if (GetSize() != rbtree.GetSize())
+					return true;
+
+				auto iter = GetConstBegin();
+				auto oiter = rbtree.GetConstBegin();
+				while (iter != GetConstEnd())
+				{
+					if (*iter != *oiter)
+						return true;
+					++iter;
+					++oiter;
+				}
+
+				return false;
+			}
+
+			template<typename OtherLessComparer, typename OtherAllocator>
+			inline bool operator!=(const RedBlackTree<V, OtherLessComparer, EqualComparer, OtherAllocator>& rbtree) const
+			{
+				if (GetSize() != rbtree.GetSize())
+					return true;
+
+				auto iter = GetConstBegin();
+				auto oiter = rbtree.GetConstBegin();
+				while (iter != GetConstEnd())
+				{
+					if (*iter != *oiter)
+						return true;
+					++iter;
+					++oiter;
+				}
+
+				return false;
+			}
+
+		private:
+			template<typename T>
+			class IteratorImpl
+			{
+			public:
+				using ValueType = T;
+
+				friend class RedBlackTree<V, LessComparer, EqualComparer, Allocator>;
+
+				struct OutOfRangeError
+				{
+					inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+					inline static bool Judge(const IteratorImpl& iter)
+					{
+						return iter.m_pContent == &(iter.m_pTree->m_NilNode);
+					}
+				};
+
+			public:
+				inline static IteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const RedBlackTree&, RedBlackTree&> rbtree)
+				{
+					if (rbtree.m_Size)
+						return IteratorImpl(rbtree.GetMinimumNode(rbtree.m_pRoot), &rbtree);
+					else
+						return IteratorImpl(&(rbtree.m_NilNode), &rbtree);
+				}
+
+				inline static IteratorImpl GetEnd(std::conditional_t<std::is_const_v<T>, const RedBlackTree&, RedBlackTree&> rbtree)
+				{
+					return IteratorImpl(&(rbtree.m_NilNode), &rbtree);
+				}
+
+				inline IteratorImpl(const IteratorImpl& iter)
+				{
+					m_pContent = iter.m_pContent;
+					m_pTree = iter.m_pTree;
+				}
+
+				inline IteratorImpl& operator=(const IteratorImpl& iter)
+				{
+					SGE_ASSERT(SelfAssignmentError, this, &iter);
+					m_pContent = iter.m_pContent;
+					m_pTree = iter.m_pTree;
+					return *this;
+				}
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+				inline IteratorImpl(const IteratorType& iter)
+				{
+					m_pContent = (InternalPointerType)iter.m_pContent;
+					m_pTree = (InternalRedBlackTreePointerType)iter.m_pTree;
+				}
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+				inline IteratorImpl& operator=(const IteratorType& iter)
+				{
+					m_pContent = (InternalPointerType)iter.m_pContent;
+					m_pTree = (InternalRedBlackTreePointerType)iter.m_pTree;
+					return *this;
+				}
+
+				inline IteratorImpl& operator++()
+				{
+					if (m_pContent != &(m_pTree->m_NilNode))
+						m_pContent = m_pTree->GetNextNode(m_pContent);
+					else
+					{
+						if (m_pTree->m_Size)
+							m_pContent = m_pTree->GetMinimumNode(m_pTree->m_pRoot);
+					}
+					return *this;
+				}
+
+				inline const IteratorImpl operator++(int)
+				{
+					IteratorImpl re(*this);
+					if (m_pContent != &(m_pTree->m_NilNode))
+						m_pContent = m_pTree->GetNextNode(m_pContent);
+					else
+					{
+						if (m_pTree->m_Size)
+							m_pContent = m_pTree->GetMinimumNode(m_pTree->m_pRoot);
+					}
+					return re;
+				}
+
+				inline IteratorImpl& operator+=(SizeType i)
+				{
+					for (SizeType j = 0; j < i; ++j)
+					{
+						operator++();
+					}
+					return *this;
+				}
+
+				inline IteratorImpl operator+(SizeType i) const
+				{
+					IteratorImpl re(*this);
+					re += i;
+					return re;
+				}
+
+				inline IteratorImpl& operator--()
+				{
+					if (m_pContent != &(m_pTree->m_NilNode))
+						m_pContent = m_pTree->GetPreviousNode(m_pContent);
+					else
+					{
+						if (m_pTree->m_Size)
+							m_pContent = m_pTree->GetMaximumNode(m_pTree->m_pRoot);
+					}
+					return *this;
+				}
+
+				inline const IteratorImpl operator--(int)
+				{
+					IteratorImpl re(*this);
+					if (m_pContent != &(m_pTree->m_NilNode))
+						m_pContent = m_pTree->GetPreviousNode(m_pContent);
+					else
+					{
+						if (m_pTree->m_Size)
+							m_pContent = m_pTree->GetMaximumNode(m_pTree->m_pRoot);
+					}
+					return re;
+				}
+
+				inline IteratorImpl& operator-=(SizeType i)
+				{
+					for (SizeType j = 0; j < i; ++j)
+					{
+						operator--();
+					}
+					return *this;
+				}
+
+				inline IteratorImpl operator-(SizeType i) const
+				{
+					IteratorImpl re(*this);
+					re -= i;
+					return re;
+				}
+
+				inline SizeType operator-(const IteratorImpl& iter) const
+				{
+					SizeType re = 0;
+					IteratorImpl i = iter;
+					while (i != *this)
+					{
+						++i;
+						re += 1;
+					}
+					return re;
+				}
+
+				inline T* operator->() const
+				{
+					SGE_ASSERT(OutOfRangeError, *this);
+					return &(m_pContent->m_Value);
+				}
+
+				inline T& operator*() const
+				{
+					SGE_ASSERT(OutOfRangeError, *this);
+					return m_pContent->m_Value;
+				}
+
+				inline bool operator==(const IteratorImpl& iter) const
+				{
+					return m_pContent == iter.m_pContent && m_pTree == iter.m_pTree;
+				}
+
+				inline bool operator!=(const IteratorImpl& iter) const
+				{
+					return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
+				}
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<std::remove_const_t<typename IteratorType::ValueType>, std::remove_const_t<ValueType>>), void>>
+				inline bool operator==(const IteratorType& iter) const
+				{
+					return m_pContent == iter.m_pContent && m_pTree == iter.m_pTree;
+				}
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<std::remove_const_t<typename IteratorType::ValueType>, std::remove_const_t<ValueType>>), void>>
+				inline bool operator!=(const IteratorType& iter) const
+				{
+					return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
+				}
+
+				inline T* GetData() const
+				{
+					return &(m_pContent->m_Value);
+				}
+
+			private:
+				using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const Node*, Node*>;
+				using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const RedBlackTree*, RedBlackTree*>;
+				inline IteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
+				{
+					SGE_ASSERT(NullPointerError, ptr);
+					SGE_ASSERT(NullPointerError, ptree);
+					m_pContent = ptr;
+					m_pTree = ptree;
+				}
+
+			private:
+				InternalPointerType m_pContent;
+				InternalRedBlackTreePointerType m_pTree;
+			};
+
+			template<typename T>
+			class ReverseIteratorImpl
+			{
+			public:
+				using ValueType = T;
+
+				friend class RedBlackTree<V, LessComparer, EqualComparer, Allocator>;
+
+				struct OutOfRangeError
+				{
+					inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+					inline static bool Judge(const ReverseIteratorImpl& iter)
+					{
+						return iter.m_pContent == &(iter.m_pTree->m_NilNode);
+					}
+				};
+
+			public:
+				inline static ReverseIteratorImpl GetBegin(std::conditional_t<std::is_const_v<T>, const RedBlackTree&, RedBlackTree&> rbtree)
+				{
+					if (rbtree.m_Size)
+						return ReverseIteratorImpl(rbtree.GetMaximumNode(rbtree.m_pRoot), &rbtree);
+					else
+						return ReverseIteratorImpl(&(rbtree.m_NilNode), &rbtree);
+				}
+
+				inline static ReverseIteratorImpl GetEnd(std::conditional_t<std::is_const_v<T>, const RedBlackTree&, RedBlackTree&> rbtree)
+				{
+					return ReverseIteratorImpl(&(rbtree.m_NilNode), &rbtree);
+				}
+
+				inline ReverseIteratorImpl(const ReverseIteratorImpl& iter)
+				{
+					m_pContent = iter.m_pContent;
+					m_pTree = iter.m_pTree;
+				}
+
+				inline ReverseIteratorImpl& operator=(const ReverseIteratorImpl& iter)
+				{
+					SGE_ASSERT(SelfAssignmentError, this, &iter);
+					m_pContent = iter.m_pContent;
+					m_pTree = iter.m_pTree;
+					return *this;
+				}
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+				inline ReverseIteratorImpl(const IteratorType& iter)
+				{
+					m_pContent = (InternalPointerType)iter.m_pContent;
+					m_pTree = (InternalRedBlackTreePointerType)iter.m_pTree;
+				}
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<typename IteratorType::ValueType, std::remove_const_t<ValueType>>), void>>
+				inline ReverseIteratorImpl& operator=(const IteratorType& iter)
+				{
+					m_pContent = (InternalPointerType)iter.m_pContent;
+					m_pTree = (InternalRedBlackTreePointerType)iter.m_pTree;
+					return *this;
+				}
+
+				inline ReverseIteratorImpl& operator++()
+				{
+					if (m_pContent != &(m_pTree->m_NilNode))
+						m_pContent = m_pTree->GetPreviousNode(m_pContent);
+					else
+					{
+						if (m_pTree->m_Size)
+							m_pContent = m_pTree->GetMaximumNode(m_pTree->m_pRoot);
+					}
+					return *this;
+				}
+
+				inline const ReverseIteratorImpl operator++(int)
+				{
+					ReverseIteratorImpl re(*this);
+					if (m_pContent != &(m_pTree->m_NilNode))
+						m_pContent = m_pTree->GetPreviousNode(m_pContent);
+					else
+					{
+						if (m_pTree->m_Size)
+							m_pContent = m_pTree->GetMaximumNode(m_pTree->m_pRoot);
+					}
+					return re;
+				}
+
+				inline ReverseIteratorImpl& operator+=(SizeType i)
+				{
+					for (SizeType j = 0; j < i; ++j)
+					{
+						operator++();
+					}
+					return *this;
+				}
+
+				inline ReverseIteratorImpl operator+(SizeType i) const
+				{
+					ReverseIteratorImpl re(*this);
+					re += i;
+					return re;
+				}
+
+				inline ReverseIteratorImpl& operator--()
+				{
+					if (m_pContent != &(m_pTree->m_NilNode))
+						m_pContent = m_pTree->GetNextNode(m_pContent);
+					else
+					{
+						if (m_pTree->m_Size)
+							m_pContent = m_pTree->GetMinimumNode(m_pTree->m_pRoot);
+					}
+					return *this;
+				}
+
+				inline const ReverseIteratorImpl operator--(int)
+				{
+					ReverseIteratorImpl re(*this);
+					if (m_pContent != &(m_pTree->m_NilNode))
+						m_pContent = m_pTree->GetNextNode(m_pContent);
+					else
+					{
+						if (m_pTree->m_Size)
+							m_pContent = m_pTree->GetMinimumNode(m_pTree->m_pRoot);
+					}
+					return re;
+				}
+
+				inline ReverseIteratorImpl& operator-=(SizeType i)
+				{
+					for (SizeType j = 0; j < i; ++j)
+					{
+						operator--();
+					}
+					return *this;
+				}
+
+				inline ReverseIteratorImpl operator-(SizeType i) const
+				{
+					ReverseIteratorImpl re(*this);
+					re -= i;
+					return re;
+				}
+
+				inline SizeType operator-(const ReverseIteratorImpl& iter) const
+				{
+					SizeType re = 0;
+					ReverseIteratorImpl i = iter;
+					while (i != *this)
+					{
+						++i;
+						re += 1;
+					}
+					return re;
+				}
+
+				inline T* operator->() const
+				{
+					SGE_ASSERT(OutOfRangeError, *this);
+					return &(m_pContent->m_Value);
+				}
+
+				inline T& operator*() const
+				{
+					SGE_ASSERT(OutOfRangeError, *this);
+					return m_pContent->m_Value;
+				}
+
+				inline bool operator==(const ReverseIteratorImpl& iter) const
+				{
+					return m_pContent == iter.m_pContent && m_pTree == iter.m_pTree;
+				}
+
+				inline bool operator!=(const ReverseIteratorImpl& iter) const
+				{
+					return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
+				}
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<std::remove_const_t<typename IteratorType::ValueType>, std::remove_const_t<ValueType>>), void>>
+				inline bool operator==(const IteratorType& iter) const
+				{
+					return m_pContent == iter.m_pContent && m_pTree == iter.m_pTree;
+				}
+
+				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value && (std::is_same_v<typename IteratorType::ValueType, ValueType> || std::is_same_v<std::remove_const_t<typename IteratorType::ValueType>, std::remove_const_t<ValueType>>), void>>
+				inline bool operator!=(const IteratorType& iter) const
+				{
+					return m_pContent != iter.m_pContent || m_pTree != iter.m_pTree;
+				}
+
+				inline T* GetData() const
+				{
+					return &(m_pContent->m_Value);
+				}
+
+			private:
+				using InternalPointerType = typename std::conditional_t<std::is_const_v<T>, const Node*, Node*>;
+				using InternalRedBlackTreePointerType = typename std::conditional_t<std::is_const_v<T>, const RedBlackTree*, RedBlackTree*>;
+				inline ReverseIteratorImpl(InternalPointerType ptr, InternalRedBlackTreePointerType ptree)
+				{
+					SGE_ASSERT(NullPointerError, ptr);
+					SGE_ASSERT(NullPointerError, ptree);
+					m_pContent = ptr;
+					m_pTree = ptree;
+				}
+
+			private:
+				InternalPointerType m_pContent;
+				InternalRedBlackTreePointerType m_pTree;
+			};
 
 		private:
 			inline void RawClear()
