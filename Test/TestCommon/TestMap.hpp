@@ -97,7 +97,7 @@ TEST(Map, InitializerListConstructionTest)
 		val_pool[o.val] += 1;
 	};
 
-	Map<test_map_object, test_map_object>* phm = new Map<test_map_object, test_map_object>(
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>(
 		{Pair<const test_map_object, test_map_object>(test_map_object(0, key_rel_func), test_map_object(0, val_rel_func)),
 		 Pair<const test_map_object, test_map_object>(test_map_object(1, key_rel_func), test_map_object(1, val_rel_func)),
 		 Pair<const test_map_object, test_map_object>(test_map_object(2, key_rel_func), test_map_object(2, val_rel_func)),
@@ -109,12 +109,12 @@ TEST(Map, InitializerListConstructionTest)
 		 Pair<const test_map_object, test_map_object>(test_map_object(8, key_rel_func), test_map_object(8, val_rel_func)),
 		 Pair<const test_map_object, test_map_object>(test_map_object(9, key_rel_func), test_map_object(9, val_rel_func))});
 
-	ASSERT_EQ(phm->GetSize(), test_size);
+	ASSERT_EQ(pm->GetSize(), test_size);
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm)[test_map_object(i)].val, i);
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
 	}
-	delete phm;
+	delete pm;
 	for (int i = 0; i < test_size; i++)
 	{
 		// initializer_list can only return const variable, so move is useless
@@ -125,18 +125,42 @@ TEST(Map, InitializerListConstructionTest)
 
 TEST(Map, ClearTest)
 {
-	Map<int, double> m({{1, 1.0},
-						{2, 2.0},
-						{3, 3.0}});
-	ASSERT_EQ(m.GetSize(), 3);
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	for (int i = 0; i < test_size; i++)
+	{
+		auto re = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(re.m_First->m_First.val, i);
+		ASSERT_EQ(re.m_First->m_Second.val, i);
+		ASSERT_TRUE(re.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
 
-	m.Clear();
+	pm->Clear();
 
-	ASSERT_EQ(m.GetSize(), 0);
-	ASSERT_EQ(m.GetBegin().GetData(), m.GetEnd().GetData());
-	ASSERT_EQ(m.GetConstBegin().GetData(), m.GetConstEnd().GetData());
-	ASSERT_EQ(m.GetReverseBegin().GetData(), m.GetReverseEnd().GetData());
-	ASSERT_EQ(m.GetConstReverseBegin().GetData(), m.GetConstReverseEnd().GetData());
+	ASSERT_EQ(pm->GetSize(), 0);
+	ASSERT_EQ(pm->GetBegin().GetData(), pm->GetEnd().GetData());
+	ASSERT_EQ(pm->GetConstBegin().GetData(), pm->GetConstEnd().GetData());
+	ASSERT_EQ(pm->GetReverseBegin().GetData(), pm->GetReverseEnd().GetData());
+	ASSERT_EQ(pm->GetConstReverseBegin().GetData(), pm->GetConstReverseEnd().GetData());
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+
+	delete pm;
 }
 
 TEST(Map, InsertTest)
@@ -223,22 +247,100 @@ TEST(Map, UpsertTest)
 
 TEST(Map, InsertListTest)
 {
-	Map<int, double> m;
-	m.Insert({Pair<int, double>(1, 1.0),
-			  Pair<int, double>(2, 2.0),
-			  Pair<int, double>(3, 3.0)});
-	ASSERT_EQ(m.GetSize(), 3);
-	auto iter = m.GetConstBegin();
-	ASSERT_EQ(iter->m_First, 1);
-	ASSERT_EQ(iter->m_Second, 1.0);
-	++iter;
-	ASSERT_EQ(iter->m_First, 2);
-	ASSERT_EQ(iter->m_Second, 2.0);
-	++iter;
-	ASSERT_EQ(iter->m_First, 3);
-	ASSERT_EQ(iter->m_Second, 3.0);
-	++iter;
-	ASSERT_EQ(iter, m.GetConstEnd());
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 10;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	// test repeat insert
+	pm->Insert(test_map_object(0, key_rel_func), test_map_object(-1));
+	ASSERT_EQ(pm->GetSize(), 1);
+	ASSERT_EQ((*pm)[test_map_object(0)].val, -1);
+
+	// have 11 elements, test repeat insert
+	pm->Insert({Pair<const test_map_object, test_map_object>(test_map_object(0, key_rel_func), test_map_object(0, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(1, key_rel_func), test_map_object(0)),
+				Pair<const test_map_object, test_map_object>(test_map_object(1), test_map_object(1, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(2, key_rel_func), test_map_object(2, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(3, key_rel_func), test_map_object(3, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(4, key_rel_func), test_map_object(4, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(5, key_rel_func), test_map_object(5, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(6, key_rel_func), test_map_object(6, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(7, key_rel_func), test_map_object(7, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(8, key_rel_func), test_map_object(8, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(9, key_rel_func), test_map_object(9, val_rel_func))});
+
+	ASSERT_EQ(pm->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 2; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+	ASSERT_EQ((*pm)[test_map_object(0)].val, -1);
+	ASSERT_EQ((*pm)[test_map_object(1)].val, 0);
+	delete pm;
+	for (int i = 0; i < test_size; i++)
+	{
+		// initializer_list can only return const variable, so move is useless
+		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(val_pool[i], i > 1 ? 2 : 1);
+	}
+}
+
+TEST(Map, UpsertListTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 10;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+
+	// test repeat insert
+	pm->Upsert(test_map_object(0, key_rel_func), test_map_object(-1));
+	ASSERT_EQ(pm->GetSize(), 1);
+	ASSERT_EQ((*pm)[test_map_object(0)].val, -1);
+
+	// have 11 elements, test repeat insert
+	pm->Upsert({Pair<const test_map_object, test_map_object>(test_map_object(0, key_rel_func), test_map_object(0, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(1, key_rel_func), test_map_object(0)),
+				Pair<const test_map_object, test_map_object>(test_map_object(1), test_map_object(1, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(2, key_rel_func), test_map_object(2, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(3, key_rel_func), test_map_object(3, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(4, key_rel_func), test_map_object(4, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(5, key_rel_func), test_map_object(5, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(6, key_rel_func), test_map_object(6, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(7, key_rel_func), test_map_object(7, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(8, key_rel_func), test_map_object(8, val_rel_func)),
+				Pair<const test_map_object, test_map_object>(test_map_object(9, key_rel_func), test_map_object(9, val_rel_func))});
+
+	ASSERT_EQ(pm->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+	delete pm;
+	for (int i = 0; i < test_size; i++)
+	{
+		// initializer_list can only return const variable, so move is useless
+		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(val_pool[i], 2);
+	}
 }
 
 TEST(Map, RemoveTest)
@@ -304,34 +406,45 @@ TEST(Map, RemoveTest)
 
 TEST(Map, RemoveByKeyTest)
 {
-	Map<int, double> m({{1, 1.0},
-						{2, 2.0},
-						{3, 3.0}});
-	ASSERT_EQ(m.GetSize(), 3);
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
 
-	ASSERT_TRUE(m.RemoveByKey(2));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
 
-	ASSERT_EQ(m.GetSize(), 2);
-	auto iter1 = m.GetBegin();
-	ASSERT_EQ(iter1->m_First, 1);
-	ASSERT_EQ(iter1->m_Second, 1.0);
-	++iter1;
-	ASSERT_EQ(iter1->m_First, 3);
-	ASSERT_EQ(iter1->m_Second, 3.0);
-	++iter1;
-	ASSERT_EQ(iter1, m.GetEnd());
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_TRUE(pm->RemoveByKey(test_map_object(i)));
+	}
 
-	ASSERT_FALSE(m.RemoveByKey(0));
+	ASSERT_EQ(pm->GetSize(), 0);
 
-	ASSERT_EQ(m.GetSize(), 2);
-	auto iter2 = m.GetBegin();
-	ASSERT_EQ(iter2->m_First, 1);
-	ASSERT_EQ(iter2->m_Second, 1.0);
-	++iter2;
-	ASSERT_EQ(iter2->m_First, 3);
-	ASSERT_EQ(iter2->m_Second, 3.0);
-	++iter2;
-	ASSERT_EQ(iter2, m.GetEnd());
+	delete pm;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
 }
 
 TEST(Map, FindTest)
@@ -467,6 +580,467 @@ TEST(Map, OperatorTest)
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(Map, CopyConstructionTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm2 = new Map<test_map_object, test_map_object>(*pm);
+
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	delete pm;
+	delete pm2;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(Map, MoveConstructionTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm2 = new Map<test_map_object, test_map_object>(std::move(*pm));
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	delete pm;
+	delete pm2;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(Map, CopyAssignmentTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm2 = new Map<test_map_object, test_map_object>();
+
+	ASSERT_EQ(pm2->GetSize(), 0);
+
+	*pm2 = *pm;
+
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	delete pm;
+	delete pm2;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 2);
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(Map, MoveAssignmentTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm2 = new Map<test_map_object, test_map_object>();
+
+	ASSERT_EQ(pm2->GetSize(), 0);
+
+	*pm2 = std::move(*pm);
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	delete pm;
+	delete pm2;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 1);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(Map, AnotherAllocatorCopyConstructionTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>(*pm);
+
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm3 = new Map<test_map_object, test_map_object>(*pm2);
+
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	ASSERT_EQ(pm3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm3)[test_map_object(i)].val, i);
+	}
+
+	delete pm;
+	delete pm2;
+	delete pm3;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);
+		ASSERT_EQ(val_pool[i], 3);
+	}
+}
+
+TEST(Map, AnotherAllocatorMoveConstructionTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>(std::move(*pm));
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm3 = new Map<test_map_object, test_map_object>(std::move(*pm2));
+
+	ASSERT_EQ(pm3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm3)[test_map_object(i)].val, i);
+	}
+
+	delete pm;
+	delete pm2;
+	delete pm3;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(Map, AnotherAllocatorCopyAssignmentTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>();
+
+	ASSERT_EQ(pm2->GetSize(), 0);
+
+	*pm2 = *pm;
+
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm3 = new Map<test_map_object, test_map_object>();
+
+	ASSERT_EQ(pm3->GetSize(), 0);
+
+	*pm3 = *pm2;
+
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	ASSERT_EQ(pm3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm3)[test_map_object(i)].val, i);
+	}
+
+	delete pm;
+	delete pm2;
+	delete pm3;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);
+		ASSERT_EQ(val_pool[i], 3);
+	}
+}
+
+TEST(Map, AnotherAllocatorMoveAssignmentTest)
+{
+	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
+	const int test_size = 1000;
+	int key_pool[test_size];
+	int val_pool[test_size];
+	memset(key_pool, 0, sizeof(key_pool));
+	memset(val_pool, 0, sizeof(val_pool));
+	auto key_rel_func = [&](test_map_object& o) {
+		key_pool[o.val] += 1;
+	};
+	auto val_rel_func = [&](test_map_object& o) {
+		val_pool[o.val] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pm->Insert(test_map_object(i, key_rel_func), test_map_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->m_First.val, i);
+		ASSERT_EQ(iter.m_First->m_Second.val, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pm->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>* pm2 = new Map<test_map_object, test_map_object, Less<test_map_object>, StdAllocator>();
+
+	ASSERT_EQ(pm2->GetSize(), 0);
+
+	*pm2 = std::move(*pm);
+
+	ASSERT_EQ(pm2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm2)[test_map_object(i)].val, i);
+	}
+
+	Map<test_map_object, test_map_object>* pm3 = new Map<test_map_object, test_map_object>();
+
+	ASSERT_EQ(pm3->GetSize(), 0);
+
+	*pm3 = std::move(*pm2);
+
+	ASSERT_EQ(pm3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pm3)[test_map_object(i)].val, i);
+	}
+
+	delete pm;
+	delete pm2;
+	delete pm3;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(key_pool[i], 3);
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }

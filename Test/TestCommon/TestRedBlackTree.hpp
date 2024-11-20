@@ -1,11 +1,11 @@
 ﻿/*
-Copyright 2024 creatorlxd
+Copyrigrbt 2024 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+rbttp://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,23 +26,27 @@ struct test_rbtree_object
 {
 	std::function<void(test_rbtree_object&)> rel_func;
 	test_rbtree_object()
-		: val(0), rel_func([](test_rbtree_object&) {})
+		: key(0), rel_func([](test_rbtree_object&) {})
 	{
 	}
-	test_rbtree_object(int v)
-		: val(v), rel_func([](test_rbtree_object&) {})
+	test_rbtree_object(int k, int v = 0)
+		: key(k), value(v), rel_func([](test_rbtree_object&) {})
 	{
 	}
-	test_rbtree_object(int v, const std::function<void(test_rbtree_object&)>& func)
-		: val(v), rel_func(func)
+	test_rbtree_object(int k, const std::function<void(test_rbtree_object&)>& func)
+		: key(k), value(0), rel_func(func)
+	{
+	}
+	test_rbtree_object(int k, int v, const std::function<void(test_rbtree_object&)>& func)
+		: key(k), value(v), rel_func(func)
 	{
 	}
 	test_rbtree_object(const test_rbtree_object& o) noexcept
-		: val(o.val), rel_func(o.rel_func)
+		: key(o.key), value(o.value), rel_func(o.rel_func)
 	{
 	}
 	test_rbtree_object(test_rbtree_object&& o) noexcept
-		: val(o.val), rel_func(std::move(o.rel_func))
+		: key(o.key), value(o.value), rel_func(std::move(o.rel_func))
 	{
 		o.rel_func = [](test_rbtree_object&) {};
 	}
@@ -50,18 +54,21 @@ struct test_rbtree_object
 	{
 		rel_func(*this);
 	}
-	int val;
+	int key;
+	int value;
 
 	test_rbtree_object& operator=(const test_rbtree_object& o)
 	{
-		val = o.val;
+		key = o.key;
+		value = o.value;
 		rel_func = o.rel_func;
 		return *this;
 	}
 
 	test_rbtree_object& operator=(test_rbtree_object&& o)
 	{
-		val = o.val;
+		key = o.key;
+		value = o.value;
 		rel_func = std::move(o.rel_func);
 		o.rel_func = [](test_rbtree_object&) {};
 		return *this;
@@ -69,28 +76,39 @@ struct test_rbtree_object
 
 	bool operator<(const test_rbtree_object& o) const
 	{
-		return val < o.val;
+		return key < o.key;
 	}
 
+	// only compare key here
 	bool operator==(const test_rbtree_object& o) const
 	{
-		return val == o.val;
+		return key == o.key && value == o.value;
 	}
 
+	// only compare key here
 	bool operator!=(const test_rbtree_object& o) const
 	{
-		return val != o.val;
+		return key != o.key || value != o.value;
+	}
+};
+
+template<>
+struct SpaceGameEngine::Equal<test_rbtree_object>
+{
+	inline static constexpr bool Compare(const test_rbtree_object& lhs, const test_rbtree_object& rhs)
+	{
+		return lhs.key == rhs.key;
 	}
 };
 
 bool operator==(const test_rbtree_object& o, int val)
 {
-	return o.val == val;
+	return o.value == val;
 }
 
 bool operator==(int val, const test_rbtree_object& o)
 {
-	return o.val == val;
+	return o.value == val;
 }
 
 TEST(RedBlackTree, InitializerListConstructionTest)
@@ -99,10 +117,10 @@ TEST(RedBlackTree, InitializerListConstructionTest)
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
 
-	Detail::RedBlackTree<test_rbtree_object>* pht = new Detail::RedBlackTree<test_rbtree_object>(
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>(
 		{test_rbtree_object(0, val_rel_func),
 		 test_rbtree_object(1, val_rel_func),
 		 test_rbtree_object(2, val_rel_func),
@@ -114,98 +132,110 @@ TEST(RedBlackTree, InitializerListConstructionTest)
 		 test_rbtree_object(8, val_rel_func),
 		 test_rbtree_object(9, val_rel_func)});
 
-	ASSERT_EQ(pht->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pht->Find(i)->val, i);
+		ASSERT_EQ(prbt->Find(i)->key, i);
 	}
-	delete pht;
+	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
 		// initializer_list can only return const variable, so move is useless
 		ASSERT_EQ(val_pool[i], 2);
 	}
 }
-/*
-TEST(RedBlackTree, FindTest)
-{
-	Detail::RedBlackTree<int> rbt1;
-	ASSERT_EQ(rbt1.GetSize(), 0);
-	ASSERT_EQ(rbt1.Find(0), nullptr);
-	ASSERT_EQ(rbt1.Find(1), nullptr);
 
-	rbt1.Insert(1);
-	ASSERT_EQ(*rbt1.Find(1), 1);
-}
-
-TEST(RedBlackTree, InsertTest)
-{
-	Detail::RedBlackTree<Pair<const int, double>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> rbt1;
-	auto res1 = rbt1.Insert(MakePair(1, 1.0));
-	ASSERT_EQ(*(res1.m_First), MakePair(1, 1.0));
-	ASSERT_TRUE(res1.m_Second);
-	auto res2 = rbt1.Insert(MakePair(0, 0.0));
-	ASSERT_EQ(*(res2.m_First), MakePair(0, 0.0));
-	ASSERT_TRUE(res2.m_Second);
-	ASSERT_EQ(rbt1.GetSize(), 2);
-	ASSERT_EQ(*rbt1.Find(1), MakePair(1, 1.0));
-	ASSERT_EQ(*rbt1.Find(0), MakePair(0, 0.0));
-
-	auto res3 = rbt1.Insert(MakePair(0, 100.0));
-	ASSERT_EQ(*(res3.m_First), MakePair(0, 0.0));
-	ASSERT_FALSE(res3.m_Second);
-	ASSERT_EQ(rbt1.GetSize(), 2);
-	ASSERT_EQ(*rbt1.Find(0), MakePair(0, 0.0));
-
-	ASSERT_EQ(rbt1.Find(-1), nullptr);
-	auto res4 = rbt1.Insert(MakePair(-1, -1.0));
-	ASSERT_EQ(*(res4.m_First), MakePair(-1, -1.0));
-	ASSERT_TRUE(res4.m_Second);
-	ASSERT_EQ(rbt1.GetSize(), 3);
-	ASSERT_EQ(*rbt1.Find(-1), MakePair(-1, -1.0));
-}
-
-TEST(RedBlackTree, RemoveTest)
-{
-	Detail::RedBlackTree<test_rbtree_object> rbt1;
-	int rel_cot = 0;
-	int last_val = 0;
-	auto rel_func = [&](test_rbtree_object& t) { rel_cot += 1; last_val=t.val; };
-	rbt1.Insert(test_rbtree_object(1, rel_func));
-	rbt1.Insert(test_rbtree_object(5, rel_func));
-
-	ASSERT_EQ(rbt1.GetSize(), 2);
-	ASSERT_EQ(rbt1.Find(1)->val, 1);
-	ASSERT_EQ(rbt1.Find(5)->val, 5);
-
-	rel_cot = 0;
-
-	ASSERT_FALSE(rbt1.Remove(2));
-	ASSERT_TRUE(rbt1.Remove(5));
-	ASSERT_EQ(rel_cot, 1);
-	ASSERT_EQ(last_val, 5);
-	ASSERT_EQ(rbt1.GetSize(), 1);
-	ASSERT_EQ(rbt1.Find(0), nullptr);
-	ASSERT_EQ(rbt1.Find(1)->val, 1);
-}
-
-TEST(RedBlackTree, ReleaseTest)
+TEST(RedBlackTree, ClearTest)
 {
 	const int test_size = 1000;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
 	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
 	for (int i = 0; i < test_size; i++)
 	{
-		prbt->Insert(test_rbtree_object(i, val_rel_func));
+		auto re = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(re.m_First->key, i);
+		ASSERT_TRUE(re.m_Second);
 	}
 	ASSERT_EQ(prbt->GetSize(), test_size);
+
+	prbt->Clear();
+
+	ASSERT_EQ(prbt->GetSize(), 0);
+	ASSERT_EQ(prbt->GetBegin().GetData(), prbt->GetEnd().GetData());
+	ASSERT_EQ(prbt->GetConstBegin().GetData(), prbt->GetConstEnd().GetData());
+	ASSERT_EQ(prbt->GetReverseBegin().GetData(), prbt->GetReverseEnd().GetData());
+	ASSERT_EQ(prbt->GetConstReverseBegin().GetData(), prbt->GetConstReverseEnd().GetData());
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+
+	delete prbt;
+}
+
+TEST(RedBlackTree, InsertTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_EQ(iter.m_First->value, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(prbt->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+		auto iter = prbt->Insert(test_rbtree_object(i, test_size - 1 - i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_EQ(iter.m_First->value, i);
+		ASSERT_FALSE(iter.m_Second);
+	}
+	delete prbt;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(RedBlackTree, UpsertTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Upsert(test_rbtree_object(i, i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_EQ(iter.m_First->value, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+		auto iter = prbt->Upsert(test_rbtree_object(i, test_size - 1 - i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_EQ(iter.m_First->value, test_size - 1 - i);
+		ASSERT_FALSE(iter.m_Second);
 	}
 	delete prbt;
 	for (int i = 0; i < test_size; i++)
@@ -214,363 +244,282 @@ TEST(RedBlackTree, ReleaseTest)
 	}
 }
 
-TEST(RedBlackTree, ClearTest)
+TEST(RedBlackTree, InsertListTest)
 {
-	Detail::RedBlackTree<int> m;
-	m.Insert(1);
-	m.Insert(2);
-	ASSERT_EQ(m.GetSize(), 2);
-	ASSERT_EQ(*m.Find(1), 1);
-	ASSERT_EQ(*m.Find(2), 2);
-
-	m.Clear();
-
-	ASSERT_EQ(m.GetSize(), 0);
-	ASSERT_EQ(m.Find(1), nullptr);
-	ASSERT_EQ(m.Find(2), nullptr);
-
-	m.Insert(3);
-
-	ASSERT_EQ(m.GetSize(), 1);
-	ASSERT_EQ(m.Find(1), nullptr);
-	ASSERT_EQ(m.Find(2), nullptr);
-	ASSERT_EQ(*m.Find(3), 3);
-}
-
-TEST(RedBlackTree, CopyConstructionTest)
-{
-	const int test_size = 1000;
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 10;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
+
+	// test repeat insert
+	prbt->Insert(test_rbtree_object(0, -1));
+	ASSERT_EQ(prbt->GetSize(), 1);
+	ASSERT_EQ(prbt->GetBegin()->value, -1);
+
+	// have 11 elements, test repeat insert
+	prbt->Insert({test_rbtree_object(0, 0, val_rel_func),
+				  test_rbtree_object(1, -1),
+				  test_rbtree_object(1, 1, val_rel_func),
+				  test_rbtree_object(2, 2, val_rel_func),
+				  test_rbtree_object(3, 3, val_rel_func),
+				  test_rbtree_object(4, 4, val_rel_func),
+				  test_rbtree_object(5, 5, val_rel_func),
+				  test_rbtree_object(6, 6, val_rel_func),
+				  test_rbtree_object(7, 7, val_rel_func),
+				  test_rbtree_object(8, 8, val_rel_func),
+				  test_rbtree_object(9, 9, val_rel_func)});
+
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 2; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+	ASSERT_EQ((*prbt)[test_rbtree_object(0)].value, -1);
+	ASSERT_EQ((*prbt)[test_rbtree_object(1)].value, -1);
+	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
+		// initializer_list can only return const variable, so move is useless
+		ASSERT_EQ(val_pool[i], i > 1 ? 2 : 1);
 	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
+}
+
+TEST(RedBlackTree, UpsertListTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 10;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+
+	// test repeat insert
+	prbt->Upsert(test_rbtree_object(0, -1));
+	ASSERT_EQ(prbt->GetSize(), 1);
+	ASSERT_EQ(prbt->GetBegin()->value, -1);
+
+	// have 11 elements, test repeat insert
+	prbt->Upsert({test_rbtree_object(0, 0, val_rel_func),
+				  test_rbtree_object(1, -1),
+				  test_rbtree_object(1, 1, val_rel_func),
+				  test_rbtree_object(2, 2, val_rel_func),
+				  test_rbtree_object(3, 3, val_rel_func),
+				  test_rbtree_object(4, 4, val_rel_func),
+				  test_rbtree_object(5, 5, val_rel_func),
+				  test_rbtree_object(6, 6, val_rel_func),
+				  test_rbtree_object(7, 7, val_rel_func),
+				  test_rbtree_object(8, 8, val_rel_func),
+				  test_rbtree_object(9, 9, val_rel_func)});
+
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
 	}
-
-	Detail::RedBlackTree<test_rbtree_object>* pm2 = new Detail::RedBlackTree<test_rbtree_object>(*pm1);
-
-	ASSERT_EQ(pm1->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
-	}
-
-	ASSERT_EQ(pm2->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
-	}
-
-	delete pm1;
-	delete pm2;
-
+	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
+		// initializer_list can only return const variable, so move is useless
 		ASSERT_EQ(val_pool[i], 2);
 	}
 }
 
-TEST(RedBlackTree, MoveConstructionTest)
+TEST(RedBlackTree, RemoveTest)
 {
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
 	const int test_size = 1000;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
 	for (int i = 0; i < test_size; i++)
 	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
 	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
 	}
 
-	Detail::RedBlackTree<test_rbtree_object>* pm2 = new Detail::RedBlackTree<test_rbtree_object>(std::move(*pm1));
-
-	ASSERT_EQ(pm1->GetSize(), 0);
-	for (int i = test_size - 1; i >= 0; i--)
+	int rm_cnt = 0;
+	auto iter = prbt->GetBegin();
+	while (iter != prbt->GetEnd())
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i)), nullptr);
+		iter = prbt->Remove(iter);
+		rm_cnt += 1;
 	}
+	ASSERT_EQ(rm_cnt, test_size);
+	ASSERT_EQ(prbt->GetSize(), 0);
 
-	ASSERT_EQ(pm2->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
-	}
-
-	delete pm1;
-	delete pm2;
-
+	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
 
-TEST(RedBlackTree, CopyAssignmentTest)
+TEST(RedBlackTree, RemoveByValueTest)
 {
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
 	const int test_size = 1000;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
-	Detail::RedBlackTree<test_rbtree_object>* pm2 = new Detail::RedBlackTree<test_rbtree_object>();
 	for (int i = 0; i < test_size; i++)
 	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
 	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
 	}
-
-	*pm2 = *pm1;
-
-	ASSERT_EQ(pm1->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
-	}
-
-	ASSERT_EQ(pm2->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
-	}
-
-	delete pm1;
-	delete pm2;
 
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(val_pool[i], 2);
-	}
-}
-
-TEST(RedBlackTree, MoveAssignmentTest)
-{
-	const int test_size = 1000;
-	int val_pool[test_size];
-	memset(val_pool, 0, sizeof(val_pool));
-	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
-	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
-	Detail::RedBlackTree<test_rbtree_object>* pm2 = new Detail::RedBlackTree<test_rbtree_object>();
-	for (int i = 0; i < test_size; i++)
-	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
-	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_TRUE(prbt->RemoveByValue(test_rbtree_object(i)));
 	}
 
-	*pm2 = std::move(*pm1);
+	ASSERT_EQ(prbt->GetSize(), 0);
 
-	ASSERT_EQ(pm1->GetSize(), 0);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i)), nullptr);
-	}
-
-	ASSERT_EQ(pm2->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
-	}
-
-	delete pm1;
-	delete pm2;
-
+	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
 
-TEST(RedBlackTree, AnotherAllocatorCopyConstructionTest)
+TEST(RedBlackTree, FindTest)
 {
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
 	const int test_size = 1000;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
 	for (int i = 0; i < test_size; i++)
 	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
 	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		auto iter = prbt->Find(test_rbtree_object(i));
+		ASSERT_EQ(iter->key, i);
 	}
 
-	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* pm2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>(*pm1);
+	auto niter = prbt->Find(test_rbtree_object(test_size));
+	ASSERT_EQ(niter, prbt->GetEnd());
 
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
+	const Detail::RedBlackTree<test_rbtree_object>* pcrbt = prbt;
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		auto iter = pcrbt->Find(test_rbtree_object(i));
+		ASSERT_EQ(iter->key, i);
 	}
 
-	ASSERT_EQ(pm2->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
-	}
+	auto cniter = pcrbt->Find(test_rbtree_object(test_size));
+	ASSERT_EQ(cniter, pcrbt->GetConstEnd());
 
-	delete pm1;
-	delete pm2;
+	ASSERT_EQ(pcrbt->GetSize(), test_size);
 
-	for (int i = 0; i < test_size; i++)
-	{
-		ASSERT_EQ(val_pool[i], 2);
-	}
-}
-
-TEST(RedBlackTree, AnotherAllocatorMoveConstructionTest)
-{
-	const int test_size = 1000;
-	int val_pool[test_size];
-	memset(val_pool, 0, sizeof(val_pool));
-	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
-	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
-	for (int i = 0; i < test_size; i++)
-	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
-	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
-	}
-
-	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* pm2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>(std::move(*pm1));
-
-	ASSERT_EQ(pm1->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
-	}
-
-	ASSERT_EQ(pm2->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
-	}
-
-	delete pm1;
-	delete pm2;
-
+	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
 
-TEST(RedBlackTree, AnotherAllocatorCopyAssignmentTest)
+TEST(RedBlackTree, GetTest)
 {
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
 	const int test_size = 1000;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
-	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* pm2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>();
 	for (int i = 0; i < test_size; i++)
 	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
 	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ(prbt->Get(test_rbtree_object(i)).key, i);
 	}
 
-	*pm2 = *pm1;
+	ASSERT_EQ(prbt->GetSize(), test_size);
 
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	const Detail::RedBlackTree<test_rbtree_object>* pcrbt = prbt;
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ(pcrbt->Get(test_rbtree_object(i)).key, i);
 	}
 
-	ASSERT_EQ(pm2->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
-	}
+	ASSERT_EQ(pcrbt->GetSize(), test_size);
 
-	delete pm1;
-	delete pm2;
-
+	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
-		ASSERT_EQ(val_pool[i], 2);
+		ASSERT_EQ(val_pool[i], 1);
 	}
 }
 
-TEST(RedBlackTree, AnotherAllocatorMoveAssignmentTest)
+TEST(RedBlackTree, OperatorTest)
 {
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
 	const int test_size = 1000;
 	int val_pool[test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
-	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* pm2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>();
 	for (int i = 0; i < test_size; i++)
 	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
+		(*prbt)[test_rbtree_object(i)] = test_rbtree_object(i, i, val_rel_func);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].value, i);
+		(*prbt)[test_rbtree_object(i)].value += 1;
 	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].value, i + 1);
+		(*prbt)[test_rbtree_object(i)].value -= 1;
 	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
 
-	*pm2 = std::move(*pm1);
-
-	ASSERT_EQ(pm1->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
-	}
-
-	ASSERT_EQ(pm2->GetSize(), test_size);
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
-	}
-
-	delete pm1;
-	delete pm2;
-
+	delete prbt;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
@@ -689,64 +638,538 @@ TEST(RedBlackTree, ReverseForEachTest)
 	}
 }
 
+TEST(RedBlackTree, CopyConstructionTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object>* prbt2 = new Detail::RedBlackTree<test_rbtree_object>(*prbt);
+
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	delete prbt;
+	delete prbt2;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(RedBlackTree, MoveConstructionTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object>* prbt2 = new Detail::RedBlackTree<test_rbtree_object>(std::move(*prbt));
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	delete prbt;
+	delete prbt2;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(RedBlackTree, CopyAssignmentTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object>* prbt2 = new Detail::RedBlackTree<test_rbtree_object>();
+
+	ASSERT_EQ(prbt2->GetSize(), 0);
+
+	*prbt2 = *prbt;
+
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	delete prbt;
+	delete prbt2;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 2);
+	}
+}
+
+TEST(RedBlackTree, MoveAssignmentTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object>* prbt2 = new Detail::RedBlackTree<test_rbtree_object>();
+
+	ASSERT_EQ(prbt2->GetSize(), 0);
+
+	*prbt2 = std::move(*prbt);
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	delete prbt;
+	delete prbt2;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(RedBlackTree, AnotherAllocatorCopyConstructionTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* prbt2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>(*prbt);
+
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object>* prbt3 = new Detail::RedBlackTree<test_rbtree_object>(*prbt2);
+
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	ASSERT_EQ(prbt3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt3)[test_rbtree_object(i)].key, i);
+	}
+
+	delete prbt;
+	delete prbt2;
+	delete prbt3;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 3);
+	}
+}
+
+TEST(RedBlackTree, AnotherAllocatorMoveConstructionTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* prbt2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>(std::move(*prbt));
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object>* prbt3 = new Detail::RedBlackTree<test_rbtree_object>(std::move(*prbt2));
+
+	ASSERT_EQ(prbt3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt3)[test_rbtree_object(i)].key, i);
+	}
+
+	delete prbt;
+	delete prbt2;
+	delete prbt3;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(RedBlackTree, AnotherAllocatorCopyAssignmentTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* prbt2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>();
+
+	ASSERT_EQ(prbt2->GetSize(), 0);
+
+	*prbt2 = *prbt;
+
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object>* prbt3 = new Detail::RedBlackTree<test_rbtree_object>();
+
+	ASSERT_EQ(prbt3->GetSize(), 0);
+
+	*prbt3 = *prbt2;
+
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	ASSERT_EQ(prbt3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt3)[test_rbtree_object(i)].key, i);
+	}
+
+	delete prbt;
+	delete prbt2;
+	delete prbt3;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 3);
+	}
+}
+
+TEST(RedBlackTree, AnotherAllocatorMoveAssignmentTest)
+{
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_rbtree_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(prbt->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* prbt2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>();
+
+	ASSERT_EQ(prbt2->GetSize(), 0);
+
+	*prbt2 = std::move(*prbt);
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
+	}
+
+	Detail::RedBlackTree<test_rbtree_object>* prbt3 = new Detail::RedBlackTree<test_rbtree_object>();
+
+	ASSERT_EQ(prbt3->GetSize(), 0);
+
+	*prbt3 = std::move(*prbt2);
+
+	ASSERT_EQ(prbt3->GetSize(), test_size);
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*prbt3)[test_rbtree_object(i)].key, i);
+	}
+
+	delete prbt;
+	delete prbt2;
+	delete prbt3;
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+}
+
+TEST(RedBlackTree, EqualTest)
+{
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator> rbt1({test_rbtree_object(1, 10),
+																																	  test_rbtree_object(2, 20),
+																																	  test_rbtree_object(3, 30)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator> rbt2({test_rbtree_object(1, 10),
+																																	  test_rbtree_object(2, 20)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator> rbt2_({test_rbtree_object(1, 10),
+																															 test_rbtree_object(2, 20)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator> rbt3({test_rbtree_object(1, 10),
+																																	  test_rbtree_object(2, 21),
+																																	  test_rbtree_object(3, 30)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator> rbt3_({test_rbtree_object(1, 10),
+																															 test_rbtree_object(2, 21),
+																															 test_rbtree_object(3, 30)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator> rbt4({test_rbtree_object(1, 10),
+																																	  test_rbtree_object(2, 20),
+																																	  test_rbtree_object(3, 30)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator> rbt4_({test_rbtree_object(1, 10),
+																															 test_rbtree_object(2, 20),
+																															 test_rbtree_object(3, 30)});
+
+	ASSERT_FALSE(rbt1 == rbt2);
+	ASSERT_FALSE(rbt1 == rbt2_);
+	ASSERT_FALSE(rbt1 == rbt3);
+	ASSERT_FALSE(rbt1 == rbt3_);
+	ASSERT_TRUE(rbt1 == rbt4);
+	ASSERT_TRUE(rbt1 == rbt4_);
+}
+
+TEST(RedBlackTree, NotEqualTest)
+{
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator> rbt1({test_rbtree_object(1, 10),
+																																	  test_rbtree_object(2, 20),
+																																	  test_rbtree_object(3, 30)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator> rbt2({test_rbtree_object(1, 10),
+																																	  test_rbtree_object(2, 20)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator> rbt2_({test_rbtree_object(1, 10),
+																															 test_rbtree_object(2, 20)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator> rbt3({test_rbtree_object(1, 10),
+																																	  test_rbtree_object(2, 21),
+																																	  test_rbtree_object(3, 30)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator> rbt3_({test_rbtree_object(1, 10),
+																															 test_rbtree_object(2, 21),
+																															 test_rbtree_object(3, 30)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator> rbt4({test_rbtree_object(1, 10),
+																																	  test_rbtree_object(2, 20),
+																																	  test_rbtree_object(3, 30)});
+	const Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator> rbt4_({test_rbtree_object(1, 10),
+																															 test_rbtree_object(2, 20),
+																															 test_rbtree_object(3, 30)});
+
+	ASSERT_TRUE(rbt1 != rbt2);
+	ASSERT_TRUE(rbt1 != rbt2_);
+	ASSERT_TRUE(rbt1 != rbt3);
+	ASSERT_TRUE(rbt1 != rbt3_);
+	ASSERT_FALSE(rbt1 != rbt4);
+	ASSERT_FALSE(rbt1 != rbt4_);
+}
+
 TEST(RedBlackTree, SwapTest)
 {
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
 	const int test_size = 1000;
 	int val_pool[2 * test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
-	Detail::RedBlackTree<test_rbtree_object>* pm1 = new Detail::RedBlackTree<test_rbtree_object>();
-	Detail::RedBlackTree<test_rbtree_object>* pm2 = new Detail::RedBlackTree<test_rbtree_object>();
 	for (int i = 0; i < test_size; i++)
 	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
 	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
 	}
 
-	for (int i = test_size; i < 2 * test_size; i++)
+	Detail::RedBlackTree<test_rbtree_object>* prbt2 = new Detail::RedBlackTree<test_rbtree_object>();
+
+	for (int i = test_size; i < 2 * test_size; ++i)
 	{
-		pm2->Insert(test_rbtree_object(i, val_rel_func));
+		auto iter = prbt2->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
 	}
-	ASSERT_EQ(pm2->GetSize(), test_size);
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
 	for (int i = 2 * test_size - 1; i >= test_size; i--)
 	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
 	}
 
-	Detail::RedBlackTree<test_rbtree_object>* pm3 = new Detail::RedBlackTree<test_rbtree_object>(std::move(*pm1));
+	Detail::RedBlackTree<test_rbtree_object>* prbt3 = new Detail::RedBlackTree<test_rbtree_object>(std::move(*prbt));
 
-	ASSERT_EQ(pm3->GetSize(), test_size);
+	ASSERT_EQ(prbt3->GetSize(), test_size);
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm3->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt3)[test_rbtree_object(i)].key, i);
 	}
 
-	*pm1 = std::move(*pm2);
+	*prbt = std::move(*prbt2);
 
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
 	for (int i = 2 * test_size - 1; i >= test_size; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
 	}
 
-	*pm2 = std::move(*pm3);
+	*prbt2 = std::move(*prbt3);
 
-	ASSERT_EQ(pm2->GetSize(), test_size);
+	ASSERT_EQ(prbt2->GetSize(), test_size);
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
 	}
 
-	delete pm1;
-	delete pm2;
-	delete pm3;
-
+	delete prbt;
+	delete prbt2;
+	delete prbt3;
 	for (int i = 0; i < 2 * test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
@@ -755,65 +1178,453 @@ TEST(RedBlackTree, SwapTest)
 
 TEST(RedBlackTree, AnotherAllocatorSwapTest)
 {
+	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();
 	const int test_size = 1000;
 	int val_pool[2 * test_size];
 	memset(val_pool, 0, sizeof(val_pool));
 	auto val_rel_func = [&](test_rbtree_object& o) {
-		val_pool[o.val] += 1;
+		val_pool[o.key] += 1;
 	};
-	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator>* pm1 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator>();
-	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* pm2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>();
 	for (int i = 0; i < test_size; i++)
 	{
-		pm1->Insert(test_rbtree_object(i, val_rel_func));
+		auto iter = prbt->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
 	}
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
 	}
 
-	for (int i = test_size; i < 2 * test_size; i++)
+	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>* prbt2 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, StdAllocator>();
+
+	for (int i = test_size; i < 2 * test_size; ++i)
 	{
-		pm2->Insert(test_rbtree_object(i, val_rel_func));
+		auto iter = prbt2->Insert(test_rbtree_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
 	}
-	ASSERT_EQ(pm2->GetSize(), test_size);
+
+	ASSERT_EQ(prbt2->GetSize(), test_size);
 	for (int i = 2 * test_size - 1; i >= test_size; i--)
 	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
 	}
 
-	Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator>* pm3 = new Detail::RedBlackTree<test_rbtree_object, Less<test_rbtree_object>, Equal<test_rbtree_object>, MemoryManagerAllocator>(std::move(*pm1));
+	Detail::RedBlackTree<test_rbtree_object>* prbt3 = new Detail::RedBlackTree<test_rbtree_object>(std::move(*prbt));
 
-	ASSERT_EQ(pm3->GetSize(), test_size);
+	ASSERT_EQ(prbt3->GetSize(), test_size);
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm3->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt3)[test_rbtree_object(i)].key, i);
 	}
 
-	*pm1 = std::move(*pm2);
+	*prbt = std::move(*prbt2);
 
-	ASSERT_EQ(pm1->GetSize(), test_size);
+	ASSERT_EQ(prbt->GetSize(), test_size);
 	for (int i = 2 * test_size - 1; i >= test_size; i--)
 	{
-		ASSERT_EQ(pm1->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt)[test_rbtree_object(i)].key, i);
 	}
 
-	*pm2 = std::move(*pm3);
+	*prbt2 = std::move(*prbt3);
 
-	ASSERT_EQ(pm2->GetSize(), test_size);
+	ASSERT_EQ(prbt2->GetSize(), test_size);
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pm2->Find(test_rbtree_object(i))->val, i);
+		ASSERT_EQ((*prbt2)[test_rbtree_object(i)].key, i);
 	}
 
-	delete pm1;
-	delete pm2;
-	delete pm3;
-
+	delete prbt;
+	delete prbt2;
+	delete prbt3;
 	for (int i = 0; i < 2 * test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
 	}
 }
-*/
+
+TEST(RedBlackTree, ConstructByEmptyListTest)
+{
+	Detail::RedBlackTree<int> rbt(std::initializer_list<int>{});
+	ASSERT_EQ(rbt.GetSize(), 0);
+
+	rbt.Insert(2);
+	ASSERT_EQ(rbt.GetSize(), 1);
+	ASSERT_EQ(*rbt.GetBegin(), 2);
+}
+
+TEST(RedBlackTree, InsertEmptyListTest)
+{
+	Detail::RedBlackTree<int> rbt({2});
+	ASSERT_EQ(rbt.GetSize(), 1);
+	ASSERT_EQ(*rbt.GetBegin(), 2);
+
+	rbt.Insert(std::initializer_list<int>{});
+	ASSERT_EQ(rbt.GetSize(), 1);
+	ASSERT_EQ(*rbt.GetBegin(), 2);
+}
+
+TEST(RedBlackTreeIterator, GetBeginTest)
+{
+	Detail::RedBlackTree<int> rbt({1, 2, 3});
+	ASSERT_EQ(rbt.GetSize(), 3);
+	auto iter = rbt.GetBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Detail::RedBlackTree<int>::Iterator>));
+	ASSERT_EQ(*iter, 1);
+}
+
+TEST(RedBlackTreeIterator, GetEndTest)
+{
+	Detail::RedBlackTree<int> rbt({1, 2, 3});
+	ASSERT_EQ(rbt.GetSize(), 3);
+	auto iter = rbt.GetEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Detail::RedBlackTree<int>::Iterator>));
+	--iter;
+	ASSERT_EQ(*iter, 3);
+}
+
+TEST(RedBlackTreeIterator, GetConstBeginTest)
+{
+	Detail::RedBlackTree<int> rbt({1, 2, 3});
+	ASSERT_EQ(rbt.GetSize(), 3);
+	auto iter = rbt.GetConstBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Detail::RedBlackTree<int>::ConstIterator>));
+	ASSERT_EQ(*iter, 1);
+}
+
+TEST(RedBlackTreeIterator, GetConstEndTest)
+{
+	Detail::RedBlackTree<int> rbt({1, 2, 3});
+	ASSERT_EQ(rbt.GetSize(), 3);
+	auto iter = rbt.GetConstEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Detail::RedBlackTree<int>::ConstIterator>));
+	--iter;
+	ASSERT_EQ(*iter, 3);
+}
+
+TEST(RedBlackTreeIterator, GetReverseBeginTest)
+{
+	Detail::RedBlackTree<int> rbt({1, 2, 3});
+	ASSERT_EQ(rbt.GetSize(), 3);
+	auto iter = rbt.GetReverseBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Detail::RedBlackTree<int>::ReverseIterator>));
+	ASSERT_EQ(*iter, 3);
+}
+
+TEST(RedBlackTreeIterator, GetReverseEndTest)
+{
+	Detail::RedBlackTree<int> rbt({1, 2, 3});
+	ASSERT_EQ(rbt.GetSize(), 3);
+	auto iter = rbt.GetReverseEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Detail::RedBlackTree<int>::ReverseIterator>));
+	--iter;
+	ASSERT_EQ(*iter, 1);
+}
+
+TEST(RedBlackTreeIterator, GetConstReverseBeginTest)
+{
+	Detail::RedBlackTree<int> rbt({1, 2, 3});
+	ASSERT_EQ(rbt.GetSize(), 3);
+	auto iter = rbt.GetConstReverseBegin();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Detail::RedBlackTree<int>::ConstReverseIterator>));
+	ASSERT_EQ(*iter, 3);
+}
+
+TEST(RedBlackTreeIterator, GetConstReverseEndTest)
+{
+	Detail::RedBlackTree<int> rbt({1, 2, 3});
+	ASSERT_EQ(rbt.GetSize(), 3);
+	auto iter = rbt.GetConstReverseEnd();
+	ASSERT_TRUE((std::is_same_v<decltype(iter), Detail::RedBlackTree<int>::ConstReverseIterator>));
+	--iter;
+	ASSERT_EQ(*iter, 1);
+}
+
+TEST(RedBlackTreeIterator, IteratorTest)
+{
+	Detail::RedBlackTree<Pair<const int, int>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> rbt({MakePair(1, 1.0),
+																									 MakePair(2, 2.0),
+																									 MakePair(3, 3.0),
+																									 MakePair(4, 4.0),
+																									 MakePair(5, 5.0),
+																									 MakePair(6, 6.0),
+																									 MakePair(7, 7.0),
+																									 MakePair(8, 8.0),
+																									 MakePair(9, 9.0),
+																									 MakePair(10, 10.0)});
+	ASSERT_EQ(rbt.GetSize(), 10);
+
+	int cnt = 1;
+	for (auto i = rbt.GetBegin(); i != rbt.GetEnd(); ++i)
+	{
+		ASSERT_EQ(cnt, i->m_First);
+		(*i).m_Second = 0;
+		cnt++;
+	}
+
+	auto iter = rbt.GetBegin();
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		++iter;
+	}
+	--iter;
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		--iter;
+	}
+	++iter;
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter.GetData()->m_First, i);
+		ASSERT_EQ(iter.GetData()->m_Second, 0);
+		++iter;
+	}
+}
+
+TEST(RedBlackTreeIterator, ConstIteratorTest)
+{
+	const Detail::RedBlackTree<Pair<const int, int>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> rbt({MakePair(1, 1.0),
+																										   MakePair(2, 2.0),
+																										   MakePair(3, 3.0),
+																										   MakePair(4, 4.0),
+																										   MakePair(5, 5.0),
+																										   MakePair(6, 6.0),
+																										   MakePair(7, 7.0),
+																										   MakePair(8, 8.0),
+																										   MakePair(9, 9.0),
+																										   MakePair(10, 10.0)});
+	ASSERT_EQ(rbt.GetSize(), 10);
+
+	int cnt = 1;
+	for (auto i = rbt.GetConstBegin(); i != rbt.GetConstEnd(); ++i)
+	{
+		ASSERT_EQ(cnt, i->m_First);
+		cnt++;
+	}
+
+	auto iter = rbt.GetConstBegin();
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		++iter;
+	}
+	--iter;
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		--iter;
+	}
+	++iter;
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter.GetData()->m_First, i);
+		ASSERT_EQ(iter.GetData()->m_Second, (double)i);
+		++iter;
+	}
+}
+
+TEST(RedBlackTreeIterator, ReverseIteratorTest)
+{
+	Detail::RedBlackTree<Pair<const int, int>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> rbt({MakePair(1, 1.0),
+																									 MakePair(2, 2.0),
+																									 MakePair(3, 3.0),
+																									 MakePair(4, 4.0),
+																									 MakePair(5, 5.0),
+																									 MakePair(6, 6.0),
+																									 MakePair(7, 7.0),
+																									 MakePair(8, 8.0),
+																									 MakePair(9, 9.0),
+																									 MakePair(10, 10.0)});
+	ASSERT_EQ(rbt.GetSize(), 10);
+
+	int cnt = 10;
+	for (auto i = rbt.GetReverseBegin(); i != rbt.GetReverseEnd(); ++i)
+	{
+		ASSERT_EQ(cnt, i->m_First);
+		(*i).m_Second = 0;
+		cnt--;
+	}
+
+	auto iter = rbt.GetReverseBegin();
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		++iter;
+	}
+	--iter;
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, 0);
+		--iter;
+	}
+	++iter;
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter.GetData()->m_First, i);
+		ASSERT_EQ(iter.GetData()->m_Second, 0);
+		++iter;
+	}
+}
+
+TEST(RedBlackTreeIterator, ConstReverseIteratorTest)
+{
+	const Detail::RedBlackTree<Pair<const int, int>, KeyComparer<Less<int>>, KeyComparer<Equal<int>>> rbt({MakePair(1, 1.0),
+																										   MakePair(2, 2.0),
+																										   MakePair(3, 3.0),
+																										   MakePair(4, 4.0),
+																										   MakePair(5, 5.0),
+																										   MakePair(6, 6.0),
+																										   MakePair(7, 7.0),
+																										   MakePair(8, 8.0),
+																										   MakePair(9, 9.0),
+																										   MakePair(10, 10.0)});
+	ASSERT_EQ(rbt.GetSize(), 10);
+
+	int cnt = 10;
+	for (auto i = rbt.GetConstReverseBegin(); i != rbt.GetConstReverseEnd(); ++i)
+	{
+		ASSERT_EQ(cnt, i->m_First);
+		cnt--;
+	}
+
+	auto iter = rbt.GetConstReverseBegin();
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		++iter;
+	}
+	--iter;
+	for (int i = 1; i <= 10; i++)
+	{
+		ASSERT_EQ(iter->m_First, i);
+		ASSERT_EQ((*iter).m_Second, (double)i);
+		--iter;
+	}
+	++iter;
+	for (int i = 10; i > 0; i--)
+	{
+		ASSERT_EQ(iter.GetData()->m_First, i);
+		ASSERT_EQ(iter.GetData()->m_Second, (double)i);
+		++iter;
+	}
+}
+
+TEST(RedBlackTreeIterator, PlusTest)
+{
+	Detail::RedBlackTree<int> rbt({0, 1, 2, 3, 4});
+	auto iter1_1 = rbt.GetBegin() + 1;
+	ASSERT_EQ(*iter1_1, 1);
+	auto iter1_2 = rbt.GetBegin() + 2;
+	ASSERT_EQ(*iter1_2, 2);
+
+	auto iter3_1 = rbt.GetReverseBegin() + 1;
+	ASSERT_EQ(*iter3_1, 3);
+	auto iter3_2 = rbt.GetReverseBegin() + 2;
+	ASSERT_EQ(*iter3_2, 2);
+
+	const Detail::RedBlackTree<int>& crbt = rbt;
+	auto iter2_1 = crbt.GetConstBegin() + 1;
+	ASSERT_EQ(*iter2_1, 1);
+	auto iter2_2 = crbt.GetConstBegin() + 2;
+	ASSERT_EQ(*iter2_2, 2);
+
+	auto iter4_1 = crbt.GetConstReverseBegin() + 1;
+	ASSERT_EQ(*iter4_1, 3);
+	auto iter4_2 = crbt.GetConstReverseBegin() + 2;
+	ASSERT_EQ(*iter4_2, 2);
+}
+
+TEST(RedBlackTreeIterator, SubtractTest)
+{
+	Detail::RedBlackTree<int> rbt({0, 1, 2, 3, 4});
+	auto iter1_1 = rbt.GetEnd() - 1;
+	ASSERT_EQ(*iter1_1, 4);
+	auto iter1_2 = rbt.GetEnd() - 2;
+	ASSERT_EQ(*iter1_2, 3);
+
+	auto iter3_1 = rbt.GetReverseEnd() - 1;
+	ASSERT_EQ(*iter3_1, 0);
+	auto iter3_2 = rbt.GetReverseEnd() - 2;
+	ASSERT_EQ(*iter3_2, 1);
+
+	const Detail::RedBlackTree<int>& crbt = rbt;
+	auto iter2_1 = crbt.GetConstEnd() - 1;
+	ASSERT_EQ(*iter2_1, 4);
+	auto iter2_2 = crbt.GetConstEnd() - 2;
+	ASSERT_EQ(*iter2_2, 3);
+
+	auto iter4_1 = crbt.GetConstReverseEnd() - 1;
+	ASSERT_EQ(*iter4_1, 0);
+	auto iter4_2 = crbt.GetConstReverseEnd() - 2;
+	ASSERT_EQ(*iter4_2, 1);
+}
+
+TEST(RedBlackTreeIterator, SelfIncreaseTest)
+{
+	Detail::RedBlackTree<int> rbt({0, 1, 2, 3, 4});
+	auto iter1 = rbt.GetBegin();
+	ASSERT_EQ(*iter1, 0);
+	iter1 += 2;
+	ASSERT_EQ(*iter1, 2);
+
+	auto iter3 = rbt.GetReverseBegin();
+	ASSERT_EQ(*iter3, 4);
+	iter3 += 2;
+	ASSERT_EQ(*iter3, 2);
+
+	const Detail::RedBlackTree<int>& crbt = rbt;
+	auto iter2 = crbt.GetConstBegin();
+	ASSERT_EQ(*iter2, 0);
+	iter2 += 2;
+	ASSERT_EQ(*iter2, 2);
+
+	auto iter4 = crbt.GetConstReverseBegin();
+	ASSERT_EQ(*iter4, 4);
+	iter4 += 2;
+	ASSERT_EQ(*iter4, 2);
+}
+
+TEST(RedBlackTreeIterator, SelfDecreaseTest)
+{
+	Detail::RedBlackTree<int> rbt({0, 1, 2, 3, 4});
+	auto iter1 = rbt.GetEnd();
+	iter1 -= 2;
+	ASSERT_EQ(*iter1, 3);
+
+	auto iter3 = rbt.GetReverseEnd();
+	iter3 -= 2;
+	ASSERT_EQ(*iter3, 1);
+
+	const Detail::RedBlackTree<int>& crbt = rbt;
+	auto iter2 = crbt.GetConstEnd();
+	iter2 -= 2;
+	ASSERT_EQ(*iter2, 3);
+
+	auto iter4 = crbt.GetConstReverseEnd();
+	iter4 -= 2;
+	ASSERT_EQ(*iter4, 1);
+}
+
+TEST(RedBlackTreeIterator, DistanceTest)
+{
+	Detail::RedBlackTree<int> rbt({0, 1, 2, 3, 4});
+	ASSERT_EQ(rbt.GetSize(), 5);
+	ASSERT_EQ(rbt.GetEnd() - rbt.GetBegin(), 5);
+	ASSERT_EQ(rbt.GetReverseEnd() - rbt.GetReverseBegin(), 5);
+
+	const Detail::RedBlackTree<int>& crbt = rbt;
+	ASSERT_EQ(crbt.GetSize(), 5);
+	ASSERT_EQ(crbt.GetConstEnd() - crbt.GetConstBegin(), 5);
+	ASSERT_EQ(crbt.GetConstReverseEnd() - crbt.GetConstReverseBegin(), 5);
+}

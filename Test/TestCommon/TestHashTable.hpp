@@ -153,6 +153,34 @@ TEST(HashTable, ListConstructionTest)
 	}
 }
 
+TEST(HashTable, ClearTest)
+{
+	Detail::HashTable<test_hashtable_object>* pht = new Detail::HashTable<test_hashtable_object>();
+	const int test_size = 1000;
+	int val_pool[test_size];
+	memset(val_pool, 0, sizeof(val_pool));
+	auto val_rel_func = [&](test_hashtable_object& o) {
+		val_pool[o.key] += 1;
+	};
+	for (int i = 0; i < test_size; i++)
+	{
+		auto iter = pht->Insert(test_hashtable_object(i, val_rel_func));
+		ASSERT_EQ(iter.m_First->key, i);
+		ASSERT_TRUE(iter.m_Second);
+	}
+	ASSERT_EQ(pht->GetSize(), test_size);
+	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
+
+	pht->Clear();
+	ASSERT_EQ(pht->GetSize(), 0);
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(val_pool[i], 1);
+	}
+	delete pht;
+}
+
 TEST(HashTable, GetLoadFactorTest)
 {
 	Detail::HashTable<int> ht1;
@@ -592,19 +620,19 @@ TEST(HashTable, FindTest)
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		auto iter = pchm->Find(test_hashtable_object(i));
+		auto iter = pcht->Find(test_hashtable_object(i));
 		ASSERT_EQ(iter->key, i);
 	}
 
-	auto cniter = pchm->Find(test_hashtable_object(test_size));
-	ASSERT_EQ(cniter, pchm->GetConstEnd());
+	auto cniter = pcht->Find(test_hashtable_object(test_size));
+	ASSERT_EQ(cniter, pcht->GetConstEnd());
 
-	ASSERT_EQ(pchm->GetSize(), test_size);
-	ASSERT_EQ(pchm->GetBucketQuantity(), pchm->GetCorrectBucketQuantity(pchm->GetLoadFactor(), pchm->GetSize()));
+	ASSERT_EQ(pcht->GetSize(), test_size);
+	ASSERT_EQ(pcht->GetBucketQuantity(), pcht->GetCorrectBucketQuantity(pcht->GetLoadFactor(), pcht->GetSize()));
 
 	delete pht;
 	for (int i = 0; i < test_size; i++)
@@ -639,15 +667,15 @@ TEST(HashTable, GetTest)
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ(pchm->Get(test_hashtable_object(i)).key, i);
+		ASSERT_EQ(pcht->Get(test_hashtable_object(i)).key, i);
 	}
 
-	ASSERT_EQ(pchm->GetSize(), test_size);
-	ASSERT_EQ(pchm->GetBucketQuantity(), pchm->GetCorrectBucketQuantity(pchm->GetLoadFactor(), pchm->GetSize()));
+	ASSERT_EQ(pcht->GetSize(), test_size);
+	ASSERT_EQ(pcht->GetBucketQuantity(), pcht->GetCorrectBucketQuantity(pcht->GetLoadFactor(), pcht->GetSize()));
 
 	delete pht;
 	for (int i = 0; i < test_size; i++)
@@ -743,7 +771,7 @@ TEST(HashTable, CopyConstructionTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm2 = new Detail::HashTable<test_hashtable_object>(*pht);
+	Detail::HashTable<test_hashtable_object>* pht2 = new Detail::HashTable<test_hashtable_object>(*pht);
 
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
@@ -752,15 +780,15 @@ TEST(HashTable, CopyConstructionTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
+	delete pht2;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 2);
@@ -789,17 +817,17 @@ TEST(HashTable, MoveConstructionTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm2 = new Detail::HashTable<test_hashtable_object>(std::move(*pht));
+	Detail::HashTable<test_hashtable_object>* pht2 = new Detail::HashTable<test_hashtable_object>(std::move(*pht));
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
+	delete pht2;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
@@ -828,11 +856,11 @@ TEST(HashTable, CopyAssignmentTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm2 = new Detail::HashTable<test_hashtable_object>();
+	Detail::HashTable<test_hashtable_object>* pht2 = new Detail::HashTable<test_hashtable_object>();
 
-	ASSERT_EQ(phm2->GetSize(), 0);
+	ASSERT_EQ(pht2->GetSize(), 0);
 
-	*phm2 = *pht;
+	*pht2 = *pht;
 
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
@@ -841,15 +869,15 @@ TEST(HashTable, CopyAssignmentTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
+	delete pht2;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 2);
@@ -878,21 +906,21 @@ TEST(HashTable, MoveAssignmentTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm2 = new Detail::HashTable<test_hashtable_object>();
+	Detail::HashTable<test_hashtable_object>* pht2 = new Detail::HashTable<test_hashtable_object>();
 
-	ASSERT_EQ(phm2->GetSize(), 0);
+	ASSERT_EQ(pht2->GetSize(), 0);
 
-	*phm2 = std::move(*pht);
+	*pht2 = std::move(*pht);
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
+	delete pht2;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
@@ -921,7 +949,7 @@ TEST(HashTable, AnotherAllocatorCopyConstructionTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* phm2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>(*pht);
+	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* pht2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>(*pht);
 
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
@@ -930,14 +958,14 @@ TEST(HashTable, AnotherAllocatorCopyConstructionTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm3 = new Detail::HashTable<test_hashtable_object>(*phm2);
+	Detail::HashTable<test_hashtable_object>* pht3 = new Detail::HashTable<test_hashtable_object>(*pht2);
 
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
@@ -946,23 +974,23 @@ TEST(HashTable, AnotherAllocatorCopyConstructionTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
-	ASSERT_EQ(phm3->GetSize(), test_size);
-	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	ASSERT_EQ(pht3->GetSize(), test_size);
+	ASSERT_EQ(pht3->GetBucketQuantity(), pht3->GetCorrectBucketQuantity(pht3->GetLoadFactor(), pht3->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm3)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht3)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
-	delete phm3;
+	delete pht2;
+	delete pht3;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 3);
@@ -991,27 +1019,27 @@ TEST(HashTable, AnotherAllocatorMoveConstructionTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* phm2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>(std::move(*pht));
+	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* pht2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>(std::move(*pht));
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm3 = new Detail::HashTable<test_hashtable_object>(std::move(*phm2));
+	Detail::HashTable<test_hashtable_object>* pht3 = new Detail::HashTable<test_hashtable_object>(std::move(*pht2));
 
-	ASSERT_EQ(phm3->GetSize(), test_size);
-	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	ASSERT_EQ(pht3->GetSize(), test_size);
+	ASSERT_EQ(pht3->GetBucketQuantity(), pht3->GetCorrectBucketQuantity(pht3->GetLoadFactor(), pht3->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm3)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht3)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
-	delete phm3;
+	delete pht2;
+	delete pht3;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
@@ -1040,31 +1068,11 @@ TEST(HashTable, AnotherAllocatorCopyAssignmentTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* phm2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>();
+	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* pht2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>();
 
-	ASSERT_EQ(phm2->GetSize(), 0);
+	ASSERT_EQ(pht2->GetSize(), 0);
 
-	*phm2 = *pht;
-
-	ASSERT_EQ(pht->GetSize(), test_size);
-	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
-	}
-
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
-	for (int i = test_size - 1; i >= 0; i--)
-	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
-	}
-
-	Detail::HashTable<test_hashtable_object>* phm3 = new Detail::HashTable<test_hashtable_object>();
-
-	ASSERT_EQ(phm3->GetSize(), 0);
-
-	*phm3 = *phm2;
+	*pht2 = *pht;
 
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
@@ -1073,23 +1081,43 @@ TEST(HashTable, AnotherAllocatorCopyAssignmentTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
-	ASSERT_EQ(phm3->GetSize(), test_size);
-	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	Detail::HashTable<test_hashtable_object>* pht3 = new Detail::HashTable<test_hashtable_object>();
+
+	ASSERT_EQ(pht3->GetSize(), 0);
+
+	*pht3 = *pht2;
+
+	ASSERT_EQ(pht->GetSize(), test_size);
+	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm3)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
+	}
+
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
+	}
+
+	ASSERT_EQ(pht3->GetSize(), test_size);
+	ASSERT_EQ(pht3->GetBucketQuantity(), pht3->GetCorrectBucketQuantity(pht3->GetLoadFactor(), pht3->GetSize()));
+	for (int i = test_size - 1; i >= 0; i--)
+	{
+		ASSERT_EQ((*pht3)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
-	delete phm3;
+	delete pht2;
+	delete pht3;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 3);
@@ -1118,35 +1146,35 @@ TEST(HashTable, AnotherAllocatorMoveAssignmentTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* phm2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>();
+	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* pht2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>();
 
-	ASSERT_EQ(phm2->GetSize(), 0);
+	ASSERT_EQ(pht2->GetSize(), 0);
 
-	*phm2 = std::move(*pht);
+	*pht2 = std::move(*pht);
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm3 = new Detail::HashTable<test_hashtable_object>();
+	Detail::HashTable<test_hashtable_object>* pht3 = new Detail::HashTable<test_hashtable_object>();
 
-	ASSERT_EQ(phm3->GetSize(), 0);
+	ASSERT_EQ(pht3->GetSize(), 0);
 
-	*phm3 = std::move(*phm2);
+	*pht3 = std::move(*pht2);
 
-	ASSERT_EQ(phm3->GetSize(), test_size);
-	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	ASSERT_EQ(pht3->GetSize(), test_size);
+	ASSERT_EQ(pht3->GetBucketQuantity(), pht3->GetCorrectBucketQuantity(pht3->GetLoadFactor(), pht3->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm3)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht3)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
-	delete phm3;
+	delete pht2;
+	delete pht3;
 	for (int i = 0; i < test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
@@ -1162,7 +1190,7 @@ TEST(HashTable, EqualTest)
 																																		   test_hashtable_object(2, 20)});
 	const Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator> ht2_({test_hashtable_object(1, 10),
 																																  test_hashtable_object(2, 20)});
-	const Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, MemoryManagerAllocator> hm3({test_hashtable_object(1, 10),
+	const Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, MemoryManagerAllocator> ht3({test_hashtable_object(1, 10),
 																																		   test_hashtable_object(2, 21),
 																																		   test_hashtable_object(3, 30)});
 	const Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator> ht3_({test_hashtable_object(1, 10),
@@ -1177,7 +1205,7 @@ TEST(HashTable, EqualTest)
 
 	ASSERT_FALSE(ht1 == ht2);
 	ASSERT_FALSE(ht1 == ht2_);
-	ASSERT_FALSE(ht1 == hm3);
+	ASSERT_FALSE(ht1 == ht3);
 	ASSERT_FALSE(ht1 == ht3_);
 	ASSERT_TRUE(ht1 == ht4);
 	ASSERT_TRUE(ht1 == ht4_);
@@ -1192,7 +1220,7 @@ TEST(HashTable, NotEqualTest)
 																																		   test_hashtable_object(2, 20)});
 	const Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator> ht2_({test_hashtable_object(1, 10),
 																																  test_hashtable_object(2, 20)});
-	const Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, MemoryManagerAllocator> hm3({test_hashtable_object(1, 10),
+	const Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, MemoryManagerAllocator> ht3({test_hashtable_object(1, 10),
 																																		   test_hashtable_object(2, 21),
 																																		   test_hashtable_object(3, 30)});
 	const Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator> ht3_({test_hashtable_object(1, 10),
@@ -1207,7 +1235,7 @@ TEST(HashTable, NotEqualTest)
 
 	ASSERT_TRUE(ht1 != ht2);
 	ASSERT_TRUE(ht1 != ht2_);
-	ASSERT_TRUE(ht1 != hm3);
+	ASSERT_TRUE(ht1 != ht3);
 	ASSERT_TRUE(ht1 != ht3_);
 	ASSERT_FALSE(ht1 != ht4);
 	ASSERT_FALSE(ht1 != ht4_);
@@ -1235,32 +1263,32 @@ TEST(HashTable, SwapTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm2 = new Detail::HashTable<test_hashtable_object>();
+	Detail::HashTable<test_hashtable_object>* pht2 = new Detail::HashTable<test_hashtable_object>();
 
 	for (int i = test_size; i < 2 * test_size; ++i)
 	{
-		auto iter = phm2->Insert(test_hashtable_object(i, val_rel_func));
+		auto iter = pht2->Insert(test_hashtable_object(i, val_rel_func));
 		ASSERT_EQ(iter.m_First->key, i);
 		ASSERT_TRUE(iter.m_Second);
 	}
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = 2 * test_size - 1; i >= test_size; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm3 = new Detail::HashTable<test_hashtable_object>(std::move(*pht));
+	Detail::HashTable<test_hashtable_object>* pht3 = new Detail::HashTable<test_hashtable_object>(std::move(*pht));
 
-	ASSERT_EQ(phm3->GetSize(), test_size);
-	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	ASSERT_EQ(pht3->GetSize(), test_size);
+	ASSERT_EQ(pht3->GetBucketQuantity(), pht3->GetCorrectBucketQuantity(pht3->GetLoadFactor(), pht3->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm3)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht3)[test_hashtable_object(i)].key, i);
 	}
 
-	*pht = std::move(*phm2);
+	*pht = std::move(*pht2);
 
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
@@ -1269,18 +1297,18 @@ TEST(HashTable, SwapTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	*phm2 = std::move(*phm3);
+	*pht2 = std::move(*pht3);
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
-	delete phm3;
+	delete pht2;
+	delete pht3;
 	for (int i = 0; i < 2 * test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
@@ -1309,32 +1337,32 @@ TEST(HashTable, AnotherAllocatorSwapTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* phm2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>();
+	Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>* pht2 = new Detail::HashTable<test_hashtable_object, Hash<test_hashtable_object>, Equal<test_hashtable_object>, StdAllocator>();
 
 	for (int i = test_size; i < 2 * test_size; ++i)
 	{
-		auto iter = phm2->Insert(test_hashtable_object(i, val_rel_func));
+		auto iter = pht2->Insert(test_hashtable_object(i, val_rel_func));
 		ASSERT_EQ(iter.m_First->key, i);
 		ASSERT_TRUE(iter.m_Second);
 	}
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = 2 * test_size - 1; i >= test_size; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
-	Detail::HashTable<test_hashtable_object>* phm3 = new Detail::HashTable<test_hashtable_object>(std::move(*pht));
+	Detail::HashTable<test_hashtable_object>* pht3 = new Detail::HashTable<test_hashtable_object>(std::move(*pht));
 
-	ASSERT_EQ(phm3->GetSize(), test_size);
-	ASSERT_EQ(phm3->GetBucketQuantity(), phm3->GetCorrectBucketQuantity(phm3->GetLoadFactor(), phm3->GetSize()));
+	ASSERT_EQ(pht3->GetSize(), test_size);
+	ASSERT_EQ(pht3->GetBucketQuantity(), pht3->GetCorrectBucketQuantity(pht3->GetLoadFactor(), pht3->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm3)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht3)[test_hashtable_object(i)].key, i);
 	}
 
-	*pht = std::move(*phm2);
+	*pht = std::move(*pht2);
 
 	ASSERT_EQ(pht->GetSize(), test_size);
 	ASSERT_EQ(pht->GetBucketQuantity(), pht->GetCorrectBucketQuantity(pht->GetLoadFactor(), pht->GetSize()));
@@ -1343,18 +1371,18 @@ TEST(HashTable, AnotherAllocatorSwapTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	*phm2 = std::move(*phm3);
+	*pht2 = std::move(*pht3);
 
-	ASSERT_EQ(phm2->GetSize(), test_size);
-	ASSERT_EQ(phm2->GetBucketQuantity(), phm2->GetCorrectBucketQuantity(phm2->GetLoadFactor(), phm2->GetSize()));
+	ASSERT_EQ(pht2->GetSize(), test_size);
+	ASSERT_EQ(pht2->GetBucketQuantity(), pht2->GetCorrectBucketQuantity(pht2->GetLoadFactor(), pht2->GetSize()));
 	for (int i = test_size - 1; i >= 0; i--)
 	{
-		ASSERT_EQ((*phm2)[test_hashtable_object(i)].key, i);
+		ASSERT_EQ((*pht2)[test_hashtable_object(i)].key, i);
 	}
 
 	delete pht;
-	delete phm2;
-	delete phm3;
+	delete pht2;
+	delete pht3;
 	for (int i = 0; i < 2 * test_size; i++)
 	{
 		ASSERT_EQ(val_pool[i], 1);
@@ -1460,9 +1488,9 @@ TEST(HashTableIterator, GetConstTest)
 		ASSERT_EQ((*pht)[test_hashtable_object(i)].key, i);
 	}
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
-	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); ++i)
+	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pcht->GetConstBegin(); i != pcht->GetConstEnd(); ++i)
 	{
 		val_check_pool[i->key] += 1;
 	}
@@ -1575,9 +1603,9 @@ TEST(HashTableIterator, SelfIncrementTest)
 		ASSERT_EQ(val_check_pool[i], 2);
 	}
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
-	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); ++i)
+	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pcht->GetConstBegin(); i != pcht->GetConstEnd(); ++i)
 	{
 		val_check_pool[i->key] += 1;
 	}
@@ -1587,7 +1615,7 @@ TEST(HashTableIterator, SelfIncrementTest)
 		ASSERT_EQ(val_check_pool[i], 3);
 	}
 
-	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); i++)
+	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pcht->GetConstBegin(); i != pcht->GetConstEnd(); i++)
 	{
 		val_check_pool[i->key] += 1;
 	}
@@ -1642,10 +1670,10 @@ TEST(HashTableIterator, PlusTest)
 	}
 	ASSERT_EQ(cnt, test_size / 2);
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
 	cnt = 0;
-	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); i = i + 2)
+	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pcht->GetConstBegin(); i != pcht->GetConstEnd(); i = i + 2)
 	{
 		ASSERT_EQ(i->key, i->value);
 		cnt += 1;
@@ -1653,7 +1681,7 @@ TEST(HashTableIterator, PlusTest)
 	ASSERT_EQ(cnt, test_size / 2);
 
 	cnt = 0;
-	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); i += 2)
+	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pcht->GetConstBegin(); i != pcht->GetConstEnd(); i += 2)
 	{
 		ASSERT_EQ(i->key, i->value);
 		cnt += 1;
@@ -1691,9 +1719,9 @@ TEST(HashTableIterator, DistanceTest)
 
 	ASSERT_EQ(pht->GetEnd() - pht->GetBegin(), test_size);
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
-	ASSERT_EQ(pchm->GetConstEnd() - pchm->GetConstBegin(), test_size);
+	ASSERT_EQ(pcht->GetConstEnd() - pcht->GetConstBegin(), test_size);
 
 	delete pht;
 	for (int i = 0; i < test_size; i++)
@@ -1737,9 +1765,9 @@ TEST(HashTableIterator, OperatorPointerTest)
 		ASSERT_EQ(val_check_pool[i], 1);
 	}
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
-	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); ++i)
+	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pcht->GetConstBegin(); i != pcht->GetConstEnd(); ++i)
 	{
 		val_check_pool[i->key] += 1;
 		ASSERT_EQ(i->key, i->value);
@@ -1792,9 +1820,9 @@ TEST(HashTableIterator, OperatorReferenceTest)
 		ASSERT_EQ(val_check_pool[i], 1);
 	}
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
-	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); ++i)
+	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pcht->GetConstBegin(); i != pcht->GetConstEnd(); ++i)
 	{
 		val_check_pool[(*i).key] += 1;
 		ASSERT_EQ((*i).key, (*i).value);
@@ -1879,9 +1907,9 @@ TEST(HashTableIterator, GetDataTest)
 		ASSERT_EQ(val_check_pool[i], 1);
 	}
 
-	const Detail::HashTable<test_hashtable_object>* pchm = pht;
+	const Detail::HashTable<test_hashtable_object>* pcht = pht;
 
-	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pchm->GetConstBegin(); i != pchm->GetConstEnd(); ++i)
+	for (Detail::HashTable<test_hashtable_object>::ConstIterator i = pcht->GetConstBegin(); i != pcht->GetConstEnd(); ++i)
 	{
 		val_check_pool[i.GetData()->key] += 1;
 		ASSERT_EQ(i.GetData()->key, i.GetData()->value);
