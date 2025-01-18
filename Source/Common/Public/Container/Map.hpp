@@ -24,7 +24,7 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 	template<typename K, typename V, typename LessComparer = Less<K>, typename Allocator = DefaultAllocator>
-	class Map : public Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>
+	class Map : public Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>
 	{
 	public:
 		using KeyType = const K;
@@ -35,30 +35,30 @@ namespace SpaceGameEngine
 	public:
 		template<typename... Args>
 		inline Map(Args&&... args)
-			: Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>(std::forward<Args>(args)...)
+			: Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>(std::forward<Args>(args)...)
 		{
 		}
 
 		template<IsPair P = Pair<K, V>>	   // not Pair<const K, V> to make key movable
 		inline Map(std::initializer_list<P> ilist)
-			: Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>(ilist)
+			: Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>(ilist)
 		{
 		}
 
 		template<typename Arg>
 		inline Map& operator=(Arg&& arg)
 		{
-			Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::operator=(std::forward<Arg>(arg));
+			Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::operator=(std::forward<Arg>(arg));
 
 			return *this;
 		}
 
-		using Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Insert;
+		using Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Insert;
 
-		using Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Upsert;
+		using Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Upsert;
 
 		template<typename K2, typename V2>
-		inline Pair<typename Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Iterator,
+		inline Pair<typename Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Iterator,
 					bool>
 		Insert(K2&& key, V2&& val)
 		{
@@ -66,7 +66,7 @@ namespace SpaceGameEngine
 		}
 
 		template<typename K2, typename V2>
-		inline Pair<typename Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Iterator,
+		inline Pair<typename Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Iterator,
 					bool>
 		Upsert(K2&& key, V2&& val)
 		{
@@ -75,28 +75,28 @@ namespace SpaceGameEngine
 
 		inline bool RemoveByKey(const K& key)
 		{
-			return Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::RemoveByValue(key);
+			return Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::RemoveByValue(key);
 		}
 
 		template<typename K2>
 		inline V& Get(const K2& key)
 		{
-			return Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Get(key)
+			return Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Get(key)
 				.m_Second;
 		}
 
 		template<typename K2>
 		inline const V& Get(const K2& key) const
 		{
-			return Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Get(key)
+			return Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Get(key)
 				.m_Second;
 		}
 
 		template<typename K2>
 		inline V& operator[](K2&& key)
 		{
-			typename Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Iterator iter = Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Find(key);
-			if (iter == Detail::RedBlackTree<Detail::KeyValuePair<const K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::GetEnd())
+			typename Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Iterator iter = Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::Find(key);
+			if (iter == Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>::GetEnd())
 				iter = Insert(std::forward<K2>(key), V()).m_First;
 			return iter->m_Second;
 		}

@@ -26,7 +26,7 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 	template<typename K, typename V, typename Hasher = Hash<K>, typename Allocator = DefaultAllocator>
-	class HashMap : public Detail::HashTable<Detail::KeyValuePair<const K, V>,
+	class HashMap : public Detail::HashTable<Detail::KeyValuePair<K, V>,
 											 KeyHash<Hasher>,
 											 KeyComparer<Equal<K>>,
 											 Allocator>
@@ -40,7 +40,7 @@ namespace SpaceGameEngine
 	public:
 		template<typename... Args>
 		inline HashMap(Args&&... args)
-			: Detail::HashTable<Detail::KeyValuePair<const K, V>,
+			: Detail::HashTable<Detail::KeyValuePair<K, V>,
 								KeyHash<Hasher>,
 								KeyComparer<Equal<K>>,
 								Allocator>(std::forward<Args>(args)...)
@@ -49,7 +49,7 @@ namespace SpaceGameEngine
 
 		template<IsPair P = Pair<K, V>>	   // not Pair<const K, V> to make key movable
 		inline HashMap(std::initializer_list<P> ilist)
-			: Detail::HashTable<Detail::KeyValuePair<const K, V>,
+			: Detail::HashTable<Detail::KeyValuePair<K, V>,
 								KeyHash<Hasher>,
 								KeyComparer<Equal<K>>,
 								Allocator>(ilist)
@@ -59,7 +59,7 @@ namespace SpaceGameEngine
 		template<typename Arg>
 		inline HashMap& operator=(Arg&& arg)
 		{
-			Detail::HashTable<Detail::KeyValuePair<const K, V>,
+			Detail::HashTable<Detail::KeyValuePair<K, V>,
 							  KeyHash<Hasher>,
 							  KeyComparer<Equal<K>>,
 							  Allocator>::operator=(std::forward<Arg>(arg));
@@ -67,18 +67,18 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		using Detail::HashTable<Detail::KeyValuePair<const K, V>,
+		using Detail::HashTable<Detail::KeyValuePair<K, V>,
 								KeyHash<Hasher>,
 								KeyComparer<Equal<K>>,
 								Allocator>::Insert;
 
-		using Detail::HashTable<Detail::KeyValuePair<const K, V>,
+		using Detail::HashTable<Detail::KeyValuePair<K, V>,
 								KeyHash<Hasher>,
 								KeyComparer<Equal<K>>,
 								Allocator>::Upsert;
 
 		template<typename K2, typename V2>
-		inline Pair<typename Detail::HashTable<Detail::KeyValuePair<const K, V>,
+		inline Pair<typename Detail::HashTable<Detail::KeyValuePair<K, V>,
 											   KeyHash<Hasher>,
 											   KeyComparer<Equal<K>>,
 											   Allocator>::Iterator,
@@ -89,7 +89,7 @@ namespace SpaceGameEngine
 		}
 
 		template<typename K2, typename V2>
-		inline Pair<typename Detail::HashTable<Detail::KeyValuePair<const K, V>,
+		inline Pair<typename Detail::HashTable<Detail::KeyValuePair<K, V>,
 											   KeyHash<Hasher>,
 											   KeyComparer<Equal<K>>,
 											   Allocator>::Iterator,
@@ -101,7 +101,7 @@ namespace SpaceGameEngine
 
 		inline bool RemoveByKey(const K& key)
 		{
-			return Detail::HashTable<Detail::KeyValuePair<const K, V>,
+			return Detail::HashTable<Detail::KeyValuePair<K, V>,
 									 KeyHash<Hasher>,
 									 KeyComparer<Equal<K>>,
 									 Allocator>::RemoveByValue(key);
@@ -110,7 +110,7 @@ namespace SpaceGameEngine
 		template<typename K2>
 		inline V& Get(const K2& key)
 		{
-			return Detail::HashTable<Detail::KeyValuePair<const K, V>,
+			return Detail::HashTable<Detail::KeyValuePair<K, V>,
 									 KeyHash<Hasher>,
 									 KeyComparer<Equal<K>>,
 									 Allocator>::Get(key)
@@ -120,7 +120,7 @@ namespace SpaceGameEngine
 		template<typename K2>
 		inline const V& Get(const K2& key) const
 		{
-			return Detail::HashTable<Detail::KeyValuePair<const K, V>,
+			return Detail::HashTable<Detail::KeyValuePair<K, V>,
 									 KeyHash<Hasher>,
 									 KeyComparer<Equal<K>>,
 									 Allocator>::Get(key)
@@ -130,14 +130,14 @@ namespace SpaceGameEngine
 		template<typename K2>
 		inline V& operator[](K2&& key)
 		{
-			typename Detail::HashTable<Detail::KeyValuePair<const K, V>,
+			typename Detail::HashTable<Detail::KeyValuePair<K, V>,
 									   KeyHash<Hasher>,
 									   KeyComparer<Equal<K>>,
-									   Allocator>::Iterator iter = Detail::HashTable<Detail::KeyValuePair<const K, V>,
+									   Allocator>::Iterator iter = Detail::HashTable<Detail::KeyValuePair<K, V>,
 																					 KeyHash<Hasher>,
 																					 KeyComparer<Equal<K>>,
 																					 Allocator>::Find(key);
-			if (iter == Detail::HashTable<Detail::KeyValuePair<const K, V>,
+			if (iter == Detail::HashTable<Detail::KeyValuePair<K, V>,
 										  KeyHash<Hasher>,
 										  KeyComparer<Equal<K>>,
 										  Allocator>::GetEnd())
