@@ -65,7 +65,7 @@ namespace SpaceGameEngine
 		inline ~ControllableObject()
 		{
 			if (m_pContent)
-				Allocator::template Delete(m_pContent);
+				Allocator::Delete(m_pContent);
 		}
 
 		inline ControllableObject(const ControllableObject& obj)
@@ -146,7 +146,7 @@ namespace SpaceGameEngine
 		inline void Release()
 		{
 			SGE_ASSERT(HasNotBeenInitializedError, m_pContent);
-			Allocator::template Delete(m_pContent);
+			Allocator::Delete(m_pContent);
 			m_pContent = nullptr;
 		}
 		inline T& Get()

@@ -969,7 +969,7 @@ namespace SpaceGameEngine
 					ReleaseNode(p->m_pLeftChild);
 				if (p->m_pRightChild && p->m_pRightChild != &m_NilNode)
 					ReleaseNode(p->m_pRightChild);
-				Allocator::template Delete(p);
+				Allocator::Delete(p);
 			}
 
 			template<typename V2>
@@ -1232,7 +1232,7 @@ namespace SpaceGameEngine
 				}
 				if (is_y_original_red == false)
 					RemoveFixUp(px);
-				Allocator::template Delete(pz);
+				Allocator::Delete(pz);
 				m_Size -= 1;
 			}
 

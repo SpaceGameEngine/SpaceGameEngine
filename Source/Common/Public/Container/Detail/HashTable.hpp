@@ -80,7 +80,7 @@ namespace SpaceGameEngine
 					{
 						Node* pb = pnow;
 						pnow = pnow->m_pNext;
-						Allocator::template Delete(pb);
+						Allocator::Delete(pb);
 					}
 				}
 
@@ -91,7 +91,7 @@ namespace SpaceGameEngine
 					{
 						Node* pb = pnow;
 						pnow = pnow->m_pNext;
-						Allocator::template Delete(pb);
+						Allocator::Delete(pb);
 					}
 					m_pHead = nullptr;
 				}

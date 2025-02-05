@@ -320,7 +320,7 @@ namespace SpaceGameEngine
 				{
 					Node* pb = pn;
 					pn = pn->m_pNext;
-					Allocator::template Delete(pb);
+					Allocator::Delete(pb);
 				}
 			}
 		}
@@ -334,7 +334,7 @@ namespace SpaceGameEngine
 				{
 					Node* pb = pn;
 					pn = pn->m_pNext;
-					Allocator::template Delete(pb);
+					Allocator::Delete(pb);
 				}
 			}
 
@@ -818,7 +818,7 @@ namespace SpaceGameEngine
 				m_pHead = nullptr;
 
 			m_Size -= 1;
-			Allocator::template Delete(pn);
+			Allocator::Delete(pn);
 		}
 
 		inline void PopFront()
@@ -835,7 +835,7 @@ namespace SpaceGameEngine
 				m_pTail = nullptr;
 
 			m_Size -= 1;
-			Allocator::template Delete(pn);
+			Allocator::Delete(pn);
 		}
 
 		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
@@ -860,7 +860,7 @@ namespace SpaceGameEngine
 				m_pTail = pbck;
 
 			m_Size -= 1;
-			Allocator::template Delete(pn);
+			Allocator::Delete(pn);
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 				return IteratorType(pfwd, m_pHead, m_pTail);
@@ -906,7 +906,7 @@ namespace SpaceGameEngine
 				Node* pb = (Node*)iter.m_pNode;
 				++iter;
 				m_Size -= 1;
-				Allocator::template Delete(pb);
+				Allocator::Delete(pb);
 			}
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
@@ -1133,7 +1133,7 @@ namespace SpaceGameEngine
 				{
 					Node* pb = pn;
 					pn = pn->m_pNext;
-					Allocator::template Delete(pb);
+					Allocator::Delete(pb);
 				}
 			}
 		}

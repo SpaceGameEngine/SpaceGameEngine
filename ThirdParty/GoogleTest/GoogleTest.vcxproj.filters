@@ -47,6 +47,18 @@
     <ClCompile Include="source\googlemock\src\gmock-spec-builders.cc">
       <Filter>GMock Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest_main.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-all.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-assertion-result.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\googletest\src\gtest-matchers.cc">
+      <Filter>GTest Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\googletest\src\gtest-internal-inl.h">

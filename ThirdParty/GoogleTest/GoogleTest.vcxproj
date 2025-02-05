@@ -24,13 +24,17 @@
     <ClCompile Include="source\googlemock\src\gmock-matchers.cc" />
     <ClCompile Include="source\googlemock\src\gmock-spec-builders.cc" />
     <ClCompile Include="source\googlemock\src\gmock.cc" />
+    <ClCompile Include="source\googletest\src\gtest-all.cc" />
+    <ClCompile Include="source\googletest\src\gtest-assertion-result.cc" />
     <ClCompile Include="source\googletest\src\gtest-death-test.cc" />
     <ClCompile Include="source\googletest\src\gtest-filepath.cc" />
+    <ClCompile Include="source\googletest\src\gtest-matchers.cc" />
     <ClCompile Include="source\googletest\src\gtest-port.cc" />
     <ClCompile Include="source\googletest\src\gtest-printers.cc" />
     <ClCompile Include="source\googletest\src\gtest-test-part.cc" />
     <ClCompile Include="source\googletest\src\gtest-typed-test.cc" />
     <ClCompile Include="source\googletest\src\gtest.cc" />
+    <ClCompile Include="source\googletest\src\gtest_main.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\googletest\src\gtest-internal-inl.h" />
