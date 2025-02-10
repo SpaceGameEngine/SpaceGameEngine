@@ -30,5 +30,6 @@
     <ClInclude Include="TestLog.hpp" />
     <ClInclude Include="TestRedBlackTree.hpp" />
     <ClInclude Include="TestHashTable.hpp" />
+    <ClInclude Include="TestSet.hpp" />
   </ItemGroup>
 </Project>

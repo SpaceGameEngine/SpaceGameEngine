@@ -173,6 +173,7 @@
     <ClInclude Include="Public\Container\Map.hpp" />
     <ClInclude Include="Public\Container\PriorityQueue.hpp" />
     <ClInclude Include="Public\Container\Queue.hpp" />
+    <ClInclude Include="Public\Container\Set.hpp" />
     <ClInclude Include="Public\Container\Stack.hpp" />
     <ClInclude Include="Public\Container\Vector.hpp" />
     <ClInclude Include="Public\Error.h" />

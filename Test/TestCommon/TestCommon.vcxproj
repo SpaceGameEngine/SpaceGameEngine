@@ -200,6 +200,7 @@
     <ClInclude Include="TestQueue.hpp" />
     <ClInclude Include="TestRange.hpp" />
     <ClInclude Include="TestRedBlackTree.hpp" />
+    <ClInclude Include="TestSet.hpp" />
     <ClInclude Include="TestStack.hpp" />
     <ClInclude Include="TestString.hpp" />
     <ClInclude Include="TestFunction.hpp" />
