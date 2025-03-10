@@ -142,7 +142,7 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::EscapeCharacterSet::IsEscapeCharacte
 
 bool SpaceGameEngine::SpaceLanguage::Lexer::InvalidEscapeCharacterError::Judge(Char c)
 {
-	return c != SGE_STR('n') && c != SGE_STR('r') && c != SGE_STR('t') && c != SGE_STR('\'') && c != SGE_STR('"') && c != SGE_STR('0');
+	return !EscapeCharacterSet::GetSingleton().IsEscapeCharacter(c);
 }
 
 bool SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::Judge(const String& str, const String& error_info_formatter) const
