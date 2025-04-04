@@ -584,6 +584,120 @@ TEST(Map, OperatorTest)
 	}
 }
 
+TEST(Map, ForEachTest)
+{
+	const int test_size = 1000;
+	double test_cnt[test_size];
+	for (int i = 0; i < test_size; i++)
+	{
+		test_cnt[i] = 0;
+	}
+	Map<test_map_object, test_map_object> m1;
+	ASSERT_EQ(m1.GetSize(), 0);
+	for (int i = 0; i < test_size; i++)
+	{
+		m1.Insert(test_map_object(i), test_map_object(1));
+	}
+	ASSERT_EQ(m1.GetSize(), test_size);
+
+	int last_key = 0;
+	m1.ForEach([&last_key](Pair<const test_map_object, test_map_object>& val) {
+		ASSERT_EQ(val.m_First.val, last_key);
+		ASSERT_EQ(val.m_Second.val, 1);
+		val.m_Second.val = val.m_First.val;
+		++last_key;
+	});
+
+	ASSERT_EQ(m1.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(m1.Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	const Map<test_map_object, test_map_object> m2(m1);
+	ASSERT_EQ(m2.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(m2.Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	last_key = 0;
+	m2.ForEach([&](const Pair<const test_map_object, test_map_object>& val) {
+		ASSERT_EQ(val.m_First.val, last_key);
+		ASSERT_EQ(val.m_First.val, val.m_Second.val);
+		test_cnt[val.m_First.val] += 1;
+		++last_key;
+	});
+
+	ASSERT_EQ(m2.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(m2.Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(test_cnt[i], 1);
+	}
+}
+
+TEST(Map, ReverseForEachTest)
+{
+	const int test_size = 1000;
+	double test_cnt[test_size];
+	for (int i = 0; i < test_size; i++)
+	{
+		test_cnt[i] = 0;
+	}
+	Map<test_map_object, test_map_object> m1;
+	ASSERT_EQ(m1.GetSize(), 0);
+	for (int i = 0; i < test_size; i++)
+	{
+		m1.Insert(test_map_object(i), test_map_object(1));
+	}
+	ASSERT_EQ(m1.GetSize(), test_size);
+
+	int last_key = test_size - 1;
+	m1.ReverseForEach([&last_key](Pair<const test_map_object, test_map_object>& val) {
+		ASSERT_EQ(val.m_First.val, last_key);
+		ASSERT_EQ(val.m_Second.val, 1);
+		val.m_Second.val = val.m_First.val;
+		--last_key;
+	});
+
+	ASSERT_EQ(m1.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(m1.Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	const Map<test_map_object, test_map_object> m2(m1);
+	ASSERT_EQ(m2.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(m2.Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	last_key = test_size - 1;
+	m2.ReverseForEach([&](const Pair<const test_map_object, test_map_object>& val) {
+		ASSERT_EQ(val.m_First.val, last_key);
+		ASSERT_EQ(val.m_First.val, val.m_Second.val);
+		test_cnt[val.m_First.val] += 1;
+		--last_key;
+	});
+
+	ASSERT_EQ(m2.GetSize(), test_size);
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(m2.Find(test_map_object(i))->m_Second.val, i);
+	}
+
+	for (int i = 0; i < test_size; i++)
+	{
+		ASSERT_EQ(test_cnt[i], 1);
+	}
+}
+
 TEST(Map, CopyConstructionTest)
 {
 	Map<test_map_object, test_map_object>* pm = new Map<test_map_object, test_map_object>();
