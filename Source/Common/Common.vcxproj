@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="HashSet.hpp" />
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Module\CommonModule.h" />
     <ClInclude Include="Private\Time\UnixTimeImplement.h" />

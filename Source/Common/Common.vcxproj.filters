@@ -213,6 +213,9 @@
     <ClInclude Include="Public\Container\Set.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
+    <ClInclude Include="HashSet.hpp">
+      <Filter>Public\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Container/Detail/RedBlackTree.hpp"
+#include "Container/Detail/HashTable.hpp"
 
 /*!
 @ingroup Common
@@ -23,31 +23,31 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-	template<typename T, typename LessComparer = Less<T>, typename Allocator = DefaultAllocator>
-	class Set : public Detail::RedBlackTree<T, LessComparer, Equal<T>, Allocator>
+	template<typename T, typename Hasher = Hash<T>, typename Allocator = DefaultAllocator>
+	class HashSet : public Detail::HashTable<T, Hasher, Equal<T>, Allocator>
 	{
 	public:
 		using ValueType = T;
-		using LessComparerType = LessComparer;
+		using HasherType = Hasher;
 		using AllocatorType = Allocator;
 
 	public:
 		template<typename... Args>
-		inline Set(Args&&... args)
-			: Detail::RedBlackTree<T, LessComparer, Equal<T>, Allocator>(std::forward<Args>(args)...)
+		inline HashSet(Args&&... args)
+			: Detail::HashTable<T, Hasher, Equal<T>, Allocator>(std::forward<Args>(args)...)
 		{
 		}
 
 		template<typename T2>
-		inline Set(std::initializer_list<T2> ilist)
-			: Detail::RedBlackTree<T, LessComparer, Equal<T>, Allocator>(ilist)
+		inline HashSet(std::initializer_list<T2> ilist)
+			: Detail::HashTable<T, Hasher, Equal<T>, Allocator>(ilist)
 		{
 		}
 
 		template<typename Arg>
-		inline Set& operator=(Arg&& arg)
+		inline HashSet& operator=(Arg&& arg)
 		{
-			Detail::RedBlackTree<T, LessComparer, Equal<T>, Allocator>::operator=(std::forward<Arg>(arg));
+			Detail::HashTable<T, Hasher, Equal<T>, Allocator>::operator=(std::forward<Arg>(arg));
 
 			return *this;
 		}

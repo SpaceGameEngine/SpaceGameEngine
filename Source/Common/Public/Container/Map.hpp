@@ -29,8 +29,8 @@ namespace SpaceGameEngine
 	public:
 		using KeyType = const K;
 		using ValueType = V;
-		using AllocatorType = Allocator;
 		using LessComparerType = LessComparer;
+		using AllocatorType = Allocator;
 
 	public:
 		template<typename... Args>

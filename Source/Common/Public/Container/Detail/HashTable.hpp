@@ -460,94 +460,94 @@ namespace SpaceGameEngine
 				}
 			}
 
-			inline HashTable(const HashTable& hm)
-				: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(hm.m_Size)
+			inline HashTable(const HashTable& ht)
+				: m_LoadFactor(ht.m_LoadFactor), m_BucketQuantity(ht.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(ht.m_Size)
 			{
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
-					new (m_pContent + i) Bucket(*(hm.m_pContent + i));
+					new (m_pContent + i) Bucket(*(ht.m_pContent + i));
 			}
 
-			inline HashTable(HashTable&& hm)
-				: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent(hm.m_pContent), m_Size(hm.m_Size)
+			inline HashTable(HashTable&& ht)
+				: m_LoadFactor(ht.m_LoadFactor), m_BucketQuantity(ht.m_BucketQuantity), m_pContent(ht.m_pContent), m_Size(ht.m_Size)
 			{
-				hm.m_pContent = nullptr;
+				ht.m_pContent = nullptr;
 			}
 
-			inline HashTable& operator=(const HashTable& hm)
+			inline HashTable& operator=(const HashTable& ht)
 			{
-				SGE_ASSERT(SelfAssignmentError, this, &hm);
+				SGE_ASSERT(SelfAssignmentError, this, &ht);
 				RawClear();
 
-				m_LoadFactor = hm.m_LoadFactor;
-				m_BucketQuantity = hm.m_BucketQuantity;
+				m_LoadFactor = ht.m_LoadFactor;
+				m_BucketQuantity = ht.m_BucketQuantity;
 				m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
-				m_Size = hm.m_Size;
+				m_Size = ht.m_Size;
 
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
-					new (m_pContent + i) Bucket(*(hm.m_pContent + i));
+					new (m_pContent + i) Bucket(*(ht.m_pContent + i));
 
 				return *this;
 			}
 
-			inline HashTable& operator=(HashTable&& hm)
+			inline HashTable& operator=(HashTable&& ht)
 			{
-				SGE_ASSERT(SelfAssignmentError, this, &hm);
+				SGE_ASSERT(SelfAssignmentError, this, &ht);
 				RawClear();
 
-				m_LoadFactor = hm.m_LoadFactor;
-				m_BucketQuantity = hm.m_BucketQuantity;
-				m_pContent = hm.m_pContent;
-				m_Size = hm.m_Size;
+				m_LoadFactor = ht.m_LoadFactor;
+				m_BucketQuantity = ht.m_BucketQuantity;
+				m_pContent = ht.m_pContent;
+				m_Size = ht.m_Size;
 
-				hm.m_pContent = nullptr;
-
-				return *this;
-			}
-
-			template<typename OtherAllocator>
-			inline HashTable(const HashTable<V, Hasher, EqualComparer, OtherAllocator>& hm)
-				: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(hm.m_Size)
-			{
-				for (SizeType i = 0; i < m_BucketQuantity; ++i)
-					new (m_pContent + i) Bucket(*(hm.m_pContent + i));
-			}
-
-			template<typename OtherAllocator>
-			inline HashTable(HashTable<V, Hasher, EqualComparer, OtherAllocator>&& hm)
-				: m_LoadFactor(hm.m_LoadFactor), m_BucketQuantity(hm.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(hm.m_Size)
-			{
-				for (SizeType i = 0; i < m_BucketQuantity; ++i)
-					new (m_pContent + i) Bucket(std::move(*(hm.m_pContent + i)));
-			}
-
-			template<typename OtherAllocator>
-			inline HashTable& operator=(const HashTable<V, Hasher, EqualComparer, OtherAllocator>& hm)
-			{
-				RawClear();
-
-				m_LoadFactor = hm.m_LoadFactor;
-				m_BucketQuantity = hm.m_BucketQuantity;
-				m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
-				m_Size = hm.m_Size;
-
-				for (SizeType i = 0; i < m_BucketQuantity; ++i)
-					new (m_pContent + i) Bucket(*(hm.m_pContent + i));
+				ht.m_pContent = nullptr;
 
 				return *this;
 			}
 
 			template<typename OtherAllocator>
-			inline HashTable& operator=(HashTable<V, Hasher, EqualComparer, OtherAllocator>&& hm)
+			inline HashTable(const HashTable<V, Hasher, EqualComparer, OtherAllocator>& ht)
+				: m_LoadFactor(ht.m_LoadFactor), m_BucketQuantity(ht.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(ht.m_Size)
+			{
+				for (SizeType i = 0; i < m_BucketQuantity; ++i)
+					new (m_pContent + i) Bucket(*(ht.m_pContent + i));
+			}
+
+			template<typename OtherAllocator>
+			inline HashTable(HashTable<V, Hasher, EqualComparer, OtherAllocator>&& ht)
+				: m_LoadFactor(ht.m_LoadFactor), m_BucketQuantity(ht.m_BucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(ht.m_Size)
+			{
+				for (SizeType i = 0; i < m_BucketQuantity; ++i)
+					new (m_pContent + i) Bucket(std::move(*(ht.m_pContent + i)));
+			}
+
+			template<typename OtherAllocator>
+			inline HashTable& operator=(const HashTable<V, Hasher, EqualComparer, OtherAllocator>& ht)
 			{
 				RawClear();
 
-				m_LoadFactor = hm.m_LoadFactor;
-				m_BucketQuantity = hm.m_BucketQuantity;
+				m_LoadFactor = ht.m_LoadFactor;
+				m_BucketQuantity = ht.m_BucketQuantity;
 				m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
-				m_Size = hm.m_Size;
+				m_Size = ht.m_Size;
 
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
-					new (m_pContent + i) Bucket(std::move(*(hm.m_pContent + i)));
+					new (m_pContent + i) Bucket(*(ht.m_pContent + i));
+
+				return *this;
+			}
+
+			template<typename OtherAllocator>
+			inline HashTable& operator=(HashTable<V, Hasher, EqualComparer, OtherAllocator>&& ht)
+			{
+				RawClear();
+
+				m_LoadFactor = ht.m_LoadFactor;
+				m_BucketQuantity = ht.m_BucketQuantity;
+				m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
+				m_Size = ht.m_Size;
+
+				for (SizeType i = 0; i < m_BucketQuantity; ++i)
+					new (m_pContent + i) Bucket(std::move(*(ht.m_pContent + i)));
 
 				return *this;
 			}
@@ -566,9 +566,9 @@ namespace SpaceGameEngine
 				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this HashTable.");
 
 				template<typename IteratorType, typename = std::enable_if_t<IsHashTableIterator<IteratorType>::Value, void>>
-				inline static bool Judge(const IteratorType& iter, const HashTable& hm)
+				inline static bool Judge(const IteratorType& iter, const HashTable& ht)
 				{
-					return iter.m_pBucketEnd != hm.m_pContent + hm.m_BucketQuantity;
+					return iter.m_pBucketEnd != ht.m_pContent + ht.m_BucketQuantity;
 				}
 			};
 
