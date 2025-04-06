@@ -32,6 +32,7 @@ limitations under the License.
 #include "TestSet.hpp"
 #include "TestHashTable.hpp"
 #include "TestHashMap.hpp"
+#include "TestHashSet.hpp"
 #include "TestList.hpp"
 #include "TestStack.hpp"
 #include "TestQueue.hpp"

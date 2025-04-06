@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#pragma once
 #include "gtest/gtest.h"
 #include "Container/Detail/HashTable.hpp"
 #include <functional>

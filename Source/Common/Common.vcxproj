@@ -159,7 +159,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="HashSet.hpp" />
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Module\CommonModule.h" />
     <ClInclude Include="Private\Time\UnixTimeImplement.h" />
@@ -170,6 +169,7 @@
     <ClInclude Include="Public\Container\Detail\HashTable.hpp" />
     <ClInclude Include="Public\Container\Detail\RedBlackTree.hpp" />
     <ClInclude Include="Public\Container\HashMap.hpp" />
+    <ClInclude Include="Public\Container\HashSet.hpp" />
     <ClInclude Include="Public\Container\List.hpp" />
     <ClInclude Include="Public\Container\Map.hpp" />
     <ClInclude Include="Public\Container\PriorityQueue.hpp" />

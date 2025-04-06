@@ -213,7 +213,7 @@
     <ClInclude Include="Public\Container\Set.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
-    <ClInclude Include="HashSet.hpp">
+    <ClInclude Include="Public\Container\HashSet.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
   </ItemGroup>
