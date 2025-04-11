@@ -4,11 +4,35 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestVirtualMachine.hpp" />
-    <ClInclude Include="TestAssembler.hpp" />
+    <Filter Include="VirtualMachine">
+      <UniqueIdentifier>{28bd4418-86b1-444d-908b-3e942b8c3884}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Linker">
+      <UniqueIdentifier>{10306a01-a8cf-4880-8647-ef0f61c32bfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IntermediateRepresentation">
+      <UniqueIdentifier>{9f392252-5187-486f-a9e5-93f6a1c2fd8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VirtualMachine\ExternalCallerModule">
+      <UniqueIdentifier>{5e30b41c-1bec-44fd-a420-c140e8d04104}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="TestLexer.hpp" />
-    <ClInclude Include="TestCoreModule.hpp" />
-    <ClInclude Include="TestIntermediateRepresentation.hpp" />
-    <ClInclude Include="TestLinker.hpp" />
+    <ClInclude Include="Linker\TestLinker.hpp">
+      <Filter>Linker</Filter>
+    </ClInclude>
+    <ClInclude Include="IntermediateRepresentation\TestIntermediateRepresentation.hpp">
+      <Filter>IntermediateRepresentation</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualMachine\TestAssembler.hpp">
+      <Filter>VirtualMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualMachine\TestVirtualMachine.hpp">
+      <Filter>VirtualMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualMachine\ExternalCallerModule\TestCoreModule.hpp">
+      <Filter>VirtualMachine\ExternalCallerModule</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

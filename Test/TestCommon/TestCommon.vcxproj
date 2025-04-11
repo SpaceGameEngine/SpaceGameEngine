@@ -181,34 +181,33 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestContainerConcept.hpp" />
-    <ClInclude Include="TestDate.hpp" />
+    <ClInclude Include="Concurrent\TestConcurrent.hpp" />
+    <ClInclude Include="Container\Detail\TestHashTable.hpp" />
+    <ClInclude Include="Container\Detail\TestRedBlackTree.hpp" />
+    <ClInclude Include="Container\TestContainerConcept.hpp" />
+    <ClInclude Include="Container\TestHashMap.hpp" />
+    <ClInclude Include="Container\TestHashSet.hpp" />
+    <ClInclude Include="Container\TestList.hpp" />
+    <ClInclude Include="Container\TestMap.hpp" />
+    <ClInclude Include="Container\TestPriorityQueue.hpp" />
+    <ClInclude Include="Container\TestQueue.hpp" />
+    <ClInclude Include="Container\TestSet.hpp" />
+    <ClInclude Include="Container\TestStack.hpp" />
+    <ClInclude Include="Container\TestVector.hpp" />
+    <ClInclude Include="System\TestDllLoader.hpp" />
     <ClInclude Include="TestError.hpp" />
     <ClInclude Include="TestFile.hpp" />
     <ClInclude Include="TestFormat.hpp" />
-    <ClInclude Include="TestHashMap.hpp" />
-    <ClInclude Include="TestHashSet.hpp" />
-    <ClInclude Include="TestHashTable.hpp" />
-    <ClInclude Include="TestList.hpp" />
     <ClInclude Include="TestLog.hpp" />
-    <ClInclude Include="TestMap.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
     <ClInclude Include="TestMeta.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
-    <ClInclude Include="TestDllLoader.hpp" />
     <ClInclude Include="TestModule.hpp" />
-    <ClInclude Include="TestPriorityQueue.hpp" />
-    <ClInclude Include="TestQueue.hpp" />
-    <ClInclude Include="TestRange.hpp" />
-    <ClInclude Include="TestRedBlackTree.hpp" />
-    <ClInclude Include="TestSet.hpp" />
-    <ClInclude Include="TestStack.hpp" />
     <ClInclude Include="TestString.hpp" />
     <ClInclude Include="TestFunction.hpp" />
-    <ClInclude Include="TestTimeCounter.hpp" />
-    <ClInclude Include="TestUtility.hpp" />
-    <ClInclude Include="TestConcurrent.hpp" />
-    <ClInclude Include="TestVector.hpp" />
+    <ClInclude Include="Time\TestDate.hpp" />
+    <ClInclude Include="Time\TestTimeCounter.hpp" />
+    <ClInclude Include="Utility\TestUtility.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

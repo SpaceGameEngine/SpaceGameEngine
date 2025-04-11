@@ -8,29 +8,82 @@
     <ClInclude Include="TestMemoryManager.hpp" />
     <ClInclude Include="TestFunction.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
-    <ClInclude Include="TestUtility.hpp" />
-    <ClInclude Include="TestConcurrent.hpp" />
-    <ClInclude Include="TestVector.hpp" />
-    <ClInclude Include="TestContainerConcept.hpp" />
     <ClInclude Include="TestError.hpp" />
-    <ClInclude Include="TestRange.hpp" />
     <ClInclude Include="TestMeta.hpp" />
-    <ClInclude Include="TestTimeCounter.hpp" />
-    <ClInclude Include="TestMap.hpp" />
-    <ClInclude Include="TestHashMap.hpp" />
-    <ClInclude Include="TestList.hpp" />
-    <ClInclude Include="TestStack.hpp" />
-    <ClInclude Include="TestQueue.hpp" />
-    <ClInclude Include="TestPriorityQueue.hpp" />
-    <ClInclude Include="TestDllLoader.hpp" />
     <ClInclude Include="TestModule.hpp" />
     <ClInclude Include="TestFormat.hpp" />
     <ClInclude Include="TestFile.hpp" />
-    <ClInclude Include="TestDate.hpp" />
     <ClInclude Include="TestLog.hpp" />
-    <ClInclude Include="TestRedBlackTree.hpp" />
-    <ClInclude Include="TestHashTable.hpp" />
-    <ClInclude Include="TestSet.hpp" />
-    <ClInclude Include="TestHashSet.hpp" />
+    <ClInclude Include="Concurrent\TestConcurrent.hpp">
+      <Filter>Concurrent</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestHashMap.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestHashSet.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestList.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestMap.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestQueue.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestSet.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestStack.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestVector.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\Detail\TestHashTable.hpp">
+      <Filter>Container\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\Detail\TestRedBlackTree.hpp">
+      <Filter>Container\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestContainerConcept.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Container\TestPriorityQueue.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="System\TestDllLoader.hpp">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TestDate.hpp">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TestTimeCounter.hpp">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\TestUtility.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Concurrent">
+      <UniqueIdentifier>{382a9849-63a6-40dd-be07-87828fce320f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container">
+      <UniqueIdentifier>{466c41a1-77dd-475a-81f9-1a83e3fd1a3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container\Detail">
+      <UniqueIdentifier>{b20cd391-672c-4813-8fc9-47e0d81b822f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{6d796654-61ef-4d03-beb9-1a77f330dc77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time">
+      <UniqueIdentifier>{79ab9df9-658e-499c-86bf-737bdbbfaca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{128f1343-fef5-4270-9a7b-2dc0f40df0c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
