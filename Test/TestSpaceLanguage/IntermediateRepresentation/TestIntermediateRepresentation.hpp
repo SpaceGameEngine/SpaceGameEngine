@@ -375,7 +375,7 @@ TEST(IntermediateRepresentation_BasicBlock, Test)
 
 	ASSERT_EQ(bb4.GetIndex(), 1);
 	ASSERT_EQ(bb4.GetToIndices().GetSize(), 1);
-	ASSERT_EQ(bb4.GetToIndices()[0], 1);
+	ASSERT_NE(bb4.GetToIndices().Find(1), bb4.GetToIndices().GetConstEnd());
 	ASSERT_EQ(bb4.GetContent().GetSize(), 1);
 	ASSERT_EQ(*bb4.GetContent().GetConstBegin(), o3);
 
@@ -383,8 +383,8 @@ TEST(IntermediateRepresentation_BasicBlock, Test)
 
 	ASSERT_EQ(bb5.GetIndex(), 2);
 	ASSERT_EQ(bb5.GetToIndices().GetSize(), 2);
-	ASSERT_EQ(bb5.GetToIndices()[0], 2);
-	ASSERT_EQ(bb5.GetToIndices()[1], 3);
+	ASSERT_NE(bb5.GetToIndices().Find(2), bb5.GetToIndices().GetConstEnd());
+	ASSERT_NE(bb5.GetToIndices().Find(3), bb5.GetToIndices().GetConstEnd());
 	ASSERT_EQ(bb5.GetContent().GetSize(), 1);
 	ASSERT_EQ(*bb5.GetContent().GetConstBegin(), o4);
 }

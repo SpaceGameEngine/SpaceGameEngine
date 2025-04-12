@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "IntermediateRepresentation/Operation.h"
+#include "Container/Set.hpp"
 
 /*!
 @ingroup SpaceLanguage
@@ -31,7 +32,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 		BasicBlock(UInt64 idx, const Vector<Operation>& operations);
 
 		UInt64 GetIndex() const;
-		const Vector<UInt64>& GetToIndices() const;
+		const Set<UInt64>& GetToIndices() const;
 		const Vector<Operation>& GetContent() const;
 
 		bool operator==(const BasicBlock& bb) const;
@@ -39,7 +40,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	private:
 		UInt64 m_Index;
-		Vector<UInt64> m_ToIndices;
+		Set<UInt64> m_ToIndices;
 		Vector<Operation> m_Content;
 	};
 

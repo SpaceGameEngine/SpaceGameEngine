@@ -25,11 +25,11 @@ SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::BasicBlo
 	SGE_ASSERT(InvalidBasicBlockError, *this);
 	const Operation& last_operation = *m_Content.GetConstReverseBegin();
 	if (last_operation.GetType() == OperationType::Goto)
-		m_ToIndices.EmplaceBack(last_operation.GetArguments()[0].GetIndex());
+		m_ToIndices.Insert(last_operation.GetArguments()[0].GetIndex());
 	else if (last_operation.GetType() == OperationType::If)
 	{
-		m_ToIndices.EmplaceBack(last_operation.GetArguments()[1].GetIndex());
-		m_ToIndices.EmplaceBack(last_operation.GetArguments()[2].GetIndex());
+		m_ToIndices.Insert(last_operation.GetArguments()[1].GetIndex());
+		m_ToIndices.Insert(last_operation.GetArguments()[2].GetIndex());
 	}
 }
 
@@ -38,7 +38,7 @@ UInt64 SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::G
 	return m_Index;
 }
 
-const Vector<UInt64>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::GetToIndices() const
+const Set<UInt64>& SpaceGameEngine::SpaceLanguage::IntermediateRepresentation::BasicBlock::GetToIndices() const
 {
 	return m_ToIndices;
 }
