@@ -23,6 +23,7 @@ SGE_MODULE(SpaceLanguage);
 void SpaceGameEngine::SpaceLanguage::SpaceLanguageModule::OnLoad()
 {
 	ModuleManager::GetSingleton().LoadModule(SGE_STR("Common"));
+	ModuleManager::GetSingleton().LoadModule(SGE_STR("CommonParser"));
 	ModuleManager::GetSingleton().LoadModule(SGE_STR("CommonIntermediateRepresentation"));
 }
 

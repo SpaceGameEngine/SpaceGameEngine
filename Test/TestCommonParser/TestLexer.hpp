@@ -18,7 +18,7 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
-using namespace SpaceGameEngine::SpaceLanguage;
+using namespace SpaceGameEngine::CommonParser;
 
 TEST(Token, Test)
 {

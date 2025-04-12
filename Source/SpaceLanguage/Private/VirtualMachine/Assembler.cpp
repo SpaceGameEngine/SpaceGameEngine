@@ -20,7 +20,7 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::SpaceLanguage;
-using namespace SpaceGameEngine::SpaceLanguage::Lexer;
+using namespace SpaceGameEngine::CommonParser::Lexer;
 
 SpaceGameEngine::SpaceLanguage::InstructionNameSet::InstructionNameSet()
 {

@@ -18,7 +18,6 @@ limitations under the License.
 #include "SGEString.hpp"
 #include "Module/ModuleManager.h"
 #include "VirtualMachine/TestVirtualMachine.hpp"
-#include "TestLexer.hpp"
 #include "VirtualMachine/TestAssembler.hpp"
 #include "VirtualMachine/ExternalCallerModule/TestCoreModule.hpp"
 #include "IntermediateRepresentation/TestIntermediateRepresentation.hpp"

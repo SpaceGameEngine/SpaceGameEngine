@@ -69,11 +69,15 @@ set(THIRD_PARTY_TEST_LIBRARIES gtest gmock benchmark)
 # Game Engine Modules
 add_subdirectory(Source/Common)
 add_subdirectory(Source/Bootstrap)
+add_subdirectory(Source/CommonParser)
+add_subdirectory(Source/CommonIntermediateRepresentation)
 add_subdirectory(Source/SpaceLanguage)
 
 # Tests
 add_subdirectory(Test/TestCommon)
 add_subdirectory(Test/TestModule)
+add_subdirectory(Test/TestCommonParser)
+add_subdirectory(Test/TestCommonIntermediateRepresentation)
 add_subdirectory(Test/TestSpaceLanguage)
 
 # Benchmarks

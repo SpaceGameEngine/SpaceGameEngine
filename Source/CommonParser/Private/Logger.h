@@ -13,19 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "CommonIntermediateRepresentationModule.h"
+#pragma once
+#include "Log.h"
+#include "CommonParserAPI.h"
 
-using namespace SpaceGameEngine;
-using namespace SpaceGameEngine::CommonIntermediateRepresentation;
+/*!
+@ingroup CommonParser
+@{
+*/
 
-SGE_MODULE(CommonIntermediateRepresentation);
-
-void SpaceGameEngine::CommonIntermediateRepresentation::CommonIntermediateRepresentationModule::OnLoad()
+namespace SpaceGameEngine::CommonParser
 {
-	ModuleManager::GetSingleton().LoadModule(SGE_STR("Common"));
-	ModuleManager::GetSingleton().LoadModule(SGE_STR("CommonParser"));
+
+	COMMON_PARSER_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetCommonParserLogWriter();
+	COMMON_PARSER_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetCommonParserLogger();
+
 }
 
-void SpaceGameEngine::CommonIntermediateRepresentation::CommonIntermediateRepresentationModule::OnUnload()
-{
-}
+/*!
+@}
+*/

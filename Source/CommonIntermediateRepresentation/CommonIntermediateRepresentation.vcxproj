@@ -80,13 +80,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -97,7 +97,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,7 +105,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -114,13 +114,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,10 +139,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonParser\CommonParser.vcxproj">
+      <Project>{637bf691-8b90-4cec-9651-526a3000ad88}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{3d706382-4b3c-4ebc-ac11-ff05c091e4d4}</Project>
     </ProjectReference>

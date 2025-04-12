@@ -18,14 +18,14 @@ limitations under the License.
 #include "Utility/Singleton.hpp"
 #include "Container/HashMap.hpp"
 #include "Container/Vector.hpp"
-#include "SpaceLanguageAPI.h"
+#include "CommonParserAPI.h"
 
 /*!
-@ingroup SpaceLanguage
+@ingroup CommonParser
 @{
 */
 
-namespace SpaceGameEngine::SpaceLanguage::Lexer
+namespace SpaceGameEngine::CommonParser::Lexer
 {
 
 	enum class TokenType : UInt8
@@ -75,10 +75,10 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	struct InvalidTokenTypeError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The TokenType is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(TokenType tt);
+		static COMMON_PARSER_API bool Judge(TokenType tt);
 	};
 
-	class SPACE_LANGUAGE_API Token
+	class COMMON_PARSER_API Token
 	{
 	public:
 		Token();
@@ -99,7 +99,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		SizeType m_Column;
 	};
 
-	class SPACE_LANGUAGE_API SymbolSet : public UncopyableAndUnmovable, public Singleton<SymbolSet>
+	class COMMON_PARSER_API SymbolSet : public UncopyableAndUnmovable, public Singleton<SymbolSet>
 	{
 	private:
 		SymbolSet();
@@ -114,7 +114,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		HashMap<Char, TokenType> m_Content;
 	};
 
-	class SPACE_LANGUAGE_API EscapeCharacterSet : public UncopyableAndUnmovable, public Singleton<EscapeCharacterSet>
+	class COMMON_PARSER_API EscapeCharacterSet : public UncopyableAndUnmovable, public Singleton<EscapeCharacterSet>
 	{
 	private:
 		EscapeCharacterSet();
@@ -132,7 +132,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	struct InvalidEscapeCharacterError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The escape character is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(Char c);
+		static COMMON_PARSER_API bool Judge(Char c);
 	};
 
 	using StateType = UInt8;
@@ -165,7 +165,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	}
 	inline constexpr const SizeType StateSize = 23;
 
-	class SPACE_LANGUAGE_API StateMachineForJudge : public UncopyableAndUnmovable, public Singleton<StateMachineForJudge>
+	class COMMON_PARSER_API StateMachineForJudge : public UncopyableAndUnmovable, public Singleton<StateMachineForJudge>
 	{
 
 	public:
@@ -197,7 +197,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	struct InvalidSourceStringError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Source string is invalid.");
-		static SPACE_LANGUAGE_API bool Judge(const String& str, const String& error_info_formatter);
+		static COMMON_PARSER_API bool Judge(const String& str, const String& error_info_formatter);
 	};
 
 	enum class StateMachineControlSignal : UInt8
@@ -218,7 +218,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 		CommentBlockEndBack = 13,
 	};
 
-	struct SPACE_LANGUAGE_API StateTransfer
+	struct COMMON_PARSER_API StateTransfer
 	{
 		StateType m_NextState;
 		StateMachineControlSignal m_Signal;
@@ -234,12 +234,12 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 
 namespace SpaceGameEngine
 {
-	extern template class SPACE_LANGUAGE_API_TEMPLATE_DECLARE Vector<SpaceGameEngine::SpaceLanguage::Lexer::Token>;
+	extern template class COMMON_PARSER_API_TEMPLATE_DECLARE Vector<SpaceGameEngine::CommonParser::Lexer::Token>;
 }
 
-namespace SpaceGameEngine::SpaceLanguage::Lexer
+namespace SpaceGameEngine::CommonParser::Lexer
 {
-	class SPACE_LANGUAGE_API StateMachine : public UncopyableAndUnmovable, public Singleton<StateMachine>
+	class COMMON_PARSER_API StateMachine : public UncopyableAndUnmovable, public Singleton<StateMachine>
 	{
 	public:
 		friend DefaultAllocator;
@@ -262,7 +262,7 @@ namespace SpaceGameEngine::SpaceLanguage::Lexer
 	@brief Get tokens by giving string.
 	@param error_info_formatter format string which likes "In line:{} column:{}, {}"
 	*/
-	SPACE_LANGUAGE_API Vector<Token> GetTokens(const String& str, const String& error_info_formatter);
+	COMMON_PARSER_API Vector<Token> GetTokens(const String& str, const String& error_info_formatter);
 
 }
 

@@ -92,12 +92,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SPACE_LANGUAGE_EXPORTS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
     </Link>
   </ItemDefinitionGroup>
@@ -109,14 +109,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SPACE_LANGUAGE_EXPORTS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
     </Link>
   </ItemDefinitionGroup>
@@ -126,12 +126,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SPACE_LANGUAGE_EXPORTS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
     </Link>
   </ItemDefinitionGroup>
@@ -143,20 +143,23 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SPACE_LANGUAGE_EXPORTS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonIntermediateRepresentation\CommonIntermediateRepresentation.vcxproj">
       <Project>{def60535-5e99-4e17-b084-f4524659d49d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\CommonParser\CommonParser.vcxproj">
+      <Project>{637bf691-8b90-4cec-9651-526a3000ad88}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{3d706382-4b3c-4ebc-ac11-ff05c091e4d4}</Project>
@@ -173,7 +176,6 @@
     <ClInclude Include="Public\IntermediateRepresentation\Translator.h" />
     <ClInclude Include="Public\IntermediateRepresentation\Type.h" />
     <ClInclude Include="Public\IntermediateRepresentation\Variable.h" />
-    <ClInclude Include="Public\Lexer.h" />
     <ClInclude Include="Public\Linker\CompiledObject.h" />
     <ClInclude Include="Public\SpaceLanguageAPI.h" />
     <ClInclude Include="Public\VirtualMachine\Assembler.h" />
@@ -191,7 +193,6 @@
     <ClCompile Include="Private\IntermediateRepresentation\Translator.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\Type.cpp" />
     <ClCompile Include="Private\IntermediateRepresentation\Variable.cpp" />
-    <ClCompile Include="Private\Lexer.cpp" />
     <ClCompile Include="Private\Linker\CompiledObject.cpp" />
     <ClCompile Include="Private\Logger.cpp" />
     <ClCompile Include="Private\SpaceLanguageModule.cpp" />

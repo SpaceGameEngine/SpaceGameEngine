@@ -80,12 +80,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public;../../Source/CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll;CommonIntermediateRepresentation.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll;CommonIntermediateRepresentation.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,14 +96,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public;../../Source/CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll;CommonIntermediateRepresentation.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll;CommonIntermediateRepresentation.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -112,12 +112,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public;../../Source/CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll;CommonIntermediateRepresentation.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll;CommonIntermediateRepresentation.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,14 +128,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public;../../Source/CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll;CommonIntermediateRepresentation.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll;CommonIntermediateRepresentation.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -147,6 +147,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Source\CommonIntermediateRepresentation\CommonIntermediateRepresentation.vcxproj">
       <Project>{def60535-5e99-4e17-b084-f4524659d49d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Source\CommonParser\CommonParser.vcxproj">
+      <Project>{637bf691-8b90-4cec-9651-526a3000ad88}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Source\Common\Common.vcxproj">
       <Project>{3d706382-4b3c-4ebc-ac11-ff05c091e4d4}</Project>

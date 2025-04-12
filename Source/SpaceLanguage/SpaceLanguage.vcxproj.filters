@@ -60,9 +60,6 @@
     <ClInclude Include="Public\VirtualMachine\Assembler.h">
       <Filter>Public\VirtualMachine</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Lexer.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Private\Logger.h">
       <Filter>Private</Filter>
     </ClInclude>
@@ -112,9 +109,6 @@
     </ClCompile>
     <ClCompile Include="Private\VirtualMachine\Assembler.cpp">
       <Filter>Private\VirtualMachine</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Lexer.cpp">
-      <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\Logger.cpp">
       <Filter>Private</Filter>

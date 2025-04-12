@@ -19,36 +19,36 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{6c3e06dd-648f-4f8e-b0bc-fb6bea309a55}</ProjectGuid>
-    <RootNamespace>TestSpaceLanguage</RootNamespace>
-    <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
+    <ProjectGuid>{6633cef3-3951-4591-9f0e-978aaa8033cd}</ProjectGuid>
+    <RootNamespace>TestCommonParser</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -74,31 +74,18 @@
     <Import Project="..\..\ProjectCommonProperty.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public;../../Source/CommonIntermediateRepresentation/Public;../../Source/SpaceLanguage/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll;CommonParser.dll;CommonIntermediateRepresentation.dll;SpaceLanguage.dll</DelayLoadDLLs>
-      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,15 +96,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public;../../Source/CommonIntermediateRepresentation/Public;../../Source/SpaceLanguage/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll;CommonParser.dll;CommonIntermediateRepresentation.dll;SpaceLanguage.dll</DelayLoadDLLs>
-      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,13 +112,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public;../../Source/CommonIntermediateRepresentation/Public;../../Source/SpaceLanguage/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll;CommonParser.dll;CommonIntermediateRepresentation.dll;SpaceLanguage.dll</DelayLoadDLLs>
-      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -143,23 +128,22 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public;../../Source/CommonIntermediateRepresentation/Public;../../Source/SpaceLanguage/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../ThirdParty/GoogleTest/source/googletest/include;../../ThirdParty/GoogleTest/source/googlemock/include;../../Source/Common/Public;../../Source/Bootstrap/Public;../../Source/CommonParser/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll;CommonParser.dll;CommonIntermediateRepresentation.dll;SpaceLanguage.dll</DelayLoadDLLs>
-      <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <DelayLoadDLLs>Common.dll;CommonParser.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Source\Bootstrap\Bootstrap.vcxproj">
       <Project>{84ade34b-02bd-4712-8fed-84b671ca59cd}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Source\CommonIntermediateRepresentation\CommonIntermediateRepresentation.vcxproj">
-      <Project>{def60535-5e99-4e17-b084-f4524659d49d}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Source\CommonParser\CommonParser.vcxproj">
       <Project>{637bf691-8b90-4cec-9651-526a3000ad88}</Project>
@@ -167,22 +151,12 @@
     <ProjectReference Include="..\..\Source\Common\Common.vcxproj">
       <Project>{3d706382-4b3c-4ebc-ac11-ff05c091e4d4}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Source\SpaceLanguage\SpaceLanguage.vcxproj">
-      <Project>{88fc8d55-ae02-4b8b-a32e-6c5181e8f0f7}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\ThirdParty\GoogleTest\GoogleTest.vcxproj">
       <Project>{d7662b21-f269-400c-95c2-3b498e34de38}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="IntermediateRepresentation\TestIntermediateRepresentation.hpp" />
-    <ClInclude Include="Linker\TestLinker.hpp" />
-    <ClInclude Include="VirtualMachine\ExternalCallerModule\TestCoreModule.hpp" />
-    <ClInclude Include="VirtualMachine\TestAssembler.hpp" />
-    <ClInclude Include="VirtualMachine\TestVirtualMachine.hpp" />
+    <ClInclude Include="TestLexer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

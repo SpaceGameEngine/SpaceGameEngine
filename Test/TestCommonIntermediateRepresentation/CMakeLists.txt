@@ -1,0 +1,2 @@
+add_executable(TestCommonIntermediateRepresentation main.cpp)
+target_link_libraries(TestCommonIntermediateRepresentation Bootstrap Common CommonIntermediateRepresentation ${THIRD_PARTY_TEST_LIBRARIES})

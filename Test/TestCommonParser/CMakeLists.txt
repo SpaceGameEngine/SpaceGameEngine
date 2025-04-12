@@ -1,0 +1,2 @@
+add_executable(TestCommonParser main.cpp)
+target_link_libraries(TestCommonParser Bootstrap Common CommonIntermediateRepresentation ${THIRD_PARTY_TEST_LIBRARIES})

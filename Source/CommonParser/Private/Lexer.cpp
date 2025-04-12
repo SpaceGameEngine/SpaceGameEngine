@@ -18,20 +18,20 @@ limitations under the License.
 #include "Logger.h"
 
 using namespace SpaceGameEngine;
-using namespace SpaceGameEngine::SpaceLanguage;
-using namespace SpaceGameEngine::SpaceLanguage::Lexer;
+using namespace SpaceGameEngine::CommonParser;
+using namespace SpaceGameEngine::CommonParser::Lexer;
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::InvalidTokenTypeError::Judge(TokenType tt)
+bool SpaceGameEngine::CommonParser::Lexer::InvalidTokenTypeError::Judge(TokenType tt)
 {
 	return (UInt8)tt > 39;
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::Token::Token()
+SpaceGameEngine::CommonParser::Lexer::Token::Token()
 	: m_Type(TokenType::Unknown), m_Line(1), m_Column(1)
 {
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::Token::Token(TokenType token_type, const String& str, SizeType line, SizeType column)
+SpaceGameEngine::CommonParser::Lexer::Token::Token(TokenType token_type, const String& str, SizeType line, SizeType column)
 	: m_Type(token_type), m_Content(str), m_Line(line), m_Column(column)
 {
 	SGE_ASSERT(InvalidTokenTypeError, token_type);
@@ -39,37 +39,37 @@ SpaceGameEngine::SpaceLanguage::Lexer::Token::Token(TokenType token_type, const 
 	SGE_ASSERT(InvalidValueError, column, 1, UINT64_MAX);
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::TokenType SpaceGameEngine::SpaceLanguage::Lexer::Token::GetType() const
+SpaceGameEngine::CommonParser::Lexer::TokenType SpaceGameEngine::CommonParser::Lexer::Token::GetType() const
 {
 	return m_Type;
 }
 
-const String& SpaceGameEngine::SpaceLanguage::Lexer::Token::GetContent() const
+const String& SpaceGameEngine::CommonParser::Lexer::Token::GetContent() const
 {
 	return m_Content;
 }
 
-SizeType SpaceGameEngine::SpaceLanguage::Lexer::Token::GetLine() const
+SizeType SpaceGameEngine::CommonParser::Lexer::Token::GetLine() const
 {
 	return m_Line;
 }
 
-SizeType SpaceGameEngine::SpaceLanguage::Lexer::Token::GetColumn() const
+SizeType SpaceGameEngine::CommonParser::Lexer::Token::GetColumn() const
 {
 	return m_Column;
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::Token::operator==(const Token& token) const
+bool SpaceGameEngine::CommonParser::Lexer::Token::operator==(const Token& token) const
 {
 	return m_Type == token.m_Type && m_Content == token.m_Content && m_Line == token.m_Line && m_Column == token.m_Column;
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::Token::operator!=(const Token& token) const
+bool SpaceGameEngine::CommonParser::Lexer::Token::operator!=(const Token& token) const
 {
 	return m_Type != token.m_Type || m_Content != token.m_Content || m_Line != token.m_Line || m_Column != token.m_Column;
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::SymbolSet::SymbolSet()
+SpaceGameEngine::CommonParser::Lexer::SymbolSet::SymbolSet()
 	: m_Content({Pair<const Char, TokenType>(SGE_STR('!'), TokenType::Exclamation),
 				 Pair<const Char, TokenType>(SGE_STR('#'), TokenType::Hash),
 				 Pair<const Char, TokenType>(SGE_STR('$'), TokenType::Dollar),
@@ -102,7 +102,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::SymbolSet::SymbolSet()
 {
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::TokenType SpaceGameEngine::SpaceLanguage::Lexer::SymbolSet::Get(Char c) const
+SpaceGameEngine::CommonParser::Lexer::TokenType SpaceGameEngine::CommonParser::Lexer::SymbolSet::Get(Char c) const
 {
 	auto iter = m_Content.Find(c);
 	if (iter != m_Content.GetConstEnd())
@@ -111,7 +111,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::TokenType SpaceGameEngine::SpaceLanguage:
 		return TokenType::Unknown;
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::SymbolSet::IsSymbol(Char c) const
+bool SpaceGameEngine::CommonParser::Lexer::SymbolSet::IsSymbol(Char c) const
 {
 	if (m_Content.Find(c) != m_Content.GetConstEnd())
 		return true;
@@ -119,7 +119,7 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::SymbolSet::IsSymbol(Char c) const
 		return false;
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::EscapeCharacterSet::EscapeCharacterSet()
+SpaceGameEngine::CommonParser::Lexer::EscapeCharacterSet::EscapeCharacterSet()
 	: m_Content({Pair<const Char, Char>(SGE_STR('n'), SGE_STR('\n')),
 				 Pair<const Char, Char>(SGE_STR('r'), SGE_STR('\r')),
 				 Pair<const Char, Char>(SGE_STR('t'), SGE_STR('\t')),
@@ -129,23 +129,23 @@ SpaceGameEngine::SpaceLanguage::Lexer::EscapeCharacterSet::EscapeCharacterSet()
 {
 }
 
-Char SpaceGameEngine::SpaceLanguage::Lexer::EscapeCharacterSet::Translate(Char c) const
+Char SpaceGameEngine::CommonParser::Lexer::EscapeCharacterSet::Translate(Char c) const
 {
 	SGE_ASSERT(InvalidEscapeCharacterError, c);
 	return m_Content.Find(c)->m_Second;
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::EscapeCharacterSet::IsEscapeCharacter(Char c) const
+bool SpaceGameEngine::CommonParser::Lexer::EscapeCharacterSet::IsEscapeCharacter(Char c) const
 {
 	return m_Content.Find(c) != m_Content.GetConstEnd();
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::InvalidEscapeCharacterError::Judge(Char c)
+bool SpaceGameEngine::CommonParser::Lexer::InvalidEscapeCharacterError::Judge(Char c)
 {
 	return !EscapeCharacterSet::GetSingleton().IsEscapeCharacter(c);
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::Judge(const String& str, const String& error_info_formatter) const
+bool SpaceGameEngine::CommonParser::Lexer::StateMachineForJudge::Judge(const String& str, const String& error_info_formatter) const
 {
 	StateType state = State::Start;
 	String::ConstIterator iter = str.GetConstBegin();
@@ -194,7 +194,7 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::Judge(const St
 					flb = flb_submit;
 				else if (flb_submit != flb)
 				{
-					SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid file line break"))));
+					SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid file line break"))));
 					return true;
 				}
 
@@ -208,44 +208,44 @@ bool SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::Judge(const St
 
 	if (state == State::DoubleDot)
 	{
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete double decimal here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete double decimal here"))));
 		return true;
 	}
 	if (state == State::CharacterBegin || state == State::CharacterEnd)
 	{
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete character here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete character here"))));
 		return true;
 	}
 	if (state == State::EscapeCharacter)
 	{
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete escape character here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete escape character here"))));
 		return true;
 	}
 	if (state == State::String)
 	{
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete string here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete string here"))));
 		return true;
 	}
 	if (state == State::StringEscapeCharacter)
 	{
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete escape character in string here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete escape character in string here"))));
 		return true;
 	}
 	if (state == State::RawStringBegin || state == State::RawString || state == State::RawStringEnd)
 	{
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete raw string here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete raw string here"))));
 		return true;
 	}
 	if (state == State::CommentBlock || state == State::CommentBlockEnd)
 	{
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete comment block here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete comment block here"))));
 		return true;
 	}
 
 	return false;
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudge()
+SpaceGameEngine::CommonParser::Lexer::StateMachineForJudge::StateMachineForJudge()
 {
 	// Start
 	for (Char c = SGE_STR('a'); c <= SGE_STR('z'); ++c)
@@ -296,7 +296,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 								   Pair<const Char, StateType>(SGE_STR('`'), State::Start)});
 
 	m_OtherCharacterJudgeFunctions[State::Start] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported character"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported character"))));
 		return true;
 	};
 
@@ -362,7 +362,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		Char c = *iter;
 		if (c >= SGE_STR('2') && c <= SGE_STR('9'))
 		{
-			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid number in binary integer"))));
+			SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid number in binary integer"))));
 			return true;
 		}
 		else
@@ -390,7 +390,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		m_States[State::DoubleDot].Insert(c, State::Double);
 
 	m_OtherCharacterJudgeFunctions[State::DoubleDot] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete double decimal here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need complete double decimal here"))));
 		return true;
 	};
 
@@ -410,7 +410,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_OtherCharacterJudgeFunctions[State::CharacterBegin] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		if (*iter == SGE_STR('\''))
 		{
-			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need character here"))));
+			SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need character here"))));
 			return true;
 		}
 		else
@@ -425,7 +425,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	m_States[State::CharacterEnd].Insert(SGE_STR('\''), State::Start);
 
 	m_OtherCharacterJudgeFunctions[State::CharacterEnd] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
-		SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need \' here"))));
+		SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need \' here"))));
 		return true;
 	};
 
@@ -439,7 +439,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		}
 		else
 		{
-			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported escape character"))));
+			SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported escape character"))));
 			return true;
 		}
 	};
@@ -454,7 +454,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		Char c = *iter;
 		if (c == SGE_STR('\r') || c == SGE_STR('\n'))
 		{
-			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need \" here"))));
+			SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need \" here"))));
 			return true;
 		}
 		else
@@ -475,7 +475,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		}
 		else
 		{
-			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported escape character"))));
+			SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Unsupported escape character"))));
 			return true;
 		}
 	};
@@ -502,7 +502,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 		}
 		else
 		{
-			SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need prefix or ( here"))));
+			SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Need prefix or ( here"))));
 			return true;
 		}
 	};
@@ -578,37 +578,37 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachineForJudge::StateMachineForJudg
 	};
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::InvalidSourceStringError::Judge(const String& str, const String& error_info_formatter)
+bool SpaceGameEngine::CommonParser::Lexer::InvalidSourceStringError::Judge(const String& str, const String& error_info_formatter)
 {
 	return StateMachineForJudge::GetSingleton().Judge(str, error_info_formatter);
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::StateTransfer()
+SpaceGameEngine::CommonParser::Lexer::StateTransfer::StateTransfer()
 	: m_NextState(State::Start), m_Signal(StateMachineControlSignal::Forward), m_TokenType(TokenType::Unknown)
 {
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::StateTransfer(StateType next_state, StateMachineControlSignal sign, TokenType token_type)
+SpaceGameEngine::CommonParser::Lexer::StateTransfer::StateTransfer(StateType next_state, StateMachineControlSignal sign, TokenType token_type)
 	: m_NextState(next_state), m_Signal(sign), m_TokenType(token_type)
 {
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::operator==(const StateTransfer& st) const
+bool SpaceGameEngine::CommonParser::Lexer::StateTransfer::operator==(const StateTransfer& st) const
 {
 	return m_NextState == st.m_NextState && m_Signal == st.m_Signal && m_TokenType == st.m_TokenType;
 }
 
-bool SpaceGameEngine::SpaceLanguage::Lexer::StateTransfer::operator!=(const StateTransfer& st) const
+bool SpaceGameEngine::CommonParser::Lexer::StateTransfer::operator!=(const StateTransfer& st) const
 {
 	return m_NextState != st.m_NextState || m_Signal != st.m_Signal || m_TokenType != st.m_TokenType;
 }
 
 namespace SpaceGameEngine
 {
-	template class SPACE_LANGUAGE_API_TEMPLATE_DEFINE Vector<SpaceGameEngine::SpaceLanguage::Lexer::Token>;
+	template class COMMON_PARSER_API_TEMPLATE_DEFINE Vector<SpaceGameEngine::CommonParser::Lexer::Token>;
 }
 
-Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const String& str) const
+Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const String& str) const
 {
 	Vector<Token> result;
 	String str_buf;
@@ -834,7 +834,7 @@ Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::Run(const Str
 	return result;
 }
 
-SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::StateMachine()
+SpaceGameEngine::CommonParser::Lexer::StateMachine::StateMachine()
 {
 	// Start
 	for (Char c = SGE_STR('1'); c <= SGE_STR('9'); ++c)
@@ -1013,7 +1013,7 @@ SpaceGameEngine::SpaceLanguage::Lexer::StateMachine::StateMachine()
 	m_OtherCharacterStates[State::CommentLine] = StateTransfer(State::CommentLine, StateMachineControlSignal::Forward, TokenType::CommentLine);
 }
 
-Vector<Token> SpaceGameEngine::SpaceLanguage::Lexer::GetTokens(const String& str, const String& error_info_formatter)
+Vector<Token> SpaceGameEngine::CommonParser::Lexer::GetTokens(const String& str, const String& error_info_formatter)
 {
 	SGE_ASSERT(InvalidSourceStringError, str, error_info_formatter);
 	return StateMachine::GetSingleton().Run(str);
