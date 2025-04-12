@@ -19,7 +19,7 @@ add_library(SpaceLanguage SHARED
         )
 target_compile_definitions(SpaceLanguage PRIVATE SPACE_LANGUAGE_EXPORTS)
 target_include_directories(SpaceLanguage PUBLIC Public)
-target_link_libraries(SpaceLanguage PUBLIC Common)
+target_link_libraries(SpaceLanguage PUBLIC Common CommonIntermediateRepresentation)
 if((CMAKE_HOST_UNIX) AND (NOT CMAKE_HOST_APPLE))
 target_link_libraries(SpaceLanguage PUBLIC ${CMAKE_DL_LIBS})
 endif()

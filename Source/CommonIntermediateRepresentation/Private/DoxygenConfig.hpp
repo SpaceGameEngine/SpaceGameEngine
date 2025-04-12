@@ -13,19 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "SpaceLanguageModule.h"
+#pragma once
+/*!
+@defgroup CommonIntermediateRepresentation CommonIntermediateRepresentation Module
+*/
 
-using namespace SpaceGameEngine;
-using namespace SpaceGameEngine::SpaceLanguage;
+// template
+/*!
+@ingroup CommonIntermediateRepresentation
+@{
+*/
 
-SGE_MODULE(SpaceLanguage);
-
-void SpaceGameEngine::SpaceLanguage::SpaceLanguageModule::OnLoad()
-{
-	ModuleManager::GetSingleton().LoadModule(SGE_STR("Common"));
-	ModuleManager::GetSingleton().LoadModule(SGE_STR("CommonIntermediateRepresentation"));
-}
-
-void SpaceGameEngine::SpaceLanguage::SpaceLanguageModule::OnUnload()
-{
-}
+/*!
+@}
+*/
+//--------

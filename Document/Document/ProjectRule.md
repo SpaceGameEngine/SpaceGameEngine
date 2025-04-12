@@ -14,3 +14,8 @@
 * 头文件库:  
 1. 要在解决方案中的`ThirdParty`文件夹中添加同名文件夹，并添加现有文件。
 2. 添加空白的`licenseheader`文件于库所在的文件夹中。
+
+### DLL Module
+&emsp;&emsp;如果项目是一个DLL Module，除了需要实现Module系统所需的相关代码外(见[Module](./Common/Module.md))，还需要额外配置以下属性：
+1. 添加对应的导出宏(形如`XXX_EXPORTS`)
+2. 在链接器的输入页中，配置延迟加载的DLL为所需的其他模块的DLL名称

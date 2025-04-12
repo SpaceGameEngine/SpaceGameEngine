@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{88fc8d55-ae02-4b8b-a32e-6c5181e8f0f7}</ProjectGuid>
-    <RootNamespace>SpaceLanguage</RootNamespace>
+    <ProjectGuid>{def60535-5e99-4e17-b084-f4524659d49d}</ProjectGuid>
+    <RootNamespace>CommonIntermediateRepresentation</RootNamespace>
     <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -74,31 +74,19 @@
     <Import Project="..\..\ProjectCommonProperty.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>SPACE_LANGUAGE_EXPORTS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,32 +95,32 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>SPACE_LANGUAGE_EXPORTS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>SPACE_LANGUAGE_EXPORTS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,66 +129,33 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>SPACE_LANGUAGE_EXPORTS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonIntermediateRepresentation/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
+      <DelayLoadDLLs>Common.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CommonIntermediateRepresentation\CommonIntermediateRepresentation.vcxproj">
-      <Project>{def60535-5e99-4e17-b084-f4524659d49d}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{3d706382-4b3c-4ebc-ac11-ff05c091e4d4}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Private\CommonIntermediateRepresentationModule.h" />
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
-    <ClInclude Include="Private\SpaceLanguageModule.h" />
-    <ClInclude Include="Public\IntermediateRepresentation\BasicBlock.h" />
-    <ClInclude Include="Public\IntermediateRepresentation\Function.h" />
-    <ClInclude Include="Public\IntermediateRepresentation\Operation.h" />
-    <ClInclude Include="Public\IntermediateRepresentation\RegisterAllocator.h" />
-    <ClInclude Include="Public\IntermediateRepresentation\Translator.h" />
-    <ClInclude Include="Public\IntermediateRepresentation\Type.h" />
-    <ClInclude Include="Public\IntermediateRepresentation\Variable.h" />
-    <ClInclude Include="Public\Lexer.h" />
-    <ClInclude Include="Public\Linker\CompiledObject.h" />
-    <ClInclude Include="Public\SpaceLanguageAPI.h" />
-    <ClInclude Include="Public\VirtualMachine\Assembler.h" />
-    <ClInclude Include="Public\VirtualMachine\ExternalCaller.h" />
-    <ClInclude Include="Public\VirtualMachine\ExternalCallerModule\CoreModule.h" />
-    <ClInclude Include="Public\VirtualMachine\Instruction.h" />
-    <ClInclude Include="Public\VirtualMachine\Register.h" />
-    <ClInclude Include="Public\VirtualMachine\VirtualMachine.h" />
+    <ClInclude Include="Public\CommonIntermediateRepresentationAPI.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\IntermediateRepresentation\BasicBlock.cpp" />
-    <ClCompile Include="Private\IntermediateRepresentation\Function.cpp" />
-    <ClCompile Include="Private\IntermediateRepresentation\Operation.cpp" />
-    <ClCompile Include="Private\IntermediateRepresentation\RegisterAllocator.cpp" />
-    <ClCompile Include="Private\IntermediateRepresentation\Translator.cpp" />
-    <ClCompile Include="Private\IntermediateRepresentation\Type.cpp" />
-    <ClCompile Include="Private\IntermediateRepresentation\Variable.cpp" />
-    <ClCompile Include="Private\Lexer.cpp" />
-    <ClCompile Include="Private\Linker\CompiledObject.cpp" />
+    <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp" />
     <ClCompile Include="Private\Logger.cpp" />
-    <ClCompile Include="Private\SpaceLanguageModule.cpp" />
-    <ClCompile Include="Private\VirtualMachine\Assembler.cpp" />
-    <ClCompile Include="Private\VirtualMachine\ExternalCaller.cpp" />
-    <ClCompile Include="Private\VirtualMachine\ExternalCallerModule\CoreModule.cpp" />
-    <ClCompile Include="Private\VirtualMachine\Instruction.cpp" />
-    <ClCompile Include="Private\VirtualMachine\Register.cpp" />
-    <ClCompile Include="Private\VirtualMachine\VirtualMachine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
