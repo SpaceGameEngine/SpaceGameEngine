@@ -584,6 +584,16 @@ TEST(HashSet, ShrinkToFitTest)
 	}
 }
 
+TEST(HashSet, ContainsTest)
+{
+	const HashSet<int> hs({1, 2, 3});
+	ASSERT_FALSE(hs.Contains(0));
+	ASSERT_TRUE(hs.Contains(1));
+	ASSERT_TRUE(hs.Contains(2));
+	ASSERT_TRUE(hs.Contains(3));
+	ASSERT_FALSE(hs.Contains(4));
+}
+
 TEST(HashSet, FindTest)
 {
 	HashSet<test_hashset_object>* phs = new HashSet<test_hashset_object>();

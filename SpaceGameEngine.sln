@@ -117,6 +117,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonParser", "Source\Comm
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCommonParser", "Test\TestCommonParser\TestCommonParser.vcxproj", "{6633CEF3-3951-4591-9F0E-978AAA8033CD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CommonIntermediateRepresentation", "CommonIntermediateRepresentation", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -275,6 +277,7 @@ Global
 		{6B0081D3-BE6B-46F3-891A-A14B3A252CF5} = {E09406D8-3CBC-473A-8715-05471C55AAFA}
 		{637BF691-8B90-4CEC-9651-526A3000AD88} = {72DE90D1-ACF7-4F34-8E54-E28BFDE1018F}
 		{6633CEF3-3951-4591-9F0E-978AAA8033CD} = {E09406D8-3CBC-473A-8715-05471C55AAFA}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {F93E7284-FB8F-468F-A220-8A4AA2AEC39F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D3CFB05-C912-4570-A835-15950F179A40}

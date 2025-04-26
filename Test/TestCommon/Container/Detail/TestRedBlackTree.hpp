@@ -405,6 +405,16 @@ TEST(RedBlackTree, RemoveByValueTest)
 	}
 }
 
+TEST(RedBlackTree, ContainsTest)
+{
+	const Detail::RedBlackTree<int> rbtree({1, 2, 3});
+	ASSERT_FALSE(rbtree.Contains(0));
+	ASSERT_TRUE(rbtree.Contains(1));
+	ASSERT_TRUE(rbtree.Contains(2));
+	ASSERT_TRUE(rbtree.Contains(3));
+	ASSERT_FALSE(rbtree.Contains(4));
+}
+
 TEST(RedBlackTree, FindTest)
 {
 	Detail::RedBlackTree<test_rbtree_object>* prbt = new Detail::RedBlackTree<test_rbtree_object>();

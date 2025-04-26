@@ -403,6 +403,16 @@ TEST(Set, RemoveByValueTest)
 	}
 }
 
+TEST(Set, ContainsTest)
+{
+	const Set<int> s({1, 2, 3});
+	ASSERT_FALSE(s.Contains(0));
+	ASSERT_TRUE(s.Contains(1));
+	ASSERT_TRUE(s.Contains(2));
+	ASSERT_TRUE(s.Contains(3));
+	ASSERT_FALSE(s.Contains(4));
+}
+
 TEST(Set, FindTest)
 {
 	Set<test_set_object>* ps = new Set<test_set_object>();

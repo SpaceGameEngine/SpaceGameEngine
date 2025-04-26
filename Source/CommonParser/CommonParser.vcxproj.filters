@@ -24,6 +24,9 @@
     <ClInclude Include="Public\Lexer.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\LexerUtility.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonParserModule.cpp">
@@ -33,6 +36,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\Lexer.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\LexerUtility.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

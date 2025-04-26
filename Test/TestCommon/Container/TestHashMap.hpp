@@ -638,6 +638,19 @@ TEST(HashMap, ShrinkToFitTest)
 	}
 }
 
+TEST(HashMap, ContainsTest)
+{
+	const HashMap<int, int> hm({{1, 0}, {2, 1}, {3, 2}});
+	ASSERT_FALSE(hm.Contains(0));
+	ASSERT_TRUE(hm.Contains(1));
+	ASSERT_TRUE(hm.Contains(2));
+	ASSERT_TRUE(hm.Contains(3));
+	ASSERT_FALSE(hm.Contains(4));
+
+	ASSERT_TRUE(hm.Contains(MakePair(2, 1)));
+	ASSERT_TRUE(hm.Contains(MakePair(2, 3)));	 // map only compare key
+}
+
 TEST(HashMap, FindTest)
 {
 	HashMap<test_hashmap_object, test_hashmap_object>* phm = new HashMap<test_hashmap_object, test_hashmap_object>();

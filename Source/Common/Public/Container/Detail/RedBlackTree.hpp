@@ -368,6 +368,12 @@ namespace SpaceGameEngine
 			}
 
 			template<typename V2>
+			inline bool Contains(const V2& val) const
+			{
+				return FindNode(val) != &m_NilNode;
+			}
+
+			template<typename V2>
 			inline Iterator Find(const V2& val)
 			{
 				return Iterator(FindNode(val), this);

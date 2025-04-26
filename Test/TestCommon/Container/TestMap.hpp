@@ -447,6 +447,19 @@ TEST(Map, RemoveByKeyTest)
 	}
 }
 
+TEST(Map, ContainsTest)
+{
+	const Map<int, int> m({{1, 0}, {2, 1}, {3, 2}});
+	ASSERT_FALSE(m.Contains(0));
+	ASSERT_TRUE(m.Contains(1));
+	ASSERT_TRUE(m.Contains(2));
+	ASSERT_TRUE(m.Contains(3));
+	ASSERT_FALSE(m.Contains(4));
+
+	ASSERT_TRUE(m.Contains(MakePair(2, 1)));
+	ASSERT_TRUE(m.Contains(MakePair(2, 3)));	// map only compare key
+}
+
 TEST(Map, FindTest)
 {
 	const int test_size = 1000;

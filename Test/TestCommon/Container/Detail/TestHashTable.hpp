@@ -589,6 +589,16 @@ TEST(HashTable, ShrinkToFitTest)
 	}
 }
 
+TEST(HashTable, ContainsTest)
+{
+	const Detail::HashTable<int> ht({1, 2, 3});
+	ASSERT_FALSE(ht.Contains(0));
+	ASSERT_TRUE(ht.Contains(1));
+	ASSERT_TRUE(ht.Contains(2));
+	ASSERT_TRUE(ht.Contains(3));
+	ASSERT_FALSE(ht.Contains(4));
+}
+
 TEST(HashTable, FindTest)
 {
 	Detail::HashTable<test_hashtable_object>* pht = new Detail::HashTable<test_hashtable_object>();

@@ -144,10 +144,12 @@
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Public\CommonParserAPI.h" />
     <ClInclude Include="Public\Lexer.h" />
+    <ClInclude Include="Public\LexerUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonParserModule.cpp" />
     <ClCompile Include="Private\Lexer.cpp" />
+    <ClCompile Include="Private\LexerUtility.cpp" />
     <ClCompile Include="Private\Logger.cpp" />
   </ItemGroup>
   <ItemGroup>

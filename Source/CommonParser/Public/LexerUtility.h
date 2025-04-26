@@ -13,18 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "gtest/gtest.h"
-#include "Bootstrap.h"
-#include "SGEString.hpp"
-#include "Module/ModuleManager.h"
-#include "TestLexer.hpp"
-#include "TestLexerUtility.hpp"
+#pragma once
+#include "Lexer.h"
+#include "Container/Set.hpp"
 
-SpaceGameEngine::Bootstrap bootstrap;
+/*!
+@ingroup CommonParser
+@{
+*/
 
-int main(int argc, char** argv)
+namespace SpaceGameEngine::CommonParser::Lexer
 {
-	SpaceGameEngine::ModuleManager::GetSingleton().LoadModule(SGE_STR("CommonParser"));
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	COMMON_PARSER_API Vector<Token> CombineToken(const Vector<Token>& tokens, const Vector<TokenType>& token_type_pattern, TokenType result_token_type, bool repeat = false);
+
+	COMMON_PARSER_API Vector<Token> RemoveToken(const Vector<Token>& tokens, const Set<TokenType>& remove_token_type_set);
 }
+
+/*!
+@}
+*/

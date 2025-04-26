@@ -724,6 +724,15 @@ namespace SpaceGameEngine
 			}
 
 			template<typename V2>
+			inline bool Contains(const V2& val) const
+			{
+				HashType hash = Hasher::GetHash(val);
+				SizeType idx = hash & (m_BucketQuantity - 1);
+				auto pnode = m_pContent[idx].FindNode(hash, val);
+				return pnode != nullptr;
+			}
+
+			template<typename V2>
 			inline Iterator Find(const V2& val)
 			{
 				HashType hash = Hasher::GetHash(val);
