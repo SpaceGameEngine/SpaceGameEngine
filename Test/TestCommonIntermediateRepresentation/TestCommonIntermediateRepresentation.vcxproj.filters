@@ -3,4 +3,14 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Parser">
+      <UniqueIdentifier>{48d9ced1-7991-4514-a2e5-b4b12d2ae2e6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Parser\TestLexer.hpp">
+      <Filter>Parser</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

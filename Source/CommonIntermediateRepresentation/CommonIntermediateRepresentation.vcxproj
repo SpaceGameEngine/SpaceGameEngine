@@ -155,10 +155,14 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Public\CommonIntermediateRepresentationAPI.h" />
+    <ClInclude Include="Public\Parser\AbstractSyntaxTree.h" />
+    <ClInclude Include="Public\Parser\Lexer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp" />
     <ClCompile Include="Private\Logger.cpp" />
+    <ClCompile Include="Private\Parser\AbstractSyntaxTree.cpp" />
+    <ClCompile Include="Private\Parser\Lexer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

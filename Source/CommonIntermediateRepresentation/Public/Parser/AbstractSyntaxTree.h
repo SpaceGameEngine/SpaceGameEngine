@@ -13,17 +13,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "gtest/gtest.h"
-#include "Bootstrap.h"
-#include "SGEString.hpp"
-#include "Module/ModuleManager.h"
-#include "Parser/TestLexer.hpp"
+#pragma once
+#include "CommonIntermediateRepresentationAPI.h"
 
-SpaceGameEngine::Bootstrap bootstrap;
+/*!
+@ingroup CommonIntermediateRepresentation
+@{
+*/
 
-int main(int argc, char** argv)
+namespace SpaceGameEngine::CommonIntermediateRepresentation::Parser
 {
-	SpaceGameEngine::ModuleManager::GetSingleton().LoadModule(SGE_STR("CommonIntermediateRepresentation"));
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	class COMMON_INTERMEDIATE_REPRESENTATION_API AbstractSyntaxTreeNode
+	{
+	public:
+		virtual ~AbstractSyntaxTreeNode() = default;
+
+	private:
+		AbstractSyntaxTreeNode* m_pFather = nullptr;
+	};
+
+	namespace AbstractSyntaxTreeNodes
+	{
+
+	}
 }
+
+/*!
+@}
+*/
