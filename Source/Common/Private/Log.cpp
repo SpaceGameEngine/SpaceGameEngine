@@ -89,6 +89,14 @@ void SpaceGameEngine::FileLogWriterCore::DeleteOldLogFile(const Path& dir_path)
 	}
 }
 
+AllLogWriterCore& SpaceGameEngine::GetAllLogWriterCore()
+{
+	static GlobalVariable<ConsoleLogWriterCore> g_AllConsoleLogWriterCore;
+	static GlobalVariable<FileLogWriterCore> g_AllFileLogWriterCore(GetDefaultLogDirectoryPath() / Path(SGE_STR("All")));
+	static GlobalVariable<AllLogWriterCore> g_AllLogWriterCore(g_AllConsoleLogWriterCore.Get(), g_AllFileLogWriterCore.Get());
+	return g_AllLogWriterCore.Get();
+}
+
 bool SpaceGameEngine::InvalidLogLevelError::Judge(LogLevelType log_level)
 {
 	return log_level > LogLevel::All;
@@ -120,21 +128,16 @@ UTF8String SpaceGameEngine::DefaultLogFormatter::Format(const Date& date, const 
 	return SpaceGameEngine::Format(UTF8String(SGE_U8STR("{:4}-{:2}-{:2} {:2}:{:2}:{:2} {}:{}:{} {} {}\n")), date.m_Year, date.m_Month, date.m_Day, date.m_Hour, date.m_Minute, date.m_Second, SGE_TSTR_TO_UTF8(debug_info.m_pFileName), SGE_TSTR_TO_UTF8(debug_info.m_pFunctionName), debug_info.m_LineNumber, GetLogLevelUTF8String(log_level), str);
 }
 
-LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::GetDefaultLogWriter()
-{
-	static GlobalVariable<LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>> g_DefaultLogWriter(GetDefaultLogDirectoryPath() / Path(SGE_STR("Default")));
-	return g_DefaultLogWriter.Get();
-}
-
-Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::GetDefaultLogger()
-{
-	static GlobalVariable<Logger<BindConsoleLogWriterCore<FileLogWriterCore>>> g_DefaultLogger(GetDefaultLogWriter(), LogLevel::All);
-	return g_DefaultLogger.Get();
-}
-
 namespace SpaceGameEngine
 {
-	template class COMMON_API_TEMPLATE_DEFINE BindConsoleLogWriterCore<FileLogWriterCore>;
-	template class COMMON_API_TEMPLATE_DEFINE LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
-	template class COMMON_API_TEMPLATE_DEFINE Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
+	template class COMMON_API_TEMPLATE_DEFINE ProxyPairLogWriterCore<ConsoleLogWriterCore, FileLogWriterCore>;
+	template class COMMON_API_TEMPLATE_DEFINE ProxyPairLogWriterCore<FileLogWriterCore, ConsoleLogWriterCore>;
+	template class COMMON_API_TEMPLATE_DEFINE ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>;
+	template class COMMON_API_TEMPLATE_DEFINE ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>;
+	template class COMMON_API_TEMPLATE_DEFINE LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>;
+	template class COMMON_API_TEMPLATE_DEFINE LogWriter<ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>>;
+	template class COMMON_API_TEMPLATE_DEFINE Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>;
+	template class COMMON_API_TEMPLATE_DEFINE Logger<ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>>;
+
+	SGE_LOGGER_DEFINE(Default);
 }

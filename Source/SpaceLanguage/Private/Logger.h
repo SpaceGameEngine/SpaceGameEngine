@@ -24,10 +24,7 @@ limitations under the License.
 
 namespace SpaceGameEngine::SpaceLanguage
 {
-
-	SPACE_LANGUAGE_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetSpaceLanguageLogWriter();
-	SPACE_LANGUAGE_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetSpaceLanguageLogger();
-
+	SGE_LOGGER_DECLARE(SPACE_LANGUAGE_API, SpaceLanguage);
 }
 
 /*!

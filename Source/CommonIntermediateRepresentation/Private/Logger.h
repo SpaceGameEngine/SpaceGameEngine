@@ -24,10 +24,7 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonIntermediateRepresentation
 {
-
-	COMMON_INTERMEDIATE_REPRESENTATION_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetCommonIntermediateRepresentationLogWriter();
-	COMMON_INTERMEDIATE_REPRESENTATION_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetCommonIntermediateRepresentationLogger();
-
+	SGE_LOGGER_DECLARE(COMMON_INTERMEDIATE_REPRESENTATION_API, CommonIntermediateRepresentation);
 }
 
 /*!

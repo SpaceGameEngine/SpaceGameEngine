@@ -15,17 +15,7 @@ limitations under the License.
 */
 #include "Logger.h"
 
-using namespace SpaceGameEngine;
-using namespace SpaceGameEngine::CommonIntermediateRepresentation;
-
-LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::CommonIntermediateRepresentation::GetCommonIntermediateRepresentationLogWriter()
+namespace SpaceGameEngine::CommonIntermediateRepresentation
 {
-	static GlobalVariable<LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>> g_CommonIntermediateRepresentationLogWriter(GetDefaultLogDirectoryPath() / Path(SGE_STR("CommonIntermediateRepresentation")));
-	return g_CommonIntermediateRepresentationLogWriter.Get();
-}
-
-Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::CommonIntermediateRepresentation::GetCommonIntermediateRepresentationLogger()
-{
-	static GlobalVariable<Logger<BindConsoleLogWriterCore<FileLogWriterCore>>> g_CommonIntermediateRepresentationLogger(GetCommonIntermediateRepresentationLogWriter(), LogLevel::All);
-	return g_CommonIntermediateRepresentationLogger.Get();
+	SGE_LOGGER_DEFINE(CommonIntermediateRepresentation);
 }

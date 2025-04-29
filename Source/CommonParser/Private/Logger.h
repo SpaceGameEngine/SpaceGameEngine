@@ -24,10 +24,7 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonParser
 {
-
-	COMMON_PARSER_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetCommonParserLogWriter();
-	COMMON_PARSER_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetCommonParserLogger();
-
+	SGE_LOGGER_DECLARE(COMMON_PARSER_API, CommonParser);
 }
 
 /*!

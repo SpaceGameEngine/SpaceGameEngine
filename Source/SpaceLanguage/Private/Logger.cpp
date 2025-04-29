@@ -15,17 +15,7 @@ limitations under the License.
 */
 #include "Logger.h"
 
-using namespace SpaceGameEngine;
-using namespace SpaceGameEngine::SpaceLanguage;
-
-LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::SpaceLanguage::GetSpaceLanguageLogWriter()
+namespace SpaceGameEngine::SpaceLanguage
 {
-	static GlobalVariable<LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>> g_SpaceLanguageLogWriter(GetDefaultLogDirectoryPath() / Path(SGE_STR("SpaceLanguage")));
-	return g_SpaceLanguageLogWriter.Get();
-}
-
-Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::SpaceLanguage::GetSpaceLanguageLogger()
-{
-	static GlobalVariable<Logger<BindConsoleLogWriterCore<FileLogWriterCore>>> g_SpaceLanguageLogger(GetSpaceLanguageLogWriter(), LogLevel::All);
-	return g_SpaceLanguageLogger.Get();
+	SGE_LOGGER_DEFINE(SpaceLanguage);
 }

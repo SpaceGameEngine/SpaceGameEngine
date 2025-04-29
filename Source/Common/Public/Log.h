@@ -69,19 +69,12 @@ namespace SpaceGameEngine
 		TimeCounter<Second> m_TimeCounter;
 	};
 
-	template<IsLogWriterCore OtherLogWriterCore>
-		requires(!std::is_same_v<OtherLogWriterCore, ConsoleLogWriterCore>)
-	class BindConsoleLogWriterCore : public ConsoleLogWriterCore, public OtherLogWriterCore
+	template<IsLogWriterCore FirstLogWriterCore, IsLogWriterCore SecondLogWriterCore>
+	class ProxyPairLogWriterCore
 	{
 	public:
-		inline BindConsoleLogWriterCore()
-			: ConsoleLogWriterCore(), OtherLogWriterCore()
-		{
-		}
-
-		template<typename... Args>
-		inline BindConsoleLogWriterCore(Args&&... args)
-			: ConsoleLogWriterCore(), OtherLogWriterCore(std::forward<Args>(args)...)
+		inline ProxyPairLogWriterCore(FirstLogWriterCore& first, SecondLogWriterCore& second)
+			: m_First(first), m_Second(second)
 		{
 		}
 
@@ -90,10 +83,18 @@ namespace SpaceGameEngine
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 
-			ConsoleLogWriterCore::WriteLog(pstr, size);
-			OtherLogWriterCore::WriteLog(pstr, size);
+			m_First.WriteLog(pstr, size);
+			m_Second.WriteLog(pstr, size);
 		}
+
+	private:
+		FirstLogWriterCore& m_First;
+		SecondLogWriterCore& m_Second;
 	};
+
+	using AllLogWriterCore = ProxyPairLogWriterCore<ConsoleLogWriterCore, FileLogWriterCore>;
+
+	COMMON_API AllLogWriterCore& GetAllLogWriterCore();
 
 	using DefaultLogWriterCore = ConsoleLogWriterCore;
 
@@ -103,13 +104,6 @@ namespace SpaceGameEngine
 	class LogWriter : public UncopyableAndUnmovable, public LogWriterCore
 	{
 	public:
-		inline LogWriter()
-			: LogWriterCore(), m_CurrentIndex(0), m_WriteIndex(0)
-		{
-			m_IsRunning.Store(true, MemoryOrder::Release);
-			m_Thread = Thread(std::bind(&LogWriter::Run, this));
-		}
-
 		template<typename... Args>
 		inline LogWriter(Args&&... args)
 			: LogWriterCore(std::forward<Args>(args)...), m_CurrentIndex(0), m_WriteIndex(0)
@@ -255,14 +249,35 @@ namespace SpaceGameEngine
 		LogLevelType m_LogLevel;
 	};
 
+#define SGE_LOGGER_DECLARE(api_macro, name)                                                                   \
+	api_macro LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>& Get##name##LogWriter(); \
+	api_macro Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>& Get##name##Logger();
+
+#define SGE_LOGGER_DEFINE(name)                                                                                                                                                      \
+	LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>& Get##name##LogWriter()                                                                                   \
+	{                                                                                                                                                                                \
+		static GlobalVariable<FileLogWriterCore> g_##name##FileLogWriterCore(GetDefaultLogDirectoryPath() / Path(SGE_STR(#name)));                                                   \
+		static GlobalVariable<LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>> g_##name##LogWriter(GetAllLogWriterCore(), g_##name##FileLogWriterCore.Get()); \
+		return g_##name##LogWriter.Get();                                                                                                                                            \
+	}                                                                                                                                                                                \
+	Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>& Get##name##Logger()                                                                                         \
+	{                                                                                                                                                                                \
+		static GlobalVariable<Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>> g_##name##Logger(Get##name##LogWriter(), LogLevel::All);                          \
+		return g_##name##Logger.Get();                                                                                                                                               \
+	}
+
 #define SGE_LOG(logger, level, str, ...) logger.WriteLog(SpaceGameEngine::GetLocalDate(), SGE_DEBUG_INFORMATION, level, str, ##__VA_ARGS__);
 
-	extern template class COMMON_API_TEMPLATE_DECLARE BindConsoleLogWriterCore<FileLogWriterCore>;
-	extern template class COMMON_API_TEMPLATE_DECLARE LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>;
-	extern template class COMMON_API_TEMPLATE_DECLARE Logger<BindConsoleLogWriterCore<FileLogWriterCore>>;
+	extern template class COMMON_API_TEMPLATE_DECLARE ProxyPairLogWriterCore<ConsoleLogWriterCore, FileLogWriterCore>;
+	extern template class COMMON_API_TEMPLATE_DECLARE ProxyPairLogWriterCore<FileLogWriterCore, ConsoleLogWriterCore>;
+	extern template class COMMON_API_TEMPLATE_DECLARE ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>;
+	extern template class COMMON_API_TEMPLATE_DECLARE ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>;
+	extern template class COMMON_API_TEMPLATE_DECLARE LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>;
+	extern template class COMMON_API_TEMPLATE_DECLARE LogWriter<ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>>;
+	extern template class COMMON_API_TEMPLATE_DECLARE Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>;
+	extern template class COMMON_API_TEMPLATE_DECLARE Logger<ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>>;
 
-	COMMON_API LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogWriter();
-	COMMON_API Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& GetDefaultLogger();
+	SGE_LOGGER_DECLARE(COMMON_API, Default);
 
 }
 

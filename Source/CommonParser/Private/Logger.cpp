@@ -15,17 +15,7 @@ limitations under the License.
 */
 #include "Logger.h"
 
-using namespace SpaceGameEngine;
-using namespace SpaceGameEngine::CommonParser;
-
-LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::CommonParser::GetCommonParserLogWriter()
+namespace SpaceGameEngine::CommonParser
 {
-	static GlobalVariable<LogWriter<BindConsoleLogWriterCore<FileLogWriterCore>>> g_CommonParserLogWriter(GetDefaultLogDirectoryPath() / Path(SGE_STR("CommonParser")));
-	return g_CommonParserLogWriter.Get();
-}
-
-Logger<BindConsoleLogWriterCore<FileLogWriterCore>>& SpaceGameEngine::CommonParser::GetCommonParserLogger()
-{
-	static GlobalVariable<Logger<BindConsoleLogWriterCore<FileLogWriterCore>>> g_CommonParserLogger(GetCommonParserLogWriter(), LogLevel::All);
-	return g_CommonParserLogger.Get();
+	SGE_LOGGER_DEFINE(CommonParser);
 }

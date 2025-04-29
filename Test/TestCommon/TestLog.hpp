@@ -87,19 +87,22 @@ TEST(FileLogWriterCore, WriteLogTest)
 	ASSERT_FALSE(log_path2.IsExist());
 }
 
-TEST(BindConsoleLogWriterCore, InstanceTest)
+TEST(ProxyPairLogWriterCore, InstanceTest)
 {
 	Path log_path = GetDefaultLogDirectoryPath();
 	SizeType children_size = GetDirectoryFileChildrenSize(log_path);
 	SleepFor(MakeTimeDuration<Second>(1));
-	BindConsoleLogWriterCore<FileLogWriterCore> lw;
+	ConsoleLogWriterCore clc;
+	FileLogWriterCore flc;
+	ProxyPairLogWriterCore<ConsoleLogWriterCore, FileLogWriterCore> lw(clc, flc);
 	SizeType children_size2 = GetDirectoryFileChildrenSize(log_path);
 	ASSERT_EQ(children_size >= 5 ? 5 : children_size + 1, children_size2);
 
 	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
 	{
 		ASSERT_FALSE(log_path2.IsExist());
-		BindConsoleLogWriterCore<FileLogWriterCore> lw2(log_path2);
+		FileLogWriterCore flc2(log_path2);
+		ProxyPairLogWriterCore<ConsoleLogWriterCore, FileLogWriterCore> lw2(clc, flc2);
 		ASSERT_TRUE(log_path2.IsExist());
 		ASSERT_EQ(log_path2.GetChildPath().GetSize(), 1);
 	}
@@ -108,14 +111,16 @@ TEST(BindConsoleLogWriterCore, InstanceTest)
 	ASSERT_FALSE(log_path2.IsExist());
 }
 
-TEST(BindConsoleLogWriterCore, WriteLogTest)
+TEST(ProxyPairLogWriterCore, WriteLogTest)
 {
 	Path log_path = GetDefaultLogDirectoryPath();
 	Path log_path2 = GetDefaultLogDirectoryPath() / Path(SGE_STR("Test"));
 
 	{
 		ASSERT_FALSE(log_path2.IsExist());
-		BindConsoleLogWriterCore<FileLogWriterCore> lw(log_path2);
+		ConsoleLogWriterCore clc;
+		FileLogWriterCore flc(log_path2);
+		ProxyPairLogWriterCore<ConsoleLogWriterCore, FileLogWriterCore> lw(clc, flc);
 		lw.WriteLog(SGE_U8STR("test"), 4);
 		ASSERT_TRUE(log_path2.IsExist());
 		ASSERT_EQ(log_path2.GetChildPath().GetSize(), 1);
