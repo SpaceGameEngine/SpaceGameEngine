@@ -26,5 +26,5 @@ Vector<CommonParser::Lexer::Token> SpaceGameEngine::CommonIntermediateRepresenta
 	return RemoveToken(
 		CombineToken(
 			SpaceGameEngine::CommonParser::Lexer::GetTokens(str, SGE_STR("line:{} column:{}, {}")), {TokenType::Identifier, TokenType::Dot, TokenType::Identifier}, TokenType::Identifier),
-		{TokenType::WordSeparator, TokenType::LineSeparator});
+		{TokenType::WordSeparator, TokenType::LineSeparator, TokenType::CommentLine, TokenType::CommentBlock});
 }

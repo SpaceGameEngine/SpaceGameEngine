@@ -23,7 +23,10 @@ using namespace SpaceGameEngine::CommonIntermediateRepresentation::Parser;
 
 TEST(GetTokens, Test)
 {
-	auto result1 = SpaceGameEngine::CommonIntermediateRepresentation::Parser::GetTokens(SGE_STR("test.id = 1"));
+	auto result1 = SpaceGameEngine::CommonIntermediateRepresentation::Parser::GetTokens(SGE_STR(R"(test.id = 1
+//test comment line
+/*test comment block
+*/)"));
 	ASSERT_EQ(result1.GetSize(), 3);
 	ASSERT_EQ(result1[0].GetType(), TokenType::Identifier);
 	ASSERT_EQ(result1[0].GetContent(), SGE_STR("test.id"));
