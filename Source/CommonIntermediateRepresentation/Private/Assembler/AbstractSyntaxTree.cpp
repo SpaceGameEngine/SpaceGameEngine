@@ -13,18 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "Parser/Lexer.h"
-#include "LexerUtility.h"
+#include "Assembler/AbstractSyntaxTree.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonIntermediateRepresentation;
-using namespace SpaceGameEngine::CommonIntermediateRepresentation::Parser;
-using namespace SpaceGameEngine::CommonParser::Lexer;
+using namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler;
 
-Vector<CommonParser::Lexer::Token> SpaceGameEngine::CommonIntermediateRepresentation::Parser::GetTokens(const String& str)
+SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNode::AbstractSyntaxTreeNode(AbstractSyntaxTreeNode* pfather)
+	: m_pFather(pfather)
 {
-	return RemoveToken(
-		CombineToken(
-			SpaceGameEngine::CommonParser::Lexer::GetTokens(str, SGE_STR("line:{} column:{}, {}")), {TokenType::Identifier, TokenType::Dot, TokenType::Identifier}, TokenType::Identifier),
-		{TokenType::WordSeparator, TokenType::LineSeparator, TokenType::CommentLine, TokenType::CommentBlock});
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::VariableNode::VariableNode(const String& name, AbstractSyntaxTreeNode* pfather)
+	: m_Name(name), AbstractSyntaxTreeNode(pfather)
+{
 }

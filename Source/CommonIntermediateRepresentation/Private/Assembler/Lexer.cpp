@@ -13,8 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "Parser/AbstractSyntaxTree.h"
+#include "Assembler/Lexer.h"
+#include "LexerUtility.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonIntermediateRepresentation;
-using namespace SpaceGameEngine::CommonIntermediateRepresentation::Parser;
+using namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler;
+using namespace SpaceGameEngine::CommonParser::Lexer;
+
+Vector<CommonParser::Lexer::Token> SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(const String& str)
+{
+	return RemoveToken(
+		CombineToken(
+			SpaceGameEngine::CommonParser::Lexer::GetTokens(str, SGE_STR("line:{} column:{}, {}")), {TokenType::Identifier, TokenType::Dot, TokenType::Identifier}, TokenType::Identifier),
+		{TokenType::WordSeparator, TokenType::LineSeparator, TokenType::CommentLine, TokenType::CommentBlock});
+}

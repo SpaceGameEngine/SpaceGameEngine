@@ -17,7 +17,7 @@ limitations under the License.
 #include "Bootstrap.h"
 #include "SGEString.hpp"
 #include "Module/ModuleManager.h"
-#include "Parser/TestLexer.hpp"
+#include "Assembler/TestLexer.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;
 

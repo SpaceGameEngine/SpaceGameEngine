@@ -1,8 +1,8 @@
 add_library(CommonIntermediateRepresentation SHARED
         Private/CommonIntermediateRepresentationModule.cpp
         Private/Logger.cpp
-        Private/Parser/Lexer.cpp
-        Private/Parser/AbstractSyntaxTree.cpp
+        Private/Assembler/Lexer.cpp
+        Private/Assembler/AbstractSyntaxTree.cpp
         )
 target_compile_definitions(CommonIntermediateRepresentation PRIVATE COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS)
 target_include_directories(CommonIntermediateRepresentation PUBLIC Public)

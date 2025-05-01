@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Parser/Lexer.h"
+#include "Assembler/Lexer.h"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonParser::Lexer;
-using namespace SpaceGameEngine::CommonIntermediateRepresentation::Parser;
+using namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler;
 
 TEST(GetTokens, Test)
 {
-	auto result1 = SpaceGameEngine::CommonIntermediateRepresentation::Parser::GetTokens(SGE_STR(R"(test.id = 1
+	auto result1 = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR(R"(test.id = 1
 //test comment line
 /*test comment block
 */)"));

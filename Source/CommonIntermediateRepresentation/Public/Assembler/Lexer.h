@@ -15,27 +15,16 @@ limitations under the License.
 */
 #pragma once
 #include "CommonIntermediateRepresentationAPI.h"
+#include <Lexer.h>
 
 /*!
 @ingroup CommonIntermediateRepresentation
 @{
 */
 
-namespace SpaceGameEngine::CommonIntermediateRepresentation::Parser
+namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 {
-	class COMMON_INTERMEDIATE_REPRESENTATION_API AbstractSyntaxTreeNode
-	{
-	public:
-		virtual ~AbstractSyntaxTreeNode() = default;
-
-	private:
-		AbstractSyntaxTreeNode* m_pFather = nullptr;
-	};
-
-	namespace AbstractSyntaxTreeNodes
-	{
-
-	}
+	COMMON_INTERMEDIATE_REPRESENTATION_API Vector<CommonParser::Lexer::Token> GetTokens(const String& str);
 }
 
 /*!

@@ -7,11 +7,11 @@
     <Filter Include="Private">
       <UniqueIdentifier>{f6a9b25a-78c9-49d9-be04-954518c91caf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Public\Parser">
-      <UniqueIdentifier>{61e3218a-aaa2-4b4b-9e42-520fc2e6f97a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\Parser">
+    <Filter Include="Private\Assembler">
       <UniqueIdentifier>{85f2d03a-e1b3-437f-aef7-b864f08db449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Assembler">
+      <UniqueIdentifier>{61e3218a-aaa2-4b4b-9e42-520fc2e6f97a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -27,11 +27,11 @@
     <ClInclude Include="Private\Logger.h">
       <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Parser\AbstractSyntaxTree.h">
-      <Filter>Public\Parser</Filter>
+    <ClInclude Include="Public\Assembler\AbstractSyntaxTree.h">
+      <Filter>Public\Assembler</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Parser\Lexer.h">
-      <Filter>Public\Parser</Filter>
+    <ClInclude Include="Public\Assembler\Lexer.h">
+      <Filter>Public\Assembler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -41,11 +41,11 @@
     <ClCompile Include="Private\Logger.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Parser\AbstractSyntaxTree.cpp">
-      <Filter>Private\Parser</Filter>
+    <ClCompile Include="Private\Assembler\AbstractSyntaxTree.cpp">
+      <Filter>Private\Assembler</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Parser\Lexer.cpp">
-      <Filter>Private\Parser</Filter>
+    <ClCompile Include="Private\Assembler\Lexer.cpp">
+      <Filter>Private\Assembler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
