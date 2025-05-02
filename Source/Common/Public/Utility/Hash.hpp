@@ -35,7 +35,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	struct Hash<StringCore<T, Trait, Allocator>>
 	{
 		inline static HashType GetHash(const StringCore<T, Trait, Allocator>& val)

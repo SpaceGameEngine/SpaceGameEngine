@@ -30,7 +30,7 @@ namespace SpaceGameEngine
 	@note the ControllableObject can automatically release its resource if
 	the user has not invoked its Release method.
 	*/
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T, IsAllocator Allocator = DefaultAllocator>
 	class ControllableObject
 	{
 	public:
@@ -55,7 +55,7 @@ namespace SpaceGameEngine
 		using AllocatorType = Allocator;
 
 	public:
-		template<typename _T, typename _Allocator>
+		template<typename _T, IsAllocator _Allocator>
 		friend class ControllableObject;
 
 		inline ControllableObject()
@@ -196,13 +196,13 @@ namespace SpaceGameEngine
 		inline static constexpr const bool Value = false;
 	};
 
-	template<typename T, typename Allocator>
+	template<typename T, IsAllocator Allocator>
 	struct IsControllableObject<ControllableObject<T, Allocator>>
 	{
 		inline static constexpr const bool Value = true;
 	};
 
-	template<typename T, typename Allocator, typename U,
+	template<typename T, IsAllocator Allocator, typename U,
 			 typename = std::enable_if_t<!IsControllableObject<U>::Value, void>>
 	inline bool operator==(const ControllableObject<T, Allocator>& obj, const U& value)
 	{
@@ -212,7 +212,7 @@ namespace SpaceGameEngine
 			return false;
 	}
 
-	template<typename T, typename Allocator, typename U,
+	template<typename T, IsAllocator Allocator, typename U,
 			 typename = std::enable_if_t<!IsControllableObject<U>::Value, void>>
 	inline bool operator==(const U& value, const ControllableObject<T, Allocator>& obj)
 	{
@@ -222,7 +222,7 @@ namespace SpaceGameEngine
 			return false;
 	}
 
-	template<typename T, typename Allocator, typename U,
+	template<typename T, IsAllocator Allocator, typename U,
 			 typename = std::enable_if_t<!IsControllableObject<U>::Value, void>>
 	inline bool operator!=(const ControllableObject<T, Allocator>& obj, const U& value)
 	{
@@ -232,7 +232,7 @@ namespace SpaceGameEngine
 			return true;
 	}
 
-	template<typename T, typename Allocator, typename U,
+	template<typename T, IsAllocator Allocator, typename U,
 			 typename = std::enable_if_t<!IsControllableObject<U>::Value, void>>
 	inline bool operator!=(const U& value, const ControllableObject<T, Allocator>& obj)
 	{

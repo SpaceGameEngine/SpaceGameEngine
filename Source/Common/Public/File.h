@@ -742,18 +742,18 @@ namespace SpaceGameEngine
 		static FileLineBreak Get(const Char8* pc1, const Char8* pc2);
 	};
 
-	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
+	template<typename T, typename Trait = CharTrait<T>, IsAllocator Allocator = DefaultAllocator>
 	struct GetFileLineBreakStringCore
 	{
 	};
 
-	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
+	template<typename T, typename Trait = CharTrait<T>, IsAllocator Allocator = DefaultAllocator>
 	inline StringCore<T, Trait, Allocator> GetFileLineBreakString(FileLineBreak flb)
 	{
 		return GetFileLineBreakStringCore<T, Trait, Allocator>::Get(flb);
 	}
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct GetFileLineBreakStringCore<Char16, UCS2Trait, Allocator>
 	{
 		inline static StringCore<Char16, UCS2Trait, Allocator> Get(FileLineBreak flb)
@@ -768,7 +768,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct GetFileLineBreakStringCore<Char8, UTF8Trait, Allocator>
 	{
 		inline static StringCore<Char8, UTF8Trait, Allocator> Get(FileLineBreak flb)
@@ -1055,7 +1055,7 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		template<typename Allocator>
+		template<IsAllocator Allocator>
 		inline File& operator>>(StringCore<T, Trait, Allocator>& val)
 		{
 			SGE_ASSERT(FileIOModeNotReadError, BinaryFile::m_Mode);
@@ -1080,7 +1080,7 @@ namespace SpaceGameEngine
 			return *this;
 		}
 
-		template<typename Allocator>
+		template<IsAllocator Allocator>
 		inline File& operator<<(StringCore<T, Trait, Allocator>& val)
 		{
 			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);

@@ -65,7 +65,7 @@ BENCHMARK(BM_StdAllocatorFixedSizeAllocate)->ThreadRange(1, 8)->RangeMultiplier(
 BENCHMARK(BM_SgeFixedSizeAllocatorFixedSizeAllocate)->ThreadRange(1, 8)->RangeMultiplier(2)->Range(1, max_buffer_size);
 // BENCHMARK(BM_SgeMultiThreadBufferedFixedSizeAllocatorFixedSizeAllocate)->ThreadRange(1, 8)->RangeMultiplier(2)->Range(1, max_buffer_size);
 
-template<typename Allocator>
+template<SpaceGameEngine::IsAllocator Allocator>
 void BM_AllocatorAllocate(benchmark::State& state)
 {
 	auto size = state.range(0);

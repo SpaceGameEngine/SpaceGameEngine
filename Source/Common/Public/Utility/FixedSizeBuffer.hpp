@@ -26,7 +26,7 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 
-	template<SizeType MaxSize, typename Allocator = DefaultAllocator>
+	template<SizeType MaxSize, IsAllocator Allocator = DefaultAllocator>
 	class FixedSizeBuffer
 	{
 	public:
@@ -41,7 +41,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-		template<SizeType _MaxSize, typename _Allocator>
+		template<SizeType _MaxSize, IsAllocator _Allocator>
 		friend class FixedSizeBuffer;
 
 		inline FixedSizeBuffer()

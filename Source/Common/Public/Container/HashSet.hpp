@@ -23,7 +23,7 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-	template<typename T, typename Hasher = Hash<T>, typename Allocator = DefaultAllocator>
+	template<typename T, typename Hasher = Hash<T>, IsAllocator Allocator = DefaultAllocator>
 	class HashSet : public Detail::HashTable<T, Hasher, Equal<T>, Allocator>
 	{
 	public:

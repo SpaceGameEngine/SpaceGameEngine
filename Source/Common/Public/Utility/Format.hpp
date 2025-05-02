@@ -26,7 +26,7 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	inline bool IsFormatString(const StringCore<T, Trait, Allocator>& str)
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -218,7 +218,7 @@ namespace SpaceGameEngine
 	struct NonFormatStringError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not format string.");
-		template<typename T, typename Trait, typename Allocator>
+		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -230,7 +230,7 @@ namespace SpaceGameEngine
 	struct InvalidNumberBaseOptionError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The option for the number base is invalid, only B/D/H can be chosen.");
-		template<typename T, typename Trait, typename Allocator>
+		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -274,7 +274,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, typename Allocator, typename ValueType>
+	template<typename T, typename Trait, IsAllocator Allocator, typename ValueType>
 	struct Formatter
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -285,7 +285,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, typename Allocator, std::integral IntegerType>
+	template<typename T, typename Trait, IsAllocator Allocator, std::integral IntegerType>
 	struct Formatter<T, Trait, Allocator, IntegerType>
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -343,7 +343,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	struct Formatter<T, Trait, Allocator, T*>
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -355,7 +355,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	struct Formatter<T, Trait, Allocator, float>
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -372,7 +372,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	struct Formatter<T, Trait, Allocator, double>
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -391,7 +391,7 @@ namespace SpaceGameEngine
 
 	namespace FormatCore
 	{
-		template<typename T, typename Trait, typename Allocator>
+		template<typename T, typename Trait, IsAllocator Allocator>
 		inline void DoFormat(Vector<Pair<SizeType, StringCore<T, Trait, Allocator>>>& arg_strs, SizeType less, SizeType idx)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -405,7 +405,7 @@ namespace SpaceGameEngine
 			}
 		}
 
-		template<typename T, typename Trait, typename Allocator, typename Arg0, typename... Args>
+		template<typename T, typename Trait, IsAllocator Allocator, typename Arg0, typename... Args>
 		inline void DoFormat(Vector<Pair<SizeType, StringCore<T, Trait, Allocator>>>& arg_strs, SizeType less, SizeType idx, const Arg0& arg0, const Args&... args)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -424,7 +424,7 @@ namespace SpaceGameEngine
 		}
 	}
 
-	template<typename T, typename Trait, typename Allocator, typename... Args>
+	template<typename T, typename Trait, IsAllocator Allocator, typename... Args>
 	inline StringCore<T, Trait, Allocator> Format(const StringCore<T, Trait, Allocator>& str, const Args&... args)
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");

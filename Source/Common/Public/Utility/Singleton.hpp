@@ -28,7 +28,7 @@ namespace SpaceGameEngine
 	@attention inherit `Singleton<T>` to use it,and define the Allocator which you want to use as a friend in the class and
 	define the class's constructor as a private function at the same time.
 	*/
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T, IsAllocator Allocator = DefaultAllocator>
 	struct Singleton
 	{
 		inline static T& GetSingleton()

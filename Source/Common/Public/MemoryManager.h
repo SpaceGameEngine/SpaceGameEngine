@@ -22,6 +22,7 @@ limitations under the License.
 #include "Concurrent/Atomic.hpp"
 #include "Utility/Pair.hpp"
 #include "CommonAPI.h"
+#include <concepts>
 
 /*!
 @ingroup Common
@@ -52,6 +53,22 @@ namespace SpaceGameEngine
 	memory size,when the size >= 16,the alignment is 16,or it will be 4.
 	*/
 	COMMON_API SizeType GetDefaultAlignment(SizeType size);
+
+	template<typename T>
+	concept IsAllocator = requires {
+		{
+			T::RawNew(std::declval<SizeType>(), std::declval<SizeType>())
+		} -> std::same_as<void*>;
+		{
+			T::RawDelete(std::declval<void*>())
+		} -> std::same_as<void>;
+		{
+			T::template New<T>(std::declval<T>())
+		} -> std::same_as<T*>;
+		{
+			T::Delete(std::declval<T*>())
+		} -> std::same_as<void>;
+	};
 
 	struct COMMON_API StdAllocator
 	{

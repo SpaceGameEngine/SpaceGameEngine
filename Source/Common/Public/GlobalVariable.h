@@ -35,7 +35,7 @@ namespace SpaceGameEngine
 
 		static GlobalVariableManager& GetSingleton();
 
-		template<typename T, typename Allocator>
+		template<typename T, IsAllocator Allocator>
 		friend class GlobalVariable;
 
 	private:
@@ -47,7 +47,7 @@ namespace SpaceGameEngine
 		Stack<Function<void(), StdAllocator>, StdAllocator> m_Content;
 	};
 
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T, IsAllocator Allocator = DefaultAllocator>
 	class GlobalVariable : public UncopyableAndUnmovable
 	{
 	public:

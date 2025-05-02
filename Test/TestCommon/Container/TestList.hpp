@@ -80,7 +80,7 @@ struct test_list_object
 	}
 };
 
-template<typename Allocator>
+template<IsAllocator Allocator>
 inline bool CheckListConnection(const List<test_list_object, Allocator>& l)
 {
 	int* pval = new int[l.GetSize()];

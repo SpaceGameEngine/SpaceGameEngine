@@ -27,7 +27,7 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T, IsAllocator Allocator = DefaultAllocator>
 	class List
 	{
 	public:
@@ -43,7 +43,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-		template<typename _T, typename _Allocator>
+		template<typename _T, IsAllocator _Allocator>
 		friend class List;
 
 	private:

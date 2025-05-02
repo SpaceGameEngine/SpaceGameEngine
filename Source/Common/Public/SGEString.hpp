@@ -74,7 +74,7 @@ namespace SpaceGameEngine
 		/*!
 		@brief simple storage for the string, do not consider '\0'.
 		*/
-		template<typename T, typename Allocator = DefaultAllocator>
+		template<typename T, IsAllocator Allocator = DefaultAllocator>
 		class Storage
 		{
 		private:
@@ -1218,13 +1218,13 @@ namespace SpaceGameEngine
 		};
 	}
 
-	template<typename T, typename Trait = CharTrait<T>, typename Allocator = DefaultAllocator>
+	template<typename T, typename Trait = CharTrait<T>, IsAllocator Allocator = DefaultAllocator>
 	class StringCore;
 
-	template<typename Allocator = DefaultAllocator>
+	template<IsAllocator Allocator = DefaultAllocator>
 	inline StringCore<Char8, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr);
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	class StringCore
 	{
 	public:
@@ -1238,13 +1238,13 @@ namespace SpaceGameEngine
 
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 
-		template<typename _T, typename _Trait, typename _Allocator>
+		template<typename _T, typename _Trait, IsAllocator _Allocator>
 		friend class StringCore;
 
-		template<typename _Allocator>
+		template<IsAllocator _Allocator>
 		friend inline StringCore<Char8, UTF8Trait, _Allocator> UCS2StringToUTF8String(const StringCore<Char16, UCS2Trait, _Allocator>& str);
 
-		template<typename _Allocator>
+		template<IsAllocator _Allocator>
 		friend inline StringCore<Char8, UTF8Trait, _Allocator> UCS2StringToUTF8String(const Char16* pstr);
 
 		struct EmptyStringCoreError
@@ -3505,7 +3505,7 @@ namespace SpaceGameEngine
 	extern template class COMMON_API_TEMPLATE_DECLARE StringCore<Char16, UCS2Trait, DefaultAllocator>;
 	extern template class COMMON_API_TEMPLATE_DECLARE StringCore<Char8, UTF8Trait, DefaultAllocator>;
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const StringCore<Char8, UTF8Trait, Allocator>& str)
 	{
 		SizeType size = str.GetSize();
@@ -3521,7 +3521,7 @@ namespace SpaceGameEngine
 		return re;
 	}
 
-	template<typename Allocator = DefaultAllocator>
+	template<IsAllocator Allocator = DefaultAllocator>
 	inline StringCore<Char16, UCS2Trait, Allocator> UTF8StringToUCS2String(const Char8* pstr)
 	{
 		SGE_ASSERT(NullPointerError, pstr);
@@ -3540,7 +3540,7 @@ namespace SpaceGameEngine
 		return re;
 	}
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	inline StringCore<Char8, UTF8Trait, Allocator> UCS2StringToUTF8String(const StringCore<Char16, UCS2Trait, Allocator>& str)
 	{
 		SizeType nsize = 0;
@@ -3563,7 +3563,7 @@ namespace SpaceGameEngine
 		return re;
 	}
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	inline StringCore<Char8, UTF8Trait, Allocator> UCS2StringToUTF8String(const Char16* pstr)
 	{
 		SGE_ASSERT(NullPointerError, pstr);
@@ -3588,7 +3588,7 @@ namespace SpaceGameEngine
 	}
 
 #ifdef SGE_USE_WIDE_CHAR
-	template<typename Allocator = DefaultAllocator>
+	template<IsAllocator Allocator = DefaultAllocator>
 	using TString = StringCore<Char16, UCS2Trait, Allocator>;
 
 #define SGE_UCS2_TO_TSTR(str) str
@@ -3597,7 +3597,7 @@ namespace SpaceGameEngine
 #define SGE_TSTR_TO_UCS2(str) str
 #define SGE_TSTR_TO_UTF8(str) SpaceGameEngine::UCS2StringToUTF8String(str)
 #else
-	template<typename Allocator = DefaultAllocator>
+	template<IsAllocator Allocator = DefaultAllocator>
 	using TString = StringCore<Char8, UTF8Trait, Allocator>;
 
 #define SGE_UCS2_TO_TSTR(str) SpaceGameEngine::UCS2StringToUTF8String(str)
@@ -3645,7 +3645,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator, std::integral IntegerType>
+	template<IsAllocator Allocator, std::integral IntegerType>
 	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
@@ -3863,7 +3863,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, float>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
@@ -3894,7 +3894,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, double>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
@@ -3927,7 +3927,7 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename Allocator, std::integral IntegerType>
+	template<IsAllocator Allocator, std::integral IntegerType>
 	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
@@ -4145,7 +4145,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, float>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
@@ -4176,7 +4176,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, double>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
@@ -4280,7 +4280,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	inline bool IsSignedNumericalString(const StringCore<T, Trait, Allocator>& str)
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -4386,7 +4386,7 @@ namespace SpaceGameEngine
 		return true;
 	}
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	inline bool IsUnsignedNumericalString(const StringCore<T, Trait, Allocator>& str)
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -4464,7 +4464,7 @@ namespace SpaceGameEngine
 		return true;
 	}
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	inline bool IsDecimalString(const StringCore<T, Trait, Allocator>& str)
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -4542,7 +4542,7 @@ namespace SpaceGameEngine
 	struct NonSignedNumericalStringError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not numerical string.");
-		template<typename T, typename Trait, typename Allocator>
+		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -4554,7 +4554,7 @@ namespace SpaceGameEngine
 	struct NonUnsignedNumericalStringError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not unsigned numerical string.");
-		template<typename T, typename Trait, typename Allocator>
+		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -4566,7 +4566,7 @@ namespace SpaceGameEngine
 	struct NonDecimalStringError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not decimal string.");
-		template<typename T, typename Trait, typename Allocator>
+		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
@@ -4590,7 +4590,7 @@ namespace SpaceGameEngine
 		return StringToCore<StringType, T>::Get(str);
 	}
 
-	template<typename Allocator, std::integral IntegerType>
+	template<IsAllocator Allocator, std::integral IntegerType>
 	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
@@ -4714,7 +4714,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, float>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
@@ -4754,7 +4754,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, double>
 	{
 		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
@@ -4796,7 +4796,7 @@ namespace SpaceGameEngine
 
 	//------------------------------------------------------------------
 
-	template<typename Allocator, std::integral IntegerType>
+	template<IsAllocator Allocator, std::integral IntegerType>
 	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, IntegerType>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
@@ -4920,7 +4920,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, float>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
@@ -4960,7 +4960,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename Allocator>
+	template<IsAllocator Allocator>
 	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, double>
 	{
 		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
@@ -5000,7 +5000,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, typename Allocator>
+	template<typename T, typename Trait, IsAllocator Allocator>
 	inline Vector<StringCore<T, Trait, Allocator>, Allocator> Split(const StringCore<T, Trait, Allocator>& str, const StringCore<T, Trait, Allocator>& separ)
 	{
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");

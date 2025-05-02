@@ -43,7 +43,7 @@ namespace SpaceGameEngine
 		AutoReleaseBuffer(AutoReleaseBuffer&& a);
 		AutoReleaseBuffer& operator=(AutoReleaseBuffer&& a);
 
-		template<typename T, typename Allocator = DefaultAllocator, typename... Args>
+		template<typename T, IsAllocator Allocator = DefaultAllocator, typename... Args>
 		inline T* NewObject(Args&&... args)
 		{
 			T* re = Allocator::template New<T>(std::forward<Args>(args)...);

@@ -28,7 +28,7 @@ namespace SpaceGameEngine
 {
 	namespace Detail
 	{
-		template<typename V, typename Hasher = Hash<V>, typename EqualComparer = Equal<V>, typename Allocator = DefaultAllocator>
+		template<typename V, typename Hasher = Hash<V>, typename EqualComparer = Equal<V>, IsAllocator Allocator = DefaultAllocator>
 		class HashTable
 		{
 		public:
@@ -37,7 +37,7 @@ namespace SpaceGameEngine
 			using EqualComparerType = EqualComparer;
 			using AllocatorType = Allocator;
 
-			template<typename _V, typename _Hasher, typename _EqualComparer, typename _Allocator>
+			template<typename _V, typename _Hasher, typename _EqualComparer, IsAllocator _Allocator>
 			friend class HashTable;
 
 			inline static constexpr const double sm_DefaultLoadFactor = 1.0;
@@ -64,7 +64,7 @@ namespace SpaceGameEngine
 				template<typename T>
 				friend class IteratorImpl;
 
-				template<typename _V, typename _Hasher, typename _EqualComparer, typename _Allocator>
+				template<typename _V, typename _Hasher, typename _EqualComparer, IsAllocator _Allocator>
 				friend class HashTable;
 
 			public:

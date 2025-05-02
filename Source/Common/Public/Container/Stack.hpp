@@ -25,7 +25,7 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 
-	template<typename T, typename Allocator = DefaultAllocator, template<typename, typename> class Implement = List>
+	template<typename T, IsAllocator Allocator = DefaultAllocator, template<typename, typename> class Implement = List>
 	class Stack
 	{
 	public:
@@ -42,7 +42,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-		template<typename _T, typename _Allocator, template<typename, typename> class _Implement>
+		template<typename _T, IsAllocator _Allocator, template<typename, typename> class _Implement>
 		friend class Stack;
 
 	public:

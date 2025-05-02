@@ -23,6 +23,14 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+TEST(IsAllocator, Test)
+{
+	ASSERT_TRUE(IsAllocator<StdAllocator>);
+	ASSERT_TRUE(IsAllocator<MemoryManagerAllocator>);
+	ASSERT_TRUE(IsAllocator<DefaultAllocator>);
+	ASSERT_FALSE(IsAllocator<int>);
+}
+
 TEST(MemoryManager, StdAllocatorNewDeleteTest)
 {
 	Int32* pint = StdAllocator::New<Int32>(3);

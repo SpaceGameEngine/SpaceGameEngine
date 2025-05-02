@@ -23,7 +23,7 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-	template<typename T, typename LessComparer = Less<T>, typename Allocator = DefaultAllocator>
+	template<typename T, typename LessComparer = Less<T>, IsAllocator Allocator = DefaultAllocator>
 	class Set : public Detail::RedBlackTree<T, LessComparer, Equal<T>, Allocator>
 	{
 	public:

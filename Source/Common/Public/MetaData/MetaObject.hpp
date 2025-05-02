@@ -36,14 +36,14 @@ namespace SpaceGameEngine
 	/*!
 	@brief a wrapper of object which erases its type.
 	*/
-	template<typename Allocator = DefaultAllocator>
+	template<IsAllocator Allocator = DefaultAllocator>
 	class MetaObject
 	{
 	public:
 		using AllocatorType = Allocator;
 
 	public:
-		template<typename _Allocator>
+		template<IsAllocator _Allocator>
 		friend class MetaObject;
 
 		inline MetaObject() = delete;
@@ -170,7 +170,7 @@ namespace SpaceGameEngine
 		void* m_pContent;
 	};
 
-	template<typename Allocator1, typename Allocator2>
+	template<IsAllocator Allocator1, IsAllocator Allocator2>
 	inline bool operator==(const MetaObject<Allocator1>& m1, const MetaObject<Allocator2>& m2)
 	{
 		if (m1.GetMetaData() == m2.GetMetaData())

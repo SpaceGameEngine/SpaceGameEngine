@@ -23,7 +23,7 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-	template<typename K, typename V, typename LessComparer = Less<K>, typename Allocator = DefaultAllocator>
+	template<typename K, typename V, typename LessComparer = Less<K>, IsAllocator Allocator = DefaultAllocator>
 	class Map : public Detail::RedBlackTree<Detail::KeyValuePair<K, V>, KeyComparer<LessComparer>, KeyComparer<Equal<K>>, Allocator>
 	{
 	public:

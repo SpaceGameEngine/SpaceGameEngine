@@ -25,7 +25,7 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-	template<typename K, typename V, typename Hasher = Hash<K>, typename Allocator = DefaultAllocator>
+	template<typename K, typename V, typename Hasher = Hash<K>, IsAllocator Allocator = DefaultAllocator>
 	class HashMap : public Detail::HashTable<Detail::KeyValuePair<K, V>,
 											 KeyHash<Hasher>,
 											 KeyComparer<Equal<K>>,

@@ -124,7 +124,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief a callable object wrapper.
 	*/
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T, IsAllocator Allocator = DefaultAllocator>
 	class Function
 	{
 	};
@@ -132,14 +132,14 @@ namespace SpaceGameEngine
 	struct InvalidFunctionError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Function is invalid");
-		template<typename T, typename Allocator>
+		template<typename T, IsAllocator Allocator>
 		inline static bool Judge(const Function<T, Allocator>& func)
 		{
 			return !func.IsValid();
 		}
 	};
 
-	template<typename Allocator, typename Ret, typename... Args>
+	template<IsAllocator Allocator, typename Ret, typename... Args>
 	class Function<Ret(Args...), Allocator>
 	{
 	public:
@@ -149,7 +149,7 @@ namespace SpaceGameEngine
 			inline static constexpr const bool Value = false;
 		};
 
-		template<typename _Allocator, typename _Ret, typename... _Args>
+		template<IsAllocator _Allocator, typename _Ret, typename... _Args>
 		struct IsFunction<Function<_Ret(_Args...), _Allocator>>
 		{
 			inline static constexpr const bool Value = true;
@@ -159,7 +159,7 @@ namespace SpaceGameEngine
 		using FunctionType = Ret(Args...);
 
 	public:
-		template<typename _T, typename _Allocator>
+		template<typename _T, IsAllocator _Allocator>
 		friend class Function;
 
 		inline Function()

@@ -51,7 +51,7 @@ namespace SpaceGameEngine
 	it will call the T's moving constructor by using the objects in another Vector
 	one by one.
 	*/
-	template<typename T, typename Allocator = DefaultAllocator>
+	template<typename T, IsAllocator Allocator = DefaultAllocator>
 	class Vector
 	{
 	public:
@@ -69,7 +69,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-		template<typename _T, typename _Allocator>
+		template<typename _T, IsAllocator _Allocator>
 		friend class Vector;
 
 	private:

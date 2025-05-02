@@ -31,7 +31,7 @@ namespace SpaceGameEngine
 		@brief Red-black tree implement
 		@warning Do not change the node's value which will impact the node's order judgement
 		*/
-		template<typename V, typename LessComparer = Less<V>, typename EqualComparer = Equal<V>, typename Allocator = DefaultAllocator>
+		template<typename V, typename LessComparer = Less<V>, typename EqualComparer = Equal<V>, IsAllocator Allocator = DefaultAllocator>
 		class RedBlackTree
 		{
 		public:
@@ -40,7 +40,7 @@ namespace SpaceGameEngine
 			using EqualComparerType = EqualComparer;
 			using AllocatorType = Allocator;
 
-			template<typename _V, typename _LessComparer, typename _EqualComparer, typename _Allocator>
+			template<typename _V, typename _LessComparer, typename _EqualComparer, IsAllocator _Allocator>
 			friend class RedBlackTree;
 
 		private:

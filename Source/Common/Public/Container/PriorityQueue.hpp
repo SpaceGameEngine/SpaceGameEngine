@@ -25,7 +25,7 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 
-	template<typename T, typename Comparer = Less<T>, typename Allocator = DefaultAllocator, template<typename, typename> class Implement = Vector>
+	template<typename T, typename Comparer = Less<T>, IsAllocator Allocator = DefaultAllocator, template<typename, typename> class Implement = Vector>
 	class PriorityQueue
 	{
 	public:
@@ -43,7 +43,7 @@ namespace SpaceGameEngine
 			}
 		};
 
-		template<typename _T, typename _Comparer, typename _Allocator, template<typename, typename> class _Implement>
+		template<typename _T, typename _Comparer, IsAllocator _Allocator, template<typename, typename> class _Implement>
 		friend class PriorityQueue;
 
 	public:
