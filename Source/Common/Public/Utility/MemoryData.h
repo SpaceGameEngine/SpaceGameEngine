@@ -30,7 +30,7 @@ namespace SpaceGameEngine
 	/*!
 	@brief MemoryData is a class that manages memory data and it is not copyable but movable.
 	@details It is used to encapsulate a pointer to memory and its size, along with a function to free the memory.
-	@note You'd better use the `MakeMemoryData` function to create a `MemoryData` object.
+	@note You'd better use the `MakeMemoryData`/`NewMemoryData`/`ReferenceMemoryData` function to create a `MemoryData` object.
 	*/
 	class COMMON_API MemoryData : public Uncopyable
 	{
@@ -74,6 +74,32 @@ namespace SpaceGameEngine
 		memcpy(ptr, src, size);
 		return MemoryData(ptr, size, [](void* ptr, SizeType size) {
 			Allocator::RawDelete(ptr);
+		});
+	}
+
+	/*!
+	@brief Create a MemoryData object from a size.
+	@details The function allocates memory using the specified allocator and returns a MemoryData object with the allocated memory.
+	*/
+	template<IsAllocator Allocator = DefaultAllocator>
+	inline MemoryData NewMemoryData(SizeType size)
+	{
+		SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+		return MemoryData(Allocator::RawNew(size), size, [](void* ptr, SizeType size) {
+			Allocator::RawDelete(ptr);
+		});
+	}
+
+	/*!
+	@brief Create a MemoryData object from a pointer and size.
+	@details The function creates a MemoryData object that references the specified pointer and size without maintain its lifetime.
+	*/
+	inline MemoryData ReferenceMemoryData(void* ptr, SizeType size)
+	{
+		SGE_ASSERT(NullPointerError, ptr);
+		SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
+		return MemoryData(ptr, size, [](void* ptr, SizeType size) {
+			// do nothing
 		});
 	}
 }

@@ -150,7 +150,7 @@ TEST(MemoryData, ClearTest)
 	ASSERT_FALSE(freed);
 }
 
-TEST(MemoryData, Test)
+TEST(MakeMemoryData, Test)
 {
 	const char* test_str = "TestMemoryData";
 	size_t str_len = strlen(test_str) + 1;
@@ -160,4 +160,48 @@ TEST(MemoryData, Test)
 	ASSERT_NE(md.GetData(), test_str);
 	ASSERT_EQ(md.GetSize(), str_len);
 	ASSERT_STREQ(static_cast<const char*>(md.GetData()), test_str);
+}
+
+TEST(NewMemoryData, Test)
+{
+	const SizeType testSize = 128;
+	auto md = NewMemoryData<DefaultAllocator>(testSize);
+
+	ASSERT_NE(md.GetData(), nullptr);
+	ASSERT_EQ(md.GetSize(), testSize);
+
+	memset(md.GetData(), 0xAB, testSize);
+	for (SizeType i = 0; i < testSize; ++i)
+	{
+		ASSERT_EQ(((uint8_t*)md.GetData())[i], 0xAB);
+	}
+}
+
+TEST(ReferenceMemoryData, Test)
+{
+	int testData[] = {1, 2, 3, 4, 5};
+	const SizeType testSize = sizeof(testData);
+
+	{
+		auto md = ReferenceMemoryData(testData, testSize);
+
+		ASSERT_EQ(md.GetData(), testData);
+		ASSERT_EQ(md.GetSize(), testSize);
+
+		ASSERT_EQ(((int*)md.GetData())[2], 3);
+
+		testData[2] = 42;
+
+		ASSERT_EQ(((int*)md.GetData())[0], 1);
+		ASSERT_EQ(((int*)md.GetData())[1], 2);
+		ASSERT_EQ(((int*)md.GetData())[2], 42);
+		ASSERT_EQ(((int*)md.GetData())[3], 4);
+		ASSERT_EQ(((int*)md.GetData())[4], 5);
+	}
+
+	ASSERT_EQ(testData[0], 1);
+	ASSERT_EQ(testData[1], 2);
+	ASSERT_EQ(testData[2], 42);
+	ASSERT_EQ(testData[3], 4);
+	ASSERT_EQ(testData[4], 5);
 }
