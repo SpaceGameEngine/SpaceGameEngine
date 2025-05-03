@@ -89,6 +89,9 @@
     <ClInclude Include="Utility\TestPair.hpp">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\TestMemoryData.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">

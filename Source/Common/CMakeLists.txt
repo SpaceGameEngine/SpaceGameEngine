@@ -8,6 +8,7 @@ add_library(Common SHARED
         Private/Utility/AutoReleaseBuffer.cpp
         Private/Utility/Endian.cpp
         Private/Utility/DebugInformation.cpp
+        Private/Utility/MemoryData.cpp
         Private/Time/TimeCounter.cpp
         Private/Time/WindowsTimeImplement.cpp
         Private/Time/UnixTimeImplement.cpp
@@ -19,6 +20,7 @@ add_library(Common SHARED
         Private/GlobalVariable.cpp
         Private/File.cpp
         Private/Log.cpp
+        Private/Stream/Stream.cpp
         )
 target_compile_definitions(Common PRIVATE COMMON_EXPORTS)
 target_include_directories(Common PUBLIC Public)

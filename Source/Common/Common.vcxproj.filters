@@ -55,6 +55,12 @@
     <Filter Include="Public\Container\Detail">
       <UniqueIdentifier>{374d7dba-337a-44d6-b841-ecac62159b4f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Stream">
+      <UniqueIdentifier>{2b1b89ad-0ae1-4d26-9303-4462ae5779ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Stream">
+      <UniqueIdentifier>{24fb18a2-f41c-44ab-bfff-7d02ce8cebe8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -216,6 +222,12 @@
     <ClInclude Include="Public\Container\HashSet.hpp">
       <Filter>Public\Container</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Stream\Stream.h">
+      <Filter>Public\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Utility\MemoryData.h">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -277,6 +289,12 @@
     </ClCompile>
     <ClCompile Include="Private\SGEString.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Stream\Stream.cpp">
+      <Filter>Private\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Utility\MemoryData.cpp">
+      <Filter>Private\Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
