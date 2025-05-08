@@ -3381,6 +3381,13 @@ TEST(ToString, DoubleTest)
 	ASSERT_EQ(ToString<UTF8String>(-123.5045678, 0), SGE_U8STR("-124"));
 }
 
+TEST(ToString, CharTest)
+{
+	ASSERT_EQ(ToString<UCS2String>(SGE_STR('T')), SGE_WSTR("T"));
+
+	ASSERT_EQ(ToString<UTF8String>(SGE_U8STR('T')), SGE_U8STR("T"));
+}
+
 TEST(StringTo, IsNumericalCharacterTest)
 {
 	ASSERT_FALSE((IsNumericalCharacter<NumberBase::Decimal, Char16, UCS2Trait>(SGE_WSTR(' '))));
@@ -3569,6 +3576,16 @@ TEST(StringTo, IsDecimalStringTest)
 	ASSERT_TRUE((IsDecimalString(UTF8String(SGE_U8STR("-123.123")))));
 }
 
+TEST(StringTo, IsCharStringTest)
+{
+	ASSERT_TRUE(IsCharString(UCS2String(SGE_WSTR("T"))));
+	ASSERT_FALSE(IsCharString(UCS2String(SGE_WSTR("TE"))));
+
+	ASSERT_TRUE(IsCharString(UTF8String(SGE_U8STR("T"))));
+	ASSERT_FALSE(IsCharString(UTF8String(SGE_U8STR("TE"))));
+	ASSERT_FALSE(IsCharString(UTF8String(SGE_U8STR("测"))));	// not support multi-byte char
+}
+
 TEST(StringTo, IntTest)
 {
 	ASSERT_EQ((StringTo<UCS2String, Int64>(SGE_WSTR("0"))), 0);
@@ -3700,6 +3717,13 @@ TEST(StringTo, DoubleTest)
 	ASSERT_EQ((StringTo<UTF8String, double>(SGE_U8STR("-123.456"))), -123.456);
 }
 
+TEST(StringTo, CharTest)
+{
+	ASSERT_EQ((StringTo<UCS2String, Char16>(SGE_WSTR("T"))), SGE_WSTR('T'));
+
+	ASSERT_EQ((StringTo<UTF8String, Char8>(SGE_U8STR("T"))), SGE_U8STR('T'));
+}
+
 TEST(Split, SplitTest)
 {
 	Vector<UCS2String> v1 = Split(UCS2String(SGE_WSTR("test0//test1//test2")), UCS2String(SGE_WSTR("//")));
@@ -3737,4 +3761,32 @@ TEST(Split, SplitTest)
 	ASSERT_EQ(v2[0], SGE_U8STR("test0"));
 	ASSERT_EQ(v2[1], SGE_U8STR("test1"));
 	ASSERT_EQ(v2[2], SGE_U8STR(""));
+}
+
+TEST(MakeMemoryData, StringTest)
+{
+	UCS2String test_ucs2_string(SGE_WSTR("test"));
+	MemoryData ucs2_memory_data = MakeMemoryData(test_ucs2_string);
+	ASSERT_NE(ucs2_memory_data.GetData(), test_ucs2_string.GetData());
+	ASSERT_EQ(ucs2_memory_data.GetSize(), test_ucs2_string.GetNormalSize());
+	ASSERT_EQ(memcmp(ucs2_memory_data.GetData(), test_ucs2_string.GetData(), ucs2_memory_data.GetSize()), 0);
+
+	UTF8String test_utf8_string(SGE_U8STR("test"));
+	MemoryData utf8_memory_data = MakeMemoryData(test_utf8_string);
+	ASSERT_NE(utf8_memory_data.GetData(), test_utf8_string.GetData());
+	ASSERT_EQ(utf8_memory_data.GetSize(), test_utf8_string.GetNormalSize());
+	ASSERT_EQ(memcmp(utf8_memory_data.GetData(), test_utf8_string.GetData(), utf8_memory_data.GetSize()), 0);
+}
+
+TEST(ReferenceMemoryData, StringTest)
+{
+	UCS2String test_ucs2_string(SGE_WSTR("test"));
+	MemoryData ucs2_memory_data = ReferenceMemoryData(test_ucs2_string);
+	ASSERT_EQ(ucs2_memory_data.GetData(), test_ucs2_string.GetData());
+	ASSERT_EQ(ucs2_memory_data.GetSize(), test_ucs2_string.GetNormalSize());
+
+	UTF8String test_utf8_string(SGE_U8STR("test"));
+	MemoryData utf8_memory_data = ReferenceMemoryData(test_utf8_string);
+	ASSERT_EQ(utf8_memory_data.GetData(), test_utf8_string.GetData());
+	ASSERT_EQ(utf8_memory_data.GetSize(), test_utf8_string.GetNormalSize());
 }

@@ -22,6 +22,7 @@ limitations under the License.
 #include "Utility/Utility.hpp"
 #include "Concurrent/Atomic.hpp"
 #include "Container/Vector.hpp"
+#include "Utility/MemoryData.h"
 #include <cstring>
 #include <cmath>
 #include <algorithm>
@@ -3925,6 +3926,17 @@ namespace SpaceGameEngine
 		}
 	};
 
+	template<IsAllocator Allocator>
+	struct ToStringCore<StringCore<Char16, UCS2Trait, Allocator>, Char16>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static StringType Get(Char16 value)
+		{
+			return StringType(1, value);
+		}
+	};
+
 	//------------------------------------------------------------------
 
 	template<IsAllocator Allocator, std::integral IntegerType>
@@ -4204,6 +4216,17 @@ namespace SpaceGameEngine
 			}
 			else
 				return ToString<StringType, Int64>((Int64)round(value));
+		}
+	};
+
+	template<IsAllocator Allocator>
+	struct ToStringCore<StringCore<Char8, UTF8Trait, Allocator>, Char8>
+	{
+		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
+
+		inline static StringType Get(Char8 value)
+		{
+			return StringType(1, &value);
 		}
 	};
 
@@ -4539,6 +4562,13 @@ namespace SpaceGameEngine
 		return true;
 	}
 
+	template<typename T, typename Trait, IsAllocator Allocator>
+	inline bool IsCharString(const StringCore<T, Trait, Allocator>& str)
+	{
+		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+		return str.GetNormalSize() == 1;
+	}
+
 	struct NonSignedNumericalStringError
 	{
 		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not numerical string.");
@@ -4572,6 +4602,18 @@ namespace SpaceGameEngine
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 
 			return !IsDecimalString(str);
+		}
+	};
+
+	struct NonCharStringError
+	{
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not char string.");
+		template<typename T, typename Trait, IsAllocator Allocator>
+		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
+		{
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+
+			return !IsCharString(str);
 		}
 	};
 
@@ -4794,6 +4836,18 @@ namespace SpaceGameEngine
 		}
 	};
 
+	template<IsAllocator Allocator>
+	struct StringToCore<StringCore<Char16, UCS2Trait, Allocator>, Char16>
+	{
+		using StringType = StringCore<Char16, UCS2Trait, Allocator>;
+
+		inline static Char16 Get(const StringType& str)
+		{
+			SGE_ASSERT(NonCharStringError, str);
+			return str[0];
+		}
+	};
+
 	//------------------------------------------------------------------
 
 	template<IsAllocator Allocator, std::integral IntegerType>
@@ -5000,6 +5054,20 @@ namespace SpaceGameEngine
 		}
 	};
 
+	template<IsAllocator Allocator>
+	struct StringToCore<StringCore<Char8, UTF8Trait, Allocator>, Char8>
+	{
+		using StringType = StringCore<Char8, UTF8Trait, Allocator>;
+
+		inline static Char8 Get(const StringType& str)
+		{
+			SGE_ASSERT(NonCharStringError, str);
+			return str.GetData()[0];
+		}
+	};
+
+	//------------------------------------------------------------------
+
 	template<typename T, typename Trait, IsAllocator Allocator>
 	inline Vector<StringCore<T, Trait, Allocator>, Allocator> Split(const StringCore<T, Trait, Allocator>& str, const StringCore<T, Trait, Allocator>& separ)
 	{
@@ -5079,6 +5147,18 @@ namespace SpaceGameEngine
 			return (*pc) == SGE_U8STR(' ') || (*pc) == SGE_U8STR('\t') || (*pc) == SGE_U8STR('\n') || (*pc) == SGE_U8STR('\r');
 		}
 	};
+
+	template<typename T, typename Trait, IsAllocator StringAllocator, IsAllocator MemoryDataAllocator = DefaultAllocator>
+	inline MemoryData MakeMemoryData(const StringCore<T, Trait, StringAllocator>& str)
+	{
+		return MakeMemoryData<MemoryDataAllocator>(str.GetData(), str.GetNormalSize());
+	}
+
+	template<typename T, typename Trait, IsAllocator Allocator>
+	inline MemoryData ReferenceMemoryData(StringCore<T, Trait, Allocator>& str)
+	{
+		return ReferenceMemoryData(str.GetData(), str.GetNormalSize());
+	}
 
 }
 
