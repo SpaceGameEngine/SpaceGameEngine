@@ -102,6 +102,12 @@ namespace SpaceGameEngine
 			// do nothing
 		});
 	}
+
+	template<typename T>
+	inline MemoryData ReferenceMemoryData(const T& value)
+	{
+		return ReferenceMemoryData((void*)&value, sizeof(T));
+	}
 }
 
 /*!

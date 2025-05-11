@@ -204,4 +204,9 @@ TEST(ReferenceMemoryData, Test)
 	ASSERT_EQ(testData[2], 42);
 	ASSERT_EQ(testData[3], 4);
 	ASSERT_EQ(testData[4], 5);
+
+	int testData2 = 12345;
+	auto md2 = ReferenceMemoryData(testData2);
+	ASSERT_EQ(md2.GetData(), &testData2);
+	ASSERT_EQ(md2.GetSize(), sizeof(int));
 }

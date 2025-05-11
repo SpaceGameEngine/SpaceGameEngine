@@ -3497,6 +3497,18 @@ namespace SpaceGameEngine
 		SizeType m_Size;
 	};
 
+	namespace Detail
+	{
+		template<typename T>
+		inline constexpr const bool IsStringCore = false;
+
+		template<typename T, typename Trait, typename Allocator>
+		inline constexpr const bool IsStringCore<StringCore<T, Trait, Allocator>> = true;
+	}
+
+	template<typename T>
+	concept IsString = Detail::IsStringCore<T> && std::is_same_v<typename T::CharType, typename T::ValueTrait::ValueType>;
+
 	using UCS2String = StringCore<Char16, UCS2Trait, DefaultAllocator>;
 	using UTF8String = StringCore<Char8, UTF8Trait, DefaultAllocator>;
 	using String = UCS2String;
@@ -3615,7 +3627,7 @@ namespace SpaceGameEngine
 #define SGE_STR_TO_UTF8(str) SpaceGameEngine::UCS2StringToUTF8String(str)
 #define SGE_UTF8_TO_STR(str) SpaceGameEngine::UTF8StringToUCS2String(str)
 
-	template<typename StringType, typename T>
+	template<IsString StringType, typename T>
 	struct ToStringCore
 	{
 		inline static StringType Get(const T& value)
@@ -3624,7 +3636,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename StringType, typename T, typename... Args>
+	template<IsString StringType, typename T, typename... Args>
 	inline StringType ToString(const T& value, Args&&... args)
 	{
 		return ToStringCore<StringType, T>::Get(value, std::forward<Args>(args)...);
@@ -4617,7 +4629,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename StringType, typename T>
+	template<IsString StringType, typename T>
 	struct StringToCore
 	{
 		inline static T Get(const StringType& str)
@@ -4626,7 +4638,7 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename StringType, typename T>
+	template<IsString StringType, typename T>
 	inline T StringTo(const StringType& str)
 	{
 		return StringToCore<StringType, T>::Get(str);

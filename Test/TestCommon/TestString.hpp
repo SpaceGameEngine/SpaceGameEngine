@@ -2992,6 +2992,20 @@ TEST(StringCoreIterator, ConvertTest)
 	ASSERT_TRUE(IsUTF8CharSame(*i2_8, SGE_U8STR("这")));
 }
 
+TEST(IsString, Test)
+{
+	ASSERT_TRUE(IsString<UCS2String>);
+	ASSERT_TRUE((IsString<StringCore<Char16, UCS2Trait, StdAllocator>>));
+	ASSERT_TRUE((IsString<StringCore<Char16, UCS2Trait, MemoryManagerAllocator>>));
+	// ASSERT_FALSE((IsString<StringCore<Char16, UTF8Trait>>));	// when instance StringCore template, it will make a static assert failure.
+	ASSERT_TRUE(IsString<UTF8String>);
+	ASSERT_TRUE((IsString<StringCore<Char8, UTF8Trait, StdAllocator>>));
+	ASSERT_TRUE((IsString<StringCore<Char8, UTF8Trait, MemoryManagerAllocator>>));
+	// ASSERT_FALSE((IsString<StringCore<Char8, UCS2Trait>>));	// when instance StringCore template, it will make a static assert failure.
+
+	ASSERT_FALSE(IsString<std::string>);
+}
+
 TEST(StringConvert, UTF8StringToUCS2StringTest)
 {
 	UTF8String s1_1(SGE_U8STR("这是个测试test123"));
