@@ -92,6 +92,9 @@
     <ClInclude Include="Utility\TestMemoryData.hpp">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Serializer\TestSerializer.hpp">
+      <Filter>Serializer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">
@@ -111,6 +114,9 @@
     </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{128f1343-fef5-4270-9a7b-2dc0f40df0c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serializer">
+      <UniqueIdentifier>{f391dd60-517d-4502-a64d-1f83dedb8c0f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

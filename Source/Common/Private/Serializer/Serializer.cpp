@@ -13,35 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#pragma once
-#include "CommonAPI.h"
-#include "TypeDefinition.hpp"
-#include "Utility/MemoryData.h"
+#include "Serializer/Serializer.h"
 
-/*!
-@ingroup Common
-@{
-*/
-
-namespace SpaceGameEngine
-{
-	class COMMON_API InputStream
-	{
-	public:
-		virtual ~InputStream() = default;
-
-		virtual bool Read(MemoryData& data) = 0;
-	};
-
-	class COMMON_API OutputStream
-	{
-	public:
-		virtual ~OutputStream() = default;
-
-		virtual bool Write(const MemoryData& data) = 0;
-	};
-}
-
-/*!
-@}
-*/
+using namespace SpaceGameEngine;

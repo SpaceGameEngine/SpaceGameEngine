@@ -21,6 +21,7 @@ add_library(Common SHARED
         Private/File.cpp
         Private/Log.cpp
         Private/Stream/Stream.cpp
+        Private/Serializer/Serializer.cpp
         )
 target_compile_definitions(Common PRIVATE COMMON_EXPORTS)
 target_include_directories(Common PUBLIC Public)

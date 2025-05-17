@@ -194,6 +194,7 @@
     <ClInclude Include="Container\TestSet.hpp" />
     <ClInclude Include="Container\TestStack.hpp" />
     <ClInclude Include="Container\TestVector.hpp" />
+    <ClInclude Include="Serializer\TestSerializer.hpp" />
     <ClInclude Include="System\TestDllLoader.hpp" />
     <ClInclude Include="TestError.hpp" />
     <ClInclude Include="TestFile.hpp" />

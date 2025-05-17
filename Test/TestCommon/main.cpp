@@ -51,6 +51,7 @@ limitations under the License.
 #include "TestFile.hpp"
 #include "Time/TestDate.hpp"
 #include "TestLog.hpp"
+#include "Serializer/TestSerializer.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;
 

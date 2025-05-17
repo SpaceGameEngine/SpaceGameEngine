@@ -3782,13 +3782,13 @@ TEST(MakeMemoryData, StringTest)
 	UCS2String test_ucs2_string(SGE_WSTR("test"));
 	MemoryData ucs2_memory_data = MakeMemoryData(test_ucs2_string);
 	ASSERT_NE(ucs2_memory_data.GetData(), test_ucs2_string.GetData());
-	ASSERT_EQ(ucs2_memory_data.GetSize(), test_ucs2_string.GetNormalSize());
+	ASSERT_EQ(ucs2_memory_data.GetSize(), test_ucs2_string.GetNormalSize() * sizeof(Char16));
 	ASSERT_EQ(memcmp(ucs2_memory_data.GetData(), test_ucs2_string.GetData(), ucs2_memory_data.GetSize()), 0);
 
 	UTF8String test_utf8_string(SGE_U8STR("test"));
 	MemoryData utf8_memory_data = MakeMemoryData(test_utf8_string);
 	ASSERT_NE(utf8_memory_data.GetData(), test_utf8_string.GetData());
-	ASSERT_EQ(utf8_memory_data.GetSize(), test_utf8_string.GetNormalSize());
+	ASSERT_EQ(utf8_memory_data.GetSize(), test_utf8_string.GetNormalSize() * sizeof(Char8));
 	ASSERT_EQ(memcmp(utf8_memory_data.GetData(), test_utf8_string.GetData(), utf8_memory_data.GetSize()), 0);
 }
 
@@ -3797,10 +3797,10 @@ TEST(ReferenceMemoryData, StringTest)
 	UCS2String test_ucs2_string(SGE_WSTR("test"));
 	MemoryData ucs2_memory_data = ReferenceMemoryData(test_ucs2_string);
 	ASSERT_EQ(ucs2_memory_data.GetData(), test_ucs2_string.GetData());
-	ASSERT_EQ(ucs2_memory_data.GetSize(), test_ucs2_string.GetNormalSize());
+	ASSERT_EQ(ucs2_memory_data.GetSize(), test_ucs2_string.GetNormalSize() * sizeof(Char16));
 
 	UTF8String test_utf8_string(SGE_U8STR("test"));
 	MemoryData utf8_memory_data = ReferenceMemoryData(test_utf8_string);
 	ASSERT_EQ(utf8_memory_data.GetData(), test_utf8_string.GetData());
-	ASSERT_EQ(utf8_memory_data.GetSize(), test_utf8_string.GetNormalSize());
+	ASSERT_EQ(utf8_memory_data.GetSize(), test_utf8_string.GetNormalSize() * sizeof(Char8));
 }

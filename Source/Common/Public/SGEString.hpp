@@ -5160,16 +5160,16 @@ namespace SpaceGameEngine
 		}
 	};
 
-	template<typename T, typename Trait, IsAllocator StringAllocator, IsAllocator MemoryDataAllocator = DefaultAllocator>
-	inline MemoryData MakeMemoryData(const StringCore<T, Trait, StringAllocator>& str)
+	template<IsString StringType, IsAllocator Allocator = DefaultAllocator>
+	inline MemoryData MakeMemoryData(const StringType& str)
 	{
-		return MakeMemoryData<MemoryDataAllocator>(str.GetData(), str.GetNormalSize());
+		return MakeMemoryData<Allocator>(str.GetData(), str.GetNormalSize() * sizeof(typename StringType::CharType));
 	}
 
-	template<typename T, typename Trait, IsAllocator Allocator>
-	inline MemoryData ReferenceMemoryData(StringCore<T, Trait, Allocator>& str)
+	template<IsString StringType>
+	inline MemoryData ReferenceMemoryData(StringType& str)
 	{
-		return ReferenceMemoryData(str.GetData(), str.GetNormalSize());
+		return ReferenceMemoryData(str.GetData(), str.GetNormalSize() * sizeof(typename StringType::CharType));
 	}
 
 }
