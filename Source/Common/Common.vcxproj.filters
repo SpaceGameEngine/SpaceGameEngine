@@ -237,10 +237,13 @@
     <ClInclude Include="Public\Serializer\Serializer.h">
       <Filter>Public\Serializer</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Stream\StreamReader.h">
+    <ClInclude Include="Public\Stream\StreamReader.hpp">
       <Filter>Public\Stream</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Stream\StreamWriter.h">
+    <ClInclude Include="Public\Stream\StreamWriter.hpp">
+      <Filter>Public\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Stream\CumulateStream.hpp">
       <Filter>Public\Stream</Filter>
     </ClInclude>
   </ItemGroup>

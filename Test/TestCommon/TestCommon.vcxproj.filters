@@ -104,6 +104,9 @@
     <ClInclude Include="Stream\TestStreamWriter.hpp">
       <Filter>Stream</Filter>
     </ClInclude>
+    <ClInclude Include="Stream\TestCumulateStream.hpp">
+      <Filter>Stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">

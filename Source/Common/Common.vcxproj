@@ -194,9 +194,10 @@
     <ClInclude Include="Public\Serializer\Serializer.h" />
     <ClInclude Include="Public\SGEString.hpp" />
     <ClInclude Include="Public\SGEStringForward.h" />
+    <ClInclude Include="Public\Stream\CumulateStream.hpp" />
     <ClInclude Include="Public\Stream\Stream.h" />
-    <ClInclude Include="Public\Stream\StreamReader.h" />
-    <ClInclude Include="Public\Stream\StreamWriter.h" />
+    <ClInclude Include="Public\Stream\StreamReader.hpp" />
+    <ClInclude Include="Public\Stream\StreamWriter.hpp" />
     <ClInclude Include="Public\System\AllowWindowsMacro.h" />
     <ClInclude Include="Public\System\DllLoader.h" />
     <ClInclude Include="Public\System\HideWindowsMacro.h" />

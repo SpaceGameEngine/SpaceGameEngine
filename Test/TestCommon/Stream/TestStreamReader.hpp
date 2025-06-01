@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "gtest/gtest.h"
-#include "Stream/StreamReader.h"
+#include "Stream/StreamReader.hpp"
 
 using namespace SpaceGameEngine;
 

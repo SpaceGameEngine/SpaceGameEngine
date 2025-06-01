@@ -53,7 +53,7 @@ namespace SpaceGameEngine
 		template<typename T>
 		inline StreamWriter& operator<<(T& value)
 		{
-			m_IsValid = m_Stream.Write(StringSerializer::Serialize(value));
+			m_IsValid = m_Stream.Write(Serializer::Serialize(value));
 			return *this;
 		}
 

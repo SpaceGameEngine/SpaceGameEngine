@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "gtest/gtest.h"
-#include "Stream/StreamWriter.h"
+#include "Stream/StreamWriter.hpp"
 
 using namespace SpaceGameEngine;
 
