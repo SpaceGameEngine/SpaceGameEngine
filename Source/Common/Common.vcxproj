@@ -195,6 +195,8 @@
     <ClInclude Include="Public\SGEString.hpp" />
     <ClInclude Include="Public\SGEStringForward.h" />
     <ClInclude Include="Public\Stream\Stream.h" />
+    <ClInclude Include="Public\Stream\StreamReader.h" />
+    <ClInclude Include="Public\Stream\StreamWriter.h" />
     <ClInclude Include="Public\System\AllowWindowsMacro.h" />
     <ClInclude Include="Public\System\DllLoader.h" />
     <ClInclude Include="Public\System\HideWindowsMacro.h" />

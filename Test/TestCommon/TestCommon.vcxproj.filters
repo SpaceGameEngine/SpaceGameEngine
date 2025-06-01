@@ -95,6 +95,15 @@
     <ClInclude Include="Serializer\TestSerializer.hpp">
       <Filter>Serializer</Filter>
     </ClInclude>
+    <ClInclude Include="Stream\TestStream.hpp">
+      <Filter>Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="Stream\TestStreamReader.hpp">
+      <Filter>Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="Stream\TestStreamWriter.hpp">
+      <Filter>Stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">
@@ -117,6 +126,9 @@
     </Filter>
     <Filter Include="Serializer">
       <UniqueIdentifier>{f391dd60-517d-4502-a64d-1f83dedb8c0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stream">
+      <UniqueIdentifier>{5ab3fbfc-6972-4da9-be3c-d842b18e8328}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

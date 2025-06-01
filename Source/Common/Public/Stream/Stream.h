@@ -30,6 +30,11 @@ namespace SpaceGameEngine
 	public:
 		virtual ~InputStream() = default;
 
+		/*!
+		@brief Read data from the stream into the provided MemoryData object.
+		@param data The MemoryData object to read data into.
+		@return True if the read operation was successful, false otherwise.
+		*/
 		virtual bool Read(MemoryData& data) = 0;
 	};
 
@@ -38,6 +43,11 @@ namespace SpaceGameEngine
 	public:
 		virtual ~OutputStream() = default;
 
+		/*!
+		@brief Write data from the provided MemoryData object to the stream.
+		@param data The MemoryData object containing the data to write.
+		@return True if the write operation was successful, false otherwise.
+		*/
 		virtual bool Write(const MemoryData& data) = 0;
 	};
 }
