@@ -16,6 +16,8 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "Stream/StreamReader.hpp"
+#include "Serializer/StringSerializer.hpp"
+#include "TestStream.hpp"
 
 using namespace SpaceGameEngine;
 
@@ -23,4 +25,24 @@ TEST(IsStreamReader, Test)
 {
 	ASSERT_TRUE(IsStreamReader<StreamReader<StringSerializer<UCS2String>>>);
 	ASSERT_TRUE(IsStreamReader<StreamReader<StringSerializer<UTF8String>>>);
+}
+
+TEST(StreamReader, StringSerializerTest)
+{
+	Char16 ucs2_test_str[] = SGE_WSTR("123456");
+	Char8 utf8_test_str[] = SGE_U8STR("789101");
+
+	TestStream stream;
+	ASSERT_TRUE(stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+	ASSERT_TRUE(stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+
+	int test_value = 0;
+
+	StreamReader<StringSerializer<UCS2String>> ucs2_reader(stream);
+	ASSERT_TRUE(ucs2_reader >> test_value);
+	ASSERT_EQ(test_value, 123456);
+
+	StreamReader<StringSerializer<UTF8String>> utf8_reader(stream);
+	ASSERT_TRUE(utf8_reader >> test_value);
+	ASSERT_EQ(test_value, 789101);
 }

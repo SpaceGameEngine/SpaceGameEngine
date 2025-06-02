@@ -16,7 +16,6 @@ limitations under the License.
 #pragma once
 #include "CommonAPI.h"
 #include "Utility/MemoryData.h"
-#include "SGEString.hpp"
 #include <concepts>
 
 /*!
@@ -38,24 +37,6 @@ namespace SpaceGameEngine
 		{
 			T::template Deserialize<int>(md_input)
 		} -> std::same_as<int>;
-	};
-
-	template<IsString StringType>
-	class StringSerializer
-	{
-	public:
-		template<typename T>
-		inline static MemoryData Serialize(const T& value)
-		{
-			return MakeMemoryData(ToString<StringType>(value));
-		}
-
-		template<typename T>
-		inline static T Deserialize(const MemoryData& md)
-		{
-			using CharType = StringType::CharType;
-			return StringTo<StringType, T>(StringType((const CharType*)md.GetData(), (const CharType*)((Byte*)md.GetData() + md.GetSize())));
-		}
 	};
 }
 

@@ -16,5 +16,33 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "Stream/Stream.h"
+#include "Container/Queue.hpp"
 
 using namespace SpaceGameEngine;
+
+class TestStream : public InputStream, public OutputStream
+{
+public:
+	inline virtual ~TestStream() = default;
+
+	inline virtual bool Read(MemoryData& data) override
+	{
+		if (m_Content.GetSize())
+		{
+			data = std::move(m_Content.GetFront());
+			m_Content.Pop();
+			return true;
+		}
+		else
+			return false;
+	}
+
+	inline virtual bool Write(const MemoryData& data) override
+	{
+		m_Content.Push(MakeMemoryData(data.GetData(), data.GetSize()));
+		return true;
+	}
+
+private:
+	Queue<MemoryData> m_Content;
+};

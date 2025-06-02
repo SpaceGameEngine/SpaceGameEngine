@@ -246,6 +246,9 @@
     <ClInclude Include="Public\Stream\CumulateStream.hpp">
       <Filter>Public\Stream</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Serializer\StringSerializer.hpp">
+      <Filter>Public\Serializer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
