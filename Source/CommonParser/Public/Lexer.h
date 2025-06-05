@@ -27,49 +27,51 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonParser::Lexer
 {
+	using TokenType = UInt8;
 
-	enum class TokenType : UInt8
+	namespace TokenTypes
 	{
-		Unknown = 0,
-		Identifier = 1,
-		IntegerLiteral = 2,
-		FloatLiteral = 3,
-		DoubleLiteral = 4,
-		CharacterLiteral = 5,
-		StringLiteral = 6,
-		LineSeparator = 7,
-		WordSeparator = 8,
-		Exclamation = 9,			//!
-		Hash = 10,					// #
-		Dollar = 11,				//$
-		Mod = 12,					//%
-		And = 13,					//&
-		LeftBracket = 14,			//(
-		RightBracket = 15,			//)
-		Multiply = 16,				//*
-		Add = 17,					//+
-		Comma = 18,					//,
-		Subtract = 19,				//-
-		Dot = 20,					//.
-		Slash = 21,					///
-		Colon = 22,					//:
-		Semicolon = 23,				//;
-		Less = 24,					//<
-		Equal = 25,					//=
-		Greater = 26,				//>
-		Question = 27,				//?
-		At = 28,					//@
-		LeftSquareBracket = 29,		//[
-		Backslash = 30,				/*\*/
-		RightSquareBracket = 31,	//]
-		Caret = 32,					//^
-		LeftCurlyBracket = 33,		//{
-		Vertical = 34,				//|
-		RightCurlyBracket = 35,		//}
-		Tilde = 36,					//~
-		Quote = 37,					//`
-		CommentLine = 38,
-		CommentBlock = 39
+		inline constexpr const TokenType Unknown = 0;
+		inline constexpr const TokenType Identifier = 1;
+		inline constexpr const TokenType IntegerLiteral = 2;
+		inline constexpr const TokenType FloatLiteral = 3;
+		inline constexpr const TokenType DoubleLiteral = 4;
+		inline constexpr const TokenType CharacterLiteral = 5;
+		inline constexpr const TokenType StringLiteral = 6;
+		inline constexpr const TokenType LineSeparator = 7;
+		inline constexpr const TokenType WordSeparator = 8;
+		inline constexpr const TokenType Exclamation = 9;			 //!
+		inline constexpr const TokenType Hash = 10;					 // #
+		inline constexpr const TokenType Dollar = 11;				 //$
+		inline constexpr const TokenType Mod = 12;					 //%
+		inline constexpr const TokenType And = 13;					 //&
+		inline constexpr const TokenType LeftBracket = 14;			 //(
+		inline constexpr const TokenType RightBracket = 15;			 //)
+		inline constexpr const TokenType Multiply = 16;				 //*
+		inline constexpr const TokenType Add = 17;					 //+
+		inline constexpr const TokenType Comma = 18;				 //,
+		inline constexpr const TokenType Subtract = 19;				 //-
+		inline constexpr const TokenType Dot = 20;					 //.
+		inline constexpr const TokenType Slash = 21;				 ///
+		inline constexpr const TokenType Colon = 22;				 //:
+		inline constexpr const TokenType Semicolon = 23;			 //;
+		inline constexpr const TokenType Less = 24;					 //<
+		inline constexpr const TokenType Equal = 25;				 //=
+		inline constexpr const TokenType Greater = 26;				 //>
+		inline constexpr const TokenType Question = 27;				 //?
+		inline constexpr const TokenType At = 28;					 //@
+		inline constexpr const TokenType LeftSquareBracket = 29;	 //[
+		inline constexpr const TokenType Backslash = 30;			 /*\*/
+		inline constexpr const TokenType RightSquareBracket = 31;	 //]
+		inline constexpr const TokenType Caret = 32;				 //^
+		inline constexpr const TokenType LeftCurlyBracket = 33;		 //{
+		inline constexpr const TokenType Vertical = 34;				 //|
+		inline constexpr const TokenType RightCurlyBracket = 35;	 //}
+		inline constexpr const TokenType Tilde = 36;				 //~
+		inline constexpr const TokenType Quote = 37;				 //`
+		inline constexpr const TokenType CommentLine = 38;
+		inline constexpr const TokenType CommentBlock = 39;
+		inline constexpr const TokenType DefaultTokenTypesCount = 40;
 	};
 
 	struct InvalidTokenTypeError

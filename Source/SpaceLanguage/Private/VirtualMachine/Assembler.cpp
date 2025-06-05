@@ -93,9 +93,9 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 
 	for (auto iter = tokens.GetConstBegin(); iter != tokens.GetConstEnd(); ++iter)
 	{
-		if (iter->GetType() == TokenType::LineSeparator || iter->GetType() == TokenType::CommentLine || iter->GetType() == TokenType::CommentBlock)
+		if (iter->GetType() == TokenTypes::LineSeparator || iter->GetType() == TokenTypes::CommentLine || iter->GetType() == TokenTypes::CommentBlock)
 			continue;
-		else if (iter->GetType() == TokenType::Colon)
+		else if (iter->GetType() == TokenTypes::Colon)
 		{
 			if (instr_size)
 			{
@@ -108,7 +108,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need tag here"))));
 				return true;
 			}
-			if (next->GetType() != TokenType::Identifier)
+			if (next->GetType() != TokenTypes::Identifier)
 			{
 				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Invalid tag name"))));
 				return true;
@@ -126,7 +126,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 		}
 		else if (instr_size == 8)
 		{
-			if (iter->GetType() == TokenType::Identifier)
+			if (iter->GetType() == TokenTypes::Identifier)
 			{
 				if (pinstr->m_Index != InstructionTypeIndex::ExternalCall)
 				{
@@ -145,7 +145,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 						return true;
 					}
 					auto next = iter + 1;
-					if (next == tokens.GetConstEnd() || next->GetType() != TokenType::Colon)
+					if (next == tokens.GetConstEnd() || next->GetType() != TokenTypes::Colon)
 					{
 						SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need : here"))));
 						return true;
@@ -164,22 +164,22 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 					iter += 2;
 				}
 			}
-			else if (iter->GetType() != TokenType::IntegerLiteral && iter->GetType() != TokenType::WordSeparator)
+			else if (iter->GetType() != TokenTypes::IntegerLiteral && iter->GetType() != TokenTypes::WordSeparator)
 			{
 				SGE_LOG(GetSpaceLanguageLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, iter->GetLine(), iter->GetColumn(), SGE_STR("Need integer here"))));
 				return true;
 			}
 
-			if (iter->GetType() != TokenType::WordSeparator)
+			if (iter->GetType() != TokenTypes::WordSeparator)
 				instr_size = 0;
 		}
 		else
 		{
-			if (iter->GetType() != TokenType::WordSeparator)
+			if (iter->GetType() != TokenTypes::WordSeparator)
 			{
 				if (instr_size)
 				{
-					if (iter->GetType() == TokenType::IntegerLiteral)
+					if (iter->GetType() == TokenTypes::IntegerLiteral)
 					{
 						if (StringTo<String, UInt8>(iter->GetContent()) >= RegistersSize)
 						{
@@ -187,7 +187,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 							return true;
 						}
 					}
-					else if (iter->GetType() == TokenType::Identifier)
+					else if (iter->GetType() == TokenTypes::Identifier)
 					{
 						if (!RegisterNameSet::GetSingleton().IsRegisterName(iter->GetContent()))
 						{
@@ -203,7 +203,7 @@ bool SpaceGameEngine::SpaceLanguage::InvalidAssemblerSourceStringError::Judge(co
 
 					instr_size -= 1;
 				}
-				else if (iter->GetType() == TokenType::Identifier)
+				else if (iter->GetType() == TokenTypes::Identifier)
 				{
 					if (iter->GetLine() == instr_line)
 					{
@@ -270,12 +270,12 @@ Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& s
 
 	for (auto iter = tokens.GetConstBegin(); iter != tokens.GetConstEnd(); ++iter)
 	{
-		if (iter->GetType() == TokenType::LineSeparator || iter->GetType() == TokenType::WordSeparator || iter->GetType() == TokenType::CommentBlock || iter->GetType() == TokenType::CommentLine)
+		if (iter->GetType() == TokenTypes::LineSeparator || iter->GetType() == TokenTypes::WordSeparator || iter->GetType() == TokenTypes::CommentBlock || iter->GetType() == TokenTypes::CommentLine)
 			continue;
 
 		if (instr_size == 8)
 		{
-			if (iter->GetType() == TokenType::IntegerLiteral)
+			if (iter->GetType() == TokenTypes::IntegerLiteral)
 				*(UInt64*)(&result[write_idx]) = StringTo<String, UInt64>(iter->GetContent());
 			else if (pinstr->m_Index != InstructionTypeIndex::ExternalCall)
 			{
@@ -298,7 +298,7 @@ Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& s
 		}
 		else if (instr_size)
 		{
-			if (iter->GetType() == TokenType::IntegerLiteral)
+			if (iter->GetType() == TokenTypes::IntegerLiteral)
 				result[write_idx] = StringTo<String, UInt8>(iter->GetContent());
 			else	// Identifier
 				result[write_idx] = RegisterNameSet::GetSingleton().Get(iter->GetContent());
@@ -307,7 +307,7 @@ Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& s
 		}
 		else
 		{
-			if (iter->GetType() == TokenType::Identifier)
+			if (iter->GetType() == TokenTypes::Identifier)
 			{
 				pinstr = &InstructionNameSet::GetSingleton().Get(iter->GetContent());
 				instr_size = pinstr->m_Size - 1;
@@ -315,7 +315,7 @@ Vector<UInt8> SpaceGameEngine::SpaceLanguage::Assembler::Compile(const String& s
 				result[write_idx] = pinstr->m_Index;
 				++write_idx;
 			}
-			else if (iter->GetType() == TokenType::Colon)
+			else if (iter->GetType() == TokenTypes::Colon)
 			{
 				++iter;
 				tags.Insert(iter->GetContent(), result.GetSize());
