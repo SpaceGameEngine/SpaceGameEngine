@@ -24,12 +24,23 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 {
+	class COMMON_INTERMEDIATE_REPRESENTATION_API AbstractSyntaxTreeNodeVisitor
+	{
+	public:
+		virtual ~AbstractSyntaxTreeNodeVisitor() = default;
+
+		virtual void Visit(const AbstractSyntaxTreeNodes::VariableNode& node) = 0;
+		// todo more node types as needed
+	};
+
 	class COMMON_INTERMEDIATE_REPRESENTATION_API AbstractSyntaxTreeNode
 	{
 	public:
 		AbstractSyntaxTreeNode() = default;
 		AbstractSyntaxTreeNode(AbstractSyntaxTreeNode* pfather);
 		virtual ~AbstractSyntaxTreeNode() = default;
+
+		virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const = 0;
 
 	private:
 		AbstractSyntaxTreeNode* m_pFather = nullptr;
@@ -41,6 +52,8 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		{
 		public:
 			VariableNode(const String& name, AbstractSyntaxTreeNode* pfather = nullptr);
+
+			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
 
 		private:
 			String m_Name;

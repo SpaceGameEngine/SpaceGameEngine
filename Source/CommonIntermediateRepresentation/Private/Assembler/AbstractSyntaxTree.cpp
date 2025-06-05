@@ -28,3 +28,8 @@ SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTree
 	: m_Name(name), AbstractSyntaxTreeNode(pfather)
 {
 }
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::VariableNode::Accept(AbstractSyntaxTreeNodeVisitor& visitor) const
+{
+	visitor.Visit(*this);
+}
