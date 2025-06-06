@@ -33,6 +33,9 @@
     <ClInclude Include="Public\Assembler\Lexer.h">
       <Filter>Public\Assembler</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Assembler\AbstractSyntaxTreePrinter.h">
+      <Filter>Public\Assembler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp">
@@ -45,6 +48,9 @@
       <Filter>Private\Assembler</Filter>
     </ClCompile>
     <ClCompile Include="Private\Assembler\Lexer.cpp">
+      <Filter>Private\Assembler</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assembler\AbstractSyntaxTreePrinter.cpp">
       <Filter>Private\Assembler</Filter>
     </ClCompile>
   </ItemGroup>

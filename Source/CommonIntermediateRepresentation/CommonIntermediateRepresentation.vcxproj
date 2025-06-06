@@ -80,7 +80,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public;./Private</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -97,7 +97,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public;./Private</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,7 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public;./Private</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMMON_INTERMEDIATE_REPRESENTATION_EXPORTS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Public;../Common/Public;../CommonParser/Public;./Private</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,11 +155,13 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Public\Assembler\AbstractSyntaxTree.h" />
+    <ClInclude Include="Public\Assembler\AbstractSyntaxTreePrinter.h" />
     <ClInclude Include="Public\Assembler\Lexer.h" />
     <ClInclude Include="Public\CommonIntermediateRepresentationAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Assembler\AbstractSyntaxTree.cpp" />
+    <ClCompile Include="Private\Assembler\AbstractSyntaxTreePrinter.cpp" />
     <ClCompile Include="Private\Assembler\Lexer.cpp" />
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp" />
     <ClCompile Include="Private\Logger.cpp" />

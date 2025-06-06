@@ -25,7 +25,7 @@ limitations under the License.
 namespace SpaceGameEngine
 {
 	template<IsAllocator Allocator = DefaultAllocator>
-	class CumulateStream : public InputStream, OutputStream
+	class CumulateStream : public InputStream, public OutputStream
 	{
 	public:
 		inline virtual bool Read(MemoryData& data) override

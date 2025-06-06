@@ -48,6 +48,8 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 
 			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
 
+			const String& GetName() const;
+
 		private:
 			String m_Name;
 		};

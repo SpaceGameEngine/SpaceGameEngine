@@ -23,7 +23,7 @@ using namespace SpaceGameEngine::CommonParser::Lexer;
 
 bool SpaceGameEngine::CommonParser::Lexer::InvalidTokenTypeError::Judge(TokenType tt)
 {
-	return (UInt8)tt > 39;
+	return tt >= TokenTypes::DefaultTokenTypesCount;
 }
 
 SpaceGameEngine::CommonParser::Lexer::Token::Token()

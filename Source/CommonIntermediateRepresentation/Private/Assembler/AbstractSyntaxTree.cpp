@@ -33,3 +33,8 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 {
 	visitor.Visit(*this);
 }
+
+const String& SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::VariableNode::GetName() const
+{
+	return m_Name;
+}

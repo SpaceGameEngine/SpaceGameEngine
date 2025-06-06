@@ -12,5 +12,8 @@
     <ClInclude Include="Assembler\TestLexer.hpp">
       <Filter>Assembler</Filter>
     </ClInclude>
+    <ClInclude Include="Assembler\TestAbstractSyntaxTreePrinter.hpp">
+      <Filter>Assembler</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
