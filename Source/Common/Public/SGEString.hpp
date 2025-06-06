@@ -2807,7 +2807,7 @@ namespace SpaceGameEngine
 				}
 				else
 				{
-					for (auto pbuf = begin; pbuf != end; pbuf = StringImplement::GetNextMultipleByteChar<T, Trait>(pbuf))
+					for (const T* pbuf = begin; pbuf != end; pbuf = StringImplement::GetNextMultipleByteChar<T, Trait>(pbuf))
 					{
 						SGE_ASSERT(_InvalidMultipleByteCharError, pbuf);
 						snsize += StringImplement::GetMultipleByteCharSize<T, Trait>(pbuf);

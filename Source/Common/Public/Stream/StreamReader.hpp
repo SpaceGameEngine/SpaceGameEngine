@@ -39,34 +39,11 @@ namespace SpaceGameEngine
 
 	/*!
 	@brief A stream reader that reads data from an input stream using a serializer.
-	@note This template class provides a default implementation. You can specialize this class for the specific serializer.
+	@note Users should specialize this class for their own serializer types.
 	*/
 	template<IsSerializer Serializer>
 	class StreamReader
 	{
-	public:
-		inline StreamReader(InputStream& stream)
-			: m_Stream(stream)
-		{
-		}
-
-		template<typename T>
-		inline StreamReader& operator>>(T& value)
-		{
-			MemoryData memoryData;
-			m_IsValid = m_Stream.Read(memoryData);
-			value = Serializer::template Deserialize<T>(memoryData);
-			return *this;
-		}
-
-		inline operator bool() const
-		{
-			return m_IsValid;
-		}
-
-	private:
-		InputStream& m_Stream;
-		bool m_IsValid = true;
 	};
 }
 

@@ -32,6 +32,7 @@ namespace SpaceGameEngine
 
 		/*!
 		@brief Read data from the stream into the provided MemoryData object.
+		@note The MemoryData object should be pre-allocated, and the InputStream will fill it with data.
 		@param data The MemoryData object to read data into.
 		@return True if the read operation was successful, false otherwise.
 		*/
@@ -49,6 +50,12 @@ namespace SpaceGameEngine
 		@return True if the write operation was successful, false otherwise.
 		*/
 		virtual bool Write(const MemoryData& data) = 0;
+	};
+
+	struct InvalidMemoryDataForInputStreamReadError
+	{
+		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The MemoryData is invalid for InputStream::Read.");
+		static COMMON_API bool Judge(const MemoryData& data);
 	};
 }
 

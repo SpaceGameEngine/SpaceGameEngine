@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "Stream/StreamReader.hpp"
+#include "Stream/CumulateStream.hpp"
 #include "Serializer/StringSerializer.hpp"
 #include "TestStream.hpp"
 
@@ -32,17 +33,17 @@ TEST(StreamReader, StringSerializerTest)
 	Char16 ucs2_test_str[] = SGE_WSTR("123456");
 	Char8 utf8_test_str[] = SGE_U8STR("789101");
 
-	TestStream stream;
-	ASSERT_TRUE(stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
-	ASSERT_TRUE(stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+	CumulateStream ucs2_stream, utf8_stream;
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
 
 	int test_value = 0;
 
-	StreamReader<StringSerializer<UCS2String>> ucs2_reader(stream);
-	ASSERT_TRUE(ucs2_reader >> test_value);
+	StreamReader<StringSerializer<UCS2String>> ucs2_reader(ucs2_stream);
+	ASSERT_FALSE(ucs2_reader >> test_value);	// touch the end of the stream
 	ASSERT_EQ(test_value, 123456);
 
-	StreamReader<StringSerializer<UTF8String>> utf8_reader(stream);
-	ASSERT_TRUE(utf8_reader >> test_value);
+	StreamReader<StringSerializer<UTF8String>> utf8_reader(utf8_stream);
+	ASSERT_FALSE(utf8_reader >> test_value);	// touch the end of the stream
 	ASSERT_EQ(test_value, 789101);
 }

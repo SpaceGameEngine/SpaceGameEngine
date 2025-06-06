@@ -30,11 +30,21 @@ namespace SpaceGameEngine
 	public:
 		inline virtual bool Read(MemoryData& data) override
 		{
+			SGE_ASSERT(InvalidMemoryDataForInputStreamReadError, data);
+
 			if (m_Content.GetSize() == 0)
 				return false;
 
-			data = MakeMemoryData<Allocator>(m_Content.GetData(), m_Content.GetSize());
-			m_Content.Clear();
+			if (data.GetSize())
+			{
+				SizeType readSize = std::min(data.GetSize(), m_Content.GetSize());
+				auto eiter = m_Content.GetConstBegin() + readSize;
+				auto ptr = (Byte*)data.GetData();
+				for (auto iter = m_Content.GetConstBegin(); iter != eiter; ++iter)
+					*(ptr++) = *iter;
+				m_Content.Remove(m_Content.GetConstBegin(), eiter);
+			}
+
 			return true;
 		}
 
@@ -46,6 +56,11 @@ namespace SpaceGameEngine
 			const Byte* ptr = (const Byte*)data.GetData();
 			m_Content.Insert(m_Content.GetConstEnd(), ptr, ptr + data.GetSize());
 			return true;
+		}
+
+		inline SizeType GetSize() const
+		{
+			return m_Content.GetSize();
 		}
 
 	private:

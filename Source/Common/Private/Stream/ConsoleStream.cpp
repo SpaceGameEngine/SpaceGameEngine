@@ -13,8 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#pragma once
-#include "gtest/gtest.h"
-#include "Stream/Stream.h"
+#include "Stream/ConsoleStream.h"
+#include <stdio.h>
 
 using namespace SpaceGameEngine;
+
+bool SpaceGameEngine::ConsoleStream::Read(MemoryData& data)
+{
+	// todo
+	return false;
+}
+
+bool SpaceGameEngine::ConsoleStream::Write(const MemoryData& data)
+{
+	// todo
+	return false;
+}

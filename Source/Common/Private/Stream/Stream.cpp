@@ -16,3 +16,8 @@ limitations under the License.
 #include "Stream/Stream.h"
 
 using namespace SpaceGameEngine;
+
+bool SpaceGameEngine::InvalidMemoryDataForInputStreamReadError::Judge(const MemoryData& data)
+{
+	return data.GetSize() && data.GetData() == nullptr;
+}

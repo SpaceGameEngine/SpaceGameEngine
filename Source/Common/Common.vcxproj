@@ -195,6 +195,7 @@
     <ClInclude Include="Public\Serializer\StringSerializer.hpp" />
     <ClInclude Include="Public\SGEString.hpp" />
     <ClInclude Include="Public\SGEStringForward.h" />
+    <ClInclude Include="Public\Stream\ConsoleStream.h" />
     <ClInclude Include="Public\Stream\CumulateStream.hpp" />
     <ClInclude Include="Public\Stream\Stream.h" />
     <ClInclude Include="Public\Stream\StreamReader.hpp" />
@@ -234,6 +235,7 @@
     <ClCompile Include="Private\Module\ModuleManager.cpp" />
     <ClCompile Include="Private\Serializer\Serializer.cpp" />
     <ClCompile Include="Private\SGEString.cpp" />
+    <ClCompile Include="Private\Stream\ConsoleStream.cpp" />
     <ClCompile Include="Private\Stream\Stream.cpp" />
     <ClCompile Include="Private\System\DllLoader.cpp" />
     <ClCompile Include="Private\Time\Date.cpp" />

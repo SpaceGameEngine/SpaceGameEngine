@@ -249,6 +249,9 @@
     <ClInclude Include="Public\Serializer\StringSerializer.hpp">
       <Filter>Public\Serializer</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Stream\ConsoleStream.h">
+      <Filter>Public\Stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
@@ -319,6 +322,9 @@
     </ClCompile>
     <ClCompile Include="Private\Serializer\Serializer.cpp">
       <Filter>Private\Serializer</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Stream\ConsoleStream.cpp">
+      <Filter>Private\Stream</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

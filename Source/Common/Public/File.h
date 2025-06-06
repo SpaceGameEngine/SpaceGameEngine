@@ -893,7 +893,7 @@ namespace SpaceGameEngine
 						while ((memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer)))
 						{
 							if (SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer) != m_FileLineBreak)
-								str_buffer += (T*)buffer;
+								str_buffer.Insert(str_buffer.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 							else
 							{
 								str_buffer += GetFileLineBreakString<T, Trait>(flb);
@@ -919,13 +919,13 @@ namespace SpaceGameEngine
 								}
 								else
 								{
-									str_buffer += (T*)buffer;
+									str_buffer.Insert(str_buffer.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 									memcpy(buffer, buffer2, sizeof(buffer));
 								}
 							}
 							else
 							{
-								str_buffer += (T*)buffer;
+								str_buffer.Insert(str_buffer.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 								is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
 							}
 						}
@@ -986,7 +986,7 @@ namespace SpaceGameEngine
 				if (m_FileLineBreak != FileLineBreak::CRLF)
 				{
 					while ((memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer)) && SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer) != m_FileLineBreak)
-						re += (T*)buffer;
+						re.Insert(re.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 				}
 				else
 				{
@@ -1000,13 +1000,13 @@ namespace SpaceGameEngine
 								break;
 							else
 							{
-								re += (T*)buffer;
+								re.Insert(re.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 								memcpy(buffer, buffer2, sizeof(buffer));
 							}
 						}
 						else
 						{
-							re += (T*)buffer;
+							re.Insert(re.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 							is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
 						}
 					}
@@ -1038,7 +1038,7 @@ namespace SpaceGameEngine
 					is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
 				while (is_read && !IsWordSeparatorCharacter<T, Trait>(buffer))
 				{
-					re += (T*)buffer;
+					re.Insert(re.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 					is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
 				}
 			}

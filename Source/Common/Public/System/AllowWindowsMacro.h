@@ -16,6 +16,14 @@ limitations under the License.
 #include "Platform.hpp"
 
 #ifdef SGE_WINDOWS
+#ifndef max
+#pragma pop_macro("max")
+#endif
+
+#ifndef min
+#pragma pop_macro("min")
+#endif
+
 #ifndef CreateDirectory
 #pragma pop_macro("CreateDirectory")
 #endif

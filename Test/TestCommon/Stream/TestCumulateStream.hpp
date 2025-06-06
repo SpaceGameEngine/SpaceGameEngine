@@ -34,7 +34,7 @@ TEST(CumulateStream, Test)
 	MemoryData data2 = ReferenceMemoryData((void*)testData2, dataSize2);
 	ASSERT_TRUE(stream.Write(data2));
 
-	MemoryData readData;
+	MemoryData readData = NewMemoryData(stream.GetSize());
 	ASSERT_TRUE(stream.Read(readData));
 
 	ASSERT_EQ(readData.GetSize(), dataSize1 + dataSize2);
@@ -49,7 +49,10 @@ TEST(CumulateStream, Test)
 	ASSERT_FALSE(stream.Write(emptyData));
 
 	ASSERT_TRUE(stream.Write(data1));
-	ASSERT_TRUE(stream.Read(readData));
-	ASSERT_EQ(readData.GetSize(), dataSize1);
-	ASSERT_EQ(memcmp(readData.GetData(), testData1, dataSize1), 0);
+
+	MemoryData readData2 = NewMemoryData(stream.GetSize());
+	ASSERT_TRUE(stream.Read(readData2));
+
+	ASSERT_EQ(readData2.GetSize(), dataSize1);
+	ASSERT_EQ(memcmp(readData2.GetData(), testData1, dataSize1), 0);
 }

@@ -14,7 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "gtest/gtest.h"
 #include "Stream/Stream.h"
 
-using namespace SpaceGameEngine;
+/*!
+@ingroup Common
+@{
+*/
+
+namespace SpaceGameEngine
+{
+	/*!
+	@brief ConsoleStream is a stream that reads from and writes to the console.
+	@note When reading, it will block until input is available.
+	*/
+	class ConsoleStream : public InputStream, public OutputStream
+	{
+	public:
+		virtual bool Read(MemoryData& data) override;
+		virtual bool Write(const MemoryData& data) override;
+	};
+}
+
+/*!
+@}
+*/

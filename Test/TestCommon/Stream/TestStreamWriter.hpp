@@ -16,6 +16,7 @@ limitations under the License.
 #pragma once
 #include "gtest/gtest.h"
 #include "Stream/StreamWriter.hpp"
+#include "Stream/CumulateStream.hpp"
 #include "Serializer/StringSerializer.hpp"
 #include "TestStream.hpp"
 
@@ -32,7 +33,7 @@ TEST(StreamWriter, StringSerializerTest)
 	Char16 ucs2_test_str[] = SGE_WSTR("123456");
 	Char8 utf8_test_str[] = SGE_U8STR("789101");
 
-	TestStream stream;
+	CumulateStream stream;
 
 	StreamWriter<StringSerializer<UCS2String>> ucs2_writer(stream);
 	ASSERT_TRUE(ucs2_writer << 123456);
@@ -40,7 +41,9 @@ TEST(StreamWriter, StringSerializerTest)
 	StreamWriter<StringSerializer<UTF8String>> utf8_writer(stream);
 	ASSERT_TRUE(utf8_writer << 789101);
 
-	MemoryData ucs2_data, utf8_data;
+	MemoryData ucs2_data = NewMemoryData(6 * sizeof(Char16));
+	MemoryData utf8_data = NewMemoryData(6 * sizeof(Char8));
+
 	ASSERT_TRUE(stream.Read(ucs2_data));
 	ASSERT_TRUE(stream.Read(utf8_data));
 

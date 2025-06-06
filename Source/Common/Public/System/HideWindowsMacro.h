@@ -40,4 +40,14 @@ limitations under the License.
 #pragma push_macro("CreateDirectory")
 #undef CreateDirectory
 #endif
+
+#ifdef min
+#pragma push_macro("min")
+#undef min
+#endif
+
+#ifdef max
+#pragma push_macro("max")
+#undef max
+#endif
 #endif
