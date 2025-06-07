@@ -32,8 +32,7 @@ TEST(AbstractSyntaxTreePrinter, Test)
 	AbstractSyntaxTreeNodes::VariableNode variable_node(SGE_STR("test"));
 	variable_node.Accept(printer);
 
-	String result;
-	reader >> result;
+	String result = reader.ReadAll();
 	ASSERT_EQ(result, SGE_STR("Variable \"test\"\n"));
 
 	// todo add more tests for other node types

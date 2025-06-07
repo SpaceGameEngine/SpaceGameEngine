@@ -17,6 +17,7 @@ limitations under the License.
 #include "Serializer/Serializer.h"
 #include "SGEString.hpp"
 #include "Stream/StreamReader.hpp"
+#include "Utility/LineBreak.h"
 
 /*!
 @ingroup Common
@@ -77,6 +78,109 @@ namespace SpaceGameEngine
 				while (m_IsValid && IsWordSeparatorCharacter<CharType, CharTrait>(char_buf))
 					ReadChar(char_buf);
 				while (m_IsValid && !IsWordSeparatorCharacter<CharType, CharTrait>(char_buf))
+				{
+					result.Insert(result.GetConstEnd(), (CharType*)char_buf, (CharType*)char_buf + StringImplement::GetMultipleByteCharSize<CharType, CharTrait>(char_buf));
+					ReadChar(char_buf);
+				}
+			}
+			return result;
+		}
+
+		inline StringType ReadLine(LineBreak lb = LineBreak::LF)
+		{
+			SGE_ASSERT(UnknownLineBreakError, lb);
+
+			StringType result;
+			// read line, similar to File::ReadLine
+			if constexpr (!CharTrait::IsMultipleByte)
+			{
+				CharType char_buf = 0;
+				ReadChar(&char_buf);
+				if (lb != LineBreak::CRLF)
+				{
+					while (m_IsValid && GetLineBreak<CharType, CharTrait>(char_buf, char_buf) != lb)
+					{
+						result += char_buf;
+						ReadChar(&char_buf);
+					}
+				}
+				else
+				{
+					while (m_IsValid)
+					{
+						if (GetLineBreak<CharType, CharTrait>(char_buf, char_buf) == LineBreak::CR)
+						{
+							CharType pre_char_buf = char_buf;
+							ReadChar(&char_buf);
+							if (m_IsValid && GetLineBreak<CharType, CharTrait>(pre_char_buf, char_buf) == LineBreak::CRLF)
+								break;
+							else
+								result += pre_char_buf;
+						}
+						else
+						{
+							result += char_buf;
+							ReadChar(&char_buf);
+						}
+					}
+				}
+			}
+			else
+			{
+				CharType char_buf[CharTrait::MaxMultipleByteSize];
+				ReadChar(char_buf);
+
+				if (lb != LineBreak::CRLF)
+				{
+					while (m_IsValid && GetLineBreak<CharType, CharTrait>(char_buf, char_buf) != lb)
+					{
+						result.Insert(result.GetConstEnd(), (CharType*)char_buf, (CharType*)char_buf + StringImplement::GetMultipleByteCharSize<CharType, CharTrait>(char_buf));
+						ReadChar(char_buf);
+					}
+				}
+				else
+				{
+					CharType pre_char_buf[CharTrait::MaxMultipleByteSize];
+					while (m_IsValid)
+					{
+						if (GetLineBreak<CharType, CharTrait>(char_buf, char_buf) == LineBreak::CR)
+						{
+							memcpy(pre_char_buf, char_buf, sizeof(char_buf));
+							ReadChar(char_buf);
+							if (m_IsValid && GetLineBreak<CharType, CharTrait>(pre_char_buf, char_buf) == LineBreak::CRLF)
+								break;
+							else
+								result.Insert(result.GetConstEnd(), (CharType*)pre_char_buf, (CharType*)pre_char_buf + StringImplement::GetMultipleByteCharSize<CharType, CharTrait>(pre_char_buf));
+						}
+						else
+						{
+							result.Insert(result.GetConstEnd(), (CharType*)char_buf, (CharType*)char_buf + StringImplement::GetMultipleByteCharSize<CharType, CharTrait>(char_buf));
+							ReadChar(char_buf);
+						}
+					}
+				}
+			}
+			return result;
+		}
+
+		inline StringType ReadAll()
+		{
+			StringType result;
+			if constexpr (!CharTrait::IsMultipleByte)
+			{
+				CharType char_buf = 0;
+				ReadChar(&char_buf);
+				while (m_IsValid)
+				{
+					result += char_buf;
+					ReadChar(&char_buf);
+				}
+			}
+			else
+			{
+				CharType char_buf[CharTrait::MaxMultipleByteSize];
+				ReadChar(char_buf);
+				while (m_IsValid)
 				{
 					result.Insert(result.GetConstEnd(), (CharType*)char_buf, (CharType*)char_buf + StringImplement::GetMultipleByteCharSize<CharType, CharTrait>(char_buf));
 					ReadChar(char_buf);

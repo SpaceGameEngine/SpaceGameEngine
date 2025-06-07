@@ -46,4 +46,52 @@ TEST(StreamReader, StringSerializerTest)
 	StreamReader<StringSerializer<UTF8String>> utf8_reader(utf8_stream);
 	ASSERT_FALSE(utf8_reader >> test_value);	// touch the end of the stream
 	ASSERT_EQ(test_value, 789101);
+
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)SGE_WSTR(" "), sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)SGE_WSTR("\n"), sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)SGE_WSTR("\n"), sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)SGE_WSTR("\r\n"), 2 * sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+
+	ASSERT_EQ(ucs2_reader.ReadWord(), ucs2_test_str);
+	ASSERT_EQ(ucs2_reader.ReadWord(), ucs2_test_str);
+
+	ASSERT_EQ(ucs2_reader.ReadLine(), ucs2_test_str);
+	ASSERT_EQ(ucs2_reader.ReadLine(LineBreak::CRLF), ucs2_test_str);
+	ASSERT_EQ(ucs2_reader.ReadLine(LineBreak::CRLF), ucs2_test_str);
+
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)SGE_WSTR(" "), sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)ucs2_test_str, 6 * sizeof(Char16))));
+	ASSERT_TRUE(ucs2_stream.Write(ReferenceMemoryData((void*)SGE_WSTR("\n"), sizeof(Char16))));
+
+	ASSERT_EQ(ucs2_reader.ReadAll(), SGE_WSTR("123456 123456\n"));
+
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)SGE_U8STR(" "), sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)SGE_U8STR("\n"), sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)SGE_U8STR("\n"), sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)SGE_U8STR("\r\n"), 2 * sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+
+	ASSERT_EQ(utf8_reader.ReadWord(), utf8_test_str);
+	ASSERT_EQ(utf8_reader.ReadWord(), utf8_test_str);
+
+	ASSERT_EQ(utf8_reader.ReadLine(), utf8_test_str);
+	ASSERT_EQ(utf8_reader.ReadLine(LineBreak::CRLF), utf8_test_str);
+	ASSERT_EQ(utf8_reader.ReadLine(LineBreak::CRLF), utf8_test_str);
+
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)SGE_U8STR(" "), sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)utf8_test_str, 6 * sizeof(Char8))));
+	ASSERT_TRUE(utf8_stream.Write(ReferenceMemoryData((void*)SGE_U8STR("\n"), sizeof(Char8))));
+
+	ASSERT_EQ(utf8_reader.ReadAll(), SGE_U8STR("789101 789101\n"));
 }
