@@ -15,7 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "Assembler/AbstractSyntaxTree.h"
-#include "Serializer/StringSerializer.hpp"
+#include "Serializer/StringSerializer.h"
 #include "Stream/StreamWriter.hpp"
 
 /*!

@@ -18,6 +18,7 @@ limitations under the License.
 #include "SGEString.hpp"
 #include "Utility/Utility.hpp"
 #include "Utility/Endian.h"
+#include "Utility/LineBreak.h"
 #ifdef SGE_WINDOWS
 #include <Windows.h>
 #include <tchar.h>
@@ -705,92 +706,6 @@ namespace SpaceGameEngine
 		bool m_HasBomHeader;
 	};
 
-	enum class FileLineBreak : UInt8
-	{
-		Unknown = 0,
-		LF = 1,
-		CR = 2,
-		CRLF = 3
-	};
-
-	struct UnknownFileLineBreakError
-	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The FileLineBreak is unknown.");
-		static COMMON_API bool Judge(FileLineBreak flb);
-	};
-
-	template<typename T, typename Trait = CharTrait<T>>
-	struct GetFileLineBreakCore
-	{
-	};
-
-	template<typename T, typename Trait = CharTrait<T>, typename ArgType = std::enable_if_t<std::is_same_v<T, typename Trait::ValueType>, std::conditional_t<Trait::IsMultipleByte, const T*, T>>>
-	inline FileLineBreak GetFileLineBreak(ArgType c1, ArgType c2)
-	{
-		return GetFileLineBreakCore<T, Trait>::Get(c1, c2);
-	}
-
-	template<>
-	struct COMMON_API GetFileLineBreakCore<Char16, UCS2Trait>
-	{
-		static FileLineBreak Get(Char16 c1, Char16 c2);
-	};
-
-	template<>
-	struct COMMON_API GetFileLineBreakCore<Char8, UTF8Trait>
-	{
-		static FileLineBreak Get(const Char8* pc1, const Char8* pc2);
-	};
-
-	template<typename T, typename Trait = CharTrait<T>, IsAllocator Allocator = DefaultAllocator>
-	struct GetFileLineBreakStringCore
-	{
-	};
-
-	template<typename T, typename Trait = CharTrait<T>, IsAllocator Allocator = DefaultAllocator>
-	inline StringCore<T, Trait, Allocator> GetFileLineBreakString(FileLineBreak flb)
-	{
-		return GetFileLineBreakStringCore<T, Trait, Allocator>::Get(flb);
-	}
-
-	template<IsAllocator Allocator>
-	struct GetFileLineBreakStringCore<Char16, UCS2Trait, Allocator>
-	{
-		inline static StringCore<Char16, UCS2Trait, Allocator> Get(FileLineBreak flb)
-		{
-			SGE_ASSERT(UnknownFileLineBreakError, flb);
-			if (flb == FileLineBreak::CR)
-				return SGE_WSTR("\r");
-			else if (flb == FileLineBreak::LF)
-				return SGE_WSTR("\n");
-			else if (flb == FileLineBreak::CRLF)
-				return SGE_WSTR("\r\n");
-		}
-	};
-
-	template<IsAllocator Allocator>
-	struct GetFileLineBreakStringCore<Char8, UTF8Trait, Allocator>
-	{
-		inline static StringCore<Char8, UTF8Trait, Allocator> Get(FileLineBreak flb)
-		{
-			SGE_ASSERT(UnknownFileLineBreakError, flb);
-			if (flb == FileLineBreak::CR)
-				return SGE_U8STR("\r");
-			else if (flb == FileLineBreak::LF)
-				return SGE_U8STR("\n");
-			else if (flb == FileLineBreak::CRLF)
-				return SGE_U8STR("\r\n");
-		}
-	};
-
-	COMMON_API FileLineBreak GetSystemFileLineBreak();
-
-	struct EndLineType
-	{
-	};
-
-	inline constexpr const EndLineType EndLine;
-
 	template<typename T, typename Trait = CharTrait<T>>
 	class File : public FileCore<T, Trait>
 	{
@@ -801,7 +716,7 @@ namespace SpaceGameEngine
 		using ValueTrait = typename FileCore<T, Trait>::ValueTrait;
 
 		inline File()
-			: m_FileLineBreak(FileLineBreak::Unknown), FileCore<T, Trait>()
+			: m_LineBreak(LineBreak::Unknown), FileCore<T, Trait>()
 		{
 		}
 
@@ -809,31 +724,31 @@ namespace SpaceGameEngine
 			: FileCore<T, Trait>(path, mode)
 		{
 			if ((UInt8)(mode & FileIOMode::Read))
-				ReadFileLineBreak();
+				ReadLineBreak();
 			else
-				m_FileLineBreak = GetSystemFileLineBreak();
+				m_LineBreak = GetSystemLineBreak();
 		}
 
 		inline void Open(const Path& path, FileIOMode mode)
 		{
 			FileCore<T, Trait>::Open(path, mode);
 			if ((UInt8)(mode & FileIOMode::Read))
-				ReadFileLineBreak();
+				ReadLineBreak();
 			else
-				m_FileLineBreak = GetSystemFileLineBreak();
+				m_LineBreak = GetSystemLineBreak();
 		}
 
-		inline FileLineBreak GetFileLineBreak() const
+		inline LineBreak GetLineBreak() const
 		{
-			return m_FileLineBreak;
+			return m_LineBreak;
 		}
 
-		inline void SetFileLineBreak(FileLineBreak flb)
+		inline void SetLineBreak(LineBreak lb)
 		{
 			SGE_ASSERT(FileIOModeNotReadError, BinaryFile::m_Mode);
 			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);
-			SGE_ASSERT(UnknownFileLineBreakError, flb);
-			if (flb != m_FileLineBreak)
+			SGE_ASSERT(UnknownLineBreakError, lb);
+			if (lb != m_LineBreak)
 			{
 				Int64 fpos = FileCore<T, Trait>::Seek(FilePositionOrigin::Current, 0);
 				FileCore<T, Trait>::Seek(FilePositionOrigin::Begin, 0);
@@ -842,16 +757,16 @@ namespace SpaceGameEngine
 				if constexpr (!Trait::IsMultipleByte)
 				{
 					Pair<T, bool> buffer = FileCore<T, Trait>::ReadChar();
-					if (m_FileLineBreak != FileLineBreak::CRLF)
+					if (m_LineBreak != LineBreak::CRLF)
 					{
 						while (buffer.m_Second)
 						{
-							if (SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer.m_First) != m_FileLineBreak)
+							if (SpaceGameEngine::GetLineBreak<T, Trait>(buffer.m_First, buffer.m_First) != m_LineBreak)
 								str_buffer += buffer.m_First;
 							else
 							{
-								str_buffer += GetFileLineBreakString<T, Trait>(flb);
-								if (flb == FileLineBreak::CRLF && fpos >= FileCore<T, Trait>::Seek(FilePositionOrigin::Current, 0))
+								str_buffer += GetLineBreakString<T, Trait>(lb);
+								if (lb == LineBreak::CRLF && fpos >= FileCore<T, Trait>::Seek(FilePositionOrigin::Current, 0))
 									fpos_offset += 1;
 							}
 							buffer = FileCore<T, Trait>::ReadChar();
@@ -861,12 +776,12 @@ namespace SpaceGameEngine
 					{
 						while (buffer.m_Second)
 						{
-							if (SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer.m_First) == FileLineBreak::CR)
+							if (SpaceGameEngine::GetLineBreak<T, Trait>(buffer.m_First, buffer.m_First) == LineBreak::CR)
 							{
 								auto buffer2 = FileCore<T, Trait>::ReadChar();
-								if (buffer2.m_Second && SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer2.m_First) == FileLineBreak::CRLF)
+								if (buffer2.m_Second && SpaceGameEngine::GetLineBreak<T, Trait>(buffer.m_First, buffer2.m_First) == LineBreak::CRLF)
 								{
-									str_buffer += GetFileLineBreakString<T, Trait>(flb);
+									str_buffer += GetLineBreakString<T, Trait>(lb);
 									if (fpos >= FileCore<T, Trait>::Seek(FilePositionOrigin::Current, 0))
 										fpos_offset -= 1;
 									buffer = FileCore<T, Trait>::ReadChar();
@@ -888,16 +803,16 @@ namespace SpaceGameEngine
 				else
 				{
 					T buffer[Trait::MaxMultipleByteSize];
-					if (m_FileLineBreak != FileLineBreak::CRLF)
+					if (m_LineBreak != LineBreak::CRLF)
 					{
 						while ((memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer)))
 						{
-							if (SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer) != m_FileLineBreak)
+							if (SpaceGameEngine::GetLineBreak<T, Trait>(buffer, buffer) != m_LineBreak)
 								str_buffer.Insert(str_buffer.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 							else
 							{
-								str_buffer += GetFileLineBreakString<T, Trait>(flb);
-								if (flb == FileLineBreak::CRLF && fpos >= FileCore<T, Trait>::Seek(FilePositionOrigin::Current, 0))
+								str_buffer += GetLineBreakString<T, Trait>(lb);
+								if (lb == LineBreak::CRLF && fpos >= FileCore<T, Trait>::Seek(FilePositionOrigin::Current, 0))
 									fpos_offset += 1;
 							}
 						}
@@ -907,12 +822,12 @@ namespace SpaceGameEngine
 						bool is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
 						while (is_read)
 						{
-							if (SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer) == FileLineBreak::CR)
+							if (SpaceGameEngine::GetLineBreak<T, Trait>(buffer, buffer) == LineBreak::CR)
 							{
 								T buffer2[Trait::MaxMultipleByteSize];
-								if ((is_read = FileCore<T, Trait>::ReadChar(buffer2)) && SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer2) == FileLineBreak::CRLF)
+								if ((is_read = FileCore<T, Trait>::ReadChar(buffer2)) && SpaceGameEngine::GetLineBreak<T, Trait>(buffer, buffer2) == LineBreak::CRLF)
 								{
-									str_buffer += GetFileLineBreakString<T, Trait>(flb);
+									str_buffer += GetLineBreakString<T, Trait>(lb);
 									if (fpos >= FileCore<T, Trait>::Seek(FilePositionOrigin::Current, 0))
 										fpos_offset -= 1;
 									is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
@@ -938,7 +853,7 @@ namespace SpaceGameEngine
 					BinaryFile::Write(str_buffer.GetData(), str_buffer.GetNormalSize() * sizeof(T));
 				}
 				FileCore<T, Trait>::Seek(FilePositionOrigin::Begin, fpos + fpos_offset);
-				m_FileLineBreak = flb;
+				m_LineBreak = lb;
 			}
 		}
 
@@ -949,9 +864,9 @@ namespace SpaceGameEngine
 			if constexpr (!Trait::IsMultipleByte)
 			{
 				Pair<T, bool> buffer = FileCore<T, Trait>::ReadChar();
-				if (m_FileLineBreak != FileLineBreak::CRLF)
+				if (m_LineBreak != LineBreak::CRLF)
 				{
-					while (buffer.m_Second && SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer.m_First) != m_FileLineBreak)
+					while (buffer.m_Second && SpaceGameEngine::GetLineBreak<T, Trait>(buffer.m_First, buffer.m_First) != m_LineBreak)
 					{
 						re += buffer.m_First;
 						buffer = FileCore<T, Trait>::ReadChar();
@@ -961,10 +876,10 @@ namespace SpaceGameEngine
 				{
 					while (buffer.m_Second)
 					{
-						if (SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer.m_First) == FileLineBreak::CR)
+						if (SpaceGameEngine::GetLineBreak<T, Trait>(buffer.m_First, buffer.m_First) == LineBreak::CR)
 						{
 							auto buffer2 = FileCore<T, Trait>::ReadChar();
-							if (buffer2.m_Second && SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer2.m_First) == FileLineBreak::CRLF)
+							if (buffer2.m_Second && SpaceGameEngine::GetLineBreak<T, Trait>(buffer.m_First, buffer2.m_First) == LineBreak::CRLF)
 								break;
 							else
 							{
@@ -983,9 +898,9 @@ namespace SpaceGameEngine
 			else
 			{
 				T buffer[Trait::MaxMultipleByteSize];
-				if (m_FileLineBreak != FileLineBreak::CRLF)
+				if (m_LineBreak != LineBreak::CRLF)
 				{
-					while ((memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer)) && SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer) != m_FileLineBreak)
+					while ((memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer)) && SpaceGameEngine::GetLineBreak<T, Trait>(buffer, buffer) != m_LineBreak)
 						re.Insert(re.GetConstEnd(), (T*)buffer, (T*)buffer + StringImplement::GetMultipleByteCharSize<T, Trait>(buffer));
 				}
 				else
@@ -993,10 +908,10 @@ namespace SpaceGameEngine
 					bool is_read = (memset(buffer, 0, sizeof(buffer)), FileCore<T, Trait>::ReadChar(buffer));
 					while (is_read)
 					{
-						if (SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer) == FileLineBreak::CR)
+						if (SpaceGameEngine::GetLineBreak<T, Trait>(buffer, buffer) == LineBreak::CR)
 						{
 							T buffer2[Trait::MaxMultipleByteSize];
-							if ((is_read = FileCore<T, Trait>::ReadChar(buffer2)) && SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer2) == FileLineBreak::CRLF)
+							if ((is_read = FileCore<T, Trait>::ReadChar(buffer2)) && SpaceGameEngine::GetLineBreak<T, Trait>(buffer, buffer2) == LineBreak::CRLF)
 								break;
 							else
 							{
@@ -1091,12 +1006,12 @@ namespace SpaceGameEngine
 		inline File& operator<<(const EndLineType& endl)
 		{
 			SGE_ASSERT(FileIOModeNotWriteError, BinaryFile::m_Mode);
-			WriteString(GetFileLineBreakString<T, Trait>(m_FileLineBreak));
+			WriteString(GetLineBreakString<T, Trait>(m_LineBreak));
 			return *this;
 		}
 
 	private:
-		inline void ReadFileLineBreak()
+		inline void ReadLineBreak()
 		{
 			SGE_ASSERT(FileIOModeNotReadError, BinaryFile::m_Mode);
 			if constexpr (!Trait::IsMultipleByte)
@@ -1107,12 +1022,12 @@ namespace SpaceGameEngine
 					buffer = FileCore<T, Trait>::ReadChar();
 					if (!buffer.m_Second)
 						break;
-				} while ((m_FileLineBreak = SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer.m_First)) == FileLineBreak::Unknown);
-				if (m_FileLineBreak == FileLineBreak::CR)	 // CRLF judge
+				} while ((m_LineBreak = SpaceGameEngine::GetLineBreak<T, Trait>(buffer.m_First, buffer.m_First)) == LineBreak::Unknown);
+				if (m_LineBreak == LineBreak::CR)	 // CRLF judge
 				{
 					auto buffer2 = FileCore<T, Trait>::ReadChar();
 					if (buffer2.m_Second)
-						m_FileLineBreak = SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer.m_First, buffer2.m_First);
+						m_LineBreak = SpaceGameEngine::GetLineBreak<T, Trait>(buffer.m_First, buffer2.m_First);
 				}
 			}
 			else
@@ -1122,23 +1037,23 @@ namespace SpaceGameEngine
 				{
 					if (!FileCore<T, Trait>::ReadChar(buffer))
 						break;
-				} while ((m_FileLineBreak = SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer)) == FileLineBreak::Unknown);
-				if (m_FileLineBreak == FileLineBreak::CR)	 // CRLF judge
+				} while ((m_LineBreak = SpaceGameEngine::GetLineBreak<T, Trait>(buffer, buffer)) == LineBreak::Unknown);
+				if (m_LineBreak == LineBreak::CR)	 // CRLF judge
 				{
 					T buffer2[Trait::MaxMultipleByteSize];
 					if (FileCore<T, Trait>::ReadChar(buffer2))
-						m_FileLineBreak = SpaceGameEngine::GetFileLineBreak<T, Trait>(buffer, buffer2);
+						m_LineBreak = SpaceGameEngine::GetLineBreak<T, Trait>(buffer, buffer2);
 				}
 			}
 
-			if (((UInt8)(BinaryFile::m_Mode & FileIOMode::Write)) && m_FileLineBreak == FileLineBreak::Unknown)	   // write need file line break
-				m_FileLineBreak = GetSystemFileLineBreak();														   // can not judge, use system file line break
+			if (((UInt8)(BinaryFile::m_Mode & FileIOMode::Write)) && m_LineBreak == LineBreak::Unknown)	   // write need file line break
+				m_LineBreak = GetSystemLineBreak();														   // can not judge, use system file line break
 			FileCore<T, Trait>::m_IsReadFinished = false;
 			FileCore<T, Trait>::Seek(FilePositionOrigin::Begin, 0);
 		}
 
 	private:
-		FileLineBreak m_FileLineBreak;
+		LineBreak m_LineBreak;
 	};
 
 	using UCS2File = File<Char16, UCS2Trait>;

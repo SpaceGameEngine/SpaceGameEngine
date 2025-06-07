@@ -132,6 +132,9 @@ namespace SpaceGameEngine
 		InputStream& m_Stream;
 		bool m_IsValid = true;
 	};
+
+	extern template class COMMON_API_TEMPLATE_DECLARE StreamReader<StringSerializer<UCS2String>>;
+	extern template class COMMON_API_TEMPLATE_DECLARE StreamReader<StringSerializer<UTF8String>>;
 }
 
 /*!

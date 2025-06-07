@@ -192,7 +192,7 @@
     <ClInclude Include="Public\Module\ModuleManager.h" />
     <ClInclude Include="Public\Platform.hpp" />
     <ClInclude Include="Public\Serializer\Serializer.h" />
-    <ClInclude Include="Public\Serializer\StringSerializer.hpp" />
+    <ClInclude Include="Public\Serializer\StringSerializer.h" />
     <ClInclude Include="Public\SGEString.hpp" />
     <ClInclude Include="Public\SGEStringForward.h" />
     <ClInclude Include="Public\Stream\ConsoleStream.h" />
@@ -215,6 +215,7 @@
     <ClInclude Include="Public\Utility\FixedSizeBuffer.hpp" />
     <ClInclude Include="Public\Utility\Format.hpp" />
     <ClInclude Include="Public\Utility\Hash.hpp" />
+    <ClInclude Include="Public\Utility\LineBreak.h" />
     <ClInclude Include="Public\Utility\MemoryData.h" />
     <ClInclude Include="Public\Utility\Optional.hpp" />
     <ClInclude Include="Public\Utility\Pair.hpp" />
@@ -234,6 +235,7 @@
     <ClCompile Include="Private\Module\Module.cpp" />
     <ClCompile Include="Private\Module\ModuleManager.cpp" />
     <ClCompile Include="Private\Serializer\Serializer.cpp" />
+    <ClCompile Include="Private\Serializer\StringSerializer.cpp" />
     <ClCompile Include="Private\SGEString.cpp" />
     <ClCompile Include="Private\Stream\ConsoleStream.cpp" />
     <ClCompile Include="Private\Stream\Stream.cpp" />
@@ -245,6 +247,7 @@
     <ClCompile Include="Private\Utility\AutoReleaseBuffer.cpp" />
     <ClCompile Include="Private\Utility\DebugInformation.cpp" />
     <ClCompile Include="Private\Utility\Endian.cpp" />
+    <ClCompile Include="Private\Utility\LineBreak.cpp" />
     <ClCompile Include="Private\Utility\MemoryData.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

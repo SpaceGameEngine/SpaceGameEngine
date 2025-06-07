@@ -246,11 +246,14 @@
     <ClInclude Include="Public\Stream\CumulateStream.hpp">
       <Filter>Public\Stream</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Serializer\StringSerializer.hpp">
+    <ClInclude Include="Public\Serializer\StringSerializer.h">
       <Filter>Public\Serializer</Filter>
     </ClInclude>
     <ClInclude Include="Public\Stream\ConsoleStream.h">
       <Filter>Public\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Utility\LineBreak.h">
+      <Filter>Public\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -325,6 +328,12 @@
     </ClCompile>
     <ClCompile Include="Private\Stream\ConsoleStream.cpp">
       <Filter>Private\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Utility\LineBreak.cpp">
+      <Filter>Private\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Serializer\StringSerializer.cpp">
+      <Filter>Private\Serializer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

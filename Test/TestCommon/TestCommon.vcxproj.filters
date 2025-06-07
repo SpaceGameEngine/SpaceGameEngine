@@ -110,6 +110,9 @@
     <ClInclude Include="Serializer\TestStringSerializer.hpp">
       <Filter>Serializer</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\TestLineBreak.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">

@@ -17,7 +17,7 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "Stream/StreamReader.hpp"
 #include "Stream/CumulateStream.hpp"
-#include "Serializer/StringSerializer.hpp"
+#include "Serializer/StringSerializer.h"
 #include "TestStream.hpp"
 
 using namespace SpaceGameEngine;

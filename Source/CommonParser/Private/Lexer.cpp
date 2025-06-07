@@ -149,7 +149,7 @@ bool SpaceGameEngine::CommonParser::Lexer::StateMachineForJudge::Judge(const Str
 {
 	StateType state = State::Start;
 	String::ConstIterator iter = str.GetConstBegin();
-	FileLineBreak flb = FileLineBreak::Unknown;
+	LineBreak lb = LineBreak::Unknown;
 	SizeType line = 1;
 	SizeType col = 1;
 	bool is_wait_for_lf = false;
@@ -169,7 +169,7 @@ bool SpaceGameEngine::CommonParser::Lexer::StateMachineForJudge::Judge(const Str
 
 		if (iter != old_iter)
 		{
-			FileLineBreak flb_submit = FileLineBreak::Unknown;
+			LineBreak lb_submit = LineBreak::Unknown;
 			if (!is_wait_for_lf)
 			{
 				if (*old_iter == SGE_STR('\r'))
@@ -177,22 +177,22 @@ bool SpaceGameEngine::CommonParser::Lexer::StateMachineForJudge::Judge(const Str
 					if (iter != str.GetConstEnd() && *iter == SGE_STR('\n'))
 						is_wait_for_lf = true;
 					else
-						flb_submit = FileLineBreak::CR;
+						lb_submit = LineBreak::CR;
 				}
 				else if (*old_iter == SGE_STR('\n'))
-					flb_submit = FileLineBreak::LF;
+					lb_submit = LineBreak::LF;
 			}
 			else
 			{
-				flb_submit = FileLineBreak::CRLF;
+				lb_submit = LineBreak::CRLF;
 				is_wait_for_lf = false;
 			}
 
-			if (flb_submit != FileLineBreak::Unknown)
+			if (lb_submit != LineBreak::Unknown)
 			{
-				if (flb == FileLineBreak::Unknown)
-					flb = flb_submit;
-				else if (flb_submit != flb)
+				if (lb == LineBreak::Unknown)
+					lb = lb_submit;
+				else if (lb_submit != lb)
 				{
 					SGE_LOG(GetCommonParserLogger(), LogLevel::Error, SGE_STR_TO_UTF8(Format(error_info_formatter, line, col, SGE_STR("Invalid file line break"))));
 					return true;
@@ -614,7 +614,7 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const Stri
 	String str_buf;
 	StateType state = State::Start;
 	String::ConstIterator iter = str.GetConstBegin();
-	FileLineBreak flb = FileLineBreak::Unknown;
+	LineBreak lb = LineBreak::Unknown;
 	SizeType line = 1;
 	SizeType col = 1;
 	SizeType word_line = line;
@@ -655,7 +655,7 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const Stri
 		}
 		else if (st.m_Signal == StateMachineControlSignal::PartialSubmitLineSeparator)
 		{
-			if (flb == FileLineBreak::Unknown)
+			if (lb == LineBreak::Unknown)
 			{
 				if (str_buf.GetSize() == 0)
 				{
@@ -666,7 +666,7 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const Stri
 							str_buf += *iter;
 						else
 						{
-							flb = FileLineBreak::CR;
+							lb = LineBreak::CR;
 							result.EmplaceBack(TokenTypes::LineSeparator, String(1, *iter), word_line, word_col);
 							++word_line;
 							word_col = 1;
@@ -674,7 +674,7 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const Stri
 					}
 					else if (*iter == SGE_STR('\n'))
 					{
-						flb = FileLineBreak::LF;
+						lb = LineBreak::LF;
 						result.EmplaceBack(TokenTypes::LineSeparator, String(1, *iter), word_line, word_col);
 						++word_line;
 						word_col = 1;
@@ -682,7 +682,7 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const Stri
 				}
 				else
 				{
-					flb = FileLineBreak::CRLF;
+					lb = LineBreak::CRLF;
 					str_buf += *iter;
 					result.EmplaceBack(TokenTypes::LineSeparator, str_buf, word_line, word_col);
 					str_buf.Clear();
@@ -692,7 +692,7 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const Stri
 			}
 			else
 			{
-				if (flb == FileLineBreak::CRLF)
+				if (lb == LineBreak::CRLF)
 				{
 					str_buf += *iter;
 					if (str_buf.GetSize() == 2)
@@ -784,7 +784,7 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const Stri
 
 		if (iter != old_iter)
 		{
-			FileLineBreak flb_submit = FileLineBreak::Unknown;
+			LineBreak lb_submit = LineBreak::Unknown;
 			if (!is_wait_for_lf)
 			{
 				if (*old_iter == SGE_STR('\r'))
@@ -792,21 +792,21 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::StateMachine::Run(const Stri
 					if (iter != str.GetConstEnd() && *iter == SGE_STR('\n'))
 						is_wait_for_lf = true;
 					else
-						flb_submit = FileLineBreak::CR;
+						lb_submit = LineBreak::CR;
 				}
 				else if (*old_iter == SGE_STR('\n'))
-					flb_submit = FileLineBreak::LF;
+					lb_submit = LineBreak::LF;
 			}
 			else
 			{
-				flb_submit = FileLineBreak::CRLF;
+				lb_submit = LineBreak::CRLF;
 				is_wait_for_lf = false;
 			}
 
-			if (flb_submit != FileLineBreak::Unknown)
+			if (lb_submit != LineBreak::Unknown)
 			{
-				if (flb == FileLineBreak::Unknown)
-					flb = flb_submit;
+				if (lb == LineBreak::Unknown)
+					lb = lb_submit;
 
 				++line;
 				col = 1;

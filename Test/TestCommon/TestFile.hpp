@@ -1817,14 +1817,14 @@ TEST(UCS2File, OpenTest)
 	{
 		UCS2File file(p_cr, FileIOMode::Read);
 		ASSERT_EQ(file.GetEndian(), Endian::Little);
-		ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+		ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 		memset(test_input, 0, sizeof(test_input));
 		ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 		ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
 	}
 	UCS2File file(p_lf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
@@ -1832,7 +1832,7 @@ TEST(UCS2File, OpenTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
@@ -1840,7 +1840,7 @@ TEST(UCS2File, OpenTest)
 
 	file.Open(p_nbk, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::Unknown);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::Unknown);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
@@ -1848,7 +1848,7 @@ TEST(UCS2File, OpenTest)
 
 	file.Open(p_nbk, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), GetSystemFileLineBreak());
+	ASSERT_EQ(file.GetLineBreak(), GetSystemLineBreak());
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
@@ -1864,7 +1864,7 @@ TEST(UCS2File, OpenTest)
 	ASSERT_FALSE(p_nbk.IsExist());
 }
 
-TEST(UCS2File, SetFileLineBreakTest)
+TEST(UCS2File, SetLineBreakTest)
 {
 	Path p_cr(SGE_STR("./TestData/TestCommon/TestFile/test_usc2_crs.txt"));
 	ASSERT_FALSE(p_cr.IsExist());
@@ -1908,12 +1908,12 @@ TEST(UCS2File, SetFileLineBreakTest)
 
 	UCS2File file(p_cr, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
-	file.SetFileLineBreak(FileLineBreak::LF);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	file.SetLineBreak(LineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(lf) - sizeof(Char16)), sizeof(lf) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, lf, sizeof(lf) - sizeof(Char16)), 0);
@@ -1924,12 +1924,12 @@ TEST(UCS2File, SetFileLineBreakTest)
 
 	file.Open(p_lf, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
-	file.SetFileLineBreak(FileLineBreak::CRLF);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	file.SetLineBreak(LineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(crlf) - sizeof(Char16)), sizeof(crlf) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, crlf, sizeof(crlf) - sizeof(Char16)), 0);
@@ -1940,12 +1940,12 @@ TEST(UCS2File, SetFileLineBreakTest)
 
 	file.Open(p_crlf, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
-	file.SetFileLineBreak(FileLineBreak::CR);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	file.SetLineBreak(LineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(cr) - sizeof(Char16)), sizeof(cr) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, cr, sizeof(cr) - sizeof(Char16)), 0);
@@ -1956,7 +1956,7 @@ TEST(UCS2File, SetFileLineBreakTest)
 
 	file.Open(p_cr, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
@@ -1970,7 +1970,7 @@ TEST(UCS2File, SetFileLineBreakTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
@@ -1984,7 +1984,7 @@ TEST(UCS2File, SetFileLineBreakTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char16)), sizeof(test_input) - sizeof(Char16));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char16)), 0);
@@ -2047,21 +2047,21 @@ TEST(UCS2File, ReadLineTest)
 
 	UCS2File file(p_cr, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_EQ(file.ReadLine(), test_str);
 	ASSERT_EQ(file.ReadLine(), test_str2);
 	file.Close();
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ASSERT_EQ(file.ReadLine(), test_str);
 	ASSERT_EQ(file.ReadLine(), test_str2);
 	file.Close();
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ASSERT_EQ(file.ReadLine(), test_str);
 	ASSERT_EQ(file.ReadLine(), test_str2);
 	file.Close();
@@ -2117,7 +2117,7 @@ TEST(UCS2File, ReadWordTest)
 
 	UCS2File file(p_cr, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
@@ -2128,7 +2128,7 @@ TEST(UCS2File, ReadWordTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
@@ -2139,7 +2139,7 @@ TEST(UCS2File, ReadWordTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
@@ -2208,7 +2208,7 @@ TEST(UCS2File, ReadOperatorTest)
 
 	UCS2File file(p_cr, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
 	ASSERT_FALSE(file >> uval);
 	ASSERT_EQ(ival, 1);
@@ -2220,7 +2220,7 @@ TEST(UCS2File, ReadOperatorTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ival = 0;
 	fval = 0;
 	dval = 0;
@@ -2236,7 +2236,7 @@ TEST(UCS2File, ReadOperatorTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ival = 0;
 	fval = 0;
 	dval = 0;
@@ -2300,7 +2300,7 @@ TEST(UCS2File, WriteStringTest)
 
 	UCS2File file(p_cr, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
@@ -2311,7 +2311,7 @@ TEST(UCS2File, WriteStringTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
@@ -2322,7 +2322,7 @@ TEST(UCS2File, WriteStringTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_WSTR("test"));
@@ -2351,7 +2351,7 @@ TEST(UCS2File, WriteOperatorTest)
 	UCS2File output_file;
 	output_file.Open(p_cr, FileIOMode::Read | FileIOMode::Write);
 	output_file.SetEndian(Endian::Little);
-	output_file.SetFileLineBreak(FileLineBreak::CR);
+	output_file.SetLineBreak(LineBreak::CR);
 	output_file << 1 << SGE_WSTR(" ") << 1.5f << SGE_WSTR(" ") << 2.5f << EndLine;
 	output_file << SGE_WSTR("str") << EndLine;
 	output_file.Close();
@@ -2359,7 +2359,7 @@ TEST(UCS2File, WriteOperatorTest)
 
 	output_file.Open(p_lf, FileIOMode::Read | FileIOMode::Write);
 	output_file.SetEndian(Endian::Little);
-	output_file.SetFileLineBreak(FileLineBreak::LF);
+	output_file.SetLineBreak(LineBreak::LF);
 	output_file << 1 << SGE_WSTR(" ") << 1.5f << SGE_WSTR(" ") << 2.5f << EndLine;
 	output_file << SGE_WSTR("str") << EndLine;
 	output_file.Close();
@@ -2367,7 +2367,7 @@ TEST(UCS2File, WriteOperatorTest)
 
 	output_file.Open(p_crlf, FileIOMode::Read | FileIOMode::Write);
 	output_file.SetEndian(Endian::Little);
-	output_file.SetFileLineBreak(FileLineBreak::CRLF);
+	output_file.SetLineBreak(LineBreak::CRLF);
 	output_file << 1 << SGE_WSTR(" ") << 1.5f << SGE_WSTR(" ") << 2.5f << EndLine;
 	output_file << SGE_WSTR("str") << EndLine;
 	output_file.Close();
@@ -2381,7 +2381,7 @@ TEST(UCS2File, WriteOperatorTest)
 
 	UCS2File file(p_cr, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
 	ASSERT_FALSE(file >> uval);
 	ASSERT_EQ(ival, 1);
@@ -2393,7 +2393,7 @@ TEST(UCS2File, WriteOperatorTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ival = 0;
 	fval = 0;
 	dval = 0;
@@ -2409,7 +2409,7 @@ TEST(UCS2File, WriteOperatorTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_EQ(file.GetEndian(), Endian::Little);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ival = 0;
 	fval = 0;
 	dval = 0;
@@ -2516,14 +2516,14 @@ TEST(UTF8File, OpenTest)
 	{
 		UTF8File file(p_cr, FileIOMode::Read);
 		ASSERT_TRUE(file.IsHasBomHeader());
-		ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+		ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 		memset(test_input, 0, sizeof(test_input));
 		ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 		ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
 	}
 	UTF8File file(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
@@ -2531,7 +2531,7 @@ TEST(UTF8File, OpenTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
@@ -2539,7 +2539,7 @@ TEST(UTF8File, OpenTest)
 
 	file.Open(p_nbk, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::Unknown);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::Unknown);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
@@ -2547,7 +2547,7 @@ TEST(UTF8File, OpenTest)
 
 	file.Open(p_nbk, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), GetSystemFileLineBreak());
+	ASSERT_EQ(file.GetLineBreak(), GetSystemLineBreak());
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
@@ -2563,7 +2563,7 @@ TEST(UTF8File, OpenTest)
 	ASSERT_FALSE(p_nbk.IsExist());
 }
 
-TEST(UTF8File, SetFileLineBreakTest)
+TEST(UTF8File, SetLineBreakTest)
 {
 	Path p_cr(SGE_STR("./TestData/TestCommon/TestFile/test_utf8_crs.txt"));
 	ASSERT_FALSE(p_cr.IsExist());
@@ -2607,12 +2607,12 @@ TEST(UTF8File, SetFileLineBreakTest)
 
 	UTF8File file(p_cr, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
-	file.SetFileLineBreak(FileLineBreak::LF);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	file.SetLineBreak(LineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(lf) - sizeof(Char8)), sizeof(lf) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, lf, sizeof(lf) - sizeof(Char8)), 0);
@@ -2623,12 +2623,12 @@ TEST(UTF8File, SetFileLineBreakTest)
 
 	file.Open(p_lf, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
-	file.SetFileLineBreak(FileLineBreak::CRLF);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	file.SetLineBreak(LineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(crlf) - sizeof(Char8)), sizeof(crlf) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, crlf, sizeof(crlf) - sizeof(Char8)), 0);
@@ -2639,12 +2639,12 @@ TEST(UTF8File, SetFileLineBreakTest)
 
 	file.Open(p_crlf, FileIOMode::Read | FileIOMode::Write);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
-	file.SetFileLineBreak(FileLineBreak::CR);
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	file.SetLineBreak(LineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(cr) - sizeof(Char8)), sizeof(cr) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, cr, sizeof(cr) - sizeof(Char8)), 0);
@@ -2655,7 +2655,7 @@ TEST(UTF8File, SetFileLineBreakTest)
 
 	file.Open(p_cr, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
@@ -2669,7 +2669,7 @@ TEST(UTF8File, SetFileLineBreakTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
@@ -2683,7 +2683,7 @@ TEST(UTF8File, SetFileLineBreakTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	memset(test_input, 0, sizeof(test_input));
 	ASSERT_EQ(file.Read(test_input, sizeof(test_input) - sizeof(Char8)), sizeof(test_input) - sizeof(Char8));
 	ASSERT_EQ(memcmp(test_input, test_str, sizeof(test_input) - sizeof(Char8)), 0);
@@ -2746,21 +2746,21 @@ TEST(UTF8File, ReadLineTest)
 
 	UTF8File file(p_cr, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_EQ(file.ReadLine(), test_str);
 	ASSERT_EQ(file.ReadLine(), test_str2);
 	file.Close();
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ASSERT_EQ(file.ReadLine(), test_str);
 	ASSERT_EQ(file.ReadLine(), test_str2);
 	file.Close();
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ASSERT_EQ(file.ReadLine(), test_str);
 	ASSERT_EQ(file.ReadLine(), test_str2);
 	file.Close();
@@ -2816,7 +2816,7 @@ TEST(UTF8File, ReadWordTest)
 
 	UTF8File file(p_cr, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
@@ -2827,7 +2827,7 @@ TEST(UTF8File, ReadWordTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
@@ -2838,7 +2838,7 @@ TEST(UTF8File, ReadWordTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
@@ -2907,7 +2907,7 @@ TEST(UTF8File, ReadOperatorTest)
 
 	UTF8File file(p_cr, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
 	ASSERT_FALSE(file >> uval);
 	ASSERT_EQ(ival, 1);
@@ -2919,7 +2919,7 @@ TEST(UTF8File, ReadOperatorTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ival = 0;
 	fval = 0;
 	dval = 0;
@@ -2935,7 +2935,7 @@ TEST(UTF8File, ReadOperatorTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ival = 0;
 	fval = 0;
 	dval = 0;
@@ -2999,7 +2999,7 @@ TEST(UTF8File, WriteStringTest)
 
 	UTF8File file(p_cr, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
@@ -3010,7 +3010,7 @@ TEST(UTF8File, WriteStringTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
@@ -3021,7 +3021,7 @@ TEST(UTF8File, WriteStringTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("this"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("is"));
 	ASSERT_EQ(file.ReadWord(), SGE_U8STR("test"));
@@ -3051,7 +3051,7 @@ TEST(UTF8File, WriteOperatorTest)
 
 	output_file.Open(p_cr, FileIOMode::Read | FileIOMode::Write);
 	output_file.SetHasBomHeader(true);
-	output_file.SetFileLineBreak(FileLineBreak::CR);
+	output_file.SetLineBreak(LineBreak::CR);
 	output_file << 1 << SGE_U8STR(" ") << 1.5f << SGE_U8STR(" ") << 2.5f << EndLine;
 	output_file << SGE_U8STR("str") << EndLine;
 	output_file.Close();
@@ -3059,7 +3059,7 @@ TEST(UTF8File, WriteOperatorTest)
 
 	output_file.Open(p_lf, FileIOMode::Read | FileIOMode::Write);
 	output_file.SetHasBomHeader(true);
-	output_file.SetFileLineBreak(FileLineBreak::LF);
+	output_file.SetLineBreak(LineBreak::LF);
 	output_file << 1 << SGE_U8STR(" ") << 1.5f << SGE_U8STR(" ") << 2.5f << EndLine;
 	output_file << SGE_U8STR("str") << EndLine;
 	output_file.Close();
@@ -3067,7 +3067,7 @@ TEST(UTF8File, WriteOperatorTest)
 
 	output_file.Open(p_crlf, FileIOMode::Read | FileIOMode::Write);
 	output_file.SetHasBomHeader(true);
-	output_file.SetFileLineBreak(FileLineBreak::CRLF);
+	output_file.SetLineBreak(LineBreak::CRLF);
 	output_file << 1 << SGE_U8STR(" ") << 1.5f << SGE_U8STR(" ") << 2.5f << EndLine;
 	output_file << SGE_U8STR("str") << EndLine;
 	output_file.Close();
@@ -3081,7 +3081,7 @@ TEST(UTF8File, WriteOperatorTest)
 
 	UTF8File file(p_cr, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CR);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CR);
 	ASSERT_TRUE(file >> ival >> fval >> dval >> sval);
 	ASSERT_FALSE(file >> uval);
 	ASSERT_EQ(ival, 1);
@@ -3093,7 +3093,7 @@ TEST(UTF8File, WriteOperatorTest)
 
 	file.Open(p_lf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::LF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::LF);
 	ival = 0;
 	fval = 0;
 	dval = 0;
@@ -3109,7 +3109,7 @@ TEST(UTF8File, WriteOperatorTest)
 
 	file.Open(p_crlf, FileIOMode::Read);
 	ASSERT_TRUE(file.IsHasBomHeader());
-	ASSERT_EQ(file.GetFileLineBreak(), FileLineBreak::CRLF);
+	ASSERT_EQ(file.GetLineBreak(), LineBreak::CRLF);
 	ival = 0;
 	fval = 0;
 	dval = 0;

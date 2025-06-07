@@ -9,6 +9,7 @@ add_library(Common SHARED
         Private/Utility/Endian.cpp
         Private/Utility/DebugInformation.cpp
         Private/Utility/MemoryData.cpp
+        Private/Utility/LineBreak.cpp
         Private/Time/TimeCounter.cpp
         Private/Time/WindowsTimeImplement.cpp
         Private/Time/UnixTimeImplement.cpp
@@ -22,6 +23,7 @@ add_library(Common SHARED
         Private/Log.cpp
         Private/Stream/Stream.cpp
         Private/Serializer/Serializer.cpp
+        Private/Serializer/StringSerializer.cpp
         )
 target_compile_definitions(Common PRIVATE COMMON_EXPORTS)
 target_include_directories(Common PUBLIC Public)
