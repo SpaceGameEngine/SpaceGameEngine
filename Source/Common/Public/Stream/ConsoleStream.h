@@ -27,7 +27,7 @@ namespace SpaceGameEngine
 	@brief ConsoleStream is a stream that reads from and writes to the console.
 	@note When reading, it will block until input is available.
 	*/
-	class ConsoleStream : public InputStream, public OutputStream
+	class COMMON_API ConsoleStream : public InputStream, public OutputStream
 	{
 	public:
 		virtual bool Read(MemoryData& data) override;

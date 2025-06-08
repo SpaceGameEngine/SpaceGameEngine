@@ -20,12 +20,10 @@ using namespace SpaceGameEngine;
 
 bool SpaceGameEngine::ConsoleStream::Read(MemoryData& data)
 {
-	// todo
-	return false;
+	return fread(data.GetData(), data.GetSize(), 1, stdin) == data.GetSize();
 }
 
 bool SpaceGameEngine::ConsoleStream::Write(const MemoryData& data)
 {
-	// todo
-	return false;
+	return fwrite(data.GetData(), data.GetSize(), 1, stdout) == data.GetSize();
 }

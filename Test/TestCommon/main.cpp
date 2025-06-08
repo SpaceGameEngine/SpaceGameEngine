@@ -56,6 +56,7 @@ limitations under the License.
 #include "Stream/TestStreamReader.hpp"
 #include "Stream/TestStreamWriter.hpp"
 #include "Stream/TestCumulateStream.hpp"
+#include "Stream/TestConsoleStream.hpp"
 #include "Serializer/TestSerializer.hpp"
 #include "Serializer/TestStringSerializer.hpp"
 

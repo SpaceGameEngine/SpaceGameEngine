@@ -196,6 +196,7 @@
     <ClInclude Include="Container\TestVector.hpp" />
     <ClInclude Include="Serializer\TestSerializer.hpp" />
     <ClInclude Include="Serializer\TestStringSerializer.hpp" />
+    <ClInclude Include="Stream\TestConsoleStream.hpp" />
     <ClInclude Include="Stream\TestCumulateStream.hpp" />
     <ClInclude Include="Stream\TestStream.hpp" />
     <ClInclude Include="Stream\TestStreamReader.hpp" />

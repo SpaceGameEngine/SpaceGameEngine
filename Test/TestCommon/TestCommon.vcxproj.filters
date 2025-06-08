@@ -113,6 +113,9 @@
     <ClInclude Include="Utility\TestLineBreak.hpp">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Stream\TestConsoleStream.hpp">
+      <Filter>Stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">
