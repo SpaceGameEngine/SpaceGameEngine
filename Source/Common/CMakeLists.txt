@@ -22,6 +22,7 @@ add_library(Common SHARED
         Private/File.cpp
         Private/Log.cpp
         Private/Stream/Stream.cpp
+        Private/Stream/ConsoleStream.cpp
         Private/Serializer/Serializer.cpp
         Private/Serializer/StringSerializer.cpp
         )
