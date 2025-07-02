@@ -16,8 +16,11 @@ limitations under the License.
 #pragma once
 #include <benchmark/benchmark.h>
 #include "Log.h"
+#include <cassert>
+#include <iostream>
+#include <atomic>
 
-class COMMON_API BenchmarkLogWriterCore
+class BenchmarkLogWriterCore
 {
 public:
 	inline void WriteLog(const SpaceGameEngine::Char8* pstr, SpaceGameEngine::SizeType size)
@@ -25,16 +28,29 @@ public:
 		++m_LogCount;
 	}
 
+	inline SpaceGameEngine::SizeType GetLogCount() const
+	{
+		return m_LogCount;
+	}
+
 private:
-	SpaceGameEngine::SizeType m_LogCount = 0;
+	std::atomic<SpaceGameEngine::SizeType> m_LogCount = 0;
 };
+
+inline SpaceGameEngine::Logger<BenchmarkLogWriterCore>& GetBenchmarkLogger()
+{
+	static SpaceGameEngine::LogWriter<BenchmarkLogWriterCore> g_log_writer;
+	static SpaceGameEngine::Logger<BenchmarkLogWriterCore> g_logger(g_log_writer, SpaceGameEngine::LogLevel::All);
+	return g_logger;
+}
 
 void BM_LogWrite(benchmark::State& state)
 {
-	SpaceGameEngine::LogWriter<BenchmarkLogWriterCore> log_writer;
-	SpaceGameEngine::Logger<BenchmarkLogWriterCore> logger(log_writer, SpaceGameEngine::LogLevel::All);
+	auto& logger = GetBenchmarkLogger();
 	for (auto _ : state)
 	{
-		logger.WriteLog(SpaceGameEngine::GetLocalDate(), SGE_DEBUG_INFORMATION, SpaceGameEngine::LogLevel::Debug, SGE_U8STR("This is a benchmark log message."));
+		SGE_LOG(logger, SpaceGameEngine::LogLevel::Information, SGE_U8STR("This is a benchmark log message."));
 	}
 }
+
+BENCHMARK(BM_LogWrite)->ThreadRange(1, 8)->Iterations(1000000);
