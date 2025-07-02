@@ -126,10 +126,9 @@ void BM_StdVectorIteration(benchmark::State& state)
 	for (auto _ : state)
 	{
 		std::vector<int> v(vector_test_size, 1);
-		int cnt = 0;
-		for (auto i = v.begin(); i != v.end(); ++i, ++cnt)
+		for (auto i = v.begin(); i != v.end(); ++i)
 		{
-			assert(*i == cnt);
+			assert(*i, 1);
 		}
 	}
 }
@@ -139,10 +138,9 @@ void BM_SgeVectorIteration(benchmark::State& state)
 	for (auto _ : state)
 	{
 		SpaceGameEngine::Vector<int> v(vector_test_size, 1);
-		int cnt = 0;
-		for (auto i = v.GetBegin(); i != v.GetEnd(); ++i, ++cnt)
+		for (auto i = v.GetBegin(); i != v.GetEnd(); ++i)
 		{
-			assert(*i == cnt);
+			assert(*i, 1);
 		}
 	}
 }

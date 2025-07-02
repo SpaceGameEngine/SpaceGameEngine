@@ -134,10 +134,9 @@ void BM_StdListIteration(benchmark::State& state)
 	for (auto _ : state)
 	{
 		std::list<int> l(list_test_size, 1);
-		int cnt = 0;
-		for (auto i = l.begin(); i != l.end(); ++i, ++cnt)
+		for (auto i = l.begin(); i != l.end(); ++i)
 		{
-			assert(*i == cnt);
+			assert(*i == 1);
 		}
 	}
 }
@@ -147,10 +146,9 @@ void BM_SgeListIteration(benchmark::State& state)
 	for (auto _ : state)
 	{
 		SpaceGameEngine::List<int> l(list_test_size, 1);
-		int cnt = 0;
-		for (auto i = l.GetBegin(); i != l.GetEnd(); ++i, ++cnt)
+		for (auto i = l.GetBegin(); i != l.GetEnd(); ++i)
 		{
-			assert(*i == cnt);
+			assert(*i == 1);
 		}
 	}
 }
