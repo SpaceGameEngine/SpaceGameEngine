@@ -8,6 +8,7 @@
     <ClInclude Include="BenchmarkHashMap.hpp" />
     <ClInclude Include="BenchmarkList.hpp" />
     <ClInclude Include="BenchmarkVector.hpp" />
+    <ClInclude Include="BenchmarkLog.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

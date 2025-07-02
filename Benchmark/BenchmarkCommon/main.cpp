@@ -26,6 +26,7 @@ limitations under the License.
 #include "BenchmarkAllocator.hpp"
 #include "BenchmarkHashMap.hpp"
 #include "BenchmarkList.hpp"
+#include "BenchmarkLog.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;
 

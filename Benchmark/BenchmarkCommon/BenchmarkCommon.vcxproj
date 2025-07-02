@@ -183,6 +183,7 @@
     <ClInclude Include="BenchmarkFunction.hpp" />
     <ClInclude Include="BenchmarkHashMap.hpp" />
     <ClInclude Include="BenchmarkList.hpp" />
+    <ClInclude Include="BenchmarkLog.hpp" />
     <ClInclude Include="BenchmarkMap.hpp" />
     <ClInclude Include="BenchmarkString.hpp" />
     <ClInclude Include="BenchmarkVector.hpp" />

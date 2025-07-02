@@ -42,7 +42,7 @@ namespace SpaceGameEngine
 #define SGE_FUNCTION __FUNCTION__
 #endif
 #define SGE_LINE __LINE__
-#define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation((const TChar*)SGE_FILE, (const TChar*)SGE_FUNCTION, SGE_LINE)
+#define SGE_DEBUG_INFORMATION SpaceGameEngine::DebugInformation((const SpaceGameEngine::TChar*)SGE_FILE, (const SpaceGameEngine::TChar*)SGE_FUNCTION, SGE_LINE)
 
 }
 
