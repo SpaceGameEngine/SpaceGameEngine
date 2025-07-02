@@ -128,7 +128,7 @@ void BM_StdVectorIteration(benchmark::State& state)
 		std::vector<int> v(vector_test_size, 1);
 		for (auto i = v.begin(); i != v.end(); ++i)
 		{
-			assert(*i, 1);
+			assert(*i == 1);
 		}
 	}
 }
@@ -140,7 +140,7 @@ void BM_SgeVectorIteration(benchmark::State& state)
 		SpaceGameEngine::Vector<int> v(vector_test_size, 1);
 		for (auto i = v.GetBegin(); i != v.GetEnd(); ++i)
 		{
-			assert(*i, 1);
+			assert(*i == 1);
 		}
 	}
 }
