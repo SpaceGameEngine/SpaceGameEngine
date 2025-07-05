@@ -42,7 +42,7 @@ TEST(LockFreeFixedSizeBuffer, MultiThreadTryAppendTest)
 	LockFreeFixedSizeBuffer<1024> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 1024);
-	Atomic<bool> is_start{false};
+	Atomic<bool> is_start(false);
 	Vector<Thread> threads;
 	for (int i = 0; i < 1024 / 8; ++i)
 	{

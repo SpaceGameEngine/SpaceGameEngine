@@ -201,6 +201,16 @@ namespace SpaceGameEngine
 	class AtomicImplement<T*, AtomicForPointerTag> : public AtomicBase<T*>
 	{
 	public:
+		inline AtomicImplement<T*, AtomicForPointerTag>() noexcept
+			: AtomicBase<T*>()
+		{
+		}
+
+		inline AtomicImplement<T*, AtomicForPointerTag>(T* val)
+			: AtomicBase<T*>(val)
+		{
+		}
+
 		inline T* FetchAdd(AddressType offset, MemoryOrder order = MemoryOrderSequentiallyConsistent) noexcept
 		{
 			return std::atomic<T*>::fetch_add((std::ptrdiff_t)offset, (std::memory_order)order);
@@ -286,6 +296,16 @@ namespace SpaceGameEngine
 	class AtomicImplement<T, AtomicForFloatingPointTag> : public AtomicBase<T>
 	{
 	public:
+		inline AtomicImplement<T, AtomicForFloatingPointTag>() noexcept
+			: AtomicBase<T>()
+		{
+		}
+
+		inline AtomicImplement<T, AtomicForFloatingPointTag>(T val)
+			: AtomicBase<T>(val)
+		{
+		}
+
 #ifdef SGE_CPP20
 		inline T FetchAdd(T val, MemoryOrder order = MemoryOrderSequentiallyConsistent) noexcept
 		{
@@ -333,6 +353,16 @@ namespace SpaceGameEngine
 	class AtomicImplement<T, AtomicForIntegralTag> : public AtomicBase<T>
 	{
 	public:
+		inline AtomicImplement<T, AtomicForIntegralTag>() noexcept
+			: AtomicBase<T>()
+		{
+		}
+
+		inline AtomicImplement<T, AtomicForIntegralTag>(T val)
+			: AtomicBase<T>(val)
+		{
+		}
+
 		inline T FetchAdd(T val, MemoryOrder order = MemoryOrderSequentiallyConsistent) noexcept
 		{
 			return std::atomic<T>::fetch_add(val, (std::memory_order)order);
