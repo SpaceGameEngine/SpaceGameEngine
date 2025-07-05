@@ -255,6 +255,9 @@
     <ClInclude Include="Public\Utility\LineBreak.h">
       <Filter>Public\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\LockFreeFixedSizeBuffer.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

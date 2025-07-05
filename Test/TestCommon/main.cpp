@@ -27,6 +27,7 @@ limitations under the License.
 #include "Utility/TestFixedSizeBuffer.hpp"
 #include "Utility/TestHash.hpp"
 #include "Utility/TestLineBreak.hpp"
+#include "Utility/TestLockFreeFixedSizeBuffer.hpp"
 #include "Utility/TestMemoryData.hpp"
 #include "Utility/TestOptional.hpp"
 #include "Utility/TestPair.hpp"

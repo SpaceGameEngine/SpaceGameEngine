@@ -221,6 +221,7 @@
     <ClInclude Include="Utility\TestFixedSizeBuffer.hpp" />
     <ClInclude Include="Utility\TestHash.hpp" />
     <ClInclude Include="Utility\TestLineBreak.hpp" />
+    <ClInclude Include="Utility\TestLockFreeFixedSizeBuffer.hpp" />
     <ClInclude Include="Utility\TestMemoryData.hpp" />
     <ClInclude Include="Utility\TestOptional.hpp" />
     <ClInclude Include="Utility\TestPair.hpp" />

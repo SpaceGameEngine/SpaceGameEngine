@@ -79,6 +79,8 @@ namespace SpaceGameEngine
 		inline FixedSizeBuffer& operator=(FixedSizeBuffer&& buffer)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &buffer);
+			if (m_pContent)
+				Allocator::RawDelete(m_pContent);
 			m_pContent = buffer.m_pContent;
 			m_Size = buffer.m_Size;
 			buffer.m_pContent = nullptr;
