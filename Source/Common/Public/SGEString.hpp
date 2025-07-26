@@ -2852,7 +2852,7 @@ namespace SpaceGameEngine
 					}
 				}
 				if constexpr (Trait::IsMultipleByte && std::is_pointer_v<OtherIteratorType>)
-					m_Size = mc_cnt;
+					m_Size += mc_cnt;
 				else
 					m_Size += (end - begin);
 				m_Storage.SetSize(nsize + 1);
@@ -2918,7 +2918,7 @@ namespace SpaceGameEngine
 					}
 				}
 				if constexpr (Trait::IsMultipleByte && std::is_pointer_v<OtherIteratorType>)
-					m_Size = mc_cnt;
+					m_Size += mc_cnt;
 				else
 					m_Size += (end - begin);
 				m_Storage.SetSize(nsize + 1);
