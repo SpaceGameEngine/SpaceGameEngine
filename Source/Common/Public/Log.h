@@ -20,7 +20,7 @@ limitations under the License.
 #include "Concurrent/Thread.h"
 #include "Concurrent/Lock.h"
 #include "SGEStringForward.h"
-#include "Utility/FixedSizeBuffer.hpp"
+#include "Utility/LockFreeFixedSizeRingBuffer.hpp"
 #include "Utility/DebugInformation.h"
 #include "Utility/Format.hpp"
 #include "Time/Date.h"
@@ -96,6 +96,8 @@ namespace SpaceGameEngine
 
 	COMMON_API AllLogWriterCore& GetAllLogWriterCore();
 
+	COMMON_API void HandleLogOverflow(const Char8* pstr, SizeType size);
+
 	using DefaultLogWriterCore = ConsoleLogWriterCore;
 
 	inline static constexpr const SizeType LogWriterBufferSize = 4194304;
@@ -106,7 +108,7 @@ namespace SpaceGameEngine
 	public:
 		template<typename... Args>
 		inline LogWriter(Args&&... args)
-			: LogWriterCore(std::forward<Args>(args)...), m_CurrentIndex(0), m_WriteIndex(0)
+			: LogWriterCore(std::forward<Args>(args)...)
 		{
 			m_IsRunning.Store(true, MemoryOrder::Release);
 			m_Thread = Thread(std::bind(&LogWriter::Run, this));
@@ -122,24 +124,8 @@ namespace SpaceGameEngine
 		{
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(InvalidValueError, size, 1, LogWriterBufferSize);
-			RecursiveLock locker(m_Mutex);
-			locker.Lock();
-			if (m_Buffers[m_CurrentIndex].GetFreeSize() >= size)
-				m_Buffers[m_CurrentIndex].Append(pstr, size);
-			else
-			{
-				if (((m_CurrentIndex + 1) % sm_BufferArraySize) == m_WriteIndex)
-				{
-					m_Buffers[m_CurrentIndex].Clear();
-					m_Buffers[m_CurrentIndex].Append(SGE_U8STR("Log overflow"), 12);
-				}
-				else
-				{
-					m_CurrentIndex = (m_CurrentIndex + 1) % sm_BufferArraySize;
-					m_Buffers[m_CurrentIndex].Append(pstr, size);
-					m_Condition.NodifyAll();
-				}
-			}
+			if (!m_Buffer.TryPush(pstr, size))
+				HandleLogOverflow(pstr, size);
 		}
 
 	private:
@@ -147,24 +133,14 @@ namespace SpaceGameEngine
 		{
 			while (m_IsRunning.Load(MemoryOrder::Acquire))
 			{
-				RecursiveLock locker(m_Mutex);
-				locker.Lock();
-				if (m_CurrentIndex == m_WriteIndex)
-					m_Condition.WaitFor(locker, MakeTimeDuration<Second, TimeType>(4));
-				if (m_CurrentIndex == m_WriteIndex && m_Buffers[m_CurrentIndex].GetSize() > 0)
-					m_CurrentIndex = (m_CurrentIndex + 1) % sm_BufferArraySize;
-				locker.Unlock();
-
-				for (; m_WriteIndex != m_CurrentIndex; m_WriteIndex = (m_WriteIndex + 1) % sm_BufferArraySize)
-				{
-					LogWriterCore::WriteLog((const Char8*)(m_Buffers[m_WriteIndex].GetData()), m_Buffers[m_WriteIndex].GetSize());
-					m_Buffers[m_WriteIndex].Clear();
-				}
+				if (!m_Buffer.Pop([this](void* ptr, SizeType size) {
+						LogWriterCore::WriteLog((const Char8*)ptr, size);
+					}))
+					Thread::YieldCurrentThread();
 			}
-			if (m_CurrentIndex == m_WriteIndex && m_Buffers[m_CurrentIndex].GetSize() > 0)
-				m_CurrentIndex = (m_CurrentIndex + 1) % sm_BufferArraySize;
-			for (; m_WriteIndex != m_CurrentIndex; m_WriteIndex = (m_WriteIndex + 1) % sm_BufferArraySize)
-				LogWriterCore::WriteLog((const Char8*)(m_Buffers[m_WriteIndex].GetData()), m_Buffers[m_WriteIndex].GetSize());
+			m_Buffer.Pop([this](void* ptr, SizeType size) {
+				LogWriterCore::WriteLog((const Char8*)ptr, size);
+			});
 		}
 
 	private:
@@ -172,11 +148,7 @@ namespace SpaceGameEngine
 
 		Atomic<bool> m_IsRunning;
 		Thread m_Thread;
-		FixedSizeBuffer<LogWriterBufferSize> m_Buffers[sm_BufferArraySize];
-		SizeType m_CurrentIndex;
-		SizeType m_WriteIndex;
-		Mutex m_Mutex;
-		Condition m_Condition;
+		LockFreeFixedSizeRingBuffer<LogWriterBufferSize, sm_BufferArraySize> m_Buffer;
 	};
 
 	using LogLevelType = UInt8;

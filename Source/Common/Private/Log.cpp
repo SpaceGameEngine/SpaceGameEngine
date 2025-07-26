@@ -97,6 +97,11 @@ AllLogWriterCore& SpaceGameEngine::GetAllLogWriterCore()
 	return g_AllLogWriterCore.Get();
 }
 
+void SpaceGameEngine::HandleLogOverflow(const Char8* pstr, SizeType size)
+{
+	std::cerr << "Log overflow" << std::endl;
+}
+
 bool SpaceGameEngine::InvalidLogLevelError::Judge(LogLevelType log_level)
 {
 	return log_level > LogLevel::All;
