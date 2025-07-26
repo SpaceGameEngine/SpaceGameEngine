@@ -199,10 +199,11 @@ TEST(LockFreeFixedSizeRingBuffer, TopTest)
 	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer.GetFreeSize(), 16 - sizeof(test_data));
 
-	buffer.Top(sizeof(test_data), [test_data](void* ptr, SizeType size) {
+	ASSERT_EQ(buffer.Top(sizeof(test_data), [test_data](void* ptr, SizeType size) {
 		ASSERT_EQ(*(UInt32*)ptr, test_data);
 		ASSERT_EQ(size, sizeof(test_data));
-	});
+	}),
+			  sizeof(test_data));
 
 	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer.GetFreeSize(), 16 - sizeof(test_data));
@@ -220,10 +221,11 @@ TEST(LockFreeFixedSizeRingBuffer, PopTest)
 	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer.GetFreeSize(), 16 - sizeof(test_data));
 
-	buffer.Pop([test_data](void* ptr, SizeType size) {
+	ASSERT_EQ(buffer.Pop([test_data](void* ptr, SizeType size) {
 		ASSERT_EQ(*(UInt32*)ptr, test_data);
 		ASSERT_EQ(size, sizeof(test_data));
-	});
+	}),
+			  sizeof(test_data));
 
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 16);

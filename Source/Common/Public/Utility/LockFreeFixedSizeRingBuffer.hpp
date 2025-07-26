@@ -161,29 +161,34 @@ namespace SpaceGameEngine
 		@note This function only reads data without removing it from the ring buffer. Since data may span across multiple buffers, the callback function may be invoked multiple times with different chunk sizes, though their sum will equal the requested size parameter.
 		@param size The size of the data to be read from the top of the ring buffer.
 		@param func The function to be called on the top data. It should accept a pointer to the data and its size.
+		@return The actual size of the data read from the ring buffer, which may be less than the requested size if there is not enough data available.
 		*/
 		template<typename Func>
-		inline void Top(SizeType size, Func&& func)
+		inline SizeType Top(SizeType size, Func&& func)
 		{
 			SizeType head = m_Head.Load(MemoryOrder::Acquire);
 			SizeType tail = m_Tail.Load(MemoryOrder::Acquire);
-			SGE_ASSERT(InvalidValueError, size, 0, tail - head);
-			OperateOnBuffer(head, size, std::forward<Func>(func));
+			SizeType real_size = Min(size, tail - head);
+			OperateOnBuffer(head, real_size, std::forward<Func>(func));
+			return real_size;
 		}
 
 		/*!
 		@brief Pop data from the ring buffer.
 		@note This function reads data and then removes it from the ring buffer. Since data may span across multiple buffers, the callback function may be invoked multiple times with different chunk sizes, though their sum will equal the requested size parameter.
 		@param func The function to be called on the popped data. It should accept a pointer to the data and its size.
+		@return The actual size of the data popped from the ring buffer.
 		*/
 		template<typename Func>
-		inline void Pop(Func&& func)
+		inline SizeType Pop(Func&& func)
 		{
 			SizeType head = m_Head.Load(MemoryOrder::Acquire);
 			SizeType tail = m_Tail.Load(MemoryOrder::Acquire);
 			while (!m_Head.CompareExchangeWeak(head, tail, MemoryOrder::AcquireRelease))
 				tail = m_Tail.Load(MemoryOrder::Acquire);
-			OperateOnBuffer(head, tail - head, std::forward<Func>(func));
+			SizeType size = tail - head;
+			OperateOnBuffer(head, size, std::forward<Func>(func));
+			return size;
 		}
 
 		inline SizeType GetSize() const
