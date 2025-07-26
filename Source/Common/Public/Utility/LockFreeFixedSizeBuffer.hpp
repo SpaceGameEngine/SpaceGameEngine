@@ -32,6 +32,7 @@ namespace SpaceGameEngine
 	{
 	public:
 		inline static constexpr const SizeType sm_MaxSize = MaxSize;
+		using AllocatorType = Allocator;
 
 		struct BufferOverflowError
 		{
@@ -67,9 +68,8 @@ namespace SpaceGameEngine
 		}
 
 		inline LockFreeFixedSizeBuffer(LockFreeFixedSizeBuffer&& buffer)
-			: m_pContent(buffer.m_pContent.Load(MemoryOrder::Acquire)), m_Size(buffer.m_Size.Load(MemoryOrder::Acquire))
+			: m_pContent(buffer.m_pContent.Exchange(nullptr, MemoryOrder::AcquireRelease)), m_Size(buffer.m_Size.Load(MemoryOrder::Acquire))
 		{
-			buffer.m_pContent.Store(nullptr, MemoryOrder::Release);
 		}
 
 		inline LockFreeFixedSizeBuffer& operator=(const LockFreeFixedSizeBuffer& buffer)
