@@ -566,52 +566,68 @@ namespace SpaceGameEngine
 
 		using InvalidUTF8StringError = InvalidMultipleByteStringError<Char8, UTF8Trait>;
 
-		template<typename T, typename Trait = CharTrait<T>>
-		inline const T* GetNextMultipleByteChar(const T* ptr)
+		template<typename T, typename Trait = CharTrait<T>, IsPointerTo<T> Ptr = const T*>
+		struct GetNextMultipleByteCharCore
+		{
+		};
+
+		template<typename T, typename Trait = CharTrait<T>, IsPointerTo<T> Ptr = const T*>
+		inline Ptr GetNextMultipleByteChar(Ptr ptr)
 		{
 			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
 			SGE_ASSERT(NullPointerError, ptr);
 			// need specialize for different situation
-			return ptr + 1;
+			return GetNextMultipleByteCharCore<T, Trait, Ptr>::Get(ptr);
 		}
 
-		template<>
-		inline const Char8* GetNextMultipleByteChar<Char8, UTF8Trait>(const Char8* ptr)
+		template<IsPointerTo<Char8> Ptr>
+		struct GetNextMultipleByteCharCore<Char8, UTF8Trait, Ptr>
 		{
-			SGE_ASSERT(NullPointerError, ptr);
-			SGE_ASSERT(InvalidUTF8CharError, ptr);
-			if (static_cast<const UInt8>(*ptr) <= 0b01111111)
-				return ptr + 1;
-			else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
-				return ptr + 2;
-			else if (static_cast<const UInt8>(*ptr) <= 0b11101111)
-				return ptr + 3;
-			else if (static_cast<const UInt8>(*ptr) <= 0b11110111)
-				return ptr + 4;
-		}
-
-		template<typename T, typename Trait = CharTrait<T>>
-		inline const T* GetPreviousMultipleByteChar(const T* ptr)
-		{
-			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
-			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
-			SGE_ASSERT(NullPointerError, ptr);
-			// need specialize for different situation
-			return ptr - 1;
-		}
-
-		template<>
-		inline const Char8* GetPreviousMultipleByteChar<Char8, UTF8Trait>(const Char8* ptr)
-		{
-			SGE_ASSERT(NullPointerError, ptr);
-			do
+			inline static Ptr Get(Ptr ptr)
 			{
-				ptr -= 1;
-			} while ((static_cast<const UInt8>(*ptr) & 0b11000000) == 0b10000000);
-			SGE_ASSERT(InvalidUTF8CharError, ptr);
-			return ptr;
+				SGE_ASSERT(NullPointerError, ptr);
+				SGE_ASSERT(InvalidUTF8CharError, ptr);
+				if (static_cast<const UInt8>(*ptr) <= 0b01111111)
+					return ptr + 1;
+				else if (static_cast<const UInt8>(*ptr) <= 0b11011111)
+					return ptr + 2;
+				else if (static_cast<const UInt8>(*ptr) <= 0b11101111)
+					return ptr + 3;
+				else if (static_cast<const UInt8>(*ptr) <= 0b11110111)
+					return ptr + 4;
+			}
+		};
+
+		template<typename T, typename Trait = CharTrait<T>, IsPointerTo<T> Ptr = const T*>
+		struct GetPreviousMultipleByteCharCore
+		{
+		};
+
+		template<typename T, typename Trait = CharTrait<T>, IsPointerTo<T> Ptr = const T*>
+		inline Ptr GetPreviousMultipleByteChar(Ptr ptr)
+		{
+			static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
+			static_assert(Trait::IsMultipleByte, "invalid trait : the trait is not multi-byte");
+			SGE_ASSERT(NullPointerError, ptr);
+			// need specialize for different situation
+			return GetPreviousMultipleByteCharCore<T, Trait, Ptr>::Get(ptr);
 		}
+
+		template<IsPointerTo<Char8> Ptr>
+		struct GetPreviousMultipleByteCharCore<Char8, UTF8Trait, Ptr>
+		{
+			inline static Ptr Get(Ptr ptr)
+			{
+				SGE_ASSERT(NullPointerError, ptr);
+				do
+				{
+					ptr -= 1;
+				} while ((static_cast<const UInt8>(*ptr) & 0b11000000) == 0b10000000);
+				SGE_ASSERT(InvalidUTF8CharError, ptr);
+				return ptr;
+			}
+		};
 
 		/*!
 		@brief Get the multi-byte char's size(not the real memory size).

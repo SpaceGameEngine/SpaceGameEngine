@@ -109,6 +109,8 @@ namespace SpaceGameEngine
 	template<typename T>
 	concept IsTrivial = std::is_trivial_v<T>;
 
+	template<typename Ptr, typename T>
+	concept IsPointerTo = std::is_pointer_v<Ptr> && std::is_same_v<std::remove_cvref_t<std::remove_pointer_t<std::remove_cvref_t<Ptr>>>, T>;
 }
 
 /*!
