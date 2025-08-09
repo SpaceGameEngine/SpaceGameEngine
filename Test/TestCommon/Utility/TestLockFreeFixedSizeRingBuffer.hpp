@@ -35,10 +35,11 @@ TEST(LockFreeFixedSizeRingBuffer, TryPushTest)
 	ASSERT_TRUE(buffer.TryPush(&test_data, sizeof(test_data)));
 	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer.GetFreeSize(), 16 - sizeof(test_data));
-	buffer.Pop([test_data](void* ptr, SizeType size) {
+	ASSERT_EQ(buffer.Pop(16, [test_data](void* ptr, SizeType size) {
 		ASSERT_EQ(*(UInt32*)ptr, test_data);
 		ASSERT_EQ(size, sizeof(test_data));
-	});
+	}),
+			  sizeof(test_data));
 	test_data = 789101;
 	ASSERT_TRUE(buffer.TryPush(&test_data, sizeof(test_data)));
 	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
@@ -56,7 +57,7 @@ TEST(LockFreeFixedSizeRingBuffer, TryPushTest)
 	ASSERT_EQ(buffer.GetSize(), 4 * sizeof(test_data));
 	ASSERT_EQ(buffer.GetFreeSize(), 16 - 4 * sizeof(test_data));
 	bool flag = false;
-	buffer.Pop([test_data, &flag](void* ptr, SizeType size) {
+	buffer.Pop(16, [test_data, &flag](void* ptr, SizeType size) {
 		UInt32* data_ptr = (UInt32*)ptr;
 		if (!flag)
 		{
@@ -80,10 +81,11 @@ TEST(LockFreeFixedSizeRingBuffer, TryPushTest)
 	ASSERT_TRUE(buffer2.TryPush(&test_data, sizeof(test_data)));
 	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer2.GetFreeSize(), 16 - sizeof(test_data));
-	buffer2.Pop([test_data](void* ptr, SizeType size) {
+	ASSERT_EQ(buffer2.Pop(16, [test_data](void* ptr, SizeType size) {
 		ASSERT_EQ(*(UInt32*)ptr, test_data);
 		ASSERT_EQ(size, sizeof(test_data));
-	});
+	}),
+			  sizeof(test_data));
 	test_data = 789101;
 	ASSERT_TRUE(buffer2.TryPush(&test_data, sizeof(test_data)));
 	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
@@ -102,9 +104,11 @@ TEST(LockFreeFixedSizeRingBuffer, TryPushTest)
 	ASSERT_EQ(buffer2.GetFreeSize(), 16 - 4 * sizeof(test_data));
 	int cnt = 0;
 	UInt32 test_data2[] = {789101, 124810, 135791, 235711};
-	buffer2.Pop([test_data2, &cnt](void* ptr, SizeType size) {
+	ASSERT_EQ(buffer2.Pop(16, [test_data2, &cnt](void* ptr, SizeType size) {
 		ASSERT_EQ(*(UInt32*)ptr, test_data2[cnt++]);
-	});
+		ASSERT_EQ(size, sizeof(test_data2[0]));
+	}),
+			  sizeof(test_data2));
 }
 
 TEST(LockFreeFixedSizeRingBuffer, MultiThreadTryPushTest)
@@ -135,14 +139,15 @@ TEST(LockFreeFixedSizeRingBuffer, MultiThreadTryPushTest)
 	ASSERT_EQ(buffer.GetFreeSize(), 0);
 	int cnt[1024 / 8];
 	memset(cnt, 0, sizeof(cnt));
-	buffer.Pop([&cnt](void* ptr, SizeType size) {
+	ASSERT_EQ(buffer.Pop(1024, [&cnt](void* ptr, SizeType size) {
 		ASSERT_EQ(size, 1024);
 		for (SizeType i = 0; i < 1024 / 8; ++i)
 		{
 			UInt64 data = *(UInt64*)((Byte*)ptr + i * sizeof(UInt64));
 			++cnt[data];
 		}
-	});
+	}),
+			  1024);
 	for (SizeType i = 0; i < 1024 / 8; ++i)
 		ASSERT_EQ(cnt[i], 1);
 	ASSERT_EQ(buffer.GetSize(), 0);
@@ -173,14 +178,15 @@ TEST(LockFreeFixedSizeRingBuffer, MultiThreadTryPushTest)
 	ASSERT_EQ(buffer2.GetSize(), 1024);
 	ASSERT_EQ(buffer2.GetFreeSize(), 0);
 	memset(cnt, 0, sizeof(cnt));
-	buffer2.Pop([&cnt](void* ptr, SizeType size) {
+	ASSERT_EQ(buffer2.Pop(1024, [&cnt](void* ptr, SizeType size) {
 		ASSERT_EQ(size, 256);
 		for (SizeType i = 0; i < 256 / 8; ++i)
 		{
 			UInt64 data = *(UInt64*)((Byte*)ptr + i * sizeof(UInt64));
 			++cnt[data];
 		}
-	});
+	}),
+			  1024);
 	for (SizeType i = 0; i < 1024 / 8; ++i)
 		ASSERT_EQ(cnt[i], 1);
 	ASSERT_EQ(buffer2.GetSize(), 0);
@@ -221,7 +227,7 @@ TEST(LockFreeFixedSizeRingBuffer, PopTest)
 	ASSERT_EQ(buffer.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer.GetFreeSize(), 16 - sizeof(test_data));
 
-	ASSERT_EQ(buffer.Pop([test_data](void* ptr, SizeType size) {
+	ASSERT_EQ(buffer.Pop(sizeof(test_data), [test_data](void* ptr, SizeType size) {
 		ASSERT_EQ(*(UInt32*)ptr, test_data);
 		ASSERT_EQ(size, sizeof(test_data));
 	}),

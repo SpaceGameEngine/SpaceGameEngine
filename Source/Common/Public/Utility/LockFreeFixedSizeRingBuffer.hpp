@@ -26,6 +26,9 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
+	/*!
+	@brief Lock-free fixed-size ring-buffer, supports multiply writer thread and multiply reader thread at the same time.
+	*/
 	template<SizeType BufferSize, SizeType BufferCount = 1, IsAllocator Allocator = DefaultAllocator>
 	class LockFreeFixedSizeRingBuffer
 	{
@@ -38,7 +41,7 @@ namespace SpaceGameEngine
 		friend class LockFreeFixedSizeRingBuffer;
 
 		inline LockFreeFixedSizeRingBuffer()
-			: m_Head(0), m_Tail(0)
+			: m_Head(0), m_Tail(0), m_Size(0)
 		{
 			for (SizeType i = 0; i < BufferCount; ++i)
 				m_pContent[i].Store(Allocator::RawNew(BufferSize), MemoryOrder::Release);
@@ -63,14 +66,17 @@ namespace SpaceGameEngine
 				memcpy(ptr, other.m_pContent[i].Load(MemoryOrder::Acquire), BufferSize);
 				m_pContent[i].Store(ptr, MemoryOrder::Release);
 			}
+			m_Size.Store(other.m_Size.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 		}
 
 		inline LockFreeFixedSizeRingBuffer(LockFreeFixedSizeRingBuffer&& other)
-			: m_Head(other.m_Head.Exchange(0, MemoryOrder::AcquireRelease)),
-			  m_Tail(other.m_Tail.Exchange(0, MemoryOrder::AcquireRelease))
 		{
+			SizeType size = other.m_Size.Exchange(0, MemoryOrder::AcquireRelease);
+			m_Head.Store(other.m_Head.Exchange(0, MemoryOrder::AcquireRelease), MemoryOrder::Release);
+			m_Tail.Store(other.m_Tail.Exchange(0, MemoryOrder::AcquireRelease), MemoryOrder::Release);
 			for (SizeType i = 0; i < BufferCount; ++i)
 				m_pContent[i].Store(other.m_pContent[i].Exchange(nullptr, MemoryOrder::AcquireRelease), MemoryOrder::Release);
+			m_Size.Store(size, MemoryOrder::Release);
 		}
 
 		inline LockFreeFixedSizeRingBuffer& operator=(const LockFreeFixedSizeRingBuffer& other)
@@ -80,16 +86,19 @@ namespace SpaceGameEngine
 			m_Tail.Store(other.m_Tail.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 			for (SizeType i = 0; i < BufferCount; ++i)
 				memcpy(m_pContent[i].Load(MemoryOrder::Acquire), other.m_pContent[i].Load(MemoryOrder::Acquire), BufferSize);
+			m_Size.Store(other.m_Size.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 			return *this;
 		}
 
 		inline LockFreeFixedSizeRingBuffer& operator=(LockFreeFixedSizeRingBuffer&& other)
 		{
 			SGE_ASSERT(SelfAssignmentError, this, &other);
+			SizeType size = other.m_Size.Exchange(0, MemoryOrder::AcquireRelease);
 			m_Head.Store(other.m_Head.Exchange(0, MemoryOrder::AcquireRelease), MemoryOrder::Release);
 			m_Tail.Store(other.m_Tail.Exchange(0, MemoryOrder::AcquireRelease), MemoryOrder::Release);
 			for (SizeType i = 0; i < BufferCount; ++i)
 				m_pContent[i].Store(other.m_pContent[i].Exchange(nullptr, MemoryOrder::AcquireRelease), MemoryOrder::Release);
+			m_Size.Store(size, MemoryOrder::Release);
 			return *this;
 		}
 
@@ -103,6 +112,7 @@ namespace SpaceGameEngine
 				memcpy(ptr, other.m_pContent[i].Load(MemoryOrder::Acquire), BufferSize);
 				m_pContent[i].Store(ptr, MemoryOrder::Release);
 			}
+			m_Size.Store(other.m_Size.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 		}
 
 		template<typename OtherAllocator>
@@ -115,6 +125,7 @@ namespace SpaceGameEngine
 				memcpy(ptr, other.m_pContent[i].Load(MemoryOrder::Acquire), BufferSize);
 				m_pContent[i].Store(ptr, MemoryOrder::Release);
 			}
+			m_Size.Store(other.m_Size.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 		}
 
 		template<typename OtherAllocator>
@@ -124,6 +135,7 @@ namespace SpaceGameEngine
 			m_Tail.Store(other.m_Tail.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 			for (SizeType i = 0; i < BufferCount; ++i)
 				memcpy(m_pContent[i].Load(MemoryOrder::Acquire), other.m_pContent[i].Load(MemoryOrder::Acquire), BufferSize);
+			m_Size.Store(other.m_Size.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 			return *this;
 		}
 
@@ -134,6 +146,7 @@ namespace SpaceGameEngine
 			m_Tail.Store(other.m_Tail.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 			for (SizeType i = 0; i < BufferCount; ++i)
 				memcpy(m_pContent[i].Load(MemoryOrder::Acquire), other.m_pContent[i].Load(MemoryOrder::Acquire), BufferSize);
+			m_Size.Store(other.m_Size.Load(MemoryOrder::Acquire), MemoryOrder::Release);
 			return *this;
 		}
 
@@ -153,6 +166,7 @@ namespace SpaceGameEngine
 				memcpy(cur_ptr, ptr, cur_size);
 				ptr = (const Byte*)ptr + cur_size;
 			});
+			m_Size.FetchAdd(size, MemoryOrder::AcquireRelease);
 			return true;
 		}
 
@@ -166,10 +180,8 @@ namespace SpaceGameEngine
 		template<typename Func>
 		inline SizeType Top(SizeType size, Func&& func)
 		{
-			SizeType head = m_Head.Load(MemoryOrder::Acquire);
-			SizeType tail = m_Tail.Load(MemoryOrder::Acquire);
-			SizeType real_size = Min(size, tail - head);
-			OperateOnBuffer(head, real_size, std::forward<Func>(func));
+			SizeType real_size = Min(size, m_Size.Load(MemoryOrder::Acquire));
+			OperateOnBuffer(m_Head.Load(MemoryOrder::Acquire), real_size, std::forward<Func>(func));
 			return real_size;
 		}
 
@@ -180,20 +192,29 @@ namespace SpaceGameEngine
 		@return The actual size of the data popped from the ring buffer.
 		*/
 		template<typename Func>
-		inline SizeType Pop(Func&& func)
+		inline SizeType Pop(SizeType size, Func&& func)
 		{
-			SizeType head = m_Head.Load(MemoryOrder::Acquire);
-			SizeType tail = m_Tail.Load(MemoryOrder::Acquire);
-			while (!m_Head.CompareExchangeWeak(head, tail, MemoryOrder::AcquireRelease))
-				tail = m_Tail.Load(MemoryOrder::Acquire);
-			SizeType size = tail - head;
-			OperateOnBuffer(head, size, std::forward<Func>(func));
-			return size;
+			// SizeType head = m_Head.Load(MemoryOrder::Acquire);
+			// SizeType tail = m_Tail.Load(MemoryOrder::Acquire);
+			// SizeType real_size = Min(size, tail - head);
+			// OperateOnBuffer(head, real_size, std::forward<Func>(func));
+			// m_Head.Store(head + real_size, MemoryOrder::Release);
+			// return real_size;
+			SizeType cur_size = m_Size.Load(MemoryOrder::Acquire);
+			SizeType real_size = 0;
+			while (true)
+			{
+				real_size = Min(size, cur_size);
+				if (m_Size.CompareExchangeWeak(cur_size, cur_size - real_size, MemoryOrder::AcquireRelease))
+					break;
+			}
+			OperateOnBuffer(m_Head.FetchAdd(real_size, MemoryOrder::AcquireRelease), real_size, std::forward<Func>(func));
+			return real_size;
 		}
 
 		inline SizeType GetSize() const
 		{
-			return m_Tail.Load(MemoryOrder::Acquire) - m_Head.Load(MemoryOrder::Acquire);
+			return m_Size.Load(MemoryOrder::Acquire);
 		}
 
 		inline SizeType GetFreeSize() const
@@ -203,6 +224,7 @@ namespace SpaceGameEngine
 
 		inline void Clear()
 		{
+			m_Size.Store(0, MemoryOrder::Release);
 			m_Head.Store(0, MemoryOrder::Release);
 			m_Tail.Store(0, MemoryOrder::Release);
 		}
@@ -234,6 +256,7 @@ namespace SpaceGameEngine
 		Atomic<void*> m_pContent[BufferCount];
 		Atomic<SizeType> m_Head;
 		Atomic<SizeType> m_Tail;
+		Atomic<SizeType> m_Size;
 	};
 }
 

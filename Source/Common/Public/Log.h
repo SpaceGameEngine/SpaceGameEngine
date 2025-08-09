@@ -96,11 +96,9 @@ namespace SpaceGameEngine
 
 	COMMON_API AllLogWriterCore& GetAllLogWriterCore();
 
-	COMMON_API void HandleLogOverflow(const Char8* pstr, SizeType size);
+	COMMON_API void NotifyLogOverflowToStdErr(const Char8* pstr, SizeType size);
 
 	using DefaultLogWriterCore = ConsoleLogWriterCore;
-
-	inline static constexpr const SizeType LogWriterBufferSize = 4194304;
 
 	template<IsLogWriterCore LogWriterCore = DefaultLogWriterCore>
 	class LogWriter : public UncopyableAndUnmovable, public LogWriterCore
@@ -123,7 +121,7 @@ namespace SpaceGameEngine
 		inline void WriteLog(const Char8* pstr, SizeType size)
 		{
 			SGE_ASSERT(NullPointerError, pstr);
-			SGE_ASSERT(InvalidValueError, size, 1, LogWriterBufferSize);
+			SGE_ASSERT(InvalidValueError, size, 1, sm_BufferSize);
 			if (!m_Buffer.TryPush(pstr, size))
 				HandleLogOverflow(pstr, size);
 		}
@@ -133,22 +131,28 @@ namespace SpaceGameEngine
 		{
 			while (m_IsRunning.Load(MemoryOrder::Acquire))
 			{
-				if (!m_Buffer.Pop([this](void* ptr, SizeType size) {
+				if (!m_Buffer.Pop(sm_BufferSize, [this](void* ptr, SizeType size) {
 						LogWriterCore::WriteLog((const Char8*)ptr, size);
 					}))
 					Thread::YieldCurrentThread();
 			}
-			m_Buffer.Pop([this](void* ptr, SizeType size) {
+			m_Buffer.Pop(sm_BufferSize * sm_BufferCount, [this](void* ptr, SizeType size) {
 				LogWriterCore::WriteLog((const Char8*)ptr, size);
 			});
 		}
 
+		inline void HandleLogOverflow(const Char8* pstr, SizeType size)
+		{
+			NotifyLogOverflowToStdErr(pstr, size);
+		}
+
 	private:
-		inline static constexpr const SizeType sm_BufferArraySize = 4;
+		inline static constexpr const SizeType sm_BufferSize = 4194304;
+		inline static constexpr const SizeType sm_BufferCount = 4;
 
 		Atomic<bool> m_IsRunning;
 		Thread m_Thread;
-		LockFreeFixedSizeRingBuffer<LogWriterBufferSize, sm_BufferArraySize> m_Buffer;
+		LockFreeFixedSizeRingBuffer<sm_BufferSize, sm_BufferCount> m_Buffer;
 	};
 
 	using LogLevelType = UInt8;
