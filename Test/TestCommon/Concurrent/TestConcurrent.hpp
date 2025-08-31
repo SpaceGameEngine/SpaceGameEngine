@@ -183,25 +183,25 @@ TEST(Concurrent, ConditionTest)
 	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(0)));
 
-	condition.NodifyOne();
+	condition.NotifyOne();
 	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(0)));
 
-	condition.NodifyAll();
+	condition.NotifyAll();
 	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(0)));
 
 	flag = true;
 
-	condition.NodifyOne();
+	condition.NotifyOne();
 	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(1)));
 
-	condition.NodifyOne();
+	condition.NotifyOne();
 	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(2)));
 
-	condition.NodifyAll();
+	condition.NotifyAll();
 	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_TRUE((checker(10)));
 

@@ -116,11 +116,8 @@
     <ClInclude Include="Stream\TestConsoleStream.hpp">
       <Filter>Stream</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\TestLockFreeFixedSizeBuffer.hpp">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Utility\TestLockFreeFixedSizeRingBuffer.hpp">
-      <Filter>Utility</Filter>
+    <ClInclude Include="Container\Concurrent\TestLockFreeSCSPFixedSizeByteRingBuffer.hpp">
+      <Filter>Container\Concurrent</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +144,9 @@
     </Filter>
     <Filter Include="Stream">
       <UniqueIdentifier>{5ab3fbfc-6972-4da9-be3c-d842b18e8328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container\Concurrent">
+      <UniqueIdentifier>{10c91346-2e3c-4987-8bd8-c39d952da690}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

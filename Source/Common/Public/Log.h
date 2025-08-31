@@ -19,10 +19,12 @@ limitations under the License.
 #include "Concurrent/Atomic.hpp"
 #include "Concurrent/Thread.h"
 #include "Concurrent/Lock.h"
+#include "Container/HashSet.hpp"
+#include "Container/Concurrent/LockFreeSCSPFixedSizeByteRingBuffer.hpp"
 #include "SGEStringForward.h"
-#include "Utility/LockFreeFixedSizeRingBuffer.hpp"
 #include "Utility/DebugInformation.h"
 #include "Utility/Format.hpp"
+#include "Utility/Singleton.hpp"
 #include "Time/Date.h"
 #include "Time/TimeCounter.h"
 #include "File.h"
@@ -35,16 +37,20 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-
-	template<typename T>
-	concept IsLogWriterCore = requires(T t, const Char8* pstr, SizeType size) {
-		t.WriteLog(pstr, size);
-	};
-
-	class COMMON_API ConsoleLogWriterCore
+	class COMMON_API LogWriterCore
 	{
 	public:
-		void WriteLog(const Char8* pstr, SizeType size);
+		virtual ~LogWriterCore() = default;
+		virtual void WriteLog(const Char8* pstr, SizeType size) = 0;
+	};
+
+	template<typename T>
+	concept IsLogWriterCore = std::derived_from<T, LogWriterCore>;
+
+	class COMMON_API ConsoleLogWriterCore : public LogWriterCore
+	{
+	public:
+		void WriteLog(const Char8* pstr, SizeType size) override;
 	};
 
 	/*!
@@ -53,13 +59,13 @@ namespace SpaceGameEngine
 	*/
 	COMMON_API Path GetDefaultLogDirectoryPath();
 
-	class COMMON_API FileLogWriterCore : public UncopyableAndUnmovable
+	class COMMON_API FileLogWriterCore : public LogWriterCore, public UncopyableAndUnmovable
 	{
 	public:
 		FileLogWriterCore();
 		FileLogWriterCore(const Path& dir_path);
 
-		void WriteLog(const Char8* pstr, SizeType size);
+		void WriteLog(const Char8* pstr, SizeType size) override;
 
 	private:
 		void DeleteOldLogFile(const Path& dir_path);
@@ -70,7 +76,7 @@ namespace SpaceGameEngine
 	};
 
 	template<IsLogWriterCore FirstLogWriterCore, IsLogWriterCore SecondLogWriterCore>
-	class ProxyPairLogWriterCore
+	class ProxyPairLogWriterCore : public LogWriterCore
 	{
 	public:
 		inline ProxyPairLogWriterCore(FirstLogWriterCore& first, SecondLogWriterCore& second)
@@ -78,7 +84,7 @@ namespace SpaceGameEngine
 		{
 		}
 
-		inline void WriteLog(const Char8* pstr, SizeType size)
+		inline void WriteLog(const Char8* pstr, SizeType size) override
 		{
 			SGE_ASSERT(NullPointerError, pstr);
 			SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
@@ -96,64 +102,73 @@ namespace SpaceGameEngine
 
 	COMMON_API AllLogWriterCore& GetAllLogWriterCore();
 
-	COMMON_API void NotifyLogOverflowToStdErr(const Char8* pstr, SizeType size);
-
 	using DefaultLogWriterCore = ConsoleLogWriterCore;
 
-	template<IsLogWriterCore LogWriterCore = DefaultLogWriterCore>
-	class LogWriter : public UncopyableAndUnmovable, public LogWriterCore
+	namespace Detail
 	{
-	public:
-		template<typename... Args>
-		inline LogWriter(Args&&... args)
-			: LogWriterCore(std::forward<Args>(args)...)
+		COMMON_API void NotifyLogOverflowToStdErr(const Char8* pstr, SizeType size);
+
+		class LogWriter;
+
+		class COMMON_API LogWriterBuffer : public UncopyableAndUnmovable
 		{
-			m_IsRunning.Store(true, MemoryOrder::Release);
-			m_Thread = Thread(std::bind(&LogWriter::Run, this));
-		}
+		public:
+			LogWriterBuffer(LogWriterCore& log_writer_core);
 
-		inline ~LogWriter()
+			~LogWriterBuffer();
+
+			/*!
+			@brief Write log to the buffer.
+			@note Should be called from the producer thread.
+			*/
+			void Push(const Char8* pstr, SizeType size);
+
+			/*!
+			@brief Pop log from the buffer and write them to the log writer core.
+			@note Should be called from the consumer thread.
+			@return Have popped or not.
+			*/
+			bool Pop();
+
+			void OnLogWriterReleased();
+
+		private:
+			void HandleLogOverflow(const Char8* pstr, SizeType size);
+
+		private:
+			inline static constexpr const SizeType sm_BufferSize = 4194304;
+
+			bool m_IsLogWriterReleased = false;
+			LogWriterCore& m_LogWriterCore;
+			LockFreeSCSPFixedSizeByteRingBuffer<sm_BufferSize> m_Content;
+		};
+
+		class COMMON_API LogWriter : public UncopyableAndUnmovable,
+									 public Singleton<LogWriter>
 		{
-			m_IsRunning.Store(false, MemoryOrder::Release);
-			m_Thread.Join();
-		}
+		private:
+			LogWriter();
 
-		inline void WriteLog(const Char8* pstr, SizeType size)
-		{
-			SGE_ASSERT(NullPointerError, pstr);
-			SGE_ASSERT(InvalidValueError, size, 1, sm_BufferSize);
-			if (!m_Buffer.TryPush(pstr, size))
-				HandleLogOverflow(pstr, size);
-		}
+		public:
+			friend DefaultAllocator;
+			friend LogWriterBuffer;
 
-	private:
-		inline void Run()
-		{
-			while (m_IsRunning.Load(MemoryOrder::Acquire))
-			{
-				if (!m_Buffer.Pop(sm_BufferSize, [this](void* ptr, SizeType size) {
-						LogWriterCore::WriteLog((const Char8*)ptr, size);
-					}))
-					Thread::YieldCurrentThread();
-			}
-			m_Buffer.Pop(sm_BufferSize * sm_BufferCount, [this](void* ptr, SizeType size) {
-				LogWriterCore::WriteLog((const Char8*)ptr, size);
-			});
-		}
+			~LogWriter();
 
-		inline void HandleLogOverflow(const Char8* pstr, SizeType size)
-		{
-			NotifyLogOverflowToStdErr(pstr, size);
-		}
+		private:
+			void Run();
 
-	private:
-		inline static constexpr const SizeType sm_BufferSize = 4194304;
-		inline static constexpr const SizeType sm_BufferCount = 4;
+			void RegisterBuffer(LogWriterBuffer& buffer);
 
-		Atomic<bool> m_IsRunning;
-		Thread m_Thread;
-		LockFreeFixedSizeRingBuffer<sm_BufferSize, sm_BufferCount> m_Buffer;
-	};
+			void UnregisterBuffer(LogWriterBuffer& buffer);
+
+		private:
+			Atomic<bool> m_IsRunning = true;
+			Thread m_Thread;
+			Mutex m_mutex;
+			HashSet<LogWriterBuffer*> m_Buffers;
+		};
+	}
 
 	using LogLevelType = UInt8;
 	namespace LogLevel
@@ -188,12 +203,12 @@ namespace SpaceGameEngine
 		static UTF8String Format(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str);
 	};
 
-	template<IsLogWriterCore LogWriterCore = DefaultLogWriterCore, IsLogFormatter LogFormatter = DefaultLogFormatter>
+	template<IsLogFormatter LogFormatter = DefaultLogFormatter>
 	class Logger : public UncopyableAndUnmovable
 	{
 	public:
-		inline Logger(LogWriter<LogWriterCore>& log_writer, LogLevelType log_level = LogLevel::All)
-			: m_LogWriter(log_writer), m_LogLevel(log_level)
+		inline Logger(LogWriterCore& log_writer_core, LogLevelType log_level = LogLevel::All)
+			: m_Buffer(log_writer_core), m_LogLevel(log_level)
 		{
 		}
 
@@ -204,7 +219,7 @@ namespace SpaceGameEngine
 			else
 			{
 				UTF8String result = LogFormatter::Format(date, debug_info, log_level, str);
-				m_LogWriter.WriteLog(result.GetData(), result.GetNormalSize());
+				m_Buffer.Push(result.GetData(), result.GetNormalSize());
 			}
 		}
 
@@ -216,30 +231,25 @@ namespace SpaceGameEngine
 			else
 			{
 				UTF8String result = LogFormatter::Format(date, debug_info, log_level, Format(str, std::forward<Args>(args)...));
-				m_LogWriter.WriteLog(result.GetData(), result.GetNormalSize());
+				m_Buffer.Push(result.GetData(), result.GetNormalSize());
 			}
 		}
 
 	private:
-		LogWriter<LogWriterCore>& m_LogWriter;
+		Detail::LogWriterBuffer m_Buffer;
 		LogLevelType m_LogLevel;
 	};
 
-#define SGE_LOGGER_DECLARE(api_macro, name)                                                                   \
-	api_macro LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>& Get##name##LogWriter(); \
-	api_macro Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>& Get##name##Logger();
+#define SGE_LOGGER_DECLARE(api_macro, name) \
+	api_macro Logger<>& Get##name##Logger();
 
-#define SGE_LOGGER_DEFINE(name)                                                                                                                                                      \
-	LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>& Get##name##LogWriter()                                                                                   \
-	{                                                                                                                                                                                \
-		static GlobalVariable<FileLogWriterCore> g_##name##FileLogWriterCore(GetDefaultLogDirectoryPath() / Path(SGE_STR(#name)));                                                   \
-		static GlobalVariable<LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>> g_##name##LogWriter(GetAllLogWriterCore(), g_##name##FileLogWriterCore.Get()); \
-		return g_##name##LogWriter.Get();                                                                                                                                            \
-	}                                                                                                                                                                                \
-	Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>& Get##name##Logger()                                                                                         \
-	{                                                                                                                                                                                \
-		static GlobalVariable<Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>> g_##name##Logger(Get##name##LogWriter(), LogLevel::All);                          \
-		return g_##name##Logger.Get();                                                                                                                                               \
+#define SGE_LOGGER_DEFINE(name)                                                                                                                                               \
+	Logger<>& Get##name##Logger()                                                                                                                                             \
+	{                                                                                                                                                                         \
+		static GlobalVariable<FileLogWriterCore> g_##name##FileLogWriterCore(GetDefaultLogDirectoryPath() / Path(SGE_STR(#name)));                                            \
+		static GlobalVariable<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>> g_##name##LogWriterCore(GetAllLogWriterCore(), g_##name##FileLogWriterCore.Get()); \
+		thread_local Logger<> t_##name##Logger(g_##name##LogWriterCore.Get());                                                                                                \
+		return t_##name##Logger;                                                                                                                                              \
 	}
 
 #define SGE_LOG(logger, level, str, ...) logger.WriteLog(SpaceGameEngine::GetLocalDate(), SGE_DEBUG_INFORMATION, level, str, ##__VA_ARGS__);
@@ -248,10 +258,7 @@ namespace SpaceGameEngine
 	extern template class COMMON_API_TEMPLATE_DECLARE ProxyPairLogWriterCore<FileLogWriterCore, ConsoleLogWriterCore>;
 	extern template class COMMON_API_TEMPLATE_DECLARE ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>;
 	extern template class COMMON_API_TEMPLATE_DECLARE ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>;
-	extern template class COMMON_API_TEMPLATE_DECLARE LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>;
-	extern template class COMMON_API_TEMPLATE_DECLARE LogWriter<ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>>;
-	extern template class COMMON_API_TEMPLATE_DECLARE Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>;
-	extern template class COMMON_API_TEMPLATE_DECLARE Logger<ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>>;
+	extern template class COMMON_API_TEMPLATE_DECLARE Logger<>;
 
 	SGE_LOGGER_DECLARE(COMMON_API, Default);
 

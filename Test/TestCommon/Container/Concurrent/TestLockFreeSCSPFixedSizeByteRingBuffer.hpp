@@ -14,21 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "Utility/LockFreeFixedSizeRingBuffer.hpp"
+#include "Container/Concurrent/LockFreeSCSPFixedSizeByteRingBuffer.hpp"
 #include "Concurrent/Lock.h"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
 
-TEST(LockFreeFixedSizeRingBuffer, InstanceTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, InstanceTest)
 {
-	LockFreeFixedSizeRingBuffer<16> buffer;
-	LockFreeFixedSizeRingBuffer<4, 4> buffer2;
+	LockFreeSCSPFixedSizeByteRingBuffer<16> buffer;
 }
 
-TEST(LockFreeFixedSizeRingBuffer, TryPushTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, TryPushTest)
 {
-	LockFreeFixedSizeRingBuffer<16> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<16> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 16);
 	UInt32 test_data = 123456;
@@ -73,129 +72,45 @@ TEST(LockFreeFixedSizeRingBuffer, TryPushTest)
 			ASSERT_EQ(size, sizeof(test_data));
 		}
 	});
-
-	LockFreeFixedSizeRingBuffer<4, 4> buffer2;
-	ASSERT_EQ(buffer2.GetSize(), 0);
-	ASSERT_EQ(buffer2.GetFreeSize(), 16);
-	test_data = 123456;
-	ASSERT_TRUE(buffer2.TryPush(&test_data, sizeof(test_data)));
-	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
-	ASSERT_EQ(buffer2.GetFreeSize(), 16 - sizeof(test_data));
-	ASSERT_EQ(buffer2.Pop(16, [test_data](void* ptr, SizeType size) {
-		ASSERT_EQ(*(UInt32*)ptr, test_data);
-		ASSERT_EQ(size, sizeof(test_data));
-	}),
-			  sizeof(test_data));
-	test_data = 789101;
-	ASSERT_TRUE(buffer2.TryPush(&test_data, sizeof(test_data)));
-	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
-	ASSERT_EQ(buffer2.GetFreeSize(), 16 - sizeof(test_data));
-	test_data = 124810;
-	ASSERT_TRUE(buffer2.TryPush(&test_data, sizeof(test_data)));
-	ASSERT_EQ(buffer2.GetSize(), 2 * sizeof(test_data));
-	ASSERT_EQ(buffer2.GetFreeSize(), 16 - 2 * sizeof(test_data));
-	test_data = 135791;
-	ASSERT_TRUE(buffer2.TryPush(&test_data, sizeof(test_data)));
-	ASSERT_EQ(buffer2.GetSize(), 3 * sizeof(test_data));
-	ASSERT_EQ(buffer2.GetFreeSize(), 16 - 3 * sizeof(test_data));
-	test_data = 235711;
-	ASSERT_TRUE(buffer2.TryPush(&test_data, sizeof(test_data)));
-	ASSERT_EQ(buffer2.GetSize(), 4 * sizeof(test_data));
-	ASSERT_EQ(buffer2.GetFreeSize(), 16 - 4 * sizeof(test_data));
-	int cnt = 0;
-	UInt32 test_data2[] = {789101, 124810, 135791, 235711};
-	ASSERT_EQ(buffer2.Pop(16, [test_data2, &cnt](void* ptr, SizeType size) {
-		ASSERT_EQ(*(UInt32*)ptr, test_data2[cnt++]);
-		ASSERT_EQ(size, sizeof(test_data2[0]));
-	}),
-			  sizeof(test_data2));
 }
 
-TEST(LockFreeFixedSizeRingBuffer, MultiThreadTryPushTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, SCSPTest)
 {
-	LockFreeFixedSizeRingBuffer<1024> buffer;
-	ASSERT_EQ(buffer.GetSize(), 0);
-	ASSERT_EQ(buffer.GetFreeSize(), 1024);
-	Atomic<bool> is_start(false);
-	Vector<Thread> threads;
-	for (int i = 0; i < 1024 / 8; ++i)
-	{
-		Thread t(
-			[&buffer, &is_start, i]() {
-				while (!is_start.Load(MemoryOrder::Acquire))
-					;
-				UInt64 test_data = i;
-				while (!buffer.TryPush(&test_data, sizeof(test_data)))
-					;
-			});
-		threads.EmplaceBack(std::move(t));
-	}
-	is_start.Store(true, MemoryOrder::Release);
-	for (auto iter = threads.GetBegin(); iter != threads.GetEnd(); ++iter)
-	{
-		iter->Join();
-	}
-	ASSERT_EQ(buffer.GetSize(), 1024);
-	ASSERT_EQ(buffer.GetFreeSize(), 0);
-	int cnt[1024 / 8];
-	memset(cnt, 0, sizeof(cnt));
-	ASSERT_EQ(buffer.Pop(1024, [&cnt](void* ptr, SizeType size) {
-		ASSERT_EQ(size, 1024);
-		for (SizeType i = 0; i < 1024 / 8; ++i)
+	LockFreeSCSPFixedSizeByteRingBuffer<1024> buffer;
+	int test_cnt[1024 / 4];
+	memset(test_cnt, 0, sizeof(test_cnt));
+	Atomic<bool> is_start = false;
+	Thread producer([&buffer, &is_start]() {
+		while (!is_start.Load(MemoryOrder::Acquire))
+			;
+		for (UInt32 i = 0; i < 1024 / 4; ++i)
 		{
-			UInt64 data = *(UInt64*)((Byte*)ptr + i * sizeof(UInt64));
-			++cnt[data];
+			while (!buffer.TryPush(&i, sizeof(i)))
+				;
 		}
-	}),
-			  1024);
-	for (SizeType i = 0; i < 1024 / 8; ++i)
-		ASSERT_EQ(cnt[i], 1);
-	ASSERT_EQ(buffer.GetSize(), 0);
-	ASSERT_EQ(buffer.GetFreeSize(), 1024);
-
-	LockFreeFixedSizeRingBuffer<256, 4> buffer2;
-	ASSERT_EQ(buffer2.GetSize(), 0);
-	ASSERT_EQ(buffer2.GetFreeSize(), 1024);
-	is_start.Store(false, MemoryOrder::Release);
-	threads.Clear();
-	for (int i = 0; i < 1024 / 8; ++i)
-	{
-		Thread t(
-			[&buffer2, &is_start, i]() {
-				while (!is_start.Load(MemoryOrder::Acquire))
-					;
-				UInt64 test_data = i;
-				while (!buffer2.TryPush(&test_data, sizeof(test_data)))
-					;
-			});
-		threads.EmplaceBack(std::move(t));
-	}
-	is_start.Store(true, MemoryOrder::Release);
-	for (auto iter = threads.GetBegin(); iter != threads.GetEnd(); ++iter)
-	{
-		iter->Join();
-	}
-	ASSERT_EQ(buffer2.GetSize(), 1024);
-	ASSERT_EQ(buffer2.GetFreeSize(), 0);
-	memset(cnt, 0, sizeof(cnt));
-	ASSERT_EQ(buffer2.Pop(1024, [&cnt](void* ptr, SizeType size) {
-		ASSERT_EQ(size, 256);
-		for (SizeType i = 0; i < 256 / 8; ++i)
+	});
+	Thread consumer([&buffer, &test_cnt, &is_start]() {
+		while (!is_start.Load(MemoryOrder::Acquire))
+			;
+		for (UInt32 i = 0; i < 1024 / 4; ++i)
 		{
-			UInt64 data = *(UInt64*)((Byte*)ptr + i * sizeof(UInt64));
-			++cnt[data];
+			while (!buffer.Pop(sizeof(i), [&test_cnt, i](void* ptr, SizeType size) {
+				ASSERT_EQ(size, sizeof(i));
+				test_cnt[*(UInt32*)ptr]++;
+			}))
+				;
 		}
-	}),
-			  1024);
-	for (SizeType i = 0; i < 1024 / 8; ++i)
-		ASSERT_EQ(cnt[i], 1);
-	ASSERT_EQ(buffer2.GetSize(), 0);
-	ASSERT_EQ(buffer2.GetFreeSize(), 1024);
+	});
+	is_start.Store(true, MemoryOrder::Release);
+	producer.Join();
+	consumer.Join();
+	for (SizeType i = 0; i < 1024 / 4; ++i)
+		ASSERT_EQ(test_cnt[i], 1);
 }
 
-TEST(LockFreeFixedSizeRingBuffer, TopTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, TopTest)
 {
-	LockFreeFixedSizeRingBuffer<4, 4> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<16> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 16);
 
@@ -215,9 +130,9 @@ TEST(LockFreeFixedSizeRingBuffer, TopTest)
 	ASSERT_EQ(buffer.GetFreeSize(), 16 - sizeof(test_data));
 }
 
-TEST(LockFreeFixedSizeRingBuffer, PopTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, PopTest)
 {
-	LockFreeFixedSizeRingBuffer<4, 4> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<16> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 16);
 
@@ -237,9 +152,9 @@ TEST(LockFreeFixedSizeRingBuffer, PopTest)
 	ASSERT_EQ(buffer.GetFreeSize(), 16);
 }
 
-TEST(LockFreeFixedSizeRingBuffer, CopyConstructionTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, CopyConstructionTest)
 {
-	LockFreeFixedSizeRingBuffer<8, 4> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<32> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 32);
 	UInt32 test_data = 123456;
@@ -251,7 +166,7 @@ TEST(LockFreeFixedSizeRingBuffer, CopyConstructionTest)
 		ASSERT_EQ(size, sizeof(test_data));
 	});
 
-	LockFreeFixedSizeRingBuffer<8, 4> buffer2(buffer);
+	LockFreeSCSPFixedSizeByteRingBuffer<32> buffer2(buffer);
 
 	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
@@ -268,9 +183,9 @@ TEST(LockFreeFixedSizeRingBuffer, CopyConstructionTest)
 	});
 }
 
-TEST(LockFreeFixedSizeRingBuffer, MoveConstructionTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, MoveConstructionTest)
 {
-	LockFreeFixedSizeRingBuffer<8, 4> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<32> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 32);
 	UInt32 test_data = 123456;
@@ -282,7 +197,7 @@ TEST(LockFreeFixedSizeRingBuffer, MoveConstructionTest)
 		ASSERT_EQ(size, sizeof(test_data));
 	});
 
-	LockFreeFixedSizeRingBuffer<8, 4> buffer2(std::move(buffer));
+	LockFreeSCSPFixedSizeByteRingBuffer<32> buffer2(std::move(buffer));
 	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
 	buffer2.Top(sizeof(test_data), [test_data](void* ptr, SizeType size) {
@@ -291,9 +206,9 @@ TEST(LockFreeFixedSizeRingBuffer, MoveConstructionTest)
 	});
 }
 
-TEST(LockFreeFixedSizeRingBuffer, CopyOperatorTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, CopyOperatorTest)
 {
-	LockFreeFixedSizeRingBuffer<8, 4> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<32> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 32);
 	UInt32 test_data = 123456;
@@ -305,7 +220,7 @@ TEST(LockFreeFixedSizeRingBuffer, CopyOperatorTest)
 		ASSERT_EQ(size, sizeof(test_data));
 	});
 
-	LockFreeFixedSizeRingBuffer<8, 4> buffer2;
+	LockFreeSCSPFixedSizeByteRingBuffer<32> buffer2;
 	ASSERT_EQ(buffer2.GetSize(), 0);
 	ASSERT_EQ(buffer2.GetFreeSize(), 32);
 
@@ -326,9 +241,9 @@ TEST(LockFreeFixedSizeRingBuffer, CopyOperatorTest)
 	});
 }
 
-TEST(LockFreeFixedSizeRingBuffer, MoveOperatorTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, MoveOperatorTest)
 {
-	LockFreeFixedSizeRingBuffer<8, 4> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<32> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 32);
 	UInt32 test_data = 123456;
@@ -340,7 +255,7 @@ TEST(LockFreeFixedSizeRingBuffer, MoveOperatorTest)
 		ASSERT_EQ(size, sizeof(test_data));
 	});
 
-	LockFreeFixedSizeRingBuffer<8, 4> buffer2;
+	LockFreeSCSPFixedSizeByteRingBuffer<32> buffer2;
 	ASSERT_EQ(buffer2.GetSize(), 0);
 	ASSERT_EQ(buffer2.GetFreeSize(), 32);
 
@@ -354,9 +269,9 @@ TEST(LockFreeFixedSizeRingBuffer, MoveOperatorTest)
 	});
 }
 
-TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorCopyConstructionTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, AnotherAllocatorCopyConstructionTest)
 {
-	LockFreeFixedSizeRingBuffer<8, 4, MemoryManagerAllocator> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<32, MemoryManagerAllocator> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 32);
 	UInt32 test_data = 123456;
@@ -368,7 +283,7 @@ TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorCopyConstructionTest)
 		ASSERT_EQ(size, sizeof(test_data));
 	});
 
-	LockFreeFixedSizeRingBuffer<8, 4, StdAllocator> buffer2(buffer);
+	LockFreeSCSPFixedSizeByteRingBuffer<32, StdAllocator> buffer2(buffer);
 
 	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
@@ -385,9 +300,9 @@ TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorCopyConstructionTest)
 	});
 }
 
-TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorMoveConstructionTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, AnotherAllocatorMoveConstructionTest)
 {
-	LockFreeFixedSizeRingBuffer<8, 4, MemoryManagerAllocator> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<32, MemoryManagerAllocator> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 32);
 	UInt32 test_data = 123456;
@@ -399,7 +314,7 @@ TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorMoveConstructionTest)
 		ASSERT_EQ(size, sizeof(test_data));
 	});
 
-	LockFreeFixedSizeRingBuffer<8, 4, StdAllocator> buffer2(std::move(buffer));
+	LockFreeSCSPFixedSizeByteRingBuffer<32, StdAllocator> buffer2(std::move(buffer));
 	ASSERT_EQ(buffer2.GetSize(), sizeof(test_data));
 	ASSERT_EQ(buffer2.GetFreeSize(), 32 - sizeof(test_data));
 	buffer2.Top(sizeof(test_data), [test_data](void* ptr, SizeType size) {
@@ -408,9 +323,9 @@ TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorMoveConstructionTest)
 	});
 }
 
-TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorCopyOperatorTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, AnotherAllocatorCopyOperatorTest)
 {
-	LockFreeFixedSizeRingBuffer<8, 4, MemoryManagerAllocator> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<32, MemoryManagerAllocator> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 32);
 	UInt32 test_data = 123456;
@@ -422,7 +337,7 @@ TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorCopyOperatorTest)
 		ASSERT_EQ(size, sizeof(test_data));
 	});
 
-	LockFreeFixedSizeRingBuffer<8, 4, StdAllocator> buffer2;
+	LockFreeSCSPFixedSizeByteRingBuffer<32, StdAllocator> buffer2;
 	ASSERT_EQ(buffer2.GetSize(), 0);
 	ASSERT_EQ(buffer2.GetFreeSize(), 32);
 
@@ -443,9 +358,9 @@ TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorCopyOperatorTest)
 	});
 }
 
-TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorMoveOperatorTest)
+TEST(LockFreeSCSPFixedSizeByteRingBuffer, AnotherAllocatorMoveOperatorTest)
 {
-	LockFreeFixedSizeRingBuffer<8, 4, MemoryManagerAllocator> buffer;
+	LockFreeSCSPFixedSizeByteRingBuffer<32, MemoryManagerAllocator> buffer;
 	ASSERT_EQ(buffer.GetSize(), 0);
 	ASSERT_EQ(buffer.GetFreeSize(), 32);
 	UInt32 test_data = 123456;
@@ -457,7 +372,7 @@ TEST(LockFreeFixedSizeRingBuffer, AnotherAllocatorMoveOperatorTest)
 		ASSERT_EQ(size, sizeof(test_data));
 	});
 
-	LockFreeFixedSizeRingBuffer<8, 4, StdAllocator> buffer2;
+	LockFreeSCSPFixedSizeByteRingBuffer<32, StdAllocator> buffer2;
 	ASSERT_EQ(buffer2.GetSize(), 0);
 	ASSERT_EQ(buffer2.GetFreeSize(), 32);
 

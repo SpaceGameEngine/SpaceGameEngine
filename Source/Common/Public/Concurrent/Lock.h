@@ -120,9 +120,9 @@ namespace SpaceGameEngine
 
 		Condition& operator=(const Condition&) = delete;
 
-		void NodifyOne();
+		void NotifyOne();
 
-		void NodifyAll();
+		void NotifyAll();
 
 		/*!
 		@warning The lock need to be locked before invoking the function.

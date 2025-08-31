@@ -20,10 +20,10 @@ limitations under the License.
 #include <iostream>
 #include <atomic>
 
-class BenchmarkLogWriterCore
+class BenchmarkLogWriterCore : public SpaceGameEngine::LogWriterCore
 {
 public:
-	inline void WriteLog(const SpaceGameEngine::Char8* pstr, SpaceGameEngine::SizeType size)
+	inline void WriteLog(const SpaceGameEngine::Char8* pstr, SpaceGameEngine::SizeType size) override
 	{
 		++m_LogCount;
 	}
@@ -37,19 +37,18 @@ private:
 	std::atomic<SpaceGameEngine::SizeType> m_LogCount = 0;
 };
 
-inline SpaceGameEngine::Logger<BenchmarkLogWriterCore>& GetBenchmarkLogger()
+inline SpaceGameEngine::Logger<>& GetBenchmarkLogger()
 {
-	static SpaceGameEngine::LogWriter<BenchmarkLogWriterCore> g_log_writer;
-	static SpaceGameEngine::Logger<BenchmarkLogWriterCore> g_logger(g_log_writer, SpaceGameEngine::LogLevel::All);
+	static BenchmarkLogWriterCore g_log_writer_core;
+	thread_local SpaceGameEngine::Logger<> g_logger(g_log_writer_core, SpaceGameEngine::LogLevel::All);
 	return g_logger;
 }
 
 void BM_LogWrite(benchmark::State& state)
 {
-	auto& logger = GetBenchmarkLogger();
 	for (auto _ : state)
 	{
-		SGE_LOG(logger, SpaceGameEngine::LogLevel::Information, SGE_U8STR("This is a benchmark log message."));
+		SGE_LOG(GetBenchmarkLogger(), SpaceGameEngine::LogLevel::Information, SGE_U8STR("This is a benchmark log message."));
 	}
 }
 

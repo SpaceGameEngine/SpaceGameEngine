@@ -135,14 +135,7 @@ TEST(ProxyPairLogWriterCore, WriteLogTest)
 	ASSERT_FALSE(log_path2.IsExist());
 }
 
-TEST(LogWriter, InstanceTest)
-{
-	LogWriter lw;
-}
-
-using TestStringType = StringCore<Char8>;
-
-class TestLogWriterCore
+class TestLogWriterCore : public LogWriterCore
 {
 public:
 	inline TestLogWriterCore()
@@ -150,7 +143,7 @@ public:
 	{
 	}
 
-	inline TestLogWriterCore(TestStringType& output)
+	inline TestLogWriterCore(UTF8String& output)
 		: m_Output(&output)
 	{
 	}
@@ -163,7 +156,7 @@ public:
 			m_Output->Insert(m_Output->GetEnd(), pstr, pstr + size);
 	}
 
-	inline void SetOutput(TestStringType& output)
+	inline void SetOutput(UTF8String& output)
 	{
 		RecursiveLock locker(m_Mutex);
 		locker.Lock();
@@ -172,57 +165,10 @@ public:
 
 private:
 	Mutex m_Mutex;
-	TestStringType* m_Output;
+	UTF8String* m_Output;
 };
 
-TEST(LogWriter, WriteLogTest)
-{
-	TestStringType test_output;
-	{
-		// test LogWriterCore construction
-		LogWriter<TestLogWriterCore> lw(test_output);
-		// test LogWriterCore method
-		lw.SetOutput(test_output);
-		Mutex mutex;
-		Condition end_cond;
-		int cnt = 16;
-		for (auto i = 0; i < 16; ++i)
-		{
-			Thread t([&, i]() {
-				Char8 c_buf = i;
-				TestStringType str_buf(1024, c_buf);
-				for (auto j = 0; j < 1024; ++j)
-				{
-					lw.WriteLog(str_buf.GetData(), str_buf.GetNormalSize());
-					// SleepFor(MakeTimeDuration<Microsecond, TimeType>(100));
-				}
-				RecursiveLock locker(mutex);
-				locker.Lock();
-				cnt -= 1;
-				if (cnt == 0)
-					end_cond.NodifyAll();
-			});
-			t.Detach();
-		}
-		RecursiveLock locker(mutex);
-		locker.Lock();
-		end_cond.Wait(locker, [&]() { return cnt == 0; });
-	}
-	ASSERT_EQ(test_output.GetNormalSize(), 16 * 1024 * 1024);
-	int test_cnt[16];
-	memset(test_cnt, 0, sizeof(test_cnt));
-	for (auto i = test_output.GetConstBegin(); i != test_output.GetConstEnd();)
-	{
-		Char8 c = *i;
-		for (auto j = 0; j < 1024; ++j, ++i)
-			ASSERT_EQ(*i, c);
-		test_cnt[(SizeType)c] += 1024;
-	}
-	for (auto i = 0; i < 16; ++i)
-		ASSERT_EQ(test_cnt[i], 1024 * 1024);
-}
-
-class TestLogWriterCore2
+class TestLogWriterCore2 : public LogWriterCore
 {
 public:
 	inline void WriteLog(const Char8* pstr, SizeType size)
@@ -244,16 +190,25 @@ private:
 	UTF8String m_String;
 };
 
+struct TestLoggerFormatter
+{
+public:
+	inline static UTF8String Format(const Date& date, const DebugInformation& debug_info, LogLevelType log_level, const UTF8String& str)
+	{
+		return str;
+	}
+};
+
 TEST(Logger, InstanceTest)
 {
-	LogWriter<TestLogWriterCore2> lw;
-	Logger<TestLogWriterCore2> l(lw, LogLevel::Warning);
+	TestLogWriterCore lwc;
+	Logger<> l(lwc, LogLevel::Warning);
 }
 
 TEST(Logger, WriteLogTest)
 {
-	LogWriter<TestLogWriterCore2> lw;
-	Logger<TestLogWriterCore2> l(lw, LogLevel::Warning);
+	TestLogWriterCore2 lwc;
+	Logger<> l(lwc, LogLevel::Warning);
 	Date test_date;
 	test_date.m_Year = 1;
 	test_date.m_Month = 2;
@@ -267,7 +222,7 @@ TEST(Logger, WriteLogTest)
 	l.WriteLog(test_date, test_di, LogLevel::Debug, SGE_U8STR("test {}+{}={} debug"), 1, 2, 3);
 	l.WriteLog(test_date, test_di, LogLevel::Exception, SGE_U8STR("test {}+{}={} exception"), 1, 2, 3);
 	SleepFor(MakeTimeDuration<Millisecond>(4250));
-	UTF8String result = lw.GetString();
+	UTF8String result = lwc.GetString();
 	auto lines = Split(result, UTF8String(SGE_U8STR("\n")));
 	ASSERT_EQ(lines.GetSize(), 3);
 	ASSERT_EQ(lines[0], SGE_U8STR("0001-02-03 04:05:06 test_file:test_func:78 WARNING test non-formatted warning"));
@@ -275,10 +230,48 @@ TEST(Logger, WriteLogTest)
 	ASSERT_EQ(lines[2].GetSize(), 0);
 }
 
-TEST(GetDefaultLogWriter, Test)
+TEST(Logger, MultiThreadWriteLogTest)
 {
-	const Char8 pstr[] = SGE_U8STR("test default log writer\n");
-	GetDefaultLogWriter().WriteLog(pstr, sizeof(pstr) / sizeof(Char8) - 1);
+	UTF8String test_output;
+	{
+		// test LogWriterCore construction
+		TestLogWriterCore lwc(test_output);
+		// test LogWriterCore method
+		lwc.SetOutput(test_output);
+		Vector<Thread> threads;
+		Atomic<bool> is_start = false;
+		for (auto i = 0; i < 16; ++i)
+		{
+			threads.EmplaceBack([&, i]() {
+				while (!is_start.Load(MemoryOrder::Acquire))
+					;
+				thread_local Logger<TestLoggerFormatter> logger(lwc);
+				Char8 c_buf = i;
+				UTF8String str_buf(1024, &c_buf);
+				for (auto j = 0; j < 1024; ++j)
+				{
+					SGE_LOG(logger, LogLevel::Debug, UTF8String(str_buf.GetConstBegin(), str_buf.GetConstEnd()));
+				}
+			});
+		}
+		is_start.Store(true, MemoryOrder::Release);
+		for (auto i = 0; i < 16; ++i)
+		{
+			threads[i].Join();
+		}
+	}
+	ASSERT_EQ(test_output.GetNormalSize(), 16 * 1024 * 1024);
+	int test_cnt[16];
+	memset(test_cnt, 0, sizeof(test_cnt));
+	for (auto i = test_output.GetConstBegin(); i != test_output.GetConstEnd();)
+	{
+		Char8 c = **i;
+		for (auto j = 0; j < 1024; ++j, ++i)
+			ASSERT_EQ(**i, c);
+		test_cnt[(SizeType)c] += 1024;
+	}
+	for (auto i = 0; i < 16; ++i)
+		ASSERT_EQ(test_cnt[i], 1024 * 1024);
 }
 
 TEST(GetDefaultLogger, Test)

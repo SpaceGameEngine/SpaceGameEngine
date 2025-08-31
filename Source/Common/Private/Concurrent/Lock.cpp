@@ -59,12 +59,12 @@ SpaceGameEngine::Condition::Condition()
 {
 }
 
-void SpaceGameEngine::Condition::NodifyOne()
+void SpaceGameEngine::Condition::NotifyOne()
 {
 	m_ConditionImpl.notify_one();
 }
 
-void SpaceGameEngine::Condition::NodifyAll()
+void SpaceGameEngine::Condition::NotifyAll()
 {
 	m_ConditionImpl.notify_all();
 }

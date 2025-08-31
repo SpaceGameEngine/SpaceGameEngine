@@ -67,6 +67,9 @@
     <Filter Include="Private\Serializer">
       <UniqueIdentifier>{87c8c68b-bb25-4f16-a0cc-75096f1d237e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Container\Concurrent">
+      <UniqueIdentifier>{c53a4763-a338-4280-8ba7-c59922dbd8e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Error.h">
@@ -255,11 +258,8 @@
     <ClInclude Include="Public\Utility\LineBreak.h">
       <Filter>Public\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Utility\LockFreeFixedSizeBuffer.hpp">
-      <Filter>Public\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Utility\LockFreeFixedSizeRingBuffer.hpp">
-      <Filter>Public\Utility</Filter>
+    <ClInclude Include="Public\Container\Concurrent\LockFreeSCSPFixedSizeByteRingBuffer.hpp">
+      <Filter>Public\Container\Concurrent</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

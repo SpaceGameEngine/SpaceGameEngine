@@ -182,6 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Concurrent\TestConcurrent.hpp" />
+    <ClInclude Include="Container\Concurrent\TestLockFreeSCSPFixedSizeByteRingBuffer.hpp" />
     <ClInclude Include="Container\Detail\TestHashTable.hpp" />
     <ClInclude Include="Container\Detail\TestRedBlackTree.hpp" />
     <ClInclude Include="Container\TestContainerConcept.hpp" />
@@ -221,8 +222,6 @@
     <ClInclude Include="Utility\TestFixedSizeBuffer.hpp" />
     <ClInclude Include="Utility\TestHash.hpp" />
     <ClInclude Include="Utility\TestLineBreak.hpp" />
-    <ClInclude Include="Utility\TestLockFreeFixedSizeBuffer.hpp" />
-    <ClInclude Include="Utility\TestLockFreeFixedSizeRingBuffer.hpp" />
     <ClInclude Include="Utility\TestMemoryData.hpp" />
     <ClInclude Include="Utility\TestOptional.hpp" />
     <ClInclude Include="Utility\TestPair.hpp" />

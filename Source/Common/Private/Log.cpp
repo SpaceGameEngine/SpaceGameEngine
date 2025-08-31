@@ -97,9 +97,93 @@ AllLogWriterCore& SpaceGameEngine::GetAllLogWriterCore()
 	return g_AllLogWriterCore.Get();
 }
 
-void SpaceGameEngine::NotifyLogOverflowToStdErr(const Char8* pstr, SizeType size)
+void SpaceGameEngine::Detail::NotifyLogOverflowToStdErr(const Char8* pstr, SizeType size)
 {
 	std::cerr << "Log overflow" << std::endl;
+}
+
+SpaceGameEngine::Detail::LogWriterBuffer::LogWriterBuffer(LogWriterCore& log_writer_core)
+	: m_LogWriterCore(log_writer_core)
+{
+	LogWriter::GetSingleton().RegisterBuffer(*this);
+}
+
+SpaceGameEngine::Detail::LogWriterBuffer::~LogWriterBuffer()
+{
+	if (!m_IsLogWriterReleased)
+	{
+		while (m_Content.GetSize())
+			Thread::YieldCurrentThread();	 // wait for the buffer to be empty
+		LogWriter::GetSingleton().UnregisterBuffer(*this);
+	}
+}
+
+void SpaceGameEngine::Detail::LogWriterBuffer::Push(const Char8* pstr, SizeType size)
+{
+	SGE_ASSERT(NullPointerError, pstr);
+	SGE_ASSERT(InvalidValueError, size, 1, m_Content.GetFreeSize());
+	if (!m_Content.TryPush(pstr, size))
+		HandleLogOverflow(pstr, size);
+}
+
+bool SpaceGameEngine::Detail::LogWriterBuffer::Pop()
+{
+	return m_Content.Pop(sm_BufferSize, [this](void* ptr, SizeType size) {
+		m_LogWriterCore.WriteLog((Char8*)ptr, size);
+	});
+}
+
+void SpaceGameEngine::Detail::LogWriterBuffer::OnLogWriterReleased()
+{
+	m_IsLogWriterReleased = true;
+}
+
+void SpaceGameEngine::Detail::LogWriterBuffer::HandleLogOverflow(const Char8* pstr, SizeType size)
+{
+	NotifyLogOverflowToStdErr(pstr, size);
+}
+
+SpaceGameEngine::Detail::LogWriter::LogWriter()
+{
+	m_Thread = Thread(std::bind(&LogWriter::Run, this));
+}
+
+SpaceGameEngine::Detail::LogWriter::~LogWriter()
+{
+	m_IsRunning.Store(false, MemoryOrder::Release);
+	m_Thread.Join();
+	RecursiveLock lock(m_mutex);
+	lock.Lock();
+	for (auto iter = m_Buffers.GetBegin(); iter != m_Buffers.GetEnd(); ++iter)
+		(*iter)->OnLogWriterReleased();
+}
+
+void SpaceGameEngine::Detail::LogWriter::Run()
+{
+	while (m_IsRunning.Load(MemoryOrder::Acquire))
+	{
+		RecursiveLock lock(m_mutex);
+		lock.Lock();
+		bool did_popped = false;
+		for (auto iter = m_Buffers.GetBegin(); iter != m_Buffers.GetEnd(); ++iter)
+			did_popped |= (*iter)->Pop();
+		if (!did_popped)
+			Thread::YieldCurrentThread();
+	}
+}
+
+void SpaceGameEngine::Detail::LogWriter::RegisterBuffer(LogWriterBuffer& buffer)
+{
+	RecursiveLock lock(m_mutex);
+	lock.Lock();
+	m_Buffers.Insert(&buffer);
+}
+
+void SpaceGameEngine::Detail::LogWriter::UnregisterBuffer(LogWriterBuffer& buffer)
+{
+	RecursiveLock lock(m_mutex);
+	lock.Lock();
+	m_Buffers.RemoveByValue(&buffer);
 }
 
 bool SpaceGameEngine::InvalidLogLevelError::Judge(LogLevelType log_level)
@@ -139,10 +223,7 @@ namespace SpaceGameEngine
 	template class COMMON_API_TEMPLATE_DEFINE ProxyPairLogWriterCore<FileLogWriterCore, ConsoleLogWriterCore>;
 	template class COMMON_API_TEMPLATE_DEFINE ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>;
 	template class COMMON_API_TEMPLATE_DEFINE ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>;
-	template class COMMON_API_TEMPLATE_DEFINE LogWriter<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>;
-	template class COMMON_API_TEMPLATE_DEFINE LogWriter<ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>>;
-	template class COMMON_API_TEMPLATE_DEFINE Logger<ProxyPairLogWriterCore<AllLogWriterCore, FileLogWriterCore>>;
-	template class COMMON_API_TEMPLATE_DEFINE Logger<ProxyPairLogWriterCore<FileLogWriterCore, AllLogWriterCore>>;
+	template class COMMON_API_TEMPLATE_DEFINE Logger<>;
 
 	SGE_LOGGER_DEFINE(Default);
 }
