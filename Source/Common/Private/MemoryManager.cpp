@@ -79,7 +79,6 @@ SpaceGameEngine::MemoryManager::FixedSizeAllocator::~FixedSizeAllocator()
 void* SpaceGameEngine::MemoryManager::FixedSizeAllocator::Allocate()
 {
 	RecursiveLock lock(m_Mutex);
-	lock.Lock();
 	if (!m_pFreeMemoryBlocks)
 	{
 		MemoryPageHeader* pNewPage = reinterpret_cast<MemoryPageHeader*>(new Byte[m_MemoryPageSize]);
@@ -111,7 +110,6 @@ void* SpaceGameEngine::MemoryManager::FixedSizeAllocator::Allocate()
 void SpaceGameEngine::MemoryManager::FixedSizeAllocator::Free(void* ptr)
 {
 	RecursiveLock lock(m_Mutex);
-	lock.Lock();
 	SGE_ASSERT(NullPointerError, ptr);
 	MemoryBlockHeader* pBlock = reinterpret_cast<MemoryBlockHeader*>(ptr);
 	pBlock->m_pNext = m_pFreeMemoryBlocks;

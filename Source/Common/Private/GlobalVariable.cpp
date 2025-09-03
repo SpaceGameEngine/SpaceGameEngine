@@ -39,6 +39,5 @@ SpaceGameEngine::GlobalVariableManager::GlobalVariableManager()
 void SpaceGameEngine::GlobalVariableManager::Add(Function<void(), StdAllocator>&& rel_func)
 {
 	RecursiveLock lock(m_Mutex);
-	lock.Lock();
 	m_Content.Push(std::move(rel_func));
 }

@@ -151,7 +151,6 @@ public:
 	inline void WriteLog(const Char8* pstr, SizeType size)
 	{
 		RecursiveLock locker(m_Mutex);
-		locker.Lock();
 		if (m_Output)
 			m_Output->Insert(m_Output->GetEnd(), pstr, pstr + size);
 	}
@@ -159,7 +158,6 @@ public:
 	inline void SetOutput(UTF8String& output)
 	{
 		RecursiveLock locker(m_Mutex);
-		locker.Lock();
 		m_Output = &output;
 	}
 
@@ -174,14 +172,12 @@ public:
 	inline void WriteLog(const Char8* pstr, SizeType size)
 	{
 		RecursiveLock locker(m_Mutex);
-		locker.Lock();
 		m_String.Insert(m_String.GetConstEnd(), pstr, pstr + size);
 	}
 
 	inline UTF8String GetString()
 	{
 		RecursiveLock locker(m_Mutex);
-		locker.Lock();
 		return m_String;
 	}
 

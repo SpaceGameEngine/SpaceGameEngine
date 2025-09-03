@@ -61,10 +61,21 @@ namespace SpaceGameEngine
 		std::recursive_timed_mutex m_MutexImpl;
 	};
 
+	namespace LockTag
+	{
+		using DeferLockType = std::defer_lock_t;
+		using TryToLockType = std::try_to_lock_t;
+		using AdoptLockType = std::adopt_lock_t;
+
+		inline constexpr DeferLockType DeferLock{};
+		inline constexpr TryToLockType TryToLock{};
+		inline constexpr AdoptLockType AdoptLock{};
+	}
+
+	template<typename T>
+	concept IsLockTag = std::is_same_v<T, LockTag::DeferLockType> || std::is_same_v<T, LockTag::TryToLockType> || std::is_same_v<T, LockTag::AdoptLockType>;
+
 	/*!\brief Class SpaceGameEngine::RecursiveLock is a wrapper of a std::unique_lock<std::recursive_timed_mutex>
-	 *
-	 * Unlike std::unique_lock, this class's constructor will not lock the mutex, which is same as using
-	 * std::defer_lock in std::unique_lock's constructor.
 	 *
 	 * Checkout c++ reference for more details.
 	 */
@@ -75,7 +86,13 @@ namespace SpaceGameEngine
 
 		RecursiveLock(RecursiveLock&& other) noexcept;
 
-		explicit RecursiveLock(Mutex&);
+		explicit RecursiveLock(Mutex& mutex);
+
+		template<IsLockTag LockTagType>
+		inline RecursiveLock(Mutex& mutex, LockTagType lockTag)
+			: m_LockImpl(mutex.m_MutexImpl, lockTag)
+		{
+		}
 
 		~RecursiveLock() = default;
 

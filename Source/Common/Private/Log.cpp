@@ -153,7 +153,6 @@ SpaceGameEngine::Detail::LogWriter::~LogWriter()
 	m_IsRunning.Store(false, MemoryOrder::Release);
 	m_Thread.Join();
 	RecursiveLock lock(m_mutex);
-	lock.Lock();
 	for (auto iter = m_Buffers.GetBegin(); iter != m_Buffers.GetEnd(); ++iter)
 		(*iter)->OnLogWriterReleased();
 }
@@ -163,7 +162,6 @@ void SpaceGameEngine::Detail::LogWriter::Run()
 	while (m_IsRunning.Load(MemoryOrder::Acquire))
 	{
 		RecursiveLock lock(m_mutex);
-		lock.Lock();
 		bool did_popped = false;
 		for (auto iter = m_Buffers.GetBegin(); iter != m_Buffers.GetEnd(); ++iter)
 			did_popped |= (*iter)->Pop();
@@ -175,14 +173,12 @@ void SpaceGameEngine::Detail::LogWriter::Run()
 void SpaceGameEngine::Detail::LogWriter::RegisterBuffer(LogWriterBuffer& buffer)
 {
 	RecursiveLock lock(m_mutex);
-	lock.Lock();
 	m_Buffers.Insert(&buffer);
 }
 
 void SpaceGameEngine::Detail::LogWriter::UnregisterBuffer(LogWriterBuffer& buffer)
 {
 	RecursiveLock lock(m_mutex);
-	lock.Lock();
 	m_Buffers.RemoveByValue(&buffer);
 }
 

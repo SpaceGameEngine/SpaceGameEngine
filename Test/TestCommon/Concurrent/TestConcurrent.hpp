@@ -60,7 +60,6 @@ bool flag2_1 = false, flag2_2 = false;
 void foo2(Mutex& mutex, bool& run_flag)
 {
 	RecursiveLock lock(mutex);
-	lock.Lock();
 	LOG("foo2 thread " << Thread::GetCurrentThreadId());
 
 	ASSERT_TRUE((!flag2_1 && !flag2_2));
@@ -90,7 +89,6 @@ bool flag3 = false;
 void foo3_lock(Mutex& mutex)
 {
 	RecursiveLock lock(mutex);
-	lock.Lock();
 	LOG("foo3_lock thread " << Thread::GetCurrentThreadId());
 	ASSERT_FALSE(flag3);
 	Thread::Sleep(MakeTimeDuration<Second, double>(1));
@@ -100,7 +98,7 @@ void foo3_lock(Mutex& mutex)
 
 void foo3_trylock(Mutex& mutex)
 {
-	RecursiveLock lock(mutex);
+	RecursiveLock lock(mutex, LockTag::DeferLock);
 	Thread::Sleep(MakeTimeDuration<Second, double>(0.5));
 	ASSERT_FALSE(lock.TryLock());
 	ASSERT_TRUE(lock.TryLock(MakeTimeDuration<Second, double>(1)));
@@ -161,7 +159,6 @@ TEST(Concurrent, ConditionTest)
 	{
 		threads.emplace_back([&] {
 			RecursiveLock lock(m);
-			lock.Lock();
 			LOG("foo5 thread " << Thread::GetCurrentThreadId());
 			condition.Wait(lock, [&] { return flag; });
 			run_flag = true;

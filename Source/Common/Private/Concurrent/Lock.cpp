@@ -23,7 +23,7 @@ SpaceGameEngine::Mutex::Mutex()
 }
 
 SpaceGameEngine::RecursiveLock::RecursiveLock(SpaceGameEngine::Mutex& mutex)
-	: m_LockImpl(mutex.m_MutexImpl, std::defer_lock)
+	: m_LockImpl(mutex.m_MutexImpl)
 {
 }
 
