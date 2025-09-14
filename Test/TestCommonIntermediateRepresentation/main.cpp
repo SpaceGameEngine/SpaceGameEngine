@@ -18,6 +18,7 @@ limitations under the License.
 #include "SGEString.hpp"
 #include "Module/ModuleManager.h"
 #include "Assembler/TestLexer.hpp"
+#include "Assembler/TestAbstractSyntaxTree.hpp"
 #include "Assembler/TestAbstractSyntaxTreePrinter.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;

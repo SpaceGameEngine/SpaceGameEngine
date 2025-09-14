@@ -30,9 +30,44 @@ SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTree
 {
 }
 
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::SymbolNode& node)
+{
+	PrintLine(Format(String(SGE_STR("Symbol \"{}.{}\"\t<line:{}, column:{}>")), node.GetDialectName(), node.GetName(), node.GetLine(), node.GetColumn()));
+}
+
 void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::VariableNode& node)
 {
-	PrintLine(Format(String(SGE_STR("Variable \"{}\"")), node.GetName()));
+	PrintLine(Format(String(SGE_STR("Variable \"{}\"\t<line:{}, column:{}>")), node.GetName(), node.GetLine(), node.GetColumn()));
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::VariableDefinitionNode& node)
+{
+	const auto& type_symbol = node.GetTypeSymbolNode();
+	PrintLine(Format(String(SGE_STR("VariableDefinition \"{}\"\t<line:{}, column:{}>")), node.GetName(), node.GetLine(), node.GetColumn()));
+	if (type_symbol.HasValue())
+	{
+		StartPrintChildren();
+		Visit(node.GetTypeSymbolNode().Get());
+		EndPrintChildren();
+	}
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionNode& node)
+{
+	PrintLine(Format(String(SGE_STR("ParameterDefinition \"{}\"\t<line:{}, column:{}>")), node.GetName(), node.GetLine(), node.GetColumn()));
+	StartPrintChildren();
+	Visit(node.GetTypeSymbolNode());
+	EndPrintChildren();
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionsNode& node)
+{
+	PrintLine(Format(String(SGE_STR("ParameterDefinitions \t<line:{}, column:{}>")), node.GetLine(), node.GetColumn()));
+	StartPrintChildren();
+	const auto& parameter_definitions = node.GetParameterDefinitions();
+	for (auto iter = parameter_definitions.GetConstBegin(); iter != parameter_definitions.GetConstEnd(); ++iter)
+		Visit(*iter);
+	EndPrintChildren();
 }
 
 void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::PrintLine(const String& str)

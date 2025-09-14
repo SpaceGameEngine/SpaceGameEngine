@@ -36,7 +36,11 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 	public:
 		AbstractSyntaxTreePrinter(OutputStream& stream);
 
+		virtual void Visit(const AbstractSyntaxTreeNodes::SymbolNode& node) override;
 		virtual void Visit(const AbstractSyntaxTreeNodes::VariableNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::VariableDefinitionNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionsNode& node) override;
 
 	private:
 		void PrintLine(const String& str);
