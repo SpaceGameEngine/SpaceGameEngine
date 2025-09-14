@@ -34,7 +34,7 @@ SpaceGameEngine::CommonParser::Lexer::Token::Token()
 SpaceGameEngine::CommonParser::Lexer::Token::Token(TokenType token_type, const String& str, SizeType line, SizeType column)
 	: m_Type(token_type), m_Content(str), m_Line(line), m_Column(column)
 {
-	SGE_ASSERT(InvalidTokenTypeError, token_type);
+	// SGE_ASSERT(InvalidTokenTypeError, token_type);	// allow custom token type
 	SGE_ASSERT(InvalidValueError, line, 1, UINT64_MAX);
 	SGE_ASSERT(InvalidValueError, column, 1, UINT64_MAX);
 }

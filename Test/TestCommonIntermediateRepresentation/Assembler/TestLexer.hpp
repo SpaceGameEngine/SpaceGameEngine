@@ -23,21 +23,21 @@ using namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler;
 
 TEST(GetTokens, Test)
 {
-	auto result1 = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR(R"(test.id = 1
+	auto result1 = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR(R"(test.flag = true
 //test comment line
 /*test comment block
 */)"));
 	ASSERT_EQ(result1.GetSize(), 3);
-	ASSERT_EQ(result1[0].GetType(), TokenTypes::Identifier);
-	ASSERT_EQ(result1[0].GetContent(), SGE_STR("test.id"));
+	ASSERT_EQ(result1[0].GetType(), SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(result1[0].GetContent(), SGE_STR("test.flag"));
 	ASSERT_EQ(result1[0].GetLine(), 1);
 	ASSERT_EQ(result1[0].GetColumn(), 1);
-	ASSERT_EQ(result1[1].GetType(), TokenTypes::Equal);
+	ASSERT_EQ(result1[1].GetType(), SpaceGameEngine::CommonParser::Lexer::TokenTypes::Equal);
 	ASSERT_EQ(result1[1].GetContent(), SGE_STR("="));
 	ASSERT_EQ(result1[1].GetLine(), 1);
-	ASSERT_EQ(result1[1].GetColumn(), 9);
-	ASSERT_EQ(result1[2].GetType(), TokenTypes::IntegerLiteral);
-	ASSERT_EQ(result1[2].GetContent(), SGE_STR("1"));
+	ASSERT_EQ(result1[1].GetColumn(), 11);
+	ASSERT_EQ(result1[2].GetType(), SpaceGameEngine::CommonIntermediateRepresentation::Assembler::TokenTypes::BooleanLiteral);
+	ASSERT_EQ(result1[2].GetContent(), SGE_STR("true"));
 	ASSERT_EQ(result1[2].GetLine(), 1);
-	ASSERT_EQ(result1[2].GetColumn(), 11);
+	ASSERT_EQ(result1[2].GetColumn(), 13);
 }

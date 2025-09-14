@@ -24,6 +24,11 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 {
+	namespace TokenTypes
+	{
+		inline constexpr const CommonParser::Lexer::TokenType BooleanLiteral = CommonParser::Lexer::TokenTypes::DefaultTokenTypesCount;
+	}
+
 	COMMON_INTERMEDIATE_REPRESENTATION_API Vector<CommonParser::Lexer::Token> GetTokens(const String& str);
 }
 

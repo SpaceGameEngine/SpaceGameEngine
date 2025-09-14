@@ -25,6 +25,17 @@ Vector<CommonParser::Lexer::Token> SpaceGameEngine::CommonIntermediateRepresenta
 {
 	return RemoveToken(
 		CombineToken(
-			SpaceGameEngine::CommonParser::Lexer::GetTokens(str, SGE_STR("line:{} column:{}, {}")), {TokenTypes::Identifier, TokenTypes::Dot, TokenTypes::Identifier}, TokenTypes::Identifier),
-		{TokenTypes::WordSeparator, TokenTypes::LineSeparator, TokenTypes::CommentLine, TokenTypes::CommentBlock});
+			TransformToken(SpaceGameEngine::CommonParser::Lexer::GetTokens(str, SGE_STR("line:{} column:{}, {}")),
+						   [=](const Token& token) {
+							   if (token.GetType() == SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier)
+							   {
+								   if (token.GetContent() == SGE_STR("true") || token.GetContent() == SGE_STR("false"))
+								   {
+									   return Token(SpaceGameEngine::CommonIntermediateRepresentation::Assembler::TokenTypes::BooleanLiteral, token.GetContent(), token.GetLine(), token.GetColumn());
+								   }
+							   }
+							   return token;
+						   }),
+			{SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier, SpaceGameEngine::CommonParser::Lexer::TokenTypes::Dot, SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier}, SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier),
+		{SpaceGameEngine::CommonParser::Lexer::TokenTypes::WordSeparator, SpaceGameEngine::CommonParser::Lexer::TokenTypes::LineSeparator, SpaceGameEngine::CommonParser::Lexer::TokenTypes::CommentLine, SpaceGameEngine::CommonParser::Lexer::TokenTypes::CommentBlock});
 }

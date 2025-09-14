@@ -24,6 +24,17 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonParser::Lexer
 {
+	template<typename Callable>
+	inline Vector<Token> TransformToken(const Vector<Token>& tokens, Callable&& transformer)
+	{
+		Vector<Token> result;
+		for (auto iter = tokens.GetConstBegin(); iter != tokens.GetConstEnd(); ++iter)
+		{
+			result.EmplaceBack(transformer(*iter));
+		}
+		return result;
+	}
+
 	COMMON_PARSER_API Vector<Token> CombineToken(const Vector<Token>& tokens, const Vector<TokenType>& token_type_pattern, TokenType result_token_type, bool repeat = false);
 
 	COMMON_PARSER_API Vector<Token> RemoveToken(const Vector<Token>& tokens, const Set<TokenType>& remove_token_type_set);

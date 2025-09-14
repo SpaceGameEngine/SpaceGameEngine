@@ -20,6 +20,52 @@ limitations under the License.
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonParser;
 
+TEST(TransformToken, Test)
+{
+	String formatter(SGE_STR("line:{} column:{}, {}"));
+	auto tokens = Lexer::GetTokens(SGE_STR("a=true"), formatter);
+	ASSERT_EQ(tokens.GetSize(), 3);
+	ASSERT_EQ(tokens[0].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(tokens[0].GetContent(), SGE_STR("a"));
+	ASSERT_EQ(tokens[0].GetLine(), 1);
+	ASSERT_EQ(tokens[0].GetColumn(), 1);
+	ASSERT_EQ(tokens[1].GetType(), Lexer::TokenTypes::Equal);
+	ASSERT_EQ(tokens[1].GetContent(), SGE_STR("="));
+	ASSERT_EQ(tokens[1].GetLine(), 1);
+	ASSERT_EQ(tokens[1].GetColumn(), 2);
+	ASSERT_EQ(tokens[2].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(tokens[2].GetContent(), SGE_STR("true"));
+	ASSERT_EQ(tokens[2].GetLine(), 1);
+	ASSERT_EQ(tokens[2].GetColumn(), 3);
+
+	auto BooleanLiteral = CommonParser::Lexer::TokenTypes::DefaultTokenTypesCount;
+
+	auto result = Lexer::TransformToken(tokens, [BooleanLiteral](const Lexer::Token& token) {
+		if (token.GetType() == Lexer::TokenTypes::Identifier)
+		{
+			if (token.GetContent() == SGE_STR("true") || token.GetContent() == SGE_STR("false"))
+			{
+				return Lexer::Token(BooleanLiteral, token.GetContent(), token.GetLine(), token.GetColumn());
+			}
+		}
+		return token;
+	});
+
+	ASSERT_EQ(result.GetSize(), 3);
+	ASSERT_EQ(result[0].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(result[0].GetContent(), SGE_STR("a"));
+	ASSERT_EQ(result[0].GetLine(), 1);
+	ASSERT_EQ(result[0].GetColumn(), 1);
+	ASSERT_EQ(result[1].GetType(), Lexer::TokenTypes::Equal);
+	ASSERT_EQ(result[1].GetContent(), SGE_STR("="));
+	ASSERT_EQ(result[1].GetLine(), 1);
+	ASSERT_EQ(result[1].GetColumn(), 2);
+	ASSERT_EQ(result[2].GetType(), BooleanLiteral);
+	ASSERT_EQ(result[2].GetContent(), SGE_STR("true"));
+	ASSERT_EQ(result[2].GetLine(), 1);
+	ASSERT_EQ(result[2].GetColumn(), 3);
+}
+
 TEST(CombineToken, Test)
 {
 	String formatter(SGE_STR("line:{} column:{}, {}"));
