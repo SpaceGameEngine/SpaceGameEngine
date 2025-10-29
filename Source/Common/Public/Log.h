@@ -136,11 +136,11 @@ namespace SpaceGameEngine
 			void HandleLogOverflow(const Char8* pstr, SizeType size);
 
 		private:
-			inline static constexpr const SizeType sm_BufferSize = 4194304;
+			inline static constexpr const SizeType BufferSize = 4194304;
 
 			bool m_IsLogWriterReleased = false;
 			LogWriterCore& m_LogWriterCore;
-			LockFreeSCSPFixedSizeByteRingBuffer<sm_BufferSize> m_Content;
+			LockFreeSCSPFixedSizeByteRingBuffer<BufferSize> m_Content;
 		};
 
 		class COMMON_API LogWriter : public UncopyableAndUnmovable,
@@ -184,7 +184,7 @@ namespace SpaceGameEngine
 
 	struct InvalidLogLevelError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The LogLevel is invalid.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The LogLevel is invalid.");
 		static COMMON_API bool Judge(LogLevelType log_level);
 	};
 

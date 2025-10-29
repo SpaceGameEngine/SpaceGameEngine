@@ -150,7 +150,7 @@ namespace SpaceGameEngine::SpaceLanguage
 
 	struct InvalidInstructionsError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Instructions is invalid.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The Instructions is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const void* ptr, SizeType size);
 	};
 

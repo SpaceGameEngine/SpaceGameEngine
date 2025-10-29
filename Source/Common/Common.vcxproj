@@ -222,6 +222,7 @@
     <ClInclude Include="Public\Utility\Pair.hpp" />
     <ClInclude Include="Public\Utility\Singleton.hpp" />
     <ClInclude Include="Public\Utility\Utility.hpp" />
+    <ClInclude Include="Public\Utility\Variant.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp" />

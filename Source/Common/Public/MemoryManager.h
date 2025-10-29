@@ -40,7 +40,7 @@ namespace SpaceGameEngine
 
 	struct InvalidAlignmentError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The alignment is invalid");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The alignment is invalid");
 		/*!
 		@note only the alignment which is 0 or 2^n can pass the judgment.
 		*/
@@ -186,8 +186,8 @@ namespace SpaceGameEngine
 			void Free(void* ptr);
 
 		private:
-			inline static const SizeType sm_PreAllocationBufferQuantity = 2 * (Thread::QueryHardwareConcurrency() != 0 ? Thread::QueryHardwareConcurrency() : 1);
-			inline static const SizeType sm_FreeBufferQuantity = 8 * (Thread::QueryHardwareConcurrency() != 0 ? Thread::QueryHardwareConcurrency() : 1);
+			inline static const SizeType PreAllocationBufferQuantity = 2 * (Thread::QueryHardwareConcurrency() != 0 ? Thread::QueryHardwareConcurrency() : 1);
+			inline static const SizeType FreeBufferQuantity = 8 * (Thread::QueryHardwareConcurrency() != 0 ? Thread::QueryHardwareConcurrency() : 1);
 
 			OnceFlag m_OnceFlag;
 			Atomic<void*>* m_pPreAllocationBuffer;
@@ -221,7 +221,7 @@ namespace SpaceGameEngine
 
 		struct InvalidRequestInformationError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The RequestInformation is invalid");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The RequestInformation is invalid");
 			/*!
 			@note the request_info's size must be less than or equal to 1024,
 			the alignment of it can not be larger than 128.
@@ -239,11 +239,11 @@ namespace SpaceGameEngine
 		/*!
 		@note 262273=((1024<<8)|128)+1
 		*/
-		inline static const SizeType sm_MaxFixedSizeAllocatorQuantity = 262273;
-		inline static const SizeType sm_MaxMemoryBlockSize = 1024;
-		inline static const SizeType sm_MemoryPageSize = 65536;
+		inline static const SizeType MaxFixedSizeAllocatorQuantity = 262273;
+		inline static const SizeType MaxMemoryBlockSize = 1024;
+		inline static const SizeType MemoryPageSize = 65536;
 
-		FixedSizeAllocator* m_FixedSizeAllocators[sm_MaxFixedSizeAllocatorQuantity];
+		FixedSizeAllocator* m_FixedSizeAllocators[MaxFixedSizeAllocatorQuantity];
 	};
 
 	struct COMMON_API MemoryManagerAllocator

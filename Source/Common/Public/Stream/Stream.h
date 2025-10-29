@@ -54,7 +54,7 @@ namespace SpaceGameEngine
 
 	struct InvalidMemoryDataForInputStreamReadError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The MemoryData is invalid for InputStream::Read.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The MemoryData is invalid for InputStream::Read.");
 		static COMMON_API bool Judge(const MemoryData& data);
 	};
 }

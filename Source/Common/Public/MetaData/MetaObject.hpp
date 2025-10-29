@@ -26,7 +26,7 @@ namespace SpaceGameEngine
 {
 	struct DifferentMetaDataError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The two MetaDatas are different");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The two MetaDatas are different");
 		inline static bool Judge(const MetaData& meta_data1, const MetaData& meta_data2)
 		{
 			return !(meta_data1 == meta_data2);

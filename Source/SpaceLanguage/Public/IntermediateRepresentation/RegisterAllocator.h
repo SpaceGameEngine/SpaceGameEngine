@@ -33,19 +33,19 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct InvalidRegisterAllocationStateError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The RegisterAllocationState is invalid.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The RegisterAllocationState is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(RegisterAllocationState state);
 	};
 
 	struct RegisterAllocationStateUnknownError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The RegisterAllocationState is Unknown.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The RegisterAllocationState is Unknown.");
 		static SPACE_LANGUAGE_API bool Judge(RegisterAllocationState state);
 	};
 
 	struct RegisterAllocationStateNotUnknownError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The RegisterAllocationState is not Unknown.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The RegisterAllocationState is not Unknown.");
 		static SPACE_LANGUAGE_API bool Judge(RegisterAllocationState state);
 	};
 
@@ -70,7 +70,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct InvalidFunctionCallTypeError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The FunctionCallType is invalid.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The FunctionCallType is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(FunctionCallType fc_type);
 	};
 
@@ -95,13 +95,13 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct RegisterAllocationRequestAlreadyExistError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The RegisterAllocationRequest has already existed.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The RegisterAllocationRequest has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const Map<UInt64, bool>::ConstIterator& citer, const Map<UInt64, bool>::ConstIterator& cend);
 	};
 
 	struct FunctionCallRecordAlreadyExistError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The FunctionCallRecord has already existed.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The FunctionCallRecord has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const Map<UInt64, Pair<FunctionCallType, UInt64>>::ConstIterator& citer, const Map<UInt64, Pair<FunctionCallType, UInt64>>::ConstIterator& cend);
 	};
 
@@ -117,7 +117,7 @@ namespace SpaceGameEngine::SpaceLanguage::IntermediateRepresentation
 
 	struct RegisterAllocationResultAlreadyExistError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The RegisterAllocationResult has already existed.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The RegisterAllocationResult has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const Map<UInt64, RegisterAllocationResult>::ConstIterator& citer, const Map<UInt64, RegisterAllocationResult>::ConstIterator& cend);
 	};
 

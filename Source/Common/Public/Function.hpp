@@ -131,7 +131,7 @@ namespace SpaceGameEngine
 
 	struct InvalidFunctionError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Function is invalid");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("Function is invalid");
 		template<typename T, IsAllocator Allocator>
 		inline static bool Judge(const Function<T, Allocator>& func)
 		{

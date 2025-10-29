@@ -139,7 +139,7 @@ SpaceGameEngine::SizeType SpaceGameEngine::GetDefaultAlignment(SizeType size)
 
 SpaceGameEngine::MemoryManager::~MemoryManager()
 {
-	for (SizeType i = 0; i < sm_MaxFixedSizeAllocatorQuantity; i++)
+	for (SizeType i = 0; i < MaxFixedSizeAllocatorQuantity; i++)
 	{
 		if (m_FixedSizeAllocators[i])
 			delete m_FixedSizeAllocators[i];
@@ -157,7 +157,7 @@ void* SpaceGameEngine::MemoryManager::Allocate(SizeType size, SizeType alignment
 	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
-	if (size > sm_MaxMemoryBlockSize)
+	if (size > MaxMemoryBlockSize)
 	{
 		return _mm_malloc(size, alignment);
 	}
@@ -166,7 +166,7 @@ void* SpaceGameEngine::MemoryManager::Allocate(SizeType size, SizeType alignment
 		SGE_ASSERT(InvalidRequestInformationError, RequestInformation(size, alignment));
 		UInt32 index = RequestInformationToIndex(RequestInformation(size, alignment));
 		if (!m_FixedSizeAllocators[index])
-			m_FixedSizeAllocators[index] = new FixedSizeAllocator(size, sm_MemoryPageSize, alignment);
+			m_FixedSizeAllocators[index] = new FixedSizeAllocator(size, MemoryPageSize, alignment);
 		return m_FixedSizeAllocators[index]->Allocate();
 	}
 }
@@ -177,7 +177,7 @@ void SpaceGameEngine::MemoryManager::Free(void* ptr, SizeType size, SizeType ali
 	SGE_ASSERT(InvalidValueError, size, 1, SGE_MAX_MEMORY_SIZE);
 	SGE_ASSERT(InvalidAlignmentError, alignment);
 
-	if (size > sm_MaxMemoryBlockSize)
+	if (size > MaxMemoryBlockSize)
 	{
 		_mm_free(ptr);
 	}
@@ -192,7 +192,7 @@ void SpaceGameEngine::MemoryManager::Free(void* ptr, SizeType size, SizeType ali
 
 SpaceGameEngine::MemoryManager::MemoryManager()
 {
-	memset(m_FixedSizeAllocators, 0, sizeof(FixedSizeAllocator*) * sm_MaxFixedSizeAllocatorQuantity);
+	memset(m_FixedSizeAllocators, 0, sizeof(FixedSizeAllocator*) * MaxFixedSizeAllocatorQuantity);
 }
 
 SpaceGameEngine::UInt32 SpaceGameEngine::MemoryManager::RequestInformationToIndex(const RequestInformation& request_info)
@@ -236,9 +236,9 @@ void SpaceGameEngine::MemoryManagerAllocator::RawDelete(void* ptr)
 
 /*
 SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::MultiThreadBufferedFixedSizeAllocator(SizeType alloc_mem_size, SizeType page_mem_size, SizeType alignment)
-	: FixedSizeAllocator(alloc_mem_size, page_mem_size, alignment), m_pPreAllocationBuffer(new Atomic<void*>[sm_PreAllocationBufferQuantity]), m_pFreeBuffer(new Atomic<void*>[sm_FreeBufferQuantity])
+	: FixedSizeAllocator(alloc_mem_size, page_mem_size, alignment), m_pPreAllocationBuffer(new Atomic<void*>[PreAllocationBufferQuantity]), m_pFreeBuffer(new Atomic<void*>[FreeBufferQuantity])
 {
-	for (SizeType i = 0; i < sm_FreeBufferQuantity; ++i)
+	for (SizeType i = 0; i < FreeBufferQuantity; ++i)
 		m_pFreeBuffer[i].Store(nullptr, MemoryOrder::Release);
 }
 
@@ -254,20 +254,20 @@ SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::~MultiThr
 void* SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::Allocate()
 {
 	CallOnce(m_OnceFlag, [this]() {
-		for (SizeType i = 0; i < sm_PreAllocationBufferQuantity; ++i)
+		for (SizeType i = 0; i < PreAllocationBufferQuantity; ++i)
 			m_pPreAllocationBuffer[i].Store(FixedSizeAllocator::Allocate(), MemoryOrder::Release);
 	});
 
 	void* re = nullptr;
 	SizeType idx = 0;
-	while ((re = m_pPreAllocationBuffer[(idx = (idx + 1) % sm_PreAllocationBufferQuantity)].Exchange(nullptr, MemoryOrder::AcquireRelease)) == nullptr)
+	while ((re = m_pPreAllocationBuffer[(idx = (idx + 1) % PreAllocationBufferQuantity)].Exchange(nullptr, MemoryOrder::AcquireRelease)) == nullptr)
 	{
 		Thread::YieldCurrentThread();
 	}
 	Thread t(
 		[this, idx]() {
 			void* buf = nullptr;
-			for (SizeType i = 0; i < sm_FreeBufferQuantity; ++i)
+			for (SizeType i = 0; i < FreeBufferQuantity; ++i)
 			{
 				buf = m_pFreeBuffer[i].Exchange(nullptr, MemoryOrder::AcquireRelease);
 				if (buf != nullptr)
@@ -286,7 +286,7 @@ void SpaceGameEngine::MemoryManager::MultiThreadBufferedFixedSizeAllocator::Free
 {
 	SGE_ASSERT(NullPointerError, ptr);
 	void* buf = ptr;
-	for (SizeType i = 0; i < sm_FreeBufferQuantity; ++i)
+	for (SizeType i = 0; i < FreeBufferQuantity; ++i)
 	{
 		buf = m_pFreeBuffer[i].Exchange(buf, MemoryOrder::AcquireRelease);
 		if (buf == nullptr)

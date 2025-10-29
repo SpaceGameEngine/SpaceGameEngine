@@ -40,8 +40,8 @@ namespace SpaceGameEngine
 			template<typename _V, typename _Hasher, typename _EqualComparer, IsAllocator _Allocator>
 			friend class HashTable;
 
-			inline static constexpr const double sm_DefaultLoadFactor = 1.0;
-			inline static constexpr const SizeType sm_DefaultBucketQuantity = 16;
+			inline static constexpr const double DefaultLoadFactor = 1.0;
+			inline static constexpr const SizeType DefaultBucketQuantity = 16;
 
 		private:
 			class Bucket
@@ -385,12 +385,12 @@ namespace SpaceGameEngine
 				Node* m_pHead;
 			};
 
-			inline static constexpr const SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(typename Bucket::Node);
-			inline static constexpr const SizeType sm_MaxBucketQuantity = SGE_MAX_MEMORY_SIZE / sizeof(Bucket);
+			inline static constexpr const SizeType MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(typename Bucket::Node);
+			inline static constexpr const SizeType MaxBucketQuantity = SGE_MAX_MEMORY_SIZE / sizeof(Bucket);
 
 			struct ZeroLoadFactorError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The load factor can not be zero.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The load factor can not be zero.");
 
 				inline static bool Judge(double load_factor)
 				{
@@ -403,7 +403,7 @@ namespace SpaceGameEngine
 
 		public:
 			inline HashTable()
-				: m_LoadFactor(sm_DefaultLoadFactor), m_BucketQuantity(sm_DefaultBucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(0)
+				: m_LoadFactor(DefaultLoadFactor), m_BucketQuantity(DefaultBucketQuantity), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(0)
 			{
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
 					new (m_pContent + i) Bucket();
@@ -430,8 +430,8 @@ namespace SpaceGameEngine
 					Allocator::RawDelete(m_pContent);
 				}
 
-				m_LoadFactor = sm_DefaultLoadFactor;
-				m_BucketQuantity = sm_DefaultBucketQuantity;
+				m_LoadFactor = DefaultLoadFactor;
+				m_BucketQuantity = DefaultBucketQuantity;
 				m_pContent = (Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket));
 				m_Size = 0;
 
@@ -448,7 +448,7 @@ namespace SpaceGameEngine
 
 			template<typename V2>
 			inline HashTable(std::initializer_list<V2> ilist)
-				: m_LoadFactor(sm_DefaultLoadFactor), m_BucketQuantity(GetCorrectBucketQuantity(m_LoadFactor, ilist.size())), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(ilist.size())
+				: m_LoadFactor(DefaultLoadFactor), m_BucketQuantity(GetCorrectBucketQuantity(m_LoadFactor, ilist.size())), m_pContent((Bucket*)Allocator::RawNew(m_BucketQuantity * sizeof(Bucket), alignof(Bucket))), m_Size(ilist.size())
 			{
 				for (SizeType i = 0; i < m_BucketQuantity; ++i)
 					new (m_pContent + i) Bucket();
@@ -563,7 +563,7 @@ namespace SpaceGameEngine
 
 			struct ExternalIteratorError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this HashTable.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator does not belong to this HashTable.");
 
 				template<typename IteratorType, typename = std::enable_if_t<IsHashTableIterator<IteratorType>::Value, void>>
 				inline static bool Judge(const IteratorType& iter, const HashTable& ht)
@@ -595,7 +595,7 @@ namespace SpaceGameEngine
 			inline static SizeType GetCorrectBucketQuantity(double load_factor, SizeType size)
 			{
 				SGE_ASSERT(ZeroLoadFactorError, load_factor);
-				SGE_ASSERT(InvalidValueError, size, 0, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, size, 0, MaxSize);
 				SizeType buf = (SizeType)std::round((double)size / load_factor);
 				if (buf <= 1)
 					return 1;
@@ -783,7 +783,7 @@ namespace SpaceGameEngine
 
 			inline void Rehash(SizeType new_bucket_quantity)
 			{
-				SGE_ASSERT(InvalidValueError, new_bucket_quantity, 1, sm_MaxBucketQuantity);
+				SGE_ASSERT(InvalidValueError, new_bucket_quantity, 1, MaxBucketQuantity);
 
 				Bucket* pbuf = (Bucket*)Allocator::RawNew(new_bucket_quantity * sizeof(Bucket), alignof(Bucket));
 				for (SizeType i = 0; i < new_bucket_quantity; ++i)
@@ -893,7 +893,7 @@ namespace SpaceGameEngine
 
 				struct OutOfRangeError
 				{
-					inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+					inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 					inline static bool Judge(const IteratorImpl& iter)
 					{
 						return iter.m_pBucket == iter.m_pBucketEnd || iter.m_pNode == nullptr;

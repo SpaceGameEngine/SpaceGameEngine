@@ -33,7 +33,7 @@ namespace SpaceGameEngine
 
 	struct UnknownLineBreakError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The LineBreak is unknown.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The LineBreak is unknown.");
 		static COMMON_API bool Judge(LineBreak lb);
 	};
 

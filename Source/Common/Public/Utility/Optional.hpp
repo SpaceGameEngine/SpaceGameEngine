@@ -187,7 +187,7 @@ namespace SpaceGameEngine
 
 	private:
 		bool m_HasValue;
-		Byte m_Value[sizeof(T)];
+		alignas(T) Byte m_Value[sizeof(T)];
 	};
 
 	template<typename T>
@@ -244,7 +244,7 @@ namespace SpaceGameEngine
 
 	struct OptionalIsEmptyError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Optional is empty");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("Optional is empty");
 		template<typename T>
 		inline static bool Judge(const Optional<T>& optional)
 		{
@@ -254,7 +254,7 @@ namespace SpaceGameEngine
 
 	struct OptionalIsNotEmptyError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Optional is not empty");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("Optional is not empty");
 		template<typename T>
 		inline static bool Judge(const Optional<T>& optional)
 		{

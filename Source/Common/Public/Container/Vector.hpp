@@ -58,11 +58,11 @@ namespace SpaceGameEngine
 		using ValueType = T;
 		using AllocatorType = Allocator;
 
-		inline static const constexpr SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(T);
+		inline static const constexpr SizeType MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(T);
 
 		struct EmptyVectorError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Vector is empty");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The Vector is empty");
 			inline static bool Judge(SizeType size)
 			{
 				return size == 0;
@@ -541,7 +541,7 @@ namespace SpaceGameEngine
 
 		inline Vector(std::initializer_list<T> ilist)
 		{
-			SGE_ASSERT(InvalidValueError, ilist.size(), 0, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, ilist.size(), 0, MaxSize);
 
 			if (ilist.size())
 			{
@@ -598,7 +598,7 @@ namespace SpaceGameEngine
 
 		inline Vector(SizeType size, const T& val)
 		{
-			SGE_ASSERT(InvalidValueError, size, 0, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 0, MaxSize);
 			m_Size = size;
 			m_RealSize = size * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -612,7 +612,7 @@ namespace SpaceGameEngine
 		inline Vector(const IteratorType& begin, const IteratorType& end)
 		{
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidValueError, size, 0, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 0, MaxSize);
 			m_Size = size;
 			m_RealSize = size * 2;
 			m_pContent = Allocator::RawNew(m_RealSize * sizeof(T), alignof(T));
@@ -634,7 +634,7 @@ namespace SpaceGameEngine
 		*/
 		inline void SetRealSize(SizeType size)
 		{
-			SGE_ASSERT(InvalidValueError, size, m_Size, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, m_Size, MaxSize);
 			if (m_RealSize == size)
 				return;
 			else
@@ -1106,7 +1106,7 @@ namespace SpaceGameEngine
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
-				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == m_Size)
 				{
@@ -1161,7 +1161,7 @@ namespace SpaceGameEngine
 			else	// reverse
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
-				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == 0)
 				{
@@ -1231,7 +1231,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent), reinterpret_cast<T*>(m_pContent) + m_Size);
 				SizeType size = end - begin;
-				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == m_Size)
 				{
@@ -1289,7 +1289,7 @@ namespace SpaceGameEngine
 			{
 				SGE_ASSERT(typename IteratorType::OutOfRangeError, iter, reinterpret_cast<T*>(m_pContent) - 1, reinterpret_cast<T*>(m_pContent) + m_Size - 1);
 				SizeType size = end - begin;
-				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, sm_MaxSize);
+				SGE_ASSERT(InvalidValueError, m_Size + size, m_Size + 1, MaxSize);
 				SizeType index = iter - IteratorType::GetBegin(*this);
 				if (index == 0)
 				{
@@ -1363,7 +1363,7 @@ namespace SpaceGameEngine
 		inline IteratorType Insert(const IteratorType& iter, std::initializer_list<T> ilist)
 		{
 			SizeType size = ilist.size();
-			SGE_ASSERT(InvalidValueError, m_Size + size, m_Size, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, m_Size + size, m_Size, MaxSize);
 
 			if constexpr (std::is_same_v<IteratorType, Iterator> || std::is_same_v<IteratorType, ConstIterator>)
 			{
@@ -1867,7 +1867,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const IteratorImpl& iter, _T* begin, _T* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
@@ -2026,7 +2026,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const ReverseIteratorImpl& iter, _T* begin, _T* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);

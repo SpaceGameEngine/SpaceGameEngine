@@ -45,7 +45,7 @@ namespace SpaceGameEngine
 	template<typename T, typename... Args>
 	concept IsError = requires(Args... args) {
 		{
-			T::sm_pContent
+			T::pContent
 		}
 		-> std::convertible_to<const ErrorMessageChar*>;
 		{
@@ -56,7 +56,7 @@ namespace SpaceGameEngine
 
 	struct NullPointerError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Pointer can not be null");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("Pointer can not be null");
 		template<typename T>
 		inline static bool Judge(const T ptr)
 		{
@@ -66,7 +66,7 @@ namespace SpaceGameEngine
 
 	struct InvalidValueError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The value is invalid");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The value is invalid");
 		template<typename T1, typename T2, typename T3>
 		inline static bool Judge(T1&& val, T2&& min_val, T3&& max_val)
 		{
@@ -76,7 +76,7 @@ namespace SpaceGameEngine
 
 	struct SelfAssignmentError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("a self assignment has occured");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("a self assignment has occured");
 		template<typename T>
 		inline static bool Judge(const T* pthis, const T* ptr)
 		{
@@ -103,7 +103,7 @@ namespace SpaceGameEngine
 		{
 #ifdef SGE_DEBUG
 			if (m_IsDefault && m_Result)
-				ThrowError(ErrorType::sm_pContent, m_DebugInformation);
+				ThrowError(ErrorType::pContent, m_DebugInformation);
 #endif
 		}
 
@@ -149,7 +149,7 @@ namespace SpaceGameEngine
 		inline ~Check()
 		{
 			if (m_IsDefault && m_Result)
-				ThrowError(ErrorType::sm_pContent, m_DebugInformation);
+				ThrowError(ErrorType::pContent, m_DebugInformation);
 		}
 
 		template<typename Func, typename... Args>

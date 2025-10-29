@@ -93,7 +93,7 @@ TEST(HashMap, InstanceTest)
 {
 	HashMap<int, int> hm1;
 	ASSERT_EQ(hm1.GetSize(), 0);
-	ASSERT_EQ(hm1.GetBucketQuantity(), hm1.sm_DefaultBucketQuantity);
+	ASSERT_EQ(hm1.GetBucketQuantity(), hm1.DefaultBucketQuantity);
 }
 
 TEST(HashMap, ListConstructionTest)
@@ -174,7 +174,7 @@ TEST(HashMap, ClearTest)
 TEST(HashMap, GetLoadFactorTest)
 {
 	HashMap<int, int> hm1;
-	ASSERT_EQ(hm1.GetLoadFactor(), hm1.sm_DefaultLoadFactor);
+	ASSERT_EQ(hm1.GetLoadFactor(), hm1.DefaultLoadFactor);
 }
 
 TEST(HashMap, SetLoadFactorTest)
@@ -297,18 +297,18 @@ TEST(HashMap, GetSizeTest)
 
 TEST(HashMap, GetBucketQuantityTest)
 {
-	ASSERT_EQ((SpaceGameEngine::HashMap<int, int>::sm_DefaultLoadFactor), 1.0f);
-	ASSERT_EQ((SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity), 16);
+	ASSERT_EQ((SpaceGameEngine::HashMap<int, int>::DefaultLoadFactor), 1.0f);
+	ASSERT_EQ((SpaceGameEngine::HashMap<int, int>::DefaultBucketQuantity), 16);
 
 	HashMap<int, int> hm1;
-	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::DefaultBucketQuantity));
 	hm1.Insert(1, 1);
-	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::DefaultBucketQuantity));
 	hm1.Insert(1, 2);
-	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::DefaultBucketQuantity));
 	hm1.Insert(2, 2);
 	hm1.Insert(3, 3);
-	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::sm_DefaultBucketQuantity));
+	ASSERT_EQ(hm1.GetBucketQuantity(), (SpaceGameEngine::HashMap<int, int>::DefaultBucketQuantity));
 
 	const HashMap<int, int> chm1({Pair<const int, int>(1, 1),
 								  Pair<const int, int>(2, 2),

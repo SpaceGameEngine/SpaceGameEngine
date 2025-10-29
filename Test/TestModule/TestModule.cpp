@@ -31,24 +31,24 @@ SpaceGameEngine::MemoryManager* GetMemoryManagerAddress()
 class TestModuleModule : public Module
 {
 public:
-	static int sm_load_count;
+	static int load_count;
 
 	virtual void OnLoad() override
 	{
-		sm_load_count += 1;
+		load_count += 1;
 	}
 
 	virtual void OnUnload() override
 	{
-		sm_load_count -= 1;
+		load_count -= 1;
 	}
 };
 
-int TestModuleModule::sm_load_count = 0;
+int TestModuleModule::load_count = 0;
 
 SGE_MODULE(TestModule);
 
 int GetTestModuleLoadCount()
 {
-	return TestModuleModule::sm_load_count;
+	return TestModuleModule::load_count;
 }

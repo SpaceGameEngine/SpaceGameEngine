@@ -33,7 +33,7 @@ namespace SpaceGameEngine
 	class LockFreeSCSPFixedSizeByteRingBuffer
 	{
 	public:
-		inline static constexpr const SizeType sm_BufferSize = BufferSize;
+		inline static constexpr const SizeType BufferSize = BufferSize;
 		using AllocatorType = Allocator;
 
 		template<SizeType _BufferSize, IsAllocator _Allocator>

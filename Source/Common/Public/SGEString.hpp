@@ -478,25 +478,25 @@ namespace SpaceGameEngine
 		template<typename T, typename Trait = CharTrait<T>>
 		struct InvalidMultipleByteCharHeadError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The multiple byte char's head is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The multiple byte char's head is invalid.");
 		};
 
 		template<typename T, typename Trait = CharTrait<T>>
 		struct InvalidMultipleByteCharError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The multiple byte char is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The multiple byte char is invalid.");
 		};
 
 		template<typename T, typename Trait = CharTrait<T>>
 		struct InvalidMultipleByteStringError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The multiple byte string is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The multiple byte string is invalid.");
 		};
 
 		template<>
 		struct InvalidMultipleByteCharHeadError<Char8, UTF8Trait>
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UTF8 char's head is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UTF8 char's head is invalid.");
 			inline static bool Judge(const Char8* pc)
 			{
 				if (!pc)
@@ -510,7 +510,7 @@ namespace SpaceGameEngine
 		template<>
 		struct InvalidMultipleByteCharError<Char8, UTF8Trait>
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UTF8 char is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UTF8 char is invalid.");
 			inline static Pair<bool, const Char8*> JudgeCharContent(const Char8* pc)
 			{
 				if (static_cast<const UInt8>(*pc) > 0b11110111)
@@ -547,7 +547,7 @@ namespace SpaceGameEngine
 		template<>
 		struct InvalidMultipleByteStringError<Char8, UTF8Trait>
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UTF8 string is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UTF8 string is invalid.");
 			inline static bool Judge(const Char8* pstr)
 			{
 				if (!pstr)
@@ -669,7 +669,7 @@ namespace SpaceGameEngine
 
 		struct InvalidUTF8CharForUCS2CharError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UTF8 char is invalid for UCS2 char.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UTF8 char is invalid for UCS2 char.");
 			inline static Pair<bool, const Char8*> JudgeCharContent(const Char8* pc)
 			{
 				if (static_cast<const UInt8>(*pc) > 0b11110111)
@@ -703,7 +703,7 @@ namespace SpaceGameEngine
 
 		struct InvalidUTF8StringForUCS2StringError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UTF8 string is invalid for UCS2 string.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UTF8 string is invalid for UCS2 string.");
 			inline static bool Judge(const Char8* pc)
 			{
 				if (!pc)
@@ -801,7 +801,7 @@ namespace SpaceGameEngine
 		template<typename T, typename Trait = CharTrait<T>>
 		struct InvalidCharError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The char is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The char is invalid.");
 			inline static bool Judge(T c)
 			{
 				return false;
@@ -811,7 +811,7 @@ namespace SpaceGameEngine
 		template<>
 		struct InvalidCharError<Char16, UCS2Trait>
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UCS2 char is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UCS2 char is invalid.");
 			inline static bool Judge(Char16 c)
 			{
 				return false;
@@ -821,7 +821,7 @@ namespace SpaceGameEngine
 		template<>
 		struct InvalidCharError<Char8, UTF8Trait>
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UTF8 char is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UTF8 char is invalid.");
 			inline static bool Judge(const Char8* pc)
 			{
 				return InvalidMultipleByteCharError<Char8, UTF8Trait>::Judge(pc);
@@ -831,7 +831,7 @@ namespace SpaceGameEngine
 		template<typename T, typename Trait = CharTrait<T>>
 		struct InvalidStringError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The string is invalid.");
 			inline static bool Judge(const T* pstr)
 			{
 				return pstr == nullptr;
@@ -841,7 +841,7 @@ namespace SpaceGameEngine
 		template<>
 		struct InvalidStringError<Char16, UCS2Trait>
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UCS2 string is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UCS2 string is invalid.");
 			inline static bool Judge(const Char16* pstr)
 			{
 				return pstr == nullptr;
@@ -851,7 +851,7 @@ namespace SpaceGameEngine
 		template<>
 		struct InvalidStringError<Char8, UTF8Trait>
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The UTF8 string is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The UTF8 string is invalid.");
 			inline static bool Judge(const Char8* pstr)
 			{
 				return InvalidMultipleByteStringError<Char8, UTF8Trait>::Judge(pstr);
@@ -1251,7 +1251,7 @@ namespace SpaceGameEngine
 		using ValueTrait = Trait;
 		using AllocatorType = Allocator;
 
-		inline static const constexpr SizeType sm_MaxSize = (SGE_MAX_MEMORY_SIZE / sizeof(T)) - 1;
+		inline static const constexpr SizeType MaxSize = (SGE_MAX_MEMORY_SIZE / sizeof(T)) - 1;
 
 		static_assert(std::is_same_v<T, typename Trait::ValueType>, "invalid trait : the value type is different");
 
@@ -1266,7 +1266,7 @@ namespace SpaceGameEngine
 
 		struct EmptyStringCoreError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The StringCore is empty");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The StringCore is empty");
 			inline static bool Judge(SizeType size)
 			{
 				return size == 0;
@@ -1594,7 +1594,7 @@ namespace SpaceGameEngine
 		*/
 		inline void SetRealSize(const SizeType size)
 		{
-			SGE_ASSERT(InvalidValueError, size, GetNormalSize(), sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, GetNormalSize(), MaxSize);
 			m_Storage.SetRealSize(size + 1);
 		}
 
@@ -1610,7 +1610,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const IteratorImpl& iter, const std::remove_const_t<_T>* begin, const std::remove_const_t<_T>* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
@@ -1853,7 +1853,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const ReverseIteratorImpl& iter, const std::remove_const_t<_T>* begin, const std::remove_const_t<_T>* end)
 				{
 					SGE_ASSERT(NullPointerError, begin);
@@ -2187,7 +2187,7 @@ namespace SpaceGameEngine
 
 		struct InvalidCharAppendError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The char appending is invalid.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The char appending is invalid.");
 			inline static bool Judge(const T c)
 			{
 				if constexpr (!Trait::IsMultipleByte)
@@ -3667,7 +3667,7 @@ namespace SpaceGameEngine
 
 	struct InvalidNumberBaseError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The number base is invalid.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The number base is invalid.");
 		inline static bool Judge(NumberBase base)
 		{
 			return base != NumberBase::Decimal && base != NumberBase::Binary && base != NumberBase::Hex;
@@ -4599,7 +4599,7 @@ namespace SpaceGameEngine
 
 	struct NonSignedNumericalStringError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not numerical string.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The string is not numerical string.");
 		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
@@ -4611,7 +4611,7 @@ namespace SpaceGameEngine
 
 	struct NonUnsignedNumericalStringError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not unsigned numerical string.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The string is not unsigned numerical string.");
 		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
@@ -4623,7 +4623,7 @@ namespace SpaceGameEngine
 
 	struct NonDecimalStringError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not decimal string.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The string is not decimal string.");
 		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{
@@ -4635,7 +4635,7 @@ namespace SpaceGameEngine
 
 	struct NonCharStringError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The string is not char string.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The string is not char string.");
 		template<typename T, typename Trait, IsAllocator Allocator>
 		inline static bool Judge(const StringCore<T, Trait, Allocator>& str)
 		{

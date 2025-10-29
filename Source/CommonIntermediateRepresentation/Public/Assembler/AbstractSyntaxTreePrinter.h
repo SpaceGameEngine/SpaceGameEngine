@@ -27,7 +27,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 {
 	struct InvalidAbstractSyntaxTreePrinterIndentationForEndPrintChildrenError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The AbstractSyntaxTreePrinter's indentation is invalid for EndPrintChildren().");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The AbstractSyntaxTreePrinter's indentation is invalid for EndPrintChildren().");
 		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(SizeType indention);
 	};
 

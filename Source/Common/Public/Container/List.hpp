@@ -36,7 +36,7 @@ namespace SpaceGameEngine
 
 		struct EmptyListError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The List is empty");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The List is empty");
 			inline static bool Judge(SizeType size)
 			{
 				return size == 0;
@@ -73,7 +73,7 @@ namespace SpaceGameEngine
 		class ReverseIteratorImpl;
 
 	public:
-		inline static const constexpr SizeType sm_MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(Node);
+		inline static const constexpr SizeType MaxSize = SGE_MAX_MEMORY_SIZE / sizeof(Node);
 
 	public:
 		inline List()
@@ -83,7 +83,7 @@ namespace SpaceGameEngine
 
 		inline List(SizeType size, const T& val)
 		{
-			SGE_ASSERT(InvalidValueError, size, 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 1, MaxSize);
 
 			m_pHead = Allocator::template New<Node>(val);
 			m_pTail = m_pHead;
@@ -102,7 +102,7 @@ namespace SpaceGameEngine
 		inline List(const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidValueError, size, 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 1, MaxSize);
 
 			auto aiter = begin;
 			m_pHead = Allocator::template New<Node>(*aiter);
@@ -123,7 +123,7 @@ namespace SpaceGameEngine
 		inline List(std::initializer_list<T> ilist)
 			: m_pHead(nullptr), m_pTail(nullptr), m_Size(0)
 		{
-			SGE_ASSERT(InvalidValueError, ilist.size(), 0, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, ilist.size(), 0, MaxSize);
 
 			if (ilist.size())
 			{
@@ -361,7 +361,7 @@ namespace SpaceGameEngine
 
 		struct ExternalIteratorError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this List.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator does not belong to this List.");
 
 			template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, void>>
 			inline static bool Judge(const IteratorType& iter, const List& l)
@@ -625,7 +625,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, SizeType size, const T& val)
 		{
-			SGE_ASSERT(InvalidValueError, size, 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 1, MaxSize);
 
 			Node* pnhead = Allocator::template New<Node>(val);
 			Node* pntail = pnhead;
@@ -674,7 +674,7 @@ namespace SpaceGameEngine
 		inline IteratorType Insert(const IteratorType& iter, const AnotherIteratorType& begin, const AnotherIteratorType& end)
 		{
 			SizeType size = end - begin;
-			SGE_ASSERT(InvalidValueError, size, 1, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, size, 1, MaxSize);
 
 			auto aiter = begin;
 			Node* pnhead = Allocator::template New<Node>(*aiter);
@@ -738,7 +738,7 @@ namespace SpaceGameEngine
 		template<typename IteratorType, typename = std::enable_if_t<IsListIterator<IteratorType>::Value, bool>>
 		inline IteratorType Insert(const IteratorType& iter, std::initializer_list<T> ilist)
 		{
-			SGE_ASSERT(InvalidValueError, ilist.size(), 0, sm_MaxSize);
+			SGE_ASSERT(InvalidValueError, ilist.size(), 0, MaxSize);
 
 			if (ilist.size())
 			{
@@ -1144,7 +1144,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const IteratorImpl& iter)
 				{
 					return iter.m_pNode == nullptr;
@@ -1342,7 +1342,7 @@ namespace SpaceGameEngine
 		public:
 			struct OutOfRangeError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 				inline static bool Judge(const ReverseIteratorImpl& iter)
 				{
 					return iter.m_pNode == nullptr;

@@ -43,9 +43,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 	protected:
 		void SetFather(AbstractSyntaxTreeNode& father);
 		/*!
-		@brief Relink the children nodes' father pointer to this node. This function should be called when the nodes which have children had been moved.
+		@brief Link the children nodes' father pointer to this node. This function should be called when the nodes which have children just been constructed or been moved.
 		*/
-		virtual void Relink();
+		virtual void Link();
 
 	private:
 		SizeType m_Line = 0;
@@ -97,7 +97,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 			const Optional<SymbolNode>& GetTypeSymbolNode() const;
 
 		protected:
-			virtual void Relink() override;
+			virtual void Link() override;
 
 		private:
 			String m_Name;
@@ -117,7 +117,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 			const SymbolNode& GetTypeSymbolNode() const;
 
 		protected:
-			virtual void Relink() override;
+			virtual void Link() override;
 
 		private:
 			String m_Name;
@@ -133,9 +133,32 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 
 			const Vector<ParameterDefinitionNode>& GetParameterDefinitions() const;
 
+		protected:
+			virtual void Link() override;
+
 		private:
 			Vector<ParameterDefinitionNode> m_ParameterDefinitions;
 		};
+
+		/*class AttributeValueNode;
+
+		class COMMON_INTERMEDIATE_REPRESENTATION_API AttributeDefinitionNode : public AbstractSyntaxTreeNode
+		{
+		public:
+			AttributeDefinitionNode(const String& name, AttributeValueNode&& value, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather = nullptr);
+
+			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
+
+			const String& GetName() const;
+			const AttributeValueNode& GetValue() const;
+
+		protected:
+			virtual void Link() override;
+
+		private:
+			String m_Name;
+			AttributeValueNode m_Value;
+		};*/
 	}
 
 	class COMMON_INTERMEDIATE_REPRESENTATION_API AbstractSyntaxTreeNodeVisitor

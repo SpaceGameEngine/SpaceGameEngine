@@ -22,7 +22,7 @@
 &emsp;&emsp;`Error`不是某个具体类，而是一个概念，代表着一系列类。一个`Error`类应有以下内容:
 ```c++
 public:
-	static const ErrorMessageChar sm_pContent[] = SGE_ESTR("错误消息内容");//错误消息内容
+	static const ErrorMessageChar pContent[] = SGE_ESTR("错误消息内容");//错误消息内容
 
 	static bool Judge();//通过检验其参数来判断是否出错，参数随意，返回true表示有错误发生，返回false表示无错误发生
 ```
@@ -39,7 +39,7 @@ public:
 ```c++
 struct NullPointerError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Pointer can not be null");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("Pointer can not be null");
 		template<typename T>
 		inline static bool Judge(const T ptr)
 		{
@@ -49,7 +49,7 @@ struct NullPointerError
 
 	struct InvalidValueError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The value is invalid");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The value is invalid");
 		template<typename T1, typename T2, typename T3>
 		inline static bool Judge(T1&& val, T2&& min_val, T3&& max_val)
 		{

@@ -30,11 +30,11 @@ namespace SpaceGameEngine
 	class FixedSizeBuffer
 	{
 	public:
-		inline static constexpr const SizeType sm_MaxSize = MaxSize;
+		inline static constexpr const SizeType MaxSize = MaxSize;
 
 		struct BufferOverflowError
 		{
-			inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The buffer is overflow.");
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("The buffer is overflow.");
 			inline static bool Judge(SizeType size)
 			{
 				return size > MaxSize;

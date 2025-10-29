@@ -75,7 +75,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 	m_pFather = &father;
 }
 
-void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNode::Relink()
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNode::Link()
 {
 	// Base class has no children, do nothing.
 }
@@ -88,8 +88,7 @@ const String& SpaceGameEngine::CommonIntermediateRepresentation::Assembler::Abst
 SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::VariableDefinitionNode::VariableDefinitionNode(const String& name, Optional<SymbolNode>&& type_symbol, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather)
 	: m_Name(name), m_TypeSymbol(std::move(type_symbol)), AbstractSyntaxTreeNode(line, column, pfather)
 {
-	if (m_TypeSymbol.HasValue())
-		m_TypeSymbol.Get().SetFather(*this);
+	Link();
 }
 
 void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::VariableDefinitionNode::Accept(AbstractSyntaxTreeNodeVisitor& visitor) const
@@ -107,7 +106,7 @@ const Optional<SymbolNode>& SpaceGameEngine::CommonIntermediateRepresentation::A
 	return m_TypeSymbol;
 }
 
-void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::VariableDefinitionNode::Relink()
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::VariableDefinitionNode::Link()
 {
 	if (m_TypeSymbol.HasValue())
 		m_TypeSymbol.Get().SetFather(*this);
@@ -116,7 +115,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::ParameterDefinitionNode::ParameterDefinitionNode(const String& name, SymbolNode&& type_symbol, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather)
 	: m_Name(name), m_TypeSymbol(std::move(type_symbol)), AbstractSyntaxTreeNode(line, column, pfather)
 {
-	m_TypeSymbol.SetFather(*this);
+	Link();
 }
 
 void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::ParameterDefinitionNode::Accept(AbstractSyntaxTreeNodeVisitor& visitor) const
@@ -134,7 +133,7 @@ const SymbolNode& SpaceGameEngine::CommonIntermediateRepresentation::Assembler::
 	return m_TypeSymbol;
 }
 
-void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::ParameterDefinitionNode::Relink()
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::ParameterDefinitionNode::Link()
 {
 	m_TypeSymbol.SetFather(*this);
 }
@@ -142,11 +141,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::ParameterDefinitionsNode::ParameterDefinitionsNode(Vector<ParameterDefinitionNode>&& parameter_definitions, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather)
 	: m_ParameterDefinitions(std::move(parameter_definitions)), AbstractSyntaxTreeNode(line, column, pfather)
 {
-	for (auto iter = m_ParameterDefinitions.GetBegin(); iter != m_ParameterDefinitions.GetEnd(); ++iter)
-	{
-		iter->SetFather(*this);
-		iter->Relink();
-	}
+	Link();
 }
 
 void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::ParameterDefinitionsNode::Accept(AbstractSyntaxTreeNodeVisitor& visitor) const
@@ -157,4 +152,13 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 const Vector<ParameterDefinitionNode>& SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::ParameterDefinitionsNode::GetParameterDefinitions() const
 {
 	return m_ParameterDefinitions;
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreeNodes::ParameterDefinitionsNode::Link()
+{
+	for (auto iter = m_ParameterDefinitions.GetBegin(); iter != m_ParameterDefinitions.GetEnd(); ++iter)
+	{
+		iter->SetFather(*this);
+		iter->Link();
+	}
 }

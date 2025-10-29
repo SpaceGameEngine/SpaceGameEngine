@@ -128,7 +128,7 @@ void SpaceGameEngine::Detail::LogWriterBuffer::Push(const Char8* pstr, SizeType 
 
 bool SpaceGameEngine::Detail::LogWriterBuffer::Pop()
 {
-	return m_Content.Pop(sm_BufferSize, [this](void* ptr, SizeType size) {
+	return m_Content.Pop(BufferSize, [this](void* ptr, SizeType size) {
 		m_LogWriterCore.WriteLog((Char8*)ptr, size);
 	});
 }

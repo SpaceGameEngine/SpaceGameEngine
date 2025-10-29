@@ -68,7 +68,7 @@ namespace SpaceGameEngine
 
 			struct NilNodeError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The node can not be nil node.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The node can not be nil node.");
 				inline static bool Judge(const Node* pn, const Node* pnil)
 				{
 					return pn == pnil;
@@ -234,7 +234,7 @@ namespace SpaceGameEngine
 
 			struct ExternalIteratorError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator does not belong to this RedBlackTree.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator does not belong to this RedBlackTree.");
 
 				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value, void>>
 				inline static bool Judge(const IteratorType& iter, const RedBlackTree& m)
@@ -245,7 +245,7 @@ namespace SpaceGameEngine
 
 			struct KeyNotFoundError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The key can not be found in this RedBlackTree.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The key can not be found in this RedBlackTree.");
 
 				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value, void>>
 				inline static bool Judge(const IteratorType& iter, const IteratorType& end)
@@ -256,7 +256,7 @@ namespace SpaceGameEngine
 
 			struct NilNodeIteratorError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator which pointing to the nil node is invalid.");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator which pointing to the nil node is invalid.");
 
 				template<typename IteratorType, typename = std::enable_if_t<IsRedBlackTreeIterator<IteratorType>::Value, void>>
 				inline static bool Judge(const IteratorType& iter, const IteratorType& end)
@@ -551,7 +551,7 @@ namespace SpaceGameEngine
 
 				struct OutOfRangeError
 				{
-					inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+					inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 					inline static bool Judge(const IteratorImpl& iter)
 					{
 						return iter.m_pContent == &(iter.m_pTree->m_NilNode);
@@ -760,7 +760,7 @@ namespace SpaceGameEngine
 
 				struct OutOfRangeError
 				{
-					inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The iterator is out of range.");
+					inline static const ErrorMessageChar pContent[] = SGE_ESTR("The iterator is out of range.");
 					inline static bool Judge(const ReverseIteratorImpl& iter)
 					{
 						return iter.m_pContent == &(iter.m_pTree->m_NilNode);

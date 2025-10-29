@@ -261,6 +261,9 @@
     <ClInclude Include="Public\Container\Concurrent\LockFreeSCSPFixedSizeByteRingBuffer.hpp">
       <Filter>Public\Container\Concurrent</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\Variant.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

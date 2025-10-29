@@ -36,7 +36,7 @@ namespace SpaceGameEngine
 		{
 			struct GetTimeOfDayFailedError
 			{
-				inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("Can not get the time of day");
+				inline static const ErrorMessageChar pContent[] = SGE_ESTR("Can not get the time of day");
 				static COMMON_API bool Judge(int re_code);
 			};
 		}

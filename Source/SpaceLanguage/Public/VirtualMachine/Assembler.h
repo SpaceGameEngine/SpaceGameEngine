@@ -41,7 +41,7 @@ namespace SpaceGameEngine::SpaceLanguage
 
 	struct InvalidInstructionNameError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The instruction name is invalid.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The instruction name is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const String& str);
 	};
 
@@ -62,7 +62,7 @@ namespace SpaceGameEngine::SpaceLanguage
 
 	struct InvalidRegisterNameError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The register name is invalid.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The register name is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const String& str);
 	};
 
@@ -71,13 +71,13 @@ namespace SpaceGameEngine::SpaceLanguage
 	*/
 	struct InvalidAssemblerSourceStringError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The Assembler source string is invalid.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The Assembler source string is invalid.");
 		static SPACE_LANGUAGE_API bool Judge(const String& str, const String& error_info_formatter, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions);
 	};
 
 	struct AssemblerExternalCallerModuleAlreadyExistError
 	{
-		inline static const ErrorMessageChar sm_pContent[] = SGE_ESTR("The ExternalCallerModule in Assembler has already existed.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The ExternalCallerModule in Assembler has already existed.");
 		static SPACE_LANGUAGE_API bool Judge(const String& module_name, const HashMap<String, Pair<UInt32, HashMap<String, UInt32>>>& module_functions);
 	};
 
