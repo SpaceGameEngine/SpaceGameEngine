@@ -143,7 +143,7 @@ namespace SpaceGameEngine
 
 		template<typename T, SizeType Index>
 		inline static constexpr const bool IsVistorForIndex = requires(T t) {
-			t.Visit<Index>(std::declval<typename Types::template Get<Index>>());
+			t.template Visit<Index>(std::declval<typename Types::template Get<Index>>());
 		};
 
 		template<typename T, typename IndexSequence>
