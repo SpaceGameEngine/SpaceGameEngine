@@ -9,7 +9,6 @@
     <ClInclude Include="TestFunction.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
     <ClInclude Include="TestError.hpp" />
-    <ClInclude Include="TestMeta.hpp" />
     <ClInclude Include="TestModule.hpp" />
     <ClInclude Include="TestFormat.hpp" />
     <ClInclude Include="TestFile.hpp" />
@@ -119,6 +118,18 @@
     <ClInclude Include="Container\Concurrent\TestLockFreeSCSPFixedSizeByteRingBuffer.hpp">
       <Filter>Container\Concurrent</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\TestVariant.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Meta\TestTypeList.hpp">
+      <Filter>Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="Meta\TestTrait.hpp">
+      <Filter>Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="Meta\TestConcept.hpp">
+      <Filter>Meta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">
@@ -147,6 +158,9 @@
     </Filter>
     <Filter Include="Container\Concurrent">
       <UniqueIdentifier>{10c91346-2e3c-4987-8bd8-c39d952da690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Meta">
+      <UniqueIdentifier>{6ce4b05f-a3b9-47b0-ae01-9a2e7e4efbb0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

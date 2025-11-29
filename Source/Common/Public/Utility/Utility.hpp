@@ -43,13 +43,13 @@ namespace SpaceGameEngine
 	};
 
 	template<typename T>
-	inline T Min(const T& a, const T& b)
+	inline constexpr T Min(const T& a, const T& b)
 	{
 		return (a < b ? a : b);
 	}
 
 	template<typename T>
-	inline T Max(const T& a, const T& b)
+	inline constexpr T Max(const T& a, const T& b)
 	{
 		return (a > b ? a : b);
 	}
@@ -111,6 +111,9 @@ namespace SpaceGameEngine
 		}
 	}
 
+	struct COMMON_API EmptyType
+	{
+	};
 }
 
 /*!

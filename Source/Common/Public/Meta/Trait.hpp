@@ -23,7 +23,6 @@ limitations under the License.
 
 namespace SpaceGameEngine
 {
-
 	template<typename T>
 	struct RemoveCVRef
 	{
@@ -41,6 +40,33 @@ namespace SpaceGameEngine
 
 	template<typename T>
 	inline constexpr const TypeWrapper<T> TypeWrapperValue;
+
+	template<auto V>
+	struct ValueWrapper
+	{
+		inline static constexpr const auto Value = V;
+	};
+
+	template<template<typename...> typename T, typename... Ts>
+	struct BindFirstWithType
+	{
+		template<typename... Args>
+		using Type = T<Ts..., Args...>;
+	};
+
+	template<template<auto...> typename T, auto... Vs>
+	struct BindFirstWithValue
+	{
+		template<auto... Args>
+		using Type = T<Vs..., Args...>;
+	};
+
+	template<template<typename...> typename T, template<typename> typename U>
+	struct Compose
+	{
+		template<typename... Args>
+		using Type = U<T<Args...>>;
+	};
 }
 
 /*!

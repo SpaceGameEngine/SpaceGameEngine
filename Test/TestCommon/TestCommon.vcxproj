@@ -195,6 +195,9 @@
     <ClInclude Include="Container\TestSet.hpp" />
     <ClInclude Include="Container\TestStack.hpp" />
     <ClInclude Include="Container\TestVector.hpp" />
+    <ClInclude Include="Meta\TestConcept.hpp" />
+    <ClInclude Include="Meta\TestTrait.hpp" />
+    <ClInclude Include="Meta\TestTypeList.hpp" />
     <ClInclude Include="Serializer\TestSerializer.hpp" />
     <ClInclude Include="Serializer\TestStringSerializer.hpp" />
     <ClInclude Include="Stream\TestConsoleStream.hpp" />
@@ -208,7 +211,6 @@
     <ClInclude Include="TestFormat.hpp" />
     <ClInclude Include="TestLog.hpp" />
     <ClInclude Include="TestMemoryManager.hpp" />
-    <ClInclude Include="TestMeta.hpp" />
     <ClInclude Include="TestMetaData.hpp" />
     <ClInclude Include="TestModule.hpp" />
     <ClInclude Include="TestString.hpp" />
@@ -226,6 +228,7 @@
     <ClInclude Include="Utility\TestOptional.hpp" />
     <ClInclude Include="Utility\TestPair.hpp" />
     <ClInclude Include="Utility\TestUtility.hpp" />
+    <ClInclude Include="Utility\TestVariant.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

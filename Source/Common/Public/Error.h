@@ -39,6 +39,8 @@ namespace SpaceGameEngine
 
 	COMMON_API void ThrowError(const ErrorMessageChar* error_msg, DebugInformation debug_info);
 
+#define SGE_THROW_ERROR(error_msg) SpaceGameEngine::ThrowError(error_msg, SGE_DEBUG_INFORMATION)
+
 	/*!
 	@brief Can check whether a type is a error type or not.But need to specify the Judge function's arguments' types.
 	*/
@@ -56,7 +58,7 @@ namespace SpaceGameEngine
 
 	struct NullPointerError
 	{
-		inline static const ErrorMessageChar pContent[] = SGE_ESTR("Pointer can not be null");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("Pointer can not be null.");
 		template<typename T>
 		inline static bool Judge(const T ptr)
 		{
@@ -66,7 +68,7 @@ namespace SpaceGameEngine
 
 	struct InvalidValueError
 	{
-		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The value is invalid");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The value is invalid.");
 		template<typename T1, typename T2, typename T3>
 		inline static bool Judge(T1&& val, T2&& min_val, T3&& max_val)
 		{
@@ -76,7 +78,7 @@ namespace SpaceGameEngine
 
 	struct SelfAssignmentError
 	{
-		inline static const ErrorMessageChar pContent[] = SGE_ESTR("a self assignment has occured");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("A self assignment has occured.");
 		template<typename T>
 		inline static bool Judge(const T* pthis, const T* ptr)
 		{

@@ -189,6 +189,7 @@
     <ClInclude Include="Public\MetaData\MetaObject.hpp" />
     <ClInclude Include="Public\Meta\Concept.hpp" />
     <ClInclude Include="Public\Meta\Trait.hpp" />
+    <ClInclude Include="Public\Meta\TypeList.hpp" />
     <ClInclude Include="Public\Module\Module.h" />
     <ClInclude Include="Public\Module\ModuleManager.h" />
     <ClInclude Include="Public\Platform.hpp" />

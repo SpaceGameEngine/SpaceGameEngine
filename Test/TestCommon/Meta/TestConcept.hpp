@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "gtest/gtest.h"
-#include "Meta/Trait.hpp"
 #include "Meta/Concept.hpp"
+#include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
 
@@ -68,26 +67,7 @@ struct test_trivial_destructor
 	}
 };
 
-TEST(MetaTrait, RemoveCVRefTest)
-{
-	ASSERT_TRUE((std::is_same_v<RemoveCVRefType<const int&>, int>));
-	ASSERT_TRUE((std::is_same_v<RemoveCVRefType<const int&&>, int>));
-	ASSERT_TRUE((std::is_same_v<RemoveCVRefType<int&&>, int>));
-	ASSERT_TRUE((std::is_same_v<RemoveCVRefType<const int>, int>));
-	ASSERT_TRUE((std::is_same_v<RemoveCVRefType<volatile int>, int>));
-	ASSERT_TRUE((std::is_same_v<RemoveCVRefType<volatile int&>, int>));
-}
-
-TEST(MetaTrait, TypeWrapperTest)
-{
-	ASSERT_TRUE((std::is_same_v<TypeWrapper<const int&>::Type, const int&>));
-	ASSERT_TRUE((std::is_same_v<TypeWrapper<int&>::Type, int&>));
-	ASSERT_TRUE((std::is_same_v<TypeWrapper<int>::Type, int>));
-	ASSERT_TRUE((std::is_same_v<TypeWrapper<int*>::Type, int*>));
-	ASSERT_TRUE((std::is_same_v<TypeWrapper<int&&>::Type, int&&>));
-}
-
-TEST(MetaConcept, IsWeakEqualityComparableTest)
+TEST(IsWeakEqualityComparable, Test)
 {
 	ASSERT_TRUE((IsWeakEqualityComparable<int, long>));
 	ASSERT_FALSE((IsWeakEqualityComparable<std::string, float>));
@@ -95,7 +75,7 @@ TEST(MetaConcept, IsWeakEqualityComparableTest)
 	ASSERT_TRUE((IsWeakEqualityComparable<double>));
 }
 
-TEST(MetaConcept, IsEqualityComparableTest)
+TEST(IsEqualityComparable, Test)
 {
 	ASSERT_TRUE((IsEqualityComparable<int, long>));
 	ASSERT_FALSE((IsEqualityComparable<std::string, float>));
@@ -103,7 +83,7 @@ TEST(MetaConcept, IsEqualityComparableTest)
 	ASSERT_TRUE((IsEqualityComparable<double>));
 }
 
-TEST(MetaConcept, IsTotallyOrderedTest)
+TEST(IsTotallyOrdered, Test)
 {
 	ASSERT_TRUE((IsTotallyOrdered<int, long>));
 	ASSERT_FALSE((IsTotallyOrdered<std::string, float>));
@@ -111,7 +91,7 @@ TEST(MetaConcept, IsTotallyOrderedTest)
 	ASSERT_TRUE((IsTotallyOrdered<double>));
 }
 
-TEST(MetaConcept, IsTrivialTest)
+TEST(IsTrivial, Test)
 {
 	ASSERT_TRUE(IsTrivial<int>);
 	ASSERT_TRUE(IsTrivial<test_trivial>);
