@@ -173,6 +173,11 @@ namespace SpaceGameEngine
 			inline static constexpr const bool Value = (... && std::is_same_v<VistorResultTypeForIndex<T, Indices>, VistorResultTypeForIndex<T, 0>>);
 		};
 
+	public:
+		template<typename T>
+		inline static constexpr const bool IsVistor = IsVistorForIndices<T, std::make_integer_sequence<SizeType, Types::Size>>::Value && IsVistorResultForIndicesSame<T, std::make_integer_sequence<SizeType, Types::Size>>::Value;
+
+	private:
 		template<typename VistorType>
 			requires IsVistor<VistorType>
 		using VisitResultType = VistorResultTypeForIndex<VistorType, 0>;	// all result type must be same
@@ -228,10 +233,6 @@ namespace SpaceGameEngine
 		{
 			inline static constexpr const ConstVistorFunctionType<VistorType> Value[] = {GetConstVistorFunctionMetaFunction<VistorType, Indices>::Value...};
 		};
-
-	public:
-		template<typename T>
-		inline static constexpr const bool IsVistor = IsVistorForIndices<T, std::make_integer_sequence<SizeType, Types::Size>>::Value && IsVistorResultForIndicesSame<T, std::make_integer_sequence<SizeType, Types::Size>>::Value;
 
 	public:
 		inline Variant()
