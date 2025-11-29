@@ -29,7 +29,7 @@ namespace SpaceGameEngine
 		template<typename T, typename... Ts>
 		struct MaxSizeOfTypes
 		{
-			inline static constexpr const SizeType Value = Max(sizeof(T), MaxSizeOfTypes<Ts...>::Value);
+			inline static constexpr const SizeType Value = Max<SizeType>(sizeof(T), MaxSizeOfTypes<Ts...>::Value);
 		};
 
 		template<typename T>
@@ -41,7 +41,7 @@ namespace SpaceGameEngine
 		template<typename T, typename... Ts>
 		struct MaxAlignmentOfTypes
 		{
-			inline static constexpr const SizeType Value = Max(alignof(T), MaxAlignmentOfTypes<Ts...>::Value);
+			inline static constexpr const SizeType Value = Max<SizeType>(alignof(T), MaxAlignmentOfTypes<Ts...>::Value);
 		};
 
 		template<typename T>
