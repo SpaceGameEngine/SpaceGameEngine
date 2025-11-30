@@ -27,30 +27,30 @@ jobs:
       msbuildArch: 'x64'
       msbuildConfig: 'Release'
 
-  - template: windows-template.yml
-    parameters:
-      name: 'VS2026_x86_Debug'
-      vmImage: 'windows-2026'
-      msbuildArch: 'x86'
-      msbuildConfig: 'Debug'
+  # - template: windows-template.yml
+  #   parameters:
+  #     name: 'VS2026_x86_Debug'
+  #     vmImage: 'windows-2026'
+  #     msbuildArch: 'x86'
+  #     msbuildConfig: 'Debug'
 
-  - template: windows-template.yml
-    parameters:
-      name: 'VS2026_x64_Debug'
-      vmImage: 'windows-2026'
-      msbuildArch: 'x64'
-      msbuildConfig: 'Debug'
+  # - template: windows-template.yml
+  #   parameters:
+  #     name: 'VS2026_x64_Debug'
+  #     vmImage: 'windows-2026'
+  #     msbuildArch: 'x64'
+  #     msbuildConfig: 'Debug'
 
-  - template: windows-template.yml
-    parameters:
-      name: 'VS2026_x86_Release'
-      vmImage: 'windows-2026'
-      msbuildArch: 'x86'
-      msbuildConfig: 'Release'
+  # - template: windows-template.yml
+  #   parameters:
+  #     name: 'VS2026_x86_Release'
+  #     vmImage: 'windows-2026'
+  #     msbuildArch: 'x86'
+  #     msbuildConfig: 'Release'
 
-  - template: windows-template.yml
-    parameters:
-      name: 'VS2026_x64_Release'
-      vmImage: 'windows-2026'
-      msbuildArch: 'x64'
-      msbuildConfig: 'Release'
+  # - template: windows-template.yml
+  #   parameters:
+  #     name: 'VS2026_x64_Release'
+  #     vmImage: 'windows-2026'
+  #     msbuildArch: 'x64'
+  #     msbuildConfig: 'Release'
