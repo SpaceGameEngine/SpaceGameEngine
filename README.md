@@ -16,7 +16,8 @@ We use [Azure Pipeline](https://azure.microsoft.com/en-us/services/devops/pipeli
     <th>Status</th>
   </tr>
   <tr>
-    <td rowspan="8">Windows 10</td>
+    <!-- <td rowspan="8">Windows 10</td> -->
+    <td rowspan="4">Windows 10</td>
     <td rowspan="4">Visual Studio 2022</td>
     <td rowspan="2">Debug</td>
     <td>x64</td>
