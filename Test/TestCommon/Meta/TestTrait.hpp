@@ -99,3 +99,20 @@ TEST(Compose, Test)
 	ASSERT_TRUE((std::is_same_v<ComposedType1::Type::FirstType, int>));
 	ASSERT_TRUE((std::is_same_v<ComposedType1::Type::SecondType, float>));
 }
+
+TEST(IsTypesUnique, Test)
+{
+	ASSERT_TRUE((IsTypesUnique<int>::Value));
+	ASSERT_TRUE((IsTypesUnique<int, float, double>::Value));
+	ASSERT_FALSE((IsTypesUnique<int, float, int>::Value));
+	ASSERT_FALSE((IsTypesUnique<int, int, int>::Value));
+	ASSERT_FALSE((IsTypesUnique<int, double, float, double>::Value));
+}
+
+TEST(IsSame, Test)
+{
+	ASSERT_TRUE((IsSame<int, int>::Value));
+	ASSERT_FALSE((IsSame<int, float>::Value));
+	ASSERT_FALSE((IsSame<const int, int>::Value));
+	ASSERT_FALSE((IsSame<int&, int>::Value));
+}

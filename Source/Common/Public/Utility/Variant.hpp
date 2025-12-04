@@ -142,96 +142,96 @@ namespace SpaceGameEngine
 		};
 
 		template<typename T, SizeType Index>
-		inline static constexpr const bool IsVistorForIndex = requires(T t) {
+		inline static constexpr const bool IsVisitorForIndex = requires(T t) {
 			t.template Visit<Index>(std::declval<typename Types::template Get<Index>>());
 		};
 
 		template<typename T, typename IndexSequence>
-		struct IsVistorForIndices
+		struct IsVisitorForIndices
 		{
 			inline static constexpr const bool Value = false;
 		};
 
 		template<typename T, SizeType... Indices>
-		struct IsVistorForIndices<T, std::integer_sequence<SizeType, Indices...>>
+		struct IsVisitorForIndices<T, std::integer_sequence<SizeType, Indices...>>
 		{
-			inline static constexpr const bool Value = (... && IsVistorForIndex<T, Indices>);
+			inline static constexpr const bool Value = (... && IsVisitorForIndex<T, Indices>);
 		};
 
 		template<typename T, SizeType Index>
-		using VistorResultTypeForIndex = decltype(std::declval<T>().template Visit<Index>(std::declval<typename Types::template Get<Index>>()));
+		using VisitorResultTypeForIndex = decltype(std::declval<T>().template Visit<Index>(std::declval<typename Types::template Get<Index>>()));
 
 		template<typename T, typename IndexSequence>
-		struct IsVistorResultForIndicesSame
+		struct IsVisitorResultForIndicesSame
 		{
 			inline static constexpr const bool Value = false;
 		};
 
 		template<typename T, SizeType... Indices>
-		struct IsVistorResultForIndicesSame<T, std::integer_sequence<SizeType, Indices...>>
+		struct IsVisitorResultForIndicesSame<T, std::integer_sequence<SizeType, Indices...>>
 		{
-			inline static constexpr const bool Value = (... && std::is_same_v<VistorResultTypeForIndex<T, Indices>, VistorResultTypeForIndex<T, 0>>);
+			inline static constexpr const bool Value = (... && std::is_same_v<VisitorResultTypeForIndex<T, Indices>, VisitorResultTypeForIndex<T, 0>>);
 		};
 
 	public:
 		template<typename T>
-		inline static constexpr const bool IsVistor = IsVistorForIndices<T, std::make_integer_sequence<SizeType, Types::Size>>::Value && IsVistorResultForIndicesSame<T, std::make_integer_sequence<SizeType, Types::Size>>::Value;
+		inline static constexpr const bool IsVisitor = IsVisitorForIndices<T, std::make_integer_sequence<SizeType, Types::Size>>::Value && IsVisitorResultForIndicesSame<T, std::make_integer_sequence<SizeType, Types::Size>>::Value;
 
 	private:
-		template<typename VistorType>
-			requires IsVistor<VistorType>
-		using VisitResultType = VistorResultTypeForIndex<VistorType, 0>;	// all result type must be same
+		template<typename VisitorType>
+			requires IsVisitor<VisitorType>
+		using VisitResultType = VisitorResultTypeForIndex<VisitorType, 0>;	  // all result type must be same
 
-		template<typename VistorType>
-			requires IsVistor<VistorType>
-		using VistorFunctionType = VisitResultType<VistorType>(*)(VistorType&&, Byte*);
+		template<typename VisitorType>
+			requires IsVisitor<VisitorType>
+		using VisitorFunctionType = VisitResultType<VisitorType>(*)(VisitorType&&, Byte*);
 
-		template<typename VistorType>
-			requires IsVistor<VistorType>
-		using ConstVistorFunctionType = VisitResultType<VistorType>(*)(VistorType&&, const Byte*);
+		template<typename VisitorType>
+			requires IsVisitor<VisitorType>
+		using ConstVisitorFunctionType = VisitResultType<VisitorType>(*)(VisitorType&&, const Byte*);
 
-		template<typename VistorType, SizeType Index>
-			requires IsVistor<VistorType>
-		struct GetVistorFunctionMetaFunction
+		template<typename VisitorType, SizeType Index>
+			requires IsVisitor<VisitorType>
+		struct GetVisitorFunctionMetaFunction
 		{
-			inline static constexpr const VistorFunctionType<VistorType> Value = [](VistorType&& vistor, Byte* ptr) -> VisitResultType<VistorType> {
-				return std::forward<VistorType>(vistor).template Visit<Index>(*reinterpret_cast<typename Types::template Get<Index>*>(ptr));
+			inline static constexpr const VisitorFunctionType<VisitorType> Value = [](VisitorType&& vistor, Byte* ptr) -> VisitResultType<VisitorType> {
+				return std::forward<VisitorType>(vistor).template Visit<Index>(*reinterpret_cast<typename Types::template Get<Index>*>(ptr));
 			};
 		};
 
-		template<typename VistorType, SizeType Index>
-			requires IsVistor<VistorType>
-		struct GetConstVistorFunctionMetaFunction
+		template<typename VisitorType, SizeType Index>
+			requires IsVisitor<VisitorType>
+		struct GetConstVisitorFunctionMetaFunction
 		{
-			inline static constexpr const ConstVistorFunctionType<VistorType> Value = [](VistorType&& vistor, const Byte* ptr) -> VisitResultType<VistorType> {
-				return std::forward<VistorType>(vistor).template Visit<Index>(*reinterpret_cast<const typename Types::template Get<Index>*>(ptr));
+			inline static constexpr const ConstVisitorFunctionType<VisitorType> Value = [](VisitorType&& vistor, const Byte* ptr) -> VisitResultType<VisitorType> {
+				return std::forward<VisitorType>(vistor).template Visit<Index>(*reinterpret_cast<const typename Types::template Get<Index>*>(ptr));
 			};
 		};
 
-		template<typename VistorType, typename IndexSequence>
-			requires IsVistor<VistorType>
-		struct GetVistorFunctionArrayMetaFunction
+		template<typename VisitorType, typename IndexSequence>
+			requires IsVisitor<VisitorType>
+		struct GetVisitorFunctionArrayMetaFunction
 		{
 		};
 
-		template<typename VistorType, SizeType... Indices>
-			requires IsVistor<VistorType>
-		struct GetVistorFunctionArrayMetaFunction<VistorType, std::integer_sequence<SizeType, Indices...>>
+		template<typename VisitorType, SizeType... Indices>
+			requires IsVisitor<VisitorType>
+		struct GetVisitorFunctionArrayMetaFunction<VisitorType, std::integer_sequence<SizeType, Indices...>>
 		{
-			inline static constexpr const VistorFunctionType<VistorType> Value[] = {GetVistorFunctionMetaFunction<VistorType, Indices>::Value...};
+			inline static constexpr const VisitorFunctionType<VisitorType> Value[] = {GetVisitorFunctionMetaFunction<VisitorType, Indices>::Value...};
 		};
 
-		template<typename VistorType, typename IndexSequence>
-			requires IsVistor<VistorType>
-		struct GetConstVistorFunctionArrayMetaFunction
+		template<typename VisitorType, typename IndexSequence>
+			requires IsVisitor<VisitorType>
+		struct GetConstVisitorFunctionArrayMetaFunction
 		{
 		};
 
-		template<typename VistorType, SizeType... Indices>
-			requires IsVistor<VistorType>
-		struct GetConstVistorFunctionArrayMetaFunction<VistorType, std::integer_sequence<SizeType, Indices...>>
+		template<typename VisitorType, SizeType... Indices>
+			requires IsVisitor<VisitorType>
+		struct GetConstVisitorFunctionArrayMetaFunction<VisitorType, std::integer_sequence<SizeType, Indices...>>
 		{
-			inline static constexpr const ConstVistorFunctionType<VistorType> Value[] = {GetConstVistorFunctionMetaFunction<VistorType, Indices>::Value...};
+			inline static constexpr const ConstVisitorFunctionType<VisitorType> Value[] = {GetConstVisitorFunctionMetaFunction<VisitorType, Indices>::Value...};
 		};
 
 	public:
@@ -339,20 +339,20 @@ namespace SpaceGameEngine
 			return reinterpret_cast<const typename Types::template Get<Index>*>(m_Content);
 		}
 
-		template<typename VistorType>
-			requires IsVistor<VistorType>
-		inline decltype(auto) Visit(VistorType&& vistor)
+		template<typename VisitorType>
+			requires IsVisitor<VisitorType>
+		inline decltype(auto) Visit(VisitorType&& vistor)
 		{
-			static auto vistor_functions = GetVistorFunctionArrayMetaFunction<VistorType, std::make_integer_sequence<SizeType, Types::Size>>::Value;
-			return vistor_functions[m_TypeIndex](std::forward<VistorType>(vistor), m_Content);
+			static auto vistor_functions = GetVisitorFunctionArrayMetaFunction<VisitorType, std::make_integer_sequence<SizeType, Types::Size>>::Value;
+			return vistor_functions[m_TypeIndex](std::forward<VisitorType>(vistor), m_Content);
 		}
 
-		template<typename VistorType>
-			requires IsVistor<VistorType>
-		inline decltype(auto) Visit(VistorType&& vistor) const
+		template<typename VisitorType>
+			requires IsVisitor<VisitorType>
+		inline decltype(auto) Visit(VisitorType&& vistor) const
 		{
-			static auto vistor_functions = GetConstVistorFunctionArrayMetaFunction<VistorType, std::make_integer_sequence<SizeType, Types::Size>>::Value;
-			return vistor_functions[m_TypeIndex](std::forward<VistorType>(vistor), m_Content);
+			static auto vistor_functions = GetConstVisitorFunctionArrayMetaFunction<VisitorType, std::make_integer_sequence<SizeType, Types::Size>>::Value;
+			return vistor_functions[m_TypeIndex](std::forward<VisitorType>(vistor), m_Content);
 		}
 
 	private:
@@ -360,8 +360,107 @@ namespace SpaceGameEngine
 		SizeType m_TypeIndex = FirstDefaultConstructibleIndex;
 	};
 
-	template<typename VariantType, typename VistorType>
-	concept IsVariantVistor = VariantType::template IsVistor<VistorType>;
+	template<typename VariantType, typename VisitorType>
+	concept IsVariantVisitor = VariantType::template IsVisitor<VisitorType>;
+
+	template<typename... Ts>
+		requires((... && !std::is_reference_v<Ts>) && IsTypesUnique<Ts...>::Value)
+	class UniqueVariant : public Variant<Ts...>
+	{
+	private:
+		template<typename VisitorType, typename T>
+		inline static constexpr const bool IsVisitorForType = requires(VisitorType visitor) {
+			visitor(std::declval<T>());
+		};
+
+		template<typename VisitorType, typename T>
+		using VisitorResultTypeForType = decltype(std::declval<VisitorType>()(std::declval<T>()));
+
+	public:
+		template<typename VisitorType>
+		inline static constexpr const bool IsVisitor = (... && IsVisitorForType<VisitorType, Ts>)&&(... && std::is_same_v<VisitorResultTypeForType<VisitorType, Ts>, VisitorResultTypeForType<VisitorType, typename Variant<Ts...>::Types::template Get<0>>>);
+
+	private:
+		template<typename VisitorType>
+			requires IsVisitor<VisitorType>
+		class VisitorAdaptor
+		{
+		public:
+			inline VisitorAdaptor(VisitorType&& visitor)
+				: m_Visitor(std::forward<VisitorType>(visitor))
+			{
+			}
+
+			template<SizeType Index, typename T>
+			inline decltype(auto) Visit(T&& value) const
+			{
+				return std::forward<VisitorType>(m_Visitor)(std::forward<T>(value));
+			}
+
+		private:
+			VisitorType&& m_Visitor;
+		};
+
+	public:
+		template<typename T, typename... Args>
+		inline std::remove_reference_t<T>& Emplace(Args&&... args)
+		{
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<typename BindFirstWithType<IsSame, T>::Type>;
+			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
+			return Variant<Ts...>::template Emplace<Index>(std::forward<Args>(args)...);
+		}
+
+		template<typename T>
+		inline std::remove_reference_t<T>& Get()
+		{
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<typename BindFirstWithType<IsSame, T>::Type>;
+			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
+			return Variant<Ts...>::template Get<Index>();
+		}
+
+		template<typename T>
+		inline const std::remove_reference_t<T>& Get() const
+		{
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<typename BindFirstWithType<IsSame, T>::Type>;
+			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
+			return Variant<Ts...>::template Get<Index>();
+		}
+
+		template<typename T>
+		inline std::remove_reference_t<T>* Query()
+		{
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<typename BindFirstWithType<IsSame, T>::Type>;
+			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
+			return Variant<Ts...>::template Query<Index>();
+		}
+
+		template<typename T>
+		inline const std::remove_reference_t<T>* Query() const
+		{
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<typename BindFirstWithType<IsSame, T>::Type>;
+			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
+			return Variant<Ts...>::template Query<Index>();
+		}
+
+		template<typename VisitorType>
+			requires IsVisitor<VisitorType>
+		inline decltype(auto) Visit(VisitorType&& visitor)
+		{
+			VisitorAdaptor<VisitorType> adaptor(std::forward<VisitorType>(visitor));
+			return Variant<Ts...>::Visit(ForwardLike<VisitorType>(adaptor));
+		}
+
+		template<typename VisitorType>
+			requires IsVisitor<VisitorType>
+		inline decltype(auto) Visit(VisitorType&& visitor) const
+		{
+			VisitorAdaptor<VisitorType> adaptor(std::forward<VisitorType>(visitor));
+			return Variant<Ts...>::Visit(ForwardLike<VisitorType>(adaptor));
+		}
+	};
+
+	template<typename UniqueVariantType, typename VisitorType>
+	concept IsUniqueVariantVisitor = UniqueVariantType::template IsVisitor<VisitorType>;
 }
 
 /*!

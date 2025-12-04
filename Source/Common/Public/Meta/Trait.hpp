@@ -67,6 +67,29 @@ namespace SpaceGameEngine
 		template<typename... Args>
 		using Type = U<T<Args...>>;
 	};
+
+	template<typename... Ts>
+	struct IsTypesUnique
+	{
+	};
+
+	template<typename T>
+	struct IsTypesUnique<T>
+	{
+		inline static constexpr const bool Value = true;
+	};
+
+	template<typename T, typename... Ts>
+	struct IsTypesUnique<T, Ts...>
+	{
+		inline static constexpr const bool Value = (!std::is_same_v<T, Ts> && ...) && IsTypesUnique<Ts...>::Value;
+	};
+
+	template<typename T1, typename T2>
+	struct IsSame
+	{
+		inline static constexpr const bool Value = std::is_same_v<T1, T2>;
+	};
 }
 
 /*!

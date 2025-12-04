@@ -66,3 +66,17 @@ TEST(Digits16, CorrectnessTest)
 		ASSERT_EQ(Digits<16>(num), (UInt64)(std::log2(num) / 4.0) + 1);
 	}
 }
+
+TEST(ForwardLike, Test)
+{
+	ASSERT_TRUE((std::is_same_v<decltype(ForwardLike<int&>(std::declval<char>())), char&>));
+	ASSERT_TRUE((std::is_same_v<decltype(ForwardLike<const int&>(std::declval<char>())), const char&>));
+	ASSERT_TRUE((std::is_same_v<decltype(ForwardLike<int&&>(std::declval<char>())), char&&>));
+	ASSERT_TRUE((std::is_same_v<decltype(ForwardLike<const int&&>(std::declval<char>())), const char&&>));
+	ASSERT_TRUE((std::is_same_v<decltype(ForwardLike<int>(std::declval<char>())), char&&>));
+	ASSERT_TRUE((std::is_same_v<decltype(ForwardLike<const int>(std::declval<char>())), const char&&>));
+
+	ASSERT_FALSE((std::is_same_v<decltype(ForwardLike<int&>(std::declval<char>())), const char&>));
+	ASSERT_FALSE((std::is_same_v<decltype(ForwardLike<int>(std::declval<char>())), char>));
+	ASSERT_FALSE((std::is_same_v<decltype(ForwardLike<const int>(std::declval<char>())), const char>));
+}
