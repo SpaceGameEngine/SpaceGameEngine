@@ -401,11 +401,21 @@ namespace SpaceGameEngine
 			VisitorType&& m_Visitor;
 		};
 
+		template<typename T>
+		struct IsSameWith
+		{
+			template<typename U>
+			struct Type
+			{
+				inline static constexpr const bool Value = std::is_same_v<T, U>;
+			};
+		};
+
 	public:
 		template<typename T, typename... Args>
 		inline std::remove_reference_t<T>& Emplace(Args&&... args)
 		{
-			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<BindFirstWithType<IsSame, T>::template Type>;
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<IsSameWith<T>::template Type>;
 			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
 			return Variant<Ts...>::template Emplace<Index>(std::forward<Args>(args)...);
 		}
@@ -413,7 +423,7 @@ namespace SpaceGameEngine
 		template<typename T>
 		inline std::remove_reference_t<T>& Get()
 		{
-			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<BindFirstWithType<IsSame, T>::template Type>;
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<IsSameWith<T>::template Type>;
 			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
 			return Variant<Ts...>::template Get<Index>();
 		}
@@ -421,7 +431,7 @@ namespace SpaceGameEngine
 		template<typename T>
 		inline const std::remove_reference_t<T>& Get() const
 		{
-			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<BindFirstWithType<IsSame, T>::template Type>;
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<IsSameWith<T>::template Type>;
 			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
 			return Variant<Ts...>::template Get<Index>();
 		}
@@ -429,7 +439,7 @@ namespace SpaceGameEngine
 		template<typename T>
 		inline std::remove_reference_t<T>* Query()
 		{
-			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<BindFirstWithType<IsSame, T>::template Type>;
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<IsSameWith<T>::template Type>;
 			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
 			return Variant<Ts...>::template Query<Index>();
 		}
@@ -437,7 +447,7 @@ namespace SpaceGameEngine
 		template<typename T>
 		inline const std::remove_reference_t<T>* Query() const
 		{
-			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<BindFirstWithType<IsSame, T>::template Type>;
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<IsSameWith<T>::template Type>;
 			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
 			return Variant<Ts...>::template Query<Index>();
 		}
