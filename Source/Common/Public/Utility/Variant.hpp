@@ -242,6 +242,15 @@ namespace SpaceGameEngine
 			new (m_Content) DefaultType();
 		}
 
+		template<SizeType Index, typename... Args>
+		inline Variant(ValueWrapper<Index>, Args&&... args)
+			: m_TypeIndex(Index)
+		{
+			static_assert(Index < Types::Size, "Index out of bounds in Variant constructor.");
+			using Type = typename Types::template Get<Index>;
+			new (m_Content) Type(std::forward<Args>(args)...);
+		}
+
 		inline ~Variant()
 		{
 			Destructors[m_TypeIndex](m_Content);
@@ -412,6 +421,20 @@ namespace SpaceGameEngine
 		};
 
 	public:
+		inline UniqueVariant() = default;
+		inline UniqueVariant(const UniqueVariant&) = default;
+		inline UniqueVariant(UniqueVariant&&) = default;
+		inline UniqueVariant& operator=(const UniqueVariant&) = default;
+		inline UniqueVariant& operator=(UniqueVariant&&) = default;
+
+		template<typename T, typename... Args>
+		inline UniqueVariant(TypeWrapper<T>, Args&&... args)
+			: Variant<Ts...>(InPlaceIndex<Variant<Ts...>::Types::template FirstIndex<IsSameWith<T>::template Type>>, std::forward<Args>(args)...)
+		{
+			static constexpr const SizeType Index = Variant<Ts...>::Types::template FirstIndex<IsSameWith<T>::template Type>;
+			static_assert(Index < Variant<Ts...>::Types::Size, "Type T is not in UniqueVariant.");
+		}
+
 		template<typename T, typename... Args>
 		inline std::remove_reference_t<T>& Emplace(Args&&... args)
 		{

@@ -38,11 +38,27 @@ TEST(TypeWrapper, Test)
 	ASSERT_TRUE((std::is_same_v<TypeWrapper<int&&>::Type, int&&>));
 }
 
+TEST(InPlaceType, Test)
+{
+	ASSERT_TRUE((std::is_same_v<decltype(InPlaceType<const int&>)::Type, const int&>));
+	ASSERT_TRUE((std::is_same_v<decltype(InPlaceType<int&>)::Type, int&>));
+	ASSERT_TRUE((std::is_same_v<decltype(InPlaceType<int>)::Type, int>));
+	ASSERT_TRUE((std::is_same_v<decltype(InPlaceType<int*>)::Type, int*>));
+	ASSERT_TRUE((std::is_same_v<decltype(InPlaceType<int&&>)::Type, int&&>));
+}
+
 TEST(ValueWrapper, Test)
 {
 	ASSERT_EQ(ValueWrapper<42>::Value, 42);
 	ASSERT_EQ(ValueWrapper<'a'>::Value, 'a');
 	ASSERT_EQ(ValueWrapper<3.14>::Value, 3.14);
+}
+
+TEST(InPlaceIndex, Test)
+{
+	ASSERT_EQ(decltype(InPlaceIndex<1>)::Value, 1);
+	ASSERT_EQ(decltype(InPlaceIndex<42>)::Value, 42);
+	ASSERT_EQ(decltype(InPlaceIndex<0>)::Value, 0);
 }
 
 template<typename T, typename U>

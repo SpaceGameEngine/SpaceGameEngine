@@ -39,13 +39,16 @@ namespace SpaceGameEngine
 	};
 
 	template<typename T>
-	inline constexpr const TypeWrapper<T> TypeWrapperValue;
+	inline constexpr const TypeWrapper<T> InPlaceType;
 
 	template<auto V>
 	struct ValueWrapper
 	{
 		inline static constexpr const auto Value = V;
 	};
+
+	template<SizeType N>
+	inline constexpr const ValueWrapper<N> InPlaceIndex;
 
 	template<template<typename...> typename T, typename... Ts>
 	struct BindFirstWithType

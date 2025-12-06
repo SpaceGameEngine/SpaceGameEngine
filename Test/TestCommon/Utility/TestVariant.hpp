@@ -264,6 +264,17 @@ TEST(Variant, DefaultConstructorTest)
 	ASSERT_EQ(variant2.GetTypeIndex(), 0);
 }
 
+TEST(Variant, ConstructorWithTypeIndexTest)
+{
+	Variant<int, float, double> variant1(InPlaceIndex<1>, 1.0f);
+	ASSERT_EQ(variant1.GetTypeIndex(), 1);
+	ASSERT_FLOAT_EQ(variant1.Get<1>(), 1.0f);
+
+	Variant<int, float, double> variant2(InPlaceIndex<2>, 3.14);
+	ASSERT_EQ(variant2.GetTypeIndex(), 2);
+	ASSERT_DOUBLE_EQ(variant2.Get<2>(), 3.14);
+}
+
 TEST(Variant, CopyConstructorTest)
 {
 	Variant<int, float, double> variant1;
@@ -674,6 +685,16 @@ TEST(UniqueVariant, DefaultConstructorTest)
 
 	UniqueVariant<EmptyType, TestVariantComplexTypeForEmplace> variant2;
 	ASSERT_EQ(variant2.GetTypeIndex(), 0);
+}
+
+TEST(UniqueVariant, ConstructorWithTypeTest)
+{
+	UniqueVariant<int, float, double> variant1(InPlaceType<float>, 1.0f);
+	ASSERT_EQ(variant1.GetTypeIndex(), 1);
+	ASSERT_FLOAT_EQ((variant1.Get<float>()), 1.0f);
+	UniqueVariant<int, float, double> variant2(InPlaceType<double>, 3.14);
+	ASSERT_EQ(variant2.GetTypeIndex(), 2);
+	ASSERT_DOUBLE_EQ((variant2.Get<double>()), 3.14);
 }
 
 TEST(UniqueVariant, CopyConstructorTest)

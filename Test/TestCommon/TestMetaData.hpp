@@ -106,12 +106,12 @@ TEST(MetaData, ComparisionTest)
 
 TEST(MetaObject, TypeWrapperConstructionTest)
 {
-	MetaObject test(TypeWrapperValue<test_metadata_class>);
+	MetaObject test(InPlaceType<test_metadata_class>);
 	ASSERT_EQ(test.Get<test_metadata_class>().i, 1);
 	test_metadata_class _test;
-	MetaObject test2(TypeWrapperValue<test_metadata_class>, _test);
+	MetaObject test2(InPlaceType<test_metadata_class>, _test);
 	ASSERT_EQ(test2.Get<test_metadata_class>().i, 2);
-	MetaObject test3(TypeWrapperValue<test_metadata_class>, std::move(_test));
+	MetaObject test3(InPlaceType<test_metadata_class>, std::move(_test));
 	ASSERT_EQ(test3.Get<test_metadata_class>().i, 3);
 }
 
