@@ -26,6 +26,7 @@ limitations under the License.
 #include "Utility/TestEndian.hpp"
 #include "Utility/TestFixedSizeBuffer.hpp"
 #include "Utility/TestHash.hpp"
+#include "Utility/TestHeapObject.hpp"
 #include "Utility/TestLineBreak.hpp"
 #include "Utility/TestMemoryData.hpp"
 #include "Utility/TestOptional.hpp"

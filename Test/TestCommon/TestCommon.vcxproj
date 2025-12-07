@@ -223,6 +223,7 @@
     <ClInclude Include="Utility\TestEndian.hpp" />
     <ClInclude Include="Utility\TestFixedSizeBuffer.hpp" />
     <ClInclude Include="Utility\TestHash.hpp" />
+    <ClInclude Include="Utility\TestHeapObject.hpp" />
     <ClInclude Include="Utility\TestLineBreak.hpp" />
     <ClInclude Include="Utility\TestMemoryData.hpp" />
     <ClInclude Include="Utility\TestOptional.hpp" />

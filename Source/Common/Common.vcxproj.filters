@@ -267,6 +267,9 @@
     <ClInclude Include="Public\Meta\TypeList.hpp">
       <Filter>Public\Meta</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\HeapObject.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">

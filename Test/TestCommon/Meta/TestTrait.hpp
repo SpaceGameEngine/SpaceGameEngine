@@ -132,3 +132,11 @@ TEST(IsSame, Test)
 	ASSERT_FALSE((IsSame<const int, int>::Value));
 	ASSERT_FALSE((IsSame<int&, int>::Value));
 }
+
+TEST(IsSameWith, Test)
+{
+	ASSERT_TRUE((IsSameWith<int>::Type<int>::Value));
+	ASSERT_FALSE((IsSameWith<int>::Type<float>::Value));
+	ASSERT_FALSE((IsSameWith<const int>::Type<int>::Value));
+	ASSERT_FALSE((IsSameWith<int&>::Type<int>::Value));
+}

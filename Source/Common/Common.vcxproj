@@ -217,6 +217,7 @@
     <ClInclude Include="Public\Utility\FixedSizeBuffer.hpp" />
     <ClInclude Include="Public\Utility\Format.hpp" />
     <ClInclude Include="Public\Utility\Hash.hpp" />
+    <ClInclude Include="Public\Utility\HeapObject.hpp" />
     <ClInclude Include="Public\Utility\LineBreak.h" />
     <ClInclude Include="Public\Utility\MemoryData.h" />
     <ClInclude Include="Public\Utility\Optional.hpp" />

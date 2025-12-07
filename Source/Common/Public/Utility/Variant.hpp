@@ -410,16 +410,6 @@ namespace SpaceGameEngine
 			VisitorType&& m_Visitor;
 		};
 
-		template<typename T>
-		struct IsSameWith
-		{
-			template<typename U>
-			struct Type
-			{
-				inline static constexpr const bool Value = std::is_same_v<T, U>;
-			};
-		};
-
 	public:
 		inline UniqueVariant() = default;
 		inline UniqueVariant(const UniqueVariant&) = default;

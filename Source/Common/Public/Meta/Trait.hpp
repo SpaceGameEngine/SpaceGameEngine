@@ -93,6 +93,16 @@ namespace SpaceGameEngine
 	{
 		inline static constexpr const bool Value = std::is_same_v<T1, T2>;
 	};
+
+	template<typename T>
+	struct IsSameWith
+	{
+		template<typename U>
+		struct Type
+		{
+			inline static constexpr const bool Value = std::is_same_v<T, U>;
+		};
+	};
 }
 
 /*!

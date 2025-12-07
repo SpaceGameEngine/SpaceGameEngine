@@ -130,6 +130,9 @@
     <ClInclude Include="Meta\TestConcept.hpp">
       <Filter>Meta</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\TestHeapObject.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">
