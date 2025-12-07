@@ -98,7 +98,7 @@ int TestHeapObjectTestObject::copy_assignment_count = 0;
 int TestHeapObjectTestObject::move_construct_count = 0;
 int TestHeapObjectTestObject::move_assignment_count = 0;
 
-TEST(HeapObjectTest, DefaultConstruction)
+TEST(HeapObject, DefaultConstructionTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -119,7 +119,7 @@ TEST(HeapObjectTest, DefaultConstruction)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 1);
 }
 
-TEST(HeapObjectTest, ConstructionWithValue)
+TEST(HeapObject, ConstructionWithValueTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -140,7 +140,7 @@ TEST(HeapObjectTest, ConstructionWithValue)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 1);
 }
 
-TEST(HeapObjectTest, CopyConstruction)
+TEST(HeapObject, CopyConstructionTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -171,7 +171,7 @@ TEST(HeapObjectTest, CopyConstruction)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 2);
 }
 
-TEST(HeapObjectTest, MoveConstruction)
+TEST(HeapObject, MoveConstructionTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -201,7 +201,7 @@ TEST(HeapObjectTest, MoveConstruction)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 2);
 }
 
-TEST(HeapObjectTest, CopyAssignment)
+TEST(HeapObject, CopyAssignmentTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -233,7 +233,7 @@ TEST(HeapObjectTest, CopyAssignment)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 2);
 }
 
-TEST(HeapObjectTest, MoveAssignment)
+TEST(HeapObject, MoveAssignmentTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -264,7 +264,7 @@ TEST(HeapObjectTest, MoveAssignment)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 2);
 }
 
-TEST(HeapObjectTest, AnotherAllocatorCopyConstruction)
+TEST(HeapObject, AnotherAllocatorCopyConstructionTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -295,7 +295,7 @@ TEST(HeapObjectTest, AnotherAllocatorCopyConstruction)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 2);
 }
 
-TEST(HeapObjectTest, AnotherAllocatorMoveConstruction)
+TEST(HeapObject, AnotherAllocatorMoveConstructionTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -325,7 +325,7 @@ TEST(HeapObjectTest, AnotherAllocatorMoveConstruction)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 2);
 }
 
-TEST(HeapObjectTest, AnotherAllocatorCopyAssignment)
+TEST(HeapObject, AnotherAllocatorCopyAssignmentTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -357,7 +357,7 @@ TEST(HeapObjectTest, AnotherAllocatorCopyAssignment)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 2);
 }
 
-TEST(HeapObjectTest, AnotherAllocatorMoveAssignment)
+TEST(HeapObject, AnotherAllocatorMoveAssignmentTest)
 {
 	TestHeapObjectTestObject::ResetCounters();
 	{
@@ -388,7 +388,7 @@ TEST(HeapObjectTest, AnotherAllocatorMoveAssignment)
 	ASSERT_EQ(TestHeapObjectTestObject::destruct_count, 2);
 }
 
-TEST(HeapObjectTest, GetMethod)
+TEST(HeapObject, GetMethodTest)
 {
 	HeapObject<TestHeapObjectTestObject> obj(300);
 
@@ -398,9 +398,21 @@ TEST(HeapObjectTest, GetMethod)
 	ASSERT_EQ(obj.Get().value, 400);
 }
 
-TEST(HeapObjectTest, ConstGetMethod)
+TEST(HeapObject, ConstGetMethodTest)
 {
 	const HeapObject<TestHeapObjectTestObject> obj(500);
 
 	ASSERT_EQ(obj.Get().value, 500);
+}
+
+TEST(HeapObject, ConversionOperatorTest)
+{
+	HeapObject<TestHeapObjectTestObject> obj(600);
+	TestHeapObjectTestObject& ref = obj;
+	ASSERT_EQ(obj.Get().value, 600);
+	ref.value = 650;
+	ASSERT_EQ(obj.Get().value, 650);
+
+	const TestHeapObjectTestObject& cref = obj;
+	ASSERT_EQ(cref.value, 650);
 }

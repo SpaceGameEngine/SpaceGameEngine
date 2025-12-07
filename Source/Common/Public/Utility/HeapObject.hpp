@@ -103,6 +103,16 @@ namespace SpaceGameEngine
 			return *static_cast<const T*>(m_pContent);
 		}
 
+		inline operator T&()
+		{
+			return Get();
+		}
+
+		inline operator const T&() const
+		{
+			return Get();
+		}
+
 	private:
 		void* m_pContent = nullptr;
 	};
