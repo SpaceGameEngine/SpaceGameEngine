@@ -41,6 +41,13 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		virtual void Visit(const AbstractSyntaxTreeNodes::VariableDefinitionNode& node) override;
 		virtual void Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionNode& node) override;
 		virtual void Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionsNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::AttributeDefinitionNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::AttributeDictionaryNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::AttributeValueNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::ArgumentNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::StatementNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::BlockNode& node) override;
+		virtual void Visit(const AbstractSyntaxTreeNodes::ProgramNode& node) override;
 
 	private:
 		void PrintLine(const String& str);

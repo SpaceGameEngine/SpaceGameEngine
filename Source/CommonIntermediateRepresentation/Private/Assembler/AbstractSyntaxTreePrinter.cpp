@@ -62,10 +62,186 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 
 void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionsNode& node)
 {
-	PrintLine(Format(String(SGE_STR("ParameterDefinitions \t<line:{}, column:{}>")), node.GetLine(), node.GetColumn()));
+	PrintLine(Format(String(SGE_STR("ParameterDefinitions\t<line:{}, column:{}>")), node.GetLine(), node.GetColumn()));
 	StartPrintChildren();
 	const auto& parameter_definitions = node.GetParameterDefinitions();
 	for (auto iter = parameter_definitions.GetConstBegin(); iter != parameter_definitions.GetConstEnd(); ++iter)
+		Visit(*iter);
+	EndPrintChildren();
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::AttributeDefinitionNode& node)
+{
+	PrintLine(Format(String(SGE_STR("AttributeDefinition \"{}\"\t<line:{}, column:{}>")), node.GetName(), node.GetLine(), node.GetColumn()));
+	StartPrintChildren();
+	Visit(node.GetValue());
+	EndPrintChildren();
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::AttributeDictionaryNode& node)
+{
+	PrintLine(Format(String(SGE_STR("AttributeDictionary\t<line:{}, column:{}>")), node.GetLine(), node.GetColumn()));
+	StartPrintChildren();
+	const auto& attribute_definitions = node.GetAttributeDefinitions();
+	for (auto iter = attribute_definitions.GetConstBegin(); iter != attribute_definitions.GetConstEnd(); ++iter)
+		Visit(*iter);
+	EndPrintChildren();
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::AttributeValueNode& node)
+{
+	struct AttributeValueVisitor
+	{
+		AttributeValueVisitor(AbstractSyntaxTreePrinter& printer, const AbstractSyntaxTreeNodes::AttributeValueNode& node)
+			: m_Printer(printer), m_Node(node)
+		{
+		}
+
+		void operator()(Int64 value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("AttributeValue:Int64 {}\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(UInt64 value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("AttributeValue:UInt64 {}\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(float value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("AttributeValue:Float {}\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(double value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("AttributeValue:Double {}\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(bool value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("AttributeValue:Bool {}\t<line:{}, column:{}>")), value ? SGE_STR("true") : SGE_STR("false"), m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(const String& value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("AttributeValue:String \"{}\"\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(const AbstractSyntaxTreeNodes::AttributeDictionaryNode& value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("AttributeValue:AttributeDictionary\t<line:{}, column:{}>")), m_Node.GetLine(), m_Node.GetColumn()));
+			m_Printer.StartPrintChildren();
+			m_Printer.Visit(value);
+			m_Printer.EndPrintChildren();
+		}
+
+		AbstractSyntaxTreePrinter& m_Printer;
+		const AbstractSyntaxTreeNodes::AttributeValueNode& m_Node;
+	};
+	AttributeValueVisitor visitor(*this, node);
+	node.GetValue().Visit(visitor);
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::ArgumentNode& node)
+{
+	struct ArgumentValueVisitor
+	{
+		ArgumentValueVisitor(AbstractSyntaxTreePrinter& printer, const AbstractSyntaxTreeNodes::ArgumentNode& node)
+			: m_Printer(printer), m_Node(node)
+		{
+		}
+
+		void operator()(Int64 value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:Int64 {}\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(UInt64 value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:UInt64 {}\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(float value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:Float {}\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(double value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:Double {}\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(bool value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:Bool {}\t<line:{}, column:{}>")), value ? SGE_STR("true") : SGE_STR("false"), m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(const String& value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:String \"{}\"\t<line:{}, column:{}>")), value, m_Node.GetLine(), m_Node.GetColumn()));
+		}
+
+		void operator()(const AbstractSyntaxTreeNodes::VariableNode& value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:Variable\t<line:{}, column:{}>")), m_Node.GetLine(), m_Node.GetColumn()));
+			m_Printer.StartPrintChildren();
+			m_Printer.Visit(value);
+			m_Printer.EndPrintChildren();
+		}
+
+		void operator()(const AbstractSyntaxTreeNodes::ParameterDefinitionsNode& value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:ParameterDefinitions\t<line:{}, column:{}>")), m_Node.GetLine(), m_Node.GetColumn()));
+			m_Printer.StartPrintChildren();
+			m_Printer.Visit(value);
+			m_Printer.EndPrintChildren();
+		}
+
+		void operator()(const AbstractSyntaxTreeNodes::BlockNode& value)
+		{
+			m_Printer.PrintLine(Format(String(SGE_STR("Argument:Block\t<line:{}, column:{}>")), m_Node.GetLine(), m_Node.GetColumn()));
+			m_Printer.StartPrintChildren();
+			m_Printer.Visit(value);
+			m_Printer.EndPrintChildren();
+		}
+
+		AbstractSyntaxTreePrinter& m_Printer;
+		const AbstractSyntaxTreeNodes::ArgumentNode& m_Node;
+	};
+	ArgumentValueVisitor visitor(*this, node);
+	node.GetValue().Visit(visitor);
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::StatementNode& node)
+{
+	PrintLine(Format(String(SGE_STR("Statement\t<line:{}, column:{}>")), node.GetLine(), node.GetColumn()));
+	StartPrintChildren();
+	Visit(node.GetVariableDefinition());
+	if (node.GetAttributeDictionary().HasValue())
+		Visit(node.GetAttributeDictionary().Get());
+	Visit(node.GetSymbol());
+	const auto& arguments = node.GetArguments();
+	for (auto iter = arguments.GetConstBegin(); iter != arguments.GetConstEnd(); ++iter)
+		Visit(*iter);
+	EndPrintChildren();
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::BlockNode& node)
+{
+	PrintLine(Format(String(SGE_STR("Block\t<line:{}, column:{}>")), node.GetLine(), node.GetColumn()));
+	StartPrintChildren();
+	const auto& statements = node.GetStatements();
+	for (auto iter = statements.GetConstBegin(); iter != statements.GetConstEnd(); ++iter)
+		Visit(*iter);
+	EndPrintChildren();
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSyntaxTreePrinter::Visit(const AbstractSyntaxTreeNodes::ProgramNode& node)
+{
+	PrintLine(Format(String(SGE_STR("Program\t<line:{}, column:{}>")), node.GetLine(), node.GetColumn()));
+	StartPrintChildren();
+	const auto& statements = node.GetStatements();
+	for (auto iter = statements.GetConstBegin(); iter != statements.GetConstEnd(); ++iter)
 		Visit(*iter);
 	EndPrintChildren();
 }

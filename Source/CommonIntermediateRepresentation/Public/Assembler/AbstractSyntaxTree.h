@@ -17,6 +17,8 @@ limitations under the License.
 #include "CommonIntermediateRepresentationAPI.h"
 #include "SGEString.hpp"
 #include "Utility/Optional.hpp"
+#include "Utility/Variant.hpp"
+#include "Utility/HeapObject.hpp"
 
 /*!
 @ingroup CommonIntermediateRepresentation
@@ -60,8 +62,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		public:
 			friend class VariableDefinitionNode;
 			friend class ParameterDefinitionNode;
+			friend class StatementNode;
 
-			SymbolNode(const String& dialect_name, const String& name, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather = nullptr);
+			SymbolNode(const String& dialect_name, const String& name, SizeType line, SizeType column);
 
 			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
 
@@ -76,7 +79,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		class COMMON_INTERMEDIATE_REPRESENTATION_API VariableNode : public AbstractSyntaxTreeNode
 		{
 		public:
-			VariableNode(const String& name, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather = nullptr);
+			friend class ArgumentNode;
+
+			VariableNode(const String& name, SizeType line, SizeType column);
 
 			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
 
@@ -89,7 +94,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		class COMMON_INTERMEDIATE_REPRESENTATION_API VariableDefinitionNode : public AbstractSyntaxTreeNode
 		{
 		public:
-			VariableDefinitionNode(const String& name, Optional<SymbolNode>&& type_symbol, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather = nullptr);
+			friend class StatementNode;
+
+			VariableDefinitionNode(const String& name, Optional<SymbolNode>&& type_symbol, SizeType line, SizeType column);
 
 			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
 
@@ -109,7 +116,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		public:
 			friend class ParameterDefinitionsNode;
 
-			ParameterDefinitionNode(const String& name, SymbolNode&& type_symbol, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather = nullptr);
+			ParameterDefinitionNode(const String& name, SymbolNode&& type_symbol, SizeType line, SizeType column);
 
 			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
 
@@ -127,7 +134,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		class COMMON_INTERMEDIATE_REPRESENTATION_API ParameterDefinitionsNode : public AbstractSyntaxTreeNode
 		{
 		public:
-			ParameterDefinitionsNode(Vector<ParameterDefinitionNode>&& parameter_definitions, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather = nullptr);
+			friend class ArgumentNode;
+
+			ParameterDefinitionsNode(Vector<ParameterDefinitionNode>&& parameter_definitions, SizeType line, SizeType column);
 
 			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
 
@@ -140,12 +149,14 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 			Vector<ParameterDefinitionNode> m_ParameterDefinitions;
 		};
 
-		/*class AttributeValueNode;
+		class AttributeValueNode;
 
 		class COMMON_INTERMEDIATE_REPRESENTATION_API AttributeDefinitionNode : public AbstractSyntaxTreeNode
 		{
 		public:
-			AttributeDefinitionNode(const String& name, AttributeValueNode&& value, SizeType line, SizeType column, AbstractSyntaxTreeNode* pfather = nullptr);
+			friend class AttributeDictionaryNode;
+
+			AttributeDefinitionNode(const String& name, AttributeValueNode&& value, SizeType line, SizeType column);
 
 			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
 
@@ -157,8 +168,138 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 
 		private:
 			String m_Name;
-			AttributeValueNode m_Value;
-		};*/
+			HeapObject<AttributeValueNode> m_Value;
+		};
+
+		class COMMON_INTERMEDIATE_REPRESENTATION_API AttributeDictionaryNode : public AbstractSyntaxTreeNode
+		{
+		public:
+			friend class AttributeValueNode;
+			friend class StatementNode;
+
+			AttributeDictionaryNode(Vector<AttributeDefinitionNode>&& attribute_definitions, SizeType line, SizeType column);
+
+			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
+
+			const Vector<AttributeDefinitionNode>& GetAttributeDefinitions() const;
+
+		protected:
+			virtual void Link() override;
+
+		private:
+			Vector<AttributeDefinitionNode> m_AttributeDefinitions;
+		};
+
+		class COMMON_INTERMEDIATE_REPRESENTATION_API AttributeValueNode : public AbstractSyntaxTreeNode
+		{
+		public:
+			friend class AttributeDefinitionNode;
+
+			AttributeValueNode(Int64 value, SizeType line, SizeType column);
+			AttributeValueNode(UInt64 value, SizeType line, SizeType column);
+			AttributeValueNode(float value, SizeType line, SizeType column);
+			AttributeValueNode(double value, SizeType line, SizeType column);
+			AttributeValueNode(bool value, SizeType line, SizeType column);
+			AttributeValueNode(const String& value, SizeType line, SizeType column);
+			AttributeValueNode(AttributeDictionaryNode&& value, SizeType line, SizeType column);
+
+			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
+
+			const UniqueVariant<Int64, UInt64, float, double, bool, String, AttributeDictionaryNode>& GetValue() const;
+
+		protected:
+			virtual void Link() override;
+
+		private:
+			UniqueVariant<Int64, UInt64, float, double, bool, String, AttributeDictionaryNode> m_Value;
+		};
+
+		class BlockNode;
+
+		class COMMON_INTERMEDIATE_REPRESENTATION_API ArgumentNode : public AbstractSyntaxTreeNode
+		{
+		public:
+			friend class StatementNode;
+
+			ArgumentNode(Int64 value, SizeType line, SizeType column);
+			ArgumentNode(UInt64 value, SizeType line, SizeType column);
+			ArgumentNode(float value, SizeType line, SizeType column);
+			ArgumentNode(double value, SizeType line, SizeType column);
+			ArgumentNode(bool value, SizeType line, SizeType column);
+			ArgumentNode(const String& value, SizeType line, SizeType column);
+			ArgumentNode(VariableNode&& value, SizeType line, SizeType column);
+			ArgumentNode(ParameterDefinitionsNode&& value, SizeType line, SizeType column);
+			ArgumentNode(BlockNode&& value, SizeType line, SizeType column);
+
+			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
+
+			const UniqueVariant<Int64, UInt64, float, double, bool, String, VariableNode, ParameterDefinitionsNode, HeapObject<BlockNode>>& GetValue() const;
+
+		protected:
+			virtual void Link() override;
+
+		private:
+			UniqueVariant<Int64, UInt64, float, double, bool, String, VariableNode, ParameterDefinitionsNode, HeapObject<BlockNode>> m_Value;
+		};
+
+		class COMMON_INTERMEDIATE_REPRESENTATION_API StatementNode : public AbstractSyntaxTreeNode
+		{
+		public:
+			friend class BlockNode;
+			friend class ProgramNode;
+
+			StatementNode(VariableDefinitionNode&& variable_definition, Optional<AttributeDictionaryNode>&& attribute_dictionary, SymbolNode&& symbol, Vector<ArgumentNode>&& arguments, SizeType line, SizeType column);
+
+			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
+
+			const VariableDefinitionNode& GetVariableDefinition() const;
+			const Optional<AttributeDictionaryNode>& GetAttributeDictionary() const;
+			const SymbolNode& GetSymbol() const;
+			const Vector<ArgumentNode>& GetArguments() const;
+
+		protected:
+			virtual void Link() override;
+
+		private:
+			VariableDefinitionNode m_VariableDefinition;
+			Optional<AttributeDictionaryNode> m_AttributeDictionary;
+			SymbolNode m_Symbol;
+			Vector<ArgumentNode> m_Arguments;
+		};
+
+		class COMMON_INTERMEDIATE_REPRESENTATION_API BlockNode : public AbstractSyntaxTreeNode
+		{
+		public:
+			friend class ArgumentNode;
+
+			BlockNode(Vector<StatementNode>&& statements, SizeType line, SizeType column);
+
+			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
+
+			const Vector<StatementNode>& GetStatements() const;
+
+		protected:
+			virtual void Link() override;
+
+		private:
+			Vector<StatementNode> m_Statements;
+		};
+
+		class COMMON_INTERMEDIATE_REPRESENTATION_API ProgramNode : public AbstractSyntaxTreeNode
+		{
+		public:
+			ProgramNode(Vector<StatementNode>&& statements, SizeType line, SizeType column);
+
+			virtual void Accept(AbstractSyntaxTreeNodeVisitor& visitor) const override;
+
+			const Vector<StatementNode>& GetStatements() const;
+
+		protected:
+			virtual void Link() override;
+
+		private:
+			Vector<StatementNode> m_Statements;
+		};
 	}
 
 	class COMMON_INTERMEDIATE_REPRESENTATION_API AbstractSyntaxTreeNodeVisitor
@@ -171,7 +312,13 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		virtual void Visit(const AbstractSyntaxTreeNodes::VariableDefinitionNode& node) = 0;
 		virtual void Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionNode& node) = 0;
 		virtual void Visit(const AbstractSyntaxTreeNodes::ParameterDefinitionsNode& node) = 0;
-		// todo more node types as needed
+		virtual void Visit(const AbstractSyntaxTreeNodes::AttributeDefinitionNode& node) = 0;
+		virtual void Visit(const AbstractSyntaxTreeNodes::AttributeDictionaryNode& node) = 0;
+		virtual void Visit(const AbstractSyntaxTreeNodes::AttributeValueNode& node) = 0;
+		virtual void Visit(const AbstractSyntaxTreeNodes::ArgumentNode& node) = 0;
+		virtual void Visit(const AbstractSyntaxTreeNodes::StatementNode& node) = 0;
+		virtual void Visit(const AbstractSyntaxTreeNodes::BlockNode& node) = 0;
+		virtual void Visit(const AbstractSyntaxTreeNodes::ProgramNode& node) = 0;
 	};
 }
 
