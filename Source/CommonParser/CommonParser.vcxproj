@@ -143,8 +143,10 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Public\CommonParserAPI.h" />
+    <ClInclude Include="Public\Grammar.hpp" />
     <ClInclude Include="Public\Lexer.h" />
     <ClInclude Include="Public\LexerUtility.h" />
+    <ClInclude Include="Public\LL1Parser.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonParserModule.cpp" />

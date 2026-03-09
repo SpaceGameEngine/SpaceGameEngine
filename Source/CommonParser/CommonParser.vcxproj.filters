@@ -27,6 +27,12 @@
     <ClInclude Include="Public\LexerUtility.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Grammar.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\LL1Parser.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonParserModule.cpp">

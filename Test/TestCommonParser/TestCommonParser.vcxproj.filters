@@ -6,5 +6,7 @@
   <ItemGroup>
     <ClInclude Include="TestLexer.hpp" />
     <ClInclude Include="TestLexerUtility.hpp" />
+    <ClInclude Include="TestGrammar.hpp" />
+    <ClInclude Include="TestLL1Parser.hpp" />
   </ItemGroup>
 </Project>
