@@ -140,3 +140,19 @@ TEST(IsSameWith, Test)
 	ASSERT_FALSE((IsSameWith<const int>::Type<int>::Value));
 	ASSERT_FALSE((IsSameWith<int&>::Type<int>::Value));
 }
+
+template<ArrayLiteral Literal>
+auto TestArrayLiteral()
+{
+	return Literal.m_Value;
+}
+
+TEST(ArrayLiteral, Test)
+{
+	ASSERT_STREQ(TestArrayLiteral<SGE_WSTR("TestArrayLiteral")>(), SGE_WSTR("TestArrayLiteral"));
+	ASSERT_STREQ(TestArrayLiteral<"TestArrayLiteral">(), "TestArrayLiteral");
+
+	auto int_array_literal = TestArrayLiteral<ArrayLiteral<int, 3>{{1, 2, 3}}>();
+	int int_array_expected[] = {1, 2, 3};
+	ASSERT_TRUE(memcmp(int_array_literal, int_array_expected, sizeof(int_array_expected)) == 0);
+}

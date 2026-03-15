@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include "TypeDefinition.hpp"
 #include <type_traits>
 
 /*!
@@ -102,6 +103,20 @@ namespace SpaceGameEngine
 		{
 			inline static constexpr const bool Value = std::is_same_v<T, U>;
 		};
+	};
+
+	template<typename T, SizeType Size>
+	struct ArrayLiteral
+	{
+		T m_Value[Size];
+
+		constexpr ArrayLiteral(const T (&value)[Size])
+		{
+			for (SizeType i = 0; i < Size; ++i)
+			{
+				m_Value[i] = value[i];
+			}
+		}
 	};
 }
 
