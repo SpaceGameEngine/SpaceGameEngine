@@ -149,8 +149,8 @@ auto TestArrayLiteral()
 
 TEST(ArrayLiteral, Test)
 {
-	ASSERT_STREQ(TestArrayLiteral<SGE_WSTR("TestArrayLiteral")>(), SGE_WSTR("TestArrayLiteral"));
-	ASSERT_STREQ(TestArrayLiteral<"TestArrayLiteral">(), "TestArrayLiteral");
+	ASSERT_TRUE(memcmp(TestArrayLiteral<SGE_WSTR("TestArrayLiteral")>(), SGE_WSTR("TestArrayLiteral"), 17 * sizeof(Char16)) == 0);
+	ASSERT_TRUE(memcmp(TestArrayLiteral<SGE_U8STR("TestArrayLiteral")>(), SGE_U8STR("TestArrayLiteral"), 17 * sizeof(Char8)) == 0);
 
 	auto int_array_literal = TestArrayLiteral<ArrayLiteral<int, 3>{{1, 2, 3}}>();
 	int int_array_expected[] = {1, 2, 3};
