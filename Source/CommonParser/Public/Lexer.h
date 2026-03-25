@@ -479,7 +479,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			using TransitionActionType = void (*)(ContextType&);
 			inline static constexpr const TransitionActionType TransitionActions[TransitionCount] = {Transitions::Action::Run...};
 
-			template<IsContext ContextType, IsStateNameResolver StateNameResolver>
+			template<IsStateNameResolver StateNameResolver>
 			inline static SizeType Accept(ContextType& context)
 			{
 				static constinit const SizeType NextStateNameIndices[TransitionCount] = {StateNameResolver::template Get<Transitions::NextStateName>()...};
@@ -502,7 +502,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 				T::Name
 			} -> std::convertible_to<const Char*>;
 			{
-				T::template Accept<ContextType, EmptyStateNameResolver>(context)
+				T::template Accept<EmptyStateNameResolver>(context)
 			} -> std::same_as<SizeType>;
 		};
 
@@ -534,7 +534,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			static constexpr const SizeType StartStateIndex = StateNameResolver::template Get<StartStateName.m_Value>();
 			static constexpr const SizeType EndStateIndex = StateNameResolver::template Get<EndStateName.m_Value>();
 			using StateAcceptorType = SizeType (*)(ContextType&);
-			static constexpr const StateAcceptorType StateAcceptors[sizeof...(States)] = {States::template Accept<ContextType, StateNameResolver>...};
+			static constexpr const StateAcceptorType StateAcceptors[sizeof...(States)] = {States::template Accept<StateNameResolver>...};
 
 			ContextType context(str);
 			SizeType state_id = StartStateIndex;
