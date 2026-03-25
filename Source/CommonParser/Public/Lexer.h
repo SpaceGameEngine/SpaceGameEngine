@@ -436,7 +436,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			using Context = ContextType;
 			using Condition = ConditionType;
 			using Action = ActionType;
-			inline static constexpr const auto NextStateName = _NextStateName.m_Value;
+			inline static constexpr const auto NextStateName = _NextStateName;
 		};
 
 		template<typename T, typename ContextType>
@@ -446,20 +446,20 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			IsCondition<typename T::Condition>;
 			IsAction<typename T::Action, typename T::Context>;
 			{
-				T::NextStateName
+				T::NextStateName.m_Value
 			} -> std::convertible_to<const Char*>;
 		};
 
 		template<typename T>
 		concept IsStateNameResolver = requires {
 			{
-				T::template Get<(const Char*)nullptr>()
+				T::template Get<SGE_STR("")>()
 			} -> std::same_as<SizeType>;
 		};
 
 		struct EmptyStateNameResolver
 		{
-			template<const Char* Name>
+			template<ArrayLiteral Name>
 			inline static constexpr SizeType Get()
 			{
 				return static_cast<SizeType>(-1);
@@ -469,7 +469,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		template<IsContext ContextType, ArrayLiteral _Name, IsTransition<ContextType>... Transitions>
 		struct State
 		{
-			inline static constexpr const auto Name = _Name.m_Value;
+			inline static constexpr const auto Name = _Name;
 
 			static_assert(sizeof...(Transitions) > 0, "State must have at least one Transition.");
 
@@ -499,7 +499,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		template<typename T, typename ContextType>
 		concept IsState = IsContext<ContextType> && requires(ContextType& context) {
 			{
-				T::Name
+				T::Name.m_Value
 			} -> std::convertible_to<const Char*>;
 			{
 				T::template Accept<EmptyStateNameResolver>(context)
@@ -509,15 +509,14 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		template<auto... _StateNames>
 		struct StateNameResolver
 		{
-			inline static constexpr const Char* StateNames[sizeof...(_StateNames)] = {_StateNames...};
-
-			template<const Char* Name>
+			template<ArrayLiteral _Name>
 			inline static constexpr SizeType Get()
 			{
-				constexpr SizeType index = []() constexpr {
+				constexpr SizeType index = []() constexpr -> SizeType {
+					const bool matches[] = {IsSameCString(_Name.m_Value, _StateNames.m_Value)...};
 					for (SizeType i = 0; i < sizeof...(_StateNames); ++i)
 					{
-						if (IsSameCString(Name, StateNames[i]))
+						if (matches[i])
 							return i;
 					}
 					return static_cast<SizeType>(-1);
@@ -530,11 +529,11 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		template<typename ContextType, ArrayLiteral StartStateName, ArrayLiteral EndStateName, IsState<ContextType>... States>
 		inline Vector<Token> GetTokens(const String& str)
 		{
-			using StateNameResolver = StateNameResolver<States::Name...>;
-			static constexpr const SizeType StartStateIndex = StateNameResolver::template Get<StartStateName.m_Value>();
-			static constexpr const SizeType EndStateIndex = StateNameResolver::template Get<EndStateName.m_Value>();
+			using StateNameResolverType = StateNameResolver<States::Name...>;
+			static constexpr const SizeType StartStateIndex = StateNameResolverType::template Get<StartStateName>();
+			static constexpr const SizeType EndStateIndex = StateNameResolverType::template Get<EndStateName>();
 			using StateAcceptorType = SizeType (*)(ContextType&);
-			static constexpr const StateAcceptorType StateAcceptors[sizeof...(States)] = {States::template Accept<StateNameResolver>...};
+			static constexpr const StateAcceptorType StateAcceptors[sizeof...(States)] = {States::template Accept<StateNameResolverType>...};
 
 			ContextType context(str);
 			SizeType state_id = StartStateIndex;
