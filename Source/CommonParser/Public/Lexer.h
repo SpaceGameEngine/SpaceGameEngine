@@ -430,13 +430,13 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			}
 		};
 
-		template<IsContext ContextType, IsCondition ConditionType, IsAction<ContextType> ActionType, ArrayLiteral NextStateName>
+		template<IsContext ContextType, IsCondition ConditionType, IsAction<ContextType> ActionType, ArrayLiteral _NextStateName>
 		struct Transition
 		{
 			using Context = ContextType;
 			using Condition = ConditionType;
 			using Action = ActionType;
-			inline static constexpr const auto NextStateName = NextStateName.m_Value;
+			inline static constexpr const auto NextStateName = _NextStateName.m_Value;
 		};
 
 		template<typename T, typename ContextType>
