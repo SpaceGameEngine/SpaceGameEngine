@@ -5176,6 +5176,26 @@ namespace SpaceGameEngine
 		}
 	};
 
+	template<typename CharType>
+	inline constexpr bool IsSameCString(const CharType* str1, const CharType* str2)
+	{
+		if (str1 == str2)
+			return true;
+		else if (!str1 || !str2)
+			return false;
+		else
+		{
+			while (*str1 && *str2)
+			{
+				if (*str1 != *str2)
+					return false;
+				++str1;
+				++str2;
+			}
+			return (*str1 == *str2);
+		}
+	}
+
 	template<IsString StringType, IsAllocator Allocator = DefaultAllocator>
 	inline MemoryData MakeMemoryData(const StringType& str)
 	{

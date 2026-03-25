@@ -20,9 +20,16 @@ limitations under the License.
 @{
 */
 
-namespace SpaceGameEngine::CommonParser::Parser
+namespace SpaceGameEngine::CommonParser::Parser::Grammar
 {
+	template<typename T>
+	concept IsExpression = true;	// todo
 
+	template<IsExpression Expression>
+	struct Rule
+	{
+		// todo
+	};
 }
 
 /*!

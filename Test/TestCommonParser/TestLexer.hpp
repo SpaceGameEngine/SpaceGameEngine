@@ -506,3 +506,63 @@ TEST(GetTokens, Test)
 	ASSERT_EQ(res13[0].GetLine(), 1);
 	ASSERT_EQ(res13[0].GetColumn(), 1);
 }
+
+TEST(MatchCharsCondition, Test)
+{
+	using TestMatchCharsCondition = Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>;
+	ASSERT_TRUE(Lexer::Experimental::IsCondition<TestMatchCharsCondition>);
+	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('T')));
+	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('e')));
+	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('s')));
+	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('t')));
+	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('a')));
+	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('A')));
+	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('0')));
+}
+
+TEST(MatchCharRangeCondition, Test)
+{
+	using TestMatchCharRangeCondition = Lexer::Experimental::MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>;
+	ASSERT_TRUE(Lexer::Experimental::IsCondition<TestMatchCharRangeCondition>);
+	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('a')));
+	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('m')));
+	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('z')));
+	ASSERT_FALSE(TestMatchCharRangeCondition::Get(SGE_STR('A')));
+	ASSERT_FALSE(TestMatchCharRangeCondition::Get(SGE_STR('0')));
+}
+
+TEST(DefaultCondition, Test)
+{
+	ASSERT_TRUE(Lexer::Experimental::IsCondition<Lexer::Experimental::DefaultCondition>);
+	for (Char c = 0; c < UINT16_MAX; ++c)
+		ASSERT_TRUE(Lexer::Experimental::DefaultCondition::Get(c));
+}
+
+TEST(Transition, Test)
+{
+	using namespace Lexer::Experimental;
+	static_assert(IsTransition<Transition<BaseContext, DefaultCondition, EmptyAction, SGE_STR("TestState")>, BaseContext>);
+}
+
+TEST(State, Test)
+{
+	using namespace Lexer::Experimental;
+	State<BaseContext, SGE_STR("TestState"), Transition<BaseContext, DefaultCondition, EmptyAction, SGE_STR("TestState")>> state;
+	static_assert(IsState<decltype(state), BaseContext>);
+}
+
+TEST(ExperimentalGetTokens, Test)
+{
+	using namespace Lexer::Experimental;
+	using TestState = State<BaseContext, SGE_STR("TestState"), Transition<BaseContext, DefaultCondition, ChainAction<BaseContext, AdvanceAction, SubmitAction<123>>, SGE_STR("TestState")>>;
+	String source = SGE_STR("test string");
+	auto result = Lexer::Experimental::GetTokens<BaseContext, SGE_STR("TestState"), SGE_STR("TestState"), TestState>(source);
+	ASSERT_EQ(result.GetSize(), source.GetSize());
+	for (SizeType i = 0; i < source.GetSize(); ++i)
+	{
+		ASSERT_EQ(result[i].GetType(), 123);
+		ASSERT_EQ(result[i].GetContent(), String(1, source[i]));
+		ASSERT_EQ(result[i].GetLine(), 1);
+		ASSERT_EQ(result[i].GetColumn(), i + 1);
+	}
+}

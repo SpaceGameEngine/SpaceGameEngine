@@ -1018,3 +1018,79 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::GetTokens(const String& str,
 	SGE_ASSERT(InvalidSourceStringError, str, error_info_formatter);
 	return StateMachine::GetSingleton().Run(str);
 }
+
+SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::BaseContext(const String& str)
+	: m_Iter(str.GetConstBegin()), m_EndIter(str.GetConstEnd()), m_BufferBeginIter(str.GetConstBegin()), m_BufferEndIter(str.GetConstBegin())
+{
+}
+
+Char SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::GetCurrentChar() const
+{
+	if (!IsEnd())
+		return *m_Iter;
+	else
+		return 0;
+}
+
+bool SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::IsEnd() const
+{
+	return m_Iter == m_EndIter;
+}
+
+const Vector<Token>& SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::GetTokens() const
+{
+	return m_Tokens;
+}
+
+void Experimental::BaseContext::Advance()
+{
+	SGE_CHECK(TouchInputStringEndError, m_Iter, m_EndIter);
+	if (m_BufferBeginIter == m_BufferEndIter)
+	{
+		m_BufferBeginIter = m_BufferEndIter = m_Iter;
+		m_BufferLine = m_Line;
+		m_BufferColumn = m_Column;
+	}
+	++m_BufferEndIter;
+	++m_Iter;
+	++m_Column;
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Skip()
+{
+	SGE_CHECK(TouchInputStringEndError, m_Iter, m_EndIter);
+	++m_Iter;
+	++m_Column;
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Clear()
+{
+	m_BufferBeginIter = m_BufferEndIter;
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::NextLine()
+{
+	++m_Line;
+	m_Column = 1;
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Submit(TokenType token_type)
+{
+	m_Tokens.EmplaceBack(token_type, String(m_BufferBeginIter, m_BufferEndIter), m_BufferLine, m_BufferColumn);
+	Clear();
+}
+
+bool SpaceGameEngine::CommonParser::Lexer::Experimental::DefaultCondition::Get(Char c)
+{
+	return true;
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::EmptyAction::Run(BaseContext& context)
+{
+	// do nothing
+}
+
+bool SpaceGameEngine::CommonParser::Lexer::Experimental::TouchInputStringEndError::Judge(const String::ConstIterator iter, const String::ConstIterator end)
+{
+	return iter == end;
+}

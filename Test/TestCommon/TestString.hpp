@@ -3793,6 +3793,37 @@ TEST(Split, SplitTest)
 	ASSERT_EQ(v2[2], SGE_U8STR(""));
 }
 
+TEST(IsSameCString, Test)
+{
+	static_assert(IsSameCString(SGE_WSTR("test"), SGE_WSTR("test")));
+	static_assert(!IsSameCString(SGE_WSTR("test"), SGE_WSTR("test_test")));
+	static_assert(!IsSameCString(SGE_WSTR("test_test"), SGE_WSTR("test")));
+	constexpr auto test_u8_str1 = SGE_U8STR("test");
+	constexpr auto test_u8_str2 = SGE_U8STR("test");
+	constexpr auto test_u8_str3 = SGE_U8STR("TestTest");
+	static_assert(IsSameCString(test_u8_str1, test_u8_str2));
+	static_assert(IsSameCString(test_u8_str1, test_u8_str1));
+	static_assert(!IsSameCString(test_u8_str1, test_u8_str3));
+	static_assert(!IsSameCString(test_u8_str3, test_u8_str1));
+	static_assert(!IsSameCString(test_u8_str1, (const Char8*)nullptr));
+	static_assert(!IsSameCString((const Char8*)nullptr, test_u8_str1));
+	static_assert(IsSameCString((const Char*)nullptr, (const Char*)nullptr));
+
+	ASSERT_TRUE(IsSameCString(SGE_U8STR("test"), SGE_U8STR("test")));
+	ASSERT_FALSE(IsSameCString(SGE_U8STR("test"), SGE_U8STR("test_test")));
+	ASSERT_FALSE(IsSameCString(SGE_U8STR("test_test"), SGE_U8STR("test")));
+	auto test_w_str1 = SGE_WSTR("test");
+	auto test_w_str2 = SGE_WSTR("test");
+	auto test_w_str3 = SGE_WSTR("TestTest");
+	ASSERT_TRUE(IsSameCString(test_w_str1, test_w_str2));
+	ASSERT_TRUE(IsSameCString(test_w_str1, test_w_str1));
+	ASSERT_FALSE(IsSameCString(test_w_str1, test_w_str3));
+	ASSERT_FALSE(IsSameCString(test_w_str3, test_w_str1));
+	ASSERT_FALSE(IsSameCString(test_w_str1, (const Char16*)nullptr));
+	ASSERT_FALSE(IsSameCString((const Char16*)nullptr, test_w_str1));
+	ASSERT_TRUE(IsSameCString((const Char*)nullptr, (const Char*)nullptr));
+}
+
 TEST(MakeMemoryData, StringTest)
 {
 	UCS2String test_ucs2_string(SGE_WSTR("test"));

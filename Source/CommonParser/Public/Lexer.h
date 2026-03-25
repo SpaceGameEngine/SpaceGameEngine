@@ -266,6 +266,283 @@ namespace SpaceGameEngine::CommonParser::Lexer
 	*/
 	COMMON_PARSER_API Vector<Token> GetTokens(const String& str, const String& error_info_formatter);
 
+	namespace Experimental
+	{
+		struct TouchInputStringEndError
+		{
+			inline static const ErrorMessageChar pContent[] = SGE_ESTR("Already touched the end of the input string.");
+			static COMMON_PARSER_API bool Judge(const String::ConstIterator iter, const String::ConstIterator end);
+		};
+
+		class COMMON_PARSER_API BaseContext : public UncopyableAndUnmovable
+		{
+		public:
+			BaseContext(const String& str);
+
+			/*!
+			@brief Get the current character. If the end of the input string is already touched, it will return 0.
+			*/
+			Char GetCurrentChar() const;
+
+			bool IsEnd() const;
+
+			const Vector<Token>& GetTokens() const;
+
+			/*!
+			@brief Advance the iterator, update column number and add the character to the buffer.
+			*/
+			void Advance();
+
+			/*!
+			@brief Advance the iterator, update column number but do not add the character to the buffer.
+			*/
+			void Skip();
+
+			/*!
+			@brief Clear the buffer.
+			*/
+			void Clear();
+
+			/*!
+			@brief Update line and column number to next line.
+			*/
+			void NextLine();
+
+			void Submit(TokenType token_type);
+
+		private:
+			SizeType m_Line = 1;
+			SizeType m_Column = 1;
+			SizeType m_BufferLine = 1;
+			SizeType m_BufferColumn = 1;
+			String::ConstIterator m_Iter;
+			String::ConstIterator m_EndIter;
+			String::ConstIterator m_BufferBeginIter;
+			String::ConstIterator m_BufferEndIter;
+			Vector<Token> m_Tokens;
+		};
+
+		template<typename T>
+		concept IsContext = std::derived_from<T, BaseContext>;
+
+		template<typename T>
+		concept IsCondition = requires(T t, Char c) {
+			{
+				T::Get(c)
+			} -> std::same_as<bool>;
+		};
+
+		template<ArrayLiteral Chars>
+		struct MatchCharsCondition
+		{
+			inline static bool Get(Char c)
+			{
+				for (Char ch : Chars.m_Value)
+				{
+					if (c == ch)
+						return true;
+				}
+				return false;
+			}
+		};
+
+		template<Char StartChar, Char EndChar>
+		struct MatchCharRangeCondition
+		{
+			inline static bool Get(Char c)
+			{
+				return c >= StartChar && c <= EndChar;
+			}
+		};
+
+		/*!
+		@brief This condition is used to match characters which are not in the other conditions. It should always be placed at last.
+		*/
+		struct COMMON_PARSER_API DefaultCondition
+		{
+			static bool Get(Char c);
+		};
+
+		template<typename T, typename ContextType>
+		concept IsAction = IsContext<ContextType> && requires(ContextType& context) {
+			{
+				T::Run(context)
+			} -> std::same_as<void>;
+		};
+
+		struct COMMON_PARSER_API EmptyAction
+		{
+			static void Run(BaseContext& context);
+		};
+
+		template<IsContext ContextType, IsAction<ContextType>... ActionTypes>
+		struct ChainAction
+		{
+			inline static void Run(ContextType& context)
+			{
+				(..., ActionTypes::Run(context));
+			}
+		};
+
+		struct AdvanceAction
+		{
+			template<typename ContextType>
+			inline static void Run(ContextType& context)
+			{
+				context.Advance();
+			}
+		};
+
+		struct SkipAction
+		{
+			template<typename ContextType>
+			inline static void Run(ContextType& context)
+			{
+				context.Skip();
+			}
+		};
+
+		struct ClearAction
+		{
+			template<typename ContextType>
+			inline static void Run(ContextType& context)
+			{
+				context.Clear();
+			}
+		};
+
+		struct NewLineAction
+		{
+			template<typename ContextType>
+			inline static void Run(ContextType& context)
+			{
+				context.NextLine();
+			}
+		};
+
+		template<TokenType TokenTypeValue>
+		struct SubmitAction
+		{
+			template<typename ContextType>
+			inline static void Run(ContextType& context)
+			{
+				context.Submit(TokenTypeValue);
+			}
+		};
+
+		template<IsContext ContextType, IsCondition ConditionType, IsAction<ContextType> ActionType, ArrayLiteral NextStateName>
+		struct Transition
+		{
+			using Context = ContextType;
+			using Condition = ConditionType;
+			using Action = ActionType;
+			inline static constexpr const auto NextStateName = NextStateName.m_Value;
+		};
+
+		template<typename T, typename ContextType>
+		concept IsTransition = IsContext<ContextType> && requires {
+			IsContext<typename T::Context>;
+			std::is_convertible_v<ContextType, typename T::Context>;
+			IsCondition<typename T::Condition>;
+			IsAction<typename T::Action, typename T::Context>;
+			{
+				T::NextStateName
+			} -> std::convertible_to<const Char*>;
+		};
+
+		template<typename T>
+		concept IsStateNameResolver = requires {
+			{
+				T::template Get<(const Char*)nullptr>()
+			} -> std::same_as<SizeType>;
+		};
+
+		struct EmptyStateNameResolver
+		{
+			template<const Char* Name>
+			inline static constexpr SizeType Get()
+			{
+				return static_cast<SizeType>(-1);
+			}
+		};
+
+		template<IsContext ContextType, ArrayLiteral _Name, IsTransition<ContextType>... Transitions>
+		struct State
+		{
+			inline static constexpr const auto Name = _Name.m_Value;
+
+			static_assert(sizeof...(Transitions) > 0, "State must have at least one Transition.");
+
+			inline static constexpr const SizeType TransitionCount = sizeof...(Transitions);
+			using TransitionConditionType = bool (*)(Char);
+			inline static constexpr const TransitionConditionType TransitionConditions[TransitionCount] = {Transitions::Condition::Get...};
+			using TransitionActionType = void (*)(ContextType&);
+			inline static constexpr const TransitionActionType TransitionActions[TransitionCount] = {Transitions::Action::Run...};
+
+			template<IsContext ContextType, IsStateNameResolver StateNameResolver>
+			inline static SizeType Accept(ContextType& context)
+			{
+				static constinit const SizeType NextStateNameIndices[TransitionCount] = {StateNameResolver::template Get<Transitions::NextStateName>()...};
+				Char c = context.GetCurrentChar();
+				for (SizeType i = 0; i < TransitionCount; ++i)
+				{
+					if (TransitionConditions[i](c))
+					{
+						TransitionActions[i](context);
+						return NextStateNameIndices[i];
+					}
+				}
+				// todo error handle
+			}
+		};
+
+		template<typename T, typename ContextType>
+		concept IsState = IsContext<ContextType> && requires(ContextType& context) {
+			{
+				T::Name
+			} -> std::convertible_to<const Char*>;
+			{
+				T::template Accept<ContextType, EmptyStateNameResolver>(context)
+			} -> std::same_as<SizeType>;
+		};
+
+		template<auto... _StateNames>
+		struct StateNameResolver
+		{
+			inline static constexpr const Char* StateNames[sizeof...(_StateNames)] = {_StateNames...};
+
+			template<const Char* Name>
+			inline static constexpr SizeType Get()
+			{
+				constexpr SizeType index = []() constexpr {
+					for (SizeType i = 0; i < sizeof...(_StateNames); ++i)
+					{
+						if (IsSameCString(Name, StateNames[i]))
+							return i;
+					}
+					return static_cast<SizeType>(-1);
+				}();
+				static_assert(index != static_cast<SizeType>(-1), "State name not found.");
+				return index;
+			}
+		};
+
+		template<typename ContextType, ArrayLiteral StartStateName, ArrayLiteral EndStateName, IsState<ContextType>... States>
+		inline Vector<Token> GetTokens(const String& str)
+		{
+			using StateNameResolver = StateNameResolver<States::Name...>;
+			static constexpr const SizeType StartStateIndex = StateNameResolver::template Get<StartStateName.m_Value>();
+			static constexpr const SizeType EndStateIndex = StateNameResolver::template Get<EndStateName.m_Value>();
+			using StateAcceptorType = SizeType (*)(ContextType&);
+			static constexpr const StateAcceptorType StateAcceptors[sizeof...(States)] = {States::template Accept<ContextType, StateNameResolver>...};
+
+			ContextType context(str);
+			SizeType state_id = StartStateIndex;
+			while (state_id != EndStateIndex || (!context.IsEnd()))
+				state_id = StateAcceptors[state_id](context);
+			return context.GetTokens();
+		}
+	}
 }
 
 /*!
