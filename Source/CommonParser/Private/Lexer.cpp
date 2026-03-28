@@ -493,7 +493,7 @@ SpaceGameEngine::CommonParser::Lexer::StateMachineForJudge::StateMachineForJudge
 
 	m_OtherCharacterJudgeFunctions[State::RawStringBegin] = [](String::ConstIterator& iter, StateType& state, const String& error_info_formatter, SizeType line, SizeType col, AdditionalContextForJudge& additional_context) -> bool {
 		Char c = *iter;
-		if (c != SGE_STR('"'))	  // can not contain " for easier comparation of suffix
+		if (c != SGE_STR('"'))	  // can not contain " for easier comparison of suffix
 		{
 			additional_context.m_RawStringPrefix += c;
 			// state not change

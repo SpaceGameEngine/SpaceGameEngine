@@ -355,6 +355,33 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			}
 		};
 
+		template<IsCondition Condition>
+		struct NegateCondition
+		{
+			inline static bool Get(Char c)
+			{
+				return !Condition::Get(c);
+			}
+		};
+
+		template<IsCondition... Conditions>
+		struct OrCondition
+		{
+			inline static bool Get(Char c)
+			{
+				return (... || Conditions::Get(c));
+			}
+		};
+
+		template<IsCondition... Conditions>
+		struct AndCondition
+		{
+			inline static bool Get(Char c)
+			{
+				return (... && Conditions::Get(c));
+			}
+		};
+
 		/*!
 		@brief This condition is used to match characters which are not in the other conditions. It should always be placed at last.
 		*/
