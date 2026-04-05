@@ -156,6 +156,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="TestParserError.hpp" />
     <ClInclude Include="TestGrammar.hpp" />
     <ClInclude Include="TestLexer.hpp" />
     <ClInclude Include="TestLexerUtility.hpp" />

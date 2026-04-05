@@ -1042,6 +1042,11 @@ const Vector<Token>& SpaceGameEngine::CommonParser::Lexer::Experimental::BaseCon
 	return m_Tokens;
 }
 
+const Vector<ParserError>& SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::GetErrors() const
+{
+	return m_Errors;
+}
+
 void Experimental::BaseContext::Advance()
 {
 	SGE_CHECK(TouchInputStringEndError, m_Iter, m_EndIter);
@@ -1078,6 +1083,11 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Submit(Tok
 {
 	m_Tokens.EmplaceBack(token_type, String(m_BufferBeginIter, m_BufferEndIter), m_BufferLine, m_BufferColumn);
 	Clear();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Throw(SizeType error_type_id, Vector<String>&& additional_information)
+{
+	m_Errors.EmplaceBack(ParserError(error_type_id, m_Line, m_Column, std::move(additional_information)));
 }
 
 bool SpaceGameEngine::CommonParser::Lexer::Experimental::DefaultCondition::Get(Char c)

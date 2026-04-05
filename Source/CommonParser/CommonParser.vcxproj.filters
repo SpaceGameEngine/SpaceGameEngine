@@ -33,6 +33,9 @@
     <ClInclude Include="Public\LL1Parser.hpp">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\ParserError.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonParserModule.cpp">
@@ -45,6 +48,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\LexerUtility.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\ParserError.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

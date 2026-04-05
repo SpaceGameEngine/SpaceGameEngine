@@ -143,6 +143,7 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Public\CommonParserAPI.h" />
+    <ClInclude Include="Public\ParserError.h" />
     <ClInclude Include="Public\Grammar.hpp" />
     <ClInclude Include="Public\Lexer.h" />
     <ClInclude Include="Public\LexerUtility.h" />
@@ -150,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonParserModule.cpp" />
+    <ClCompile Include="Private\ParserError.cpp" />
     <ClCompile Include="Private\Lexer.cpp" />
     <ClCompile Include="Private\LexerUtility.cpp" />
     <ClCompile Include="Private\Logger.cpp" />

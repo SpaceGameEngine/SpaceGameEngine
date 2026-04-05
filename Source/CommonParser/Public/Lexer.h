@@ -14,11 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include "CommonParserAPI.h"
 #include "SGEString.hpp"
 #include "Utility/Singleton.hpp"
 #include "Container/HashMap.hpp"
 #include "Container/Vector.hpp"
-#include "CommonParserAPI.h"
+#include "ParserError.h"
 
 /*!
 @ingroup CommonParser
@@ -288,6 +289,8 @@ namespace SpaceGameEngine::CommonParser::Lexer
 
 			const Vector<Token>& GetTokens() const;
 
+			const Vector<ParserError>& GetErrors() const;
+
 			/*!
 			@brief Advance the iterator, update column number and add the character to the buffer.
 			*/
@@ -310,6 +313,8 @@ namespace SpaceGameEngine::CommonParser::Lexer
 
 			void Submit(TokenType token_type);
 
+			void Throw(SizeType error_type_id, Vector<String>&& additional_information = Vector<String>());
+
 		private:
 			SizeType m_Line = 1;
 			SizeType m_Column = 1;
@@ -320,6 +325,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			String::ConstIterator m_BufferBeginIter;
 			String::ConstIterator m_BufferEndIter;
 			Vector<Token> m_Tokens;
+			Vector<ParserError> m_Errors;
 		};
 
 		template<typename T>
@@ -457,6 +463,16 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			}
 		};
 
+		template<SizeType ErrorTypeId>
+		struct ThrowAction
+		{
+			template<typename ContextType>
+			inline static void Run(ContextType& context)
+			{
+				context.Throw(ErrorTypeId);
+			}
+		};
+
 		template<IsContext ContextType, IsCondition ConditionType, IsAction<ContextType> ActionType, ArrayLiteral _NextStateName>
 		struct Transition
 		{
@@ -567,6 +583,11 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			while (state_id != EndStateIndex || (!context.IsEnd()))
 				state_id = StateAcceptors[state_id](context);
 			return context.GetTokens();
+		}
+
+		namespace CppLikeStyleLexer
+		{
+
 		}
 	}
 }

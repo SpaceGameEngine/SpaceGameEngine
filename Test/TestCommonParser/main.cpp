@@ -17,6 +17,7 @@ limitations under the License.
 #include "Bootstrap.h"
 #include "SGEString.hpp"
 #include "Module/ModuleManager.h"
+#include "TestParserError.hpp"
 #include "TestLexer.hpp"
 #include "TestLexerUtility.hpp"
 #include "TestGrammar.hpp"
