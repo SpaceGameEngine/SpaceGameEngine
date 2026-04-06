@@ -1115,9 +1115,27 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Deta
 	Clear();
 }
 
+void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::CppLikeStyleLexerContext::AdvanceRawStringSuffix()
+{
+	m_RawStringSuffix += GetCurrentChar();
+	Skip();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::CppLikeStyleLexerContext::GiveUpRawStringSuffix()
+{
+	m_Buffer += SGE_STR(')');
+	m_Buffer += m_RawStringSuffix;
+	ClearRawStringSuffix();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::CppLikeStyleLexerContext::ClearRawStringSuffix()
+{
+	m_RawStringSuffix.Clear();
+}
+
 bool SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::CppLikeStyleLexerContext::IsValidRawStringSuffix() const
 {
-	return m_RawStringPrefix == m_Buffer;
+	return m_RawStringPrefix == m_RawStringSuffix;
 }
 
 bool SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::IsValidEscapeCharacterCondition::Get(Char c, const CppLikeStyleLexerContext& context)
@@ -1133,4 +1151,19 @@ bool SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Deta
 void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::SubmitRawStringPrefixAction::Run(CppLikeStyleLexerContext& context)
 {
 	context.SubmitRawStringPrefix();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::AdvanceRawStringSuffixAction::Run(CppLikeStyleLexerContext& context)
+{
+	context.AdvanceRawStringSuffix();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::GiveUpRawStringSuffixAction::Run(CppLikeStyleLexerContext& context)
+{
+	context.GiveUpRawStringSuffix();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::ClearRawStringSuffixAction::Run(CppLikeStyleLexerContext& context)
+{
+	context.ClearRawStringSuffix();
 }

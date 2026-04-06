@@ -613,13 +613,30 @@ namespace SpaceGameEngine::CommonParser::Lexer
 					@brief Set the raw string prefix with the content in the buffer, then clear the buffer. This function is used when accepting the raw string prefix state, and the content in the buffer is the raw string prefix.
 					*/
 					void SubmitRawStringPrefix();
+
 					/*!
-					@brief Compare the content in the buffer with the raw string prefix. This function is used when accepting the raw string end state, and the content in the buffer is the raw string suffix.
+					@brief Add the current character to the raw string suffix, then advance the iterator and update column number. This function is used when accepting the raw string suffix state.
+					*/
+					void AdvanceRawStringSuffix();
+
+					/*!
+					@brief Give up the raw string suffix, clear the raw string suffix and append the content of the raw string suffix to the buffer(including ')').
+					*/
+					void GiveUpRawStringSuffix();
+
+					/*!
+					@brief Clear the raw string suffix. This function is used when accepting the raw string prefix state.
+					*/
+					void ClearRawStringSuffix();
+
+					/*!
+					@brief Compare the raw string suffix with the raw string prefix, if they are the same, it means the raw string suffix is valid. This function is used when judging whether the raw string is ended or not.
 					*/
 					bool IsValidRawStringSuffix() const;
 
 				private:
 					String m_RawStringPrefix;
+					String m_RawStringSuffix;
 				};
 
 				struct COMMON_PARSER_API IsValidEscapeCharacterCondition
@@ -642,7 +659,22 @@ namespace SpaceGameEngine::CommonParser::Lexer
 					}
 				};
 
-				struct SubmitRawStringPrefixAction
+				struct COMMON_PARSER_API SubmitRawStringPrefixAction
+				{
+					static void Run(CppLikeStyleLexerContext& context);
+				};
+
+				struct COMMON_PARSER_API AdvanceRawStringSuffixAction
+				{
+					static void Run(CppLikeStyleLexerContext& context);
+				};
+
+				struct COMMON_PARSER_API GiveUpRawStringSuffixAction
+				{
+					static void Run(CppLikeStyleLexerContext& context);
+				};
+
+				struct COMMON_PARSER_API ClearRawStringSuffixAction
 				{
 					static void Run(CppLikeStyleLexerContext& context);
 				};
@@ -976,6 +1008,40 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																   DefaultCondition,
 																   EmptyAction,
 																   SGE_STR("IdentifierState")>;
+				using RawStringBeginToRawStringTransition = Transition<CppLikeStyleLexerContext,
+																	   MatchCharsCondition<SGE_STR("(")>,
+																	   ChainAction<CppLikeStyleLexerContext, SubmitRawStringPrefixAction, SkipAction>,
+																	   SGE_STR("RawStringState")>;
+				using RawStringBeginInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																			MatchCharsCondition<SGE_STR("\"")>,
+																			ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																			SGE_STR("IdleState")>;
+				using RawStringBeginToRawStringBeginTransition = Transition<CppLikeStyleLexerContext,
+																			DefaultCondition,
+																			AdvanceAction,
+																			SGE_STR("RawStringBeginState")>;
+				using RawStringToRawStringEndTransition = Transition<CppLikeStyleLexerContext,
+																	 MatchCharsCondition<SGE_STR(")")>,
+																	 SkipAction,
+																	 SGE_STR("RawStringEndState")>;
+				using RawStringToRawStringTransition = Transition<CppLikeStyleLexerContext,
+																  DefaultCondition,
+																  AdvanceAction,
+																  SGE_STR("RawStringState")>;
+				using RawStringEndSubmitTransition = Transition<CppLikeStyleLexerContext,
+																AndCondition<CppLikeStyleLexerContext,
+																			 MatchCharsCondition<SGE_STR("\"")>,
+																			 IsValidRawStringSuffixCondition>,
+																ChainAction<CppLikeStyleLexerContext, SubmitAction<TokenTypes::StringLiteral>, ClearRawStringSuffixAction, SkipAction>,
+																SGE_STR("IdleState")>;
+				using RawStringEndToRawStringTransition = Transition<CppLikeStyleLexerContext,
+																	 MatchCharsCondition<SGE_STR(")\"")>,
+																	 GiveUpRawStringSuffixAction,
+																	 SGE_STR("RawStringState")>;
+				using RawStringEndToRawStringEndTransition = Transition<CppLikeStyleLexerContext,
+																		DefaultCondition,
+																		AdvanceRawStringSuffixAction,
+																		SGE_STR("RawStringEndState")>;
 
 				using IdleState = State<CppLikeStyleLexerContext, SGE_STR("IdleState"),
 										IdleToIdentifierTransition,
@@ -1072,6 +1138,17 @@ namespace SpaceGameEngine::CommonParser::Lexer
 				using RawPrefixState = State<CppLikeStyleLexerContext, SGE_STR("RawPrefixState"),
 											 RawPrefixToRawStringBeginTransition,
 											 RawPrefixToIdentifierTransition>;
+				using RawStringBeginState = State<CppLikeStyleLexerContext, SGE_STR("RawStringBeginState"),
+												  RawStringBeginToRawStringTransition,
+												  RawStringBeginInvalidCharacterTransition,
+												  RawStringBeginToRawStringBeginTransition>;
+				using RawStringState = State<CppLikeStyleLexerContext, SGE_STR("RawStringState"),
+											 RawStringToRawStringEndTransition,
+											 RawStringToRawStringTransition>;
+				using RawStringEndState = State<CppLikeStyleLexerContext, SGE_STR("RawStringEndState"),
+												RawStringEndSubmitTransition,
+												RawStringEndToRawStringTransition,
+												RawStringEndToRawStringEndTransition>;
 			}
 		}
 	}
