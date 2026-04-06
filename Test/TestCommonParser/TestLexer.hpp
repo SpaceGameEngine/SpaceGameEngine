@@ -510,74 +510,80 @@ TEST(GetTokens, Test)
 TEST(MatchCharsCondition, Test)
 {
 	using TestMatchCharsCondition = Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>;
-	ASSERT_TRUE(Lexer::Experimental::IsCondition<TestMatchCharsCondition>);
-	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('T')));
-	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('e')));
-	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('s')));
-	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('t')));
-	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('a')));
-	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('A')));
-	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('0')));
-	ASSERT_FALSE(TestMatchCharsCondition::Get(0));
+	Lexer::Experimental::BaseContext context(SGE_STR("Test"));
+	ASSERT_TRUE((Lexer::Experimental::IsCondition<TestMatchCharsCondition, Lexer::Experimental::BaseContext>));
+	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('T'), context));
+	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('e'), context));
+	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('s'), context));
+	ASSERT_TRUE(TestMatchCharsCondition::Get(SGE_STR('t'), context));
+	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('a'), context));
+	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('A'), context));
+	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('0'), context));
+	ASSERT_FALSE(TestMatchCharsCondition::Get(0, context));
 }
 
 TEST(MatchCharRangeCondition, Test)
 {
 	using TestMatchCharRangeCondition = Lexer::Experimental::MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>;
-	ASSERT_TRUE(Lexer::Experimental::IsCondition<TestMatchCharRangeCondition>);
-	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('a')));
-	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('m')));
-	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('z')));
-	ASSERT_FALSE(TestMatchCharRangeCondition::Get(SGE_STR('A')));
-	ASSERT_FALSE(TestMatchCharRangeCondition::Get(SGE_STR('0')));
-	ASSERT_FALSE(TestMatchCharRangeCondition::Get(0));
+	Lexer::Experimental::BaseContext context(SGE_STR("Test"));
+	ASSERT_TRUE((Lexer::Experimental::IsCondition<TestMatchCharRangeCondition, Lexer::Experimental::BaseContext>));
+	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('a'), context));
+	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('m'), context));
+	ASSERT_TRUE(TestMatchCharRangeCondition::Get(SGE_STR('z'), context));
+	ASSERT_FALSE(TestMatchCharRangeCondition::Get(SGE_STR('A'), context));
+	ASSERT_FALSE(TestMatchCharRangeCondition::Get(SGE_STR('0'), context));
+	ASSERT_FALSE(TestMatchCharRangeCondition::Get(0, context));
 }
 
 TEST(NegateCondition, Test)
 {
-	using TestNegateCondition = Lexer::Experimental::NegateCondition<Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>>;
-	ASSERT_TRUE(Lexer::Experimental::IsCondition<TestNegateCondition>);
-	ASSERT_FALSE(TestNegateCondition::Get(SGE_STR('T')));
-	ASSERT_FALSE(TestNegateCondition::Get(SGE_STR('e')));
-	ASSERT_FALSE(TestNegateCondition::Get(SGE_STR('s')));
-	ASSERT_FALSE(TestNegateCondition::Get(SGE_STR('t')));
-	ASSERT_TRUE(TestNegateCondition::Get(SGE_STR('a')));
-	ASSERT_TRUE(TestNegateCondition::Get(SGE_STR('A')));
-	ASSERT_TRUE(TestNegateCondition::Get(SGE_STR('0')));
+	using TestNegateCondition = Lexer::Experimental::NegateCondition<Lexer::Experimental::BaseContext, Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>>;
+	Lexer::Experimental::BaseContext context(SGE_STR("Test"));
+	ASSERT_TRUE((Lexer::Experimental::IsCondition<TestNegateCondition, Lexer::Experimental::BaseContext>));
+	ASSERT_FALSE(TestNegateCondition::Get(SGE_STR('T'), context));
+	ASSERT_FALSE(TestNegateCondition::Get(SGE_STR('e'), context));
+	ASSERT_FALSE(TestNegateCondition::Get(SGE_STR('s'), context));
+	ASSERT_FALSE(TestNegateCondition::Get(SGE_STR('t'), context));
+	ASSERT_TRUE(TestNegateCondition::Get(SGE_STR('a'), context));
+	ASSERT_TRUE(TestNegateCondition::Get(SGE_STR('A'), context));
+	ASSERT_TRUE(TestNegateCondition::Get(SGE_STR('0'), context));
 }
 
 TEST(OrCondition, Test)
 {
-	using TestOrCondition = Lexer::Experimental::OrCondition<Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>, Lexer::Experimental::MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>>;
-	ASSERT_TRUE(Lexer::Experimental::IsCondition<TestOrCondition>);
-	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('T')));
-	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('e')));
-	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('s')));
-	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('t')));
-	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('0')));
-	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('5')));
-	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('9')));
-	ASSERT_FALSE(TestOrCondition::Get(SGE_STR('a')));
-	ASSERT_FALSE(TestOrCondition::Get(SGE_STR('A')));
+	using TestOrCondition = Lexer::Experimental::OrCondition<Lexer::Experimental::BaseContext, Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>, Lexer::Experimental::MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>>;
+	Lexer::Experimental::BaseContext context(SGE_STR("Test"));
+	ASSERT_TRUE((Lexer::Experimental::IsCondition<TestOrCondition, Lexer::Experimental::BaseContext>));
+	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('T'), context));
+	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('e'), context));
+	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('s'), context));
+	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('t'), context));
+	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('0'), context));
+	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('5'), context));
+	ASSERT_TRUE(TestOrCondition::Get(SGE_STR('9'), context));
+	ASSERT_FALSE(TestOrCondition::Get(SGE_STR('a'), context));
+	ASSERT_FALSE(TestOrCondition::Get(SGE_STR('A'), context));
 }
 
 TEST(AndCondition, Test)
 {
-	using TestAndCondition = Lexer::Experimental::AndCondition<Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>, Lexer::Experimental::MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>>;
-	ASSERT_TRUE(Lexer::Experimental::IsCondition<TestAndCondition>);
-	ASSERT_FALSE(TestAndCondition::Get(SGE_STR('T')));
-	ASSERT_TRUE(TestAndCondition::Get(SGE_STR('e')));
-	ASSERT_TRUE(TestAndCondition::Get(SGE_STR('s')));
-	ASSERT_TRUE(TestAndCondition::Get(SGE_STR('t')));
-	ASSERT_FALSE(TestAndCondition::Get(SGE_STR('0')));
-	ASSERT_FALSE(TestAndCondition::Get(SGE_STR('A')));
+	using TestAndCondition = Lexer::Experimental::AndCondition<Lexer::Experimental::BaseContext, Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>, Lexer::Experimental::MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>>;
+	Lexer::Experimental::BaseContext context(SGE_STR("Test"));
+	ASSERT_TRUE((Lexer::Experimental::IsCondition<TestAndCondition, Lexer::Experimental::BaseContext>));
+	ASSERT_FALSE(TestAndCondition::Get(SGE_STR('T'), context));
+	ASSERT_TRUE(TestAndCondition::Get(SGE_STR('e'), context));
+	ASSERT_TRUE(TestAndCondition::Get(SGE_STR('s'), context));
+	ASSERT_TRUE(TestAndCondition::Get(SGE_STR('t'), context));
+	ASSERT_FALSE(TestAndCondition::Get(SGE_STR('0'), context));
+	ASSERT_FALSE(TestAndCondition::Get(SGE_STR('A'), context));
 }
 
 TEST(DefaultCondition, Test)
 {
-	ASSERT_TRUE(Lexer::Experimental::IsCondition<Lexer::Experimental::DefaultCondition>);
+	Lexer::Experimental::BaseContext context(SGE_STR("Test"));
+	ASSERT_TRUE((Lexer::Experimental::IsCondition<Lexer::Experimental::DefaultCondition, Lexer::Experimental::BaseContext>));
 	for (Char c = 0; c < UINT16_MAX; ++c)
-		ASSERT_TRUE(Lexer::Experimental::DefaultCondition::Get(c));
+		ASSERT_TRUE(Lexer::Experimental::DefaultCondition::Get(c, context));
 }
 
 TEST(Transition, Test)

@@ -320,7 +320,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 
 			void Throw(SizeType error_type_id, Vector<String>&& additional_information = Vector<String>());
 
-		private:
+		protected:
 			SizeType m_Line = 1;
 			SizeType m_Column = 1;
 			SizeType m_BufferLine = 1;
@@ -335,17 +335,18 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		template<typename T>
 		concept IsContext = std::derived_from<T, BaseContext>;
 
-		template<typename T>
-		concept IsCondition = requires(T t, Char c) {
+		template<typename T, typename ContextType>
+		concept IsCondition = IsContext<ContextType> && requires(T t, Char c, const ContextType& context) {
 			{
-				T::Get(c)
+				T::Get(c, context)
 			} -> std::same_as<bool>;
 		};
 
 		template<ArrayLiteral Chars>
 		struct MatchCharsCondition
 		{
-			inline static bool Get(Char c)
+			template<IsContext ContextType>
+			inline static bool Get(Char c, const ContextType&)
 			{
 				for (SizeType i = 0; i < decltype(Chars)::Size - 1; ++i)	// avoid the last \0
 				{
@@ -359,36 +360,37 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		template<Char StartChar, Char EndChar>
 		struct MatchCharRangeCondition
 		{
-			inline static bool Get(Char c)
+			template<IsContext ContextType>
+			inline static bool Get(Char c, const ContextType&)
 			{
 				return c >= StartChar && c <= EndChar;
 			}
 		};
 
-		template<IsCondition Condition>
+		template<IsContext ContextType, IsCondition<ContextType> Condition>
 		struct NegateCondition
 		{
-			inline static bool Get(Char c)
+			inline static bool Get(Char c, const ContextType& context)
 			{
-				return !Condition::Get(c);
+				return !Condition::Get(c, context);
 			}
 		};
 
-		template<IsCondition... Conditions>
+		template<IsContext ContextType, IsCondition<ContextType>... Conditions>
 		struct OrCondition
 		{
-			inline static bool Get(Char c)
+			inline static bool Get(Char c, const ContextType& context)
 			{
-				return (... || Conditions::Get(c));
+				return (... || Conditions::Get(c, context));
 			}
 		};
 
-		template<IsCondition... Conditions>
+		template<IsContext ContextType, IsCondition<ContextType>... Conditions>
 		struct AndCondition
 		{
-			inline static bool Get(Char c)
+			inline static bool Get(Char c, const ContextType& context)
 			{
-				return (... && Conditions::Get(c));
+				return (... && Conditions::Get(c, context));
 			}
 		};
 
@@ -397,7 +399,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		*/
 		struct COMMON_PARSER_API DefaultCondition
 		{
-			static bool Get(Char c);
+			static bool Get(Char c, const BaseContext&);
 		};
 
 		template<typename T, typename ContextType>
@@ -488,7 +490,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			}
 		};
 
-		template<IsContext ContextType, IsCondition ConditionType, IsAction<ContextType> ActionType, ArrayLiteral _NextStateName>
+		template<IsContext ContextType, IsCondition<ContextType> ConditionType, IsAction<ContextType> ActionType, ArrayLiteral _NextStateName>
 		struct Transition
 		{
 			using Context = ContextType;
@@ -501,7 +503,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		concept IsTransition = IsContext<ContextType> && requires {
 			IsContext<typename T::Context>;
 			std::is_convertible_v<ContextType, typename T::Context>;
-			IsCondition<typename T::Condition>;
+			IsCondition<typename T::Condition, typename T::Context>;
 			IsAction<typename T::Action, typename T::Context>;
 			{
 				T::NextStateName.m_Value
@@ -532,7 +534,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			static_assert(sizeof...(Transitions) > 0, "State must have at least one Transition.");
 
 			inline static constexpr const SizeType TransitionCount = sizeof...(Transitions);
-			using TransitionConditionType = bool (*)(Char);
+			using TransitionConditionType = bool (*)(Char, const ContextType&);
 			inline static constexpr const TransitionConditionType TransitionConditions[TransitionCount] = {Transitions::Condition::Get...};
 			using TransitionActionType = void (*)(ContextType&);
 			inline static constexpr const TransitionActionType TransitionActions[TransitionCount] = {Transitions::Action::Run...};
@@ -544,7 +546,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 				Char c = context.GetCurrentChar();
 				for (SizeType i = 0; i < TransitionCount; ++i)
 				{
-					if (TransitionConditions[i](c))
+					if (TransitionConditions[i](c, context))
 					{
 						TransitionActions[i](context);
 						return NextStateNameIndices[i];
@@ -606,11 +608,28 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			{
 				class COMMON_PARSER_API CppLikeStyleLexerContext : public BaseContext
 				{
+				public:
+					/*!
+					@brief Set the raw string prefix with the content in the buffer, then clear the buffer. This function is used when accepting the raw string prefix state, and the content in the buffer is the raw string prefix.
+					*/
+					void SubmitRawStringPrefix();
+					/*!
+					@brief Compare the content in the buffer with the raw string prefix. This function is used when accepting the raw string end state, and the content in the buffer is the raw string suffix.
+					*/
+					bool IsValidRawStringSuffix() const;
+
+				private:
+					String m_RawStringPrefix;
 				};
 
 				struct COMMON_PARSER_API IsValidEscapeCharacterCondition
 				{
-					static bool Get(Char c);
+					static bool Get(Char c, const CppLikeStyleLexerContext& context);
+				};
+
+				struct COMMON_PARSER_API IsValidRawStringSuffixCondition
+				{
+					static bool Get(Char c, const CppLikeStyleLexerContext& context);
 				};
 
 				struct AdvanceEscapeCharacterAction
@@ -623,18 +642,23 @@ namespace SpaceGameEngine::CommonParser::Lexer
 					}
 				};
 
+				struct SubmitRawStringPrefixAction
+				{
+					static void Run(CppLikeStyleLexerContext& context);
+				};
+
 				namespace ErrorTypeId
 				{
 					inline constexpr const SizeType InvalidCharacter = 1;	 // todo make this divided into much more detailed errors
 				}
 
 				using IdleToIdentifierTransition = Transition<CppLikeStyleLexerContext,
-															  OrCondition<
-																  MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>,
-																  AndCondition<
-																	  MatchCharRangeCondition<SGE_STR('A'), SGE_STR('Z')>,
-																	  NegateCondition<MatchCharsCondition<SGE_STR("R")>>>,
-																  MatchCharsCondition<SGE_STR("_")>>,
+															  OrCondition<CppLikeStyleLexerContext,
+																		  MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>,
+																		  AndCondition<CppLikeStyleLexerContext,
+																					   MatchCharRangeCondition<SGE_STR('A'), SGE_STR('Z')>,
+																					   NegateCondition<CppLikeStyleLexerContext, MatchCharsCondition<SGE_STR("R")>>>,
+																		  MatchCharsCondition<SGE_STR("_")>>,
 															  AdvanceAction,
 															  SGE_STR("IdentifierState")>;
 				using IdleToDecimalIntegerTransition = Transition<CppLikeStyleLexerContext,
@@ -790,11 +814,11 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																  ChainAction<CppLikeStyleLexerContext, SkipAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
 																  SGE_STR("IdleState")>;
 				using IdentifierToIdentifierTransition = Transition<CppLikeStyleLexerContext,
-																	OrCondition<
-																		MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>,
-																		MatchCharRangeCondition<SGE_STR('A'), SGE_STR('Z')>,
-																		MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
-																		MatchCharsCondition<SGE_STR("_")>>,
+																	OrCondition<CppLikeStyleLexerContext,
+																				MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>,
+																				MatchCharRangeCondition<SGE_STR('A'), SGE_STR('Z')>,
+																				MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
+																				MatchCharsCondition<SGE_STR("_")>>,
 																	AdvanceAction,
 																	SGE_STR("IdentifierState")>;
 				using IdentifierSubmitTransition = Transition<CppLikeStyleLexerContext,
@@ -862,10 +886,10 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																 SubmitAction<TokenTypes::IntegerLiteral>,
 																 SGE_STR("IdleState")>;
 				using HexIntegerToHexIntegerTransition = Transition<CppLikeStyleLexerContext,
-																	OrCondition<
-																		MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
-																		MatchCharRangeCondition<SGE_STR('a'), SGE_STR('f')>,
-																		MatchCharRangeCondition<SGE_STR('A'), SGE_STR('F')>>,
+																	OrCondition<CppLikeStyleLexerContext,
+																				MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
+																				MatchCharRangeCondition<SGE_STR('a'), SGE_STR('f')>,
+																				MatchCharRangeCondition<SGE_STR('A'), SGE_STR('F')>>,
 																	AdvanceAction,
 																	SGE_STR("HexIntegerState")>;
 				using HexIntegerSubmitTransition = Transition<CppLikeStyleLexerContext,
@@ -944,6 +968,14 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																				   DefaultCondition,
 																				   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
 																				   SGE_STR("IdleState")>;
+				using RawPrefixToRawStringBeginTransition = Transition<CppLikeStyleLexerContext,
+																	   MatchCharsCondition<SGE_STR("\"")>,
+																	   ChainAction<CppLikeStyleLexerContext, ClearAction, SkipAction>,
+																	   SGE_STR("RawStringBeginState")>;
+				using RawPrefixToIdentifierTransition = Transition<CppLikeStyleLexerContext,
+																   DefaultCondition,
+																   EmptyAction,
+																   SGE_STR("IdentifierState")>;
 
 				using IdleState = State<CppLikeStyleLexerContext, SGE_STR("IdleState"),
 										IdleToIdentifierTransition,
@@ -1037,6 +1069,9 @@ namespace SpaceGameEngine::CommonParser::Lexer
 				using StringEscapeCharacterState = State<CppLikeStyleLexerContext, SGE_STR("StringEscapeCharacterState"),
 														 StringEscapeCharacterToStringTransition,
 														 StringEscapeCharacterInvalidCharacterTransition>;
+				using RawPrefixState = State<CppLikeStyleLexerContext, SGE_STR("RawPrefixState"),
+											 RawPrefixToRawStringBeginTransition,
+											 RawPrefixToIdentifierTransition>;
 			}
 		}
 	}

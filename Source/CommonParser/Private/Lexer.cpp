@@ -1094,7 +1094,7 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Throw(Size
 	m_Errors.EmplaceBack(ParserError(error_type_id, m_Line, m_Column, std::move(additional_information)));
 }
 
-bool SpaceGameEngine::CommonParser::Lexer::Experimental::DefaultCondition::Get(Char c)
+bool SpaceGameEngine::CommonParser::Lexer::Experimental::DefaultCondition::Get(Char c, const BaseContext&)
 {
 	return true;
 }
@@ -1109,7 +1109,28 @@ bool SpaceGameEngine::CommonParser::Lexer::Experimental::TouchInputStringEndErro
 	return iter == end;
 }
 
-bool SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::IsValidEscapeCharacterCondition::Get(Char c)
+void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::CppLikeStyleLexerContext::SubmitRawStringPrefix()
+{
+	m_RawStringPrefix = std::move(m_Buffer);
+	Clear();
+}
+
+bool SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::CppLikeStyleLexerContext::IsValidRawStringSuffix() const
+{
+	return m_RawStringPrefix == m_Buffer;
+}
+
+bool SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::IsValidEscapeCharacterCondition::Get(Char c, const CppLikeStyleLexerContext& context)
 {
 	return EscapeCharacterSet::GetSingleton().IsEscapeCharacter(c);
+}
+
+bool SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::IsValidRawStringSuffixCondition::Get(Char c, const CppLikeStyleLexerContext& context)
+{
+	return context.IsValidRawStringSuffix();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::SubmitRawStringPrefixAction::Run(CppLikeStyleLexerContext& context)
+{
+	context.SubmitRawStringPrefix();
 }
