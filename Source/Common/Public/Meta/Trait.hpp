@@ -105,14 +105,15 @@ namespace SpaceGameEngine
 		};
 	};
 
-	template<typename T, SizeType Size>
+	template<typename T, SizeType _Size>
 	struct ArrayLiteral
 	{
-		T m_Value[Size];
+		T m_Value[_Size];
+		inline static constexpr const SizeType Size = _Size;
 
-		constexpr ArrayLiteral(const T (&value)[Size])
+		constexpr ArrayLiteral(const T (&value)[_Size])
 		{
-			for (SizeType i = 0; i < Size; ++i)
+			for (SizeType i = 0; i < _Size; ++i)
 			{
 				m_Value[i] = value[i];
 			}

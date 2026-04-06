@@ -297,6 +297,11 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			void Advance();
 
 			/*!
+			@brief add the character to the buffer but do not advance the iterator or update column number.
+			*/
+			void Append(Char c);
+
+			/*!
 			@brief Advance the iterator, update column number but do not add the character to the buffer.
 			*/
 			void Skip();
@@ -322,8 +327,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			SizeType m_BufferColumn = 1;
 			String::ConstIterator m_Iter;
 			String::ConstIterator m_EndIter;
-			String::ConstIterator m_BufferBeginIter;
-			String::ConstIterator m_BufferEndIter;
+			String m_Buffer;
 			Vector<Token> m_Tokens;
 			Vector<ParserError> m_Errors;
 		};
@@ -343,9 +347,9 @@ namespace SpaceGameEngine::CommonParser::Lexer
 		{
 			inline static bool Get(Char c)
 			{
-				for (Char ch : Chars.m_Value)
+				for (SizeType i = 0; i < decltype(Chars)::Size - 1; ++i)	// avoid the last \0
 				{
-					if (c == ch)
+					if (c == Chars.m_Value[i])
 						return true;
 				}
 				return false;
@@ -423,6 +427,17 @@ namespace SpaceGameEngine::CommonParser::Lexer
 			inline static void Run(ContextType& context)
 			{
 				context.Advance();
+			}
+		};
+
+		template<ArrayLiteral Chars>
+		struct AppendAction
+		{
+			template<typename ContextType>
+			inline static void Run(ContextType& context)
+			{
+				for (SizeType i = 0; i < decltype(Chars)::Size - 1; ++i)	// avoid the last \0
+					context.Append(Chars.m_Value[i]);
 			}
 		};
 
@@ -587,7 +602,442 @@ namespace SpaceGameEngine::CommonParser::Lexer
 
 		namespace CppLikeStyleLexer
 		{
+			namespace Detail
+			{
+				class COMMON_PARSER_API CppLikeStyleLexerContext : public BaseContext
+				{
+				};
 
+				struct COMMON_PARSER_API IsValidEscapeCharacterCondition
+				{
+					static bool Get(Char c);
+				};
+
+				struct AdvanceEscapeCharacterAction
+				{
+					template<typename ContextType>
+					inline static void Run(ContextType& context)
+					{
+						context.Append(EscapeCharacterSet::GetInstance().Translate(context.GetCurrentChar()));
+						context.Skip();
+					}
+				};
+
+				namespace ErrorTypeId
+				{
+					inline constexpr const SizeType InvalidCharacter = 1;	 // todo make this divided into much more detailed errors
+				}
+
+				using IdleToIdentifierTransition = Transition<CppLikeStyleLexerContext,
+															  OrCondition<
+																  MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>,
+																  AndCondition<
+																	  MatchCharRangeCondition<SGE_STR('A'), SGE_STR('Z')>,
+																	  NegateCondition<MatchCharsCondition<SGE_STR("R")>>>,
+																  MatchCharsCondition<SGE_STR("_")>>,
+															  AdvanceAction,
+															  SGE_STR("IdentifierState")>;
+				using IdleToDecimalIntegerTransition = Transition<CppLikeStyleLexerContext,
+																  MatchCharRangeCondition<SGE_STR('1'), SGE_STR('9')>,
+																  AdvanceAction,
+																  SGE_STR("DecimalIntegerState")>;
+				using IdleToZeroPrefixTransition = Transition<CppLikeStyleLexerContext,
+															  MatchCharsCondition<SGE_STR("0")>,
+															  AdvanceAction,
+															  SGE_STR("ZeroPrefixState")>;
+				using IdleToCharacterBeginTransition = Transition<CppLikeStyleLexerContext,
+																  MatchCharsCondition<SGE_STR("'")>,
+																  SkipAction,
+																  SGE_STR("CharacterBeginState")>;
+				using IdleToStringTransition = Transition<CppLikeStyleLexerContext,
+														  MatchCharsCondition<SGE_STR("\"")>,
+														  SkipAction,
+														  SGE_STR("StringState")>;
+				using IdleToRawPrefixTransition = Transition<CppLikeStyleLexerContext,
+															 MatchCharsCondition<SGE_STR("R")>,
+															 AdvanceAction,
+															 SGE_STR("RawPrefixState")>;
+				using IdleToLFLineSeparatorTransition = Transition<CppLikeStyleLexerContext,
+																   MatchCharsCondition<SGE_STR("\n")>,
+																   AdvanceAction,
+																   SGE_STR("LFLineSeparatorState")>;
+				using IdleToCRLineSeparatorTransition = Transition<CppLikeStyleLexerContext,
+																   MatchCharsCondition<SGE_STR("\r")>,
+																   AdvanceAction,
+																   SGE_STR("CRLineSeparatorState")>;
+				using IdleToWordSeparatorTransition = Transition<CppLikeStyleLexerContext,
+																 MatchCharsCondition<SGE_STR(" \t")>,
+																 AdvanceAction,
+																 SGE_STR("WordSeparatorState")>;
+				using IdleToSlashPrefixTransition = Transition<CppLikeStyleLexerContext,
+															   MatchCharsCondition<SGE_STR("/")>,
+															   AdvanceAction,
+															   SGE_STR("SlashPrefixState")>;
+				using IdleSubmitExclamationTransition = Transition<CppLikeStyleLexerContext,
+																   MatchCharsCondition<SGE_STR("!")>,
+																   ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Exclamation>>,
+																   SGE_STR("IdleState")>;
+				using IdleSubmitHashTransition = Transition<CppLikeStyleLexerContext,
+															MatchCharsCondition<SGE_STR("#")>,
+															ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Hash>>,
+															SGE_STR("IdleState")>;
+				using IdleSubmitDollarTransition = Transition<CppLikeStyleLexerContext,
+															  MatchCharsCondition<SGE_STR("$")>,
+															  ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Dollar>>,
+															  SGE_STR("IdleState")>;
+				using IdleSubmitModTransition = Transition<CppLikeStyleLexerContext,
+														   MatchCharsCondition<SGE_STR("%")>,
+														   ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Mod>>,
+														   SGE_STR("IdleState")>;
+				using IdleSubmitAndTransition = Transition<CppLikeStyleLexerContext,
+														   MatchCharsCondition<SGE_STR("&")>,
+														   ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::And>>,
+														   SGE_STR("IdleState")>;
+				using IdleSubmitLeftBracketTransition = Transition<CppLikeStyleLexerContext,
+																   MatchCharsCondition<SGE_STR("(")>,
+																   ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::LeftBracket>>,
+																   SGE_STR("IdleState")>;
+				using IdleSubmitRightBracketTransition = Transition<CppLikeStyleLexerContext,
+																	MatchCharsCondition<SGE_STR(")")>,
+																	ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::RightBracket>>,
+																	SGE_STR("IdleState")>;
+				using IdleSubmitMultiplyTransition = Transition<CppLikeStyleLexerContext,
+																MatchCharsCondition<SGE_STR("*")>,
+																ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Multiply>>,
+																SGE_STR("IdleState")>;
+				using IdleSubmitAddTransition = Transition<CppLikeStyleLexerContext,
+														   MatchCharsCondition<SGE_STR("+")>,
+														   ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Add>>,
+														   SGE_STR("IdleState")>;
+				using IdleSubmitCommaTransition = Transition<CppLikeStyleLexerContext,
+															 MatchCharsCondition<SGE_STR(",")>,
+															 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Comma>>,
+															 SGE_STR("IdleState")>;
+				using IdleSubmitSubtractTransition = Transition<CppLikeStyleLexerContext,
+																MatchCharsCondition<SGE_STR("-")>,
+																ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Subtract>>,
+																SGE_STR("IdleState")>;
+				using IdleSubmitDotTransition = Transition<CppLikeStyleLexerContext,
+														   MatchCharsCondition<SGE_STR(".")>,
+														   ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Dot>>,
+														   SGE_STR("IdleState")>;
+				using IdleSubmitColonTransition = Transition<CppLikeStyleLexerContext,
+															 MatchCharsCondition<SGE_STR(":")>,
+															 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Colon>>,
+															 SGE_STR("IdleState")>;
+				using IdleSubmitSemicolonTransition = Transition<CppLikeStyleLexerContext,
+																 MatchCharsCondition<SGE_STR(";")>,
+																 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Semicolon>>,
+																 SGE_STR("IdleState")>;
+				using IdleSubmitLessTransition = Transition<CppLikeStyleLexerContext,
+															MatchCharsCondition<SGE_STR("<")>,
+															ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Less>>,
+															SGE_STR("IdleState")>;
+				using IdleSubmitEqualTransition = Transition<CppLikeStyleLexerContext,
+															 MatchCharsCondition<SGE_STR("=")>,
+															 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Equal>>,
+															 SGE_STR("IdleState")>;
+				using IdleSubmitGreaterTransition = Transition<CppLikeStyleLexerContext,
+															   MatchCharsCondition<SGE_STR(">")>,
+															   ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Greater>>,
+															   SGE_STR("IdleState")>;
+				using IdleSubmitQuestionTransition = Transition<CppLikeStyleLexerContext,
+																MatchCharsCondition<SGE_STR("?")>,
+																ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Question>>,
+																SGE_STR("IdleState")>;
+				using IdleSubmitAtTransition = Transition<CppLikeStyleLexerContext,
+														  MatchCharsCondition<SGE_STR("@")>,
+														  ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::At>>,
+														  SGE_STR("IdleState")>;
+				using IdleSubmitLeftSquareBracketTransition = Transition<CppLikeStyleLexerContext,
+																		 MatchCharsCondition<SGE_STR("[")>,
+																		 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::LeftSquareBracket>>,
+																		 SGE_STR("IdleState")>;
+				using IdleSubmitBackslashTransition = Transition<CppLikeStyleLexerContext,
+																 MatchCharsCondition<SGE_STR("\\")>,
+																 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Backslash>>,
+																 SGE_STR("IdleState")>;
+				using IdleSubmitRightSquareBracketTransition = Transition<CppLikeStyleLexerContext,
+																		  MatchCharsCondition<SGE_STR("]")>,
+																		  ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::RightSquareBracket>>,
+																		  SGE_STR("IdleState")>;
+				using IdleSubmitCaretTransition = Transition<CppLikeStyleLexerContext,
+															 MatchCharsCondition<SGE_STR("^")>,
+															 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Caret>>,
+															 SGE_STR("IdleState")>;
+				using IdleSubmitLeftCurlyBracketTransition = Transition<CppLikeStyleLexerContext,
+																		MatchCharsCondition<SGE_STR("{")>,
+																		ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::LeftCurlyBracket>>,
+																		SGE_STR("IdleState")>;
+				using IdleSubmitVerticalTransition = Transition<CppLikeStyleLexerContext,
+																MatchCharsCondition<SGE_STR("|")>,
+																ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Vertical>>,
+																SGE_STR("IdleState")>;
+				using IdleSubmitRightCurlyBracketTransition = Transition<CppLikeStyleLexerContext,
+																		 MatchCharsCondition<SGE_STR("}")>,
+																		 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::RightCurlyBracket>>,
+																		 SGE_STR("IdleState")>;
+				using IdleSubmitTildeTransition = Transition<CppLikeStyleLexerContext,
+															 MatchCharsCondition<SGE_STR("~")>,
+															 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Tilde>>,
+															 SGE_STR("IdleState")>;
+				using IdleSubmitQuoteTransition = Transition<CppLikeStyleLexerContext,
+															 MatchCharsCondition<SGE_STR("`")>,
+															 ChainAction<CppLikeStyleLexerContext, AdvanceAction, SubmitAction<TokenTypes::Quote>>,
+															 SGE_STR("IdleState")>;
+				using IdleInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																  DefaultCondition,
+																  ChainAction<CppLikeStyleLexerContext, SkipAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																  SGE_STR("IdleState")>;
+				using IdentifierToIdentifierTransition = Transition<CppLikeStyleLexerContext,
+																	OrCondition<
+																		MatchCharRangeCondition<SGE_STR('a'), SGE_STR('z')>,
+																		MatchCharRangeCondition<SGE_STR('A'), SGE_STR('Z')>,
+																		MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
+																		MatchCharsCondition<SGE_STR("_")>>,
+																	AdvanceAction,
+																	SGE_STR("IdentifierState")>;
+				using IdentifierSubmitTransition = Transition<CppLikeStyleLexerContext,
+															  DefaultCondition,
+															  SubmitAction<TokenTypes::Identifier>,
+															  SGE_STR("IdleState")>;
+				using LFLineSeparatorSubmitTransition = Transition<CppLikeStyleLexerContext,
+																   DefaultCondition,
+																   ChainAction<CppLikeStyleLexerContext, SubmitAction<TokenTypes::LineSeparator>, NewLineAction>,
+																   SGE_STR("IdleState")>;
+				using CRLineSeparatorToLFLineSeparatorTransition = Transition<CppLikeStyleLexerContext,
+																			  MatchCharsCondition<SGE_STR("\n")>,
+																			  AdvanceAction,
+																			  SGE_STR("LFLineSeparatorState")>;
+				using CRLineSeparatorSubmitTransition = Transition<CppLikeStyleLexerContext,
+																   DefaultCondition,
+																   ChainAction<CppLikeStyleLexerContext, SubmitAction<TokenTypes::LineSeparator>, NewLineAction>,
+																   SGE_STR("IdleState")>;
+				using WordSeparatorToWordSeparatorTransition = Transition<CppLikeStyleLexerContext,
+																		  MatchCharsCondition<SGE_STR(" \t")>,
+																		  AdvanceAction,
+																		  SGE_STR("WordSeparatorState")>;
+				using WordSeparatorSubmitTransition = Transition<CppLikeStyleLexerContext,
+																 DefaultCondition,
+																 SubmitAction<TokenTypes::WordSeparator>,
+																 SGE_STR("IdleState")>;
+				using ZeroPrefixToDecimalIntegerTransition = Transition<CppLikeStyleLexerContext,
+																		MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
+																		AdvanceAction,
+																		SGE_STR("DecimalIntegerState")>;
+				using ZeroPrefixToBinaryIntegerTransition = Transition<CppLikeStyleLexerContext,
+																	   MatchCharsCondition<SGE_STR("b")>,
+																	   AdvanceAction,
+																	   SGE_STR("BinaryIntegerState")>;
+				using ZeroPrefixToHexIntegerTransition = Transition<CppLikeStyleLexerContext,
+																	MatchCharsCondition<SGE_STR("x")>,
+																	AdvanceAction,
+																	SGE_STR("HexIntegerState")>;
+				using ZeroPrefixSubmitTransition = Transition<CppLikeStyleLexerContext,
+															  DefaultCondition,
+															  SubmitAction<TokenTypes::IntegerLiteral>,
+															  SGE_STR("IdleState")>;
+				using DecimalIntegerToDecimalIntegerTransition = Transition<CppLikeStyleLexerContext,
+																			MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
+																			AdvanceAction,
+																			SGE_STR("DecimalIntegerState")>;
+				using DecimalIntegerToDoubleDotTransition = Transition<CppLikeStyleLexerContext,
+																	   MatchCharsCondition<SGE_STR(".")>,
+																	   AdvanceAction,
+																	   SGE_STR("DoubleDotState")>;
+				using DecimalIntegerSubmitTransition = Transition<CppLikeStyleLexerContext,
+																  DefaultCondition,
+																  SubmitAction<TokenTypes::IntegerLiteral>,
+																  SGE_STR("IdleState")>;
+				using BinaryIntegerToBinaryIntegerTransition = Transition<CppLikeStyleLexerContext,
+																		  MatchCharsCondition<SGE_STR("01")>,
+																		  AdvanceAction,
+																		  SGE_STR("BinaryIntegerState")>;
+				using BinaryIntegerInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																		   MatchCharRangeCondition<SGE_STR('2'), SGE_STR('9')>,
+																		   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																		   SGE_STR("IdleState")>;
+				using BinaryIntegerSubmitTransition = Transition<CppLikeStyleLexerContext,
+																 DefaultCondition,
+																 SubmitAction<TokenTypes::IntegerLiteral>,
+																 SGE_STR("IdleState")>;
+				using HexIntegerToHexIntegerTransition = Transition<CppLikeStyleLexerContext,
+																	OrCondition<
+																		MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
+																		MatchCharRangeCondition<SGE_STR('a'), SGE_STR('f')>,
+																		MatchCharRangeCondition<SGE_STR('A'), SGE_STR('F')>>,
+																	AdvanceAction,
+																	SGE_STR("HexIntegerState")>;
+				using HexIntegerSubmitTransition = Transition<CppLikeStyleLexerContext,
+															  DefaultCondition,
+															  SubmitAction<TokenTypes::IntegerLiteral>,
+															  SGE_STR("IdleState")>;
+				using DoubleDotToDoubleTransition = Transition<CppLikeStyleLexerContext,
+															   MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
+															   AdvanceAction,
+															   SGE_STR("DoubleState")>;
+				using DoubleDotInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																	   DefaultCondition,
+																	   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																	   SGE_STR("IdleState")>;
+				using DoubleToDoubleTransition = Transition<CppLikeStyleLexerContext,
+															MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
+															AdvanceAction,
+															SGE_STR("DoubleState")>;
+				using DoubleSubmitFloatTransition = Transition<CppLikeStyleLexerContext,
+															   MatchCharsCondition<SGE_STR("f")>,
+															   ChainAction<CppLikeStyleLexerContext, SubmitAction<TokenTypes::FloatLiteral>, SkipAction>,
+															   SGE_STR("IdleState")>;
+				using DoubleSubmitDoubleTransition = Transition<CppLikeStyleLexerContext,
+																DefaultCondition,
+																SubmitAction<TokenTypes::DoubleLiteral>,
+																SGE_STR("IdleState")>;
+				using CharacterBeginToEscapeCharacterTransition = Transition<CppLikeStyleLexerContext,
+																			 MatchCharsCondition<SGE_STR("\\")>,
+																			 SkipAction,
+																			 SGE_STR("EscapeCharacterState")>;
+				using CharacterBeginInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																			MatchCharsCondition<SGE_STR("'")>,
+																			ChainAction<CppLikeStyleLexerContext, SkipAction, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																			SGE_STR("IdleState")>;
+				using CharacterBeginToCharacterEndTransition = Transition<CppLikeStyleLexerContext,
+																		  DefaultCondition,
+																		  AdvanceAction,
+																		  SGE_STR("CharacterEndState")>;
+				using CharacterEndSubmitTransition = Transition<CppLikeStyleLexerContext,
+																MatchCharsCondition<SGE_STR("'")>,
+																ChainAction<CppLikeStyleLexerContext, SubmitAction<TokenTypes::CharacterLiteral>, SkipAction>,
+																SGE_STR("IdleState")>;
+				using CharacterEndInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																		  DefaultCondition,
+																		  ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																		  SGE_STR("IdleState")>;
+				using EscapeCharacterToCharacterEndTransition = Transition<CppLikeStyleLexerContext,
+																		   IsValidEscapeCharacterCondition,
+																		   AdvanceEscapeCharacterAction,
+																		   SGE_STR("CharacterEndState")>;
+				using EscapeCharacterInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																			 DefaultCondition,
+																			 ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																			 SGE_STR("IdleState")>;
+				using StringToStringEscapeCharacter = Transition<CppLikeStyleLexerContext,
+																 MatchCharsCondition<SGE_STR("\\")>,
+																 SkipAction,
+																 SGE_STR("StringEscapeCharacterState")>;
+				using StringSubmitTransition = Transition<CppLikeStyleLexerContext,
+														  MatchCharsCondition<SGE_STR("\"")>,
+														  ChainAction<CppLikeStyleLexerContext, SubmitAction<TokenTypes::StringLiteral>, SkipAction>,
+														  SGE_STR("IdleState")>;
+				using StringInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																	MatchCharsCondition<SGE_STR("\r\n")>,
+																	ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																	SGE_STR("IdleState")>;
+				using StringToStringTransition = Transition<CppLikeStyleLexerContext,
+															DefaultCondition,
+															AdvanceAction,
+															SGE_STR("StringState")>;
+				using StringEscapeCharacterToStringTransition = Transition<CppLikeStyleLexerContext,
+																		   IsValidEscapeCharacterCondition,
+																		   AdvanceEscapeCharacterAction,
+																		   SGE_STR("StringState")>;
+				using StringEscapeCharacterInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
+																				   DefaultCondition,
+																				   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																				   SGE_STR("IdleState")>;
+
+				using IdleState = State<CppLikeStyleLexerContext, SGE_STR("IdleState"),
+										IdleToIdentifierTransition,
+										IdleToDecimalIntegerTransition,
+										IdleToZeroPrefixTransition,
+										IdleToCharacterBeginTransition,
+										IdleToStringTransition,
+										IdleToRawPrefixTransition,
+										IdleToLFLineSeparatorTransition,
+										IdleToCRLineSeparatorTransition,
+										IdleToWordSeparatorTransition,
+										IdleToSlashPrefixTransition,
+										IdleSubmitExclamationTransition,
+										IdleSubmitHashTransition,
+										IdleSubmitDollarTransition,
+										IdleSubmitModTransition,
+										IdleSubmitAndTransition,
+										IdleSubmitLeftBracketTransition,
+										IdleSubmitRightBracketTransition,
+										IdleSubmitMultiplyTransition,
+										IdleSubmitAddTransition,
+										IdleSubmitCommaTransition,
+										IdleSubmitSubtractTransition,
+										IdleSubmitDotTransition,
+										IdleSubmitColonTransition,
+										IdleSubmitSemicolonTransition,
+										IdleSubmitLessTransition,
+										IdleSubmitEqualTransition,
+										IdleSubmitGreaterTransition,
+										IdleSubmitQuestionTransition,
+										IdleSubmitAtTransition,
+										IdleSubmitLeftSquareBracketTransition,
+										IdleSubmitBackslashTransition,
+										IdleSubmitRightSquareBracketTransition,
+										IdleSubmitCaretTransition,
+										IdleSubmitLeftCurlyBracketTransition,
+										IdleSubmitVerticalTransition,
+										IdleSubmitRightCurlyBracketTransition,
+										IdleSubmitTildeTransition,
+										IdleSubmitQuoteTransition,
+										IdleInvalidCharacterTransition>;
+				using IdentifierState = State<CppLikeStyleLexerContext, SGE_STR("IdentifierState"),
+											  IdentifierToIdentifierTransition,
+											  IdentifierSubmitTransition>;
+				using LFLineSeparatorState = State<CppLikeStyleLexerContext, SGE_STR("LFLineSeparatorState"),
+												   LFLineSeparatorSubmitTransition>;
+				using CRLineSeparatorState = State<CppLikeStyleLexerContext, SGE_STR("CRLineSeparatorState"),
+												   CRLineSeparatorToLFLineSeparatorTransition,
+												   CRLineSeparatorSubmitTransition>;
+				using WordSeparatorState = State<CppLikeStyleLexerContext, SGE_STR("WordSeparatorState"),
+												 WordSeparatorToWordSeparatorTransition,
+												 WordSeparatorSubmitTransition>;
+				using ZeroPrefixState = State<CppLikeStyleLexerContext, SGE_STR("ZeroPrefixState"),
+											  ZeroPrefixToDecimalIntegerTransition,
+											  ZeroPrefixToBinaryIntegerTransition,
+											  ZeroPrefixToHexIntegerTransition,
+											  ZeroPrefixSubmitTransition>;
+				using DecimalIntegerState = State<CppLikeStyleLexerContext, SGE_STR("DecimalIntegerState"),
+												  DecimalIntegerToDecimalIntegerTransition,
+												  DecimalIntegerToDoubleDotTransition,
+												  DecimalIntegerSubmitTransition>;
+				using BinaryIntegerState = State<CppLikeStyleLexerContext, SGE_STR("BinaryIntegerState"),
+												 BinaryIntegerToBinaryIntegerTransition,
+												 BinaryIntegerInvalidCharacterTransition,
+												 BinaryIntegerSubmitTransition>;
+				using HexIntegerState = State<CppLikeStyleLexerContext, SGE_STR("HexIntegerState"),
+											  HexIntegerToHexIntegerTransition,
+											  HexIntegerSubmitTransition>;
+				using DoubleDotState = State<CppLikeStyleLexerContext, SGE_STR("DoubleDotState"),
+											 DoubleDotToDoubleTransition,
+											 DoubleDotInvalidCharacterTransition>;
+				using DoubleState = State<CppLikeStyleLexerContext, SGE_STR("DoubleState"),
+										  DoubleToDoubleTransition,
+										  DoubleSubmitFloatTransition,
+										  DoubleSubmitDoubleTransition>;
+				using CharacterBeginState = State<CppLikeStyleLexerContext, SGE_STR("CharacterBeginState"),
+												  CharacterBeginToEscapeCharacterTransition,
+												  CharacterBeginInvalidCharacterTransition,
+												  CharacterBeginToCharacterEndTransition>;
+				using CharacterEndState = State<CppLikeStyleLexerContext, SGE_STR("CharacterEndState"),
+												CharacterEndSubmitTransition,
+												CharacterEndInvalidCharacterTransition>;
+				using EscapeCharacterState = State<CppLikeStyleLexerContext, SGE_STR("EscapeCharacterState"),
+												   EscapeCharacterToCharacterEndTransition,
+												   EscapeCharacterInvalidCharacterTransition>;
+				using StringState = State<CppLikeStyleLexerContext, SGE_STR("StringState"),
+										  StringToStringEscapeCharacter,
+										  StringSubmitTransition,
+										  StringInvalidCharacterTransition,
+										  StringToStringTransition>;
+				using StringEscapeCharacterState = State<CppLikeStyleLexerContext, SGE_STR("StringEscapeCharacterState"),
+														 StringEscapeCharacterToStringTransition,
+														 StringEscapeCharacterInvalidCharacterTransition>;
+			}
 		}
 	}
 }

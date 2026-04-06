@@ -1020,7 +1020,7 @@ Vector<Token> SpaceGameEngine::CommonParser::Lexer::GetTokens(const String& str,
 }
 
 SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::BaseContext(const String& str)
-	: m_Iter(str.GetConstBegin()), m_EndIter(str.GetConstEnd()), m_BufferBeginIter(str.GetConstBegin()), m_BufferEndIter(str.GetConstBegin())
+	: m_Iter(str.GetConstBegin()), m_EndIter(str.GetConstEnd())
 {
 }
 
@@ -1050,15 +1050,19 @@ const Vector<ParserError>& SpaceGameEngine::CommonParser::Lexer::Experimental::B
 void Experimental::BaseContext::Advance()
 {
 	SGE_CHECK(TouchInputStringEndError, m_Iter, m_EndIter);
-	if (m_BufferBeginIter == m_BufferEndIter)
+	if (m_Buffer.GetSize() == 0)
 	{
-		m_BufferBeginIter = m_BufferEndIter = m_Iter;
 		m_BufferLine = m_Line;
 		m_BufferColumn = m_Column;
 	}
-	++m_BufferEndIter;
+	m_Buffer += *m_Iter;
 	++m_Iter;
 	++m_Column;
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Append(Char c)
+{
+	m_Buffer += c;
 }
 
 void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Skip()
@@ -1070,7 +1074,7 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Skip()
 
 void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Clear()
 {
-	m_BufferBeginIter = m_BufferEndIter;
+	m_Buffer.Clear();
 }
 
 void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::NextLine()
@@ -1081,7 +1085,7 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::NextLine()
 
 void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Submit(TokenType token_type)
 {
-	m_Tokens.EmplaceBack(token_type, String(m_BufferBeginIter, m_BufferEndIter), m_BufferLine, m_BufferColumn);
+	m_Tokens.EmplaceBack(token_type, std::move(m_Buffer), m_BufferLine, m_BufferColumn);
 	Clear();
 }
 
@@ -1103,4 +1107,9 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::EmptyAction::Run(BaseCo
 bool SpaceGameEngine::CommonParser::Lexer::Experimental::TouchInputStringEndError::Judge(const String::ConstIterator iter, const String::ConstIterator end)
 {
 	return iter == end;
+}
+
+bool SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::IsValidEscapeCharacterCondition::Get(Char c)
+{
+	return EscapeCharacterSet::GetSingleton().IsEscapeCharacter(c);
 }

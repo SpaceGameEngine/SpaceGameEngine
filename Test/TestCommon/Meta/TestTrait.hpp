@@ -142,17 +142,26 @@ TEST(IsSameWith, Test)
 }
 
 template<ArrayLiteral Literal>
-auto TestArrayLiteral()
+auto TestArrayLiteralValue()
 {
 	return Literal.m_Value;
 }
 
+template<ArrayLiteral Literal>
+auto TestArrayLiteralSize()
+{
+	return decltype(Literal)::Size;
+}
+
 TEST(ArrayLiteral, Test)
 {
-	ASSERT_TRUE(memcmp(TestArrayLiteral<SGE_WSTR("TestArrayLiteral")>(), SGE_WSTR("TestArrayLiteral"), 17 * sizeof(Char16)) == 0);
-	ASSERT_TRUE(memcmp(TestArrayLiteral<SGE_U8STR("TestArrayLiteral")>(), SGE_U8STR("TestArrayLiteral"), 17 * sizeof(Char8)) == 0);
+	ASSERT_TRUE(memcmp(TestArrayLiteralValue<SGE_WSTR("TestArrayLiteral")>(), SGE_WSTR("TestArrayLiteral"), 17 * sizeof(Char16)) == 0);
+	ASSERT_EQ(TestArrayLiteralSize<SGE_WSTR("TestArrayLiteral")>(), 17);
+	ASSERT_TRUE(memcmp(TestArrayLiteralValue<SGE_U8STR("TestArrayLiteral")>(), SGE_U8STR("TestArrayLiteral"), 17 * sizeof(Char8)) == 0);
+	ASSERT_EQ(TestArrayLiteralSize<SGE_U8STR("TestArrayLiteral")>(), 17);
 
-	auto int_array_literal = TestArrayLiteral<ArrayLiteral<int, 3>{{1, 2, 3}}>();
+	auto int_array_literal = TestArrayLiteralValue<ArrayLiteral<int, 3>{{1, 2, 3}}>();
 	int int_array_expected[] = {1, 2, 3};
 	ASSERT_TRUE(memcmp(int_array_literal, int_array_expected, sizeof(int_array_expected)) == 0);
+	ASSERT_EQ((TestArrayLiteralSize<ArrayLiteral<int, 3>{{1, 2, 3}}>()), 3);
 }
