@@ -618,7 +618,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 					template<typename ContextType>
 					inline static void Run(ContextType& context)
 					{
-						context.Append(EscapeCharacterSet::GetInstance().Translate(context.GetCurrentChar()));
+						context.Append(EscapeCharacterSet::GetSingleton().Translate(context.GetCurrentChar()));
 						context.Skip();
 					}
 				};
