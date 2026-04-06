@@ -3,6 +3,7 @@ add_library(CommonParser SHARED
         Private/Logger.cpp
         Private/Lexer.cpp
         Private/LexerUtility.cpp
+        Private/ParserError.cpp
         )
 target_compile_definitions(CommonParser PRIVATE COMMON_PARSER_EXPORTS)
 target_include_directories(CommonParser PUBLIC Public)
