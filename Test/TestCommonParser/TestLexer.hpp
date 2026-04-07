@@ -520,6 +520,15 @@ TEST(MatchCharsCondition, Test)
 	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('A'), context));
 	ASSERT_FALSE(TestMatchCharsCondition::Get(SGE_STR('0'), context));
 	ASSERT_FALSE(TestMatchCharsCondition::Get(0, context));
+
+	using TestMatchCharsCondition2 = Lexer::Experimental::MatchCharsCondition<SGE_STR("123\0")>;
+	ASSERT_TRUE((Lexer::Experimental::IsCondition<TestMatchCharsCondition2, Lexer::Experimental::BaseContext>));
+	ASSERT_TRUE(TestMatchCharsCondition2::Get(SGE_STR('1'), context));
+	ASSERT_TRUE(TestMatchCharsCondition2::Get(SGE_STR('2'), context));
+	ASSERT_TRUE(TestMatchCharsCondition2::Get(SGE_STR('3'), context));
+	ASSERT_TRUE(TestMatchCharsCondition2::Get(SGE_STR('\0'), context));
+	ASSERT_TRUE(TestMatchCharsCondition2::Get(0, context));
+	ASSERT_FALSE(TestMatchCharsCondition2::Get(SGE_STR('0'), context));
 }
 
 TEST(MatchCharRangeCondition, Test)

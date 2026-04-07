@@ -1042,6 +1042,42 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																		DefaultCondition,
 																		AdvanceRawStringSuffixAction,
 																		SGE_STR("RawStringEndState")>;
+				using SlashPrefixToCommentLineTransition = Transition<CppLikeStyleLexerContext,
+																	  MatchCharsCondition<SGE_STR("/")>,
+																	  ChainAction<CppLikeStyleLexerContext, ClearAction, SkipAction>,
+																	  SGE_STR("CommentLineState")>;
+				using SlashPrefixToCommentBlockTransition = Transition<CppLikeStyleLexerContext,
+																	   MatchCharsCondition<SGE_STR("*")>,
+																	   ChainAction<CppLikeStyleLexerContext, ClearAction, SkipAction>,
+																	   SGE_STR("CommentBlockState")>;
+				using SlashPrefixSubmitTransition = Transition<CppLikeStyleLexerContext,
+															   DefaultCondition,
+															   SubmitAction<TokenTypes::Slash>,
+															   SGE_STR("IdleState")>;
+				using CommentBlockToCommentBlockEndTransition = Transition<CppLikeStyleLexerContext,
+																		   MatchCharsCondition<SGE_STR("*")>,
+																		   SkipAction,
+																		   SGE_STR("CommentBlockEndState")>;
+				using CommentBlockToCommentBlockTransition = Transition<CppLikeStyleLexerContext,
+																		DefaultCondition,
+																		AdvanceAction,
+																		SGE_STR("CommentBlockState")>;
+				using CommentBlockEndSubmitTransition = Transition<CppLikeStyleLexerContext,
+																   MatchCharsCondition<SGE_STR("/")>,
+																   ChainAction<CppLikeStyleLexerContext, SubmitAction<TokenTypes::CommentBlock>, SkipAction>,
+																   SGE_STR("IdleState")>;
+				using CommentBlockEndToCommentBlockTransition = Transition<CppLikeStyleLexerContext,
+																		   DefaultCondition,
+																		   AppendAction<SGE_STR("*")>,
+																		   SGE_STR("CommentBlockState")>;
+				using CommentLineSubmitTransition = Transition<CppLikeStyleLexerContext,
+															   MatchCharsCondition<SGE_STR("\r\n\0")>,
+															   SubmitAction<TokenTypes::CommentLine>,
+															   SGE_STR("IdleState")>;
+				using CommentLineToCommentLineTransition = Transition<CppLikeStyleLexerContext,
+																	  DefaultCondition,
+																	  AdvanceAction,
+																	  SGE_STR("CommentLineState")>;
 
 				using IdleState = State<CppLikeStyleLexerContext, SGE_STR("IdleState"),
 										IdleToIdentifierTransition,
@@ -1149,6 +1185,19 @@ namespace SpaceGameEngine::CommonParser::Lexer
 												RawStringEndSubmitTransition,
 												RawStringEndToRawStringTransition,
 												RawStringEndToRawStringEndTransition>;
+				using SlashPrefixState = State<CppLikeStyleLexerContext, SGE_STR("SlashPrefixState"),
+											   SlashPrefixToCommentLineTransition,
+											   SlashPrefixToCommentBlockTransition,
+											   SlashPrefixSubmitTransition>;
+				using CommentBlockState = State<CppLikeStyleLexerContext, SGE_STR("CommentBlockState"),
+												CommentBlockToCommentBlockEndTransition,
+												CommentBlockToCommentBlockTransition>;
+				using CommentBlockEndState = State<CppLikeStyleLexerContext, SGE_STR("CommentBlockEndState"),
+												   CommentBlockEndSubmitTransition,
+												   CommentBlockEndToCommentBlockTransition>;
+				using CommentLineState = State<CppLikeStyleLexerContext, SGE_STR("CommentLineState"),
+											   CommentLineSubmitTransition,
+											   CommentLineToCommentLineTransition>;
 			}
 		}
 	}
