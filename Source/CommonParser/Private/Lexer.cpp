@@ -1050,11 +1050,6 @@ const Vector<ParserError>& SpaceGameEngine::CommonParser::Lexer::Experimental::B
 void Experimental::BaseContext::Advance()
 {
 	SGE_CHECK(TouchInputStringEndError, m_Iter, m_EndIter);
-	if (m_Buffer.GetSize() == 0)
-	{
-		m_BufferLine = m_Line;
-		m_BufferColumn = m_Column;
-	}
 	m_Buffer += *m_Iter;
 	++m_Iter;
 	++m_Column;
@@ -1083,6 +1078,22 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::NextLine()
 	m_Column = 1;
 }
 
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::SetTokenLineAndColumn()
+{
+	m_BufferLine = m_Line;
+	m_BufferColumn = m_Column;
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::AddOffsetToTokenLine(Int64 offset)
+{
+	m_BufferLine += offset;
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::AddOffsetToTokenColumn(Int64 offset)
+{
+	m_BufferColumn += offset;
+}
+
 void SpaceGameEngine::CommonParser::Lexer::Experimental::BaseContext::Submit(TokenType token_type)
 {
 	m_Tokens.EmplaceBack(token_type, std::move(m_Buffer), m_BufferLine, m_BufferColumn);
@@ -1104,9 +1115,39 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::EmptyAction::Run(BaseCo
 	// do nothing
 }
 
+void SpaceGameEngine::CommonParser::Lexer::Experimental::AdvanceAction::Run(BaseContext& context)
+{
+	context.Advance();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::SkipAction::Run(BaseContext& context)
+{
+	context.Skip();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::ClearAction::Run(BaseContext& context)
+{
+	context.Clear();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::NewLineAction::Run(BaseContext& context)
+{
+	context.NextLine();
+}
+
+void SpaceGameEngine::CommonParser::Lexer::Experimental::SetTokenLineAndColumnAction::Run(BaseContext& context)
+{
+	context.SetTokenLineAndColumn();
+}
+
 bool SpaceGameEngine::CommonParser::Lexer::Experimental::TouchInputStringEndError::Judge(const String::ConstIterator iter, const String::ConstIterator end)
 {
 	return iter == end;
+}
+
+SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::CppLikeStyleLexerContext::CppLikeStyleLexerContext(const String& str)
+	: BaseContext(str)
+{
 }
 
 void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::CppLikeStyleLexerContext::SubmitRawStringPrefix()
@@ -1166,4 +1207,36 @@ void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Deta
 void SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::Detail::ClearRawStringSuffixAction::Run(CppLikeStyleLexerContext& context)
 {
 	context.ClearRawStringSuffix();
+}
+
+COMMON_PARSER_API Pair<Vector<Token>, Vector<ParserError>> SpaceGameEngine::CommonParser::Lexer::Experimental::CppLikeStyleLexer::GetTokens(const String& source)
+{
+	using namespace CppLikeStyleLexer::Detail;
+	return Experimental::GetTokens<CppLikeStyleLexerContext,
+								   SGE_STR("IdleState"),
+								   SGE_STR("IdleState"),
+								   IdleState,
+								   IdentifierState,
+								   LFLineSeparatorState,
+								   CRLineSeparatorState,
+								   WordSeparatorState,
+								   ZeroPrefixState,
+								   DecimalIntegerState,
+								   BinaryIntegerState,
+								   HexIntegerState,
+								   DoubleDotState,
+								   DoubleState,
+								   CharacterBeginState,
+								   CharacterEndState,
+								   EscapeCharacterState,
+								   StringState,
+								   StringEscapeCharacterState,
+								   RawPrefixState,
+								   RawStringBeginState,
+								   RawStringState,
+								   RawStringEndState,
+								   SlashPrefixState,
+								   CommentBlockState,
+								   CommentBlockEndState,
+								   CommentLineState>(source);
 }

@@ -612,22 +612,32 @@ TEST(ExperimentalGetTokens, Test)
 {
 	using namespace Lexer::Experimental;
 	{
-		using TestState = State<BaseContext, SGE_STR("TestState"), Transition<BaseContext, DefaultCondition, ChainAction<BaseContext, AdvanceAction, SubmitAction<123>>, SGE_STR("TestState")>>;
-		String source = SGE_STR("test string");
+		using TestState = State<BaseContext, SGE_STR("TestState"),
+								Transition<BaseContext, MatchCharsCondition<SGE_STR("_")>, ChainAction<BaseContext, ThrowAction<12345>, SkipAction>, SGE_STR("TestState")>,
+								Transition<BaseContext, DefaultCondition, ChainAction<BaseContext, SetTokenLineAndColumnAction, AdvanceAction, SubmitAction<123>>, SGE_STR("TestState")>>;
+		String source = SGE_STR("test_string");
 		auto result = Lexer::Experimental::GetTokens<BaseContext, SGE_STR("TestState"), SGE_STR("TestState"), TestState>(source);
-		ASSERT_EQ(result.GetSize(), source.GetSize());
-		for (SizeType i = 0; i < source.GetSize(); ++i)
+		ASSERT_EQ(result.m_First.GetSize(), source.GetSize() - 1);
+		for (SizeType i = 0, j = 0; i < source.GetSize(); ++i)
 		{
-			ASSERT_EQ(result[i].GetType(), 123);
-			ASSERT_EQ(result[i].GetContent(), String(1, source[i]));
-			ASSERT_EQ(result[i].GetLine(), 1);
-			ASSERT_EQ(result[i].GetColumn(), i + 1);
+			if (i == 4)
+				continue;
+			ASSERT_EQ(result.m_First[j].GetType(), 123);
+			ASSERT_EQ(result.m_First[j].GetContent(), String(1, source[i]));
+			ASSERT_EQ(result.m_First[j].GetLine(), 1);
+			ASSERT_EQ(result.m_First[j].GetColumn(), i + 1);
+			++j;
 		}
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), 12345);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 5);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 0);
 	}
 	{
 		using IdleState = State<BaseContext, SGE_STR("IdleState"),
-								Transition<BaseContext, MatchCharsCondition<SGE_STR("0")>, EmptyAction, SGE_STR("0State")>,
-								Transition<BaseContext, MatchCharsCondition<SGE_STR("1")>, EmptyAction, SGE_STR("1State")>>;
+								Transition<BaseContext, MatchCharsCondition<SGE_STR("0")>, SetTokenLineAndColumnAction, SGE_STR("0State")>,
+								Transition<BaseContext, MatchCharsCondition<SGE_STR("1")>, SetTokenLineAndColumnAction, SGE_STR("1State")>>;
 		using ZeroState = State<BaseContext, SGE_STR("0State"),
 								Transition<BaseContext, MatchCharsCondition<SGE_STR("0")>, AdvanceAction, SGE_STR("0State")>,
 								Transition<BaseContext, DefaultCondition, SubmitAction<0>, SGE_STR("IdleState")>>;
@@ -636,22 +646,222 @@ TEST(ExperimentalGetTokens, Test)
 							   Transition<BaseContext, DefaultCondition, SubmitAction<1>, SGE_STR("IdleState")>>;
 		String source = SGE_STR("001101");
 		auto result = Lexer::Experimental::GetTokens<BaseContext, SGE_STR("IdleState"), SGE_STR("IdleState"), IdleState, ZeroState, OneState>(source);
-		ASSERT_EQ(result.GetSize(), 4);
-		ASSERT_EQ(result[0].GetType(), 0);
-		ASSERT_EQ(result[0].GetContent(), SGE_STR("00"));
-		ASSERT_EQ(result[0].GetLine(), 1);
-		ASSERT_EQ(result[0].GetColumn(), 1);
-		ASSERT_EQ(result[1].GetType(), 1);
-		ASSERT_EQ(result[1].GetContent(), SGE_STR("11"));
-		ASSERT_EQ(result[1].GetLine(), 1);
-		ASSERT_EQ(result[1].GetColumn(), 3);
-		ASSERT_EQ(result[2].GetType(), 0);
-		ASSERT_EQ(result[2].GetContent(), SGE_STR("0"));
-		ASSERT_EQ(result[2].GetLine(), 1);
-		ASSERT_EQ(result[2].GetColumn(), 5);
-		ASSERT_EQ(result[3].GetType(), 1);
-		ASSERT_EQ(result[3].GetContent(), SGE_STR("1"));
-		ASSERT_EQ(result[3].GetLine(), 1);
-		ASSERT_EQ(result[3].GetColumn(), 6);
+		ASSERT_EQ(result.m_First.GetSize(), 4);
+		ASSERT_EQ(result.m_First[0].GetType(), 0);
+		ASSERT_EQ(result.m_First[0].GetContent(), SGE_STR("00"));
+		ASSERT_EQ(result.m_First[0].GetLine(), 1);
+		ASSERT_EQ(result.m_First[0].GetColumn(), 1);
+		ASSERT_EQ(result.m_First[1].GetType(), 1);
+		ASSERT_EQ(result.m_First[1].GetContent(), SGE_STR("11"));
+		ASSERT_EQ(result.m_First[1].GetLine(), 1);
+		ASSERT_EQ(result.m_First[1].GetColumn(), 3);
+		ASSERT_EQ(result.m_First[2].GetType(), 0);
+		ASSERT_EQ(result.m_First[2].GetContent(), SGE_STR("0"));
+		ASSERT_EQ(result.m_First[2].GetLine(), 1);
+		ASSERT_EQ(result.m_First[2].GetColumn(), 5);
+		ASSERT_EQ(result.m_First[3].GetType(), 1);
+		ASSERT_EQ(result.m_First[3].GetContent(), SGE_STR("1"));
+		ASSERT_EQ(result.m_First[3].GetLine(), 1);
+		ASSERT_EQ(result.m_First[3].GetColumn(), 6);
+		ASSERT_EQ(result.m_Second.GetSize(), 0);
 	}
+}
+
+TEST(CppLikeStyleLexerGetTokens, Test)
+{
+	using namespace Lexer::Experimental::CppLikeStyleLexer;
+	auto res1 = GetTokens(SGE_STR("this is\ta_test_for R\r\n\r\n123"));
+	ASSERT_EQ(res1.m_Second.GetSize(), 0);
+	ASSERT_EQ(res1.m_First.GetSize(), 10);
+	ASSERT_EQ(res1.m_First[0].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(res1.m_First[0].GetContent(), SGE_STR("this"));
+	ASSERT_EQ(res1.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res1.m_First[0].GetColumn(), 1);
+	ASSERT_EQ(res1.m_First[1].GetType(), Lexer::TokenTypes::WordSeparator);
+	ASSERT_EQ(res1.m_First[1].GetContent(), SGE_STR(" "));
+	ASSERT_EQ(res1.m_First[1].GetLine(), 1);
+	ASSERT_EQ(res1.m_First[1].GetColumn(), 5);
+	ASSERT_EQ(res1.m_First[2].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(res1.m_First[2].GetContent(), SGE_STR("is"));
+	ASSERT_EQ(res1.m_First[2].GetLine(), 1);
+	ASSERT_EQ(res1.m_First[2].GetColumn(), 6);
+	ASSERT_EQ(res1.m_First[3].GetType(), Lexer::TokenTypes::WordSeparator);
+	ASSERT_EQ(res1.m_First[3].GetContent(), SGE_STR("\t"));
+	ASSERT_EQ(res1.m_First[3].GetLine(), 1);
+	ASSERT_EQ(res1.m_First[3].GetColumn(), 8);
+	ASSERT_EQ(res1.m_First[4].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(res1.m_First[4].GetContent(), SGE_STR("a_test_for"));
+	ASSERT_EQ(res1.m_First[4].GetLine(), 1);
+	ASSERT_EQ(res1.m_First[4].GetColumn(), 9);
+	ASSERT_EQ(res1.m_First[5].GetType(), Lexer::TokenTypes::WordSeparator);
+	ASSERT_EQ(res1.m_First[5].GetContent(), SGE_STR(" "));
+	ASSERT_EQ(res1.m_First[5].GetLine(), 1);
+	ASSERT_EQ(res1.m_First[5].GetColumn(), 19);
+	ASSERT_EQ(res1.m_First[6].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(res1.m_First[6].GetContent(), SGE_STR("R"));
+	ASSERT_EQ(res1.m_First[6].GetLine(), 1);
+	ASSERT_EQ(res1.m_First[6].GetColumn(), 20);
+	ASSERT_EQ(res1.m_First[7].GetType(), Lexer::TokenTypes::LineSeparator);
+	ASSERT_EQ(res1.m_First[7].GetContent(), SGE_STR("\r\n"));
+	ASSERT_EQ(res1.m_First[7].GetLine(), 1);
+	ASSERT_EQ(res1.m_First[7].GetColumn(), 21);
+	ASSERT_EQ(res1.m_First[8].GetType(), Lexer::TokenTypes::LineSeparator);
+	ASSERT_EQ(res1.m_First[8].GetContent(), SGE_STR("\r\n"));
+	ASSERT_EQ(res1.m_First[8].GetLine(), 2);
+	ASSERT_EQ(res1.m_First[8].GetColumn(), 1);
+	ASSERT_EQ(res1.m_First[9].GetType(), Lexer::TokenTypes::IntegerLiteral);
+	ASSERT_EQ(res1.m_First[9].GetContent(), SGE_STR("123"));
+	ASSERT_EQ(res1.m_First[9].GetLine(), 3);
+	ASSERT_EQ(res1.m_First[9].GetColumn(), 1);
+
+	auto res2 = GetTokens(SGE_STR("\r\n\r\n\r\n"));
+	ASSERT_EQ(res2.m_Second.GetSize(), 0);
+	ASSERT_EQ(res2.m_First.GetSize(), 3);
+	for (auto i = 0; i < 3; ++i)
+	{
+		ASSERT_EQ(res2.m_First[i].GetType(), Lexer::TokenTypes::LineSeparator);
+		ASSERT_EQ(res2.m_First[i].GetContent(), SGE_STR("\r\n"));
+		ASSERT_EQ(res2.m_First[i].GetLine(), i + 1);
+		ASSERT_EQ(res2.m_First[i].GetColumn(), 1);
+	}
+
+	auto res3 = GetTokens(SGE_STR("123.12"));
+	ASSERT_EQ(res3.m_Second.GetSize(), 0);
+	ASSERT_EQ(res3.m_First.GetSize(), 1);
+	ASSERT_EQ(res3.m_First[0].GetType(), Lexer::TokenTypes::DoubleLiteral);
+	ASSERT_EQ(res3.m_First[0].GetContent(), SGE_STR("123.12"));
+	ASSERT_EQ(res3.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res3.m_First[0].GetColumn(), 1);
+
+	auto res4 = GetTokens(SGE_STR("123.45f"));
+	ASSERT_EQ(res4.m_Second.GetSize(), 0);
+	ASSERT_EQ(res4.m_First.GetSize(), 1);
+	ASSERT_EQ(res4.m_First[0].GetType(), Lexer::TokenTypes::FloatLiteral);
+	ASSERT_EQ(res4.m_First[0].GetContent(), SGE_STR("123.45"));
+	ASSERT_EQ(res4.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res4.m_First[0].GetColumn(), 1);
+
+	auto res5 = GetTokens(SGE_STR("0xA02f+0b1011"));
+	ASSERT_EQ(res5.m_Second.GetSize(), 0);
+	ASSERT_EQ(res5.m_First.GetSize(), 3);
+	ASSERT_EQ(res5.m_First[0].GetType(), Lexer::TokenTypes::IntegerLiteral);
+	ASSERT_EQ(res5.m_First[0].GetContent(), SGE_STR("0xA02f"));
+	ASSERT_EQ(res5.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res5.m_First[0].GetColumn(), 1);
+	ASSERT_EQ(res5.m_First[1].GetType(), Lexer::TokenTypes::Add);
+	ASSERT_EQ(res5.m_First[1].GetContent(), SGE_STR("+"));
+	ASSERT_EQ(res5.m_First[1].GetLine(), 1);
+	ASSERT_EQ(res5.m_First[1].GetColumn(), 7);
+	ASSERT_EQ(res5.m_First[2].GetType(), Lexer::TokenTypes::IntegerLiteral);
+	ASSERT_EQ(res5.m_First[2].GetContent(), SGE_STR("0b1011"));
+	ASSERT_EQ(res5.m_First[2].GetLine(), 1);
+	ASSERT_EQ(res5.m_First[2].GetColumn(), 8);
+
+	auto res6 = GetTokens(SGE_STR("-12--12.345f"));
+	ASSERT_EQ(res6.m_Second.GetSize(), 0);
+	ASSERT_EQ(res6.m_First.GetSize(), 5);
+	ASSERT_EQ(res6.m_First[0].GetType(), Lexer::TokenTypes::Subtract);
+	ASSERT_EQ(res6.m_First[0].GetContent(), SGE_STR("-"));
+	ASSERT_EQ(res6.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res6.m_First[0].GetColumn(), 1);
+	ASSERT_EQ(res6.m_First[1].GetType(), Lexer::TokenTypes::IntegerLiteral);
+	ASSERT_EQ(res6.m_First[1].GetContent(), SGE_STR("12"));
+	ASSERT_EQ(res6.m_First[1].GetLine(), 1);
+	ASSERT_EQ(res6.m_First[1].GetColumn(), 2);
+	ASSERT_EQ(res6.m_First[2].GetType(), Lexer::TokenTypes::Subtract);
+	ASSERT_EQ(res6.m_First[2].GetContent(), SGE_STR("-"));
+	ASSERT_EQ(res6.m_First[2].GetLine(), 1);
+	ASSERT_EQ(res6.m_First[2].GetColumn(), 4);
+	ASSERT_EQ(res6.m_First[3].GetType(), Lexer::TokenTypes::Subtract);
+	ASSERT_EQ(res6.m_First[3].GetContent(), SGE_STR("-"));
+	ASSERT_EQ(res6.m_First[3].GetLine(), 1);
+	ASSERT_EQ(res6.m_First[3].GetColumn(), 5);
+	ASSERT_EQ(res6.m_First[4].GetType(), Lexer::TokenTypes::FloatLiteral);
+	ASSERT_EQ(res6.m_First[4].GetContent(), SGE_STR("12.345"));
+	ASSERT_EQ(res6.m_First[4].GetLine(), 1);
+	ASSERT_EQ(res6.m_First[4].GetColumn(), 6);
+
+	auto res7 = GetTokens(SGE_STR("//test comment line"));
+	ASSERT_EQ(res7.m_Second.GetSize(), 0);
+	ASSERT_EQ(res7.m_First.GetSize(), 1);
+	ASSERT_EQ(res7.m_First[0].GetType(), Lexer::TokenTypes::CommentLine);
+	ASSERT_EQ(res7.m_First[0].GetContent(), SGE_STR("test comment line"));
+	ASSERT_EQ(res7.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res7.m_First[0].GetColumn(), 1);
+
+	auto res8 = GetTokens(SGE_STR("/*test comment block*/a"));
+	ASSERT_EQ(res8.m_Second.GetSize(), 0);
+	ASSERT_EQ(res8.m_First.GetSize(), 2);
+	ASSERT_EQ(res8.m_First[0].GetType(), Lexer::TokenTypes::CommentBlock);
+	ASSERT_EQ(res8.m_First[0].GetContent(), SGE_STR("test comment block"));
+	ASSERT_EQ(res8.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res8.m_First[0].GetColumn(), 1);
+	ASSERT_EQ(res8.m_First[1].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(res8.m_First[1].GetContent(), SGE_STR("a"));
+	ASSERT_EQ(res8.m_First[1].GetLine(), 1);
+	ASSERT_EQ(res8.m_First[1].GetColumn(), 23);
+
+	auto res9 = GetTokens(SGE_STR("1/b//"));
+	ASSERT_EQ(res9.m_Second.GetSize(), 0);
+	ASSERT_EQ(res9.m_First.GetSize(), 4);
+	ASSERT_EQ(res9.m_First[0].GetType(), Lexer::TokenTypes::IntegerLiteral);
+	ASSERT_EQ(res9.m_First[0].GetContent(), SGE_STR("1"));
+	ASSERT_EQ(res9.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res9.m_First[0].GetColumn(), 1);
+	ASSERT_EQ(res9.m_First[1].GetType(), Lexer::TokenTypes::Slash);
+	ASSERT_EQ(res9.m_First[1].GetContent(), SGE_STR("/"));
+	ASSERT_EQ(res9.m_First[1].GetLine(), 1);
+	ASSERT_EQ(res9.m_First[1].GetColumn(), 2);
+	ASSERT_EQ(res9.m_First[2].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(res9.m_First[2].GetContent(), SGE_STR("b"));
+	ASSERT_EQ(res9.m_First[2].GetLine(), 1);
+	ASSERT_EQ(res9.m_First[2].GetColumn(), 3);
+	ASSERT_EQ(res9.m_First[3].GetType(), Lexer::TokenTypes::CommentLine);
+	ASSERT_EQ(res9.m_First[3].GetContent(), SGE_STR(""));
+	ASSERT_EQ(res9.m_First[3].GetLine(), 1);
+	ASSERT_EQ(res9.m_First[3].GetColumn(), 4);
+
+	auto res10 = GetTokens(SGE_STR("'a''\\n'"));
+	ASSERT_EQ(res10.m_Second.GetSize(), 0);
+	ASSERT_EQ(res10.m_First.GetSize(), 2);
+	ASSERT_EQ(res10.m_First[0].GetType(), Lexer::TokenTypes::CharacterLiteral);
+	ASSERT_EQ(res10.m_First[0].GetContent(), SGE_STR("a"));
+	ASSERT_EQ(res10.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res10.m_First[0].GetColumn(), 1);
+	ASSERT_EQ(res10.m_First[1].GetType(), Lexer::TokenTypes::CharacterLiteral);
+	ASSERT_EQ(res10.m_First[1].GetContent(), SGE_STR("\n"));
+	ASSERT_EQ(res10.m_First[1].GetLine(), 1);
+	ASSERT_EQ(res10.m_First[1].GetColumn(), 4);
+
+	auto res11 = GetTokens(SGE_STR("\"test string\ttest\"b"));
+	ASSERT_EQ(res11.m_Second.GetSize(), 0);
+	ASSERT_EQ(res11.m_First.GetSize(), 2);
+	ASSERT_EQ(res11.m_First[0].GetType(), Lexer::TokenTypes::StringLiteral);
+	ASSERT_EQ(res11.m_First[0].GetContent(), SGE_STR("test string\ttest"));
+	ASSERT_EQ(res11.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res11.m_First[0].GetColumn(), 1);
+	ASSERT_EQ(res11.m_First[1].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(res11.m_First[1].GetContent(), SGE_STR("b"));
+	ASSERT_EQ(res11.m_First[1].GetLine(), 1);
+	ASSERT_EQ(res11.m_First[1].GetColumn(), 19);
+
+	auto res12 = GetTokens(SGE_STR("R\"(test string\\ttest)\"R"));
+	ASSERT_EQ(res12.m_Second.GetSize(), 0);
+	ASSERT_EQ(res12.m_First.GetSize(), 2);
+	ASSERT_EQ(res12.m_First[0].GetType(), Lexer::TokenTypes::StringLiteral);
+	ASSERT_EQ(res12.m_First[0].GetContent(), SGE_STR("test string\\ttest"));
+	ASSERT_EQ(res12.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res12.m_First[0].GetColumn(), 1);
+	ASSERT_EQ(res12.m_First[1].GetType(), Lexer::TokenTypes::Identifier);
+	ASSERT_EQ(res12.m_First[1].GetContent(), SGE_STR("R"));
+	ASSERT_EQ(res12.m_First[1].GetLine(), 1);
+	ASSERT_EQ(res12.m_First[1].GetColumn(), 23);
+
+	auto res13 = GetTokens(SGE_STR("R\"test_@#'(1(2(3)123__abc)ttt)aaa\"bbb)ccc)ddd\")test_@#'\""));
+	ASSERT_EQ(res13.m_Second.GetSize(), 0);
+	ASSERT_EQ(res13.m_First.GetSize(), 1);
+	ASSERT_EQ(res13.m_First[0].GetType(), Lexer::TokenTypes::StringLiteral);
+	ASSERT_EQ(res13.m_First[0].GetContent(), SGE_STR("1(2(3)123__abc)ttt)aaa\"bbb)ccc)ddd\""));
+	ASSERT_EQ(res13.m_First[0].GetLine(), 1);
+	ASSERT_EQ(res13.m_First[0].GetColumn(), 1);
 }
