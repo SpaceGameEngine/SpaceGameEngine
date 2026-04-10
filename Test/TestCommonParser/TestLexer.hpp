@@ -507,6 +507,97 @@ TEST(GetTokens, Test)
 	ASSERT_EQ(res13[0].GetColumn(), 1);
 }
 
+TEST(BaseContext, Test)
+{
+	Lexer::Experimental::BaseContext context(SGE_STR("Test"));
+
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('T'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.Advance();
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('e'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.Append(SGE_STR('a'));
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('e'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.Skip();
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('s'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.Clear();
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('s'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.NextLine();
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('s'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.SetTokenLineAndColumn();
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('s'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.AddOffsetToTokenLine(1);
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('s'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.AddOffsetToTokenColumn(100);
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('s'));
+	ASSERT_FALSE(context.IsEnd());
+	ASSERT_EQ(context.GetTokens().GetSize(), 0);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.Advance();
+	context.Append(SGE_STR('e'));
+
+	context.Submit(12);
+	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('t'));
+	ASSERT_FALSE(context.IsEnd());
+	auto tokens = context.GetTokens();
+	ASSERT_EQ(tokens.GetSize(), 1);
+	ASSERT_EQ(tokens[0].GetType(), 12);
+	ASSERT_EQ(tokens[0].GetContent(), SGE_STR("se"));
+	ASSERT_EQ(tokens[0].GetLine(), 3);
+	ASSERT_EQ(tokens[0].GetColumn(), 101);
+	ASSERT_EQ(context.GetErrors().GetSize(), 0);
+
+	context.Skip();
+	ASSERT_EQ(context.GetCurrentChar(), 0);
+	ASSERT_TRUE(context.IsEnd());
+
+	context.Throw(789, {SGE_STR("test error")});
+	ASSERT_EQ(context.GetCurrentChar(), 0);
+	ASSERT_TRUE(context.IsEnd());
+	tokens = context.GetTokens();
+	ASSERT_EQ(tokens.GetSize(), 1);
+	ASSERT_EQ(tokens[0].GetType(), 12);
+	ASSERT_EQ(tokens[0].GetContent(), SGE_STR("se"));
+	ASSERT_EQ(tokens[0].GetLine(), 3);
+	ASSERT_EQ(tokens[0].GetColumn(), 101);
+	auto errors = context.GetErrors();
+	ASSERT_EQ(errors.GetSize(), 1);
+	ASSERT_EQ(errors[0].GetTypeId(), 789);
+	ASSERT_EQ(errors[0].GetLine(), 2);
+	ASSERT_EQ(errors[0].GetColumn(), 3);
+}
+
 TEST(MatchCharsCondition, Test)
 {
 	using TestMatchCharsCondition = Lexer::Experimental::MatchCharsCondition<SGE_STR("Test")>;

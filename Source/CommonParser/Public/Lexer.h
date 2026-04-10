@@ -707,7 +707,17 @@ namespace SpaceGameEngine::CommonParser::Lexer
 
 				namespace ErrorTypeId
 				{
-					inline constexpr const SizeType InvalidCharacter = 1;	 // todo make this divided into much more detailed errors
+					inline constexpr const SizeType IdleInvalidCharacter = 1;
+					inline constexpr const SizeType BinaryIntegerInvalidCharacter = 2;
+					inline constexpr const SizeType DoubleDotInvalidCharacter = 3;
+					inline constexpr const SizeType EmptyCharacterLiteral = 4;
+					inline constexpr const SizeType CharacterNotEnd = 5;
+					inline constexpr const SizeType MultiplyCharacter = 6;
+					inline constexpr const SizeType InvalidEscapeCharacter = 7;
+					inline constexpr const SizeType StringNotEnd = 8;
+					inline constexpr const SizeType RawStringInvalidPrefix = 9;
+					inline constexpr const SizeType RawStringNotEnd = 10;
+					inline constexpr const SizeType CommentBlockNotEnd = 11;
 				}
 
 				using IdleToIdentifierTransition = Transition<CppLikeStyleLexerContext,
@@ -869,7 +879,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 															 SGE_STR("IdleState")>;
 				using IdleInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																  DefaultCondition,
-																  ChainAction<CppLikeStyleLexerContext, ThrowAction<ErrorTypeId::InvalidCharacter>, SkipAction>,
+																  ChainAction<CppLikeStyleLexerContext, ThrowAction<ErrorTypeId::IdleInvalidCharacter>, SkipAction>,
 																  SGE_STR("IdleState")>;
 				using IdentifierToIdentifierTransition = Transition<CppLikeStyleLexerContext,
 																	OrCondition<CppLikeStyleLexerContext,
@@ -937,7 +947,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																		  SGE_STR("BinaryIntegerState")>;
 				using BinaryIntegerInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																		   MatchCharRangeCondition<SGE_STR('2'), SGE_STR('9')>,
-																		   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																		   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::BinaryIntegerInvalidCharacter>>,
 																		   SGE_STR("IdleState")>;
 				using BinaryIntegerSubmitTransition = Transition<CppLikeStyleLexerContext,
 																 DefaultCondition,
@@ -960,7 +970,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 															   SGE_STR("DoubleState")>;
 				using DoubleDotInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																	   DefaultCondition,
-																	   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																	   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::DoubleDotInvalidCharacter>>,
 																	   SGE_STR("IdleState")>;
 				using DoubleToDoubleTransition = Transition<CppLikeStyleLexerContext,
 															MatchCharRangeCondition<SGE_STR('0'), SGE_STR('9')>,
@@ -980,11 +990,11 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																			 SGE_STR("EscapeCharacterState")>;
 				using CharacterBeginEmptyCharacterTransition = Transition<CppLikeStyleLexerContext,
 																		  MatchCharsCondition<SGE_STR("'")>,
-																		  ChainAction<CppLikeStyleLexerContext, ThrowAction<ErrorTypeId::InvalidCharacter>, SkipAction>,
+																		  ChainAction<CppLikeStyleLexerContext, ThrowAction<ErrorTypeId::EmptyCharacterLiteral>, SkipAction>,
 																		  SGE_STR("IdleState")>;
 				using CharacterBeginInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																			MatchCharsCondition<SGE_STR("\r\n\0")>,
-																			ThrowAction<ErrorTypeId::InvalidCharacter>,
+																			ThrowAction<ErrorTypeId::CharacterNotEnd>,
 																			SGE_STR("IdleState")>;
 				using CharacterBeginToCharacterEndTransition = Transition<CppLikeStyleLexerContext,
 																		  DefaultCondition,
@@ -996,7 +1006,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																SGE_STR("IdleState")>;
 				using CharacterEndInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																		  DefaultCondition,
-																		  ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																		  ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::MultiplyCharacter>>,
 																		  SGE_STR("IdleState")>;
 				using EscapeCharacterToCharacterEndTransition = Transition<CppLikeStyleLexerContext,
 																		   IsValidEscapeCharacterCondition,
@@ -1004,7 +1014,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																		   SGE_STR("CharacterEndState")>;
 				using EscapeCharacterInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																			 DefaultCondition,
-																			 ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																			 ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidEscapeCharacter>>,
 																			 SGE_STR("IdleState")>;
 				using StringToStringEscapeCharacter = Transition<CppLikeStyleLexerContext,
 																 MatchCharsCondition<SGE_STR("\\")>,
@@ -1016,7 +1026,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 														  SGE_STR("IdleState")>;
 				using StringInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																	MatchCharsCondition<SGE_STR("\r\n\0")>,
-																	ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																	ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::StringNotEnd>>,
 																	SGE_STR("IdleState")>;
 				using StringToStringTransition = Transition<CppLikeStyleLexerContext,
 															DefaultCondition,
@@ -1028,7 +1038,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																		   SGE_STR("StringState")>;
 				using StringEscapeCharacterInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																				   DefaultCondition,
-																				   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																				   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidEscapeCharacter>>,
 																				   SGE_STR("IdleState")>;
 				using RawPrefixToRawStringBeginTransition = Transition<CppLikeStyleLexerContext,
 																	   MatchCharsCondition<SGE_STR("\"")>,
@@ -1044,7 +1054,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																	   SGE_STR("RawStringState")>;
 				using RawStringBeginInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																			MatchCharsCondition<SGE_STR("\"\0")>,
-																			ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																			ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::RawStringInvalidPrefix>>,
 																			SGE_STR("IdleState")>;
 				using RawStringBeginToRawStringBeginTransition = Transition<CppLikeStyleLexerContext,
 																			DefaultCondition,
@@ -1056,7 +1066,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																	 SGE_STR("RawStringEndState")>;
 				using RawStringInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																	   MatchCharsCondition<SGE_STR("\0")>,
-																	   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																	   ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::RawStringNotEnd>>,
 																	   SGE_STR("IdleState")>;
 				using RawStringToRawStringTransition = Transition<CppLikeStyleLexerContext,
 																  DefaultCondition,
@@ -1074,7 +1084,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																	 SGE_STR("RawStringState")>;
 				using RawStringEndInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																		  MatchCharsCondition<SGE_STR("\0")>,
-																		  ChainAction<CppLikeStyleLexerContext, ClearAction, ClearRawStringSuffixAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																		  ChainAction<CppLikeStyleLexerContext, ClearAction, ClearRawStringSuffixAction, ThrowAction<ErrorTypeId::RawStringNotEnd>>,
 																		  SGE_STR("IdleState")>;
 				using RawStringEndToRawStringEndTransition = Transition<CppLikeStyleLexerContext,
 																		DefaultCondition,
@@ -1098,7 +1108,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																		   SGE_STR("CommentBlockEndState")>;
 				using CommentBlockInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																		  MatchCharsCondition<SGE_STR("\0")>,
-																		  ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																		  ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::CommentBlockNotEnd>>,
 																		  SGE_STR("IdleState")>;
 				using CommentBlockToCommentBlockTransition = Transition<CppLikeStyleLexerContext,
 																		DefaultCondition,
@@ -1110,7 +1120,7 @@ namespace SpaceGameEngine::CommonParser::Lexer
 																   SGE_STR("IdleState")>;
 				using CommentBlockEndInvalidCharacterTransition = Transition<CppLikeStyleLexerContext,
 																			 MatchCharsCondition<SGE_STR("\0")>,
-																			 ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::InvalidCharacter>>,
+																			 ChainAction<CppLikeStyleLexerContext, ClearAction, ThrowAction<ErrorTypeId::CommentBlockNotEnd>>,
 																			 SGE_STR("IdleState")>;
 				using CommentBlockEndToCommentBlockTransition = Transition<CppLikeStyleLexerContext,
 																		   DefaultCondition,
