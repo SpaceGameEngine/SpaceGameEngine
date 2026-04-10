@@ -509,7 +509,8 @@ TEST(GetTokens, Test)
 
 TEST(BaseContext, Test)
 {
-	Lexer::Experimental::BaseContext context(SGE_STR("Test"));
+	String source = SGE_STR("Test");
+	Lexer::Experimental::BaseContext context(source);
 
 	ASSERT_EQ(context.GetCurrentChar(), SGE_STR('T'));
 	ASSERT_FALSE(context.IsEnd());
