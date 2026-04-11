@@ -42,6 +42,9 @@ namespace SpaceGameEngine::CommonParser
 		SizeType GetColumn() const;
 		const Vector<String>& GetAdditionalInformation() const;
 
+		bool operator==(const ParserError& error) const = default;
+		bool operator!=(const ParserError& error) const = default;
+
 	private:
 		SizeType m_TypeId;
 		SizeType m_Line;

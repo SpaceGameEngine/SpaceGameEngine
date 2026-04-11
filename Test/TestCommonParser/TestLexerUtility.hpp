@@ -22,8 +22,7 @@ using namespace SpaceGameEngine::CommonParser;
 
 TEST(TransformToken, Test)
 {
-	String formatter(SGE_STR("line:{} column:{}, {}"));
-	auto tokens = Lexer::GetTokens(SGE_STR("a=true"), formatter);
+	auto tokens = Lexer::CppLikeStyleLexer::GetTokens(SGE_STR("a=true")).m_First;
 	ASSERT_EQ(tokens.GetSize(), 3);
 	ASSERT_EQ(tokens[0].GetType(), Lexer::TokenTypes::Identifier);
 	ASSERT_EQ(tokens[0].GetContent(), SGE_STR("a"));
@@ -68,8 +67,7 @@ TEST(TransformToken, Test)
 
 TEST(CombineToken, Test)
 {
-	String formatter(SGE_STR("line:{} column:{}, {}"));
-	auto tokens = Lexer::GetTokens(SGE_STR("test.combine_token.test"), formatter);
+	auto tokens = Lexer::CppLikeStyleLexer::GetTokens(SGE_STR("test.combine_token.test")).m_First;
 	ASSERT_EQ(tokens.GetSize(), 5);
 	ASSERT_EQ(tokens[0].GetType(), Lexer::TokenTypes::Identifier);
 	ASSERT_EQ(tokens[0].GetContent(), SGE_STR("test"));
@@ -117,8 +115,7 @@ TEST(CombineToken, Test)
 
 TEST(RemoveToken, Test)
 {
-	String formatter(SGE_STR("line:{} column:{}, {}"));
-	auto tokens = Lexer::GetTokens(SGE_STR("test \n123"), formatter);
+	auto tokens = Lexer::CppLikeStyleLexer::GetTokens(SGE_STR("test \n123")).m_First;
 	ASSERT_EQ(tokens.GetSize(), 4);
 	ASSERT_EQ(tokens[0].GetType(), Lexer::TokenTypes::Identifier);
 	ASSERT_EQ(tokens[0].GetContent(), SGE_STR("test"));
