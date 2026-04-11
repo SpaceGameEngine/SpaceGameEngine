@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <!-- ==================== Pair<T, U> ==================== -->
+  <Type Name="SpaceGameEngine::Pair&lt;*&gt;">
+    <DisplayString>({m_First}, {m_Second})</DisplayString>
+    <Expand>
+      <Item Name="first">m_First</Item>
+      <Item Name="second">m_Second</Item>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Detail::KeyValuePair<K, V> ==================== -->
+  <!-- Used internally by Map and HashMap -->
+  <Type Name="SpaceGameEngine::Detail::KeyValuePair&lt;*&gt;">
+    <DisplayString>({m_First}, {m_Second})</DisplayString>
+    <Expand>
+      <Item Name="key">m_First</Item>
+      <Item Name="value">m_Second</Item>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Optional<T> ==================== -->
+  <Type Name="SpaceGameEngine::Optional&lt;*&gt;">
+    <DisplayString Condition="!m_HasValue">empty</DisplayString>
+    <DisplayString Condition="m_HasValue">{*($T1*)m_Value}</DisplayString>
+    <Expand>
+      <Item Name="[has_value]">m_HasValue</Item>
+      <Item Name="[value]" Condition="m_HasValue">*($T1*)m_Value</Item>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Variant<T1, T2, ...> ==================== -->
+  <!-- Shows the active type index (0-based) and the value for up to 8 types -->
+  <Type Name="SpaceGameEngine::Variant&lt;*&gt;">
+    <DisplayString Condition="m_TypeIndex == 0">[0] = {*($T1*)m_Content}</DisplayString>
+    <DisplayString Condition="m_TypeIndex == 1">[1] = {*($T2*)m_Content}</DisplayString>
+    <DisplayString Condition="m_TypeIndex == 2">[2] = {*($T3*)m_Content}</DisplayString>
+    <DisplayString Condition="m_TypeIndex == 3">[3] = {*($T4*)m_Content}</DisplayString>
+    <DisplayString Condition="m_TypeIndex == 4">[4] = {*($T5*)m_Content}</DisplayString>
+    <DisplayString Condition="m_TypeIndex == 5">[5] = {*($T6*)m_Content}</DisplayString>
+    <DisplayString Condition="m_TypeIndex == 6">[6] = {*($T7*)m_Content}</DisplayString>
+    <DisplayString Condition="m_TypeIndex == 7">[7] = {*($T8*)m_Content}</DisplayString>
+    <DisplayString>{{ type_index={m_TypeIndex} }}</DisplayString>
+    <Expand>
+      <Item Name="[type_index]">m_TypeIndex</Item>
+      <Item Name="[value]" Condition="m_TypeIndex == 0">*($T1*)m_Content</Item>
+      <Item Name="[value]" Condition="m_TypeIndex == 1">*($T2*)m_Content</Item>
+      <Item Name="[value]" Condition="m_TypeIndex == 2">*($T3*)m_Content</Item>
+      <Item Name="[value]" Condition="m_TypeIndex == 3">*($T4*)m_Content</Item>
+      <Item Name="[value]" Condition="m_TypeIndex == 4">*($T5*)m_Content</Item>
+      <Item Name="[value]" Condition="m_TypeIndex == 5">*($T6*)m_Content</Item>
+      <Item Name="[value]" Condition="m_TypeIndex == 6">*($T7*)m_Content</Item>
+      <Item Name="[value]" Condition="m_TypeIndex == 7">*($T8*)m_Content</Item>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Vector<T, Allocator> ==================== -->
+  <!-- m_pContent: raw memory block, m_Size: element count, m_RealSize: capacity -->
+  <Type Name="SpaceGameEngine::Vector&lt;*&gt;">
+    <DisplayString>{{ size={m_Size} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <Item Name="[capacity]">m_RealSize</Item>
+      <ArrayItems>
+        <Size>m_Size</Size>
+        <ValuePointer>($T1*)m_pContent</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== List<T, Allocator> ==================== -->
+  <!-- Doubly-linked list: Node has m_Content, m_pNext, m_pPrevious -->
+  <Type Name="SpaceGameEngine::List&lt;*&gt;">
+    <DisplayString>{{ size={m_Size} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <LinkedListItems>
+        <Size>m_Size</Size>
+        <HeadPointer>m_pHead</HeadPointer>
+        <NextPointer>m_pNext</NextPointer>
+        <ValueNode>m_Content</ValueNode>
+      </LinkedListItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Stack<T, Allocator, Implement> ==================== -->
+  <!-- Delegates to m_Implement (default: List). Top = last element. -->
+  <Type Name="SpaceGameEngine::Stack&lt;*&gt;">
+    <DisplayString>{{ size={m_Implement.m_Size} }}</DisplayString>
+    <Expand>
+      <ExpandedItem>m_Implement</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Queue<T, Allocator, Implement> ==================== -->
+  <!-- Delegates to m_Implement (default: List). Front = first element. -->
+  <Type Name="SpaceGameEngine::Queue&lt;*&gt;">
+    <DisplayString>{{ size={m_Implement.m_Size} }}</DisplayString>
+    <Expand>
+      <ExpandedItem>m_Implement</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <!-- ==================== PriorityQueue<T, Comparer, Allocator, Implement> ==================== -->
+  <!-- Delegates to m_Implement (default: Vector). Elements stored in heap order. -->
+  <Type Name="SpaceGameEngine::PriorityQueue&lt;*&gt;">
+    <DisplayString>{{ size={m_Implement.m_Size} }}</DisplayString>
+    <Expand>
+      <ExpandedItem>m_Implement</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Detail::RedBlackTree<V, Less, Equal, Allocator> ==================== -->
+  <!-- Private layout: Node& m_NilNode, UInt8 m_NilNodeContent[], Node* m_pRoot, SizeType m_Size -->
+  <!-- &m_NilNode == (Node*)m_NilNodeContent — the sentinel nil node (all fields zeroed) -->
+  <!-- Performs iterative in-order (sorted) traversal -->
+  <Type Name="SpaceGameEngine::Detail::RedBlackTree&lt;*&gt;">
+    <DisplayString>{{ size={m_Size} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <CustomListItems MaxItemsPerView="5000">
+        <Variable Name="node" InitialValue="m_pRoot" />
+        <Variable Name="nil"  InitialValue="&amp;m_NilNode" />
+        <Variable Name="i"    InitialValue="(SpaceGameEngine::UInt64)0" />
+        <If Condition="node != nil">
+          <!-- Find the leftmost (minimum) node -->
+          <Loop>
+            <Break Condition="node-&gt;m_pLeftChild == nil" />
+            <Exec>node = node-&gt;m_pLeftChild</Exec>
+          </Loop>
+          <!-- In-order traversal -->
+          <Loop>
+            <Break Condition="node == nil" />
+            <Item Name="[{i}]">node-&gt;m_Value</Item>
+            <Exec>i = i + 1</Exec>
+            <If Condition="node-&gt;m_pRightChild != nil">
+              <!-- Descend into right subtree, then go as far left as possible -->
+              <Exec>node = node-&gt;m_pRightChild</Exec>
+              <Loop>
+                <Break Condition="node-&gt;m_pLeftChild == nil" />
+                <Exec>node = node-&gt;m_pLeftChild</Exec>
+              </Loop>
+            </If>
+            <Else>
+              <!-- Ascend until we arrive from a left child, then step to parent -->
+              <Loop>
+                <Break Condition="node-&gt;m_pParent == nil || node-&gt;m_pParent-&gt;m_pLeftChild == node" />
+                <Exec>node = node-&gt;m_pParent</Exec>
+              </Loop>
+              <Exec>node = node-&gt;m_pParent</Exec>
+            </Else>
+          </Loop>
+        </If>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Set<T, LessComparer, Allocator> ==================== -->
+  <!-- Inherits Detail::RedBlackTree — same in-order traversal -->
+  <Type Name="SpaceGameEngine::Set&lt;*&gt;">
+    <DisplayString>{{ size={m_Size} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <CustomListItems MaxItemsPerView="5000">
+        <Variable Name="node" InitialValue="m_pRoot" />
+        <Variable Name="nil"  InitialValue="&amp;m_NilNode" />
+        <Variable Name="i"    InitialValue="(SpaceGameEngine::UInt64)0" />
+        <If Condition="node != nil">
+          <Loop>
+            <Break Condition="node-&gt;m_pLeftChild == nil" />
+            <Exec>node = node-&gt;m_pLeftChild</Exec>
+          </Loop>
+          <Loop>
+            <Break Condition="node == nil" />
+            <Item Name="[{i}]">node-&gt;m_Value</Item>
+            <Exec>i = i + 1</Exec>
+            <If Condition="node-&gt;m_pRightChild != nil">
+              <Exec>node = node-&gt;m_pRightChild</Exec>
+              <Loop>
+                <Break Condition="node-&gt;m_pLeftChild == nil" />
+                <Exec>node = node-&gt;m_pLeftChild</Exec>
+              </Loop>
+            </If>
+            <Else>
+              <Loop>
+                <Break Condition="node-&gt;m_pParent == nil || node-&gt;m_pParent-&gt;m_pLeftChild == node" />
+                <Exec>node = node-&gt;m_pParent</Exec>
+              </Loop>
+              <Exec>node = node-&gt;m_pParent</Exec>
+            </Else>
+          </Loop>
+        </If>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Map<K, V, LessComparer, Allocator> ==================== -->
+  <!-- Inherits Detail::RedBlackTree — node values are KeyValuePair<K,V> -->
+  <Type Name="SpaceGameEngine::Map&lt;*&gt;">
+    <DisplayString>{{ size={m_Size} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <CustomListItems MaxItemsPerView="5000">
+        <Variable Name="node" InitialValue="m_pRoot" />
+        <Variable Name="nil"  InitialValue="&amp;m_NilNode" />
+        <Variable Name="i"    InitialValue="(SpaceGameEngine::UInt64)0" />
+        <If Condition="node != nil">
+          <Loop>
+            <Break Condition="node-&gt;m_pLeftChild == nil" />
+            <Exec>node = node-&gt;m_pLeftChild</Exec>
+          </Loop>
+          <Loop>
+            <Break Condition="node == nil" />
+            <Item Name="[{i}]">node-&gt;m_Value</Item>
+            <Exec>i = i + 1</Exec>
+            <If Condition="node-&gt;m_pRightChild != nil">
+              <Exec>node = node-&gt;m_pRightChild</Exec>
+              <Loop>
+                <Break Condition="node-&gt;m_pLeftChild == nil" />
+                <Exec>node = node-&gt;m_pLeftChild</Exec>
+              </Loop>
+            </If>
+            <Else>
+              <Loop>
+                <Break Condition="node-&gt;m_pParent == nil || node-&gt;m_pParent-&gt;m_pLeftChild == node" />
+                <Exec>node = node-&gt;m_pParent</Exec>
+              </Loop>
+              <Exec>node = node-&gt;m_pParent</Exec>
+            </Else>
+          </Loop>
+        </If>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== Detail::HashTable<V, Hasher, Equal, Allocator> ==================== -->
+  <!-- m_pContent: Bucket[], each Bucket has a singly-linked Node list via m_pHead/m_pNext -->
+  <Type Name="SpaceGameEngine::Detail::HashTable&lt;*&gt;">
+    <DisplayString>{{ size={m_Size}, buckets={m_BucketQuantity} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <Item Name="[bucket_count]">m_BucketQuantity</Item>
+      <Item Name="[load_factor]">m_LoadFactor</Item>
+      <CustomListItems MaxItemsPerView="5000">
+        <Variable Name="bidx" InitialValue="(SpaceGameEngine::UInt64)0" />
+        <Variable Name="node" InitialValue="m_pContent[0].m_pHead" />
+        <Variable Name="i"    InitialValue="(SpaceGameEngine::UInt64)0" />
+        <Loop>
+          <Break Condition="m_pContent == nullptr || bidx &gt;= m_BucketQuantity" />
+          <Exec>node = m_pContent[bidx].m_pHead</Exec>
+          <Loop>
+            <Break Condition="node == nullptr" />
+            <Item Name="[{i}]">node-&gt;m_Value</Item>
+            <Exec>i = i + 1</Exec>
+            <Exec>node = node-&gt;m_pNext</Exec>
+          </Loop>
+          <Exec>bidx = bidx + 1</Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== HashSet<T, Hasher, Allocator> ==================== -->
+  <!-- Inherits Detail::HashTable -->
+  <Type Name="SpaceGameEngine::HashSet&lt;*&gt;">
+    <DisplayString>{{ size={m_Size}, buckets={m_BucketQuantity} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <Item Name="[bucket_count]">m_BucketQuantity</Item>
+      <Item Name="[load_factor]">m_LoadFactor</Item>
+      <CustomListItems MaxItemsPerView="5000">
+        <Variable Name="bidx" InitialValue="(SpaceGameEngine::UInt64)0" />
+        <Variable Name="node" InitialValue="m_pContent[0].m_pHead" />
+        <Variable Name="i"    InitialValue="(SpaceGameEngine::UInt64)0" />
+        <Loop>
+          <Break Condition="m_pContent == nullptr || bidx &gt;= m_BucketQuantity" />
+          <Exec>node = m_pContent[bidx].m_pHead</Exec>
+          <Loop>
+            <Break Condition="node == nullptr" />
+            <Item Name="[{i}]">node-&gt;m_Value</Item>
+            <Exec>i = i + 1</Exec>
+            <Exec>node = node-&gt;m_pNext</Exec>
+          </Loop>
+          <Exec>bidx = bidx + 1</Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== HashMap<K, V, Hasher, Allocator> ==================== -->
+  <!-- Inherits Detail::HashTable — node values are KeyValuePair<K,V> -->
+  <Type Name="SpaceGameEngine::HashMap&lt;*&gt;">
+    <DisplayString>{{ size={m_Size}, buckets={m_BucketQuantity} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <Item Name="[bucket_count]">m_BucketQuantity</Item>
+      <Item Name="[load_factor]">m_LoadFactor</Item>
+      <CustomListItems MaxItemsPerView="5000">
+        <Variable Name="bidx" InitialValue="(SpaceGameEngine::UInt64)0" />
+        <Variable Name="node" InitialValue="m_pContent[0].m_pHead" />
+        <Variable Name="i"    InitialValue="(SpaceGameEngine::UInt64)0" />
+        <Loop>
+          <Break Condition="m_pContent == nullptr || bidx &gt;= m_BucketQuantity" />
+          <Exec>node = m_pContent[bidx].m_pHead</Exec>
+          <Loop>
+            <Break Condition="node == nullptr" />
+            <Item Name="[{i}]">node-&gt;m_Value</Item>
+            <Exec>i = i + 1</Exec>
+            <Exec>node = node-&gt;m_pNext</Exec>
+          </Loop>
+          <Exec>bidx = bidx + 1</Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== StringCore<wchar_t, UCS2Trait, *> ==================== -->
+  <!-- String / UCS2String on Windows (Char16 = wchar_t)                          -->
+  <!-- Storage layout: SizeType m_RealSize + union{ struct{SizeType m_Size,        -->
+  <!--   wchar_t* m_pContent}; wchar_t m_Content[8] }                             -->
+  <!-- Small string: m_RealSize in [1..8]  (up to 7 wchar_t + L'\0')             -->
+  <!-- Large string: m_RealSize > 8        (heap-allocated, null-terminated)      -->
+  <Type Name="SpaceGameEngine::StringCore&lt;wchar_t,SpaceGameEngine::UCS2Trait,*&gt;">
+    <DisplayString Condition="m_Storage.m_RealSize == 0">""</DisplayString>
+    <DisplayString Condition="m_Storage.m_RealSize &gt; 0 &amp;&amp; m_Storage.m_RealSize &lt;= 8">{(const wchar_t*)m_Storage.m_Content}</DisplayString>
+    <DisplayString Condition="m_Storage.m_RealSize &gt; 8">{m_Storage.m_pContent}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <Item Name="[storage_size]">m_Storage.m_RealSize</Item>
+      <Item Name="[data]" Condition="m_Storage.m_RealSize &gt; 0 &amp;&amp; m_Storage.m_RealSize &lt;= 8">(const wchar_t*)m_Storage.m_Content</Item>
+      <Item Name="[data]" Condition="m_Storage.m_RealSize &gt; 8">m_Storage.m_pContent</Item>
+      <CustomListItems MaxItemsPerView="5000">
+        <Variable Name="i" InitialValue="(SpaceGameEngine::UInt64)0" />
+        <If Condition="m_Storage.m_RealSize &gt; 0 &amp;&amp; m_Storage.m_RealSize &lt;= 8">
+          <Loop>
+            <Break Condition="i &gt;= m_Storage.m_RealSize - 1" />
+            <Item Name="[{i}]">((const wchar_t*)m_Storage.m_Content)[i]</Item>
+            <Exec>i = i + 1</Exec>
+          </Loop>
+        </If>
+        <If Condition="m_Storage.m_RealSize &gt; 8">
+          <Loop>
+            <Break Condition="i &gt;= m_Storage.m_Size - 1" />
+            <Item Name="[{i}]">m_Storage.m_pContent[i]</Item>
+            <Exec>i = i + 1</Exec>
+          </Loop>
+        </If>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <!-- ==================== StringCore<char8_t, UTF8Trait, *> ==================== -->
+  <!-- UTF8String on Windows with C++20 (Char8 = char8_t)                         -->
+  <!-- Storage layout: SizeType m_RealSize + union{ struct{SizeType m_Size,        -->
+  <!--   char8_t* m_pContent}; char8_t m_Content[16] }                            -->
+  <!-- Small string: m_RealSize in [1..16]  (up to 15 char8_t + '\0')            -->
+  <!-- Large string: m_RealSize > 16         (heap-allocated, null-terminated)    -->
+  <Type Name="SpaceGameEngine::StringCore&lt;char8_t,SpaceGameEngine::UTF8Trait,*&gt;">
+    <DisplayString Condition="m_Storage.m_RealSize == 0">""</DisplayString>
+    <DisplayString Condition="m_Storage.m_RealSize &gt; 0 &amp;&amp; m_Storage.m_RealSize &lt;= 16">{(const char*)m_Storage.m_Content}</DisplayString>
+    <DisplayString Condition="m_Storage.m_RealSize &gt; 16">{(const char*)m_Storage.m_pContent}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_Size</Item>
+      <Item Name="[storage_size]">m_Storage.m_RealSize</Item>
+      <Item Name="[data]" Condition="m_Storage.m_RealSize &gt; 0 &amp;&amp; m_Storage.m_RealSize &lt;= 16">(const char*)m_Storage.m_Content</Item>
+      <Item Name="[data]" Condition="m_Storage.m_RealSize &gt; 16">(const char*)m_Storage.m_pContent</Item>
+      <CustomListItems MaxItemsPerView="5000">
+        <Variable Name="i" InitialValue="(SpaceGameEngine::UInt64)0" />
+        <If Condition="m_Storage.m_RealSize &gt; 0 &amp;&amp; m_Storage.m_RealSize &lt;= 16">
+          <Loop>
+            <Break Condition="i &gt;= m_Storage.m_RealSize - 1" />
+            <Item Name="[{i}]">((const char*)m_Storage.m_Content)[i]</Item>
+            <Exec>i = i + 1</Exec>
+          </Loop>
+        </If>
+        <If Condition="m_Storage.m_RealSize &gt; 16">
+          <Loop>
+            <Break Condition="i &gt;= m_Storage.m_Size - 1" />
+            <Item Name="[{i}]">((const char*)m_Storage.m_pContent)[i]</Item>
+            <Exec>i = i + 1</Exec>
+          </Loop>
+        </If>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+</AutoVisualizer>

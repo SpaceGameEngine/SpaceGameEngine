@@ -351,4 +351,9 @@
       <Filter>Private\Serializer</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Public\Common.natvis">
+      <Filter>Public</Filter>
+    </Natvis>
+  </ItemGroup>
 </Project>

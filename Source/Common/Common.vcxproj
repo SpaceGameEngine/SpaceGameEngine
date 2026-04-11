@@ -254,6 +254,9 @@
     <ClCompile Include="Private\Utility\LineBreak.cpp" />
     <ClCompile Include="Private\Utility\MemoryData.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Public\Common.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
