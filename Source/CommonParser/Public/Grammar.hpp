@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
+#include "Lexer.h"
+#include "Meta/TypeList.hpp"
 
 /*!
 @ingroup CommonParser
@@ -22,13 +24,62 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonParser::Parser::Grammar
 {
-	template<typename T>
-	concept IsExpression = true;	// todo
-
-	template<IsExpression Expression>
-	struct Rule
+	struct Expression
 	{
-		// todo
+	};
+
+	template<typename T>
+	concept IsExpression = std::derived_from<T, Expression>;
+
+	template<IsExpression _Expression>
+	struct Rule : public Expression
+	{
+		using Expression = _Expression;
+	};
+
+	template<Lexer::TokenType _Type>
+	struct MatchTokenTypeExpression : public Expression
+	{
+		inline static constexpr const Lexer::TokenType Type = _Type;
+	};
+
+	template<Lexer::TokenType _Type, ArrayLiteral _Content>
+	struct MatchTokenTypeAndContentExpression : public Expression
+	{
+		inline static constexpr const Lexer::TokenType Type = _Type;
+		inline static constexpr const auto Content = _Content;
+	};
+
+	template<IsExpression... _Expressions>
+	struct SequenceExpression : public Expression
+	{
+		using Expressions = TypeList<_Expressions...>;
+	};
+
+	template<IsExpression... _Expressions>
+	struct SelectExpression : public Expression
+	{
+		using Expressions = TypeList<_Expressions...>;
+	};
+
+	template<IsExpression _Expression>
+	struct NegateExpression : public Expression
+	{
+		using Expression = _Expression;
+	};
+
+	template<IsExpression _Expression>
+	struct OptionalExpression : public Expression
+	{
+		using Expression = _Expression;
+	};
+
+	template<IsExpression _Expression, SizeType _MinCount = 0, SizeType _MaxCount = UINT64_MAX>
+	struct RepeatExpression : public Expression
+	{
+		using Expression = _Expression;
+		inline static constexpr const SizeType MinCount = _MinCount;
+		inline static constexpr const SizeType MaxCount = _MaxCount;
 	};
 }
 

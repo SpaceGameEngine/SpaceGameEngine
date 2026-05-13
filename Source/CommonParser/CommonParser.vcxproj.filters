@@ -30,7 +30,7 @@
     <ClInclude Include="Public\Grammar.hpp">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\LL1Parser.hpp">
+    <ClInclude Include="Public\TopDownParser.hpp">
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\ParserError.h">

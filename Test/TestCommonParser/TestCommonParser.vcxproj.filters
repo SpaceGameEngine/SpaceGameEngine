@@ -7,7 +7,7 @@
     <ClInclude Include="TestLexer.hpp" />
     <ClInclude Include="TestLexerUtility.hpp" />
     <ClInclude Include="TestGrammar.hpp" />
-    <ClInclude Include="TestLL1Parser.hpp" />
+    <ClInclude Include="TestTopDownParser.hpp" />
     <ClInclude Include="TestParserError.hpp" />
   </ItemGroup>
 </Project>

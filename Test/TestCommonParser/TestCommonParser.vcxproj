@@ -160,7 +160,7 @@
     <ClInclude Include="TestGrammar.hpp" />
     <ClInclude Include="TestLexer.hpp" />
     <ClInclude Include="TestLexerUtility.hpp" />
-    <ClInclude Include="TestLL1Parser.hpp" />
+    <ClInclude Include="TestTopDownParser.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

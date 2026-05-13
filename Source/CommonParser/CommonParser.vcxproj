@@ -147,7 +147,7 @@
     <ClInclude Include="Public\Grammar.hpp" />
     <ClInclude Include="Public\Lexer.h" />
     <ClInclude Include="Public\LexerUtility.h" />
-    <ClInclude Include="Public\LL1Parser.hpp" />
+    <ClInclude Include="Public\TopDownParser.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonParserModule.cpp" />
