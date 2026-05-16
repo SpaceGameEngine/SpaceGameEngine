@@ -149,7 +149,7 @@ namespace SpaceGameEngine
 		template<IsTuple A, IsTuple B, SizeType... AIndices, SizeType... BIndices>
 		inline auto Concat2TuplesImplement(A&& a, B&& b, std::integer_sequence<SizeType, AIndices...>, std::integer_sequence<SizeType, BIndices...>)
 		{
-			return Tuple<typename std::remove_cvref_t<A>::template Types::template Get<AIndices>..., typename std::remove_cvref_t<B>::template Types::template Get<BIndices>...>(ForwardLike<A>(a.template Get<AIndices>())..., ForwardLike<B>(b.template Get<BIndices>())...);
+			return Tuple<typename std::remove_cvref_t<A>::Types::template Get<AIndices>..., typename std::remove_cvref_t<B>::Types::template Get<BIndices>...>(ForwardLike<A>(a.template Get<AIndices>())..., ForwardLike<B>(b.template Get<BIndices>())...);
 		}
 
 		template<IsTuple A, IsTuple B>
