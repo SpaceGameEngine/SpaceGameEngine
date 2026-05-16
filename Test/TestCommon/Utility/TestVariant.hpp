@@ -19,6 +19,17 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 
+struct TestVariantNonDefaultConstructibleType
+{
+	int value;
+	TestVariantNonDefaultConstructibleType(int v)
+		: value(v)
+	{
+	}
+
+	TestVariantNonDefaultConstructibleType() = delete;
+};
+
 struct TestVariantMoveOnlyType
 {
 	int value;
@@ -262,6 +273,13 @@ TEST(Variant, DefaultConstructorTest)
 
 	Variant<EmptyType, TestVariantComplexTypeForEmplace> variant2;
 	ASSERT_EQ(variant2.GetTypeIndex(), 0);
+}
+
+TEST(Variant, NonDefaultConstructibleTypeTest)
+{
+	Variant<TestVariantNonDefaultConstructibleType> variant(InPlaceIndex<0>, 42);
+	ASSERT_EQ(variant.GetTypeIndex(), 0);
+	ASSERT_EQ(variant.Get<0>().value, 42);
 }
 
 TEST(Variant, ConstructorWithTypeIndexTest)
