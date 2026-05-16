@@ -30,6 +30,7 @@ limitations under the License.
 #include "Utility/TestLineBreak.hpp"
 #include "Utility/TestMemoryData.hpp"
 #include "Utility/TestOptional.hpp"
+#include "Utility/TestTuple.hpp"
 #include "Utility/TestPair.hpp"
 #include "Utility/TestUtility.hpp"
 #include "Utility/TestVariant.hpp"

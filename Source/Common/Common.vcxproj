@@ -223,6 +223,7 @@
     <ClInclude Include="Public\Utility\Optional.hpp" />
     <ClInclude Include="Public\Utility\Pair.hpp" />
     <ClInclude Include="Public\Utility\Singleton.hpp" />
+    <ClInclude Include="Public\Utility\Tuple.hpp" />
     <ClInclude Include="Public\Utility\Utility.hpp" />
     <ClInclude Include="Public\Utility\Variant.hpp" />
   </ItemGroup>

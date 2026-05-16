@@ -228,6 +228,7 @@
     <ClInclude Include="Utility\TestMemoryData.hpp" />
     <ClInclude Include="Utility\TestOptional.hpp" />
     <ClInclude Include="Utility\TestPair.hpp" />
+    <ClInclude Include="Utility\TestTuple.hpp" />
     <ClInclude Include="Utility\TestUtility.hpp" />
     <ClInclude Include="Utility\TestVariant.hpp" />
   </ItemGroup>
