@@ -9,5 +9,6 @@
     <ClInclude Include="TestGrammar.hpp" />
     <ClInclude Include="TestTopDownParser.hpp" />
     <ClInclude Include="TestParserError.hpp" />
+    <ClInclude Include="TestAbstractSyntaxTree.hpp" />
   </ItemGroup>
 </Project>

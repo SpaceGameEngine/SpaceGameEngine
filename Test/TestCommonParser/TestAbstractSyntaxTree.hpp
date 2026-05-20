@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright 2026 creatorlxd
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+#pragma once
+#include "AbstractSyntaxTree.hpp"
 #include "gtest/gtest.h"
-#include "Bootstrap.h"
-#include "SGEString.hpp"
-#include "Module/ModuleManager.h"
-#include "TestParserError.hpp"
-#include "TestLexer.hpp"
-#include "TestLexerUtility.hpp"
-#include "TestGrammar.hpp"
-#include "TestAbstractSyntaxTree.hpp"
-#include "TestTopDownParser.hpp"
 
-SpaceGameEngine::Bootstrap bootstrap;
-
-int main(int argc, char** argv)
-{
-	SpaceGameEngine::ModuleManager::GetSingleton().LoadModule(SGE_STR("CommonParser"));
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
+using namespace SpaceGameEngine;
+using namespace SpaceGameEngine::CommonParser;

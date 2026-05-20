@@ -142,6 +142,7 @@
     <ClInclude Include="Private\CommonParserModule.h" />
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
+    <ClInclude Include="Public\AbstractSyntaxTree.hpp" />
     <ClInclude Include="Public\CommonParserAPI.h" />
     <ClInclude Include="Public\ParserError.h" />
     <ClInclude Include="Public\Grammar.hpp" />

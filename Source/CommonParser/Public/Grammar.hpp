@@ -31,12 +31,6 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 	template<typename T>
 	concept IsExpression = std::derived_from<T, Expression>;
 
-	template<IsExpression _Expression>
-	struct Rule : public Expression
-	{
-		using Expression = _Expression;
-	};
-
 	template<Lexer::TokenType _Type>
 	struct MatchTokenTypeExpression : public Expression
 	{
@@ -81,6 +75,57 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 		inline static constexpr const SizeType MinCount = _MinCount;
 		inline static constexpr const SizeType MaxCount = _MaxCount;
 	};
+
+	namespace Detail
+	{
+		template<Lexer::TokenType _Type>
+		inline constexpr auto GetUnderlyingExpressionType(MatchTokenTypeExpression<_Type>&&)
+		{
+			return TypeWrapper<MatchTokenTypeExpression<_Type>>{};
+		}
+
+		template<Lexer::TokenType _Type, ArrayLiteral _Content>
+		inline constexpr auto GetUnderlyingExpressionType(MatchTokenTypeAndContentExpression<_Type, _Content>&&)
+		{
+			return TypeWrapper<MatchTokenTypeAndContentExpression<_Type, _Content>>{};
+		}
+
+		template<IsExpression... _Expressions>
+		inline constexpr auto GetUnderlyingExpressionType(SequenceExpression<_Expressions...>&&)
+		{
+			return TypeWrapper<SequenceExpression<_Expressions...>>{};
+		}
+
+		template<IsExpression... _Expressions>
+		inline constexpr auto GetUnderlyingExpressionType(SelectExpression<_Expressions...>&&)
+		{
+			return TypeWrapper<SelectExpression<_Expressions...>>{};
+		}
+
+		template<IsExpression _Expression>
+		inline constexpr auto GetUnderlyingExpressionType(NegateExpression<_Expression>&&)
+		{
+			return TypeWrapper<NegateExpression<_Expression>>{};
+		}
+
+		template<IsExpression _Expression>
+		inline constexpr auto GetUnderlyingExpressionType(OptionalExpression<_Expression>&&)
+		{
+			return TypeWrapper<OptionalExpression<_Expression>>{};
+		}
+
+		template<IsExpression _Expression, SizeType _MinCount, SizeType _MaxCount>
+		inline constexpr auto GetUnderlyingExpressionType(RepeatExpression<_Expression, _MinCount, _MaxCount>&&)
+		{
+			return TypeWrapper<RepeatExpression<_Expression, _MinCount, _MaxCount>>{};
+		}
+	}
+
+	/*!
+	@brief get underlying expression type of any expression type. So the user can define custom rule expressions by deriving from the composited expression type.
+	*/
+	template<IsExpression _Expression>
+	using UnderlyingExpressionType = typename decltype(Detail::GetUnderlyingExpressionType(std::declval<_Expression>()))::Type;
 }
 
 /*!
