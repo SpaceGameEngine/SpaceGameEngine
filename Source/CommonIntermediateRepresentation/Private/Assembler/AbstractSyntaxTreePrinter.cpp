@@ -47,7 +47,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 	if (type_symbol.HasValue())
 	{
 		StartPrintChildren();
-		Visit(node.GetTypeSymbolNode().Get());
+		node.GetTypeSymbolNode().Get().Accept(*this);
 		EndPrintChildren();
 	}
 }
@@ -56,7 +56,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 {
 	PrintLine(Format(String(SGE_STR("ParameterDefinition \"{}\"\t<line:{}, column:{}>")), node.GetName(), node.GetLine(), node.GetColumn()));
 	StartPrintChildren();
-	Visit(node.GetTypeSymbolNode());
+	node.GetTypeSymbolNode().Accept(*this);
 	EndPrintChildren();
 }
 
@@ -66,7 +66,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 	StartPrintChildren();
 	const auto& parameter_definitions = node.GetParameterDefinitions();
 	for (auto iter = parameter_definitions.GetConstBegin(); iter != parameter_definitions.GetConstEnd(); ++iter)
-		Visit(*iter);
+		iter->Accept(*this);
 	EndPrintChildren();
 }
 
@@ -74,7 +74,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 {
 	PrintLine(Format(String(SGE_STR("AttributeDefinition \"{}\"\t<line:{}, column:{}>")), node.GetName(), node.GetLine(), node.GetColumn()));
 	StartPrintChildren();
-	Visit(node.GetValue());
+	node.GetValue().Accept(*this);
 	EndPrintChildren();
 }
 
@@ -84,7 +84,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 	StartPrintChildren();
 	const auto& attribute_definitions = node.GetAttributeDefinitions();
 	for (auto iter = attribute_definitions.GetConstBegin(); iter != attribute_definitions.GetConstEnd(); ++iter)
-		Visit(*iter);
+		iter->Accept(*this);
 	EndPrintChildren();
 }
 
@@ -131,7 +131,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 		{
 			m_Printer.PrintLine(Format(String(SGE_STR("AttributeValue:AttributeDictionary\t<line:{}, column:{}>")), m_Node.GetLine(), m_Node.GetColumn()));
 			m_Printer.StartPrintChildren();
-			m_Printer.Visit(value);
+			value.Accept(m_Printer);
 			m_Printer.EndPrintChildren();
 		}
 
@@ -185,7 +185,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 		{
 			m_Printer.PrintLine(Format(String(SGE_STR("Argument:Variable\t<line:{}, column:{}>")), m_Node.GetLine(), m_Node.GetColumn()));
 			m_Printer.StartPrintChildren();
-			m_Printer.Visit(value);
+			value.Accept(m_Printer);
 			m_Printer.EndPrintChildren();
 		}
 
@@ -193,7 +193,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 		{
 			m_Printer.PrintLine(Format(String(SGE_STR("Argument:ParameterDefinitions\t<line:{}, column:{}>")), m_Node.GetLine(), m_Node.GetColumn()));
 			m_Printer.StartPrintChildren();
-			m_Printer.Visit(value);
+			value.Accept(m_Printer);
 			m_Printer.EndPrintChildren();
 		}
 
@@ -201,7 +201,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 		{
 			m_Printer.PrintLine(Format(String(SGE_STR("Argument:Block\t<line:{}, column:{}>")), m_Node.GetLine(), m_Node.GetColumn()));
 			m_Printer.StartPrintChildren();
-			m_Printer.Visit(value);
+			value.Accept(m_Printer);
 			m_Printer.EndPrintChildren();
 		}
 
@@ -216,13 +216,13 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 {
 	PrintLine(Format(String(SGE_STR("Statement\t<line:{}, column:{}>")), node.GetLine(), node.GetColumn()));
 	StartPrintChildren();
-	Visit(node.GetVariableDefinition());
+	node.GetVariableDefinition().Accept(*this);
 	if (node.GetAttributeDictionary().HasValue())
-		Visit(node.GetAttributeDictionary().Get());
-	Visit(node.GetSymbol());
+		node.GetAttributeDictionary().Get().Accept(*this);
+	node.GetSymbol().Accept(*this);
 	const auto& arguments = node.GetArguments();
 	for (auto iter = arguments.GetConstBegin(); iter != arguments.GetConstEnd(); ++iter)
-		Visit(*iter);
+		iter->Accept(*this);
 	EndPrintChildren();
 }
 
@@ -232,7 +232,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 	StartPrintChildren();
 	const auto& statements = node.GetStatements();
 	for (auto iter = statements.GetConstBegin(); iter != statements.GetConstEnd(); ++iter)
-		Visit(*iter);
+		iter->Accept(*this);
 	EndPrintChildren();
 }
 
@@ -242,7 +242,7 @@ void SpaceGameEngine::CommonIntermediateRepresentation::Assembler::AbstractSynta
 	StartPrintChildren();
 	const auto& statements = node.GetStatements();
 	for (auto iter = statements.GetConstBegin(); iter != statements.GetConstEnd(); ++iter)
-		Visit(*iter);
+		iter->Accept(*this);
 	EndPrintChildren();
 }
 
