@@ -35,12 +35,12 @@ namespace SpaceGameEngine::CommonParser::Parser::AbstractSyntaxTree
 	}
 
 	template<Grammar::IsExpression _Expression>
-	class AbstractSyntaxTreeNode : public Detail::AbstractSyntaxTreeNodeExpressionSpecifiedData<_Expression>
+	class AbstractSyntaxTreeNode : public Detail::AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::UnderlyingExpressionType<_Expression>>
 	{
 	public:
 		template<typename... Args>
 		inline AbstractSyntaxTreeNode(const Vector<Lexer::Token>::ConstIterator& begin_token_iter, const Vector<Lexer::Token>::ConstIterator& end_token_iter, Args&&... args)
-			: m_BeginTokenIter(begin_token_iter), m_EndTokenIter(end_token_iter), Detail::AbstractSyntaxTreeNodeExpressionSpecifiedData<_Expression>(std::forward<Args>(args)...)
+			: m_BeginTokenIter(begin_token_iter), m_EndTokenIter(end_token_iter), Detail::AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::UnderlyingExpressionType<_Expression>>(std::forward<Args>(args)...)
 		{
 		}
 
