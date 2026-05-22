@@ -42,6 +42,15 @@ namespace SpaceGameEngine
 			using Type = T;
 		};
 
+		template<SizeType Index, typename... Ts>
+		struct GetRestTypesFromTypes;
+
+		template<SizeType Index, typename T, typename... Ts>
+		struct GetRestTypesFromTypes<Index, T, Ts...>
+		{
+			using Types = typename GetRestTypesFromTypes<Index - 1, Ts...>::Types;
+		};
+
 		template<template<typename> typename T>
 		concept IsTypeFilter = std::is_same_v<std::remove_cvref_t<decltype(T<void>::Value)>, bool>;
 
@@ -82,6 +91,9 @@ namespace SpaceGameEngine
 		template<SizeType Index>
 		using Get = typename Detail::GetTypeFromTypes<Index, Ts...>::Type;
 
+		template<SizeType Index>
+		using GetRest = typename Detail::GetRestTypesFromTypes<Index, Ts...>::Types;
+
 		template<template<typename> typename Filter>
 			requires Detail::IsTypeFilter<Filter>
 		inline static constexpr const SizeType FirstIndex = Detail::FirstIndexInTypes<Filter, Ts...>;
@@ -93,6 +105,12 @@ namespace SpaceGameEngine
 
 	namespace Detail
 	{
+		template<typename T, typename... Ts>
+		struct GetRestTypesFromTypes<0, T, Ts...>
+		{
+			using Types = TypeList<Ts...>;
+		};
+
 		template<typename T>
 		struct IsTypeListCore
 		{

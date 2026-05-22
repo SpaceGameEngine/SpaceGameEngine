@@ -52,6 +52,17 @@ TEST(TypeList, GetTest)
 	ASSERT_TRUE((std::is_same_v<TypeListType::Get<2>, double>));
 }
 
+TEST(TypeList, GetRestTest)
+{
+	using TypeListType = TypeList<int, float, double>;
+	using RestTypeList1 = TypeListType::GetRest<0>;
+	ASSERT_TRUE((std::is_same_v<RestTypeList1, TypeList<float, double>>));
+	using RestTypeList2 = TypeListType::GetRest<1>;
+	ASSERT_TRUE((std::is_same_v<RestTypeList2, TypeList<double>>));
+	using RestTypeList3 = TypeListType::GetRest<2>;
+	ASSERT_TRUE((std::is_same_v<RestTypeList3, TypeList<>>));
+}
+
 template<typename T>
 struct TestTypeListFirstIndexType
 {
