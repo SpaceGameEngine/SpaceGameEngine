@@ -131,6 +131,17 @@ namespace SpaceGameEngine::CommonParser::Parser::AbstractSyntaxTree
 		private:
 			Vector<AbstractSyntaxTreeNode<_Expression>> m_Children;
 		};
+
+		template<ArrayLiteral _Name, Grammar::IsExpression _Expression, bool _IsSynchronousPoint>
+		class AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>> : public AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::UnderlyingExpressionType<_Expression>>
+		{
+		public:
+			template<typename... Args>
+			inline AbstractSyntaxTreeNodeExpressionSpecifiedData(Args&&... args)
+				: AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::UnderlyingExpressionType<_Expression>>(std::forward<Args>(args)...)
+			{
+			}
+		};
 	}
 }
 

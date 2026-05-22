@@ -92,6 +92,21 @@ TEST(RepeatExpression, Test)
 	static_assert(Expression2::MaxCount == 10);
 }
 
+TEST(RuleExpression, Test)
+{
+	using Expression = Parser::Grammar::RuleExpression<SGE_STR("rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
+	static_assert(Parser::Grammar::IsExpression<Expression>);
+	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("rule")));
+	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
+	static_assert(Expression::IsSynchronousPoint == false);
+
+	using Expression2 = Parser::Grammar::RuleExpression<SGE_STR("sync_rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>, true>;
+	static_assert(Parser::Grammar::IsExpression<Expression2>);
+	static_assert(IsSameCString(Expression2::Name.m_Value, SGE_STR("sync_rule")));
+	static_assert(std::same_as<Expression2::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>>);
+	static_assert(Expression2::IsSynchronousPoint == true);
+}
+
 TEST(UnderlyingExpressionType, Test)
 {
 	using Expression1 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
@@ -112,6 +127,10 @@ TEST(UnderlyingExpressionType, Test)
 	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression6>, Expression6>);
 	using Expression7 = Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, 1, 10>;
 	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression7>, Expression7>);
+	using Expression8 = Parser::Grammar::RuleExpression<SGE_STR("rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
+	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression8>, Expression8>);
+	using Expression9 = Parser::Grammar::RuleExpression<SGE_STR("sync_rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, true>;
+	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression9>, Expression9>);
 	class CustomExpression : public Expression7
 	{
 	};

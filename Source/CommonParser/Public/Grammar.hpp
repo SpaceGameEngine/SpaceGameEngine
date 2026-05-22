@@ -76,6 +76,14 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 		inline static constexpr const SizeType MaxCount = _MaxCount;
 	};
 
+	template<ArrayLiteral _Name, IsExpression _Expression, bool _IsSynchronousPoint = false>
+	struct RuleExpression : public Expression
+	{
+		inline static constexpr const auto Name = _Name;
+		using Expression = _Expression;
+		inline static constexpr const bool IsSynchronousPoint = _IsSynchronousPoint;
+	};
+
 	namespace Detail
 	{
 		template<Lexer::TokenType _Type>
@@ -118,6 +126,12 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 		inline constexpr auto GetUnderlyingExpressionType(RepeatExpression<_Expression, _MinCount, _MaxCount>&&)
 		{
 			return TypeWrapper<RepeatExpression<_Expression, _MinCount, _MaxCount>>{};
+		}
+
+		template<ArrayLiteral _Name, IsExpression _Expression, bool _IsSynchronousPoint>
+		inline constexpr auto GetUnderlyingExpressionType(RuleExpression<_Name, _Expression, _IsSynchronousPoint>&&)
+		{
+			return TypeWrapper<RuleExpression<_Name, _Expression, _IsSynchronousPoint>>{};
 		}
 	}
 
