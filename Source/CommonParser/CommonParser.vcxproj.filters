@@ -39,6 +39,9 @@
     <ClInclude Include="Public\AbstractSyntaxTree.hpp">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\AbstractSyntaxTreePrinter.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonParserModule.cpp">
@@ -54,6 +57,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\ParserError.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\AbstractSyntaxTreePrinter.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

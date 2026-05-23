@@ -37,6 +37,10 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 		template<Grammar::IsExpression _Expression>
 		struct ParseCore
 		{
+			inline static auto Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+			{
+				return ParseCore<Grammar::UnderlyingExpressionType<_Expression>>::Parse(iter, end_iter);
+			}
 		};
 
 		template<Grammar::IsExpression _Expression>
@@ -218,7 +222,7 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 				else
 				{
 					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::NegateExpression<_Expression>>(backup_iter, backup_iter);
-					return ParseResult<Grammar::NegateExpression<_Expression>>(std::move(node), std::move(result.m_Second));
+					return ParseResult<Grammar::NegateExpression<_Expression>>(std::move(node), Vector<ParserError>());	   // negative expression should not include any error coming from parsing inside expression, so the error vector is empty.
 				}
 			}
 		};
@@ -287,7 +291,7 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 				auto result = ParseCore<_Expression>::Parse(iter, end_iter);
 				if (result.m_First.HasValue())
 				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(backup_iter, iter, std::move(result.m_First.Get()));
+					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(result.m_First.Get()));
 					return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(node), std::move(result.m_Second));
 				}
 				else
@@ -298,11 +302,10 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 						while (iter != end_iter)
 						{
 							++iter;
-							auto recovery_begin = iter;
 							auto recovery_result = ParseCore<_Expression>::Parse(iter, end_iter);
 							if (recovery_result.m_First.HasValue())
 							{
-								auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(recovery_begin, iter, std::move(recovery_result.m_First.Get()));
+								auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(recovery_result.m_First.Get()));
 								if (recovery_result.m_Second.GetSize() > 0)
 									errors.Insert(errors.GetConstEnd(), recovery_result.m_Second.GetConstBegin(), recovery_result.m_Second.GetConstEnd());
 								return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(node), std::move(errors));
@@ -327,7 +330,7 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 	inline auto Parse(const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
 	{
 		auto iter = begin_iter;
-		return Detail::ParseCore<Grammar::UnderlyingExpressionType<_Expression>>::Parse(iter, end_iter);
+		return Detail::ParseCore<_Expression>::Parse(iter, end_iter);
 	}
 }
 

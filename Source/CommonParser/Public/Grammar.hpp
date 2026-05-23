@@ -142,6 +142,9 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 	*/
 	template<IsExpression _Expression>
 	using UnderlyingExpressionType = typename decltype(Detail::GetUnderlyingExpressionType(std::declval<_Expression>()))::Type;
+
+	template<typename _Expression>
+	concept IsCustomExpression = IsExpression<_Expression> && (std::is_same_v<_Expression, UnderlyingExpressionType<_Expression>> == false);
 }
 
 /*!

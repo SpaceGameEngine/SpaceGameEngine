@@ -143,6 +143,7 @@
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Public\AbstractSyntaxTree.hpp" />
+    <ClInclude Include="Public\AbstractSyntaxTreePrinter.h" />
     <ClInclude Include="Public\CommonParserAPI.h" />
     <ClInclude Include="Public\ParserError.h" />
     <ClInclude Include="Public\Grammar.hpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="Public\TopDownParser.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\AbstractSyntaxTreePrinter.cpp" />
     <ClCompile Include="Private\CommonParserModule.cpp" />
     <ClCompile Include="Private\ParserError.cpp" />
     <ClCompile Include="Private\Lexer.cpp" />

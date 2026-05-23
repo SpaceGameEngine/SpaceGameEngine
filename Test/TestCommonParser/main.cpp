@@ -22,6 +22,7 @@ limitations under the License.
 #include "TestLexerUtility.hpp"
 #include "TestGrammar.hpp"
 #include "TestAbstractSyntaxTree.hpp"
+#include "TestAbstractSyntaxTreePrinter.hpp"
 #include "TestTopDownParser.hpp"
 
 SpaceGameEngine::Bootstrap bootstrap;

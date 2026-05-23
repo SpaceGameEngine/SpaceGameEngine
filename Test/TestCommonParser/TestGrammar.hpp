@@ -20,20 +20,20 @@ limitations under the License.
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonParser;
 
-TEST(IsExpression, Test)
+TEST(Grammar, IsExpressionTest)
 {
 	static_assert(Parser::Grammar::IsExpression<Parser::Grammar::Expression>);
 	static_assert(!Parser::Grammar::IsExpression<int>);
 }
 
-TEST(MatchTokenTypeExpression, Test)
+TEST(Grammar, MatchTokenTypeExpressionTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(Expression::Type == Lexer::TokenTypes::Identifier);
 }
 
-TEST(MatchTokenTypeAndContentExpression, Test)
+TEST(Grammar, MatchTokenTypeAndContentExpressionTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::Identifier, SGE_STR("test")>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
@@ -41,7 +41,7 @@ TEST(MatchTokenTypeAndContentExpression, Test)
 	static_assert(IsSameCString(Expression::Content.m_Value, SGE_STR("test")));
 }
 
-TEST(SequenceExpression, Test)
+TEST(Grammar, SequenceExpressionTest)
 {
 	using Expression = Parser::Grammar::SequenceExpression<
 		Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
@@ -52,7 +52,7 @@ TEST(SequenceExpression, Test)
 															Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
 }
 
-TEST(SelectExpression, Test)
+TEST(Grammar, SelectExpressionTest)
 {
 	using Expression = Parser::Grammar::SelectExpression<
 		Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
@@ -63,21 +63,21 @@ TEST(SelectExpression, Test)
 															Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
 }
 
-TEST(NegateExpression, Test)
+TEST(Grammar, NegateExpressionTest)
 {
 	using Expression = Parser::Grammar::NegateExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
 }
 
-TEST(OptionalExpression, Test)
+TEST(Grammar, OptionalExpressionTest)
 {
 	using Expression = Parser::Grammar::OptionalExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
 }
 
-TEST(RepeatExpression, Test)
+TEST(Grammar, RepeatExpressionTest)
 {
 	using Expression = Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
@@ -92,7 +92,7 @@ TEST(RepeatExpression, Test)
 	static_assert(Expression2::MaxCount == 10);
 }
 
-TEST(RuleExpression, Test)
+TEST(Grammar, RuleExpressionTest)
 {
 	using Expression = Parser::Grammar::RuleExpression<SGE_STR("rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
@@ -107,7 +107,7 @@ TEST(RuleExpression, Test)
 	static_assert(Expression2::IsSynchronousPoint == true);
 }
 
-TEST(UnderlyingExpressionType, Test)
+TEST(Grammar, UnderlyingExpressionTypeTest)
 {
 	using Expression1 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression1>, Expression1>);
@@ -136,4 +136,27 @@ TEST(UnderlyingExpressionType, Test)
 	};
 	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<CustomExpression>, Expression7>);
 	static_assert(!std::same_as<Parser::Grammar::UnderlyingExpressionType<CustomExpression>, CustomExpression>);
+}
+
+TEST(Grammar, IsCustomExpressionTest)
+{
+	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
+	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>);
+	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::SequenceExpression<
+					  Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
+					  Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
+	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::SelectExpression<
+					  Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
+					  Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
+	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::NegateExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>>);
+	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::OptionalExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>>);
+	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, 1, 10>>);
+	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::RuleExpression<SGE_STR("rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>>);
+	static_assert(!Parser::Grammar::IsCustomExpression<int>);
+	using BaseExpression = Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, 1, 10>;
+	class CustomExpression : public BaseExpression
+	{
+	};
+	static_assert(!Parser::Grammar::IsCustomExpression<BaseExpression>);
+	static_assert(Parser::Grammar::IsCustomExpression<CustomExpression>);
 }

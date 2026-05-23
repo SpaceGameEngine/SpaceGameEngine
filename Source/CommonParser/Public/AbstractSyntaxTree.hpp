@@ -26,21 +26,11 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonParser::Parser::AbstractSyntaxTree
 {
-	namespace Detail
-	{
-		template<Grammar::IsExpression _Expression>
-		class AbstractSyntaxTreeNodeExpressionSpecifiedData
-		{
-		};
-	}
-
-	template<Grammar::IsExpression _Expression>
-	class AbstractSyntaxTreeNode : public Detail::AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::UnderlyingExpressionType<_Expression>>
+	class AbstractSyntaxTreeNodeBase
 	{
 	public:
-		template<typename... Args>
-		inline AbstractSyntaxTreeNode(const Vector<Lexer::Token>::ConstIterator& begin_token_iter, const Vector<Lexer::Token>::ConstIterator& end_token_iter, Args&&... args)
-			: m_BeginTokenIter(begin_token_iter), m_EndTokenIter(end_token_iter), Detail::AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::UnderlyingExpressionType<_Expression>>(std::forward<Args>(args)...)
+		inline AbstractSyntaxTreeNodeBase(const Vector<Lexer::Token>::ConstIterator& begin_token_iter, const Vector<Lexer::Token>::ConstIterator& end_token_iter)
+			: m_BeginTokenIter(begin_token_iter), m_EndTokenIter(end_token_iter)
 		{
 		}
 
@@ -58,91 +48,109 @@ namespace SpaceGameEngine::CommonParser::Parser::AbstractSyntaxTree
 		Vector<Lexer::Token>::ConstIterator m_BeginTokenIter, m_EndTokenIter;
 	};
 
-	namespace Detail
+	template<Grammar::IsExpression _Expression>
+	class AbstractSyntaxTreeNode : public AbstractSyntaxTreeNodeBase
 	{
-		template<Grammar::IsExpression... _Expressions>
-		class AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::SequenceExpression<_Expressions...>>
+	public:
+		inline AbstractSyntaxTreeNode(const Vector<Lexer::Token>::ConstIterator& begin_token_iter, const Vector<Lexer::Token>::ConstIterator& end_token_iter)
+			: AbstractSyntaxTreeNodeBase(begin_token_iter, end_token_iter)
 		{
-		public:
-			inline AbstractSyntaxTreeNodeExpressionSpecifiedData(Tuple<AbstractSyntaxTreeNode<_Expressions>...>&& children)
-				: m_Children(std::move(children))
-			{
-			}
+		}
+	};
 
-			inline const Tuple<AbstractSyntaxTreeNode<_Expressions>...>& GetChildren() const
-			{
-				return m_Children;
-			}
-
-		private:
-			Tuple<AbstractSyntaxTreeNode<_Expressions>...> m_Children;
-		};
-
-		template<Grammar::IsExpression... _Expressions>
-		class AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::SelectExpression<_Expressions...>>
+	template<Grammar::IsCustomExpression _Expression>
+	class AbstractSyntaxTreeNode<_Expression> : public AbstractSyntaxTreeNode<Grammar::UnderlyingExpressionType<_Expression>>
+	{
+	public:
+		template<typename... Args>
+		inline AbstractSyntaxTreeNode<_Expression>(Args&&... args)
+			: AbstractSyntaxTreeNode<Grammar::UnderlyingExpressionType<_Expression>>(std::forward<Args>(args)...)
 		{
-		public:
-			inline AbstractSyntaxTreeNodeExpressionSpecifiedData(Variant<AbstractSyntaxTreeNode<_Expressions>...>&& child)
-				: m_Child(std::move(child))
-			{
-			}
+		}
+	};
 
-			inline const Variant<AbstractSyntaxTreeNode<_Expressions>...>& GetChild() const
-			{
-				return m_Child;
-			}
-
-		private:
-			Variant<AbstractSyntaxTreeNode<_Expressions>...> m_Child;
-		};
-
-		template<Grammar::IsExpression _Expression>
-		class AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::OptionalExpression<_Expression>>
+	template<Grammar::IsExpression... _Expressions>
+	class AbstractSyntaxTreeNode<Grammar::SequenceExpression<_Expressions...>> : public AbstractSyntaxTreeNodeBase
+	{
+	public:
+		inline AbstractSyntaxTreeNode<Grammar::SequenceExpression<_Expressions...>>(const Vector<Lexer::Token>::ConstIterator& begin_token_iter, const Vector<Lexer::Token>::ConstIterator& end_token_iter, Tuple<AbstractSyntaxTreeNode<_Expressions>...>&& children)
+			: AbstractSyntaxTreeNodeBase(begin_token_iter, end_token_iter), m_Children(std::move(children))
 		{
-		public:
-			inline AbstractSyntaxTreeNodeExpressionSpecifiedData(Optional<AbstractSyntaxTreeNode<_Expression>>&& child)
-				: m_Child(std::move(child))
-			{
-			}
+		}
 
-			inline const Optional<AbstractSyntaxTreeNode<_Expression>>& GetChild() const
-			{
-				return m_Child;
-			}
-
-		private:
-			Optional<AbstractSyntaxTreeNode<_Expression>> m_Child;
-		};
-
-		template<Grammar::IsExpression _Expression, SizeType _MinCount, SizeType _MaxCount>
-		class AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::RepeatExpression<_Expression, _MinCount, _MaxCount>>
+		inline const Tuple<AbstractSyntaxTreeNode<_Expressions>...>& GetChildren() const
 		{
-		public:
-			inline AbstractSyntaxTreeNodeExpressionSpecifiedData(Vector<AbstractSyntaxTreeNode<_Expression>>&& children)
-				: m_Children(std::move(children))
-			{
-			}
+			return m_Children;
+		}
 
-			inline const Vector<AbstractSyntaxTreeNode<_Expression>>& GetChildren() const
-			{
-				return m_Children;
-			}
+	private:
+		Tuple<AbstractSyntaxTreeNode<_Expressions>...> m_Children;
+	};
 
-		private:
-			Vector<AbstractSyntaxTreeNode<_Expression>> m_Children;
-		};
-
-		template<ArrayLiteral _Name, Grammar::IsExpression _Expression, bool _IsSynchronousPoint>
-		class AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>> : public AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::UnderlyingExpressionType<_Expression>>
+	template<Grammar::IsExpression... _Expressions>
+	class AbstractSyntaxTreeNode<Grammar::SelectExpression<_Expressions...>> : public AbstractSyntaxTreeNodeBase
+	{
+	public:
+		inline AbstractSyntaxTreeNode<Grammar::SelectExpression<_Expressions...>>(const Vector<Lexer::Token>::ConstIterator& begin_token_iter, const Vector<Lexer::Token>::ConstIterator& end_token_iter, Variant<AbstractSyntaxTreeNode<_Expressions>...>&& child)
+			: AbstractSyntaxTreeNodeBase(begin_token_iter, end_token_iter), m_Child(std::move(child))
 		{
-		public:
-			template<typename... Args>
-			inline AbstractSyntaxTreeNodeExpressionSpecifiedData(Args&&... args)
-				: AbstractSyntaxTreeNodeExpressionSpecifiedData<Grammar::UnderlyingExpressionType<_Expression>>(std::forward<Args>(args)...)
-			{
-			}
-		};
-	}
+		}
+
+		inline const Variant<AbstractSyntaxTreeNode<_Expressions>...>& GetChild() const
+		{
+			return m_Child;
+		}
+
+	private:
+		Variant<AbstractSyntaxTreeNode<_Expressions>...> m_Child;
+	};
+
+	template<Grammar::IsExpression _Expression>
+	class AbstractSyntaxTreeNode<Grammar::OptionalExpression<_Expression>> : public AbstractSyntaxTreeNodeBase
+	{
+	public:
+		inline AbstractSyntaxTreeNode<Grammar::OptionalExpression<_Expression>>(const Vector<Lexer::Token>::ConstIterator& begin_token_iter, const Vector<Lexer::Token>::ConstIterator& end_token_iter, Optional<AbstractSyntaxTreeNode<_Expression>>&& child)
+			: AbstractSyntaxTreeNodeBase(begin_token_iter, end_token_iter), m_Child(std::move(child))
+		{
+		}
+
+		inline const Optional<AbstractSyntaxTreeNode<_Expression>>& GetChild() const
+		{
+			return m_Child;
+		}
+
+	private:
+		Optional<AbstractSyntaxTreeNode<_Expression>> m_Child;
+	};
+
+	template<Grammar::IsExpression _Expression, SizeType _MinCount, SizeType _MaxCount>
+	class AbstractSyntaxTreeNode<Grammar::RepeatExpression<_Expression, _MinCount, _MaxCount>> : public AbstractSyntaxTreeNodeBase
+	{
+	public:
+		inline AbstractSyntaxTreeNode<Grammar::RepeatExpression<_Expression, _MinCount, _MaxCount>>(const Vector<Lexer::Token>::ConstIterator& begin_token_iter, const Vector<Lexer::Token>::ConstIterator& end_token_iter, Vector<AbstractSyntaxTreeNode<_Expression>>&& children)
+			: AbstractSyntaxTreeNodeBase(begin_token_iter, end_token_iter), m_Children(std::move(children))
+		{
+		}
+
+		inline const Vector<AbstractSyntaxTreeNode<_Expression>>& GetChildren() const
+		{
+			return m_Children;
+		}
+
+	private:
+		Vector<AbstractSyntaxTreeNode<_Expression>> m_Children;
+	};
+
+	template<ArrayLiteral _Name, Grammar::IsExpression _Expression, bool _IsSynchronousPoint>
+	class AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>> : public AbstractSyntaxTreeNode<_Expression>
+	{
+	public:
+		template<typename... Args>
+		inline AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(Args&&... args)
+			: AbstractSyntaxTreeNode<_Expression>(std::forward<Args>(args)...)
+		{
+		}
+	};
 }
 
 /*!

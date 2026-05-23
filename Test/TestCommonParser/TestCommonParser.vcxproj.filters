@@ -10,5 +10,6 @@
     <ClInclude Include="TestTopDownParser.hpp" />
     <ClInclude Include="TestParserError.hpp" />
     <ClInclude Include="TestAbstractSyntaxTree.hpp" />
+    <ClInclude Include="TestAbstractSyntaxTreePrinter.hpp" />
   </ItemGroup>
 </Project>

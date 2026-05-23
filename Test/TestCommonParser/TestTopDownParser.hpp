@@ -20,7 +20,7 @@ limitations under the License.
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonParser;
 
-TEST(TopDownParser, MatchTokenTypeExpression)
+TEST(TopDownParser, MatchTokenTypeExpressionTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 
@@ -67,7 +67,7 @@ TEST(TopDownParser, MatchTokenTypeExpression)
 	}
 }
 
-TEST(TopDownParser, MatchTokenTypeAndContentExpression)
+TEST(TopDownParser, MatchTokenTypeAndContentExpressionTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::Identifier, SGE_STR("foo")>;
 
@@ -116,7 +116,7 @@ TEST(TopDownParser, MatchTokenTypeAndContentExpression)
 	}
 }
 
-TEST(TopDownParser, SequenceExpression)
+TEST(TopDownParser, SequenceExpressionTest)
 {
 	using Expression = Parser::Grammar::SequenceExpression<
 		Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
@@ -173,7 +173,7 @@ TEST(TopDownParser, SequenceExpression)
 	}
 }
 
-TEST(TopDownParser, SelectExpression)
+TEST(TopDownParser, SelectExpressionTest)
 {
 	using Expression = Parser::Grammar::SelectExpression<
 		Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
@@ -226,11 +226,11 @@ TEST(TopDownParser, SelectExpression)
 	}
 }
 
-TEST(TopDownParser, NegateExpression)
+TEST(TopDownParser, NegateExpressionTest)
 {
 	using Expression = Parser::Grammar::NegateExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
 
-	// ParseSuccessWhenInnerFails: inner error is forwarded in result.m_Second
+	// ParseSuccessWhenInnerFails: negate succeeds, inner errors are discarded
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 1));
@@ -239,13 +239,7 @@ TEST(TopDownParser, NegateExpression)
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_Second.GetSize(), 1);
-		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
-		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
-		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
-		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 2);
-		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
-		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_Second.GetSize(), 0);
 	}
 
 	// ParseFailWhenInnerSucceeds
@@ -263,7 +257,7 @@ TEST(TopDownParser, NegateExpression)
 	}
 }
 
-TEST(TopDownParser, OptionalExpression)
+TEST(TopDownParser, OptionalExpressionTest)
 {
 	using Expression = Parser::Grammar::OptionalExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
 
@@ -299,7 +293,7 @@ TEST(TopDownParser, OptionalExpression)
 	}
 }
 
-TEST(TopDownParser, RepeatExpression)
+TEST(TopDownParser, RepeatExpressionTest)
 {
 	// ParseSuccessZeroOrMore: matches 2 identifiers, stops on IntegerLiteral; stop error is forwarded
 	{
@@ -404,7 +398,7 @@ TEST(TopDownParser, RepeatExpression)
 	}
 }
 
-TEST(TopDownParser, RuleExpression)
+TEST(TopDownParser, RuleExpressionTest)
 {
 	using Expression = Parser::Grammar::RuleExpression<SGE_STR("identifier_rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
 
@@ -436,7 +430,7 @@ TEST(TopDownParser, RuleExpression)
 	}
 }
 
-TEST(TopDownParser, RuleExpressionSynchronousPoint)
+TEST(TopDownParser, RuleExpressionSynchronousPointTest)
 {
 	using InnerExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 	using Expression = Parser::Grammar::RuleExpression<SGE_STR("sync_rule"), InnerExpression, true>;
@@ -548,7 +542,7 @@ TEST(TopDownParser, RuleExpressionSynchronousPoint)
 	}
 }
 
-TEST(TopDownParser, UnderlyingExpression)
+TEST(TopDownParser, UnderlyingExpressionTest)
 {
 	using BaseExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 

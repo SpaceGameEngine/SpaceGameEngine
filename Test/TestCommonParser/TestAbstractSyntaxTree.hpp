@@ -20,7 +20,7 @@ limitations under the License.
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonParser;
 
-TEST(AbstractSyntaxTreeNode, MatchTokenTypeExpression)
+TEST(AbstractSyntaxTreeNode, MatchTokenTypeExpressionTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
@@ -36,7 +36,7 @@ TEST(AbstractSyntaxTreeNode, MatchTokenTypeExpression)
 	ASSERT_EQ(node.GetEndTokenIter(), end);
 }
 
-TEST(AbstractSyntaxTreeNode, MatchTokenTypeAndContentExpression)
+TEST(AbstractSyntaxTreeNode, MatchTokenTypeAndContentExpressionTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::Identifier, SGE_STR("foo")>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
@@ -52,7 +52,7 @@ TEST(AbstractSyntaxTreeNode, MatchTokenTypeAndContentExpression)
 	ASSERT_EQ(node.GetEndTokenIter(), end);
 }
 
-TEST(AbstractSyntaxTreeNode, SequenceExpression)
+TEST(AbstractSyntaxTreeNode, SequenceExpressionTest)
 {
 	using Expression1 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 	using Expression2 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>;
@@ -81,7 +81,7 @@ TEST(AbstractSyntaxTreeNode, SequenceExpression)
 	ASSERT_EQ(node.GetChildren().template Get<1>().GetEndTokenIter(), end);
 }
 
-TEST(AbstractSyntaxTreeNode, SelectExpression)
+TEST(AbstractSyntaxTreeNode, SelectExpressionTest)
 {
 	using Expression1 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 	using Expression2 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>;
@@ -105,7 +105,7 @@ TEST(AbstractSyntaxTreeNode, SelectExpression)
 	ASSERT_EQ(node.GetChild().template Get<0>().GetEndTokenIter(), end);
 }
 
-TEST(AbstractSyntaxTreeNode, OptionalExpression)
+TEST(AbstractSyntaxTreeNode, OptionalExpressionTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 	using OptionalExpression = Parser::Grammar::OptionalExpression<Expression>;
@@ -140,7 +140,7 @@ TEST(AbstractSyntaxTreeNode, OptionalExpression)
 	}
 }
 
-TEST(AbstractSyntaxTreeNode, RepeatExpression)
+TEST(AbstractSyntaxTreeNode, RepeatExpressionTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
 
@@ -189,7 +189,7 @@ TEST(AbstractSyntaxTreeNode, RepeatExpression)
 	}
 }
 
-TEST(AbstractSyntaxTreeNode, RuleExpression)
+TEST(AbstractSyntaxTreeNode, RuleExpressionTest)
 {
 	// MatchTokenTypeExpression inner, IsSynchronousPoint = false (default)
 	{
@@ -300,7 +300,7 @@ struct TestRuleDerivedExpression : public TestRuleBaseExpression
 {
 };
 
-TEST(AbstractSyntaxTreeNode, CustomDerivedExpression)
+TEST(AbstractSyntaxTreeNode, CustomDerivedExpressionTest)
 {
 	static_assert(Parser::Grammar::IsExpression<TestCustomDerivedExpression>);
 	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<TestCustomDerivedExpression>, TestCustomBaseExpression>);
