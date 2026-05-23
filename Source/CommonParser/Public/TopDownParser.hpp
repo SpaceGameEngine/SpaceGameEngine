@@ -212,14 +212,11 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 			{
 				auto backup_iter = iter;
 				auto result = ParseCore<_Expression>::Parse(iter, end_iter);
+				iter = backup_iter;
 				if (result.m_First.HasValue())
-				{
-					iter = backup_iter;
 					return ParseResult<Grammar::NegateExpression<_Expression>>(OptionalTag::EmptyOptional, Vector<ParserError>{ParserError(ErrorTypeId::InvalidExpression, backup_iter->GetLine(), backup_iter->GetColumn())});
-				}
 				else
 				{
-					iter = backup_iter;
 					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::NegateExpression<_Expression>>(backup_iter, backup_iter);
 					return ParseResult<Grammar::NegateExpression<_Expression>>(std::move(node), std::move(result.m_Second));
 				}
@@ -295,8 +292,32 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 				}
 				else
 				{
-					iter = backup_iter;
-					return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(OptionalTag::EmptyOptional, std::move(result.m_Second));
+					if constexpr (_IsSynchronousPoint)
+					{
+						Vector<ParserError> errors(std::move(result.m_Second));
+						while (iter != end_iter)
+						{
+							++iter;
+							auto recovery_begin = iter;
+							auto recovery_result = ParseCore<_Expression>::Parse(iter, end_iter);
+							if (recovery_result.m_First.HasValue())
+							{
+								auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(recovery_begin, iter, std::move(recovery_result.m_First.Get()));
+								if (recovery_result.m_Second.GetSize() > 0)
+									errors.Insert(errors.GetConstEnd(), recovery_result.m_Second.GetConstBegin(), recovery_result.m_Second.GetConstEnd());
+								return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(node), std::move(errors));
+							}
+							if (recovery_result.m_Second.GetSize() > 0)
+								errors.Insert(errors.GetConstEnd(), recovery_result.m_Second.GetConstBegin(), recovery_result.m_Second.GetConstEnd());
+						}
+						iter = backup_iter;
+						return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(OptionalTag::EmptyOptional, std::move(errors));
+					}
+					else
+					{
+						iter = backup_iter;
+						return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(OptionalTag::EmptyOptional, std::move(result.m_Second));
+					}
 				}
 			}
 		};

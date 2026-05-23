@@ -436,6 +436,119 @@ TEST(TopDownParser, RuleExpression)
 	}
 }
 
+TEST(TopDownParser, RuleExpressionSynchronousPoint)
+{
+	using InnerExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
+	using Expression = Parser::Grammar::RuleExpression<SGE_STR("sync_rule"), InnerExpression, true>;
+
+	// ParseSuccess: first token matches, no recovery needed
+	{
+		Vector<Lexer::Token> tokens;
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
+
+		auto result = Parser::TopDownParser::Parse<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		ASSERT_TRUE(result.m_First.HasValue());
+		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
+	}
+
+	// ParseRecovery: first token does not match, skips it, recovers on second token
+	{
+		Vector<Lexer::Token> tokens;
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 1));
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 5));
+
+		auto result = Parser::TopDownParser::Parse<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		ASSERT_TRUE(result.m_First.HasValue());
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 2);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
+	}
+
+	// ParseRecoveryMultipleSkipped: skips several non-matching tokens before recovering
+	{
+		Vector<Lexer::Token> tokens;
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("1"), 1, 1));
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("2"), 1, 3));
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("3"), 1, 5));
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 7));
+
+		auto result = Parser::TopDownParser::Parse<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		ASSERT_TRUE(result.m_First.HasValue());
+		ASSERT_EQ(result.m_Second.GetSize(), 3);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 2);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_Second[1].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
+		ASSERT_EQ(result.m_Second[1].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[1].GetColumn(), 3);
+		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation().GetSize(), 2);
+		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
+		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_Second[2].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
+		ASSERT_EQ(result.m_Second[2].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[2].GetColumn(), 5);
+		ASSERT_EQ(result.m_Second[2].GetAdditionalInformation().GetSize(), 2);
+		ASSERT_EQ(result.m_Second[2].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
+		ASSERT_EQ(result.m_Second[2].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin() + 3);
+		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
+	}
+
+	// ParseFailNoRecovery: all tokens are non-matching, cannot recover, returns failure with errors
+	{
+		Vector<Lexer::Token> tokens;
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("1"), 1, 1));
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("2"), 1, 3));
+
+		auto result = Parser::TopDownParser::Parse<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		ASSERT_FALSE(result.m_First.HasValue());
+		ASSERT_EQ(result.m_Second.GetSize(), 3);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 2);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_Second[1].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
+		ASSERT_EQ(result.m_Second[1].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[1].GetColumn(), 3);
+		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation().GetSize(), 2);
+		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
+		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		// After exhausting all tokens, a final UnexpectedEnd is recorded at the last token's position
+		ASSERT_EQ(result.m_Second[2].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedEnd);
+		ASSERT_EQ(result.m_Second[2].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[2].GetColumn(), 3);
+		ASSERT_EQ(result.m_Second[2].GetAdditionalInformation().GetSize(), 0);
+	}
+
+	// ParseFailEmptyInput: empty token stream, cannot recover, returns failure
+	{
+		Vector<Lexer::Token> tokens;
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
+
+		auto result = Parser::TopDownParser::Parse<Expression>(tokens.GetConstEnd(), tokens.GetConstEnd());
+		ASSERT_FALSE(result.m_First.HasValue());
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedEnd);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 0);
+	}
+}
+
+
 TEST(TopDownParser, UnderlyingExpression)
 {
 	using BaseExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
