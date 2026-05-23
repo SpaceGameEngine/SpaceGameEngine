@@ -47,12 +47,14 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 	template<IsExpression... _Expressions>
 	struct SequenceExpression : public Expression
 	{
+		static_assert(sizeof...(_Expressions) > 0, "SequenceExpression must contain at least one expression.");
 		using Expressions = TypeList<_Expressions...>;
 	};
 
 	template<IsExpression... _Expressions>
 	struct SelectExpression : public Expression
 	{
+		static_assert(sizeof...(_Expressions) > 0, "SelectExpression must contain at least one expression.");
 		using Expressions = TypeList<_Expressions...>;
 	};
 
