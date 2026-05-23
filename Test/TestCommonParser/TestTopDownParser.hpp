@@ -548,7 +548,6 @@ TEST(TopDownParser, RuleExpressionSynchronousPoint)
 	}
 }
 
-
 TEST(TopDownParser, UnderlyingExpression)
 {
 	using BaseExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
@@ -601,5 +600,3 @@ TEST(TopDownParser, UnderlyingExpression)
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 0);
 	}
 }
-
-
