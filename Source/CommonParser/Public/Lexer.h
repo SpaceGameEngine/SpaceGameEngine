@@ -139,12 +139,12 @@ namespace SpaceGameEngine::CommonParser::Lexer
 	};
 }
 
-namespace SpaceGameEngine
-{
-	extern template class COMMON_PARSER_API_TEMPLATE_DECLARE Vector<SpaceGameEngine::CommonParser::Lexer::Token>;
-	extern template class COMMON_PARSER_API_TEMPLATE_DECLARE Vector<SpaceGameEngine::CommonParser::ParserError>;
-	extern template struct COMMON_PARSER_API_TEMPLATE_DECLARE Pair<Vector<SpaceGameEngine::CommonParser::Lexer::Token>, Vector<SpaceGameEngine::CommonParser::ParserError>>;
-}
+// namespace SpaceGameEngine
+//{
+//	extern template class COMMON_PARSER_API_TEMPLATE_DECLARE Vector<SpaceGameEngine::CommonParser::Lexer::Token>;
+//	extern template class COMMON_PARSER_API_TEMPLATE_DECLARE Vector<SpaceGameEngine::CommonParser::ParserError>;
+//	extern template struct COMMON_PARSER_API_TEMPLATE_DECLARE Pair<Vector<SpaceGameEngine::CommonParser::Lexer::Token>, Vector<SpaceGameEngine::CommonParser::ParserError>>;
+// }
 
 namespace SpaceGameEngine::CommonParser::Lexer
 {

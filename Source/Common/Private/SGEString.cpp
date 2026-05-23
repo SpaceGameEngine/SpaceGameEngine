@@ -15,10 +15,10 @@ limitations under the License.
 */
 #include "SGEString.hpp"
 
-namespace SpaceGameEngine
-{
-	template class COMMON_API_TEMPLATE_DEFINE StringImplement::Storage<Char16, DefaultAllocator>;
-	template class COMMON_API_TEMPLATE_DEFINE StringImplement::Storage<Char8, DefaultAllocator>;
-	template class COMMON_API_TEMPLATE_DEFINE StringCore<Char16, UCS2Trait, DefaultAllocator>;
-	template class COMMON_API_TEMPLATE_DEFINE StringCore<Char8, UTF8Trait, DefaultAllocator>;
-}
+// namespace SpaceGameEngine
+//{
+//	template class COMMON_API_TEMPLATE_DEFINE StringImplement::Storage<Char16, DefaultAllocator>;
+//	template class COMMON_API_TEMPLATE_DEFINE StringImplement::Storage<Char8, DefaultAllocator>;
+//	template class COMMON_API_TEMPLATE_DEFINE StringCore<Char16, UCS2Trait, DefaultAllocator>;
+//	template class COMMON_API_TEMPLATE_DEFINE StringCore<Char8, UTF8Trait, DefaultAllocator>;
+// }

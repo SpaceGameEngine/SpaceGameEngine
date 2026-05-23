@@ -145,12 +145,12 @@ bool SpaceGameEngine::CommonParser::Lexer::InvalidEscapeCharacterError::Judge(Ch
 	return !EscapeCharacterSet::GetSingleton().IsEscapeCharacter(c);
 }
 
-namespace SpaceGameEngine
-{
-	template class COMMON_PARSER_API_TEMPLATE_DEFINE Vector<SpaceGameEngine::CommonParser::Lexer::Token>;
-	template class COMMON_PARSER_API_TEMPLATE_DEFINE Vector<SpaceGameEngine::CommonParser::ParserError>;
-	template struct COMMON_PARSER_API_TEMPLATE_DEFINE Pair<Vector<SpaceGameEngine::CommonParser::Lexer::Token>, Vector<SpaceGameEngine::CommonParser::ParserError>>;
-}
+// namespace SpaceGameEngine
+//{
+//	template class COMMON_PARSER_API_TEMPLATE_DEFINE Vector<SpaceGameEngine::CommonParser::Lexer::Token>;
+//	template class COMMON_PARSER_API_TEMPLATE_DEFINE Vector<SpaceGameEngine::CommonParser::ParserError>;
+//	template struct COMMON_PARSER_API_TEMPLATE_DEFINE Pair<Vector<SpaceGameEngine::CommonParser::Lexer::Token>, Vector<SpaceGameEngine::CommonParser::ParserError>>;
+// }
 
 SpaceGameEngine::CommonParser::Lexer::BaseContext::BaseContext(const String& str)
 	: m_Iter(str.GetConstBegin()), m_EndIter(str.GetConstEnd())
