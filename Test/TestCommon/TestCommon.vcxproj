@@ -217,6 +217,7 @@
     <ClInclude Include="TestFunction.hpp" />
     <ClInclude Include="Time\TestDate.hpp" />
     <ClInclude Include="Time\TestTimeCounter.hpp" />
+    <ClInclude Include="Utility\TestArrayLiteral.hpp" />
     <ClInclude Include="Utility\TestAutoReleaseBuffer.hpp" />
     <ClInclude Include="Utility\TestControllableObject.hpp" />
     <ClInclude Include="Utility\TestDebugInformation.hpp" />

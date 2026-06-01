@@ -159,12 +159,6 @@ namespace SpaceGameEngine
 		}
 	}
 
-	template<IsTuple... Tuples>
-		requires(sizeof...(Tuples) > 1)
-	inline auto ConcatTuples(Tuples&&... tuples)
-	{
-	}
-
 	template<IsTuple A, IsTuple B>
 	inline auto ConcatTuples(A&& a, B&& b)
 	{

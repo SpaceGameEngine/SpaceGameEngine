@@ -104,21 +104,6 @@ namespace SpaceGameEngine
 			inline static constexpr const bool Value = std::is_same_v<T, U>;
 		};
 	};
-
-	template<typename T, SizeType _Size>
-	struct ArrayLiteral
-	{
-		T m_Value[_Size];
-		inline static constexpr const SizeType Size = _Size;
-
-		constexpr ArrayLiteral(const T (&value)[_Size])
-		{
-			for (SizeType i = 0; i < _Size; ++i)
-			{
-				m_Value[i] = value[i];
-			}
-		}
-	};
 }
 
 /*!

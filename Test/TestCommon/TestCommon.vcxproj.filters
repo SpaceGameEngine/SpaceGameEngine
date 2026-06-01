@@ -136,6 +136,9 @@
     <ClInclude Include="Utility\TestTuple.hpp">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\TestArrayLiteral.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Concurrent">

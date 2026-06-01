@@ -20,6 +20,7 @@ limitations under the License.
 #include "TestMemoryManager.hpp"
 #include "TestFunction.hpp"
 #include "TestMetaData.hpp"
+#include "Utility/TestArrayLiteral.hpp"
 #include "Utility/TestAutoReleaseBuffer.hpp"
 #include "Utility/TestControllableObject.hpp"
 #include "Utility/TestDebugInformation.hpp"
