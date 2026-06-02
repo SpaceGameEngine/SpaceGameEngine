@@ -31,15 +31,15 @@ TEST(AbstractSyntaxTreeNode, InstanceTest)
 	children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode(node1_name, begin, begin + 1, {}));
 	children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode(node2_name, begin + 1, end, {}));
 	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode node(SGE_STR("test"), begin, end, std::move(children));
-	ASSERT_STREQ(node.GetName(), SGE_STR("test"));
+	ASSERT_TRUE(IsSameCString(node.GetName(), SGE_STR("test")));
 	ASSERT_EQ(node.GetBeginTokenIter(), begin);
 	ASSERT_EQ(node.GetEndTokenIter(), end);
 	ASSERT_EQ(node.GetChildren().GetSize(), 2);
-	ASSERT_EQ(node.GetChildren()[0].GetName(), node1_name);
+	ASSERT_TRUE(IsSameCString(node.GetChildren()[0].GetName(), node1_name));
 	ASSERT_EQ(node.GetChildren()[0].GetBeginTokenIter(), begin);
 	ASSERT_EQ(node.GetChildren()[0].GetEndTokenIter(), begin + 1);
 	ASSERT_EQ(node.GetChildren()[0].GetChildren().GetSize(), 0);
-	ASSERT_EQ(node.GetChildren()[1].GetName(), node2_name);
+	ASSERT_TRUE(IsSameCString(node.GetChildren()[1].GetName(), node2_name));
 	ASSERT_EQ(node.GetChildren()[1].GetBeginTokenIter(), begin + 1);
 	ASSERT_EQ(node.GetChildren()[1].GetEndTokenIter(), end);
 	ASSERT_EQ(node.GetChildren()[1].GetChildren().GetSize(), 0);
