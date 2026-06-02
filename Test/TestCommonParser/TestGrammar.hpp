@@ -26,137 +26,122 @@ TEST(Grammar, IsExpressionTest)
 	static_assert(!Parser::Grammar::IsExpression<int>);
 }
 
-TEST(Grammar, MatchTokenTypeExpressionTest)
+TEST(Grammar, MatchTokenTypeTest)
 {
-	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
+	using Expression = Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(Expression::Type == Lexer::TokenTypes::Identifier);
 }
 
-TEST(Grammar, MatchTokenTypeAndContentExpressionTest)
+TEST(Grammar, MatchTokenTypeAndContentTest)
 {
-	using Expression = Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::Identifier, SGE_STR("test")>;
+	using Expression = Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::Identifier, SGE_STR("test")>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(Expression::Type == Lexer::TokenTypes::Identifier);
 	static_assert(IsSameCString(Expression::Content.m_Value, SGE_STR("test")));
 }
 
-TEST(Grammar, SequenceExpressionTest)
+TEST(Grammar, SequenceTest)
 {
-	using Expression = Parser::Grammar::SequenceExpression<
-		Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
-		Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>;
+	using Expression = Parser::Grammar::Sequence<
+		Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>,
+		Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(std::same_as<Expression::Expressions, TypeList<
-															Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
-															Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
+															Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>,
+															Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
 }
 
-TEST(Grammar, SelectExpressionTest)
+TEST(Grammar, SelectTest)
 {
-	using Expression = Parser::Grammar::SelectExpression<
-		Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
-		Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>;
+	using Expression = Parser::Grammar::Select<
+		Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>,
+		Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(std::same_as<Expression::Expressions, TypeList<
-															Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
-															Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
+															Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>,
+															Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
 }
 
-TEST(Grammar, NegateExpressionTest)
+TEST(Grammar, NegateTest)
 {
-	using Expression = Parser::Grammar::NegateExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
+	using Expression = Parser::Grammar::Negate<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
-	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
+	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>);
 }
 
-TEST(Grammar, OptionalExpressionTest)
+TEST(Grammar, OptionalTest)
 {
-	using Expression = Parser::Grammar::OptionalExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
+	using Expression = Parser::Grammar::Optional<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
-	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
+	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>);
 }
 
-TEST(Grammar, RepeatExpressionTest)
+TEST(Grammar, RepeatTest)
 {
-	using Expression = Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
+	using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
-	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
+	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>);
 	static_assert(Expression::MinCount == 0);
 	static_assert(Expression::MaxCount == UINT64_MAX);
 
-	using Expression2 = Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>, 1, 10>;
+	using Expression2 = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>, 1, 10>;
 	static_assert(Parser::Grammar::IsExpression<Expression2>);
-	static_assert(std::same_as<Expression2::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>>);
+	static_assert(std::same_as<Expression2::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>);
 	static_assert(Expression2::MinCount == 1);
 	static_assert(Expression2::MaxCount == 10);
 }
 
-TEST(Grammar, RuleExpressionTest)
+TEST(Grammar, RuleTest)
 {
-	using Expression = Parser::Grammar::RuleExpression<SGE_STR("rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
-	static_assert(Parser::Grammar::IsExpression<Expression>);
+	using Rule = Parser::Grammar::Rule<SGE_STR("rule"), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
+	static_assert(IsSameCString(Rule::Name.m_Value, SGE_STR("rule")));
+	static_assert(std::same_as<Rule::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>);
+	static_assert(Rule::IsSynchronousPoint == false);
+
+	using Rule2 = Parser::Grammar::Rule<SGE_STR("sync_rule"), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>, true>;
+	static_assert(IsSameCString(Rule2::Name.m_Value, SGE_STR("sync_rule")));
+	static_assert(std::same_as<Rule2::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>);
+	static_assert(Rule2::IsSynchronousPoint == true);
+}
+
+TEST(Grammar, IsRuleTest)
+{
+	static_assert(Parser::Grammar::IsRule<Parser::Grammar::Rule<SGE_STR("rule"), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>>);
+	static_assert(!Parser::Grammar::IsRule<int>);
+}
+
+TEST(Grammar, RuleReferenceTest)
+{
+	using Expression = Parser::Grammar::RuleReference<SGE_STR("rule")>;
 	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("rule")));
-	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
-	static_assert(Expression::IsSynchronousPoint == false);
 
-	using Expression2 = Parser::Grammar::RuleExpression<SGE_STR("sync_rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>, true>;
-	static_assert(Parser::Grammar::IsExpression<Expression2>);
+	using Expression2 = Parser::Grammar::RuleReference<SGE_STR("sync_rule")>;
 	static_assert(IsSameCString(Expression2::Name.m_Value, SGE_STR("sync_rule")));
-	static_assert(std::same_as<Expression2::Expression, Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>>);
-	static_assert(Expression2::IsSynchronousPoint == true);
 }
 
-TEST(Grammar, UnderlyingExpressionTypeTest)
+TEST(Grammar, LanguageTest)
 {
-	using Expression1 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression1>, Expression1>);
-	using Expression2 = Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression2>, Expression2>);
-	using Expression3 = Parser::Grammar::SequenceExpression<
-		Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
-		Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression3>, Expression3>);
-	using Expression4 = Parser::Grammar::SelectExpression<
-		Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
-		Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression4>, Expression4>);
-	using Expression5 = Parser::Grammar::NegateExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression5>, Expression5>);
-	using Expression6 = Parser::Grammar::OptionalExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression6>, Expression6>);
-	using Expression7 = Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, 1, 10>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression7>, Expression7>);
-	using Expression8 = Parser::Grammar::RuleExpression<SGE_STR("rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression8>, Expression8>);
-	using Expression9 = Parser::Grammar::RuleExpression<SGE_STR("sync_rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, true>;
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<Expression9>, Expression9>);
-	class CustomExpression : public Expression7
-	{
-	};
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<CustomExpression>, Expression7>);
-	static_assert(!std::same_as<Parser::Grammar::UnderlyingExpressionType<CustomExpression>, CustomExpression>);
+	using NumberRule = Parser::Grammar::Rule<SGE_STR("number"), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>;
+	using OperatorRule = Parser::Grammar::Rule<SGE_STR("operator"), Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::Identifier, SGE_STR("+")>>;
+	using ExpressionRule = Parser::Grammar::Rule<SGE_STR("expression"), Parser::Grammar::Sequence<Parser::Grammar::RuleReference<SGE_STR("number")>, Parser::Grammar::RuleReference<SGE_STR("operator")>, Parser::Grammar::RuleReference<SGE_STR("number")>>>;
+	using Language = Parser::Grammar::Language<NumberRule, OperatorRule, ExpressionRule>;
+
+	static_assert(Parser::Grammar::IsLanguage<Language>);
+	static_assert(std::same_as<Language::Rules, TypeList<NumberRule, OperatorRule, ExpressionRule>>);
+
+	static_assert(std::same_as<Language::GetRule<SGE_STR("number")>, NumberRule>);
+	static_assert(std::same_as<Language::GetRule<SGE_STR("operator")>, OperatorRule>);
+	static_assert(std::same_as<Language::GetRule<SGE_STR("expression")>, ExpressionRule>);
 }
 
-TEST(Grammar, IsCustomExpressionTest)
+TEST(Grammar, IsLanguageTest)
 {
-	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>);
-	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>);
-	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::SequenceExpression<
-					  Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
-					  Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
-	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::SelectExpression<
-					  Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>,
-					  Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
-	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::NegateExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>>);
-	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::OptionalExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>>);
-	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, 1, 10>>);
-	static_assert(!Parser::Grammar::IsCustomExpression<Parser::Grammar::RuleExpression<SGE_STR("rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>>);
-	static_assert(!Parser::Grammar::IsCustomExpression<int>);
-	using BaseExpression = Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, 1, 10>;
-	class CustomExpression : public BaseExpression
-	{
-	};
-	static_assert(!Parser::Grammar::IsCustomExpression<BaseExpression>);
-	static_assert(Parser::Grammar::IsCustomExpression<CustomExpression>);
+	using NumberRule = Parser::Grammar::Rule<SGE_STR("number"), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>;
+	using OperatorRule = Parser::Grammar::Rule<SGE_STR("operator"), Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::Identifier, SGE_STR("+")>>;
+	using ExpressionRule = Parser::Grammar::Rule<SGE_STR("expression"), Parser::Grammar::Sequence<Parser::Grammar::RuleReference<SGE_STR("number")>, Parser::Grammar::RuleReference<SGE_STR("operator")>, Parser::Grammar::RuleReference<SGE_STR("number")>>>;
+	using Language = Parser::Grammar::Language<NumberRule, OperatorRule, ExpressionRule>;
+
+	static_assert(Parser::Grammar::IsLanguage<Language>);
+	static_assert(!Parser::Grammar::IsLanguage<int>);
 }

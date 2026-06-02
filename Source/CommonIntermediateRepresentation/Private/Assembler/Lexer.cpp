@@ -41,7 +41,7 @@ Pair<Vector<CommonParser::Lexer::Token>, Vector<CommonParser::ParserError>> Spac
 														   }
 														   return token;
 													   }),
-										{SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier, SpaceGameEngine::CommonParser::Lexer::TokenTypes::Dot, SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier}, SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier),
+										{SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier, SpaceGameEngine::CommonParser::Lexer::TokenTypes::Dot, SpaceGameEngine::CommonParser::Lexer::TokenTypes::Identifier}, SpaceGameEngine::CommonIntermediateRepresentation::Assembler::TokenTypes::SymbolIdentifier),
 									{SpaceGameEngine::CommonParser::Lexer::TokenTypes::Subtract, SpaceGameEngine::CommonParser::Lexer::TokenTypes::IntegerLiteral}, SpaceGameEngine::CommonParser::Lexer::TokenTypes::IntegerLiteral),
 								{SpaceGameEngine::CommonParser::Lexer::TokenTypes::Subtract, SpaceGameEngine::CommonParser::Lexer::TokenTypes::FloatLiteral}, SpaceGameEngine::CommonParser::Lexer::TokenTypes::FloatLiteral),
 							{SpaceGameEngine::CommonParser::Lexer::TokenTypes::Subtract, SpaceGameEngine::CommonParser::Lexer::TokenTypes::DoubleLiteral}, SpaceGameEngine::CommonParser::Lexer::TokenTypes::DoubleLiteral),

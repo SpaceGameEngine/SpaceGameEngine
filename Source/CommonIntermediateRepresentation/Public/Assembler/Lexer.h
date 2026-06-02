@@ -27,6 +27,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 	namespace TokenTypes
 	{
 		inline constexpr const CommonParser::Lexer::TokenType BooleanLiteral = CommonParser::Lexer::TokenTypes::DefaultTokenTypesCount;
+		inline constexpr const CommonParser::Lexer::TokenType SymbolIdentifier = CommonParser::Lexer::TokenTypes::DefaultTokenTypesCount + 1;
 	}
 
 	COMMON_INTERMEDIATE_REPRESENTATION_API Pair<Vector<CommonParser::Lexer::Token>, Vector<CommonParser::ParserError>> GetTokens(const String& str);

@@ -20,6 +20,7 @@ limitations under the License.
 #include "Container/HashMap.hpp"
 #include "Container/Vector.hpp"
 #include "ParserError.h"
+#include "Utility/ArrayLiteral.hpp"
 
 /*!
 @ingroup CommonParser

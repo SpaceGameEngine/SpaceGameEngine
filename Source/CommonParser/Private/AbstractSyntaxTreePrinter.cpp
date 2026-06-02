@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "AbstractSyntaxTreePrinter.h"
+#include "Utility/Format.hpp"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonParser;
@@ -24,4 +25,17 @@ void SpaceGameEngine::CommonParser::Parser::AbstractSyntaxTree::Detail::PrintLin
 	for (SizeType i = 0; i < indent; ++i)
 		stream_writer << SGE_STR('\t');
 	stream_writer << str << SGE_STR('\n');
+}
+
+void SpaceGameEngine::CommonParser::Parser::AbstractSyntaxTree::Detail::PrintNode(StreamWriter<StringSerializer<String>>& stream_writer, const AbstractSyntaxTreeNode& node, SizeType indent)
+{
+	Detail::PrintLine(stream_writer, Format(String(SGE_STR("{}\t<line:{}, column:{}>")), node.GetName(), node.GetBeginTokenIter()->GetLine(), node.GetBeginTokenIter()->GetColumn()), indent);
+	for (auto iter = node.GetChildren().GetConstBegin(); iter != node.GetChildren().GetConstEnd(); ++iter)
+		Detail::PrintNode(stream_writer, *iter, indent + 1);
+}
+
+void SpaceGameEngine::CommonParser::Parser::AbstractSyntaxTree::PrintAbstractSyntaxTree(OutputStream& stream, const AbstractSyntaxTreeNode& node)
+{
+	StreamWriter<StringSerializer<String>> stream_writer(stream);
+	Detail::PrintNode(stream_writer, node);
 }

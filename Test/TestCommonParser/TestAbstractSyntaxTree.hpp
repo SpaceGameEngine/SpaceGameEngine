@@ -14,324 +14,82 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "AbstractSyntaxTree.hpp"
+#include "AbstractSyntaxTree.h"
 #include "gtest/gtest.h"
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonParser;
 
-TEST(AbstractSyntaxTreeNode, MatchTokenTypeExpressionTest)
+TEST(AbstractSyntaxTreeNode, InstanceTest)
 {
-	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-	static_assert(Parser::Grammar::IsExpression<Expression>);
-
-	Vector<Lexer::Token> tokens;
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-
+	Vector<Lexer::Token> tokens{Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1), Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5)};
 	auto begin = tokens.GetConstBegin();
 	auto end = tokens.GetConstEnd();
-
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression> node(begin, end);
+	Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+	const Char* node1_name = SGE_STR("node1");
+	const Char* node2_name = SGE_STR("node2");
+	children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode(node1_name, begin, begin + 1, {}));
+	children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode(node2_name, begin + 1, end, {}));
+	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode node(SGE_STR("test"), begin, end, std::move(children));
+	ASSERT_STREQ(node.GetName(), SGE_STR("test"));
 	ASSERT_EQ(node.GetBeginTokenIter(), begin);
 	ASSERT_EQ(node.GetEndTokenIter(), end);
+	ASSERT_EQ(node.GetChildren().GetSize(), 2);
+	ASSERT_EQ(node.GetChildren()[0].GetName(), node1_name);
+	ASSERT_EQ(node.GetChildren()[0].GetBeginTokenIter(), begin);
+	ASSERT_EQ(node.GetChildren()[0].GetEndTokenIter(), begin + 1);
+	ASSERT_EQ(node.GetChildren()[0].GetChildren().GetSize(), 0);
+	ASSERT_EQ(node.GetChildren()[1].GetName(), node2_name);
+	ASSERT_EQ(node.GetChildren()[1].GetBeginTokenIter(), begin + 1);
+	ASSERT_EQ(node.GetChildren()[1].GetEndTokenIter(), end);
+	ASSERT_EQ(node.GetChildren()[1].GetChildren().GetSize(), 0);
 }
 
-TEST(AbstractSyntaxTreeNode, MatchTokenTypeAndContentExpressionTest)
+TEST(AbstractSyntaxTreeNode, VisitTest)
 {
-	using Expression = Parser::Grammar::MatchTokenTypeAndContentExpression<Lexer::TokenTypes::Identifier, SGE_STR("foo")>;
-	static_assert(Parser::Grammar::IsExpression<Expression>);
-
-	Vector<Lexer::Token> tokens;
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-
+	// Build a tree:
+	//   root("root") [begin, end)
+	//     child0("child") [begin, begin+1)
+	//     child1("other") [begin+1, end)
+	//       grandchild("child") [begin+1, end)
+	Vector<Lexer::Token> tokens{Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1), Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5)};
 	auto begin = tokens.GetConstBegin();
 	auto end = tokens.GetConstEnd();
 
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression> node(begin, end);
-	ASSERT_EQ(node.GetBeginTokenIter(), begin);
-	ASSERT_EQ(node.GetEndTokenIter(), end);
-}
-
-TEST(AbstractSyntaxTreeNode, SequenceExpressionTest)
-{
-	using Expression1 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-	using Expression2 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>;
-	using SequenceExpression = Parser::Grammar::SequenceExpression<Expression1, Expression2>;
-
-	Vector<Lexer::Token> tokens;
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5));
-
-	auto begin = tokens.GetConstBegin();
-	auto end = tokens.GetConstEnd();
-	auto mid = begin + 1;
-
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression1> child1(begin, mid);
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression2> child2(mid, end);
-
-	Tuple<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression1>, Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression2>> children(std::move(child1), std::move(child2));
-
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<SequenceExpression> node(begin, end, std::move(children));
-
-	ASSERT_EQ(node.GetBeginTokenIter(), begin);
-	ASSERT_EQ(node.GetEndTokenIter(), end);
-	ASSERT_EQ(node.GetChildren().template Get<0>().GetBeginTokenIter(), begin);
-	ASSERT_EQ(node.GetChildren().template Get<0>().GetEndTokenIter(), mid);
-	ASSERT_EQ(node.GetChildren().template Get<1>().GetBeginTokenIter(), mid);
-	ASSERT_EQ(node.GetChildren().template Get<1>().GetEndTokenIter(), end);
-}
-
-TEST(AbstractSyntaxTreeNode, SelectExpressionTest)
-{
-	using Expression1 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-	using Expression2 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>;
-	using SelectExpression = Parser::Grammar::SelectExpression<Expression1, Expression2>;
-
-	Vector<Lexer::Token> tokens;
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-
-	auto begin = tokens.GetConstBegin();
-	auto end = tokens.GetConstEnd();
-
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression1> child(begin, end);
-	Variant<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression1>, Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression2>> varChild(InPlaceIndex<0>, std::move(child));
-
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<SelectExpression> node(begin, end, std::move(varChild));
-
-	ASSERT_EQ(node.GetBeginTokenIter(), begin);
-	ASSERT_EQ(node.GetEndTokenIter(), end);
-	ASSERT_EQ(node.GetChild().GetTypeIndex(), 0u);
-	ASSERT_EQ(node.GetChild().template Get<0>().GetBeginTokenIter(), begin);
-	ASSERT_EQ(node.GetChild().template Get<0>().GetEndTokenIter(), end);
-}
-
-TEST(AbstractSyntaxTreeNode, OptionalExpressionTest)
-{
-	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-	using OptionalExpression = Parser::Grammar::OptionalExpression<Expression>;
-
-	Vector<Lexer::Token> tokens;
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-
-	auto begin = tokens.GetConstBegin();
-	auto end = tokens.GetConstEnd();
-
-	{
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression> child(begin, end);
-		Optional<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression>> optChild(std::move(child));
-
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<OptionalExpression> node(begin, end, std::move(optChild));
-
-		ASSERT_EQ(node.GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetEndTokenIter(), end);
-		ASSERT_TRUE(node.GetChild().HasValue());
-		ASSERT_EQ(node.GetChild().Get().GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetChild().Get().GetEndTokenIter(), end);
-	}
-
-	{
-		Optional<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression>> optChild;
-
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<OptionalExpression> node(begin, end, std::move(optChild));
-
-		ASSERT_EQ(node.GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetEndTokenIter(), end);
-		ASSERT_FALSE(node.GetChild().HasValue());
-	}
-}
-
-TEST(AbstractSyntaxTreeNode, RepeatExpressionTest)
-{
-	using Expression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-
-	{
-		using RepeatExpression = Parser::Grammar::RepeatExpression<Expression, 0, 10>;
-
-		Vector<Lexer::Token> tokens;
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("bar"), 1, 5));
-
-		auto begin = tokens.GetConstBegin();
-		auto end = tokens.GetConstEnd();
-		auto mid = begin + 1;
-
-		Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression>> children;
-		children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression>(begin, mid));
-		children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression>(mid, end));
-
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<RepeatExpression> node(begin, end, std::move(children));
-
-		ASSERT_EQ(node.GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetEndTokenIter(), end);
-		ASSERT_EQ(node.GetChildren().GetSize(), 2u);
-		ASSERT_EQ(node.GetChildren()[0].GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetChildren()[0].GetEndTokenIter(), mid);
-		ASSERT_EQ(node.GetChildren()[1].GetBeginTokenIter(), mid);
-		ASSERT_EQ(node.GetChildren()[1].GetEndTokenIter(), end);
-	}
-
-	{
-		using RepeatExpression = Parser::Grammar::RepeatExpression<Expression>;
-
-		Vector<Lexer::Token> tokens;
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-
-		auto begin = tokens.GetConstBegin();
-		auto end = tokens.GetConstEnd();
-
-		Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<Expression>> children;
-
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<RepeatExpression> node(begin, end, std::move(children));
-
-		ASSERT_EQ(node.GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetEndTokenIter(), end);
-		ASSERT_EQ(node.GetChildren().GetSize(), 0u);
-	}
-}
-
-TEST(AbstractSyntaxTreeNode, RuleExpressionTest)
-{
-	// MatchTokenTypeExpression inner, IsSynchronousPoint = false (default)
-	{
-		using InnerExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-		using RuleExpression = Parser::Grammar::RuleExpression<SGE_STR("rule"), InnerExpression>;
-		static_assert(Parser::Grammar::IsExpression<RuleExpression>);
-		static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<RuleExpression>, RuleExpression>);
-		static_assert(RuleExpression::IsSynchronousPoint == false);
-
-		Vector<Lexer::Token> tokens;
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-
-		auto begin = tokens.GetConstBegin();
-		auto end = tokens.GetConstEnd();
-
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<RuleExpression> node(begin, end);
-		ASSERT_EQ(node.GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetEndTokenIter(), end);
-	}
-
-	// SequenceExpression inner
-	{
-		using InnerExpression1 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-		using InnerExpression2 = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::IntegerLiteral>;
-		using InnerSequence = Parser::Grammar::SequenceExpression<InnerExpression1, InnerExpression2>;
-		using RuleExpression = Parser::Grammar::RuleExpression<SGE_STR("seq_rule"), InnerSequence>;
-		static_assert(Parser::Grammar::IsExpression<RuleExpression>);
-
-		Vector<Lexer::Token> tokens;
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5));
-
-		auto begin = tokens.GetConstBegin();
-		auto end = tokens.GetConstEnd();
-		auto mid = begin + 1;
-
-		Tuple<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression1>,
-			  Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression2>>
-			children(
-				Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression1>(begin, mid),
-				Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression2>(mid, end));
-
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<RuleExpression> node(begin, end, std::move(children));
-		ASSERT_EQ(node.GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetEndTokenIter(), end);
-		ASSERT_EQ(node.GetChildren().template Get<0>().GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetChildren().template Get<0>().GetEndTokenIter(), mid);
-		ASSERT_EQ(node.GetChildren().template Get<1>().GetBeginTokenIter(), mid);
-		ASSERT_EQ(node.GetChildren().template Get<1>().GetEndTokenIter(), end);
-	}
-
-	// RepeatExpression inner
-	{
-		using InnerExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-		using InnerRepeat = Parser::Grammar::RepeatExpression<InnerExpression, 1, 10>;
-		using RuleExpression = Parser::Grammar::RuleExpression<SGE_STR("repeat_rule"), InnerRepeat>;
-		static_assert(Parser::Grammar::IsExpression<RuleExpression>);
-
-		Vector<Lexer::Token> tokens;
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("b"), 1, 3));
-
-		auto begin = tokens.GetConstBegin();
-		auto end = tokens.GetConstEnd();
-		auto mid = begin + 1;
-
-		Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression>> children;
-		children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression>(begin, mid));
-		children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression>(mid, end));
-
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<RuleExpression> node(begin, end, std::move(children));
-		ASSERT_EQ(node.GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetEndTokenIter(), end);
-		ASSERT_EQ(node.GetChildren().GetSize(), 2u);
-		ASSERT_EQ(node.GetChildren()[0].GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetChildren()[0].GetEndTokenIter(), mid);
-		ASSERT_EQ(node.GetChildren()[1].GetBeginTokenIter(), mid);
-		ASSERT_EQ(node.GetChildren()[1].GetEndTokenIter(), end);
-	}
-
-	// IsSynchronousPoint = true
-	{
-		using InnerExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-		using RuleExpression = Parser::Grammar::RuleExpression<SGE_STR("sync_rule"), InnerExpression, true>;
-		static_assert(Parser::Grammar::IsExpression<RuleExpression>);
-		static_assert(RuleExpression::IsSynchronousPoint == true);
-
-		Vector<Lexer::Token> tokens;
-		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("bar"), 1, 1));
-
-		auto begin = tokens.GetConstBegin();
-		auto end = tokens.GetConstEnd();
-
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<RuleExpression> node(begin, end);
-		ASSERT_EQ(node.GetBeginTokenIter(), begin);
-		ASSERT_EQ(node.GetEndTokenIter(), end);
-	}
-}
-
-// Custom expressions for testing derived expression support (must be at namespace scope to be used as template argument)
-using TestCustomBaseExpression = Parser::Grammar::RepeatExpression<Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>, 1, 5>;
-struct TestCustomDerivedExpression : public TestCustomBaseExpression
-{
-};
-
-using TestRuleBaseExpression = Parser::Grammar::RuleExpression<SGE_STR("base_rule"), Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>>;
-struct TestRuleDerivedExpression : public TestRuleBaseExpression
-{
-};
-
-TEST(AbstractSyntaxTreeNode, CustomDerivedExpressionTest)
-{
-	static_assert(Parser::Grammar::IsExpression<TestCustomDerivedExpression>);
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<TestCustomDerivedExpression>, TestCustomBaseExpression>);
-
-	using InnerExpression = Parser::Grammar::MatchTokenTypeExpression<Lexer::TokenTypes::Identifier>;
-
-	Vector<Lexer::Token> tokens;
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("x"), 1, 1));
-
-	auto begin = tokens.GetConstBegin();
-	auto end = tokens.GetConstEnd();
-
-	Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression>> children;
-	children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<InnerExpression>(begin, end));
-
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<TestCustomDerivedExpression> node(begin, end, std::move(children));
-
-	ASSERT_EQ(node.GetBeginTokenIter(), begin);
-	ASSERT_EQ(node.GetEndTokenIter(), end);
-	ASSERT_EQ(node.GetChildren().GetSize(), 1u);
-
-	static_assert(Parser::Grammar::IsExpression<TestRuleDerivedExpression>);
-	static_assert(std::same_as<Parser::Grammar::UnderlyingExpressionType<TestRuleDerivedExpression>, TestRuleBaseExpression>);
-
-	Vector<Lexer::Token> tokens2;
-	tokens2.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("baz"), 1, 1));
-
-	auto begin2 = tokens2.GetConstBegin();
-	auto end2 = tokens2.GetConstEnd();
-
-	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode<TestRuleDerivedExpression> node2(begin2, end2);
-	ASSERT_EQ(node2.GetBeginTokenIter(), begin2);
-	ASSERT_EQ(node2.GetEndTokenIter(), end2);
+	Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode> grandchildren;
+	grandchildren.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode(SGE_STR("child"), begin + 1, end, {}));
+
+	Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+	children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode(SGE_STR("child"), begin, begin + 1, {}));
+	children.EmplaceBack(Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode(SGE_STR("other"), begin + 1, end, std::move(grandchildren)));
+
+	Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode root(SGE_STR("root"), begin, end, std::move(children));
+
+	// Visit by rule name "child": should match child0 and grandchild (not root, not child1)
+	int count = 0;
+	Parser::AbstractSyntaxTree::Visit(SGE_STR("child"), root, [&](const Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode& node) {
+		ASSERT_TRUE(IsSameCString(node.GetName(), SGE_STR("child")));
+		++count;
+	});
+	ASSERT_EQ(count, 2);
+
+	// Visit with nullptr rule name: should match all 4 nodes (root + child0 + child1 + grandchild)
+	count = 0;
+	Parser::AbstractSyntaxTree::Visit(nullptr, root, [&](const Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode&) {
+		++count;
+	});
+	ASSERT_EQ(count, 4);
+
+	// Visit with predicate: match nodes whose token range covers exactly 1 token
+	count = 0;
+	Parser::AbstractSyntaxTree::Visit(
+		[](const Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode& node) {
+			return (node.GetEndTokenIter() - node.GetBeginTokenIter()) == 1;
+		},
+		[&](const Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode&) {
+			++count;
+		},
+		root);
+	// child0 [begin, begin+1) and grandchild [begin+1, end) each span 1 token
+	ASSERT_EQ(count, 3);
 }

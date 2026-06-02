@@ -1,4 +1,6 @@
 add_library(CommonParser SHARED
+        Private/AbstractSyntaxTree.cpp
+        Private/AbstractSyntaxTreePrinter.cpp
         Private/CommonParserModule.cpp
         Private/Logger.cpp
         Private/Lexer.cpp

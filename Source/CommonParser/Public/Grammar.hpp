@@ -26,125 +26,131 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 {
 	struct Expression
 	{
+		inline static constexpr const auto Name = ArrayLiteral(SGE_STR("Expression"));
 	};
 
 	template<typename T>
-	concept IsExpression = std::derived_from<T, Expression>;
+	concept IsExpression = std::derived_from<T, Expression> &&
+							   requires()
+	{
+		{
+			T::Name.m_Value
+		} -> std::convertible_to<const Char*>;
+	};
 
 	template<Lexer::TokenType _Type>
-	struct MatchTokenTypeExpression : public Expression
+	struct MatchTokenType : public Expression
 	{
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("MatchTokenType<")), ToCStringLiteral<_Type, Char>(), ArrayLiteral(SGE_STR(">")));
 		inline static constexpr const Lexer::TokenType Type = _Type;
 	};
 
 	template<Lexer::TokenType _Type, ArrayLiteral _Content>
-	struct MatchTokenTypeAndContentExpression : public Expression
+	struct MatchTokenTypeAndContent : public Expression
 	{
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("MatchTokenTypeAndContent<")), ToCStringLiteral<_Type, Char>(), ArrayLiteral(SGE_STR(", ")), _Content, ArrayLiteral(SGE_STR(">")));
 		inline static constexpr const Lexer::TokenType Type = _Type;
 		inline static constexpr const auto Content = _Content;
 	};
 
 	template<IsExpression... _Expressions>
-	struct SequenceExpression : public Expression
+	struct Sequence : public Expression
 	{
 		static_assert(sizeof...(_Expressions) > 0, "SequenceExpression must contain at least one expression.");
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("Sequence<")), JoinCStringLiterals(ArrayLiteral(SGE_STR(", ")), _Expressions::Name...), ArrayLiteral(SGE_STR(">")));
 		using Expressions = TypeList<_Expressions...>;
 	};
 
 	template<IsExpression... _Expressions>
-	struct SelectExpression : public Expression
+	struct Select : public Expression
 	{
 		static_assert(sizeof...(_Expressions) > 0, "SelectExpression must contain at least one expression.");
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("Select<")), JoinCStringLiterals(ArrayLiteral(SGE_STR(", ")), _Expressions::Name...), ArrayLiteral(SGE_STR(">")));
 		using Expressions = TypeList<_Expressions...>;
 	};
 
 	template<IsExpression _Expression>
-	struct NegateExpression : public Expression
+	struct Negate : public Expression
 	{
 		using Expression = _Expression;
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("Negate<")), _Expression::Name, ArrayLiteral(SGE_STR(">")));
 	};
 
 	template<IsExpression _Expression>
-	struct OptionalExpression : public Expression
+	struct Optional : public Expression
 	{
 		using Expression = _Expression;
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("Optional<")), _Expression::Name, ArrayLiteral(SGE_STR(">")));
 	};
 
 	template<IsExpression _Expression, SizeType _MinCount = 0, SizeType _MaxCount = UINT64_MAX>
-	struct RepeatExpression : public Expression
+	struct Repeat : public Expression
 	{
 		using Expression = _Expression;
 		inline static constexpr const SizeType MinCount = _MinCount;
 		inline static constexpr const SizeType MaxCount = _MaxCount;
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("Repeat<")), _Expression::Name, ArrayLiteral(SGE_STR(", ")), ToCStringLiteral<_MinCount, Char>(), ArrayLiteral(SGE_STR(", ")), ToCStringLiteral<_MaxCount, Char>(), ArrayLiteral(SGE_STR(">")));
 	};
 
 	template<ArrayLiteral _Name, IsExpression _Expression, bool _IsSynchronousPoint = false>
-	struct RuleExpression : public Expression
+	struct Rule
 	{
 		inline static constexpr const auto Name = _Name;
 		using Expression = _Expression;
 		inline static constexpr const bool IsSynchronousPoint = _IsSynchronousPoint;
 	};
 
+	template<typename T>
+	concept IsRule = requires() {
+		{
+			T::Name.m_Value
+		} -> std::convertible_to<const Char*>;
+		typename T::Expression;
+		{
+			T::IsSynchronousPoint
+		} -> std::convertible_to<bool>;
+	};
+
+	template<ArrayLiteral _Name>
+	struct RuleReference : public Expression
+	{
+		inline static constexpr const auto Name = _Name;
+	};
+
 	namespace Detail
 	{
-		template<Lexer::TokenType _Type>
-		inline constexpr auto GetUnderlyingExpressionType(MatchTokenTypeExpression<_Type>&&)
+		template<ArrayLiteral _ExpectedRuleName, typename _Rule>
+		struct IsRuleWithName
 		{
-			return TypeWrapper<MatchTokenTypeExpression<_Type>>{};
-		}
+			inline static constexpr const bool Value = []() constexpr -> bool {
+				if constexpr (IsRule<_Rule>)
+					return IsSameCString(_ExpectedRuleName.m_Value, _Rule::Name.m_Value);
+				else
+					return false;
+			}();
+		};
 
-		template<Lexer::TokenType _Type, ArrayLiteral _Content>
-		inline constexpr auto GetUnderlyingExpressionType(MatchTokenTypeAndContentExpression<_Type, _Content>&&)
+		template<ArrayLiteral _ExpectedRuleName>
+		struct IsRuleWithNameWrapper
 		{
-			return TypeWrapper<MatchTokenTypeAndContentExpression<_Type, _Content>>{};
-		}
-
-		template<IsExpression... _Expressions>
-		inline constexpr auto GetUnderlyingExpressionType(SequenceExpression<_Expressions...>&&)
-		{
-			return TypeWrapper<SequenceExpression<_Expressions...>>{};
-		}
-
-		template<IsExpression... _Expressions>
-		inline constexpr auto GetUnderlyingExpressionType(SelectExpression<_Expressions...>&&)
-		{
-			return TypeWrapper<SelectExpression<_Expressions...>>{};
-		}
-
-		template<IsExpression _Expression>
-		inline constexpr auto GetUnderlyingExpressionType(NegateExpression<_Expression>&&)
-		{
-			return TypeWrapper<NegateExpression<_Expression>>{};
-		}
-
-		template<IsExpression _Expression>
-		inline constexpr auto GetUnderlyingExpressionType(OptionalExpression<_Expression>&&)
-		{
-			return TypeWrapper<OptionalExpression<_Expression>>{};
-		}
-
-		template<IsExpression _Expression, SizeType _MinCount, SizeType _MaxCount>
-		inline constexpr auto GetUnderlyingExpressionType(RepeatExpression<_Expression, _MinCount, _MaxCount>&&)
-		{
-			return TypeWrapper<RepeatExpression<_Expression, _MinCount, _MaxCount>>{};
-		}
-
-		template<ArrayLiteral _Name, IsExpression _Expression, bool _IsSynchronousPoint>
-		inline constexpr auto GetUnderlyingExpressionType(RuleExpression<_Name, _Expression, _IsSynchronousPoint>&&)
-		{
-			return TypeWrapper<RuleExpression<_Name, _Expression, _IsSynchronousPoint>>{};
-		}
+			template<typename _Rule>
+			using Type = IsRuleWithName<_ExpectedRuleName, _Rule>;
+		};
 	}
 
-	/*!
-	@brief get underlying expression type of any expression type. So the user can define custom rule expressions by deriving from the composited expression type.
-	*/
-	template<IsExpression _Expression>
-	using UnderlyingExpressionType = typename decltype(Detail::GetUnderlyingExpressionType(std::declval<_Expression>()))::Type;
+	template<IsRule... _Rules>
+	struct Language
+	{
+		using Rules = TypeList<_Rules...>;
 
-	template<typename _Expression>
-	concept IsCustomExpression = IsExpression<_Expression> && (std::is_same_v<_Expression, UnderlyingExpressionType<_Expression>> == false);
+		template<ArrayLiteral _Name>
+		using GetRule = typename Rules::template Get<Rules::template FirstIndex<Detail::IsRuleWithNameWrapper<_Name>::template Type>>;
+	};
+
+	template<typename T>
+	concept IsLanguage = requires() {
+		typename T::Rules;
+	};
 }
 
 /*!

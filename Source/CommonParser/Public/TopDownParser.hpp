@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #pragma once
-#include "AbstractSyntaxTree.hpp"
+#include "Grammar.hpp"
+#include "AbstractSyntaxTree.h"
+#include "Utility/Optional.hpp"
 
 /*!
 @ingroup CommonParser
@@ -28,309 +30,300 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 		inline constexpr const SizeType UnexpectedEnd = 1001;
 		inline constexpr const SizeType UnexpectedTokenType = 1002;
 		inline constexpr const SizeType UnexpectedToken = 1003;
-		inline constexpr const SizeType InvalidExpression = 1004;
-		inline constexpr const SizeType RequireMoreRepetition = 1005;
+		inline constexpr const SizeType RequireExpression = 1004;
+		inline constexpr const SizeType UnsatisfiedExpression = 1005;
+		inline constexpr const SizeType InvalidExpression = 1006;
+		inline constexpr const SizeType RequireMoreRepetition = 1007;
+		inline constexpr const SizeType EnablePanicMode = 1008;
+		inline constexpr const SizeType DisablePanicMode = 1009;
 	}
 
 	namespace Detail
 	{
-		template<Grammar::IsExpression _Expression>
+		template<Grammar::IsLanguage _Language, Grammar::IsExpression _Expression>
 		struct ParseCore
 		{
-			inline static auto Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-			{
-				return ParseCore<Grammar::UnderlyingExpressionType<_Expression>>::Parse(iter, end_iter);
-			}
 		};
 
-		template<Grammar::IsExpression _Expression>
-		using ParseResult = Pair<Optional<AbstractSyntaxTree::AbstractSyntaxTreeNode<_Expression>>, Vector<ParserError>>;
+		using ParseResult = Pair<SpaceGameEngine::Optional<AbstractSyntaxTree::AbstractSyntaxTreeNode>, Vector<ParserError>>;
 
-		template<Lexer::TokenType _Type>
-		struct ParseCore<Grammar::MatchTokenTypeExpression<_Type>>
+		inline ParserError MakeUnexpectedEndError(const Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter)
 		{
-			inline static ParseResult<Grammar::MatchTokenTypeExpression<_Type>> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+			if (iter == begin_iter)
+				return ParserError(ErrorTypeId::UnexpectedEnd, 1, 1);
+			auto prev_iter = iter - 1;
+			return ParserError(ErrorTypeId::UnexpectedEnd, prev_iter->GetLine(), prev_iter->GetColumn() + prev_iter->GetContent().GetSize());
+		}
+
+		inline ParserError MakeOtherParserError(const Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, SizeType error_type_id, Vector<String>&& additional_information)
+		{
+			SizeType line = 1, column = 1;
+			if (iter != begin_iter)
+			{
+				line = iter->GetLine();
+				column = iter->GetColumn();
+			}
+			return ParserError(error_type_id, line, column, std::move(additional_information));
+		}
+
+		template<Grammar::IsLanguage _Language, Lexer::TokenType _Type>
+		struct ParseCore<_Language, Grammar::MatchTokenType<_Type>>
+		{
+			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
 			{
 				if (iter == end_iter)
-				{
-					auto prev_iter = iter - 1;
-					return ParseResult<Grammar::MatchTokenTypeExpression<_Type>>(OptionalTag::EmptyOptional, Vector<ParserError>{ParserError(ErrorTypeId::UnexpectedEnd, prev_iter->GetLine(), prev_iter->GetColumn())});
-				}
+					return ParseResult(OptionalTag::EmptyOptional, Vector<ParserError>{MakeUnexpectedEndError(iter, begin_iter)});
 				else if (iter->GetType() == _Type)
 				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::MatchTokenTypeExpression<_Type>>(iter, iter + 1);
+					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::MatchTokenType<_Type>::Name.m_Value, iter, iter + 1, {});
 					++iter;
-					return ParseResult<Grammar::MatchTokenTypeExpression<_Type>>(std::move(node), Vector<ParserError>());
+					return ParseResult(std::move(node), Vector<ParserError>());
 				}
 				else
-					return ParseResult<Grammar::MatchTokenTypeExpression<_Type>>(OptionalTag::EmptyOptional, Vector<ParserError>{ParserError(ErrorTypeId::UnexpectedTokenType, iter->GetLine(), iter->GetColumn(), Vector<String>{ToString<String>(_Type), ToString<String>(iter->GetType())})});
+					return ParseResult(OptionalTag::EmptyOptional, Vector<ParserError>{MakeOtherParserError(iter, begin_iter, ErrorTypeId::UnexpectedTokenType, Vector<String>{ToString<String>(_Type), ToString<String>(iter->GetType())})});
 			}
 		};
 
-		template<Lexer::TokenType _Type, ArrayLiteral _Content>
-		struct ParseCore<Grammar::MatchTokenTypeAndContentExpression<_Type, _Content>>
+		template<Grammar::IsLanguage _Language, Lexer::TokenType _Type, ArrayLiteral _Content>
+		struct ParseCore<_Language, Grammar::MatchTokenTypeAndContent<_Type, _Content>>
 		{
-			inline static ParseResult<Grammar::MatchTokenTypeAndContentExpression<_Type, _Content>> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
 			{
 				if (iter == end_iter)
-				{
-					auto prev_iter = iter - 1;
-					return ParseResult<Grammar::MatchTokenTypeAndContentExpression<_Type, _Content>>(OptionalTag::EmptyOptional, Vector<ParserError>{ParserError(ErrorTypeId::UnexpectedEnd, prev_iter->GetLine(), prev_iter->GetColumn())});
-				}
+					return ParseResult(OptionalTag::EmptyOptional, Vector<ParserError>{MakeUnexpectedEndError(iter, begin_iter)});
 				else if (iter->GetType() == _Type && iter->GetContent() == _Content.m_Value)
 				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::MatchTokenTypeAndContentExpression<_Type, _Content>>(iter, iter + 1);
+					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::MatchTokenTypeAndContent<_Type, _Content>::Name.m_Value, iter, iter + 1, {});
 					++iter;
-					return ParseResult<Grammar::MatchTokenTypeAndContentExpression<_Type, _Content>>(std::move(node), Vector<ParserError>());
+					return ParseResult(std::move(node), Vector<ParserError>());
 				}
 				else
-					return ParseResult<Grammar::MatchTokenTypeAndContentExpression<_Type, _Content>>(OptionalTag::EmptyOptional, Vector<ParserError>{ParserError(ErrorTypeId::UnexpectedToken, iter->GetLine(), iter->GetColumn(), Vector<String>{ToString<String>(_Type), String(_Content.m_Value), ToString<String>(iter->GetType()), iter->GetContent()})});
+					return ParseResult(OptionalTag::EmptyOptional, Vector<ParserError>{MakeOtherParserError(iter, begin_iter, ErrorTypeId::UnexpectedToken, Vector<String>{ToString<String>(_Type), String(_Content.m_Value), ToString<String>(iter->GetType()), iter->GetContent()})});
 			}
 		};
 
-		template<Grammar::IsExpression... _Expressions>
-		struct ParseCore<Grammar::SequenceExpression<_Expressions...>>
+		template<Grammar::IsLanguage _Language, Grammar::IsExpression... _Expressions>
+		struct ParseCore<_Language, Grammar::Sequence<_Expressions...>>
 		{
 		public:
-			inline static ParseResult<Grammar::SequenceExpression<_Expressions...>> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
 			{
-				auto backup_iter = iter;
-				auto result = ParseImplement<_Expressions...>::Parse(iter, end_iter);
-				if (result.m_First.HasValue())
-				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::SequenceExpression<_Expressions...>>(backup_iter, iter, std::move(result.m_First.Get()));
-					return ParseResult<Grammar::SequenceExpression<_Expressions...>>(std::move(node), std::move(result.m_Second));
-				}
-				else
-				{
-					iter = backup_iter;
-					return ParseResult<Grammar::SequenceExpression<_Expressions...>>(OptionalTag::EmptyOptional, std::move(result.m_Second));
-				}
-			}
-
-		private:
-			using Expressions = typename Grammar::SequenceExpression<_Expressions...>::Expressions;
-
-			template<Grammar::IsExpression... __Expressions>
-			struct ParseImplement
-			{
-			};
-
-			template<Grammar::IsExpression... __Expressions>
-			using ParseImplementResult = Pair<Optional<Tuple<AbstractSyntaxTree::AbstractSyntaxTreeNode<__Expressions>...>>, Vector<ParserError>>;
-
-			template<Grammar::IsExpression Expression1>
-			struct ParseImplement<Expression1>
-			{
-				inline static ParseImplementResult<Expression1> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-				{
-					auto result = ParseCore<Expression1>::Parse(iter, end_iter);
-					if (!result.m_First.HasValue())
-						return ParseImplementResult<Expression1>(OptionalTag::EmptyOptional, std::move(result.m_Second));
-					return ParseImplementResult<Expression1>(MakeTuple(result.m_First.Get()), std::move(result.m_Second));
-				}
-			};
-
-			template<Grammar::IsExpression Expression1, Grammar::IsExpression... __Expressions>
-			struct ParseImplement<Expression1, __Expressions...>
-			{
-				inline static ParseImplementResult<Expression1, __Expressions...> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-				{
-					auto result1 = ParseCore<Expression1>::Parse(iter, end_iter);
-					if (!result1.m_First.HasValue())
-						return ParseImplementResult<Expression1, __Expressions...>(OptionalTag::EmptyOptional, std::move(result1.m_Second));
-					auto result2 = ParseImplement<__Expressions...>::Parse(iter, end_iter);
-					if (!result2.m_First.HasValue())
-						return ParseImplementResult<Expression1, __Expressions...>(OptionalTag::EmptyOptional, std::move(result2.m_Second));
-					Vector<ParserError> errors(std::move(result1.m_Second));
-					if (result2.m_Second.GetSize() > 0)
-						errors.Insert(errors.GetConstEnd(), result2.m_Second.GetConstBegin(), result2.m_Second.GetConstEnd());
-					return ParseImplementResult<Expression1, __Expressions...>(ConcatTuples(MakeTuple(result1.m_First.Get()), result2.m_First.Get()), std::move(errors));
-				}
-			};
-		};
-
-		template<Grammar::IsExpression... _Expressions>
-		struct ParseCore<Grammar::SelectExpression<_Expressions...>>
-		{
-		public:
-			inline static ParseResult<Grammar::SelectExpression<_Expressions...>> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-			{
-				auto backup_iter = iter;
-				auto result = ParseImplement<0, _Expressions...>::Parse(iter, end_iter);
-				if (result.m_First.HasValue())
-				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::SelectExpression<_Expressions...>>(backup_iter, iter, std::move(result.m_First.Get()));
-					return ParseResult<Grammar::SelectExpression<_Expressions...>>(std::move(node), std::move(result.m_Second));
-				}
-				else
-				{
-					iter = backup_iter;
-					return ParseResult<Grammar::SelectExpression<_Expressions...>>(OptionalTag::EmptyOptional, std::move(result.m_Second));
-				}
-			}
-
-		private:
-			template<SizeType Index, Grammar::IsExpression... __Expressions>
-			struct ParseImplement
-			{
-			};
-
-			using ParseImplementResult = Pair<Optional<Variant<AbstractSyntaxTree::AbstractSyntaxTreeNode<_Expressions>...>>, Vector<ParserError>>;
-
-			template<SizeType Index, Grammar::IsExpression Expression1>
-			struct ParseImplement<Index, Expression1>
-			{
-				inline static ParseImplementResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-				{
-					auto result = ParseCore<Expression1>::Parse(iter, end_iter);
-					if (!result.m_First.HasValue())
-						return ParseImplementResult(OptionalTag::EmptyOptional, std::move(result.m_Second));
-					return ParseImplementResult(Variant<AbstractSyntaxTree::AbstractSyntaxTreeNode<_Expressions>...>(ValueWrapper<Index>(), std::move(result.m_First.Get())), std::move(result.m_Second));
-				}
-			};
-
-			template<SizeType Index, Grammar::IsExpression Expression1, Grammar::IsExpression... __Expressions>
-			struct ParseImplement<Index, Expression1, __Expressions...>
-			{
-				inline static ParseImplementResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-				{
-					auto result1 = ParseImplement<Index, Expression1>::Parse(iter, end_iter);
-					if (result1.m_First.HasValue())
-						return ParseImplementResult(Variant<AbstractSyntaxTree::AbstractSyntaxTreeNode<_Expressions>...>(std::move(result1.m_First.Get())), std::move(result1.m_Second));
-					auto result2 = ParseImplement<Index + 1, __Expressions...>::Parse(iter, end_iter);
-					if (result2.m_First.HasValue())
-						return ParseImplementResult(Variant<AbstractSyntaxTree::AbstractSyntaxTreeNode<_Expressions>...>(std::move(result2.m_First.Get())), std::move(result2.m_Second));
-					Vector<ParserError> errors(std::move(result1.m_Second));
-					if (result2.m_Second.GetSize() > 0)
-						errors.Insert(errors.GetConstEnd(), result2.m_Second.GetConstBegin(), result2.m_Second.GetConstEnd());
-					return ParseImplementResult(OptionalTag::EmptyOptional, std::move(errors));
-				}
-			};
-		};
-
-		template<Grammar::IsExpression _Expression>
-		struct ParseCore<Grammar::NegateExpression<_Expression>>
-		{
-			inline static ParseResult<Grammar::NegateExpression<_Expression>> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-			{
-				auto backup_iter = iter;
-				auto result = ParseCore<_Expression>::Parse(iter, end_iter);
-				iter = backup_iter;
-				if (result.m_First.HasValue())
-					return ParseResult<Grammar::NegateExpression<_Expression>>(OptionalTag::EmptyOptional, Vector<ParserError>{ParserError(ErrorTypeId::InvalidExpression, backup_iter->GetLine(), backup_iter->GetColumn())});
-				else
-				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::NegateExpression<_Expression>>(backup_iter, backup_iter);
-					return ParseResult<Grammar::NegateExpression<_Expression>>(std::move(node), Vector<ParserError>());	   // negative expression should not include any error coming from parsing inside expression, so the error vector is empty.
-				}
-			}
-		};
-
-		template<Grammar::IsExpression _Expression>
-		struct ParseCore<Grammar::OptionalExpression<_Expression>>
-		{
-			inline static ParseResult<Grammar::OptionalExpression<_Expression>> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-			{
-				auto backup_iter = iter;
-				auto result = ParseCore<_Expression>::Parse(iter, end_iter);
-				if (result.m_First.HasValue())
-				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::OptionalExpression<_Expression>>(backup_iter, iter, std::move(result.m_First));
-					return ParseResult<Grammar::OptionalExpression<_Expression>>(std::move(node), std::move(result.m_Second));
-				}
-				else
-				{
-					iter = backup_iter;
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::OptionalExpression<_Expression>>(backup_iter, backup_iter, OptionalTag::EmptyOptional);
-					return ParseResult<Grammar::OptionalExpression<_Expression>>(std::move(node), std::move(result.m_Second));
-				}
-			}
-		};
-
-		template<Grammar::IsExpression _Expression, SizeType _MinCount, SizeType _MaxCount>
-		struct ParseCore<Grammar::RepeatExpression<_Expression, _MinCount, _MaxCount>>
-		{
-			inline static ParseResult<Grammar::RepeatExpression<_Expression, _MinCount, _MaxCount>> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-			{
-				auto backup_iter = iter;
-				Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode<_Expression>> nodes;
+				auto start_iter = iter;
+				bool can_continue = true;
+				Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
 				Vector<ParserError> errors;
-				while (nodes.GetSize() < _MaxCount)
+				(ParseChildren<_Expressions>(iter, begin_iter, end_iter, children, errors, can_continue), ...);
+				if (children.GetSize() == sizeof...(_Expressions))
+					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Sequence<_Expressions...>::Name.m_Value, start_iter, iter, std::move(children)), std::move(errors));
+				else
 				{
-					auto result = ParseCore<_Expression>::Parse(iter, end_iter);
-					if (result.m_First.HasValue())
-						nodes.PushBack(std::move(result.m_First.Get()));
-					else
-					{
-						if (result.m_Second.GetSize() > 0)
-							errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());
-						break;
-					}
+					iter = start_iter;
+					return ParseResult(OptionalTag::EmptyOptional, std::move(errors));
 				}
-				if (nodes.GetSize() < _MinCount)
+			}
+
+		private:
+			template<Grammar::IsExpression ChildExpression>
+			inline static void ParseChildren(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter, Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode>& children, Vector<ParserError>& errors, bool& can_continue)
+			{
+				if (!can_continue)
+					return;
+				auto backup_iter = iter;
+				auto result = ParseCore<_Language, ChildExpression>::Parse(iter, begin_iter, end_iter);
+				if (result.m_First.HasValue())
 				{
-					errors.EmplaceBack(ErrorTypeId::RequireMoreRepetition, iter->GetLine(), iter->GetColumn());
-					iter = backup_iter;
-					return ParseResult<Grammar::RepeatExpression<_Expression, _MinCount, _MaxCount>>(OptionalTag::EmptyOptional, std::move(errors));
+					children.EmplaceBack(std::move(result.m_First.Get()));
+					if (result.m_Second.GetSize() > 0)
+						errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());	// keep error for panic mode
 				}
 				else
 				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::RepeatExpression<_Expression, _MinCount, _MaxCount>>(backup_iter, iter, std::move(nodes));
-					return ParseResult<Grammar::RepeatExpression<_Expression, _MinCount, _MaxCount>>(std::move(node), std::move(errors));
+					can_continue = false;
+					errors.EmplaceBack(MakeOtherParserError(backup_iter, begin_iter, ErrorTypeId::RequireExpression, Vector<String>{ChildExpression::Name.m_Value}));
+					errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());
 				}
 			}
 		};
 
-		template<ArrayLiteral _Name, Grammar::IsExpression _Expression, bool _IsSynchronousPoint>
-		struct ParseCore<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>
+		template<Grammar::IsLanguage _Language, Grammar::IsExpression... _Expressions>
+		struct ParseCore<_Language, Grammar::Select<_Expressions...>>
 		{
-			inline static ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>> Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+		public:
+			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
 			{
+				auto start_iter = iter;
+				Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+				Vector<ParserError> errors;
+				SpaceGameEngine::Optional<ParseResult> panic_mode_result;
+				SpaceGameEngine::Optional<AbstractSyntaxTree::AbstractSyntaxTreeNode> successful_node;
+				(ParseChildren<_Expressions>(iter, begin_iter, end_iter, errors, successful_node, panic_mode_result), ...);
+				if (successful_node.HasValue())
+				{
+					children.EmplaceBack(std::move(successful_node.Get()));
+					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Select<_Expressions...>::Name.m_Value, start_iter, iter, std::move(children)), Vector<ParserError>());
+				}
+				else if (panic_mode_result.HasValue())
+				{
+					start_iter = panic_mode_result.Get().m_First.Get().GetBeginTokenIter();
+					auto end_iter = panic_mode_result.Get().m_First.Get().GetEndTokenIter();
+					children.EmplaceBack(std::move(panic_mode_result.Get().m_First.Get()));
+					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Select<_Expressions...>::Name.m_Value, start_iter, end_iter, std::move(children)), std::move(panic_mode_result.Get().m_Second));
+				}
+				else
+					return ParseResult(OptionalTag::EmptyOptional, std::move(errors));
+			}
+
+		private:
+			template<Grammar::IsExpression ChildExpression>
+			inline static void ParseChildren(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter, Vector<ParserError>& errors, SpaceGameEngine::Optional<AbstractSyntaxTree::AbstractSyntaxTreeNode>& successful_node, SpaceGameEngine::Optional<ParseResult>& panic_mode_result)
+			{
+				if (successful_node.HasValue())
+					return;
 				auto backup_iter = iter;
-				auto result = ParseCore<_Expression>::Parse(iter, end_iter);
+				auto result = ParseCore<_Language, ChildExpression>::Parse(iter, begin_iter, end_iter);
 				if (result.m_First.HasValue())
 				{
-					auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(result.m_First.Get()));
-					return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(node), std::move(result.m_Second));
+					if (result.m_Second.GetSize() == 0)
+					{
+						successful_node = std::move(result.m_First.Get());
+						return;
+					}
+					if (!panic_mode_result.HasValue())
+						panic_mode_result = std::move(result);
+					iter = backup_iter;	   // need to restore iter for panic mode result
+				}
+				else
+				{
+					errors.EmplaceBack(MakeOtherParserError(backup_iter, begin_iter, ErrorTypeId::UnsatisfiedExpression, Vector<String>{ChildExpression::Name.m_Value}));
+					errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());
+				}
+			}
+		};
+
+		template<Grammar::IsLanguage _Language, Grammar::IsExpression _Expression>
+		struct ParseCore<_Language, Grammar::Negate<_Expression>>
+		{
+			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+			{
+				auto start_iter = iter;
+				auto result = ParseCore<_Language, _Expression>::Parse(iter, begin_iter, end_iter);
+				iter = start_iter;
+				if (result.m_First.HasValue() && result.m_Second.GetSize() == 0)
+					return ParseResult(OptionalTag::EmptyOptional, Vector<ParserError>{MakeOtherParserError(start_iter, begin_iter, ErrorTypeId::InvalidExpression, Vector<String>{_Expression::Name.m_Value})});
+				else
+					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Negate<_Expression>::Name.m_Value, start_iter, start_iter, {}), Vector<ParserError>());	  // negative expression should not include any error coming from parsing inside expression, so the error vector is empty.
+			}
+		};
+
+		template<Grammar::IsLanguage _Language, Grammar::IsExpression _Expression>
+		struct ParseCore<_Language, Grammar::Optional<_Expression>>
+		{
+			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+			{
+				auto start_iter = iter;
+				auto result = ParseCore<_Language, _Expression>::Parse(iter, begin_iter, end_iter);
+				if (result.m_First.HasValue())
+				{
+					Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+					children.EmplaceBack(std::move(result.m_First.Get()));
+					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Optional<_Expression>::Name.m_Value, start_iter, iter, std::move(children)), std::move(result.m_Second));
+				}
+				else
+					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Optional<_Expression>::Name.m_Value, start_iter, start_iter, {}), std::move(result.m_Second));
+			}
+		};
+
+		template<Grammar::IsLanguage _Language, Grammar::IsExpression _Expression, SizeType _MinCount, SizeType _MaxCount>
+		struct ParseCore<_Language, Grammar::Repeat<_Expression, _MinCount, _MaxCount>>
+		{
+			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+			{
+				auto start_iter = iter;
+				Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+				Vector<ParserError> errors;
+				while (children.GetSize() < _MaxCount)
+				{
+					auto result = ParseCore<_Language, _Expression>::Parse(iter, begin_iter, end_iter);
+					if (result.m_Second.GetSize() > 0)
+						errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());	// need to keep error for panic mode
+					if (result.m_First.HasValue())
+						children.PushBack(std::move(result.m_First.Get()));
+					else
+						break;
+				}
+				if (children.GetSize() < _MinCount)
+				{
+					errors.EmplaceBack(MakeOtherParserError(iter, begin_iter, ErrorTypeId::RequireMoreRepetition, Vector<String>{_Expression::Name.m_Value, ToString<String>(_MinCount), ToString<String>(children.GetSize())}));
+					iter = start_iter;
+					return ParseResult(OptionalTag::EmptyOptional, std::move(errors));
+				}
+				return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Repeat<_Expression, _MinCount, _MaxCount>::Name.m_Value, start_iter, iter, std::move(children)), std::move(errors));
+			}
+		};
+
+		template<Grammar::IsLanguage _Language, ArrayLiteral _Name>
+		struct ParseCore<_Language, Grammar::RuleReference<_Name>>
+		{
+			using RuleType = typename _Language::template GetRule<_Name>;
+			inline static constexpr const bool _IsSynchronousPoint = RuleType::IsSynchronousPoint;
+			using _Expression = typename RuleType::Expression;
+
+			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
+			{
+				auto result = ParseCore<_Language, _Expression>::Parse(iter, begin_iter, end_iter);
+				if (result.m_First.HasValue())
+				{
+					auto start_iter = result.m_First.Get().GetBeginTokenIter();
+					auto end_iter = result.m_First.Get().GetEndTokenIter();
+					Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+					children.EmplaceBack(std::move(result.m_First.Get()));
+					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(_Name.m_Value, start_iter, end_iter, std::move(children)), std::move(result.m_Second));
 				}
 				else
 				{
 					if constexpr (_IsSynchronousPoint)
 					{
+						if (iter == end_iter)	 // if there is no token left, there is no need to enter panic mode, just return the error.
+							return ParseResult(OptionalTag::EmptyOptional, std::move(result.m_Second));
 						Vector<ParserError> errors(std::move(result.m_Second));
+						errors.EmplaceBack(MakeOtherParserError(iter, begin_iter, ErrorTypeId::EnablePanicMode, Vector<String>{_Name.m_Value}));
+						auto backup_iter = iter;
 						while (iter != end_iter)
 						{
 							++iter;
-							auto recovery_result = ParseCore<_Expression>::Parse(iter, end_iter);
-							if (recovery_result.m_First.HasValue())
+							if (iter == end_iter)
 							{
-								auto node = AbstractSyntaxTree::AbstractSyntaxTreeNode<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(recovery_result.m_First.Get()));
-								if (recovery_result.m_Second.GetSize() > 0)
-									errors.Insert(errors.GetConstEnd(), recovery_result.m_Second.GetConstBegin(), recovery_result.m_Second.GetConstEnd());
-								return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(std::move(node), std::move(errors));
+								errors.EmplaceBack(MakeUnexpectedEndError(iter, begin_iter));
+								break;
 							}
+							auto recovery_result = ParseCore<_Language, _Expression>::Parse(iter, begin_iter, end_iter);
 							if (recovery_result.m_Second.GetSize() > 0)
 								errors.Insert(errors.GetConstEnd(), recovery_result.m_Second.GetConstBegin(), recovery_result.m_Second.GetConstEnd());
+							if (recovery_result.m_First.HasValue())
+							{
+								auto start_iter = recovery_result.m_First.Get().GetBeginTokenIter();
+								auto end_iter = recovery_result.m_First.Get().GetEndTokenIter();
+								Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+								children.EmplaceBack(std::move(recovery_result.m_First.Get()));
+								errors.EmplaceBack(MakeOtherParserError(iter, begin_iter, ErrorTypeId::DisablePanicMode, Vector<String>{_Name.m_Value}));
+								return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(_Name.m_Value, start_iter, end_iter, std::move(children)), std::move(errors));
+							}
 						}
 						iter = backup_iter;
-						return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(OptionalTag::EmptyOptional, std::move(errors));
+						return ParseResult(OptionalTag::EmptyOptional, std::move(errors));
 					}
 					else
-					{
-						iter = backup_iter;
-						return ParseResult<Grammar::RuleExpression<_Name, _Expression, _IsSynchronousPoint>>(OptionalTag::EmptyOptional, std::move(result.m_Second));
-					}
+						return ParseResult(OptionalTag::EmptyOptional, std::move(result.m_Second));
 				}
 			}
 		};
 	}
 
-	template<Grammar::IsExpression _Expression>
+	template<Grammar::IsLanguage _Language, ArrayLiteral RootRuleName>
 	inline auto Parse(const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
 	{
 		auto iter = begin_iter;
-		return Detail::ParseCore<_Expression>::Parse(iter, end_iter);
+		return Detail::ParseCore<_Language, Grammar::RuleReference<RootRuleName>>::Parse(iter, begin_iter, end_iter);
 	}
 }
 

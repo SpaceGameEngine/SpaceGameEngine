@@ -36,6 +36,9 @@
     <ClInclude Include="Public\Assembler\AbstractSyntaxTreePrinter.h">
       <Filter>Public\Assembler</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Assembler\Parser.h">
+      <Filter>Public\Assembler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp">
@@ -51,6 +54,9 @@
       <Filter>Private\Assembler</Filter>
     </ClCompile>
     <ClCompile Include="Private\Assembler\AbstractSyntaxTreePrinter.cpp">
+      <Filter>Private\Assembler</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assembler\Parser.cpp">
       <Filter>Private\Assembler</Filter>
     </ClCompile>
   </ItemGroup>
