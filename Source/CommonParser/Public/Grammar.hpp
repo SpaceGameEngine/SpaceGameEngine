@@ -41,14 +41,14 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 	template<Lexer::TokenType _Type>
 	struct MatchTokenType : public Expression
 	{
-		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("MatchTokenType<")), ToCStringLiteral<_Type, Char>(), ArrayLiteral(SGE_STR(">")));
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("MatchTokenType<")), IntegerToCStringLiteral<_Type, Char>(), ArrayLiteral(SGE_STR(">")));
 		inline static constexpr const Lexer::TokenType Type = _Type;
 	};
 
 	template<Lexer::TokenType _Type, ArrayLiteral _Content>
 	struct MatchTokenTypeAndContent : public Expression
 	{
-		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("MatchTokenTypeAndContent<")), ToCStringLiteral<_Type, Char>(), ArrayLiteral(SGE_STR(", ")), _Content, ArrayLiteral(SGE_STR(">")));
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("MatchTokenTypeAndContent<")), IntegerToCStringLiteral<_Type, Char>(), ArrayLiteral(SGE_STR(", ")), _Content, ArrayLiteral(SGE_STR(">")));
 		inline static constexpr const Lexer::TokenType Type = _Type;
 		inline static constexpr const auto Content = _Content;
 	};
@@ -83,13 +83,15 @@ namespace SpaceGameEngine::CommonParser::Parser::Grammar
 		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("Optional<")), _Expression::Name, ArrayLiteral(SGE_STR(">")));
 	};
 
-	template<IsExpression _Expression, SizeType _MinCount = 0, SizeType _MaxCount = UINT64_MAX>
+	template<IsExpression _Expression, SizeType _MinCount = 0, SizeType _MaxCount = UINT64_MAX, bool _IsAggressive = false>
 	struct Repeat : public Expression
 	{
+		static_assert(_MinCount <= _MaxCount, "MinCount must be less than or equal to MaxCount.");
 		using Expression = _Expression;
 		inline static constexpr const SizeType MinCount = _MinCount;
 		inline static constexpr const SizeType MaxCount = _MaxCount;
-		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("Repeat<")), _Expression::Name, ArrayLiteral(SGE_STR(", ")), ToCStringLiteral<_MinCount, Char>(), ArrayLiteral(SGE_STR(", ")), ToCStringLiteral<_MaxCount, Char>(), ArrayLiteral(SGE_STR(">")));
+		inline static constexpr const bool IsAggressive = _IsAggressive;
+		inline static constexpr const auto Name = ConcatCStringLiteral(ArrayLiteral(SGE_STR("Repeat<")), _Expression::Name, ArrayLiteral(SGE_STR(", ")), IntegerToCStringLiteral<_MinCount, Char>(), ArrayLiteral(SGE_STR(", ")), IntegerToCStringLiteral<_MaxCount, Char>(), ArrayLiteral(SGE_STR(", ")), BoolToCStringLiteral<_IsAggressive, Char>(), ArrayLiteral(SGE_STR(">")));
 	};
 
 	template<ArrayLiteral _Name, IsExpression _Expression, bool _IsSynchronousPoint = false>

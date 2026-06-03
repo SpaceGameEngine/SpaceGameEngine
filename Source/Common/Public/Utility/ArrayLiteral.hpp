@@ -89,7 +89,7 @@ namespace SpaceGameEngine
 	}
 
 	template<std::integral auto Value, typename CharType, SizeType Base = 10>
-	inline constexpr auto ToCStringLiteral()
+	inline constexpr auto IntegerToCStringLiteral()
 	{
 		static_assert(Base >= 2 && Base <= 36, "Base must be between 2 and 36");
 
@@ -149,6 +149,15 @@ namespace SpaceGameEngine
 			result[--pos] = static_cast<CharType>('-');
 
 		return ArrayLiteral<CharType, total_size>(result);
+	}
+
+	template<bool Value, typename CharType>
+	inline constexpr auto BoolToCStringLiteral()
+	{
+		if constexpr (Value)
+			return ArrayLiteral<CharType, 5>({CharType('t'), CharType('r'), CharType('u'), CharType('e'), CharType(0)});
+		else
+			return ArrayLiteral<CharType, 6>({CharType('f'), CharType('a'), CharType('l'), CharType('s'), CharType('e'), CharType(0)});
 	}
 }
 

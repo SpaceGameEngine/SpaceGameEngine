@@ -66,7 +66,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 						   Sequence<
 							   MatchTokenType<CommonParser::Lexer::TokenTypes::LeftCurlyBracket>,
 							   Repeat<
-								   RuleReference<SGE_STR("Statement")>>,
+								   RuleReference<SGE_STR("Statement")>, 0, UINT64_MAX, true>,
 							   MatchTokenType<CommonParser::Lexer::TokenTypes::RightCurlyBracket>>>;
 
 		using Argument = Rule<SGE_STR("Argument"),
@@ -118,7 +118,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 											 MatchTokenType<CommonParser::Lexer::TokenTypes::RightSquareBracket>>>;
 
 		using Program = Rule<SGE_STR("Program"),
-							 Repeat<RuleReference<SGE_STR("Statement")>>>;
+							 Repeat<RuleReference<SGE_STR("Statement")>, 0, UINT64_MAX, true>>;
 
 		using AssemblerLanguage = Language<Symbol,
 										   VariableIdentifier,

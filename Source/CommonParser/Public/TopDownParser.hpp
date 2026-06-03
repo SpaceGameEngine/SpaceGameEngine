@@ -222,19 +222,22 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 			{
 				auto start_iter = iter;
 				auto result = ParseCore<_Language, _Expression>::Parse(iter, begin_iter, end_iter);
-				if (result.m_First.HasValue())
+				if (result.m_First.HasValue() && result.m_Second.GetSize() == 0)	// if there is error, we treat it as empty optional.
 				{
 					Vector<AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
 					children.EmplaceBack(std::move(result.m_First.Get()));
 					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Optional<_Expression>::Name.m_Value, start_iter, iter, std::move(children)), std::move(result.m_Second));
 				}
 				else
-					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Optional<_Expression>::Name.m_Value, start_iter, start_iter, {}), std::move(result.m_Second));
+				{
+					iter = start_iter;	  // restore iter for panic mode, if there is error, we treat it as empty optional, so the iter should be restored for the following parsing.
+					return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Optional<_Expression>::Name.m_Value, start_iter, start_iter, {}), Vector<ParserError>());
+				}
 			}
 		};
 
-		template<Grammar::IsLanguage _Language, Grammar::IsExpression _Expression, SizeType _MinCount, SizeType _MaxCount>
-		struct ParseCore<_Language, Grammar::Repeat<_Expression, _MinCount, _MaxCount>>
+		template<Grammar::IsLanguage _Language, Grammar::IsExpression _Expression, SizeType _MinCount, SizeType _MaxCount, bool _IsAggressive>
+		struct ParseCore<_Language, Grammar::Repeat<_Expression, _MinCount, _MaxCount, _IsAggressive>>
 		{
 			inline static ParseResult Parse(Vector<Lexer::Token>::ConstIterator& iter, const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
 			{
@@ -243,21 +246,54 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 				Vector<ParserError> errors;
 				while (children.GetSize() < _MaxCount)
 				{
+					auto backup_iter = iter;
 					auto result = ParseCore<_Language, _Expression>::Parse(iter, begin_iter, end_iter);
-					if (result.m_Second.GetSize() > 0)
-						errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());	// need to keep error for panic mode
-					if (result.m_First.HasValue())
-						children.PushBack(std::move(result.m_First.Get()));
+					if constexpr (_IsAggressive)
+					{
+						if (result.m_First.HasValue())	  // success or enter panic mode but still get result with error, we treat it as a successful parsing, so we push the node into children and continue to parse next one.
+						{
+							children.PushBack(std::move(result.m_First.Get()));
+							if (result.m_Second.GetSize() > 0)
+								errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());	// need to keep error for panic mode
+						}
+						else	// failure with no result
+						{
+							if (children.GetSize() < _MinCount)
+							{
+								errors.EmplaceBack(MakeOtherParserError(iter, begin_iter, ErrorTypeId::RequireMoreRepetition, Vector<String>{_Expression::Name.m_Value, ToString<String>(_MinCount), ToString<String>(children.GetSize())}));
+								errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());
+							}
+							break;
+						}
+					}
 					else
-						break;
+					{
+						if (result.m_Second.GetSize() > 0)
+						{
+							if (children.GetSize() >= _MinCount)	// can break now
+							{
+								iter = backup_iter;	   // restore iter for panic mode, if there is error, we treat it as the end of repetition, so the iter should be restored for the following parsing.
+								break;
+							}
+							if (!result.m_First.HasValue())
+							{
+								errors.EmplaceBack(MakeOtherParserError(iter, begin_iter, ErrorTypeId::RequireMoreRepetition, Vector<String>{_Expression::Name.m_Value, ToString<String>(_MinCount), ToString<String>(children.GetSize())}));
+								errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());
+								break;
+							}
+							else
+								errors.Insert(errors.GetConstEnd(), result.m_Second.GetConstBegin(), result.m_Second.GetConstEnd());	// need to keep error for panic mode
+						}
+						// no error here or get result with error but still can continue, we treat it as a successful parsing, so we push the node into children and continue to parse next one.
+						children.PushBack(std::move(result.m_First.Get()));
+					}
 				}
 				if (children.GetSize() < _MinCount)
 				{
-					errors.EmplaceBack(MakeOtherParserError(iter, begin_iter, ErrorTypeId::RequireMoreRepetition, Vector<String>{_Expression::Name.m_Value, ToString<String>(_MinCount), ToString<String>(children.GetSize())}));
 					iter = start_iter;
 					return ParseResult(OptionalTag::EmptyOptional, std::move(errors));
 				}
-				return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Repeat<_Expression, _MinCount, _MaxCount>::Name.m_Value, start_iter, iter, std::move(children)), std::move(errors));
+				return ParseResult(AbstractSyntaxTree::AbstractSyntaxTreeNode(Grammar::Repeat<_Expression, _MinCount, _MaxCount, _IsAggressive>::Name.m_Value, start_iter, iter, std::move(children)), std::move(errors));
 			}
 		};
 

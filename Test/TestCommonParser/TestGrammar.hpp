@@ -26,11 +26,18 @@ TEST(Grammar, IsExpressionTest)
 	static_assert(!Parser::Grammar::IsExpression<int>);
 }
 
+TEST(Grammar, ExpressionTest)
+{
+	static_assert(Parser::Grammar::IsExpression<Parser::Grammar::Expression>);
+	static_assert(IsSameCString(Parser::Grammar::Expression::Name.m_Value, SGE_STR("Expression")));
+}
+
 TEST(Grammar, MatchTokenTypeTest)
 {
 	using Expression = Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(Expression::Type == Lexer::TokenTypes::Identifier);
+	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("MatchTokenType<1>")));
 }
 
 TEST(Grammar, MatchTokenTypeAndContentTest)
@@ -39,6 +46,7 @@ TEST(Grammar, MatchTokenTypeAndContentTest)
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(Expression::Type == Lexer::TokenTypes::Identifier);
 	static_assert(IsSameCString(Expression::Content.m_Value, SGE_STR("test")));
+	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("MatchTokenTypeAndContent<1, test>")));
 }
 
 TEST(Grammar, SequenceTest)
@@ -50,6 +58,7 @@ TEST(Grammar, SequenceTest)
 	static_assert(std::same_as<Expression::Expressions, TypeList<
 															Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>,
 															Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
+	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("Sequence<MatchTokenType<1>, MatchTokenTypeAndContent<2, 123>>")));
 }
 
 TEST(Grammar, SelectTest)
@@ -61,6 +70,7 @@ TEST(Grammar, SelectTest)
 	static_assert(std::same_as<Expression::Expressions, TypeList<
 															Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>,
 															Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::IntegerLiteral, SGE_STR("123")>>>);
+	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("Select<MatchTokenType<1>, MatchTokenTypeAndContent<2, 123>>")));
 }
 
 TEST(Grammar, NegateTest)
@@ -68,6 +78,7 @@ TEST(Grammar, NegateTest)
 	using Expression = Parser::Grammar::Negate<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>);
+	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("Negate<MatchTokenType<1>>")));
 }
 
 TEST(Grammar, OptionalTest)
@@ -75,6 +86,7 @@ TEST(Grammar, OptionalTest)
 	using Expression = Parser::Grammar::Optional<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
 	static_assert(Parser::Grammar::IsExpression<Expression>);
 	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>);
+	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("Optional<MatchTokenType<1>>")));
 }
 
 TEST(Grammar, RepeatTest)
@@ -84,12 +96,16 @@ TEST(Grammar, RepeatTest)
 	static_assert(std::same_as<Expression::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>);
 	static_assert(Expression::MinCount == 0);
 	static_assert(Expression::MaxCount == UINT64_MAX);
+	static_assert(Expression::IsAggressive == false);
+	static_assert(IsSameCString(Expression::Name.m_Value, SGE_STR("Repeat<MatchTokenType<1>, 0, 18446744073709551615, false>")));
 
-	using Expression2 = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>, 1, 10>;
+	using Expression2 = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>, 1, 10, true>;
 	static_assert(Parser::Grammar::IsExpression<Expression2>);
 	static_assert(std::same_as<Expression2::Expression, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>);
 	static_assert(Expression2::MinCount == 1);
 	static_assert(Expression2::MaxCount == 10);
+	static_assert(Expression2::IsAggressive == true);
+	static_assert(IsSameCString(Expression2::Name.m_Value, SGE_STR("Repeat<MatchTokenType<2>, 1, 10, true>")));
 }
 
 TEST(Grammar, RuleTest)

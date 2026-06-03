@@ -200,47 +200,94 @@ TEST(AbstractSyntaxTreePrinter, OptionalExpressionTest)
 
 TEST(AbstractSyntaxTreePrinter, RepeatExpressionTest)
 {
-	// Repeat<MatchTokenType<1>, 0, 10>::Name.m_Value == "Repeat<MatchTokenType<1>, 0, 10>"
 	using InnerExpression = Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>;
-	using RepeatExpression = Parser::Grammar::Repeat<InnerExpression, 0, 10>;
 
-	Vector<Lexer::Token> tokens;
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("bar"), 1, 5));
-	tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("baz"), 1, 9));
-
-	auto begin = tokens.GetConstBegin();
-	auto end = tokens.GetConstEnd();
-	auto mid1 = begin + 1;
-	auto mid2 = begin + 2;
-
-	// Case 1: three repetitions
+	// Conservative (IsAggressive=false): Repeat<MatchTokenType<1>, 0, 10, false>
 	{
-		Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
-		children.EmplaceBack(InnerExpression::Name.m_Value, begin, mid1, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
-		children.EmplaceBack(InnerExpression::Name.m_Value, mid1, mid2, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
-		children.EmplaceBack(InnerExpression::Name.m_Value, mid2, end, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
+		using RepeatExpression = Parser::Grammar::Repeat<InnerExpression, 0, 10>;
 
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode node(RepeatExpression::Name.m_Value, begin, end, std::move(children));
+		Vector<Lexer::Token> tokens;
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("bar"), 1, 5));
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("baz"), 1, 9));
 
-		CumulateStream<> stream;
-		StreamReader<StringSerializer<String>> reader(stream);
-		Parser::AbstractSyntaxTree::PrintAbstractSyntaxTree(stream, node);
+		auto begin = tokens.GetConstBegin();
+		auto end = tokens.GetConstEnd();
+		auto mid1 = begin + 1;
+		auto mid2 = begin + 2;
 
-		String result = reader.ReadAll();
-		ASSERT_EQ(result, SGE_STR("Repeat<MatchTokenType<1>, 0, 10>\t<line:1, column:1>\n\tMatchTokenType<1>\t<line:1, column:1>\n\tMatchTokenType<1>\t<line:1, column:5>\n\tMatchTokenType<1>\t<line:1, column:9>\n"));
+		// Case 1: three repetitions
+		{
+			Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+			children.EmplaceBack(InnerExpression::Name.m_Value, begin, mid1, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
+			children.EmplaceBack(InnerExpression::Name.m_Value, mid1, mid2, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
+			children.EmplaceBack(InnerExpression::Name.m_Value, mid2, end, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
+
+			Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode node(RepeatExpression::Name.m_Value, begin, end, std::move(children));
+
+			CumulateStream<> stream;
+			StreamReader<StringSerializer<String>> reader(stream);
+			Parser::AbstractSyntaxTree::PrintAbstractSyntaxTree(stream, node);
+
+			String result = reader.ReadAll();
+			ASSERT_EQ(result, SGE_STR("Repeat<MatchTokenType<1>, 0, 10, false>\t<line:1, column:1>\n\tMatchTokenType<1>\t<line:1, column:1>\n\tMatchTokenType<1>\t<line:1, column:5>\n\tMatchTokenType<1>\t<line:1, column:9>\n"));
+		}
+
+		// Case 2: zero repetitions — no children; zero-length span, begin still valid
+		{
+			Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode node(RepeatExpression::Name.m_Value, begin, begin, {});
+
+			CumulateStream<> stream;
+			StreamReader<StringSerializer<String>> reader(stream);
+			Parser::AbstractSyntaxTree::PrintAbstractSyntaxTree(stream, node);
+
+			String result = reader.ReadAll();
+			ASSERT_EQ(result, SGE_STR("Repeat<MatchTokenType<1>, 0, 10, false>\t<line:1, column:1>\n"));
+		}
 	}
 
-	// Case 2: zero repetitions — no children; zero-length span, begin still valid
+	// Aggressive (IsAggressive=true): Repeat<MatchTokenType<1>, 1, 5, true>
 	{
-		Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode node(RepeatExpression::Name.m_Value, begin, begin, {});
+		using RepeatExpression = Parser::Grammar::Repeat<InnerExpression, 1, 5, true>;
 
-		CumulateStream<> stream;
-		StreamReader<StringSerializer<String>> reader(stream);
-		Parser::AbstractSyntaxTree::PrintAbstractSyntaxTree(stream, node);
+		Vector<Lexer::Token> tokens;
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
+		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("bar"), 1, 5));
 
-		String result = reader.ReadAll();
-		ASSERT_EQ(result, SGE_STR("Repeat<MatchTokenType<1>, 0, 10>\t<line:1, column:1>\n"));
+		auto begin = tokens.GetConstBegin();
+		auto mid = begin + 1;
+		auto end = tokens.GetConstEnd();
+
+		// Case 3: two repetitions (aggressive, no panic)
+		{
+			Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+			children.EmplaceBack(InnerExpression::Name.m_Value, begin, mid, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
+			children.EmplaceBack(InnerExpression::Name.m_Value, mid, end, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
+
+			Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode node(RepeatExpression::Name.m_Value, begin, end, std::move(children));
+
+			CumulateStream<> stream;
+			StreamReader<StringSerializer<String>> reader(stream);
+			Parser::AbstractSyntaxTree::PrintAbstractSyntaxTree(stream, node);
+
+			String result = reader.ReadAll();
+			ASSERT_EQ(result, SGE_STR("Repeat<MatchTokenType<1>, 1, 5, true>\t<line:1, column:1>\n\tMatchTokenType<1>\t<line:1, column:1>\n\tMatchTokenType<1>\t<line:1, column:5>\n"));
+		}
+
+		// Case 4: single repetition — minimum satisfied
+		{
+			Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode> children;
+			children.EmplaceBack(InnerExpression::Name.m_Value, begin, mid, Vector<Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode>{});
+
+			Parser::AbstractSyntaxTree::AbstractSyntaxTreeNode node(RepeatExpression::Name.m_Value, begin, mid, std::move(children));
+
+			CumulateStream<> stream;
+			StreamReader<StringSerializer<String>> reader(stream);
+			Parser::AbstractSyntaxTree::PrintAbstractSyntaxTree(stream, node);
+
+			String result = reader.ReadAll();
+			ASSERT_EQ(result, SGE_STR("Repeat<MatchTokenType<1>, 1, 5, true>\t<line:1, column:1>\n\tMatchTokenType<1>\t<line:1, column:1>\n"));
+		}
 	}
 }
 
@@ -312,11 +359,11 @@ TEST(AbstractSyntaxTreePrinter, NestedSequenceExpressionTest)
 	// OuterSeq name: "Sequence<Sequence<MatchTokenType<1>, MatchTokenTypeAndContent<1, fn>>, MatchTokenType<2>>"
 	// InnerSeq name: "Sequence<MatchTokenType<1>, MatchTokenTypeAndContent<1, fn>>"
 	ASSERT_EQ(result,
-		SGE_STR("Sequence<Sequence<MatchTokenType<1>, MatchTokenTypeAndContent<1, fn>>, MatchTokenType<2>>\t<line:1, column:1>\n")
-		SGE_STR("\tSequence<MatchTokenType<1>, MatchTokenTypeAndContent<1, fn>>\t<line:1, column:1>\n")
-		SGE_STR("\t\tMatchTokenType<1>\t<line:1, column:1>\n")
-		SGE_STR("\t\tMatchTokenTypeAndContent<1, fn>\t<line:1, column:5>\n")
-		SGE_STR("\tMatchTokenType<2>\t<line:1, column:8>\n"));
+			  SGE_STR("Sequence<Sequence<MatchTokenType<1>, MatchTokenTypeAndContent<1, fn>>, MatchTokenType<2>>\t<line:1, column:1>\n")
+				  SGE_STR("\tSequence<MatchTokenType<1>, MatchTokenTypeAndContent<1, fn>>\t<line:1, column:1>\n")
+					  SGE_STR("\t\tMatchTokenType<1>\t<line:1, column:1>\n")
+						  SGE_STR("\t\tMatchTokenTypeAndContent<1, fn>\t<line:1, column:5>\n")
+							  SGE_STR("\tMatchTokenType<2>\t<line:1, column:8>\n"));
 }
 
 TEST(AbstractSyntaxTreePrinter, RuleWithSequenceBodyTest)
@@ -354,8 +401,8 @@ TEST(AbstractSyntaxTreePrinter, RuleWithSequenceBodyTest)
 	String result = reader.ReadAll();
 	// BodyExpr name: "Sequence<MatchTokenTypeAndContent<1, fn>, MatchTokenType<1>>"
 	ASSERT_EQ(result,
-		SGE_STR("func_decl\t<line:1, column:1>\n")
-		SGE_STR("\tSequence<MatchTokenTypeAndContent<1, fn>, MatchTokenType<1>>\t<line:1, column:1>\n")
-		SGE_STR("\t\tMatchTokenTypeAndContent<1, fn>\t<line:1, column:1>\n")
-		SGE_STR("\t\tMatchTokenType<1>\t<line:1, column:4>\n"));
+			  SGE_STR("func_decl\t<line:1, column:1>\n")
+				  SGE_STR("\tSequence<MatchTokenTypeAndContent<1, fn>, MatchTokenType<1>>\t<line:1, column:1>\n")
+					  SGE_STR("\t\tMatchTokenTypeAndContent<1, fn>\t<line:1, column:1>\n")
+						  SGE_STR("\t\tMatchTokenType<1>\t<line:1, column:4>\n"));
 }

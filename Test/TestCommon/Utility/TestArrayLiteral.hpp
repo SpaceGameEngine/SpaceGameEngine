@@ -106,51 +106,63 @@ TEST(ArrayLiteral, JoinCStringLiteralsTest)
 	ASSERT_TRUE(memcmp(u8join4.m_Value, SGE_U8STR("one, two, three, four"), 22 * sizeof(Char8)) == 0);
 
 	// composable with ToCStringLiteral
-	constexpr auto composed = JoinCStringLiterals(ArrayLiteral(SGE_WSTR("=")), ArrayLiteral(SGE_WSTR("val")), ToCStringLiteral<42, Char16>());
+	constexpr auto composed = JoinCStringLiterals(ArrayLiteral(SGE_WSTR("=")), ArrayLiteral(SGE_WSTR("val")), IntegerToCStringLiteral<42, Char16>());
 	// "val"=4, "="=2, "42"=3 -> "val=42"=7
 	ASSERT_EQ(decltype(composed)::Size, 7);
 	ASSERT_TRUE(memcmp(composed.m_Value, SGE_WSTR("val=42"), 7 * sizeof(Char16)) == 0);
 }
 
-TEST(ArrayLiteral, ToCStringLiteralTest)
+TEST(ArrayLiteral, IntegerToCStringLiteralTest)
 {
 	// zero
-	constexpr auto zero = ToCStringLiteral<0, Char16>();
+	constexpr auto zero = IntegerToCStringLiteral<0, Char16>();
 	ASSERT_EQ(decltype(zero)::Size, 2);
 	ASSERT_TRUE(memcmp(zero.m_Value, SGE_WSTR("0"), 2 * sizeof(Char16)) == 0);
 
 	// positive decimal (Char16)
-	constexpr auto pos = ToCStringLiteral<42, Char16>();
+	constexpr auto pos = IntegerToCStringLiteral<42, Char16>();
 	ASSERT_EQ(decltype(pos)::Size, 3);
 	ASSERT_TRUE(memcmp(pos.m_Value, SGE_WSTR("42"), 3 * sizeof(Char16)) == 0);
 
 	// negative decimal (Char16)
-	constexpr auto neg = ToCStringLiteral<-42, Char16>();
+	constexpr auto neg = IntegerToCStringLiteral<-42, Char16>();
 	ASSERT_EQ(decltype(neg)::Size, 4);
 	ASSERT_TRUE(memcmp(neg.m_Value, SGE_WSTR("-42"), 4 * sizeof(Char16)) == 0);
 
 	// positive decimal (Char8)
-	constexpr auto pos_u8 = ToCStringLiteral<1234, Char8>();
+	constexpr auto pos_u8 = IntegerToCStringLiteral<1234, Char8>();
 	ASSERT_EQ(decltype(pos_u8)::Size, 5);
 	ASSERT_TRUE(memcmp(pos_u8.m_Value, SGE_U8STR("1234"), 5 * sizeof(Char8)) == 0);
 
 	// negative decimal (Char8)
-	constexpr auto neg_u8 = ToCStringLiteral<-1, Char8>();
+	constexpr auto neg_u8 = IntegerToCStringLiteral<-1, Char8>();
 	ASSERT_EQ(decltype(neg_u8)::Size, 3);
 	ASSERT_TRUE(memcmp(neg_u8.m_Value, SGE_U8STR("-1"), 3 * sizeof(Char8)) == 0);
 
 	// hexadecimal (base 16)
-	constexpr auto hex = ToCStringLiteral<255, Char16, 16>();
+	constexpr auto hex = IntegerToCStringLiteral<255, Char16, 16>();
 	ASSERT_EQ(decltype(hex)::Size, 3);
 	ASSERT_TRUE(memcmp(hex.m_Value, SGE_WSTR("ff"), 3 * sizeof(Char16)) == 0);
 
 	// binary (base 2)
-	constexpr auto bin = ToCStringLiteral<0b1010, Char16, 2>();
+	constexpr auto bin = IntegerToCStringLiteral<0b1010, Char16, 2>();
 	ASSERT_EQ(decltype(bin)::Size, 5);
 	ASSERT_TRUE(memcmp(bin.m_Value, SGE_WSTR("1010"), 5 * sizeof(Char16)) == 0);
 
 	// octal (base 8)
-	constexpr auto oct = ToCStringLiteral<0777, Char16, 8>();
+	constexpr auto oct = IntegerToCStringLiteral<0777, Char16, 8>();
 	ASSERT_EQ(decltype(oct)::Size, 4);
 	ASSERT_TRUE(memcmp(oct.m_Value, SGE_WSTR("777"), 4 * sizeof(Char16)) == 0);
+}
+
+TEST(ArrayLiteral, BoolToCStringLiteralTest)
+{
+	// true
+	constexpr auto true_literal = BoolToCStringLiteral<true, Char16>();
+	ASSERT_EQ(decltype(true_literal)::Size, 5);
+	ASSERT_TRUE(memcmp(true_literal.m_Value, SGE_WSTR("true"), 5 * sizeof(Char16)) == 0);
+	// false
+	constexpr auto false_literal = BoolToCStringLiteral<false, Char8>();
+	ASSERT_EQ(decltype(false_literal)::Size, 6);
+	ASSERT_TRUE(memcmp(false_literal.m_Value, SGE_U8STR("false"), 6 * sizeof(Char8)) == 0);
 }

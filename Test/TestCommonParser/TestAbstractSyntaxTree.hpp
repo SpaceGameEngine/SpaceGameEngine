@@ -90,6 +90,6 @@ TEST(AbstractSyntaxTreeNode, VisitTest)
 			++count;
 		},
 		root);
-	// child0 [begin, begin+1) and grandchild [begin+1, end) each span 1 token
+	// child0 [begin, begin+1) and child1/grandchild [begin+1, end) each span 1 token
 	ASSERT_EQ(count, 3);
 }
