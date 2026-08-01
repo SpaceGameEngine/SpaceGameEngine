@@ -31,36 +31,16 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		using Symbol = Rule<SGE_STR("Symbol"), MatchTokenType<Assembler::TokenTypes::SymbolIdentifier>>;
 
 		using VariableIdentifier = Rule<SGE_STR("VariableIdentifier"),
-										Sequence<
-											MatchTokenType<CommonParser::Lexer::TokenTypes::Mod>,
-											MatchTokenType<CommonParser::Lexer::TokenTypes::Identifier>>>;
-
-		using VariableDefinition = Rule<SGE_STR("VariableDefinition"),
-										Sequence<
-											RuleReference<SGE_STR("VariableIdentifier")>,
-											Grammar::Optional<
-												Sequence<
-													MatchTokenType<CommonParser::Lexer::TokenTypes::Colon>,
-													RuleReference<SGE_STR("Symbol")>>>>>;
+										MatchTokenType<CommonParser::Lexer::TokenTypes::Identifier>>;
 
 		using ParameterDefinition = Rule<SGE_STR("ParameterDefinition"),
 										 Sequence<
 											 RuleReference<SGE_STR("VariableIdentifier")>,
 											 Sequence<
 												 MatchTokenType<CommonParser::Lexer::TokenTypes::Colon>,
-												 RuleReference<SGE_STR("Symbol")>>>>;
-
-		using ParameterDefinitions = Rule<SGE_STR("ParameterDefinitions"),
-										  Sequence<
-											  MatchTokenType<CommonParser::Lexer::TokenTypes::LeftBracket>,
-											  Grammar::Optional<
-												  Sequence<
-													  RuleReference<SGE_STR("ParameterDefinition")>,
-													  Repeat<
-														  Sequence<
-															  MatchTokenType<CommonParser::Lexer::TokenTypes::Comma>,
-															  RuleReference<SGE_STR("ParameterDefinition")>>>>>,
-											  MatchTokenType<CommonParser::Lexer::TokenTypes::RightBracket>>>;
+												 Select<
+													 RuleReference<SGE_STR("Symbol")>,
+													 RuleReference<SGE_STR("VariableIdentifier")>>>>>;
 
 		using Block = Rule<SGE_STR("Block"),
 						   Sequence<
@@ -71,8 +51,10 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 
 		using Argument = Rule<SGE_STR("Argument"),
 							  Select<
+								  RuleReference<SGE_STR("Symbol")>,
 								  RuleReference<SGE_STR("VariableIdentifier")>,
-								  RuleReference<SGE_STR("ParameterDefinitions")>,
+								  RuleReference<SGE_STR("ParameterDefinition")>,
+								  RuleReference<SGE_STR("ArgumentList")>,
 								  RuleReference<SGE_STR("Block")>,
 								  MatchTokenType<CommonParser::Lexer::TokenTypes::IntegerLiteral>,
 								  MatchTokenType<CommonParser::Lexer::TokenTypes::FloatLiteral>,
@@ -80,9 +62,21 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 								  MatchTokenType<CommonParser::Lexer::TokenTypes::StringLiteral>,
 								  MatchTokenType<Assembler::TokenTypes::BooleanLiteral>>>;
 
+		using ArgumentList = Rule<SGE_STR("ArgumentList"),
+								  Sequence<
+									  MatchTokenType<CommonParser::Lexer::TokenTypes::LeftBracket>,
+									  Grammar::Optional<
+										  Sequence<
+											  RuleReference<SGE_STR("Argument")>,
+											  Repeat<
+												  Sequence<
+													  MatchTokenType<CommonParser::Lexer::TokenTypes::Comma>,
+													  RuleReference<SGE_STR("Argument")>>>>>,
+									  MatchTokenType<CommonParser::Lexer::TokenTypes::RightBracket>>>;
+
 		using Statement = Rule<SGE_STR("Statement"),
 							   Sequence<
-								   RuleReference<SGE_STR("VariableDefinition")>,
+								   RuleReference<SGE_STR("VariableIdentifier")>,
 								   MatchTokenType<CommonParser::Lexer::TokenTypes::Equal>,
 								   Grammar::Optional<RuleReference<SGE_STR("AttributeDictionary")>>,
 								   RuleReference<SGE_STR("Symbol")>,
@@ -122,11 +116,10 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 
 		using AssemblerLanguage = Language<Symbol,
 										   VariableIdentifier,
-										   VariableDefinition,
 										   ParameterDefinition,
-										   ParameterDefinitions,
 										   Block,
 										   Argument,
+										   ArgumentList,
 										   Statement,
 										   AttributeValue,
 										   AttributeDefinition,

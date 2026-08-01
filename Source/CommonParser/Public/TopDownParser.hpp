@@ -36,6 +36,7 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 		inline constexpr const SizeType RequireMoreRepetition = 1007;
 		inline constexpr const SizeType EnablePanicMode = 1008;
 		inline constexpr const SizeType DisablePanicMode = 1009;
+		inline constexpr const SizeType RemainingTokensAfterParsing = 1010;
 	}
 
 	namespace Detail
@@ -359,7 +360,10 @@ namespace SpaceGameEngine::CommonParser::Parser::TopDownParser
 	inline auto Parse(const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
 	{
 		auto iter = begin_iter;
-		return Detail::ParseCore<_Language, Grammar::RuleReference<RootRuleName>>::Parse(iter, begin_iter, end_iter);
+		auto res = Detail::ParseCore<_Language, Grammar::RuleReference<RootRuleName>>::Parse(iter, begin_iter, end_iter);
+		if (iter != end_iter)
+			res.m_Second.EmplaceBack(Detail::MakeOtherParserError(iter, begin_iter, ErrorTypeId::RemainingTokensAfterParsing, Vector<String>()));
+		return res;
 	}
 }
 

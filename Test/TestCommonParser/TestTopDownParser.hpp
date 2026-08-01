@@ -20,29 +20,28 @@ limitations under the License.
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonParser;
 
-template<typename _Expression>
-inline auto TestParseExpression(const Vector<Lexer::Token>::ConstIterator& begin_iter, const Vector<Lexer::Token>::ConstIterator& end_iter)
-{
-	auto iter = begin_iter;
-	return Parser::TopDownParser::Detail::ParseCore<Parser::Grammar::Language<>, _Expression>::Parse(iter, begin_iter, end_iter);
-}
-
 TEST(TopDownParser, MatchTokenTypeTest)
 {
 	using Expression = Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>;
+	using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+	using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 	// ParseSuccess
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), Expression::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 0);
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("root")));
+		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
 		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetName(), Expression::Name.m_Value));
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren().GetSize(), 0);
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstEnd());
 	}
 
 	// ParseFailUnexpectedTokenType
@@ -50,22 +49,25 @@ TEST(TopDownParser, MatchTokenTypeTest)
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second.GetSize(), 2);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 2);
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_Second[1].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[1].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[1].GetColumn(), 1);
 	}
 
 	// ParseFailUnexpectedEnd: empty stream (begin == end)
 	{
 		Vector<Lexer::Token> tokens;
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstEnd(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstEnd(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 1);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedEnd);
@@ -78,19 +80,25 @@ TEST(TopDownParser, MatchTokenTypeTest)
 TEST(TopDownParser, MatchTokenTypeAndContentTest)
 {
 	using Expression = Parser::Grammar::MatchTokenTypeAndContent<Lexer::TokenTypes::Identifier, SGE_STR("foo")>;
+	using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+	using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 	// ParseSuccess
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), Expression::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 0);
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("root")));
+		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
 		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetName(), Expression::Name.m_Value));
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren().GetSize(), 0);
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstEnd());
 	}
 
 	// ParseFailUnexpectedToken
@@ -98,9 +106,9 @@ TEST(TopDownParser, MatchTokenTypeAndContentTest)
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("bar"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second.GetSize(), 2);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedToken);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
@@ -109,13 +117,16 @@ TEST(TopDownParser, MatchTokenTypeAndContentTest)
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[1], SGE_STR("foo"));
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[2], ToString<String>(Lexer::TokenTypes::Identifier));
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[3], SGE_STR("bar"));
+		ASSERT_EQ(result.m_Second[1].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[1].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[1].GetColumn(), 1);
 	}
 
 	// ParseFailUnexpectedEnd: empty stream (begin == end)
 	{
 		Vector<Lexer::Token> tokens;
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstEnd(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstEnd(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 1);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedEnd);
@@ -130,6 +141,8 @@ TEST(TopDownParser, SequenceTest)
 	using Expression = Parser::Grammar::Sequence<
 		Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>,
 		Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>;
+	using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+	using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 	// ParseSuccess
 	{
@@ -137,21 +150,26 @@ TEST(TopDownParser, SequenceTest)
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), Expression::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 2);
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("root")));
+		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
 		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren().GetSize(), 0);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 1);
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[1].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetChildren().GetSize(), 0);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 1);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetEndTokenIter(), tokens.GetConstEnd());
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_TRUE(IsSameCString(expr_node.GetName(), Expression::Name.m_Value));
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 2);
+		ASSERT_EQ(expr_node.GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstEnd());
+		ASSERT_TRUE(IsSameCString(expr_node.GetChildren()[0].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>::Name.m_Value));
+		ASSERT_EQ(expr_node.GetChildren()[0].GetChildren().GetSize(), 0);
+		ASSERT_EQ(expr_node.GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_TRUE(IsSameCString(expr_node.GetChildren()[1].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>::Name.m_Value));
+		ASSERT_EQ(expr_node.GetChildren()[1].GetChildren().GetSize(), 0);
+		ASSERT_EQ(expr_node.GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_EQ(expr_node.GetChildren()[1].GetEndTokenIter(), tokens.GetConstEnd());
 	}
 
 	// ParseFailOnFirstExpression: first token is IntegerLiteral, expected Identifier
@@ -160,10 +178,10 @@ TEST(TopDownParser, SequenceTest)
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("99"), 1, 4));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		// Sequence: first child fails -> RequireExpression then inner UnexpectedTokenType
-		ASSERT_EQ(result.m_Second.GetSize(), 2);
+		// Sequence: first child fails -> RequireExpression then inner UnexpectedTokenType; iter restored to (1,1) -> RemainingTokensAfterParsing
+		ASSERT_EQ(result.m_Second.GetSize(), 3);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
@@ -175,6 +193,9 @@ TEST(TopDownParser, SequenceTest)
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation().GetSize(), 2);
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_Second[2].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[2].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[2].GetColumn(), 1);
 	}
 
 	// ParseFailOnSecondExpression: second token is Identifier, expected IntegerLiteral
@@ -183,10 +204,10 @@ TEST(TopDownParser, SequenceTest)
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("bar"), 1, 5));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		// Sequence: second child fails -> RequireExpression then inner UnexpectedTokenType
-		ASSERT_EQ(result.m_Second.GetSize(), 2);
+		// Sequence: second child fails -> RequireExpression then inner UnexpectedTokenType; iter restored to (1,1) -> RemainingTokensAfterParsing
+		ASSERT_EQ(result.m_Second.GetSize(), 3);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[0].GetColumn(), 5);
@@ -198,6 +219,9 @@ TEST(TopDownParser, SequenceTest)
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation().GetSize(), 2);
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::Identifier));
+		ASSERT_EQ(result.m_Second[2].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[2].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[2].GetColumn(), 1);
 	}
 
 	// ParseFailUnexpectedEnd: first token matches Identifier, second is missing; error position follows last token
@@ -205,10 +229,10 @@ TEST(TopDownParser, SequenceTest)
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		// Sequence: second child hits UnexpectedEnd -> RequireExpression then UnexpectedEnd
-		ASSERT_EQ(result.m_Second.GetSize(), 2);
+		// Sequence: second child hits UnexpectedEnd -> RequireExpression then UnexpectedEnd; iter restored to (1,1) -> RemainingTokensAfterParsing
+		ASSERT_EQ(result.m_Second.GetSize(), 3);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 1);
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[0], Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>::Name.m_Value);
@@ -217,6 +241,9 @@ TEST(TopDownParser, SequenceTest)
 		ASSERT_EQ(result.m_Second[1].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[1].GetColumn(), 4);
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation().GetSize(), 0);
+		ASSERT_EQ(result.m_Second[2].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[2].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[2].GetColumn(), 1);
 	}
 }
 
@@ -225,21 +252,26 @@ TEST(TopDownParser, SelectTest)
 	using Expression = Parser::Grammar::Select<
 		Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>,
 		Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>;
+	using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+	using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 	// ParseSuccessFirstAlternative
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
 		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstEnd());
+		// children[0] is the Expression (Select) node
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetName(), Expression::Name.m_Value));
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren().GetSize(), 1);
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetChildren()[0].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>::Name.m_Value));
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren()[0].GetEndTokenIter(), tokens.GetConstEnd());
 	}
 
 	// ParseSuccessSecondAlternative
@@ -247,15 +279,17 @@ TEST(TopDownParser, SelectTest)
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
 		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstEnd());
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetName(), Expression::Name.m_Value));
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren().GetSize(), 1);
+		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetChildren()[0].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>::Name.m_Value));
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren()[0].GetEndTokenIter(), tokens.GetConstEnd());
 	}
 
 	// ParseFailNoAlternativeMatches: each branch produces one error, merged in order
@@ -263,10 +297,10 @@ TEST(TopDownParser, SelectTest)
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Semicolon, SGE_STR(";"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		// Each failed branch appends UnsatisfiedExpression then its inner error, so 4 errors total
-		ASSERT_EQ(result.m_Second.GetSize(), 4);
+		// Each failed branch appends UnsatisfiedExpression then its inner error; iter stays at (1,1) -> RemainingTokensAfterParsing
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
 		// First branch: UnsatisfiedExpression for Identifier alternative
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnsatisfiedExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -293,6 +327,9 @@ TEST(TopDownParser, SelectTest)
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation().GetSize(), 2);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::Semicolon));
+		ASSERT_EQ(result.m_Second[4].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[4].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[4].GetColumn(), 1);
 	}
 
 	// Priority tests: language with two synchronous-point rules as Select alternatives.
@@ -349,8 +386,12 @@ TEST(TopDownParser, SelectTest)
 
 		auto result = Parser::TopDownParser::Parse<SelectLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		// clean success: no errors
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		// clean success: rule_b consumed "42", but "fn", "bar", ";" remain unconsumed
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 4);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 0);
 		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("root")));
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
 		// children[0] is the Select node; children[0].GetChildren()[0] is the matched rule
@@ -374,8 +415,8 @@ TEST(TopDownParser, SelectTest)
 
 		auto result = Parser::TopDownParser::Parse<SelectLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		// rule_a panic result is returned: errors = RequireExpression + UnexpectedToken + EnablePanicMode + DisablePanicMode
-		ASSERT_EQ(result.m_Second.GetSize(), 4);
+		// rule_a panic result is returned: errors = RequireExpression + UnexpectedToken + EnablePanicMode + DisablePanicMode + RemainingTokensAfterParsing
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
 		// rule_a Sequence: MatchTokenTypeAndContent<Identifier,"fn"> fails on Semicolon at (1,1)
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -402,6 +443,11 @@ TEST(TopDownParser, SelectTest)
 		ASSERT_EQ(result.m_Second[3].GetColumn(), 9);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation().GetSize(), 1);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[0], SGE_STR("rule_a"));
+		// iter was restored to begin after storing panic result; all 4 tokens remain unconsumed
+		ASSERT_EQ(result.m_Second[4].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[4].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[4].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[4].GetAdditionalInformation().GetSize(), 0);
 		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("root")));
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
 		// children[0] is the Select node; children[0].GetChildren()[0] is the matched rule
@@ -415,7 +461,7 @@ TEST(TopDownParser, SelectTest)
 		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 3);
 	}
 
-	// ParseSuccessFirstPanicWinsOverSecondPanic: both alternatives enter panic mode from the same bad token.
+	// ParseSuccessFirstPanicWinsOverSecondPanic
 	// "rule_a" recovers on "fn baz", "rule_b" could also recover on IntegerLiteral further ahead,
 	// but "rule_a" is listed first so its panic result is chosen.
 	{
@@ -428,8 +474,8 @@ TEST(TopDownParser, SelectTest)
 
 		auto result = Parser::TopDownParser::Parse<SelectLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		// rule_a panic result is returned: errors = RequireExpression + UnexpectedToken + EnablePanicMode + DisablePanicMode
-		ASSERT_EQ(result.m_Second.GetSize(), 4);
+		// rule_a panic result is returned: errors = RequireExpression + UnexpectedToken + EnablePanicMode + DisablePanicMode + RemainingTokensAfterParsing
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
 		// rule_a Sequence: MatchTokenTypeAndContent<Identifier,"fn"> fails on Semicolon at (1,1)
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -456,6 +502,12 @@ TEST(TopDownParser, SelectTest)
 		ASSERT_EQ(result.m_Second[3].GetColumn(), 10);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation().GetSize(), 1);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[0], SGE_STR("rule_a"));
+		// iter was restored to begin after storing panic result; all 5 tokens remain unconsumed
+		ASSERT_EQ(result.m_Second[4].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[4].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[4].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[4].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[4].GetAdditionalInformation().GetSize(), 0);
 		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("root")));
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
 		// children[0] is the Select node; children[0].GetChildren()[0] is the matched rule
@@ -474,69 +526,88 @@ TEST(TopDownParser, SelectTest)
 TEST(TopDownParser, NegateTest)
 {
 	using Expression = Parser::Grammar::Negate<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
+	using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+	using TestLang = Parser::Grammar::Language<TestRootRule>;
 
-	// ParseSuccessWhenInnerFails: negate succeeds, inner errors are discarded
+	// ParseSuccessWhenInnerFails: negate succeeds, inner errors are discarded;
+	// Negate does not consume any token, so iter stays at "42" -> RemainingTokensAfterParsing is appended.
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), Expression::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 0);
-		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_TRUE(IsSameCString(expr_node.GetName(), Expression::Name.m_Value));
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 0);
+		ASSERT_EQ(expr_node.GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstBegin());
 	}
 
-	// ParseFailWhenInnerSucceeds
+	// ParseFailWhenInnerSucceeds: iter stays at "foo" -> RemainingTokensAfterParsing is also appended
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second.GetSize(), 2);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::InvalidExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 1);
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[0], String(Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>::Name.m_Value));
+		ASSERT_EQ(result.m_Second[1].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[1].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[1].GetColumn(), 1);
 	}
 }
 
 TEST(TopDownParser, OptionalTest)
 {
 	using Expression = Parser::Grammar::Optional<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
+	using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+	using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 	// ParseSuccessWhenInnerSucceeds
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("foo"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
 		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
-		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetChildren()[0].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>::Name.m_Value));
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstEnd());
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_TRUE(IsSameCString(expr_node.GetName(), Expression::Name.m_Value));
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 1);
+		ASSERT_TRUE(IsSameCString(expr_node.GetChildren()[0].GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>::Name.m_Value));
+		ASSERT_EQ(expr_node.GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetChildren()[0].GetEndTokenIter(), tokens.GetConstEnd());
 	}
 
-	// ParseSuccessWhenInnerFails: inner error is swallowed, empty node returned with no errors
+	// ParseSuccessWhenInnerFails: inner error is swallowed, empty node returned;
+	// Optional does not consume any token, so iter stays at "42" -> RemainingTokensAfterParsing is appended.
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 0);
-		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstBegin());
-		// inner expression failed but Optional swallows the error and returns empty node with no errors
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 0);
+		ASSERT_EQ(expr_node.GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
 	}
 
 	// ParseSuccessWhenInnerPanics: inner synchronous-point rule succeeds via panic recovery (has errors),
@@ -574,8 +645,6 @@ TEST(TopDownParser, OptionalTest)
 
 		auto result = Parser::TopDownParser::Parse<OptLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		// no errors: Optional discarded the panic result silently, IntegerLiteral matched cleanly
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
 		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("root")));
 		// root wraps the Sequence node
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
@@ -591,9 +660,16 @@ TEST(TopDownParser, OptionalTest)
 		ASSERT_TRUE(IsSameCString(int_node.GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>::Name.m_Value));
 		ASSERT_EQ(int_node.GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(int_node.GetEndTokenIter(), tokens.GetConstBegin() + 1);
-		// Sequence covers "42" only; "fn", "bar", ";" are unconsumed
+		// Sequence covers "42" only; "fn", "bar", ";" are unconsumed; iter stays at "fn"(1,4)
 		ASSERT_EQ(seq.GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(seq.GetEndTokenIter(), tokens.GetConstBegin() + 1);
+		// Optional discarded the panic result silently, IntegerLiteral matched cleanly;
+		// "fn"(1,4), "bar"(1,7), ";"(1,10) remain unconsumed -> RemainingTokensAfterParsing
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 4);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 0);
 	}
 }
 
@@ -604,80 +680,97 @@ TEST(TopDownParser, RepeatTest)
 	// ============================================================
 
 	// ParseSuccessZeroOrMore: matches 2 identifiers, stops on IntegerLiteral;
-	// count(2) >= minCount(0) so iter is restored and no error is forwarded.
+	// count(2) >= minCount(0) so iter is restored before IntegerLiteral -> RemainingTokensAfterParsing.
 	{
 		using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("b"), 1, 3));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 2);
-		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstBegin() + 2);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 1);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 1);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetEndTokenIter(), tokens.GetConstBegin() + 2);
-		// stop error is no longer forwarded; iter restored before IntegerLiteral
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 2);
+		ASSERT_EQ(expr_node.GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstBegin() + 2);
+		ASSERT_EQ(expr_node.GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_EQ(expr_node.GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_EQ(expr_node.GetChildren()[1].GetEndTokenIter(), tokens.GetConstBegin() + 2);
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 5);
 	}
 
 	// ParseSuccessZeroMatches: immediately stops on IntegerLiteral;
-	// count(0) >= minCount(0) so iter is restored and no error is forwarded.
+	// count(0) >= minCount(0) so iter is restored before IntegerLiteral -> RemainingTokensAfterParsing.
 	{
 		using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 1));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 0);
-		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstBegin());
-		// stop error is no longer forwarded; iter restored before IntegerLiteral
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 0);
+		ASSERT_EQ(expr_node.GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
 	}
 
 	// ParseSuccessExactlyMinCount: matches 2, stops on IntegerLiteral;
-	// count(2) >= minCount(2) so iter is restored and no error is forwarded.
+	// count(2) >= minCount(2) so iter is restored before IntegerLiteral -> RemainingTokensAfterParsing.
 	{
 		using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>, 2, 5>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("b"), 1, 3));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 2);
-		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstBegin() + 2);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 1);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 1);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetEndTokenIter(), tokens.GetConstBegin() + 2);
-		// stop error is no longer forwarded; iter restored before IntegerLiteral
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 2);
+		ASSERT_EQ(expr_node.GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstBegin() + 2);
+		ASSERT_EQ(expr_node.GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_EQ(expr_node.GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_EQ(expr_node.GetChildren()[1].GetEndTokenIter(), tokens.GetConstBegin() + 2);
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 5);
 	}
 
 	// ParseFailBelowMinCount: matches 1, fails on 2nd (count(1) < minCount(2));
-	// RequireMoreRepetition is prepended before the inner error.
+	// RequireMoreRepetition is prepended before the inner error; iter at '42' -> RemainingTokensAfterParsing.
 	{
 		using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>, 2, 5>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 3));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_Second.GetSize(), 2);
+		ASSERT_EQ(result.m_Second.GetSize(), 3);
 		// RequireMoreRepetition is prepended first
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireMoreRepetition);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -693,45 +786,55 @@ TEST(TopDownParser, RepeatTest)
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation().GetSize(), 2);
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		// Repeat restores iter to start_iter ("a" at (1,1)) on failure -> RemainingTokensAfterParsing(1,1)
+		ASSERT_EQ(result.m_Second[2].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[2].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[2].GetColumn(), 1);
 	}
-
-	// ParseSuccessStreamEnds: matches all tokens then stream ends;
-	// count(2) >= minCount(0) so iter is restored (to end_iter) and no error is forwarded.
+	// count(2) >= minCount(0) and iter reaches end_iter -> no RemainingTokensAfterParsing.
 	{
 		using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("b"), 1, 3));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 2);
-		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstEnd());
-		// stream-end stop error is no longer forwarded
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 2);
+		ASSERT_EQ(expr_node.GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstEnd());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
 	}
 
-	// ParseSuccessUpToMaxCount: stops exactly at MaxCount=2, no failed parse attempt, no errors.
+	// ParseSuccessUpToMaxCount: stops exactly at MaxCount=2; iter at 'c'(1,5) -> RemainingTokensAfterParsing.
 	{
 		using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>, 1, 2>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("b"), 1, 3));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("c"), 1, 5));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 2);
-		ASSERT_EQ(result.m_First.Get().GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstBegin() + 2);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 1);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 1);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[1].GetEndTokenIter(), tokens.GetConstBegin() + 2);
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 2);
+		ASSERT_EQ(expr_node.GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstBegin() + 2);
+		ASSERT_EQ(expr_node.GetChildren()[0].GetBeginTokenIter(), tokens.GetConstBegin());
+		ASSERT_EQ(expr_node.GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_EQ(expr_node.GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 1);
+		ASSERT_EQ(expr_node.GetChildren()[1].GetEndTokenIter(), tokens.GetConstBegin() + 2);
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 5);
 	}
 
 	// ParseSuccessIterRestoredOnStop: verifies that iter is properly restored after the conservative stop,
@@ -741,23 +844,26 @@ TEST(TopDownParser, RepeatTest)
 	{
 		using RepeatExpr = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>, 0, 10>;
 		using SeqExpression = Parser::Grammar::Sequence<RepeatExpr, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), SeqExpression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("b"), 1, 3));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5));
 
-		auto result = TestParseExpression<SeqExpression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 2);
+		auto& seq_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(seq_node.GetChildren().GetSize(), 2);
 		// child[0]: Repeat node, covers "a"+"b"
-		auto& repeat_node = result.m_First.Get().GetChildren()[0];
+		auto& repeat_node = seq_node.GetChildren()[0];
 		ASSERT_EQ(repeat_node.GetChildren().GetSize(), 2);
 		ASSERT_EQ(repeat_node.GetBeginTokenIter(), tokens.GetConstBegin());
 		ASSERT_EQ(repeat_node.GetEndTokenIter(), tokens.GetConstBegin() + 2);
 		// child[1]: IntegerLiteral node, covers "42"; confirms iter was restored after Repeat
-		auto& int_node = result.m_First.Get().GetChildren()[1];
+		auto& int_node = seq_node.GetChildren()[1];
 		ASSERT_TRUE(IsSameCString(int_node.GetName(), Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>::Name.m_Value));
 		ASSERT_EQ(int_node.GetBeginTokenIter(), tokens.GetConstBegin() + 2);
 		ASSERT_EQ(int_node.GetEndTokenIter(), tokens.GetConstEnd());
@@ -799,8 +905,13 @@ TEST(TopDownParser, RepeatTest)
 
 		auto result = Parser::TopDownParser::Parse<RepeatLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		// no errors: panic stop is silent, IntegerLiteral matched cleanly after iter restore
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		// panic stop is silent; conservative Repeat restored iter to "42", IntegerLiteral consumed it;
+		// "fn"(1,11), "bar"(1,14), ";"(1,17) remain unconsumed -> RemainingTokensAfterParsing at "fn"(1,11)
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 11);
+		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 0);
 		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("root")));
 		// root wraps Sequence
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
@@ -822,7 +933,7 @@ TEST(TopDownParser, RepeatTest)
 		ASSERT_EQ(int_node.GetEndTokenIter(), tokens.GetConstBegin() + 3);
 	}
 
-	// ParseConservativePanicAcceptedBelowMinCount: when count < minCount, conservative ALSO accepts panic
+	// ParseConservativePanicAcceptedBelowMinCount
 	// results (HasValue + errors) — it accumulates the errors and pushes the child.
 	// Once the pushed child brings count to minCount, the next error (any kind) triggers the conservative
 	// stop: iter is restored and the loop exits cleanly with no additional errors.
@@ -862,7 +973,8 @@ TEST(TopDownParser, RepeatTest)
 		// Repeat end iter is restored to before ";" because iter 2 triggered the conservative stop
 		ASSERT_EQ(rep_cv.GetEndTokenIter(), tokens.GetConstBegin() + 3);
 		// panic errors from iter 1: RequireExpression + UnexpectedToken + EnablePanicMode + DisablePanicMode
-		ASSERT_EQ(result.m_Second.GetSize(), 4);
+		// + RemainingTokensAfterParsing because iter stops at ";"(1,10) after conservative stop
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
 		// [0] Sequence inside rep_elem_cv: MatchTokenTypeAndContent<fn> failed on "42"(1,1)
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -890,10 +1002,15 @@ TEST(TopDownParser, RepeatTest)
 		ASSERT_EQ(result.m_Second[3].GetColumn(), 10);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation().GetSize(), 1);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[0], SGE_STR("rep_elem_cv"));
+		// [4] conservative stop restored iter to ";"(1,10); that token remains unconsumed
+		ASSERT_EQ(result.m_Second[4].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[4].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[4].GetColumn(), 10);
+		ASSERT_EQ(result.m_Second[4].GetAdditionalInformation().GetSize(), 0);
 	}
 
 	// ============================================================
-	// Aggressive (IsAggressive = true)
+	// Aggressive
 	// ============================================================
 
 	// AggressiveAcceptsPanicResult: panic result (HasValue + errors) is accepted and pushed;
@@ -936,7 +1053,8 @@ TEST(TopDownParser, RepeatTest)
 		ASSERT_EQ(rep_node.GetChildren()[1].GetBeginTokenIter(), tokens.GetConstBegin() + 3);	 // after skipped "42"
 		ASSERT_EQ(rep_node.GetChildren()[1].GetEndTokenIter(), tokens.GetConstBegin() + 5);
 		// panic errors forwarded: RequireExpression + UnexpectedToken + EnablePanicMode + DisablePanicMode
-		ASSERT_EQ(result.m_Second.GetSize(), 4);
+		// + RemainingTokensAfterParsing because iter stops at ";"(1,18) after aggressive Repeat
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
 		// [0] Sequence inside rep_elem_ag: MatchTokenTypeAndContent<fn> failed on "42"(1,8)
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -964,36 +1082,50 @@ TEST(TopDownParser, RepeatTest)
 		ASSERT_EQ(result.m_Second[3].GetColumn(), 18);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation().GetSize(), 1);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[0], SGE_STR("rep_elem_ag"));
+		// [4] aggressive Repeat left iter at ";"(1,18); that token remains unconsumed
+		ASSERT_EQ(result.m_Second[4].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[4].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[4].GetColumn(), 18);
+		ASSERT_EQ(result.m_Second[4].GetAdditionalInformation().GetSize(), 0);
 	}
 
-	// AggressiveSuccessCleanOnly: clean-only tokens, no panic; same outcome as conservative.
+	// AggressiveSuccessCleanOnly: Repeat stops cleanly at '42'; iter stays at '42' -> RemainingTokensAfterParsing.
 	{
 		using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>, 0, 10, true>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("b"), 1, 3));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 2);
-		ASSERT_EQ(result.m_First.Get().GetEndTokenIter(), tokens.GetConstBegin() + 2);
-		ASSERT_EQ(result.m_Second.GetSize(), 0);
+		auto& expr_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(expr_node.GetChildren().GetSize(), 2);
+		ASSERT_EQ(expr_node.GetEndTokenIter(), tokens.GetConstBegin() + 2);
+		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[0].GetColumn(), 5);
 	}
 
 	// AggressiveFailBelowMinCount: matches 1 cleanly, next fails with no value;
-	// count(1) < minCount(2) -> RequireMoreRepetition prepended before inner error.
+	// count(1) < minCount(2) -> RequireMoreRepetition prepended before inner error;
+	// Repeat restores iter to start_iter ('a' at (1,1)) on failure -> RemainingTokensAfterParsing(1,1).
 	{
 		using Expression = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>, 2, 5, true>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), Expression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 3));
 
-		auto result = TestParseExpression<Expression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_Second.GetSize(), 2);
+		ASSERT_EQ(result.m_Second.GetSize(), 3);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireMoreRepetition);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[0].GetColumn(), 3);
@@ -1006,9 +1138,12 @@ TEST(TopDownParser, RepeatTest)
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation().GetSize(), 2);
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
 		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		ASSERT_EQ(result.m_Second[2].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[2].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[2].GetColumn(), 1);
 	}
 
-	// AggressiveIterNotRestoredOnCleanStop: after aggressive Repeat stops on a clean failure,
+	// AggressiveIterNotRestoredOnCleanStop:
 	// iter stays where it is (not restored), so the following element can consume the stopping token.
 	// Sequence<Repeat<Identifier, 0, 10, true>, MatchTokenType<IntegerLiteral>>:
 	//   Repeat consumes "a"+"b", then "42" fails (no value), iter stays at "42";
@@ -1016,18 +1151,21 @@ TEST(TopDownParser, RepeatTest)
 	{
 		using RepeatExpr = Parser::Grammar::Repeat<Parser::Grammar::MatchTokenType<Lexer::TokenTypes::Identifier>, 0, 10, true>;
 		using SeqExpression = Parser::Grammar::Sequence<RepeatExpr, Parser::Grammar::MatchTokenType<Lexer::TokenTypes::IntegerLiteral>>;
+		using TestRootRule = Parser::Grammar::Rule<SGE_STR("root"), SeqExpression>;
+		using TestLang = Parser::Grammar::Language<TestRootRule>;
 
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("a"), 1, 1));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::Identifier, SGE_STR("b"), 1, 3));
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("42"), 1, 5));
 
-		auto result = TestParseExpression<SeqExpression>(tokens.GetConstBegin(), tokens.GetConstEnd());
+		auto result = Parser::TopDownParser::Parse<TestLang, SGE_STR("root")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
 		ASSERT_EQ(result.m_Second.GetSize(), 0);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren().GetSize(), 2);
-		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 2);
-		auto& int_node = result.m_First.Get().GetChildren()[1];
+		auto& seq_node = result.m_First.Get().GetChildren()[0];
+		ASSERT_EQ(seq_node.GetChildren()[0].GetChildren().GetSize(), 2);
+		ASSERT_EQ(seq_node.GetChildren()[0].GetEndTokenIter(), tokens.GetConstBegin() + 2);
+		auto& int_node = seq_node.GetChildren()[1];
 		ASSERT_EQ(int_node.GetBeginTokenIter(), tokens.GetConstBegin() + 2);
 		ASSERT_EQ(int_node.GetEndTokenIter(), tokens.GetConstEnd());
 	}
@@ -1069,7 +1207,8 @@ TEST(TopDownParser, RepeatTest)
 		// Sequence fails because aggressive Repeat left iter at ";" and IntegerLiteral cannot match it
 		ASSERT_FALSE(result.m_First.HasValue());
 		// 4 panic errors forwarded by Repeat + RequireExpression + UnexpectedTokenType from the failing IntegerLiteral child
-		ASSERT_EQ(result.m_Second.GetSize(), 6);
+		// + RemainingTokensAfterParsing because Sequence failed and iter was restored to begin
+		ASSERT_EQ(result.m_Second.GetSize(), 7);
 		// [0..3]: panic errors accumulated by Repeat during iter 2 (same as AggressiveAcceptsPanicResult)
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -1107,9 +1246,14 @@ TEST(TopDownParser, RepeatTest)
 		ASSERT_EQ(result.m_Second[5].GetAdditionalInformation().GetSize(), 2);
 		ASSERT_EQ(result.m_Second[5].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
 		ASSERT_EQ(result.m_Second[5].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::Semicolon));
+		// [6] Sequence failed and restored iter to begin; all tokens remain unconsumed
+		ASSERT_EQ(result.m_Second[6].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[6].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[6].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[6].GetAdditionalInformation().GetSize(), 0);
 	}
 
-	// AggressivePanicFollowedByCleanSuccess: after aggressive Repeat with panic children,
+	// AggressivePanicFollowedByCleanSuccess
 	// the following element still parses correctly when the token stream is set up so that
 	// the clean-fail stop token is the right type for the next expression.
 	// Tokens: [fn][foo][42][fn][bar][99]
@@ -1222,13 +1366,18 @@ TEST(TopDownParser, RuleTest)
 
 		auto result = Parser::TopDownParser::Parse<RuleLanguage, SGE_STR("identifier_rule")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
-		ASSERT_EQ(result.m_Second.GetSize(), 1);
+		ASSERT_EQ(result.m_Second.GetSize(), 2);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::UnexpectedTokenType);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation().GetSize(), 2);
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[0], ToString<String>(Lexer::TokenTypes::Identifier));
 		ASSERT_EQ(result.m_Second[0].GetAdditionalInformation()[1], ToString<String>(Lexer::TokenTypes::IntegerLiteral));
+		// [1] parse failed, iter stays at "42"(1,1); token remains unconsumed
+		ASSERT_EQ(result.m_Second[1].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[1].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[1].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[1].GetAdditionalInformation().GetSize(), 0);
 	}
 
 	// SynchronousPoint: Rule body is a Sequence: keyword "fn" (Identifier) followed by a function name (Identifier)
@@ -1281,8 +1430,8 @@ TEST(TopDownParser, RuleTest)
 
 		auto result = Parser::TopDownParser::Parse<SyncLanguage, SGE_STR("func_decl")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_TRUE(result.m_First.HasValue());
-		// errors: RequireExpression(1,1) + UnexpectedToken(1,1) + EnablePanicMode(1,1) + DisablePanicMode(1,13)
-		ASSERT_EQ(result.m_Second.GetSize(), 4);
+		// errors: RequireExpression(1,1) + UnexpectedToken(1,1) + EnablePanicMode(1,1) + DisablePanicMode(1,13) + RemainingTokensAfterParsing(1,13)
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
 		// initial Sequence parse: first child MatchTokenTypeAndContent fails on IntegerLiteral -> RequireExpression then UnexpectedToken
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -1309,6 +1458,12 @@ TEST(TopDownParser, RuleTest)
 		ASSERT_EQ(result.m_Second[3].GetColumn(), 13);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation().GetSize(), 1);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[0], SGE_STR("func_decl"));
+		// [4] panic recovery left iter at ";"(1,13); that token remains unconsumed
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
+		ASSERT_EQ(result.m_Second[4].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[4].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[4].GetColumn(), 13);
+		ASSERT_EQ(result.m_Second[4].GetAdditionalInformation().GetSize(), 0);
 		// recovered node covers only the consumed "fn" + "myFunc" tokens
 		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("func_decl")));
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
@@ -1327,7 +1482,7 @@ TEST(TopDownParser, RuleTest)
 		ASSERT_EQ(result.m_First.Get().GetChildren()[0].GetChildren()[1].GetEndTokenIter(), tokens.GetConstBegin() + 3);
 	}
 
-	// ParseRecoveryMultipleSkipped: two bad tokens before a valid "fn <name>", followed by an unconsumed token
+	// ParseRecoveryMultipleSkipped
 	{
 		Vector<Lexer::Token> tokens;
 		tokens.EmplaceBack(Lexer::Token(Lexer::TokenTypes::IntegerLiteral, SGE_STR("1"), 1, 1));	// bad
@@ -1340,8 +1495,8 @@ TEST(TopDownParser, RuleTest)
 		ASSERT_TRUE(result.m_First.HasValue());
 		// errors: RequireExpression(1,1) + UnexpectedToken(1,1) + EnablePanicMode(1,1)
 		//       + RequireExpression(1,3) + UnexpectedToken(1,3)
-		//       + DisablePanicMode(1,11)
-		ASSERT_EQ(result.m_Second.GetSize(), 6);
+		//       + DisablePanicMode(1,11) + RemainingTokensAfterParsing(1,11)
+		ASSERT_EQ(result.m_Second.GetSize(), 7);
 		// initial Sequence parse fails on "1"
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -1382,6 +1537,12 @@ TEST(TopDownParser, RuleTest)
 		ASSERT_EQ(result.m_Second[5].GetColumn(), 11);
 		ASSERT_EQ(result.m_Second[5].GetAdditionalInformation().GetSize(), 1);
 		ASSERT_EQ(result.m_Second[5].GetAdditionalInformation()[0], SGE_STR("func_decl"));
+		// [6] panic recovery left iter at ";"(1,11); that token remains unconsumed
+		ASSERT_EQ(result.m_Second.GetSize(), 7);
+		ASSERT_EQ(result.m_Second[6].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[6].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[6].GetColumn(), 11);
+		ASSERT_EQ(result.m_Second[6].GetAdditionalInformation().GetSize(), 0);
 		// recovered node covers "fn" + "bar"
 		ASSERT_TRUE(IsSameCString(result.m_First.Get().GetName(), SGE_STR("func_decl")));
 		ASSERT_EQ(result.m_First.Get().GetChildren().GetSize(), 1);
@@ -1409,8 +1570,9 @@ TEST(TopDownParser, RuleTest)
 		auto result = Parser::TopDownParser::Parse<SyncLanguage, SGE_STR("func_decl")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
 		// errors: RequireExpression(1,1) + UnexpectedToken(1,1) + EnablePanicMode(1,1)
-		//       + RequireExpression(1,3) + UnexpectedToken(1,3) + UnexceptedEnd
-		ASSERT_EQ(result.m_Second.GetSize(), 6);
+		//       + RequireExpression(1,3) + UnexpectedToken(1,3) + UnexpectedEnd
+		//       + RemainingTokensAfterParsing(1,1) because panic failed and iter was restored to begin
+		ASSERT_EQ(result.m_Second.GetSize(), 7);
 		// initial Sequence parse fails on "1"
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
@@ -1450,9 +1612,14 @@ TEST(TopDownParser, RuleTest)
 		ASSERT_EQ(result.m_Second[5].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[5].GetColumn(), 4);
 		ASSERT_EQ(result.m_Second[5].GetAdditionalInformation().GetSize(), 0);
+		// [6] panic failed; iter restored to backup_iter = begin = "1"(1,1); all tokens remain unconsumed
+		ASSERT_EQ(result.m_Second[6].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[6].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[6].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[6].GetAdditionalInformation().GetSize(), 0);
 	}
 
-	// ParseFailEmptyInput: empty token stream; Sequence immediately hits UnexpectedEnd, panic mode cannot recover
+	// ParseFailEmptyInput
 	{
 		Vector<Lexer::Token> tokens;
 
@@ -1481,8 +1648,9 @@ TEST(TopDownParser, RuleTest)
 		auto result = Parser::TopDownParser::Parse<SyncLanguage, SGE_STR("func_decl")>(tokens.GetConstBegin(), tokens.GetConstEnd());
 		ASSERT_FALSE(result.m_First.HasValue());
 		// errors: RequireExpression(1,1) + UnexpectedToken(1,1) + EnablePanicMode(1,1) + UnexpectedEnd(1,3)
+		//       + RemainingTokensAfterParsing(1,1) because panic failed and iter was restored to begin
 		// UnexpectedEnd: prev_iter is "42"(1,1,size=2), so column = 1 + 2 = 3
-		ASSERT_EQ(result.m_Second.GetSize(), 4);
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
 		ASSERT_EQ(result.m_Second[0].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RequireExpression);
 		ASSERT_EQ(result.m_Second[0].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[0].GetColumn(), 1);
@@ -1505,5 +1673,11 @@ TEST(TopDownParser, RuleTest)
 		ASSERT_EQ(result.m_Second[3].GetLine(), 1);
 		ASSERT_EQ(result.m_Second[3].GetColumn(), 3);
 		ASSERT_EQ(result.m_Second[3].GetAdditionalInformation().GetSize(), 0);
+		// [4] panic failed; iter restored to backup_iter = begin = "42"(1,1); token remains unconsumed
+		ASSERT_EQ(result.m_Second.GetSize(), 5);
+		ASSERT_EQ(result.m_Second[4].GetTypeId(), Parser::TopDownParser::ErrorTypeId::RemainingTokensAfterParsing);
+		ASSERT_EQ(result.m_Second[4].GetLine(), 1);
+		ASSERT_EQ(result.m_Second[4].GetColumn(), 1);
+		ASSERT_EQ(result.m_Second[4].GetAdditionalInformation().GetSize(), 0);
 	}
 }
