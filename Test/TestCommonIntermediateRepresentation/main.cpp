@@ -17,8 +17,6 @@ limitations under the License.
 #include "Bootstrap.h"
 #include "SGEString.hpp"
 #include "Module/ModuleManager.h"
-#include "Assembler/TestAbstractSyntaxTree.hpp"
-#include "Assembler/TestAbstractSyntaxTreePrinter.hpp"
 #include "Assembler/TestLexer.hpp"
 #include "Assembler/TestParser.hpp"
 

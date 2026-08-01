@@ -159,8 +159,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Assembler\TestAbstractSyntaxTree.hpp" />
-    <ClInclude Include="Assembler\TestAbstractSyntaxTreePrinter.hpp" />
     <ClInclude Include="Assembler\TestLexer.hpp" />
     <ClInclude Include="Assembler\TestParser.hpp" />
   </ItemGroup>

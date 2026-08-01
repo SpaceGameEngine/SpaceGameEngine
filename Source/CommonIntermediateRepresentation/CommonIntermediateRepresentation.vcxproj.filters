@@ -27,13 +27,7 @@
     <ClInclude Include="Private\Logger.h">
       <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Assembler\AbstractSyntaxTree.h">
-      <Filter>Public\Assembler</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Assembler\Lexer.h">
-      <Filter>Public\Assembler</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Assembler\AbstractSyntaxTreePrinter.h">
       <Filter>Public\Assembler</Filter>
     </ClInclude>
     <ClInclude Include="Public\Assembler\Parser.h">
@@ -47,13 +41,7 @@
     <ClCompile Include="Private\Logger.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Assembler\AbstractSyntaxTree.cpp">
-      <Filter>Private\Assembler</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Assembler\Lexer.cpp">
-      <Filter>Private\Assembler</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Assembler\AbstractSyntaxTreePrinter.cpp">
       <Filter>Private\Assembler</Filter>
     </ClCompile>
     <ClCompile Include="Private\Assembler\Parser.cpp">
