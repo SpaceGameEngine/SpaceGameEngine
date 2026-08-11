@@ -71,6 +71,90 @@ TEST(Parse, SimpleStatementTest)
 	ASSERT_EQ(argumentCount, 0);
 }
 
+TEST(Parse, StatementWithNoLHSTest)
+{
+	// Statement 可省略 LHS（无赋值），仅有 Symbol 和可选参数
+	auto lexResult = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR("test.call 1 2;"));
+	ASSERT_EQ(lexResult.m_Second.GetSize(), 0);
+
+	auto result = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::Parse(lexResult.m_First);
+	ASSERT_TRUE(result.m_First.HasValue());
+	ASSERT_EQ(result.m_Second.GetSize(), 0);
+
+	// 1 条 Statement
+	SizeType statementCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Statement"), result.m_First.Get(), [&](const auto&) { ++statementCount; });
+	ASSERT_EQ(statementCount, 1);
+
+	// 无 VariableIdentifier（没有 LHS）
+	SizeType varIdCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("VariableIdentifier"), result.m_First.Get(), [&](const auto&) { ++varIdCount; });
+	ASSERT_EQ(varIdCount, 0);
+
+	// Symbol 为 "test.call"
+	SizeType symbolCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Symbol"), result.m_First.Get(), [&](const auto& node) {
+		++symbolCount;
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), SGE_STR("test.call"));
+		ASSERT_EQ(node.GetBeginTokenIter()->GetType(), CommonIntermediateRepresentation::Assembler::TokenTypes::SymbolIdentifier);
+	});
+	ASSERT_EQ(symbolCount, 1);
+
+	// 2 个整数 Argument：依次为 "1"、"2"
+	const Char* expectedArgs[] = {SGE_STR("1"), SGE_STR("2")};
+	SizeType argIndex = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Argument"), result.m_First.Get(), [&](const auto& node) {
+		ASSERT_LT(argIndex, 2u);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), expectedArgs[argIndex]);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetType(), CommonParser::Lexer::TokenTypes::IntegerLiteral);
+		++argIndex;
+	});
+	ASSERT_EQ(argIndex, 2u);
+}
+
+TEST(Parse, MultipleReturnVariablesTest)
+{
+	// VariableIdentifierList: 逗号分隔的多个变量作为赋值 LHS
+	auto lexResult = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR("a, b, c = test.op;"));
+	ASSERT_EQ(lexResult.m_Second.GetSize(), 0);
+
+	auto result = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::Parse(lexResult.m_First);
+	ASSERT_TRUE(result.m_First.HasValue());
+	ASSERT_EQ(result.m_Second.GetSize(), 0);
+
+	// 1 条 Statement
+	SizeType statementCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Statement"), result.m_First.Get(), [&](const auto&) { ++statementCount; });
+	ASSERT_EQ(statementCount, 1);
+
+	// VariableIdentifierList 出现 1 次
+	SizeType varIdListCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("VariableIdentifierList"), result.m_First.Get(), [&](const auto& node) {
+		++varIdListCount;
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), SGE_STR("a"));
+	});
+	ASSERT_EQ(varIdListCount, 1);
+
+	// VariableIdentifier 依次为 "a"、"b"、"c"
+	const Char* expectedVarIds[] = {SGE_STR("a"), SGE_STR("b"), SGE_STR("c")};
+	SizeType varIdIndex = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("VariableIdentifier"), result.m_First.Get(), [&](const auto& node) {
+		ASSERT_LT(varIdIndex, 3u);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), expectedVarIds[varIdIndex]);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetType(), CommonParser::Lexer::TokenTypes::Identifier);
+		++varIdIndex;
+	});
+	ASSERT_EQ(varIdIndex, 3u);
+
+	// Symbol 为 "test.op"
+	SizeType symbolCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Symbol"), result.m_First.Get(), [&](const auto& node) {
+		++symbolCount;
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), SGE_STR("test.op"));
+	});
+	ASSERT_EQ(symbolCount, 1);
+}
+
 TEST(Parse, StatementWithIntegerArgumentsTest)
 {
 	auto lexResult = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR("result = test.add 1 -2;"));
@@ -129,6 +213,98 @@ TEST(Parse, StatementWithSymbolArgumentsTest)
 		++symIndex;
 	});
 	ASSERT_EQ(symIndex, 3u);
+}
+
+TEST(Parse, VariableIdentifierArgumentTest)
+{
+	// VariableIdentifier 作为 Argument：普通标识符（非 symbol.dot 形式，无冒号）
+	// Argument 中 ParameterDefinition 在 VariableIdentifier 之前，
+	// 但 "foo"、"bar" 没有冒号，无法匹配 ParameterDefinition，应回退并匹配 VariableIdentifier
+	auto lexResult = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR("result = test.call foo bar;"));
+	ASSERT_EQ(lexResult.m_Second.GetSize(), 0);
+
+	auto result = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::Parse(lexResult.m_First);
+	ASSERT_TRUE(result.m_First.HasValue());
+	ASSERT_EQ(result.m_Second.GetSize(), 0);
+
+	// 1 条 Statement
+	SizeType statementCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Statement"), result.m_First.Get(), [&](const auto&) { ++statementCount; });
+	ASSERT_EQ(statementCount, 1);
+
+	// VariableIdentifier 依次为：LHS "result"、Argument "foo"、Argument "bar"
+	const Char* expectedVarIds[] = {SGE_STR("result"), SGE_STR("foo"), SGE_STR("bar")};
+	SizeType varIdCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("VariableIdentifier"), result.m_First.Get(), [&](const auto& node) {
+		ASSERT_LT(varIdCount, 3u);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), expectedVarIds[varIdCount]);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetType(), CommonParser::Lexer::TokenTypes::Identifier);
+		++varIdCount;
+	});
+	ASSERT_EQ(varIdCount, 3u);
+
+	// 2 个 Argument，首 token 分别为 "foo"、"bar"
+	const Char* expectedArgs[] = {SGE_STR("foo"), SGE_STR("bar")};
+	SizeType argIndex = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Argument"), result.m_First.Get(), [&](const auto& node) {
+		ASSERT_LT(argIndex, 2u);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), expectedArgs[argIndex]);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetType(), CommonParser::Lexer::TokenTypes::Identifier);
+		++argIndex;
+	});
+	ASSERT_EQ(argIndex, 2u);
+}
+
+TEST(Parse, ParameterDefinitionArgumentTest)
+{
+	// ParameterDefinition 现已移至 Argument Select 中 VariableIdentifier 之前，
+	// 因此 "x:my.type" 可被正确解析为 ParameterDefinition。
+	// 测试两种形式：x:my.type（Symbol 类型注解）和 y:z（VariableIdentifier 类型注解）
+	auto lexResult = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR("result = test.op x:my.type y:z;"));
+	ASSERT_EQ(lexResult.m_Second.GetSize(), 0);
+
+	auto result = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::Parse(lexResult.m_First);
+	ASSERT_TRUE(result.m_First.HasValue());
+	ASSERT_EQ(result.m_Second.GetSize(), 0);
+
+	// 2 个 Argument，均为 ParameterDefinition
+	SizeType argumentCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Argument"), result.m_First.Get(), [&](const auto&) { ++argumentCount; });
+	ASSERT_EQ(argumentCount, 2);
+
+	// 2 个 ParameterDefinition，首 token 依次为 "x"、"y"
+	const Char* expectedParamNames[] = {SGE_STR("x"), SGE_STR("y")};
+	SizeType paramDefIndex = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("ParameterDefinition"), result.m_First.Get(), [&](const auto& node) {
+		ASSERT_LT(paramDefIndex, 2u);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), expectedParamNames[paramDefIndex]);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetType(), CommonParser::Lexer::TokenTypes::Identifier);
+		auto colonToken = node.GetBeginTokenIter() + 1;
+		ASSERT_EQ(colonToken->GetType(), CommonParser::Lexer::TokenTypes::Colon);
+		++paramDefIndex;
+	});
+	ASSERT_EQ(paramDefIndex, 2u);
+
+	// 第一个 ParameterDefinition 的类型为 Symbol "my.type"
+	SizeType symCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("Symbol"), result.m_First.Get(), [&](const auto& node) {
+		if (symCount == 0)
+			ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), SGE_STR("test.op"));
+		else
+			ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), SGE_STR("my.type"));
+		++symCount;
+	});
+	ASSERT_EQ(symCount, 2);
+
+	// VariableIdentifier 共 4 个：LHS "result"、ParameterDefinition 参数名 "x"、"y"、类型注解 "z"
+	const Char* expectedVarIds[] = {SGE_STR("result"), SGE_STR("x"), SGE_STR("y"), SGE_STR("z")};
+	SizeType varIdCount = 0;
+	AbstractSyntaxTree::Visit(SGE_STR("VariableIdentifier"), result.m_First.Get(), [&](const auto& node) {
+		ASSERT_LT(varIdCount, 4u);
+		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), expectedVarIds[varIdCount]);
+		++varIdCount;
+	});
+	ASSERT_EQ(varIdCount, 4u);
 }
 
 TEST(Parse, StatementWithMixedLiteralArgumentsTest)
@@ -515,27 +691,31 @@ TEST(Parse, PanicModeRecoveryTest)
 	ASSERT_EQ(result.m_Second[2].GetLine(), 1);
 	ASSERT_EQ(result.m_Second[2].GetColumn(), 1);	// Statement 起始位置 "bad"
 
-	// 错误 3-4: 跳过 "bad"，在 "=" 处尝试 Statement 失败（VariableIdentifier 期望 Identifier）
+	// 错误 3-4: 跳过 "bad"，在 "=" 处尝试 Statement；
+	// Optional<Sequence<VariableIdentifierList, Equal>> 因 VariableIdentifierList 需要 Identifier 而 "=" 不是，
+	// Optional 静默吞掉内部失败，随后 Symbol 在 "=" 处失败。
 	ASSERT_EQ(result.m_Second[3].GetTypeId(), TopDownParser::ErrorTypeId::RequireExpression);
-	ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[0], SGE_STR("VariableIdentifier"));
+	ASSERT_EQ(result.m_Second[3].GetAdditionalInformation()[0], SGE_STR("Symbol"));
 	ASSERT_EQ(result.m_Second[3].GetLine(), 1);
 	ASSERT_EQ(result.m_Second[3].GetColumn(), 5);	// "=" 的列
 	ASSERT_EQ(result.m_Second[4].GetTypeId(), TopDownParser::ErrorTypeId::UnexpectedTokenType);
-	ASSERT_EQ(result.m_Second[4].GetAdditionalInformation()[0], ToString<String>(CommonParser::Lexer::TokenTypes::Identifier));
+	ASSERT_EQ(result.m_Second[4].GetAdditionalInformation()[0], ToString<String>(CommonIntermediateRepresentation::Assembler::TokenTypes::SymbolIdentifier));
 	ASSERT_EQ(result.m_Second[4].GetAdditionalInformation()[1], ToString<String>(CommonParser::Lexer::TokenTypes::Equal));
 	ASSERT_EQ(result.m_Second[4].GetLine(), 1);
 	ASSERT_EQ(result.m_Second[4].GetColumn(), 5);
 
-	// 错误 5-6: 跳过 "="，在 "not_a_symbol" 处尝试 Statement，VariableIdentifier 成功但 Equal 在 "valid" 处失败
+	// 错误 5-6: 跳过 "="，在 "not_a_symbol" 处尝试 Statement；
+	// Optional<Sequence<VariableIdentifierList, Equal>> 因 Equal 在 "valid" 处失败而静默吞掉，
+	// 随后 Symbol 在 "not_a_symbol"（Identifier）处失败。
 	ASSERT_EQ(result.m_Second[5].GetTypeId(), TopDownParser::ErrorTypeId::RequireExpression);
-	ASSERT_EQ(result.m_Second[5].GetAdditionalInformation()[0], CommonParser::Parser::Grammar::MatchTokenType<CommonParser::Lexer::TokenTypes::Equal>::Name.m_Value);
+	ASSERT_EQ(result.m_Second[5].GetAdditionalInformation()[0], SGE_STR("Symbol"));
 	ASSERT_EQ(result.m_Second[5].GetLine(), 1);
-	ASSERT_EQ(result.m_Second[5].GetColumn(), 20);	// "valid" 的列
+	ASSERT_EQ(result.m_Second[5].GetColumn(), 7);	// "not_a_symbol" 的列
 	ASSERT_EQ(result.m_Second[6].GetTypeId(), TopDownParser::ErrorTypeId::UnexpectedTokenType);
-	ASSERT_EQ(result.m_Second[6].GetAdditionalInformation()[0], ToString<String>(CommonParser::Lexer::TokenTypes::Equal));
+	ASSERT_EQ(result.m_Second[6].GetAdditionalInformation()[0], ToString<String>(CommonIntermediateRepresentation::Assembler::TokenTypes::SymbolIdentifier));
 	ASSERT_EQ(result.m_Second[6].GetAdditionalInformation()[1], ToString<String>(CommonParser::Lexer::TokenTypes::Identifier));
 	ASSERT_EQ(result.m_Second[6].GetLine(), 1);
-	ASSERT_EQ(result.m_Second[6].GetColumn(), 20);
+	ASSERT_EQ(result.m_Second[6].GetColumn(), 7);
 
 	// 错误 7: DisablePanicMode("Statement") — 在 "valid" 处成功恢复
 	ASSERT_EQ(result.m_Second[7].GetTypeId(), TopDownParser::ErrorTypeId::DisablePanicMode);

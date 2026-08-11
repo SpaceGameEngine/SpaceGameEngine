@@ -33,6 +33,14 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		using VariableIdentifier = Rule<SGE_STR("VariableIdentifier"),
 										MatchTokenType<CommonParser::Lexer::TokenTypes::Identifier>>;
 
+		using VariableIdentifierList = Rule<SGE_STR("VariableIdentifierList"),
+											Sequence<
+												RuleReference<SGE_STR("VariableIdentifier")>,
+												Repeat<
+													Sequence<
+														MatchTokenType<CommonParser::Lexer::TokenTypes::Comma>,
+														RuleReference<SGE_STR("VariableIdentifier")>>>>>;
+
 		using ParameterDefinition = Rule<SGE_STR("ParameterDefinition"),
 										 Sequence<
 											 RuleReference<SGE_STR("VariableIdentifier")>,
@@ -52,8 +60,8 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		using Argument = Rule<SGE_STR("Argument"),
 							  Select<
 								  RuleReference<SGE_STR("Symbol")>,
-								  RuleReference<SGE_STR("VariableIdentifier")>,
 								  RuleReference<SGE_STR("ParameterDefinition")>,
+								  RuleReference<SGE_STR("VariableIdentifier")>,
 								  RuleReference<SGE_STR("ArgumentList")>,
 								  RuleReference<SGE_STR("Block")>,
 								  MatchTokenType<CommonParser::Lexer::TokenTypes::IntegerLiteral>,
@@ -76,8 +84,10 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 
 		using Statement = Rule<SGE_STR("Statement"),
 							   Sequence<
-								   RuleReference<SGE_STR("VariableIdentifier")>,
-								   MatchTokenType<CommonParser::Lexer::TokenTypes::Equal>,
+								   Grammar::Optional<
+									   Sequence<
+										   RuleReference<SGE_STR("VariableIdentifierList")>,
+										   MatchTokenType<CommonParser::Lexer::TokenTypes::Equal>>>,
 								   Grammar::Optional<RuleReference<SGE_STR("AttributeDictionary")>>,
 								   RuleReference<SGE_STR("Symbol")>,
 								   Repeat<RuleReference<SGE_STR("Argument")>>,
@@ -116,6 +126,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 
 		using AssemblerLanguage = Language<Symbol,
 										   VariableIdentifier,
+										   VariableIdentifierList,
 										   ParameterDefinition,
 										   Block,
 										   Argument,
