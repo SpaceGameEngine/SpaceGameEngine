@@ -161,6 +161,10 @@
   <ItemGroup>
     <ClInclude Include="Assembler\TestLexer.hpp" />
     <ClInclude Include="Assembler\TestParser.hpp" />
+    <ClInclude Include="TestContext.hpp" />
+    <ClInclude Include="TestDialect.hpp" />
+    <ClInclude Include="TestOperation.hpp" />
+    <ClInclude Include="TestValue.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

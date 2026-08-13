@@ -157,12 +157,20 @@
     <ClInclude Include="Public\Assembler\Lexer.h" />
     <ClInclude Include="Public\Assembler\Parser.h" />
     <ClInclude Include="Public\CommonIntermediateRepresentationAPI.h" />
+    <ClInclude Include="Public\Context.h" />
+    <ClInclude Include="Public\Dialect.h" />
+    <ClInclude Include="Public\Operation.h" />
+    <ClInclude Include="Public\Value.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Assembler\Lexer.cpp" />
     <ClCompile Include="Private\Assembler\Parser.cpp" />
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp" />
+    <ClCompile Include="Private\Context.cpp" />
+    <ClCompile Include="Private\Dialect.cpp" />
     <ClCompile Include="Private\Logger.cpp" />
+    <ClCompile Include="Private\Operation.cpp" />
+    <ClCompile Include="Private\Value.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

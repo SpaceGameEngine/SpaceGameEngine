@@ -1,6 +1,10 @@
 add_library(CommonIntermediateRepresentation SHARED
         Private/CommonIntermediateRepresentationModule.cpp
         Private/Logger.cpp
+        Private/Dialect.cpp
+        Private/Context.cpp
+        Private/Value.cpp
+        Private/Operation.cpp
         Private/Assembler/Lexer.cpp
         Private/Assembler/Parser.cpp
         )

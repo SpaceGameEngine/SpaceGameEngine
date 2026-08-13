@@ -15,5 +15,9 @@
     <ClInclude Include="Assembler\TestParser.hpp">
       <Filter>Assembler</Filter>
     </ClInclude>
+    <ClInclude Include="TestOperation.hpp" />
+    <ClInclude Include="TestValue.hpp" />
+    <ClInclude Include="TestDialect.hpp" />
+    <ClInclude Include="TestContext.hpp" />
   </ItemGroup>
 </Project>

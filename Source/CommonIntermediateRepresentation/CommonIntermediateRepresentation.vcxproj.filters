@@ -33,6 +33,18 @@
     <ClInclude Include="Public\Assembler\Parser.h">
       <Filter>Public\Assembler</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Operation.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Value.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Context.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Dialect.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp">
@@ -46,6 +58,18 @@
     </ClCompile>
     <ClCompile Include="Private\Assembler\Parser.cpp">
       <Filter>Private\Assembler</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Operation.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Value.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Context.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Dialect.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
