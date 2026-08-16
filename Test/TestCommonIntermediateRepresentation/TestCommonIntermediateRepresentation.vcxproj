@@ -164,6 +164,7 @@
     <ClInclude Include="TestContext.hpp" />
     <ClInclude Include="TestDialect.hpp" />
     <ClInclude Include="TestOperation.hpp" />
+    <ClInclude Include="TestPass.hpp" />
     <ClInclude Include="TestValue.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

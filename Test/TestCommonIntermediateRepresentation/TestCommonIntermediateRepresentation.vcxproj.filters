@@ -19,5 +19,6 @@
     <ClInclude Include="TestValue.hpp" />
     <ClInclude Include="TestDialect.hpp" />
     <ClInclude Include="TestContext.hpp" />
+    <ClInclude Include="TestPass.hpp" />
   </ItemGroup>
 </Project>

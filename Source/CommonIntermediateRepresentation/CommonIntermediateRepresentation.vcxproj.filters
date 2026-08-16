@@ -45,6 +45,9 @@
     <ClInclude Include="Public\Dialect.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Pass.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp">
@@ -69,6 +72,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\Dialect.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Pass.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

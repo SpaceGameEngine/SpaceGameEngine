@@ -160,6 +160,7 @@
     <ClInclude Include="Public\Context.h" />
     <ClInclude Include="Public\Dialect.h" />
     <ClInclude Include="Public\Operation.h" />
+    <ClInclude Include="Public\Pass.h" />
     <ClInclude Include="Public\Value.h" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,7 @@
     <ClCompile Include="Private\Dialect.cpp" />
     <ClCompile Include="Private\Logger.cpp" />
     <ClCompile Include="Private\Operation.cpp" />
+    <ClCompile Include="Private\Pass.cpp" />
     <ClCompile Include="Private\Value.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
