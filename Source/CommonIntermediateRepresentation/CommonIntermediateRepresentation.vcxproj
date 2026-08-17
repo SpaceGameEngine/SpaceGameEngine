@@ -154,6 +154,7 @@
     <ClInclude Include="Private\CommonIntermediateRepresentationModule.h" />
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
+    <ClInclude Include="Public\Argument.h" />
     <ClInclude Include="Public\Assembler\Lexer.h" />
     <ClInclude Include="Public\Assembler\Parser.h" />
     <ClInclude Include="Public\CommonIntermediateRepresentationAPI.h" />
@@ -161,9 +162,11 @@
     <ClInclude Include="Public\Dialect.h" />
     <ClInclude Include="Public\Operation.h" />
     <ClInclude Include="Public\Pass.h" />
+    <ClInclude Include="Public\Type.h" />
     <ClInclude Include="Public\Value.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Argument.cpp" />
     <ClCompile Include="Private\Assembler\Lexer.cpp" />
     <ClCompile Include="Private\Assembler\Parser.cpp" />
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp" />
@@ -172,6 +175,7 @@
     <ClCompile Include="Private\Logger.cpp" />
     <ClCompile Include="Private\Operation.cpp" />
     <ClCompile Include="Private\Pass.cpp" />
+    <ClCompile Include="Private\Type.cpp" />
     <ClCompile Include="Private\Value.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
