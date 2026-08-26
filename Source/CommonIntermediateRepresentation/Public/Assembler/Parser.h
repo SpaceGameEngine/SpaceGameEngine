@@ -41,15 +41,6 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 														MatchTokenType<CommonParser::Lexer::TokenTypes::Comma>,
 														RuleReference<SGE_STR("VariableIdentifier")>>>>>;
 
-		using ParameterDefinition = Rule<SGE_STR("ParameterDefinition"),
-										 Sequence<
-											 RuleReference<SGE_STR("VariableIdentifier")>,
-											 Sequence<
-												 MatchTokenType<CommonParser::Lexer::TokenTypes::Colon>,
-												 Select<
-													 RuleReference<SGE_STR("Symbol")>,
-													 RuleReference<SGE_STR("VariableIdentifier")>>>>>;
-
 		using Block = Rule<SGE_STR("Block"),
 						   Sequence<
 							   MatchTokenType<CommonParser::Lexer::TokenTypes::LeftCurlyBracket>,
@@ -60,7 +51,6 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		using Argument = Rule<SGE_STR("Argument"),
 							  Select<
 								  RuleReference<SGE_STR("Symbol")>,
-								  RuleReference<SGE_STR("ParameterDefinition")>,
 								  RuleReference<SGE_STR("VariableIdentifier")>,
 								  RuleReference<SGE_STR("ArgumentList")>,
 								  RuleReference<SGE_STR("Block")>,
@@ -127,7 +117,6 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation::Assembler
 		using AssemblerLanguage = Language<Symbol,
 										   VariableIdentifier,
 										   VariableIdentifierList,
-										   ParameterDefinition,
 										   Block,
 										   Argument,
 										   ArgumentList,

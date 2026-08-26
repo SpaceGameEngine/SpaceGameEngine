@@ -217,9 +217,7 @@ TEST(Parse, StatementWithSymbolArgumentsTest)
 
 TEST(Parse, StatementWithVariableIdentifierArgumentsTest)
 {
-	// VariableIdentifier 作为 Argument：普通标识符（非 symbol.dot 形式，无冒号）
-	// Argument 中 ParameterDefinition 在 VariableIdentifier 之前，
-	// 但 "foo"、"bar" 没有冒号，无法匹配 ParameterDefinition，应回退并匹配 VariableIdentifier
+	// VariableIdentifier 作为 Argument：普通标识符（非 symbol.dot 形式）
 	auto lexResult = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR("result = test.call foo bar;"));
 	ASSERT_EQ(lexResult.m_Second.GetSize(), 0);
 
@@ -253,56 +251,6 @@ TEST(Parse, StatementWithVariableIdentifierArgumentsTest)
 		++argIndex;
 	});
 	ASSERT_EQ(argIndex, 2u);
-}
-
-TEST(Parse, StatementWithParameterDefinitionArgumentsTest)
-{
-	// 测试两种形式：x:my.type（Symbol 类型注解）和 y:z（VariableIdentifier 类型注解）
-	auto lexResult = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::GetTokens(SGE_STR("result = test.op x:my.type y:z;"));
-	ASSERT_EQ(lexResult.m_Second.GetSize(), 0);
-
-	auto result = SpaceGameEngine::CommonIntermediateRepresentation::Assembler::Parse(lexResult.m_First);
-	ASSERT_TRUE(result.m_First.HasValue());
-	ASSERT_EQ(result.m_Second.GetSize(), 0);
-
-	// 2 个 Argument，均为 ParameterDefinition
-	SizeType argumentCount = 0;
-	AbstractSyntaxTree::Visit(SGE_STR("Argument"), result.m_First.Get(), [&](const auto&) { ++argumentCount; });
-	ASSERT_EQ(argumentCount, 2);
-
-	// 2 个 ParameterDefinition，首 token 依次为 "x"、"y"
-	const Char* expectedParamNames[] = {SGE_STR("x"), SGE_STR("y")};
-	SizeType paramDefIndex = 0;
-	AbstractSyntaxTree::Visit(SGE_STR("ParameterDefinition"), result.m_First.Get(), [&](const auto& node) {
-		ASSERT_LT(paramDefIndex, 2u);
-		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), expectedParamNames[paramDefIndex]);
-		ASSERT_EQ(node.GetBeginTokenIter()->GetType(), CommonParser::Lexer::TokenTypes::Identifier);
-		auto colonToken = node.GetBeginTokenIter() + 1;
-		ASSERT_EQ(colonToken->GetType(), CommonParser::Lexer::TokenTypes::Colon);
-		++paramDefIndex;
-	});
-	ASSERT_EQ(paramDefIndex, 2u);
-
-	// 第一个 ParameterDefinition 的类型为 Symbol "my.type"
-	SizeType symCount = 0;
-	AbstractSyntaxTree::Visit(SGE_STR("Symbol"), result.m_First.Get(), [&](const auto& node) {
-		if (symCount == 0)
-			ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), SGE_STR("test.op"));
-		else
-			ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), SGE_STR("my.type"));
-		++symCount;
-	});
-	ASSERT_EQ(symCount, 2);
-
-	// VariableIdentifier 共 4 个：LHS "result"、ParameterDefinition 参数名 "x"、"y"、类型注解 "z"
-	const Char* expectedVarIds[] = {SGE_STR("result"), SGE_STR("x"), SGE_STR("y"), SGE_STR("z")};
-	SizeType varIdCount = 0;
-	AbstractSyntaxTree::Visit(SGE_STR("VariableIdentifier"), result.m_First.Get(), [&](const auto& node) {
-		ASSERT_LT(varIdCount, 4u);
-		ASSERT_EQ(node.GetBeginTokenIter()->GetContent(), expectedVarIds[varIdCount]);
-		++varIdCount;
-	});
-	ASSERT_EQ(varIdCount, 4u);
 }
 
 TEST(Parse, StatementWithMixedLiteralArgumentsTest)
