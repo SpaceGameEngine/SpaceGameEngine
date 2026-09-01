@@ -221,6 +221,7 @@
     <ClInclude Include="Utility\TestAutoReleaseBuffer.hpp" />
     <ClInclude Include="Utility\TestControllableObject.hpp" />
     <ClInclude Include="Utility\TestDebugInformation.hpp" />
+    <ClInclude Include="Utility\TestDynamicCast.hpp" />
     <ClInclude Include="Utility\TestEndian.hpp" />
     <ClInclude Include="Utility\TestFixedSizeBuffer.hpp" />
     <ClInclude Include="Utility\TestHash.hpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="Utility\TestOptional.hpp" />
     <ClInclude Include="Utility\TestPair.hpp" />
     <ClInclude Include="Utility\TestTuple.hpp" />
+    <ClInclude Include="Utility\TestTypeId.hpp" />
     <ClInclude Include="Utility\TestUtility.hpp" />
     <ClInclude Include="Utility\TestVariant.hpp" />
   </ItemGroup>

@@ -276,6 +276,12 @@
     <ClInclude Include="Public\Utility\ArrayLiteral.hpp">
       <Filter>Public\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Utility\DynamicCast.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Utility\TypeId.hpp">
+      <Filter>Public\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Error.cpp">
