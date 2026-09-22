@@ -165,7 +165,6 @@
     <ClInclude Include="Public\Value.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Argument.cpp" />
     <ClCompile Include="Private\Assembler\Lexer.cpp" />
     <ClCompile Include="Private\Assembler\Parser.cpp" />
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp" />

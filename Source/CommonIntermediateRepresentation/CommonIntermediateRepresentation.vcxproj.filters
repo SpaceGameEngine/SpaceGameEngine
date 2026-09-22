@@ -83,8 +83,5 @@
     <ClCompile Include="Private\Type.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Argument.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
