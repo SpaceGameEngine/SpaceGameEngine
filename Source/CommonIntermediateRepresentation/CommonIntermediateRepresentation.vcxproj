@@ -154,7 +154,6 @@
     <ClInclude Include="Private\CommonIntermediateRepresentationModule.h" />
     <ClInclude Include="Private\DoxygenConfig.hpp" />
     <ClInclude Include="Private\Logger.h" />
-    <ClInclude Include="Public\Argument.h" />
     <ClInclude Include="Public\Assembler\Lexer.h" />
     <ClInclude Include="Public\Assembler\Parser.h" />
     <ClInclude Include="Public\CommonIntermediateRepresentationAPI.h" />

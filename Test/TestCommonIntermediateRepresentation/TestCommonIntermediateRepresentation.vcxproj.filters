@@ -21,6 +21,5 @@
     <ClInclude Include="TestContext.hpp" />
     <ClInclude Include="TestPass.hpp" />
     <ClInclude Include="TestType.hpp" />
-    <ClInclude Include="TestArgument.hpp" />
   </ItemGroup>
 </Project>

@@ -21,7 +21,6 @@ limitations under the License.
 #include "TestDialect.hpp"
 #include "TestContext.hpp"
 #include "TestValue.hpp"
-#include "TestArgument.hpp"
 #include "TestOperation.hpp"
 #include "TestPass.hpp"
 #include "Assembler/TestLexer.hpp"

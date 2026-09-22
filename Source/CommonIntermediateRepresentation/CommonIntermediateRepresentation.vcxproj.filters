@@ -51,9 +51,6 @@
     <ClInclude Include="Public\Type.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Argument.h">
-      <Filter>Public</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp">
