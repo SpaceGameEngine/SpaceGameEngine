@@ -23,7 +23,9 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonIntermediateRepresentation
 {
-
+	class COMMON_INTERMEDIATE_REPRESENTATION_API Dialect
+	{
+	};
 }
 
 /*!

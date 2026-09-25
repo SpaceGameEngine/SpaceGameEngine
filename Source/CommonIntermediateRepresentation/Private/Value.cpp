@@ -17,3 +17,145 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonIntermediateRepresentation;
+
+Value::Value()
+	: m_TypeId(SpaceGameEngine::GetTypeId<Value>())
+{
+}
+
+bool Value::IsInstance(const Value& value)
+{
+	return true;
+}
+
+SpaceGameEngine::UInt64 Value::GetTypeId() const
+{
+	return m_TypeId;
+}
+
+void SpaceGameEngine::CommonIntermediateRepresentation::Value::SetTypeId(UInt64 typeId)
+{
+	m_TypeId = typeId;
+}
+
+SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::Value);
+
+ResultValue::ResultValue()
+	: m_Type(nullptr), m_FirstReference(nullptr)
+{
+	SetTypeId(SpaceGameEngine::GetTypeId<ResultValue>());
+}
+
+ResultValue::~ResultValue()
+{
+}
+
+ResultValue::ResultValue(Type* type)
+	: ResultValue()
+{
+	m_Type = type;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Type* ResultValue::GetType() const
+{
+	return m_Type;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::ReferenceValue* ResultValue::GetFirstReference() const
+{
+	return m_FirstReference;
+}
+
+bool ResultValue::IsInstance(const Value& value)
+{
+	return value.GetTypeId() == SpaceGameEngine::GetTypeId<ResultValue>();
+}
+
+void ResultValue::AddReference(ReferenceValue& ref)
+{
+	if (!m_FirstReference)
+	{
+		m_FirstReference = &ref;
+		m_FirstReference->m_Next = m_FirstReference;
+		m_FirstReference->m_Previous = m_FirstReference;
+	}
+	else
+	{
+		auto tail = m_FirstReference->m_Previous;
+		tail->m_Next = &ref;
+		m_FirstReference->m_Previous = &ref;
+		ref.m_Next = m_FirstReference;
+		ref.m_Previous = tail;
+	}
+	ref.m_ResultValue = this;
+}
+
+bool ResultValue::RemoveReference(ReferenceValue& ref)
+{
+	auto cur = m_FirstReference;
+	do
+	{
+		if (cur == &ref)
+			break;
+		else
+			cur = cur->m_Next;
+	} while (cur != m_FirstReference);
+	if (cur == &ref)
+	{
+		if (cur->m_Next == cur)	   // only one reference
+		{
+			m_FirstReference = nullptr;
+		}
+		else
+		{
+			cur->m_Previous->m_Next = cur->m_Next;
+			cur->m_Next->m_Previous = cur->m_Previous;
+			if (m_FirstReference == cur)
+				m_FirstReference = cur->m_Next;
+		}
+		ref.m_ResultValue = nullptr;
+		return true;
+	}
+	else
+		return false;
+}
+
+SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::ResultValue);
+
+ReferenceValue::ReferenceValue(ResultValue& resultValue)
+{
+	SetTypeId(SpaceGameEngine::GetTypeId<ReferenceValue>());
+	resultValue.AddReference(*this);
+}
+
+ReferenceValue::~ReferenceValue()
+{
+	SGE_CHECK(ReferenceNotFoundError, m_ResultValue->RemoveReference(*this));
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::ResultValue* ReferenceValue::GetResultValue() const
+{
+	return m_ResultValue;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::ReferenceValue* ReferenceValue::GetPrevious() const
+{
+	return m_Previous;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::ReferenceValue* ReferenceValue::GetNext() const
+{
+	return m_Next;
+}
+
+bool ReferenceValue::IsInstance(const Value& value)
+{
+	return value.GetTypeId() == SpaceGameEngine::GetTypeId<ReferenceValue>();
+}
+
+SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::ReferenceValue);
+
+COMMON_INTERMEDIATE_REPRESENTATION_API bool ReferenceNotFoundError::Judge(bool found)
+{
+	return !found;
+}
