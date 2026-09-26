@@ -5,7 +5,6 @@ add_library(CommonIntermediateRepresentation SHARED
         Private/Dialect.cpp
         Private/Context.cpp
         Private/Value.cpp
-        Private/Argument.cpp
         Private/Operation.cpp
         Private/Pass.cpp
         Private/Assembler/Lexer.cpp
