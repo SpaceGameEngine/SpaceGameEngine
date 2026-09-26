@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include <concepts>
+#include "Utility/TypeId.hpp"
 
 /*!
 @ingroup Common
@@ -47,6 +48,62 @@ namespace SpaceGameEngine
 			return static_cast<const T*>(&base);
 		return nullptr;
 	}
+
+	template<typename T, typename Base>
+	class DynamicCastHelperForDerived;
+
+	/*!
+	@brief Helper class for dynamic casting, use type id to implement dynamic casting.
+	*/
+	template<typename T>
+	class DynamicCastHelperForBase
+	{
+	public:
+		template<typename Derived, typename Base>
+		friend class DynamicCastHelperForDerived;
+
+		inline DynamicCastHelperForBase()
+			: m_TypeId(GetTypeId<T>())
+		{
+		}
+
+		inline DynamicCastHelperForBase(const DynamicCastHelperForBase&)
+		{
+			// do nothing
+		}
+
+		inline DynamicCastHelperForBase& operator=(const DynamicCastHelperForBase&)
+		{
+			// do nothing
+			return *this;
+		}
+
+		inline static bool IsInstance(const T& base)
+		{
+			return true;
+		}
+
+	private:
+		UInt64 m_TypeId;
+	};
+
+	/*!
+	@brief Helper class for dynamic casting, use type id to implement dynamic casting.
+	*/
+	template<typename T, typename Base>
+	class DynamicCastHelperForDerived
+	{
+	public:
+		inline DynamicCastHelperForDerived()
+		{
+			static_cast<DynamicCastHelperForBase<Base>*>(static_cast<T*>(this))->m_TypeId = GetTypeId<T>();
+		}
+
+		inline static bool IsInstance(const Base& base)
+		{
+			return static_cast<const DynamicCastHelperForBase<Base>&>(base).m_TypeId == GetTypeId<T>();
+		}
+	};
 }
 
 /*!

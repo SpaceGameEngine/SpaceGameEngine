@@ -25,9 +25,6 @@ TEST(Value, DynamicCastTest)
 	Value value;
 	ASSERT_TRUE(Value::IsInstance(value));
 	ASSERT_EQ(DynamicCast<Value>(value), &value);
-
-	ASSERT_NE(value.GetTypeId(), 0);
-	ASSERT_EQ(value.GetTypeId(), SpaceGameEngine::GetTypeId<Value>());
 }
 
 TEST(ResultValue, GetTypeTest)
@@ -90,9 +87,6 @@ TEST(ResultValue, DynamicCastTest)
 
 	Value& base_ref = result;
 	ASSERT_EQ(DynamicCast<ResultValue>(base_ref), &result);
-
-	ASSERT_NE(result.GetTypeId(), 0);
-	ASSERT_EQ(result.GetTypeId(), SpaceGameEngine::GetTypeId<ResultValue>());
 }
 
 TEST(ReferenceValue, DynamicCastTest)
@@ -102,6 +96,38 @@ TEST(ReferenceValue, DynamicCastTest)
 	ASSERT_TRUE(ReferenceValue::IsInstance(ref));
 	Value& base_ref = ref;
 	ASSERT_EQ(DynamicCast<ReferenceValue>(base_ref), &ref);
-	ASSERT_NE(ref.GetTypeId(), 0);
-	ASSERT_EQ(ref.GetTypeId(), SpaceGameEngine::GetTypeId<ReferenceValue>());
+}
+
+TEST(TypeValue, GetTypeTest)
+{
+	Type test_type;
+	TypeValue type_value;
+	ASSERT_EQ(type_value.GetType(), nullptr);
+	TypeValue type_value_with_type(&test_type);
+	ASSERT_EQ(type_value_with_type.GetType(), &test_type);
+}
+
+TEST(TypeValue, DynamicCastTest)
+{
+	TypeValue type_value;
+	ASSERT_TRUE(TypeValue::IsInstance(type_value));
+	Value& base_ref = type_value;
+	ASSERT_EQ(DynamicCast<TypeValue>(base_ref), &type_value);
+}
+
+TEST(OperationTypeValue, GetOperationTypeTest)
+{
+	OperationType test_operation_type;
+	OperationTypeValue operation_type_value;
+	ASSERT_EQ(operation_type_value.GetOperationType(), nullptr);
+	OperationTypeValue operation_type_value_with_type(&test_operation_type);
+	ASSERT_EQ(operation_type_value_with_type.GetOperationType(), &test_operation_type);
+}
+
+TEST(OperationTypeValue, DynamicCastTest)
+{
+	OperationTypeValue operation_type_value;
+	ASSERT_TRUE(OperationTypeValue::IsInstance(operation_type_value));
+	Value& base_ref = operation_type_value;
+	ASSERT_EQ(DynamicCast<OperationTypeValue>(base_ref), &operation_type_value);
 }
