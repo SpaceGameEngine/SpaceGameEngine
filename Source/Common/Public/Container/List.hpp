@@ -18,6 +18,7 @@ limitations under the License.
 #include "TypeDefinition.hpp"
 #include "MemoryManager.h"
 #include "Error.h"
+#include "ContainerConcept.hpp"
 
 /*!
 @ingroup Common
