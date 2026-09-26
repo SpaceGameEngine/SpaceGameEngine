@@ -17,3 +17,9 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonIntermediateRepresentation;
+
+bool Operation::operator==(const Operation& other) const
+{
+	// todo
+	return true;
+}

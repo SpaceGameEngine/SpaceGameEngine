@@ -26,6 +26,12 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API OperationType
 	{
 	};
+
+	class COMMON_INTERMEDIATE_REPRESENTATION_API Operation
+	{
+	public:
+		bool operator==(const Operation& other) const;
+	};
 }
 
 /*!
