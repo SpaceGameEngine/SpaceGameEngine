@@ -17,6 +17,7 @@ limitations under the License.
 #include "Bootstrap.h"
 #include "SGEString.hpp"
 #include "Module/ModuleManager.h"
+#include "TestAttribute.hpp"
 #include "TestType.hpp"
 #include "TestDialect.hpp"
 #include "TestContext.hpp"

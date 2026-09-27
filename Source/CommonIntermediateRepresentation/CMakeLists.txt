@@ -1,4 +1,5 @@
 add_library(CommonIntermediateRepresentation SHARED
+        Private/Attribute.cpp
         Private/CommonIntermediateRepresentationModule.cpp
         Private/Logger.cpp
         Private/Type.cpp

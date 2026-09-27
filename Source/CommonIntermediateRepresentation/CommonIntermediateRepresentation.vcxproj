@@ -156,6 +156,7 @@
     <ClInclude Include="Private\Logger.h" />
     <ClInclude Include="Public\Assembler\Lexer.h" />
     <ClInclude Include="Public\Assembler\Parser.h" />
+    <ClInclude Include="Public\Attribute.h" />
     <ClInclude Include="Public\CommonIntermediateRepresentationAPI.h" />
     <ClInclude Include="Public\Context.h" />
     <ClInclude Include="Public\Dialect.h" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClCompile Include="Private\Assembler\Lexer.cpp" />
     <ClCompile Include="Private\Assembler\Parser.cpp" />
+    <ClCompile Include="Private\Attribute.cpp" />
     <ClCompile Include="Private\CommonIntermediateRepresentationModule.cpp" />
     <ClCompile Include="Private\Context.cpp" />
     <ClCompile Include="Private\Dialect.cpp" />

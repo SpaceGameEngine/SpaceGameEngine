@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="Assembler\TestLexer.hpp" />
     <ClInclude Include="Assembler\TestParser.hpp" />
+    <ClInclude Include="TestAttribute.hpp" />
     <ClInclude Include="TestContext.hpp" />
     <ClInclude Include="TestDialect.hpp" />
     <ClInclude Include="TestOperation.hpp" />
