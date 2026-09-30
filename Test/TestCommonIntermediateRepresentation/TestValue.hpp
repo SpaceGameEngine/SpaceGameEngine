@@ -31,7 +31,9 @@ TEST(Value, DynamicCastTest)
 {
 	Operation op;
 	Value value(op);
+	IntegerValue int_value(op);
 	ASSERT_TRUE(Value::IsInstance(value));
+	ASSERT_TRUE(Value::IsInstance(int_value));	  // Value is a base class of IntegerValue, so this should return true
 	ASSERT_EQ(DynamicCast<Value>(value), &value);
 }
 
@@ -94,9 +96,11 @@ TEST(ResultValue, DynamicCastTest)
 {
 	Operation op;
 	ResultValue result(op);
-	ASSERT_TRUE(ResultValue::IsInstance(result));
-
+	ReferenceValue ref(op, result);
 	Value& base_ref = result;
+
+	ASSERT_TRUE(ResultValue::IsInstance(result));
+	ASSERT_FALSE(ResultValue::IsInstance(ref));
 	ASSERT_EQ(DynamicCast<ResultValue>(base_ref), &result);
 }
 
@@ -105,8 +109,10 @@ TEST(ReferenceValue, DynamicCastTest)
 	Operation op;
 	ResultValue result(op);
 	ReferenceValue ref(op, result);
-	ASSERT_TRUE(ReferenceValue::IsInstance(ref));
 	Value& base_ref = ref;
+
+	ASSERT_TRUE(ReferenceValue::IsInstance(ref));
+	ASSERT_FALSE(ReferenceValue::IsInstance(result));
 	ASSERT_EQ(DynamicCast<ReferenceValue>(base_ref), &ref);
 }
 
@@ -134,8 +140,11 @@ TEST(TypeValue, DynamicCastTest)
 {
 	Operation op;
 	TypeValue type_value(op);
-	ASSERT_TRUE(TypeValue::IsInstance(type_value));
+	OperationTypeValue operation_type_value(op);
 	Value& base_ref = type_value;
+
+	ASSERT_TRUE(TypeValue::IsInstance(type_value));
+	ASSERT_FALSE(TypeValue::IsInstance(operation_type_value));
 	ASSERT_EQ(DynamicCast<TypeValue>(base_ref), &type_value);
 }
 
@@ -163,8 +172,11 @@ TEST(OperationTypeValue, DynamicCastTest)
 {
 	Operation op;
 	OperationTypeValue operation_type_value(op);
-	ASSERT_TRUE(OperationTypeValue::IsInstance(operation_type_value));
+	BlockValue block_value(op);
 	Value& base_ref = operation_type_value;
+
+	ASSERT_TRUE(OperationTypeValue::IsInstance(operation_type_value));
+	ASSERT_FALSE(OperationTypeValue::IsInstance(block_value));
 	ASSERT_EQ(DynamicCast<OperationTypeValue>(base_ref), &operation_type_value);
 }
 
@@ -187,8 +199,11 @@ TEST(BlockValue, DynamicCastTest)
 {
 	Operation op;
 	BlockValue block_value(op);
-	ASSERT_TRUE(BlockValue::IsInstance(block_value));
+	IntegerValue int_value(op);
 	Value& base_ref = block_value;
+
+	ASSERT_TRUE(BlockValue::IsInstance(block_value));
+	ASSERT_FALSE(BlockValue::IsInstance(int_value));
 	ASSERT_EQ(DynamicCast<BlockValue>(base_ref), &block_value);
 }
 
@@ -215,8 +230,11 @@ TEST(IntegerValue, DynamicCastTest)
 {
 	Operation op;
 	IntegerValue int_value(op);
-	ASSERT_TRUE(IntegerValue::IsInstance(int_value));
+	FloatValue float_value(op);
 	Value& base_ref = int_value;
+
+	ASSERT_TRUE(IntegerValue::IsInstance(int_value));
+	ASSERT_FALSE(IntegerValue::IsInstance(float_value));
 	ASSERT_EQ(DynamicCast<IntegerValue>(base_ref), &int_value);
 }
 
@@ -243,8 +261,11 @@ TEST(FloatValue, DynamicCastTest)
 {
 	Operation op;
 	FloatValue float_value(op);
-	ASSERT_TRUE(FloatValue::IsInstance(float_value));
+	DoubleValue double_value(op);
 	Value& base_ref = float_value;
+
+	ASSERT_TRUE(FloatValue::IsInstance(float_value));
+	ASSERT_FALSE(FloatValue::IsInstance(double_value));
 	ASSERT_EQ(DynamicCast<FloatValue>(base_ref), &float_value);
 }
 
@@ -271,8 +292,11 @@ TEST(DoubleValue, DynamicCastTest)
 {
 	Operation op;
 	DoubleValue double_value(op);
-	ASSERT_TRUE(DoubleValue::IsInstance(double_value));
+	BooleanValue bool_value(op);
 	Value& base_ref = double_value;
+
+	ASSERT_TRUE(DoubleValue::IsInstance(double_value));
+	ASSERT_FALSE(DoubleValue::IsInstance(bool_value));
 	ASSERT_EQ(DynamicCast<DoubleValue>(base_ref), &double_value);
 }
 
@@ -299,8 +323,11 @@ TEST(BooleanValue, DynamicCastTest)
 {
 	Operation op;
 	BooleanValue bool_value(op);
-	ASSERT_TRUE(BooleanValue::IsInstance(bool_value));
+	StringValue string_value(op);
 	Value& base_ref = bool_value;
+
+	ASSERT_TRUE(BooleanValue::IsInstance(bool_value));
+	ASSERT_FALSE(BooleanValue::IsInstance(string_value));
 	ASSERT_EQ(DynamicCast<BooleanValue>(base_ref), &bool_value);
 }
 
@@ -331,8 +358,11 @@ TEST(StringValue, DynamicCastTest)
 {
 	Operation op;
 	StringValue string_value(op);
-	ASSERT_TRUE(StringValue::IsInstance(string_value));
+	IntegerValue int_value(op);
 	Value& base_ref = string_value;
+
+	ASSERT_TRUE(StringValue::IsInstance(string_value));
+	ASSERT_FALSE(StringValue::IsInstance(int_value));
 	ASSERT_EQ(DynamicCast<StringValue>(base_ref), &string_value);
 }
 
@@ -379,7 +409,10 @@ TEST(ListValue, DynamicCastTest)
 {
 	Operation op;
 	ListValue list_value(op);
-	ASSERT_TRUE(ListValue::IsInstance(list_value));
+	BooleanValue bool_value(op);
 	Value& base_ref = list_value;
+
+	ASSERT_TRUE(ListValue::IsInstance(list_value));
+	ASSERT_FALSE(ListValue::IsInstance(bool_value));
 	ASSERT_EQ(DynamicCast<ListValue>(base_ref), &list_value);
 }
