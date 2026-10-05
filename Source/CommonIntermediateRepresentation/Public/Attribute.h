@@ -141,6 +141,24 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		Attribute* GetAttribute(const String& key);
 		const Attribute* GetAttribute(const String& key) const;
 
+		template<typename Callable>
+		inline void Visit(Callable&& callable)
+		{
+			for (auto iter = m_Attributes.GetBegin(); iter != m_Attributes.GetEnd(); ++iter)
+			{
+				callable(iter->m_First, iter->m_Second);
+			}
+		}
+
+		template<typename Callable>
+		inline void Visit(Callable&& callable) const
+		{
+			for (auto iter = m_Attributes.GetBegin(); iter != m_Attributes.GetEnd(); ++iter)
+			{
+				callable(iter->m_First, (const Attribute*)iter->m_Second);
+			}
+		}
+
 		using DynamicCastHelperForDerived<DictionaryAttribute, Attribute>::IsInstance;
 
 	private:

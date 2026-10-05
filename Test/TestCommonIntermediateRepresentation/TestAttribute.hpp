@@ -222,6 +222,76 @@ TEST(DictionaryAttribute, GetAttributeTest)
 	ASSERT_EQ(const_dictionary.GetAttribute(SGE_STR("key")), nullptr);
 }
 
+TEST(DictionaryAttribute, VisitTest)
+{
+	DictionaryAttribute dictionary;
+	SizeType empty_count = 0;
+	dictionary.Visit([&](const String&, Attribute*) { empty_count += 1; });
+	ASSERT_EQ(empty_count, 0);
+
+	dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 42);
+	dictionary.UpsertAttribute<StringAttribute>(SGE_STR("str"), SGE_STR("Hello"));
+
+	SizeType count = 0;
+	dictionary.Visit([&](const String& key, Attribute* pattr) {
+		ASSERT_NE(pattr, nullptr);
+		if (key == SGE_STR("int"))
+		{
+			IntegerAttribute* pint = DynamicCast<IntegerAttribute>(*pattr);
+			ASSERT_NE(pint, nullptr);
+			ASSERT_EQ(pint->GetValue(), 42);
+			pint->SetValue(100);
+		}
+		else if (key == SGE_STR("str"))
+		{
+			StringAttribute* pstr = DynamicCast<StringAttribute>(*pattr);
+			ASSERT_NE(pstr, nullptr);
+			ASSERT_EQ(pstr->GetValue(), SGE_STR("Hello"));
+		}
+		else
+			ASSERT_TRUE(false);
+		count += 1;
+	});
+	ASSERT_EQ(count, 2);
+
+	Attribute* pint_attr = dictionary.GetAttribute(SGE_STR("int"));
+	ASSERT_NE(pint_attr, nullptr);
+	ASSERT_EQ(DynamicCast<IntegerAttribute>(*pint_attr)->GetValue(), 100);
+}
+
+TEST(DictionaryAttribute, ConstVisitTest)
+{
+	DictionaryAttribute dictionary;
+	const DictionaryAttribute& const_dictionary = dictionary;
+	SizeType empty_count = 0;
+	const_dictionary.Visit([&](const String&, const Attribute*) { empty_count += 1; });
+	ASSERT_EQ(empty_count, 0);
+
+	dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 42);
+	dictionary.UpsertAttribute<StringAttribute>(SGE_STR("str"), SGE_STR("Hello"));
+
+	SizeType count = 0;
+	const_dictionary.Visit([&](const String& key, const Attribute* pattr) {
+		ASSERT_NE(pattr, nullptr);
+		if (key == SGE_STR("int"))
+		{
+			const IntegerAttribute* pint = DynamicCast<IntegerAttribute>(*pattr);
+			ASSERT_NE(pint, nullptr);
+			ASSERT_EQ(pint->GetValue(), 42);
+		}
+		else if (key == SGE_STR("str"))
+		{
+			const StringAttribute* pstr = DynamicCast<StringAttribute>(*pattr);
+			ASSERT_NE(pstr, nullptr);
+			ASSERT_EQ(pstr->GetValue(), SGE_STR("Hello"));
+		}
+		else
+			ASSERT_TRUE(false);
+		count += 1;
+	});
+	ASSERT_EQ(count, 2);
+}
+
 TEST(DictionaryAttribute, DynamicCastTest)
 {
 	DictionaryAttribute dictionary;
