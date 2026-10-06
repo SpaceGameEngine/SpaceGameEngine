@@ -32,78 +32,90 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool found);
 	};
 
-	class COMMON_INTERMEDIATE_REPRESENTATION_API InterfaceContainer : public UncopyableAndUnmovable
+	/*!
+	@brief The CRTP base class which stores the offsets of the interfaces of the type `T`.
+	@warning The interfaces are located by the offsets which are computed by `GetOffsetOfBase`, so
+	neither the interfaces nor `T` itself can be inherited virtually. The offset of a virtual base
+	class can only be got by reading the vbptr/vbtable in a real object and it depends on the most
+	derived type, so it can not be cached as a constant here.
+	*/
+	template<typename T>
+	class InterfaceContainer : public UncopyableAndUnmovable
 	{
 	public:
-		template<typename T, typename... InterfaceTypes>
+		template<typename U, typename... InterfaceTypes>
 		friend class Interfaces;
 
-		template<typename T, typename InterfaceType>
-			requires std::derived_from<T, InterfaceType>
+		template<typename InterfaceType>
 		inline bool HasInterface() const
 		{
 			return m_InterfaceTypeIds.Contains(GetTypeId<InterfaceType>());
 		}
 
-		template<typename T, typename InterfaceType>
-			requires std::derived_from<T, InterfaceType>
-		inline InterfaceType& GetInterface(T& obj)
+		template<typename InterfaceType>
+		inline InterfaceType& GetInterface()
 		{
 			auto iter = m_InterfaceTypeIds.Find(GetTypeId<InterfaceType>());
 			SGE_ASSERT(InterfaceNotFoundError, iter != m_InterfaceTypeIds.GetEnd());
-			return *reinterpret_cast<InterfaceType*>(reinterpret_cast<UInt64>(&obj) + iter->m_Second);
+			return *reinterpret_cast<InterfaceType*>(reinterpret_cast<UInt64>(static_cast<T*>(this)) + iter->m_Second);
 		}
 
-		template<typename T, typename InterfaceType>
-			requires std::derived_from<T, InterfaceType>
-		inline const InterfaceType& GetInterface(const T& obj) const
+		template<typename InterfaceType>
+		inline const InterfaceType& GetInterface() const
 		{
 			auto iter = m_InterfaceTypeIds.Find(GetTypeId<InterfaceType>());
 			SGE_ASSERT(InterfaceNotFoundError, iter != m_InterfaceTypeIds.GetConstEnd());
-			return *reinterpret_cast<const InterfaceType*>(reinterpret_cast<UInt64>(&obj) + iter->m_Second);
+			return *reinterpret_cast<const InterfaceType*>(reinterpret_cast<UInt64>(static_cast<const T*>(this)) + iter->m_Second);
 		}
 
-		template<typename T, typename InterfaceType>
-			requires std::derived_from<T, InterfaceType>
-		inline InterfaceType* QueryInterface(T& obj)
+		template<typename InterfaceType>
+		inline InterfaceType* QueryInterface()
 		{
 			auto iter = m_InterfaceTypeIds.Find(GetTypeId<InterfaceType>());
 			if (iter != m_InterfaceTypeIds.GetEnd())
-				return reinterpret_cast<InterfaceType*>(reinterpret_cast<UInt64>(&obj) + iter->m_Second);
+				return reinterpret_cast<InterfaceType*>(reinterpret_cast<UInt64>(static_cast<T*>(this)) + iter->m_Second);
 			else
 				return nullptr;
 		}
 
-		template<typename T, typename InterfaceType>
-			requires std::derived_from<T, InterfaceType>
-		inline const InterfaceType* QueryInterface(const T& obj) const
+		template<typename InterfaceType>
+		inline const InterfaceType* QueryInterface() const
 		{
 			auto iter = m_InterfaceTypeIds.Find(GetTypeId<InterfaceType>());
 			if (iter != m_InterfaceTypeIds.GetConstEnd())
-				return reinterpret_cast<const InterfaceType*>(reinterpret_cast<UInt64>(&obj) + iter->m_Second);
+				return reinterpret_cast<const InterfaceType*>(reinterpret_cast<UInt64>(static_cast<const T*>(this)) + iter->m_Second);
 			else
 				return nullptr;
 		}
 
 	private:
-		template<typename T, typename InterfaceType>
-		// requires std::derived_from<T, InterfaceType>
+		template<typename U, typename InterfaceType>
 		inline void AddInterface()
 		{
-			m_InterfaceTypeIds.Insert(GetTypeId<InterfaceType>(), GetOffsetOfBase<T, InterfaceType>());
+			static_assert(std::is_base_of_v<T, U>, "U must be derived from T");
+			m_InterfaceTypeIds.Insert(GetTypeId<InterfaceType>(), GetOffsetOfBase<U, InterfaceType>() - GetOffsetOfBase<U, T>());
 		}
 
 	private:
-		HashMap<UInt64, UInt64> m_InterfaceTypeIds;	   // type id -> offset
+		HashMap<UInt64, Int64> m_InterfaceTypeIds;	  // type id -> offset
 	};
 
+	/*!
+	@brief The helper base class which inherits the given interfaces and registers them to the
+	`InterfaceContainer` of the type `T` automatically.
+	@warning All the interfaces must be inherited non-virtually, because `AddInterface` uses
+	`GetOffsetOfBase` which requires the offset of the base class to be a compile time constant.
+	@warning The `InterfaceContainer` base class of `T` must be declared before this class in the
+	base class list of `T`, otherwise the constructor of this class will be called before the
+	`InterfaceContainer` is constructed.
+	*/
 	template<typename T, typename... InterfaceTypes>
 	class Interfaces : public InterfaceTypes...
 	{
 	public:
 		inline Interfaces()
 		{
-			(static_cast<InterfaceContainer*>(static_cast<T*>(this))->template AddInterface<T, InterfaceTypes>(), ...);
+			(static_cast<T*>(this)->template AddInterface<T, InterfaceTypes>(), ...);
 		}
 	};
 }

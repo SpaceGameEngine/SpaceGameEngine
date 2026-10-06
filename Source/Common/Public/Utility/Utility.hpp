@@ -135,6 +135,15 @@ namespace SpaceGameEngine
 		}
 	}
 
+	/*!
+	@brief Get the offset of the `Base` sub object in the `Derived` object.
+	@warning `Base` must not be a virtual base class of `Derived`. This function computes the
+	offset by casting a fake pointer, which requires the offset to be a compile time constant.
+	For a virtual base class, `static_cast` needs to read the vbptr/vbtable in the real object
+	to get the offset, so using a fake pointer will cause an access violation. Besides, the
+	offset of a virtual base class is not fixed, it depends on the most derived type, so it can
+	not be cached as a constant.
+	*/
 	template<class Derived, class Base>
 	// requires std::derived_from<Derived, Base>	// CRTP can not use "requires" to check the inheritance relationship, because the Derived class is not fully defined at this point.
 	inline UInt64 GetOffsetOfBase()
