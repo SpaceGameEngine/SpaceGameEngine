@@ -164,6 +164,7 @@
     <ClInclude Include="TestAttribute.hpp" />
     <ClInclude Include="TestContext.hpp" />
     <ClInclude Include="TestDialect.hpp" />
+    <ClInclude Include="TestInterface.hpp" />
     <ClInclude Include="TestOperation.hpp" />
     <ClInclude Include="TestPass.hpp" />
     <ClInclude Include="TestType.hpp" />

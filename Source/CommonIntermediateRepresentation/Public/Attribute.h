@@ -153,7 +153,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		template<typename Callable>
 		inline void Visit(Callable&& callable) const
 		{
-			for (auto iter = m_Attributes.GetBegin(); iter != m_Attributes.GetEnd(); ++iter)
+			for (auto iter = m_Attributes.GetConstBegin(); iter != m_Attributes.GetConstEnd(); ++iter)
 			{
 				callable(iter->m_First, (const Attribute*)iter->m_Second);
 			}

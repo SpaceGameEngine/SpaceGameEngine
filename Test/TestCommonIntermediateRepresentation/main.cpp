@@ -19,6 +19,7 @@ limitations under the License.
 #include "Module/ModuleManager.h"
 #include "TestAttribute.hpp"
 #include "TestType.hpp"
+#include "TestInterface.hpp"
 #include "TestDialect.hpp"
 #include "TestContext.hpp"
 #include "TestValue.hpp"
