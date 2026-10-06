@@ -1,8 +1,9 @@
 add_library(CommonIntermediateRepresentation SHARED
-        Private/Attribute.cpp
         Private/CommonIntermediateRepresentationModule.cpp
         Private/Logger.cpp
+        Private/Attribute.cpp
         Private/Type.cpp
+        Private/Interface.cpp
         Private/Dialect.cpp
         Private/Context.cpp
         Private/Value.cpp
