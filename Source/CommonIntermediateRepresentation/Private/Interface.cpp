@@ -17,3 +17,8 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonIntermediateRepresentation;
+
+bool InterfaceNotFoundError::Judge(bool found)
+{
+	return !found;
+}

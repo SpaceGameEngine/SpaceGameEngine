@@ -94,7 +94,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 
 	struct ReferenceNotFoundError
 	{
-		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The reference was not found in result's reference list.");
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The reference is not found in result's reference list.");
 		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool found);
 	};
 

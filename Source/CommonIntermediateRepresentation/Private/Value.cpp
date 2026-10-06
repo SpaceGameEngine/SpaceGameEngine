@@ -133,7 +133,7 @@ const SpaceGameEngine::CommonIntermediateRepresentation::ReferenceValue* Referen
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::ReferenceValue);
 
-COMMON_INTERMEDIATE_REPRESENTATION_API bool ReferenceNotFoundError::Judge(bool found)
+bool ReferenceNotFoundError::Judge(bool found)
 {
 	return !found;
 }

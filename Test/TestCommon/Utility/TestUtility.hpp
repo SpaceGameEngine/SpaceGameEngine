@@ -80,3 +80,41 @@ TEST(ForwardLike, Test)
 	ASSERT_FALSE((std::is_same_v<decltype(ForwardLike<int>(std::declval<char>())), char>));
 	ASSERT_FALSE((std::is_same_v<decltype(ForwardLike<const int>(std::declval<char>())), const char>));
 }
+
+struct TestGetOffsetOfBaseBase1
+{
+	virtual ~TestGetOffsetOfBaseBase1() = default;
+
+	int m_Content1 = 1;
+};
+
+struct TestGetOffsetOfBaseBase2
+{
+	virtual ~TestGetOffsetOfBaseBase2() = default;
+
+	int m_Content2 = 2;
+};
+
+struct TestGetOffsetOfBaseDerived : public TestGetOffsetOfBaseBase1, public TestGetOffsetOfBaseBase2
+{
+	int m_Content3 = 3;
+};
+
+TEST(GetOffsetOfBase, Test)
+{
+	ASSERT_EQ((GetOffsetOfBase<TestGetOffsetOfBaseBase1, TestGetOffsetOfBaseBase1>()), 0);
+
+	TestGetOffsetOfBaseDerived obj;
+	TestGetOffsetOfBaseDerived* pderived = &obj;
+
+	ASSERT_EQ((GetOffsetOfBase<TestGetOffsetOfBaseDerived, TestGetOffsetOfBaseBase1>()),
+			  reinterpret_cast<UInt64>(static_cast<TestGetOffsetOfBaseBase1*>(pderived)) - reinterpret_cast<UInt64>(pderived));
+	ASSERT_EQ((GetOffsetOfBase<TestGetOffsetOfBaseDerived, TestGetOffsetOfBaseBase2>()),
+			  reinterpret_cast<UInt64>(static_cast<TestGetOffsetOfBaseBase2*>(pderived)) - reinterpret_cast<UInt64>(pderived));
+
+	ASSERT_NE((GetOffsetOfBase<TestGetOffsetOfBaseDerived, TestGetOffsetOfBaseBase2>()), 0);
+
+	UInt64 offset = GetOffsetOfBase<TestGetOffsetOfBaseDerived, TestGetOffsetOfBaseBase2>();
+	TestGetOffsetOfBaseBase2* pbase2 = reinterpret_cast<TestGetOffsetOfBaseBase2*>(reinterpret_cast<UInt64>(pderived) + offset);
+	ASSERT_EQ(pbase2->m_Content2, 2);
+}

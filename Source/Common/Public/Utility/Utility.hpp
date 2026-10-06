@@ -134,6 +134,14 @@ namespace SpaceGameEngine
 				return std::move(x);
 		}
 	}
+
+	template<class Derived, class Base>
+	// requires std::derived_from<Derived, Base>	// CRTP can not use "requires" to check the inheritance relationship, because the Derived class is not fully defined at this point.
+	inline UInt64 GetOffsetOfBase()
+	{
+		static_assert(std::is_base_of_v<Base, Derived>, "Derived must be derived from Base");
+		return reinterpret_cast<UInt64>(static_cast<Base*>(reinterpret_cast<Derived*>(0x1000))) - 0x1000;
+	}
 }
 
 /*!
