@@ -63,7 +63,7 @@ namespace SpaceGameEngine
 		friend class DynamicCastHelperForDerived;
 
 		inline DynamicCastHelperForBase()
-			: m_TypeId(GetTypeId<T>())
+			: m_TypeId(SpaceGameEngine::GetTypeId<T>())
 		{
 		}
 
@@ -83,6 +83,11 @@ namespace SpaceGameEngine
 			return true;
 		}
 
+		inline UInt64 GetTypeId() const
+		{
+			return m_TypeId;
+		}
+
 	private:
 		UInt64 m_TypeId;
 	};
@@ -96,12 +101,12 @@ namespace SpaceGameEngine
 	public:
 		inline DynamicCastHelperForDerived()
 		{
-			static_cast<DynamicCastHelperForBase<Base>*>(static_cast<T*>(this))->m_TypeId = GetTypeId<T>();
+			static_cast<DynamicCastHelperForBase<Base>*>(static_cast<T*>(this))->m_TypeId = SpaceGameEngine::GetTypeId<T>();
 		}
 
 		inline static bool IsInstance(const Base& base)
 		{
-			return static_cast<const DynamicCastHelperForBase<Base>&>(base).m_TypeId == GetTypeId<T>();
+			return static_cast<const DynamicCastHelperForBase<Base>&>(base).m_TypeId == SpaceGameEngine::GetTypeId<T>();
 		}
 	};
 }
