@@ -17,3 +17,68 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonIntermediateRepresentation;
+
+bool DialectAlreadyExistsError::Judge(bool found)
+{
+	return found;
+}
+
+bool DialectNotFoundError::Judge(bool found)
+{
+	return !found;
+}
+
+bool DialectNameAlreadyExistsError::Judge(bool found)
+{
+	return found;
+}
+
+bool DialectNameNotFoundError::Judge(bool found)
+{
+	return !found;
+}
+
+Context::~Context()
+{
+	for (auto iter = m_Dialects.GetBegin(); iter != m_Dialects.GetEnd(); ++iter)
+	{
+		DefaultAllocator::Delete(iter->m_Second);
+	}
+}
+
+bool Context::HasDialectByName(const String& name) const
+{
+	return m_DialectsByName.Contains(name);
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Dialect& Context::GetDialectByName(const String& name)
+{
+	auto iter = m_DialectsByName.Find(name);
+	SGE_CHECK(DialectNameNotFoundError, iter != m_DialectsByName.GetEnd());
+	return *iter->m_Second;
+}
+
+const SpaceGameEngine::CommonIntermediateRepresentation::Dialect& Context::GetDialectByName(const String& name) const
+{
+	auto iter = m_DialectsByName.Find(name);
+	SGE_CHECK(DialectNameNotFoundError, iter != m_DialectsByName.GetConstEnd());
+	return *iter->m_Second;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Dialect* Context::QueryDialectByName(const String& name)
+{
+	auto iter = m_DialectsByName.Find(name);
+	if (iter != m_DialectsByName.GetEnd())
+		return iter->m_Second;
+	else
+		return nullptr;
+}
+
+const SpaceGameEngine::CommonIntermediateRepresentation::Dialect* Context::QueryDialectByName(const String& name) const
+{
+	auto iter = m_DialectsByName.Find(name);
+	if (iter != m_DialectsByName.GetConstEnd())
+		return iter->m_Second;
+	else
+		return nullptr;
+}

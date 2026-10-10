@@ -15,6 +15,8 @@ limitations under the License.
 */
 #pragma once
 #include "CommonIntermediateRepresentationAPI.h"
+#include "Interface.h"
+#include "Utility/DynamicCast.hpp"
 
 /*!
 @ingroup CommonIntermediateRepresentation
@@ -23,8 +25,25 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonIntermediateRepresentation
 {
-	class COMMON_INTERMEDIATE_REPRESENTATION_API OperationType
+	class Dialect;
+
+	class COMMON_INTERMEDIATE_REPRESENTATION_API OperationType : public DynamicCastHelperForBase<OperationType>, InterfaceContainer<OperationType>
 	{
+	public:
+		virtual ~OperationType();
+
+		const String& GetName() const;
+		Dialect& GetBelongedDialect();
+		const Dialect& GetBelongedDialect() const;
+
+		using DynamicCastHelperForBase<OperationType>::IsInstance;
+
+	protected:
+		OperationType(const String& name, Dialect& dialect);	// call by derived only
+
+	private:
+		String m_Name;
+		Dialect& m_BelongedDialect;
 	};
 
 	class COMMON_INTERMEDIATE_REPRESENTATION_API Operation
@@ -33,6 +52,8 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		bool operator==(const Operation& other) const;
 	};
 }
+
+SGE_DECLARE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::OperationType);
 
 /*!
 @}

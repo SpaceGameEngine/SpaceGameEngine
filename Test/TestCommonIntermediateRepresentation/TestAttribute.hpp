@@ -29,6 +29,13 @@ TEST(Attribute, DynamicCastTest)
 	ASSERT_EQ(DynamicCast<Attribute>(attribute), &attribute);
 }
 
+TEST(Attribute, GetTypeIdTest)
+{
+	Attribute attribute;
+
+	ASSERT_EQ(attribute.GetTypeId(), GetTypeId<Attribute>());
+}
+
 TEST(IntegerAttribute, SetValueTest)
 {
 	IntegerAttribute int_attribute(42);
@@ -57,6 +64,13 @@ TEST(IntegerAttribute, DynamicCastTest)
 	ASSERT_EQ(DynamicCast<IntegerAttribute>(base_ref), &int_attribute);
 }
 
+TEST(IntegerAttribute, GetTypeIdTest)
+{
+	IntegerAttribute int_attribute(42);
+
+	ASSERT_EQ(int_attribute.GetTypeId(), GetTypeId<IntegerAttribute>());
+}
+
 TEST(FloatAttribute, SetValueTest)
 {
 	FloatAttribute float_attribute(3.14f);
@@ -81,6 +95,13 @@ TEST(FloatAttribute, DynamicCastTest)
 	ASSERT_TRUE(FloatAttribute::IsInstance(float_attribute));
 	ASSERT_FALSE(FloatAttribute::IsInstance(double_attribute));
 	ASSERT_EQ(DynamicCast<FloatAttribute>(base_ref), &float_attribute);
+}
+
+TEST(FloatAttribute, GetTypeIdTest)
+{
+	FloatAttribute float_attribute(3.14f);
+
+	ASSERT_EQ(float_attribute.GetTypeId(), GetTypeId<FloatAttribute>());
 }
 
 TEST(DoubleAttribute, SetValueTest)
@@ -109,6 +130,13 @@ TEST(DoubleAttribute, DynamicCastTest)
 	ASSERT_EQ(DynamicCast<DoubleAttribute>(base_ref), &double_attribute);
 }
 
+TEST(DoubleAttribute, GetTypeIdTest)
+{
+	DoubleAttribute double_attribute(3.14);
+
+	ASSERT_EQ(double_attribute.GetTypeId(), GetTypeId<DoubleAttribute>());
+}
+
 TEST(BooleanAttribute, SetValueTest)
 {
 	BooleanAttribute bool_attribute(true);
@@ -135,6 +163,13 @@ TEST(BooleanAttribute, DynamicCastTest)
 	ASSERT_TRUE(BooleanAttribute::IsInstance(bool_attribute));
 	ASSERT_FALSE(BooleanAttribute::IsInstance(string_attribute));
 	ASSERT_EQ(DynamicCast<BooleanAttribute>(base_ref), &bool_attribute);
+}
+
+TEST(BooleanAttribute, GetTypeIdTest)
+{
+	BooleanAttribute bool_attribute(true);
+
+	ASSERT_EQ(bool_attribute.GetTypeId(), GetTypeId<BooleanAttribute>());
 }
 
 TEST(StringAttribute, SetValueTest)
@@ -170,6 +205,13 @@ TEST(StringAttribute, DynamicCastTest)
 	ASSERT_TRUE(StringAttribute::IsInstance(string_attribute));
 	ASSERT_FALSE(StringAttribute::IsInstance(int_attribute));
 	ASSERT_EQ(DynamicCast<StringAttribute>(base_ref), &string_attribute);
+}
+
+TEST(StringAttribute, GetTypeIdTest)
+{
+	StringAttribute string_attribute(SGE_STR("Test"));
+
+	ASSERT_EQ(string_attribute.GetTypeId(), GetTypeId<StringAttribute>());
 }
 
 TEST(DictionaryAttribute, UpsertAttributeTest)
@@ -300,4 +342,11 @@ TEST(DictionaryAttribute, DynamicCastTest)
 	ASSERT_TRUE(DictionaryAttribute::IsInstance(dictionary));
 	ASSERT_FALSE(DictionaryAttribute::IsInstance(int_attribute));
 	ASSERT_EQ(DynamicCast<DictionaryAttribute>(base_ref), &dictionary);
+}
+
+TEST(DictionaryAttribute, GetTypeIdTest)
+{
+	DictionaryAttribute dictionary;
+
+	ASSERT_EQ(dictionary.GetTypeId(), GetTypeId<DictionaryAttribute>());
 }
