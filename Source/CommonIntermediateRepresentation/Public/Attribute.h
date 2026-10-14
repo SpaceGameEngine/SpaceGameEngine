@@ -27,10 +27,12 @@ limitations under the License.
 
 namespace SpaceGameEngine::CommonIntermediateRepresentation
 {
-	class COMMON_INTERMEDIATE_REPRESENTATION_API Attribute : public DynamicCastHelperForBase<Attribute>, UncopyableAndUnmovable
+	class COMMON_INTERMEDIATE_REPRESENTATION_API Attribute : public DynamicCastHelperForBase<Attribute>
 	{
 	public:
 		virtual ~Attribute() = default;
+
+		virtual Attribute* Clone() const = 0;
 
 		using DynamicCastHelperForBase<Attribute>::IsInstance;
 	};
@@ -40,9 +42,15 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		IntegerAttribute(UInt64 value);
 		virtual ~IntegerAttribute();
+		IntegerAttribute(const IntegerAttribute& other) = default;
+		IntegerAttribute(IntegerAttribute&& other) = default;
+		IntegerAttribute& operator=(const IntegerAttribute& other) = default;
+		IntegerAttribute& operator=(IntegerAttribute&& other) = default;
 
 		void SetValue(UInt64 value);
 		UInt64 GetValue() const;
+
+		virtual Attribute* Clone() const override;
 
 		using DynamicCastHelperForDerived<IntegerAttribute, Attribute>::IsInstance;
 
@@ -55,9 +63,15 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		FloatAttribute(float value);
 		virtual ~FloatAttribute();
+		FloatAttribute(const FloatAttribute& other) = default;
+		FloatAttribute(FloatAttribute&& other) = default;
+		FloatAttribute& operator=(const FloatAttribute& other) = default;
+		FloatAttribute& operator=(FloatAttribute&& other) = default;
 
 		void SetValue(float value);
 		float GetValue() const;
+
+		virtual Attribute* Clone() const override;
 
 		using DynamicCastHelperForDerived<FloatAttribute, Attribute>::IsInstance;
 
@@ -70,9 +84,15 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		DoubleAttribute(double value);
 		virtual ~DoubleAttribute();
+		DoubleAttribute(const DoubleAttribute& other) = default;
+		DoubleAttribute(DoubleAttribute&& other) = default;
+		DoubleAttribute& operator=(const DoubleAttribute& other) = default;
+		DoubleAttribute& operator=(DoubleAttribute&& other) = default;
 
 		void SetValue(double value);
 		double GetValue() const;
+
+		virtual Attribute* Clone() const override;
 
 		using DynamicCastHelperForDerived<DoubleAttribute, Attribute>::IsInstance;
 
@@ -85,9 +105,15 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		BooleanAttribute(bool value);
 		virtual ~BooleanAttribute();
+		BooleanAttribute(const BooleanAttribute& other) = default;
+		BooleanAttribute(BooleanAttribute&& other) = default;
+		BooleanAttribute& operator=(const BooleanAttribute& other) = default;
+		BooleanAttribute& operator=(BooleanAttribute&& other) = default;
 
 		void SetValue(bool value);
 		bool GetValue() const;
+
+		virtual Attribute* Clone() const override;
 
 		using DynamicCastHelperForDerived<BooleanAttribute, Attribute>::IsInstance;
 
@@ -101,10 +127,16 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		StringAttribute(const String& value);
 		StringAttribute(String&& value);
 		virtual ~StringAttribute();
+		StringAttribute(const StringAttribute& other) = default;
+		StringAttribute(StringAttribute&& other) = default;
+		StringAttribute& operator=(const StringAttribute& other) = default;
+		StringAttribute& operator=(StringAttribute&& other) = default;
 
 		void SetValue(const String& value);
 		void SetValue(String&& value);
 		const String& GetValue() const;
+
+		virtual Attribute* Clone() const override;
 
 		using DynamicCastHelperForDerived<StringAttribute, Attribute>::IsInstance;
 
@@ -117,6 +149,10 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		DictionaryAttribute() = default;
 		virtual ~DictionaryAttribute();
+		DictionaryAttribute(const DictionaryAttribute& other);
+		DictionaryAttribute(DictionaryAttribute&& other) = default;
+		DictionaryAttribute& operator=(const DictionaryAttribute& other);
+		DictionaryAttribute& operator=(DictionaryAttribute&& other) = default;
 
 		template<typename T, typename... Args>
 			requires std::derived_from<T, Attribute>
@@ -158,6 +194,8 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 				callable(iter->m_First, (const Attribute*)iter->m_Second);
 			}
 		}
+
+		virtual Attribute* Clone() const override;
 
 		using DynamicCastHelperForDerived<DictionaryAttribute, Attribute>::IsInstance;
 

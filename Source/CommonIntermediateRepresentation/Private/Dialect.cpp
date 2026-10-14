@@ -46,9 +46,7 @@ Dialect::Dialect(const String& name, Context& context)
 Dialect::~Dialect()
 {
 	for (auto iter = m_OperationTypes.GetBegin(); iter != m_OperationTypes.GetEnd(); ++iter)
-	{
 		DefaultAllocator::Delete(iter->m_Second);
-	}
 }
 
 const SpaceGameEngine::String& Dialect::GetName() const

@@ -72,7 +72,18 @@ namespace SpaceGameEngine
 			// do nothing
 		}
 
+		inline DynamicCastHelperForBase(DynamicCastHelperForBase&&)
+		{
+			// do nothing
+		}
+
 		inline DynamicCastHelperForBase& operator=(const DynamicCastHelperForBase&)
+		{
+			// do nothing
+			return *this;
+		}
+
+		inline DynamicCastHelperForBase& operator=(DynamicCastHelperForBase&&)
 		{
 			// do nothing
 			return *this;
@@ -103,6 +114,19 @@ namespace SpaceGameEngine
 		{
 			static_cast<DynamicCastHelperForBase<Base>*>(static_cast<T*>(this))->m_TypeId = SpaceGameEngine::GetTypeId<T>();
 		}
+
+		inline DynamicCastHelperForDerived(const DynamicCastHelperForDerived&)
+			: DynamicCastHelperForDerived()
+		{
+		}
+
+		inline DynamicCastHelperForDerived(DynamicCastHelperForDerived&&)
+			: DynamicCastHelperForDerived()
+		{
+		}
+
+		inline DynamicCastHelperForDerived& operator=(const DynamicCastHelperForDerived&) = default;
+		inline DynamicCastHelperForDerived& operator=(DynamicCastHelperForDerived&&) = default;
 
 		inline static bool IsInstance(const Base& base)
 		{

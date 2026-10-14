@@ -102,21 +102,17 @@ SGE_DEFINE_TYPE_ID(, TestDynamicCastHelperDerived2);
 SGE_DECLARE_TYPE_ID(, TestDynamicCastHelperDerived3);
 SGE_DEFINE_TYPE_ID(, TestDynamicCastHelperDerived3);
 
-TEST(DynamicCastHelper, GetTypeIdTest)
+TEST(DynamicCastHelper, CanDynamicCastTest)
 {
-	TestDynamicCastHelperBase base;
-	TestDynamicCastHelperDerived1 derived1;
-	TestDynamicCastHelperDerived2 derived2;
-	TestDynamicCastHelperDerived3 derived3;
+	static_assert(CanDynamicCast<TestDynamicCastDerived1, TestDynamicCastBase>);
+	static_assert(CanDynamicCast<TestDynamicCastDerived2, TestDynamicCastBase>);
+	static_assert(!CanDynamicCast<TestDynamicCastBase, TestDynamicCastDerived1>);
+	static_assert(!CanDynamicCast<TestDynamicCastDerived2, TestDynamicCastDerived1>);
 
-	ASSERT_EQ(base.GetTypeId(), GetTypeId<TestDynamicCastHelperBase>());
-	ASSERT_EQ(derived1.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
-	ASSERT_EQ(derived2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived2>());
-	ASSERT_EQ(derived3.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived3>());
-
-	ASSERT_NE(derived1.GetTypeId(), derived2.GetTypeId());
-	ASSERT_NE(derived1.GetTypeId(), derived3.GetTypeId());
-	ASSERT_NE(base.GetTypeId(), derived1.GetTypeId());
+	static_assert(CanDynamicCast<TestDynamicCastHelperDerived1, TestDynamicCastHelperBase>);
+	static_assert(CanDynamicCast<TestDynamicCastHelperDerived2, TestDynamicCastHelperBase>);
+	static_assert(CanDynamicCast<TestDynamicCastHelperDerived3, TestDynamicCastHelperBase>);
+	static_assert(!CanDynamicCast<TestDynamicCastHelperDerived2, TestDynamicCastHelperDerived1>);
 }
 
 TEST(DynamicCastHelper, IsInstanceTest)
@@ -174,4 +170,131 @@ TEST(DynamicCastHelper, DynamicCastTest)
 	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived1>(cbase_ref), nullptr);
 	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived1>(cderived1_ref), &derived1);
 	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived1>(cderived2_ref), nullptr);
+}
+
+TEST(DynamicCastHelper, GetTypeIdTest)
+{
+	TestDynamicCastHelperBase base;
+	TestDynamicCastHelperDerived1 derived1;
+	TestDynamicCastHelperDerived2 derived2;
+	TestDynamicCastHelperDerived3 derived3;
+
+	ASSERT_EQ(base.GetTypeId(), GetTypeId<TestDynamicCastHelperBase>());
+	ASSERT_EQ(derived1.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+	ASSERT_EQ(derived2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived2>());
+	ASSERT_EQ(derived3.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived3>());
+
+	ASSERT_NE(derived1.GetTypeId(), derived2.GetTypeId());
+	ASSERT_NE(derived1.GetTypeId(), derived3.GetTypeId());
+	ASSERT_NE(base.GetTypeId(), derived1.GetTypeId());
+}
+
+TEST(DynamicCastHelper, CopyConstructionTest)
+{
+	TestDynamicCastHelperDerived1 derived1;
+	TestDynamicCastHelperDerived2 derived2;
+	TestDynamicCastHelperDerived3 derived3;
+
+	TestDynamicCastHelperDerived1 cderived1(derived1);
+	TestDynamicCastHelperDerived2 cderived2(derived2);
+	TestDynamicCastHelperDerived3 cderived3(derived3);
+
+	ASSERT_EQ(cderived1.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+	ASSERT_EQ(cderived2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived2>());
+	ASSERT_EQ(cderived3.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived3>());
+
+	// slicing copy from derived3 into derived1 must get derived1's type id
+	TestDynamicCastHelperDerived1 sliced(static_cast<const TestDynamicCastHelperDerived1&>(derived3));
+	ASSERT_EQ(sliced.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+	ASSERT_TRUE(TestDynamicCastHelperDerived1::IsInstance(sliced));
+	ASSERT_FALSE(TestDynamicCastHelperDerived3::IsInstance(sliced));
+
+	TestDynamicCastHelperBase& sliced_ref = sliced;
+	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived1>(sliced_ref), &sliced);
+	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived3>(sliced_ref), nullptr);
+}
+
+TEST(DynamicCastHelper, MoveConstructionTest)
+{
+	TestDynamicCastHelperDerived1 derived1;
+	TestDynamicCastHelperDerived2 derived2;
+	TestDynamicCastHelperDerived3 derived3;
+
+	TestDynamicCastHelperDerived1 mderived1(std::move(derived1));
+	TestDynamicCastHelperDerived2 mderived2(std::move(derived2));
+	TestDynamicCastHelperDerived3 mderived3(std::move(derived3));
+
+	ASSERT_EQ(mderived1.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+	ASSERT_EQ(mderived2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived2>());
+	ASSERT_EQ(mderived3.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived3>());
+
+	TestDynamicCastHelperDerived3 derived3_2;
+	TestDynamicCastHelperDerived1 msliced(static_cast<TestDynamicCastHelperDerived1&&>(derived3_2));
+	ASSERT_EQ(msliced.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+}
+
+TEST(DynamicCastHelper, CopyAssignmentTest)
+{
+	TestDynamicCastHelperBase base;
+	TestDynamicCastHelperDerived1 derived1;
+	TestDynamicCastHelperDerived2 derived2;
+	TestDynamicCastHelperDerived3 derived3;
+
+	// assignment through base reference must not change the dynamic type id
+	TestDynamicCastHelperBase& base_ref = base;
+	TestDynamicCastHelperBase& derived1_ref = derived1;
+	TestDynamicCastHelperBase& derived2_ref = derived2;
+
+	base_ref = derived1_ref;
+	ASSERT_EQ(base.GetTypeId(), GetTypeId<TestDynamicCastHelperBase>());
+	derived1_ref = derived2_ref;
+	ASSERT_EQ(derived1.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+	derived2_ref = base_ref;
+	ASSERT_EQ(derived2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived2>());
+
+	TestDynamicCastHelperDerived1 derived1_2;
+	derived1_2 = static_cast<const TestDynamicCastHelperDerived1&>(derived3);
+	ASSERT_EQ(derived1_2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+	ASSERT_EQ(derived3.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived3>());
+
+	TestDynamicCastHelperDerived3 derived3_2;
+	derived3_2 = derived3;
+	ASSERT_EQ(derived3_2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived3>());
+
+	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived1>(base_ref), nullptr);
+	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived1>(derived1_ref), &derived1);
+	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived2>(derived2_ref), &derived2);
+}
+
+TEST(DynamicCastHelper, MoveAssignmentTest)
+{
+	TestDynamicCastHelperBase base;
+	TestDynamicCastHelperDerived1 derived1;
+	TestDynamicCastHelperDerived2 derived2;
+	TestDynamicCastHelperDerived3 derived3;
+
+	// assignment through base reference must not change the dynamic type id
+	TestDynamicCastHelperBase& base_ref = base;
+	TestDynamicCastHelperBase& derived1_ref = derived1;
+	TestDynamicCastHelperBase& derived2_ref = derived2;
+
+	base_ref = std::move(derived1_ref);
+	ASSERT_EQ(base.GetTypeId(), GetTypeId<TestDynamicCastHelperBase>());
+	derived1_ref = std::move(derived2_ref);
+	ASSERT_EQ(derived1.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+	derived2_ref = std::move(base_ref);
+	ASSERT_EQ(derived2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived2>());
+
+	TestDynamicCastHelperDerived1 derived1_2;
+	derived1_2 = std::move(static_cast<TestDynamicCastHelperDerived1&>(derived3));
+	ASSERT_EQ(derived1_2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived1>());
+	ASSERT_EQ(derived3.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived3>());
+
+	TestDynamicCastHelperDerived3 derived3_2;
+	derived3_2 = std::move(derived3);
+	ASSERT_EQ(derived3_2.GetTypeId(), GetTypeId<TestDynamicCastHelperDerived3>());
+
+	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived1>(base_ref), nullptr);
+	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived1>(derived1_ref), &derived1);
+	ASSERT_EQ(DynamicCast<TestDynamicCastHelperDerived2>(derived2_ref), &derived2);
 }

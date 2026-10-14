@@ -39,6 +39,11 @@ UInt64 IntegerAttribute::GetValue() const
 	return m_Value;
 }
 
+SpaceGameEngine::CommonIntermediateRepresentation::Attribute* IntegerAttribute::Clone() const
+{
+	return DefaultAllocator::New<IntegerAttribute>(*this);
+}
+
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::IntegerAttribute);
 
 FloatAttribute::FloatAttribute(float value)
@@ -58,6 +63,11 @@ void FloatAttribute::SetValue(float value)
 float FloatAttribute::GetValue() const
 {
 	return m_Value;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Attribute* FloatAttribute::Clone() const
+{
+	return DefaultAllocator::New<FloatAttribute>(*this);
 }
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::FloatAttribute);
@@ -81,6 +91,11 @@ double DoubleAttribute::GetValue() const
 	return m_Value;
 }
 
+SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DoubleAttribute::Clone() const
+{
+	return DefaultAllocator::New<DoubleAttribute>(*this);
+}
+
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::DoubleAttribute);
 
 BooleanAttribute::BooleanAttribute(bool value)
@@ -100,6 +115,11 @@ void BooleanAttribute::SetValue(bool value)
 bool BooleanAttribute::GetValue() const
 {
 	return m_Value;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Attribute* BooleanAttribute::Clone() const
+{
+	return DefaultAllocator::New<BooleanAttribute>(*this);
 }
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::BooleanAttribute);
@@ -133,14 +153,37 @@ const String& StringAttribute::GetValue() const
 	return m_Value;
 }
 
+SpaceGameEngine::CommonIntermediateRepresentation::Attribute* StringAttribute::Clone() const
+{
+	return DefaultAllocator::New<StringAttribute>(*this);
+}
+
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::StringAttribute);
 
 DictionaryAttribute::~DictionaryAttribute()
 {
 	for (auto iter = m_Attributes.GetBegin(); iter != m_Attributes.GetEnd(); ++iter)
-	{
 		DefaultAllocator::Delete(iter->m_Second);
-	}
+}
+
+DictionaryAttribute::DictionaryAttribute(const DictionaryAttribute& other)
+{
+	for (auto iter = other.m_Attributes.GetConstBegin(); iter != other.m_Attributes.GetConstEnd(); ++iter)
+		m_Attributes.Insert(iter->m_First, iter->m_Second->Clone());
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::DictionaryAttribute& DictionaryAttribute::operator=(const DictionaryAttribute& other)
+{
+	SGE_ASSERT(SelfAssignmentError, this, &other);
+
+	for (auto iter = m_Attributes.GetBegin(); iter != m_Attributes.GetEnd(); ++iter)
+		DefaultAllocator::Delete(iter->m_Second);
+	m_Attributes.Clear();
+
+	for (auto iter = other.m_Attributes.GetConstBegin(); iter != other.m_Attributes.GetConstEnd(); ++iter)
+		m_Attributes.Insert(iter->m_First, iter->m_Second->Clone());
+
+	return *this;
 }
 
 bool DictionaryAttribute::RemoveAttribute(const String& key)
@@ -172,6 +215,11 @@ const SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DictionaryAt
 		return iter->m_Second;
 	else
 		return nullptr;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DictionaryAttribute::Clone() const
+{
+	return DefaultAllocator::New<DictionaryAttribute>(*this);
 }
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::DictionaryAttribute);

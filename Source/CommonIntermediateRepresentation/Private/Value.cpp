@@ -364,9 +364,7 @@ ListValue::ListValue(Operation& operation)
 ListValue::~ListValue()
 {
 	for (auto iter = m_Content.GetBegin(); iter != m_Content.GetEnd(); ++iter)
-	{
 		DefaultAllocator::Delete(const_cast<Value*>(*iter));
-	}
 }
 
 bool ListValue::RemoveValue(const Value& value)

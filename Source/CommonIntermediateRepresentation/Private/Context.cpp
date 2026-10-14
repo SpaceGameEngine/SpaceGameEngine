@@ -41,9 +41,7 @@ bool DialectNameNotFoundError::Judge(bool found)
 Context::~Context()
 {
 	for (auto iter = m_Dialects.GetBegin(); iter != m_Dialects.GetEnd(); ++iter)
-	{
 		DefaultAllocator::Delete(iter->m_Second);
-	}
 }
 
 bool Context::HasDialectByName(const String& name) const
