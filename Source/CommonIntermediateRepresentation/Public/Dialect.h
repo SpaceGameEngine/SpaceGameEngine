@@ -19,6 +19,7 @@ limitations under the License.
 #include "Utility/DynamicCast.hpp"
 #include "Container/HashMap.hpp"
 #include "Operation.h"
+#include "Type.h"
 
 /*!
 @ingroup CommonIntermediateRepresentation
@@ -50,6 +51,30 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	struct OperationTypeNameNotFoundError
 	{
 		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The operation type name does not exist in the dialect.");
+		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool found);
+	};
+
+	struct TypeAlreadyExistsError
+	{
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The type already exists in the dialect.");
+		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool found);
+	};
+
+	struct TypeNotFoundError
+	{
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The type does not exist in the dialect.");
+		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool found);
+	};
+
+	struct TypeNameAlreadyExistsError
+	{
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The type name already exists in the dialect.");
+		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool found);
+	};
+
+	struct TypeNameNotFoundError
+	{
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The type name does not exist in the dialect.");
 		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool found);
 	};
 
@@ -133,6 +158,77 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		OperationType* QueryOperationTypeByName(const String& name);
 		const OperationType* QueryOperationTypeByName(const String& name) const;
 
+		template<typename T>
+			requires std::derived_from<T, Type>
+		inline T& AddType()
+		{
+			UInt64 type_id = SpaceGameEngine::GetTypeId<T>();
+			SGE_CHECK(TypeAlreadyExistsError, m_Types.Contains(type_id));
+			T* new_type = DefaultAllocator::New<T>(*this);
+			SGE_CHECK(TypeNameAlreadyExistsError, m_TypesByName.Contains(new_type->GetName()));
+			m_Types.Insert(type_id, new_type);
+			m_TypesByName.Insert(new_type->GetName(), new_type);
+			return *new_type;
+		}
+
+		template<typename T>
+			requires std::derived_from<T, Type>
+		inline bool HasType() const
+		{
+			UInt64 type_id = SpaceGameEngine::GetTypeId<T>();
+			return m_Types.Contains(type_id);
+		}
+
+		template<typename T>
+			requires std::derived_from<T, Type>
+		inline T& GetType()
+		{
+			UInt64 type_id = SpaceGameEngine::GetTypeId<T>();
+			auto iter = m_Types.Find(type_id);
+			SGE_CHECK(TypeNotFoundError, iter != m_Types.GetEnd());
+			return *DynamicCast<T>(*iter->m_Second);
+		}
+
+		template<typename T>
+			requires std::derived_from<T, Type>
+		inline const T& GetType() const
+		{
+			UInt64 type_id = SpaceGameEngine::GetTypeId<T>();
+			auto iter = m_Types.Find(type_id);
+			SGE_CHECK(TypeNotFoundError, iter != m_Types.GetConstEnd());
+			return *DynamicCast<const T>(*iter->m_Second);
+		}
+
+		template<typename T>
+			requires std::derived_from<T, Type>
+		inline T* QueryType()
+		{
+			UInt64 type_id = SpaceGameEngine::GetTypeId<T>();
+			auto iter = m_Types.Find(type_id);
+			if (iter != m_Types.GetEnd())
+				return DynamicCast<T>(*iter->m_Second);
+			else
+				return nullptr;
+		}
+
+		template<typename T>
+			requires std::derived_from<T, Type>
+		inline const T* QueryType() const
+		{
+			UInt64 type_id = SpaceGameEngine::GetTypeId<T>();
+			auto iter = m_Types.Find(type_id);
+			if (iter != m_Types.GetConstEnd())
+				return DynamicCast<const T>(*iter->m_Second);
+			else
+				return nullptr;
+		}
+
+		bool HasTypeByName(const String& name) const;
+		Type& GetTypeByName(const String& name);
+		const Type& GetTypeByName(const String& name) const;
+		Type* QueryTypeByName(const String& name);
+		const Type* QueryTypeByName(const String& name) const;
+
 		using DynamicCastHelperForBase<Dialect>::IsInstance;
 
 	protected:
@@ -143,6 +239,8 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		Context& m_BelongedContext;
 		HashMap<UInt64, OperationType*> m_OperationTypes;		   // type id -> operation type, own operation type
 		HashMap<String, OperationType*> m_OperationTypesByName;	   // name -> operation type
+		HashMap<UInt64, Type*> m_Types;							   // type id -> type, own type
+		HashMap<String, Type*> m_TypesByName;					   // name -> type
 	};
 }
 

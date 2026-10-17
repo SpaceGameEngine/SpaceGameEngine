@@ -45,13 +45,44 @@ TEST(Value, GetTypeIdTest)
 	ASSERT_EQ(value.GetTypeId(), GetTypeId<Value>());
 }
 
+class TypeForTestResultValue : public Type, public DynamicCastHelperForDerived<TypeForTestResultValue, Type>
+{
+public:
+	friend class Dialect;
+	inline TypeForTestResultValue(Dialect& dialect)
+		: Type(SGE_STR("TypeForTestResultValue"), dialect)
+	{
+	}
+	using DynamicCastHelperForDerived<TypeForTestResultValue, Type>::IsInstance;
+};
+
+SGE_DECLARE_TYPE_ID(, TypeForTestResultValue);
+SGE_DEFINE_TYPE_ID(, TypeForTestResultValue);
+
+class DialectForTestResultValue : public Dialect, public DynamicCastHelperForDerived<DialectForTestResultValue, Dialect>
+{
+public:
+	friend class Context;
+	inline DialectForTestResultValue(Context& context)
+		: Dialect(SGE_STR("DialectForTestResultValue"), context)
+	{
+		AddType<TypeForTestResultValue>();
+	}
+	using DynamicCastHelperForDerived<DialectForTestResultValue, Dialect>::IsInstance;
+};
+
+SGE_DECLARE_TYPE_ID(, DialectForTestResultValue);
+SGE_DEFINE_TYPE_ID(, DialectForTestResultValue);
+
 TEST(ResultValue, GetTypeTest)
 {
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestResultValue>();
 	Operation op;
 	ResultValue result(op);
 	ASSERT_EQ(result.GetType(), nullptr);
 
-	Type test_type;
+	Type& test_type = dialect.GetType<TypeForTestResultValue>();
 	ResultValue result_with_type(op, &test_type);
 	ASSERT_EQ(result_with_type.GetType(), &test_type);
 }
@@ -141,9 +172,57 @@ TEST(ReferenceValue, GetTypeIdTest)
 	ASSERT_EQ(ref.GetTypeId(), GetTypeId<ReferenceValue>());
 }
 
+class Type1ForTestTypeValue : public Type, public DynamicCastHelperForDerived<Type1ForTestTypeValue, Type>
+{
+public:
+	friend class Dialect;
+
+	inline Type1ForTestTypeValue(Dialect& dialect)
+		: Type(SGE_STR("Type1ForTestTypeValue"), dialect)
+	{
+	}
+
+	using DynamicCastHelperForDerived<Type1ForTestTypeValue, Type>::IsInstance;
+};
+
+SGE_DECLARE_TYPE_ID(, Type1ForTestTypeValue);
+SGE_DEFINE_TYPE_ID(, Type1ForTestTypeValue);
+
+class Type2ForTestTypeValue : public Type, public DynamicCastHelperForDerived<Type2ForTestTypeValue, Type>
+{
+public:
+	friend class Dialect;
+	inline Type2ForTestTypeValue(Dialect& dialect)
+		: Type(SGE_STR("Type2ForTestTypeValue"), dialect)
+	{
+	}
+	using DynamicCastHelperForDerived<Type2ForTestTypeValue, Type>::IsInstance;
+};
+
+SGE_DECLARE_TYPE_ID(, Type2ForTestTypeValue);
+SGE_DEFINE_TYPE_ID(, Type2ForTestTypeValue);
+
+class DialectForTestTypeValue : public Dialect, public DynamicCastHelperForDerived<DialectForTestTypeValue, Dialect>
+{
+public:
+	friend class Context;
+	inline DialectForTestTypeValue(Context& context)
+		: Dialect(SGE_STR("DialectForTestTypeValue"), context)
+	{
+		AddType<Type1ForTestTypeValue>();
+		AddType<Type2ForTestTypeValue>();
+	}
+	using DynamicCastHelperForDerived<DialectForTestTypeValue, Dialect>::IsInstance;
+};
+
+SGE_DECLARE_TYPE_ID(, DialectForTestTypeValue);
+SGE_DEFINE_TYPE_ID(, DialectForTestTypeValue);
+
 TEST(TypeValue, GetTypeTest)
 {
-	Type test_type;
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestTypeValue>();
+	Type& test_type = dialect.GetType<Type1ForTestTypeValue>();
 	Operation op;
 	TypeValue type_value(op);
 	ASSERT_EQ(type_value.GetType(), nullptr);
@@ -153,7 +232,10 @@ TEST(TypeValue, GetTypeTest)
 
 TEST(TypeValue, SetTypeTest)
 {
-	Type test_type1, test_type2;
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestTypeValue>();
+	Type& test_type1 = dialect.GetType<Type1ForTestTypeValue>();
+	Type& test_type2 = dialect.GetType<Type2ForTestTypeValue>();
 	Operation op;
 	TypeValue type_value(op, &test_type1);
 	ASSERT_EQ(type_value.GetType(), &test_type1);

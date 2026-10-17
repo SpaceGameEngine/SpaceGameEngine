@@ -38,6 +38,26 @@ bool OperationTypeNameNotFoundError::Judge(bool found)
 	return !found;
 }
 
+bool TypeAlreadyExistsError::Judge(bool found)
+{
+	return found;
+}
+
+bool TypeNotFoundError::Judge(bool found)
+{
+	return !found;
+}
+
+bool TypeNameAlreadyExistsError::Judge(bool found)
+{
+	return found;
+}
+
+bool TypeNameNotFoundError::Judge(bool found)
+{
+	return !found;
+}
+
 Dialect::Dialect(const String& name, Context& context)
 	: m_Name(name), m_BelongedContext(context)
 {
@@ -46,6 +66,8 @@ Dialect::Dialect(const String& name, Context& context)
 Dialect::~Dialect()
 {
 	for (auto iter = m_OperationTypes.GetBegin(); iter != m_OperationTypes.GetEnd(); ++iter)
+		DefaultAllocator::Delete(iter->m_Second);
+	for (auto iter = m_Types.GetBegin(); iter != m_Types.GetEnd(); ++iter)
 		DefaultAllocator::Delete(iter->m_Second);
 }
 
@@ -96,6 +118,43 @@ const SpaceGameEngine::CommonIntermediateRepresentation::OperationType* Dialect:
 {
 	auto iter = m_OperationTypesByName.Find(name);
 	if (iter != m_OperationTypesByName.GetConstEnd())
+		return iter->m_Second;
+	else
+		return nullptr;
+}
+
+bool Dialect::HasTypeByName(const String& name) const
+{
+	return m_TypesByName.Contains(name);
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Type& Dialect::GetTypeByName(const String& name)
+{
+	auto iter = m_TypesByName.Find(name);
+	SGE_CHECK(TypeNameNotFoundError, iter != m_TypesByName.GetEnd());
+	return *iter->m_Second;
+}
+
+const SpaceGameEngine::CommonIntermediateRepresentation::Type& Dialect::GetTypeByName(const String& name) const
+{
+	auto iter = m_TypesByName.Find(name);
+	SGE_CHECK(TypeNameNotFoundError, iter != m_TypesByName.GetConstEnd());
+	return *iter->m_Second;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Type* Dialect::QueryTypeByName(const String& name)
+{
+	auto iter = m_TypesByName.Find(name);
+	if (iter != m_TypesByName.GetEnd())
+		return iter->m_Second;
+	else
+		return nullptr;
+}
+
+const SpaceGameEngine::CommonIntermediateRepresentation::Type* Dialect::QueryTypeByName(const String& name) const
+{
+	auto iter = m_TypesByName.Find(name);
+	if (iter != m_TypesByName.GetConstEnd())
 		return iter->m_Second;
 	else
 		return nullptr;

@@ -17,3 +17,29 @@ limitations under the License.
 
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonIntermediateRepresentation;
+
+Type::Type(const String& name, Dialect& dialect)
+	: m_Name(name), m_BelongedDialect(dialect)
+{
+}
+
+Type::~Type()
+{
+}
+
+const SpaceGameEngine::String& Type::GetName() const
+{
+	return m_Name;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Dialect& Type::GetBelongedDialect()
+{
+	return m_BelongedDialect;
+}
+
+const SpaceGameEngine::CommonIntermediateRepresentation::Dialect& Type::GetBelongedDialect() const
+{
+	return m_BelongedDialect;
+}
+
+SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::Type);
