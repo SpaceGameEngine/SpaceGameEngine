@@ -53,12 +53,12 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		friend class ReferenceValue;
 
-		ResultValue(Operation& operation);
+		ResultValue(Operation& operation, Type& type);
 		virtual ~ResultValue();
 
-		ResultValue(Operation& operation, const Type* type);
+		void SetType(Type& type);
 
-		const Type* GetType() const;
+		const Type& GetType() const;
 		const ReferenceValue* GetFirstReference() const;
 
 		using DynamicCastHelperForDerived<ResultValue, Value>::IsInstance;
@@ -101,13 +101,11 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API TypeValue : public Value, public DynamicCastHelperForDerived<TypeValue, Value>
 	{
 	public:
-		TypeValue(Operation& operation);
+		TypeValue(Operation& operation, Type& type);
 		virtual ~TypeValue();
 
-		TypeValue(Operation& operation, const Type* type);
-
-		void SetType(const Type* type);
-		const Type* GetType() const;
+		void SetType(Type& type);
+		const Type& GetType() const;
 
 		using DynamicCastHelperForDerived<TypeValue, Value>::IsInstance;
 
@@ -118,13 +116,11 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API OperationTypeValue : public Value, public DynamicCastHelperForDerived<OperationTypeValue, Value>
 	{
 	public:
-		OperationTypeValue(Operation& operation);
+		OperationTypeValue(Operation& operation, OperationType& operation_type);
 		virtual ~OperationTypeValue();
 
-		OperationTypeValue(Operation& operation, const OperationType* operation_type);
-
-		void SetOperationType(const OperationType* operation_type);
-		const OperationType* GetOperationType() const;
+		void SetOperationType(OperationType& operation_type);
+		const OperationType& GetOperationType() const;
 
 		using DynamicCastHelperForDerived<OperationTypeValue, Value>::IsInstance;
 

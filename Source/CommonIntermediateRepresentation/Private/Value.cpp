@@ -30,8 +30,8 @@ const SpaceGameEngine::CommonIntermediateRepresentation::Operation* Value::GetBe
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::Value);
 
-ResultValue::ResultValue(Operation& operation)
-	: Value(operation), m_Type(nullptr), m_FirstReference(nullptr)
+ResultValue::ResultValue(Operation& operation, Type& type)
+	: Value(operation), m_Type(&type), m_FirstReference(nullptr)
 {
 }
 
@@ -39,14 +39,14 @@ ResultValue::~ResultValue()
 {
 }
 
-ResultValue::ResultValue(Operation& operation, const Type* type)
-	: Value(operation), m_Type(type), m_FirstReference(nullptr)
+void ResultValue::SetType(Type& type)
 {
+	m_Type = &type;
 }
 
-const SpaceGameEngine::CommonIntermediateRepresentation::Type* ResultValue::GetType() const
+const SpaceGameEngine::CommonIntermediateRepresentation::Type& ResultValue::GetType() const
 {
-	return m_Type;
+	return *m_Type;
 }
 
 const SpaceGameEngine::CommonIntermediateRepresentation::ReferenceValue* ResultValue::GetFirstReference() const
@@ -138,8 +138,8 @@ bool ReferenceNotFoundError::Judge(bool found)
 	return !found;
 }
 
-TypeValue::TypeValue(Operation& operation)
-	: Value(operation), m_Type(nullptr)
+TypeValue::TypeValue(Operation& operation, Type& type)
+	: Value(operation), m_Type(&type)
 {
 }
 
@@ -147,25 +147,20 @@ TypeValue::~TypeValue()
 {
 }
 
-TypeValue::TypeValue(Operation& operation, const Type* type)
-	: Value(operation), m_Type(type)
+void TypeValue::SetType(Type& type)
 {
+	m_Type = &type;
 }
 
-void TypeValue::SetType(const Type* type)
+const SpaceGameEngine::CommonIntermediateRepresentation::Type& TypeValue::GetType() const
 {
-	m_Type = type;
-}
-
-const SpaceGameEngine::CommonIntermediateRepresentation::Type* TypeValue::GetType() const
-{
-	return m_Type;
+	return *m_Type;
 }
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::TypeValue);
 
-OperationTypeValue::OperationTypeValue(Operation& operation)
-	: Value(operation), m_OperationType(nullptr)
+OperationTypeValue::OperationTypeValue(Operation& operation, OperationType& operation_type)
+	: Value(operation), m_OperationType(&operation_type)
 {
 }
 
@@ -173,19 +168,14 @@ OperationTypeValue::~OperationTypeValue()
 {
 }
 
-OperationTypeValue::OperationTypeValue(Operation& operation, const OperationType* operation_type)
-	: Value(operation), m_OperationType(operation_type)
+void OperationTypeValue::SetOperationType(OperationType& operation_type)
 {
+	m_OperationType = &operation_type;
 }
 
-void OperationTypeValue::SetOperationType(const OperationType* operation_type)
+const SpaceGameEngine::CommonIntermediateRepresentation::OperationType& OperationTypeValue::GetOperationType() const
 {
-	m_OperationType = operation_type;
-}
-
-const SpaceGameEngine::CommonIntermediateRepresentation::OperationType* OperationTypeValue::GetOperationType() const
-{
-	return m_OperationType;
+	return *m_OperationType;
 }
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::OperationTypeValue);

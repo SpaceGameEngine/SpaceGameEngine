@@ -23,13 +23,15 @@ using namespace SpaceGameEngine::CommonIntermediateRepresentation;
 struct TestInterface1
 {
 	virtual ~TestInterface1() = default;
-	int m_Value1 = 1;
+	virtual int GetValue1() const = 0;
+	virtual void SetValue1(int value) = 0;
 };
 
 struct TestInterface2
 {
 	virtual ~TestInterface2() = default;
-	int m_Value2 = 2;
+	virtual int GetValue2() const = 0;
+	virtual void SetValue2(int value) = 0;
 };
 
 struct TestInterfaceContainerBase : public InterfaceContainer<TestInterfaceContainerBase>
@@ -43,8 +45,30 @@ struct TestEmptyInterfacesObject : public TestInterfaceContainerBase
 	virtual ~TestEmptyInterfacesObject() = default;
 };
 
-struct TestInterfacesObject : public TestInterfaceContainerBase, Interfaces<TestInterfacesObject, TestInterface1, TestInterface2>
+struct TestInterfacesObject : public TestInterfaceContainerBase, public Interfaces<TestInterfacesObject, TestInterface1, TestInterface2>
 {
+	virtual int GetValue1() const override
+	{
+		return m_Value1;
+	}
+
+	virtual void SetValue1(int value) override
+	{
+		m_Value1 = value;
+	}
+
+	virtual int GetValue2() const override
+	{
+		return m_Value2;
+	}
+
+	virtual void SetValue2(int value) override
+	{
+		m_Value2 = value;
+	}
+
+	int m_Value1 = 1;
+	int m_Value2 = 2;
 	int m_Value3 = 3;
 };
 
@@ -52,61 +76,6 @@ SGE_DECLARE_TYPE_ID(, TestInterface1);
 SGE_DEFINE_TYPE_ID(, TestInterface1);
 SGE_DECLARE_TYPE_ID(, TestInterface2);
 SGE_DEFINE_TYPE_ID(, TestInterface2);
-
-struct TestComplexInterfaceBase
-{
-	virtual ~TestComplexInterfaceBase() = default;
-	virtual int GetBaseValue() const
-	{
-		return 100;
-	}
-
-	double m_BaseValue = 1.5;
-};
-
-struct TestComplexInterface1 : public TestComplexInterfaceBase
-{
-	virtual int GetBaseValue() const override
-	{
-		return 101;
-	}
-
-	char m_Padding[13] = {};
-	int m_Value1 = 11;
-};
-
-struct TestComplexInterface2 : public TestComplexInterfaceBase
-{
-	virtual int GetBaseValue() const override
-	{
-		return 102;
-	}
-
-	long long m_Value2 = 22;
-};
-
-struct TestComplexHeadPadding
-{
-	virtual ~TestComplexHeadPadding() = default;
-	char m_Padding[7] = {};
-	double m_Value = 7.5;
-};
-
-struct TestComplexContainerBase : public TestComplexHeadPadding, public InterfaceContainer<TestComplexContainerBase>
-{
-	virtual ~TestComplexContainerBase() = default;
-	int m_Value0 = 0;
-};
-
-struct TestComplexObject : public TestComplexHeadPadding, public TestComplexContainerBase, public Interfaces<TestComplexObject, TestComplexInterface1>, public Interfaces<TestComplexObject, TestComplexInterface2>
-{
-	int m_Value3 = 33;
-};
-
-SGE_DECLARE_TYPE_ID(, TestComplexInterface1);
-SGE_DEFINE_TYPE_ID(, TestComplexInterface1);
-SGE_DECLARE_TYPE_ID(, TestComplexInterface2);
-SGE_DEFINE_TYPE_ID(, TestComplexInterface2);
 
 TEST(InterfaceContainer, HasInterfaceTest)
 {
@@ -132,16 +101,21 @@ TEST(InterfaceContainer, GetInterfaceTest)
 	TestInterface2& itf2 = obj.GetInterface<TestInterface2>();
 	ASSERT_EQ(&itf1, static_cast<TestInterface1*>(&obj));
 	ASSERT_EQ(&itf2, static_cast<TestInterface2*>(&obj));
-	ASSERT_EQ(itf1.m_Value1, 1);
-	ASSERT_EQ(itf2.m_Value2, 2);
+	ASSERT_EQ(itf1.GetValue1(), 1);
+	ASSERT_EQ(itf2.GetValue2(), 2);
+
+	itf1.SetValue1(10);
+	itf2.SetValue2(20);
+	ASSERT_EQ(obj.m_Value1, 10);
+	ASSERT_EQ(obj.m_Value2, 20);
 
 	const TestInterfacesObject& cobj = obj;
 	const TestInterface1& citf1 = cobj.GetInterface<TestInterface1>();
 	const TestInterface2& citf2 = cobj.GetInterface<TestInterface2>();
 	ASSERT_EQ(&citf1, static_cast<const TestInterface1*>(&obj));
 	ASSERT_EQ(&citf2, static_cast<const TestInterface2*>(&obj));
-	ASSERT_EQ(citf1.m_Value1, 1);
-	ASSERT_EQ(citf2.m_Value2, 2);
+	ASSERT_EQ(citf1.GetValue1(), 10);
+	ASSERT_EQ(citf2.GetValue2(), 20);
 }
 
 TEST(InterfaceContainer, QueryInterfaceTest)
@@ -160,6 +134,80 @@ TEST(InterfaceContainer, QueryInterfaceTest)
 	ASSERT_EQ((cobj.QueryInterface<TestInterface1>()), static_cast<const TestInterface1*>(&obj));
 	ASSERT_EQ((cobj.QueryInterface<TestInterface2>()), static_cast<const TestInterface2*>(&obj));
 }
+
+struct TestComplexInterfaceBase
+{
+	virtual ~TestComplexInterfaceBase() = default;
+	virtual int GetBaseValue() const = 0;
+};
+
+struct TestComplexInterface1 : public TestComplexInterfaceBase
+{
+	virtual int GetBaseValue() const override
+	{
+		return GetValue1() * 10;
+	}
+
+	virtual int GetValue1() const = 0;
+	virtual void SetValue1(int value) = 0;
+};
+
+struct TestComplexInterface2 : public TestComplexInterfaceBase
+{
+	virtual int GetBaseValue() const override
+	{
+		return static_cast<int>(GetValue2()) + 1000;
+	}
+
+	virtual long long GetValue2() const = 0;
+	virtual void SetValue2(long long value) = 0;
+};
+
+struct TestComplexHeadPadding
+{
+	virtual ~TestComplexHeadPadding() = default;
+	char m_Padding[7] = {};
+	double m_Value = 7.5;
+};
+
+struct TestComplexContainerBase : public TestComplexHeadPadding, public InterfaceContainer<TestComplexContainerBase>
+{
+	virtual ~TestComplexContainerBase() = default;
+	int m_Value0 = 0;
+};
+
+struct TestComplexObject : public TestComplexHeadPadding, public TestComplexContainerBase, public Interfaces<TestComplexObject, TestComplexInterface1, TestComplexInterface2>
+{
+	virtual int GetValue1() const override
+	{
+		return m_Value1;
+	}
+
+	virtual void SetValue1(int value) override
+	{
+		m_Value1 = value;
+	}
+
+	virtual long long GetValue2() const override
+	{
+		return m_Value2;
+	}
+
+	virtual void SetValue2(long long value) override
+	{
+		m_Value2 = value;
+	}
+
+	char m_Padding[13] = {};
+	int m_Value1 = 11;
+	long long m_Value2 = 22;
+	int m_Value3 = 33;
+};
+
+SGE_DECLARE_TYPE_ID(, TestComplexInterface1);
+SGE_DEFINE_TYPE_ID(, TestComplexInterface1);
+SGE_DECLARE_TYPE_ID(, TestComplexInterface2);
+SGE_DEFINE_TYPE_ID(, TestComplexInterface2);
 
 TEST(InterfaceContainer, ComplexLayoutTest)
 {
@@ -184,15 +232,20 @@ TEST(InterfaceContainer, ComplexLayoutTest)
 	ASSERT_GT(reinterpret_cast<UInt64>(&itf1), reinterpret_cast<UInt64>(static_cast<TestComplexContainerBase*>(&obj)));
 	ASSERT_GT(reinterpret_cast<UInt64>(&itf2), reinterpret_cast<UInt64>(&itf1));
 
-	ASSERT_EQ(itf1.m_Value1, 11);
-	ASSERT_EQ(itf2.m_Value2, 22);
-	ASSERT_EQ(itf1.GetBaseValue(), 101);
-	ASSERT_EQ(itf2.GetBaseValue(), 102);
+	ASSERT_EQ(itf1.GetValue1(), 11);
+	ASSERT_EQ(itf2.GetValue2(), 22);
+	ASSERT_EQ(itf1.GetBaseValue(), 110);
+	ASSERT_EQ(itf2.GetBaseValue(), 1022);
 
-	itf1.m_Value1 = 110;
-	itf2.m_Value2 = 220;
-	ASSERT_EQ(obj.TestComplexInterface1::m_Value1, 110);
-	ASSERT_EQ(obj.TestComplexInterface2::m_Value2, 220);
+	itf1.SetValue1(110);
+	itf2.SetValue2(220);
+	ASSERT_EQ(obj.m_Value1, 110);
+	ASSERT_EQ(obj.m_Value2, 220);
+	ASSERT_EQ(itf1.GetBaseValue(), 1100);
+	ASSERT_EQ(static_cast<TestComplexInterfaceBase&>(itf1).GetBaseValue(), 1100);
+	ASSERT_EQ(itf2.GetBaseValue(), 1220);
+	ASSERT_EQ(static_cast<TestComplexInterfaceBase&>(itf2).GetBaseValue(), 1220);
+	ASSERT_NE(static_cast<TestComplexInterfaceBase*>(&itf1), static_cast<TestComplexInterfaceBase*>(&itf2));
 
 	const TestComplexInterface1& citf1 = cobj.GetInterface<TestComplexInterface1>();
 	const TestComplexInterface2& citf2 = cobj.GetInterface<TestComplexInterface2>();
