@@ -35,12 +35,18 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API Value : public DynamicCastHelperForBase<Value>, public UncopyableAndUnmovable
 	{
 	public:
-		Value(Operation& operation);
+		friend class Operation;
+		friend class ListValue;
+
+		Value();
 		virtual ~Value() = default;
 
 		const Operation* GetBelongedOperation() const;
 
 		using DynamicCastHelperForBase<Value>::IsInstance;
+
+	private:
+		virtual void SetBelongedOperation(Operation& operation);
 
 	private:
 		const Operation* m_BelongedOperation;
@@ -53,10 +59,8 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		friend class ReferenceValue;
 
-		ResultValue(Operation& operation, Type& type);
+		ResultValue(Type& type);
 		virtual ~ResultValue();
-
-		void SetType(Type& type);
 
 		const Type& GetType() const;
 		const ReferenceValue* GetFirstReference() const;
@@ -77,7 +81,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		friend class ResultValue;
 
-		ReferenceValue(Operation& operation, ResultValue& resultValue);
+		ReferenceValue(ResultValue& resultValue);
 		virtual ~ReferenceValue();
 
 		const ResultValue* GetResultValue() const;
@@ -101,10 +105,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API TypeValue : public Value, public DynamicCastHelperForDerived<TypeValue, Value>
 	{
 	public:
-		TypeValue(Operation& operation, Type& type);
+		TypeValue(Type& type);
 		virtual ~TypeValue();
 
-		void SetType(Type& type);
 		const Type& GetType() const;
 
 		using DynamicCastHelperForDerived<TypeValue, Value>::IsInstance;
@@ -116,10 +119,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API OperationTypeValue : public Value, public DynamicCastHelperForDerived<OperationTypeValue, Value>
 	{
 	public:
-		OperationTypeValue(Operation& operation, OperationType& operation_type);
+		OperationTypeValue(OperationType& operation_type);
 		virtual ~OperationTypeValue();
 
-		void SetOperationType(OperationType& operation_type);
 		const OperationType& GetOperationType() const;
 
 		using DynamicCastHelperForDerived<OperationTypeValue, Value>::IsInstance;
@@ -131,10 +133,8 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API BlockValue : public Value, public DynamicCastHelperForDerived<BlockValue, Value>
 	{
 	public:
-		BlockValue(Operation& operation);
+		BlockValue(List<Operation>&& operations);
 		virtual ~BlockValue();
-
-		BlockValue(Operation& operation, List<Operation>&& operations);
 
 		List<Operation>& GetOperations();
 		const List<Operation>& GetOperations() const;
@@ -148,12 +148,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API IntegerValue : public Value, public DynamicCastHelperForDerived<IntegerValue, Value>
 	{
 	public:
-		IntegerValue(Operation& operation);
+		IntegerValue(UInt64 value);
 		virtual ~IntegerValue();
 
-		IntegerValue(Operation& operation, UInt64 value);
-
-		void SetValue(UInt64 value);
 		UInt64 GetValue() const;
 
 		using DynamicCastHelperForDerived<IntegerValue, Value>::IsInstance;
@@ -165,12 +162,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API FloatValue : public Value, public DynamicCastHelperForDerived<FloatValue, Value>
 	{
 	public:
-		FloatValue(Operation& operation);
+		FloatValue(float value);
 		virtual ~FloatValue();
 
-		FloatValue(Operation& operation, float value);
-
-		void SetValue(float value);
 		float GetValue() const;
 
 		using DynamicCastHelperForDerived<FloatValue, Value>::IsInstance;
@@ -182,12 +176,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API DoubleValue : public Value, public DynamicCastHelperForDerived<DoubleValue, Value>
 	{
 	public:
-		DoubleValue(Operation& operation);
+		DoubleValue(double value);
 		virtual ~DoubleValue();
 
-		DoubleValue(Operation& operation, double value);
-
-		void SetValue(double value);
 		double GetValue() const;
 
 		using DynamicCastHelperForDerived<DoubleValue, Value>::IsInstance;
@@ -199,12 +190,9 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API BooleanValue : public Value, public DynamicCastHelperForDerived<BooleanValue, Value>
 	{
 	public:
-		BooleanValue(Operation& operation);
+		BooleanValue(bool value);
 		virtual ~BooleanValue();
 
-		BooleanValue(Operation& operation, bool value);
-
-		void SetValue(bool value);
 		bool GetValue() const;
 
 		using DynamicCastHelperForDerived<BooleanValue, Value>::IsInstance;
@@ -216,14 +204,10 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API StringValue : public Value, public DynamicCastHelperForDerived<StringValue, Value>
 	{
 	public:
-		StringValue(Operation& operation);
+		StringValue(const String& value);
+		StringValue(String&& value);
 		virtual ~StringValue();
 
-		StringValue(Operation& operation, const String& value);
-		StringValue(Operation& operation, String&& value);
-
-		void SetValue(const String& value);
-		void SetValue(String&& value);
 		const String& GetValue() const;
 
 		using DynamicCastHelperForDerived<StringValue, Value>::IsInstance;
@@ -235,23 +219,15 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API ListValue : public Value, public DynamicCastHelperForDerived<ListValue, Value>
 	{
 	public:
-		ListValue(Operation& operation);
+		ListValue(Vector<const Value*>&& values);
 		virtual ~ListValue();
-
-		template<typename T, typename... Args>
-			requires std::derived_from<T, Value>
-		inline Value& AddValue(Args&&... args)
-		{
-			T* new_value = DefaultAllocator::New<T>(std::forward<Args>(args)...);
-			m_Content.PushBack(new_value);
-			return *new_value;
-		}
-
-		bool RemoveValue(const Value& value);
 
 		const Vector<const Value*>& GetValues() const;
 
 		using DynamicCastHelperForDerived<ListValue, Value>::IsInstance;
+
+	private:
+		void SetBelongedOperation(Operation& operation) override;
 
 	private:
 		Vector<const Value*> m_Content;

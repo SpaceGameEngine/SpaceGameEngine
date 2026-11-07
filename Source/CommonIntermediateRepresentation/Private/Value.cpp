@@ -18,8 +18,8 @@ limitations under the License.
 using namespace SpaceGameEngine;
 using namespace SpaceGameEngine::CommonIntermediateRepresentation;
 
-Value::Value(Operation& operation)
-	: m_BelongedOperation(&operation)
+Value::Value()
+	: m_BelongedOperation(nullptr)
 {
 }
 
@@ -28,20 +28,20 @@ const SpaceGameEngine::CommonIntermediateRepresentation::Operation* Value::GetBe
 	return m_BelongedOperation;
 }
 
+void Value::SetBelongedOperation(Operation& operation)
+{
+	m_BelongedOperation = &operation;
+}
+
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::Value);
 
-ResultValue::ResultValue(Operation& operation, Type& type)
-	: Value(operation), m_Type(&type), m_FirstReference(nullptr)
+ResultValue::ResultValue(Type& type)
+	: m_Type(&type), m_FirstReference(nullptr)
 {
 }
 
 ResultValue::~ResultValue()
 {
-}
-
-void ResultValue::SetType(Type& type)
-{
-	m_Type = &type;
 }
 
 const SpaceGameEngine::CommonIntermediateRepresentation::Type& ResultValue::GetType() const
@@ -105,8 +105,7 @@ bool ResultValue::RemoveReference(ReferenceValue& ref)
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::ResultValue);
 
-ReferenceValue::ReferenceValue(Operation& operation, ResultValue& resultValue)
-	: Value(operation)
+ReferenceValue::ReferenceValue(ResultValue& resultValue)
 {
 	resultValue.AddReference(*this);
 }
@@ -138,18 +137,13 @@ bool ReferenceNotFoundError::Judge(bool found)
 	return !found;
 }
 
-TypeValue::TypeValue(Operation& operation, Type& type)
-	: Value(operation), m_Type(&type)
+TypeValue::TypeValue(Type& type)
+	: m_Type(&type)
 {
 }
 
 TypeValue::~TypeValue()
 {
-}
-
-void TypeValue::SetType(Type& type)
-{
-	m_Type = &type;
 }
 
 const SpaceGameEngine::CommonIntermediateRepresentation::Type& TypeValue::GetType() const
@@ -159,18 +153,13 @@ const SpaceGameEngine::CommonIntermediateRepresentation::Type& TypeValue::GetTyp
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::TypeValue);
 
-OperationTypeValue::OperationTypeValue(Operation& operation, OperationType& operation_type)
-	: Value(operation), m_OperationType(&operation_type)
+OperationTypeValue::OperationTypeValue(OperationType& operation_type)
+	: m_OperationType(&operation_type)
 {
 }
 
 OperationTypeValue::~OperationTypeValue()
 {
-}
-
-void OperationTypeValue::SetOperationType(OperationType& operation_type)
-{
-	m_OperationType = &operation_type;
 }
 
 const SpaceGameEngine::CommonIntermediateRepresentation::OperationType& OperationTypeValue::GetOperationType() const
@@ -180,17 +169,12 @@ const SpaceGameEngine::CommonIntermediateRepresentation::OperationType& Operatio
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::OperationTypeValue);
 
-BlockValue::BlockValue(Operation& operation)
-	: Value(operation)
+BlockValue::BlockValue(List<Operation>&& operations)
+	: m_Operations(std::move(operations))
 {
 }
 
 BlockValue::~BlockValue()
-{
-}
-
-BlockValue::BlockValue(Operation& operation, List<Operation>&& operations)
-	: Value(operation), m_Operations(std::move(operations))
 {
 }
 
@@ -206,23 +190,13 @@ const List<Operation>& BlockValue::GetOperations() const
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::BlockValue);
 
-IntegerValue::IntegerValue(Operation& operation)
-	: Value(operation), m_Value(0)
+IntegerValue::IntegerValue(UInt64 value)
+	: m_Value(value)
 {
 }
 
 IntegerValue::~IntegerValue()
 {
-}
-
-IntegerValue::IntegerValue(Operation& operation, UInt64 value)
-	: Value(operation), m_Value(value)
-{
-}
-
-void IntegerValue::SetValue(UInt64 value)
-{
-	m_Value = value;
 }
 
 UInt64 IntegerValue::GetValue() const
@@ -232,23 +206,13 @@ UInt64 IntegerValue::GetValue() const
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::IntegerValue);
 
-FloatValue::FloatValue(Operation& operation)
-	: Value(operation), m_Value(0.0f)
+FloatValue::FloatValue(float value)
+	: m_Value(value)
 {
 }
 
 FloatValue::~FloatValue()
 {
-}
-
-FloatValue::FloatValue(Operation& operation, float value)
-	: Value(operation), m_Value(value)
-{
-}
-
-void FloatValue::SetValue(float value)
-{
-	m_Value = value;
 }
 
 float FloatValue::GetValue() const
@@ -258,23 +222,13 @@ float FloatValue::GetValue() const
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::FloatValue);
 
-DoubleValue::DoubleValue(Operation& operation)
-	: Value(operation), m_Value(0.0)
+DoubleValue::DoubleValue(double value)
+	: m_Value(value)
 {
 }
 
 DoubleValue::~DoubleValue()
 {
-}
-
-DoubleValue::DoubleValue(Operation& operation, double value)
-	: Value(operation), m_Value(value)
-{
-}
-
-void DoubleValue::SetValue(double value)
-{
-	m_Value = value;
 }
 
 double DoubleValue::GetValue() const
@@ -284,23 +238,13 @@ double DoubleValue::GetValue() const
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::DoubleValue);
 
-BooleanValue::BooleanValue(Operation& operation)
-	: Value(operation), m_Value(false)
+BooleanValue::BooleanValue(bool value)
+	: m_Value(value)
 {
 }
 
 BooleanValue::~BooleanValue()
 {
-}
-
-BooleanValue::BooleanValue(Operation& operation, bool value)
-	: Value(operation), m_Value(value)
-{
-}
-
-void BooleanValue::SetValue(bool value)
-{
-	m_Value = value;
 }
 
 bool BooleanValue::GetValue() const
@@ -310,33 +254,17 @@ bool BooleanValue::GetValue() const
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::BooleanValue);
 
-StringValue::StringValue(Operation& operation)
-	: Value(operation)
+StringValue::StringValue(const String& value)
+	: m_Value(value)
 {
 }
 
+StringValue::StringValue(String&& value)
+	: m_Value(std::move(value))
+{
+}
 StringValue::~StringValue()
 {
-}
-
-StringValue::StringValue(Operation& operation, const String& value)
-	: Value(operation), m_Value(value)
-{
-}
-
-StringValue::StringValue(Operation& operation, String&& value)
-	: Value(operation), m_Value(std::move(value))
-{
-}
-
-void StringValue::SetValue(const String& value)
-{
-	m_Value = value;
-}
-
-void StringValue::SetValue(String&& value)
-{
-	m_Value = std::move(value);
 }
 
 const String& StringValue::GetValue() const
@@ -346,8 +274,8 @@ const String& StringValue::GetValue() const
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::StringValue);
 
-ListValue::ListValue(Operation& operation)
-	: Value(operation)
+ListValue::ListValue(Vector<const Value*>&& values)
+	: m_Content(std::move(values))
 {
 }
 
@@ -357,20 +285,16 @@ ListValue::~ListValue()
 		DefaultAllocator::Delete(const_cast<Value*>(*iter));
 }
 
-bool ListValue::RemoveValue(const Value& value)
-{
-	auto iter = m_Content.Find(&value);
-	if (iter != m_Content.GetEnd())
-	{
-		m_Content.Remove(iter);
-		return true;
-	}
-	return false;
-}
-
 const Vector<const Value*>& ListValue::GetValues() const
 {
 	return m_Content;
+}
+
+void ListValue::SetBelongedOperation(Operation& operation)
+{
+	Value::SetBelongedOperation(operation);
+	for (auto iter = m_Content.GetBegin(); iter != m_Content.GetEnd(); ++iter)
+		const_cast<Value*>(*iter)->SetBelongedOperation(operation);
 }
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::ListValue);

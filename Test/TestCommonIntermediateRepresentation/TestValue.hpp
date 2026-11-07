@@ -89,18 +89,14 @@ inline Type& GetTypeForTestValue(Context& context)
 
 TEST(Value, GetBelongedOperationTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	Value value(op);
-	ASSERT_EQ(value.GetBelongedOperation(), &op);
+	Value value;
+	ASSERT_EQ(value.GetBelongedOperation(), nullptr);
 }
 
 TEST(Value, DynamicCastTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	Value value(op);
-	IntegerValue int_value(op);
+	Value value;
+	IntegerValue int_value(1);
 	ASSERT_TRUE(Value::IsInstance(value));
 	ASSERT_TRUE(Value::IsInstance(int_value));	  // Value is a base class of IntegerValue, so this should return true
 	ASSERT_EQ(DynamicCast<Value>(value), &value);
@@ -108,9 +104,7 @@ TEST(Value, DynamicCastTest)
 
 TEST(Value, GetTypeIdTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	Value value(op);
+	Value value;
 
 	ASSERT_EQ(value.GetTypeId(), GetTypeId<Value>());
 }
@@ -148,32 +142,28 @@ TEST(ResultValue, GetTypeTest)
 {
 	Context context;
 	Dialect& dialect = context.AddDialect<DialectForTestResultValue>();
-	Operation op(GetOperationTypeForTestValue(context));
 	Type& test_type = dialect.GetType<TypeForTestResultValue>();
-	ResultValue result_with_type(op, test_type);
+	ResultValue result_with_type(test_type);
 	ASSERT_EQ(&result_with_type.GetType(), &test_type);
 
-	ResultValue result(op, GetTypeForTestValue(context));
+	ResultValue result(GetTypeForTestValue(context));
 	ASSERT_EQ(&result.GetType(), &GetTypeForTestValue(context));
-	result.SetType(test_type);
-	ASSERT_EQ(&result.GetType(), &test_type);
 }
 
 TEST(ResultValue, ReferenceManagementTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ResultValue result(op, GetTypeForTestValue(op_context));
+	ResultValue result(GetTypeForTestValue(op_context));
 	ASSERT_EQ(result.GetFirstReference(), nullptr);
 
 	{
-		ReferenceValue ref1(op, result);
+		ReferenceValue ref1(result);
 		ASSERT_EQ(ref1.GetResultValue(), &result);
 		ASSERT_EQ(result.GetFirstReference(), &ref1);
 		ASSERT_EQ(ref1.GetPrevious(), &ref1);
 		ASSERT_EQ(ref1.GetNext(), &ref1);
 
-		ReferenceValue ref2(op, result);
+		ReferenceValue ref2(result);
 		ASSERT_EQ(ref2.GetResultValue(), &result);
 		ASSERT_EQ(result.GetFirstReference(), &ref1);
 		ASSERT_EQ(ref1.GetNext(), &ref2);
@@ -182,7 +172,7 @@ TEST(ResultValue, ReferenceManagementTest)
 		ASSERT_EQ(ref2.GetNext(), &ref1);
 
 		{
-			ReferenceValue ref3(op, result);
+			ReferenceValue ref3(result);
 			ASSERT_EQ(ref3.GetResultValue(), &result);
 			ASSERT_EQ(result.GetFirstReference(), &ref1);
 			ASSERT_EQ(ref1.GetNext(), &ref2);
@@ -207,9 +197,8 @@ TEST(ResultValue, ReferenceManagementTest)
 TEST(ResultValue, DynamicCastTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ResultValue result(op, GetTypeForTestValue(op_context));
-	ReferenceValue ref(op, result);
+	ResultValue result(GetTypeForTestValue(op_context));
+	ReferenceValue ref(result);
 	Value& base_ref = result;
 
 	ASSERT_TRUE(ResultValue::IsInstance(result));
@@ -220,8 +209,7 @@ TEST(ResultValue, DynamicCastTest)
 TEST(ResultValue, GetTypeIdTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ResultValue result(op, GetTypeForTestValue(op_context));
+	ResultValue result(GetTypeForTestValue(op_context));
 
 	ASSERT_EQ(result.GetTypeId(), GetTypeId<ResultValue>());
 }
@@ -229,9 +217,8 @@ TEST(ResultValue, GetTypeIdTest)
 TEST(ReferenceValue, DynamicCastTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ResultValue result(op, GetTypeForTestValue(op_context));
-	ReferenceValue ref(op, result);
+	ResultValue result(GetTypeForTestValue(op_context));
+	ReferenceValue ref(result);
 	Value& base_ref = ref;
 
 	ASSERT_TRUE(ReferenceValue::IsInstance(ref));
@@ -242,9 +229,8 @@ TEST(ReferenceValue, DynamicCastTest)
 TEST(ReferenceValue, GetTypeIdTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ResultValue result(op, GetTypeForTestValue(op_context));
-	ReferenceValue ref(op, result);
+	ResultValue result(GetTypeForTestValue(op_context));
+	ReferenceValue ref(result);
 
 	ASSERT_EQ(ref.GetTypeId(), GetTypeId<ReferenceValue>());
 }
@@ -300,30 +286,15 @@ TEST(TypeValue, GetTypeTest)
 	Context context;
 	Dialect& dialect = context.AddDialect<DialectForTestTypeValue>();
 	Type& test_type = dialect.GetType<Type1ForTestTypeValue>();
-	Operation op(GetOperationTypeForTestValue(context));
-	TypeValue type_value_with_type(op, test_type);
+	TypeValue type_value_with_type(test_type);
 	ASSERT_EQ(&type_value_with_type.GetType(), &test_type);
-}
-
-TEST(TypeValue, SetTypeTest)
-{
-	Context context;
-	Dialect& dialect = context.AddDialect<DialectForTestTypeValue>();
-	Type& test_type1 = dialect.GetType<Type1ForTestTypeValue>();
-	Type& test_type2 = dialect.GetType<Type2ForTestTypeValue>();
-	Operation op(GetOperationTypeForTestValue(context));
-	TypeValue type_value(op, test_type1);
-	ASSERT_EQ(&type_value.GetType(), &test_type1);
-	type_value.SetType(test_type2);
-	ASSERT_EQ(&type_value.GetType(), &test_type2);
 }
 
 TEST(TypeValue, DynamicCastTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	TypeValue type_value(op, GetTypeForTestValue(op_context));
-	OperationTypeValue operation_type_value(op, GetOperationTypeForTestValue(op_context));
+	TypeValue type_value(GetTypeForTestValue(op_context));
+	OperationTypeValue operation_type_value(GetOperationTypeForTestValue(op_context));
 	Value& base_ref = type_value;
 
 	ASSERT_TRUE(TypeValue::IsInstance(type_value));
@@ -334,8 +305,7 @@ TEST(TypeValue, DynamicCastTest)
 TEST(TypeValue, GetTypeIdTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	TypeValue type_value(op, GetTypeForTestValue(op_context));
+	TypeValue type_value(GetTypeForTestValue(op_context));
 
 	ASSERT_EQ(type_value.GetTypeId(), GetTypeId<TypeValue>());
 }
@@ -390,35 +360,20 @@ public:
 SGE_DECLARE_TYPE_ID(, DialectForTestOperationTypeValue);
 SGE_DEFINE_TYPE_ID(, DialectForTestOperationTypeValue);
 
-TEST(OperationTypeValue, SetOperationTypeTest)
-{
-	Context context;
-	Dialect& dialect = context.AddDialect<DialectForTestOperationTypeValue>();
-	OperationType& test_operation_type1 = dialect.GetOperationType<OperationType1ForTestOperationTypeValue>();
-	OperationType& test_operation_type2 = dialect.GetOperationType<OperationType2ForTestOperationTypeValue>();
-	Operation op(GetOperationTypeForTestValue(context));
-	OperationTypeValue operation_type_value(op, test_operation_type1);
-	ASSERT_EQ(&operation_type_value.GetOperationType(), &test_operation_type1);
-	operation_type_value.SetOperationType(test_operation_type2);
-	ASSERT_EQ(&operation_type_value.GetOperationType(), &test_operation_type2);
-}
-
 TEST(OperationTypeValue, GetOperationTypeTest)
 {
 	Context context;
 	Dialect& dialect = context.AddDialect<DialectForTestOperationTypeValue>();
 	OperationType& test_operation_type = dialect.GetOperationType<OperationType1ForTestOperationTypeValue>();
-	Operation op(GetOperationTypeForTestValue(context));
-	OperationTypeValue operation_type_value_with_type(op, test_operation_type);
+	OperationTypeValue operation_type_value_with_type(test_operation_type);
 	ASSERT_EQ(&operation_type_value_with_type.GetOperationType(), &test_operation_type);
 }
 
 TEST(OperationTypeValue, DynamicCastTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	OperationTypeValue operation_type_value(op, GetOperationTypeForTestValue(op_context));
-	BlockValue block_value(op);
+	OperationTypeValue operation_type_value(GetOperationTypeForTestValue(op_context));
+	BlockValue block_value(List<Operation>{});
 	Value& base_ref = operation_type_value;
 
 	ASSERT_TRUE(OperationTypeValue::IsInstance(operation_type_value));
@@ -429,24 +384,23 @@ TEST(OperationTypeValue, DynamicCastTest)
 TEST(OperationTypeValue, GetTypeIdTest)
 {
 	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	OperationTypeValue operation_type_value(op, GetOperationTypeForTestValue(op_context));
+	OperationTypeValue operation_type_value(GetOperationTypeForTestValue(op_context));
 
 	ASSERT_EQ(operation_type_value.GetTypeId(), GetTypeId<OperationTypeValue>());
 }
 
 TEST(BlockValue, GetOperationsTest)
 {
-	Context op_context;
-	OperationType& operation_type = GetOperationTypeForTestValue(op_context);
-	Operation op(operation_type);
-	BlockValue block_value(op);
+	Context context;
+	OperationType& operation_type = GetOperationTypeForTestValue(context);
+	BlockValue block_value(List<Operation>{});
 	ASSERT_EQ(block_value.GetOperations().GetSize(), 0);
-	Operation op1(operation_type), op2(operation_type);
+	Operation op1 = OperationBuilder(operation_type).AddArgument<IntegerValue>(1).Build();
+	Operation op2 = OperationBuilder(operation_type).AddArgument<IntegerValue>(2).Build();
 	List<Operation> operations;
-	operations.PushBack(op1);
-	operations.PushBack(op2);
-	BlockValue block_value_with_ops(op, std::move(operations));
+	operations.EmplaceBack(OperationBuilder(operation_type).AddArgument<IntegerValue>(1).Build());
+	operations.EmplaceBack(OperationBuilder(operation_type).AddArgument<IntegerValue>(2).Build());
+	BlockValue block_value_with_ops(std::move(operations));
 	ASSERT_EQ(block_value_with_ops.GetOperations().GetSize(), 2);
 	ASSERT_EQ(*block_value_with_ops.GetOperations().GetBegin(), op1);
 	ASSERT_EQ(*(block_value_with_ops.GetOperations().GetBegin() + 1), op2);
@@ -454,10 +408,8 @@ TEST(BlockValue, GetOperationsTest)
 
 TEST(BlockValue, DynamicCastTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	BlockValue block_value(op);
-	IntegerValue int_value(op);
+	BlockValue block_value(List<Operation>{});
+	IntegerValue int_value(0);
 	Value& base_ref = block_value;
 
 	ASSERT_TRUE(BlockValue::IsInstance(block_value));
@@ -467,40 +419,23 @@ TEST(BlockValue, DynamicCastTest)
 
 TEST(BlockValue, GetTypeIdTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	BlockValue block_value(op);
+	BlockValue block_value(List<Operation>{});
 
 	ASSERT_EQ(block_value.GetTypeId(), GetTypeId<BlockValue>());
 }
 
-TEST(IntegerValue, SetValueTest)
-{
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	IntegerValue int_value(op);
-	int_value.SetValue(42);
-	ASSERT_EQ(int_value.GetValue(), 42);
-	int_value.SetValue(-1);
-	ASSERT_EQ(int_value.GetValue(), -1);
-}
-
 TEST(IntegerValue, GetValueTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	IntegerValue int_value(op, 100);
+	IntegerValue int_value(100);
 	ASSERT_EQ(int_value.GetValue(), 100);
-	int_value.SetValue(-50);
-	ASSERT_EQ(int_value.GetValue(), -50);
+	IntegerValue int_value2(0);
+	ASSERT_EQ(int_value2.GetValue(), 0);
 }
 
 TEST(IntegerValue, DynamicCastTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	IntegerValue int_value(op);
-	FloatValue float_value(op);
+	IntegerValue int_value(0);
+	FloatValue float_value(0.0f);
 	Value& base_ref = int_value;
 
 	ASSERT_TRUE(IntegerValue::IsInstance(int_value));
@@ -510,40 +445,23 @@ TEST(IntegerValue, DynamicCastTest)
 
 TEST(IntegerValue, GetTypeIdTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	IntegerValue int_value(op);
+	IntegerValue int_value(0);
 
 	ASSERT_EQ(int_value.GetTypeId(), GetTypeId<IntegerValue>());
 }
 
-TEST(FloatValue, SetValueTest)
-{
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	FloatValue float_value(op);
-	float_value.SetValue(3.14f);
-	ASSERT_FLOAT_EQ(float_value.GetValue(), 3.14f);
-	float_value.SetValue(-2.71f);
-	ASSERT_FLOAT_EQ(float_value.GetValue(), -2.71f);
-}
-
 TEST(FloatValue, GetValueTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	FloatValue float_value(op, 1.618f);
+	FloatValue float_value(1.618f);
 	ASSERT_FLOAT_EQ(float_value.GetValue(), 1.618f);
-	float_value.SetValue(-0.577f);
-	ASSERT_FLOAT_EQ(float_value.GetValue(), -0.577f);
+	FloatValue float_value2(-0.577f);
+	ASSERT_FLOAT_EQ(float_value2.GetValue(), -0.577f);
 }
 
 TEST(FloatValue, DynamicCastTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	FloatValue float_value(op);
-	DoubleValue double_value(op);
+	FloatValue float_value(0.0f);
+	DoubleValue double_value(0.0);
 	Value& base_ref = float_value;
 
 	ASSERT_TRUE(FloatValue::IsInstance(float_value));
@@ -553,40 +471,23 @@ TEST(FloatValue, DynamicCastTest)
 
 TEST(FloatValue, GetTypeIdTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	FloatValue float_value(op);
+	FloatValue float_value(0.0f);
 
 	ASSERT_EQ(float_value.GetTypeId(), GetTypeId<FloatValue>());
 }
 
-TEST(DoubleValue, SetValueTest)
-{
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	DoubleValue double_value(op);
-	double_value.SetValue(3.141592653589793);
-	ASSERT_DOUBLE_EQ(double_value.GetValue(), 3.141592653589793);
-	double_value.SetValue(-2.718281828459045);
-	ASSERT_DOUBLE_EQ(double_value.GetValue(), -2.718281828459045);
-}
-
 TEST(DoubleValue, GetValueTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	DoubleValue double_value(op, 1.4142135623730951);
+	DoubleValue double_value(1.4142135623730951);
 	ASSERT_DOUBLE_EQ(double_value.GetValue(), 1.4142135623730951);
-	double_value.SetValue(-0.6931471805599453);
-	ASSERT_DOUBLE_EQ(double_value.GetValue(), -0.6931471805599453);
+	DoubleValue double_value2(-0.6931471805599453);
+	ASSERT_DOUBLE_EQ(double_value2.GetValue(), -0.6931471805599453);
 }
 
 TEST(DoubleValue, DynamicCastTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	DoubleValue double_value(op);
-	BooleanValue bool_value(op);
+	DoubleValue double_value(0.0);
+	BooleanValue bool_value(false);
 	Value& base_ref = double_value;
 
 	ASSERT_TRUE(DoubleValue::IsInstance(double_value));
@@ -596,40 +497,23 @@ TEST(DoubleValue, DynamicCastTest)
 
 TEST(DoubleValue, GetTypeIdTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	DoubleValue double_value(op);
+	DoubleValue double_value(0.0);
 
 	ASSERT_EQ(double_value.GetTypeId(), GetTypeId<DoubleValue>());
 }
 
-TEST(BooleanValue, SetValueTest)
-{
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	BooleanValue bool_value(op);
-	bool_value.SetValue(true);
-	ASSERT_TRUE(bool_value.GetValue());
-	bool_value.SetValue(false);
-	ASSERT_FALSE(bool_value.GetValue());
-}
-
 TEST(BooleanValue, GetValueTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	BooleanValue bool_value(op, true);
+	BooleanValue bool_value(true);
 	ASSERT_TRUE(bool_value.GetValue());
-	bool_value.SetValue(false);
-	ASSERT_FALSE(bool_value.GetValue());
+	BooleanValue bool_value2(false);
+	ASSERT_FALSE(bool_value2.GetValue());
 }
 
 TEST(BooleanValue, DynamicCastTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	BooleanValue bool_value(op);
-	StringValue string_value(op);
+	BooleanValue bool_value(false);
+	StringValue string_value(SGE_STR(""));
 	Value& base_ref = bool_value;
 
 	ASSERT_TRUE(BooleanValue::IsInstance(bool_value));
@@ -639,44 +523,27 @@ TEST(BooleanValue, DynamicCastTest)
 
 TEST(BooleanValue, GetTypeIdTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	BooleanValue bool_value(op);
+	BooleanValue bool_value(false);
 
 	ASSERT_EQ(bool_value.GetTypeId(), GetTypeId<BooleanValue>());
 }
 
-TEST(StringValue, SetValueTest)
-{
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	StringValue string_value(op);
-	String test_string(SGE_STR("Hello, World!"));
-	string_value.SetValue(test_string);
-	ASSERT_EQ(string_value.GetValue(), SGE_STR("Hello, World!"));
-	string_value.SetValue(SGE_STR("Test"));
-	ASSERT_EQ(string_value.GetValue(), SGE_STR("Test"));
-}
-
 TEST(StringValue, GetValueTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	StringValue string_value(op, SGE_STR("Initial Value"));
+	StringValue string_value(SGE_STR("Initial Value"));
 	ASSERT_EQ(string_value.GetValue(), SGE_STR("Initial Value"));
-	string_value.SetValue(SGE_STR("Changed Value"));
-	ASSERT_EQ(string_value.GetValue(), SGE_STR("Changed Value"));
-	String test_string(SGE_STR("Another Value"));
-	StringValue string_value2(op, test_string);
+	const String test_string(SGE_STR("Another Value"));
+	StringValue string_value2(test_string);
 	ASSERT_EQ(string_value2.GetValue(), SGE_STR("Another Value"));
+	String moved_string(SGE_STR("Moved Value"));
+	StringValue string_value3(std::move(moved_string));
+	ASSERT_EQ(string_value3.GetValue(), SGE_STR("Moved Value"));
 }
 
 TEST(StringValue, DynamicCastTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	StringValue string_value(op);
-	IntegerValue int_value(op);
+	StringValue string_value(SGE_STR(""));
+	IntegerValue int_value(0);
 	Value& base_ref = string_value;
 
 	ASSERT_TRUE(StringValue::IsInstance(string_value));
@@ -686,61 +553,38 @@ TEST(StringValue, DynamicCastTest)
 
 TEST(StringValue, GetTypeIdTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	StringValue string_value(op);
+	StringValue string_value(SGE_STR(""));
 
 	ASSERT_EQ(string_value.GetTypeId(), GetTypeId<StringValue>());
 }
 
-TEST(ListValue, AddValueTest)
-{
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ListValue list_value(op);
-	Value& new_value = list_value.AddValue<DoubleValue>(op, 3.14);
-	ASSERT_TRUE(DoubleValue::IsInstance(new_value));
-	DoubleValue& double_value = static_cast<DoubleValue&>(new_value);
-	ASSERT_DOUBLE_EQ(double_value.GetValue(), 3.14);
-	ASSERT_EQ(list_value.GetValues().GetSize(), 1);
-	ASSERT_EQ(list_value.GetValues()[0], &double_value);
-}
-
-TEST(ListValue, RemoveValueTest)
-{
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ListValue list_value(op);
-	Value& new_value1 = list_value.AddValue<DoubleValue>(op, 3.14);
-	Value& new_value2 = list_value.AddValue<BooleanValue>(op, true);
-	ASSERT_EQ(list_value.GetValues().GetSize(), 2);
-	ASSERT_TRUE(list_value.RemoveValue(new_value1));
-	ASSERT_EQ(list_value.GetValues().GetSize(), 1);
-	ASSERT_EQ(list_value.GetValues()[0], &new_value2);
-	ASSERT_FALSE(list_value.RemoveValue(new_value1));	 // Already removed
-}
-
 TEST(ListValue, GetValuesTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ListValue list_value(op);
-	Value& new_value1 = list_value.AddValue<DoubleValue>(op, 3.14);
-	Value& new_value2 = list_value.AddValue<BooleanValue>(op, true);
-	Value& new_value3 = list_value.AddValue<StringValue>(op, SGE_STR("Test"));
+	ListValue empty_list_value(Vector<const Value*>{});
+	ASSERT_EQ(empty_list_value.GetValues().GetSize(), 0);
+
+	Value* new_value1 = DefaultAllocator::New<DoubleValue>(3.14);
+	Value* new_value2 = DefaultAllocator::New<BooleanValue>(true);
+	Value* new_value3 = DefaultAllocator::New<StringValue>(SGE_STR("Test"));
+	Vector<const Value*> input_values;
+	input_values.PushBack(new_value1);
+	input_values.PushBack(new_value2);
+	input_values.PushBack(new_value3);
+	ListValue list_value(std::move(input_values));
 	const Vector<const Value*>& values = list_value.GetValues();
 	ASSERT_EQ(values.GetSize(), 3);
-	ASSERT_EQ(values[0], &new_value1);
-	ASSERT_EQ(values[1], &new_value2);
-	ASSERT_EQ(values[2], &new_value3);
+	ASSERT_EQ(values[0], new_value1);
+	ASSERT_EQ(values[1], new_value2);
+	ASSERT_EQ(values[2], new_value3);
+	ASSERT_DOUBLE_EQ(static_cast<const DoubleValue*>(values[0])->GetValue(), 3.14);
+	ASSERT_TRUE(static_cast<const BooleanValue*>(values[1])->GetValue());
+	ASSERT_EQ(static_cast<const StringValue*>(values[2])->GetValue(), SGE_STR("Test"));
 }
 
 TEST(ListValue, DynamicCastTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ListValue list_value(op);
-	BooleanValue bool_value(op);
+	ListValue list_value(Vector<const Value*>{});
+	BooleanValue bool_value(false);
 	Value& base_ref = list_value;
 
 	ASSERT_TRUE(ListValue::IsInstance(list_value));
@@ -750,9 +594,7 @@ TEST(ListValue, DynamicCastTest)
 
 TEST(ListValue, GetTypeIdTest)
 {
-	Context op_context;
-	Operation op(GetOperationTypeForTestValue(op_context));
-	ListValue list_value(op);
+	ListValue list_value(Vector<const Value*>{});
 
 	ASSERT_EQ(list_value.GetTypeId(), GetTypeId<ListValue>());
 }

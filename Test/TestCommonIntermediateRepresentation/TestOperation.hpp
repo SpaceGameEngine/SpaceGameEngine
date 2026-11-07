@@ -15,6 +15,7 @@ limitations under the License.
 */
 #pragma once
 #include "Operation.h"
+#include "Value.h"
 #include "Dialect.h"
 #include "Context.h"
 #include "gtest/gtest.h"
@@ -128,4 +129,98 @@ TEST(OperationType, GetTypeIdTest)
 	ASSERT_EQ(operation_type1.GetTypeId(), GetTypeId<OperationType1ForTestOperationType>());
 	ASSERT_EQ(operation_type2.GetTypeId(), GetTypeId<OperationType2ForTestOperationType>());
 	ASSERT_NE(operation_type1.GetTypeId(), operation_type2.GetTypeId());
+}
+
+class TypeForTestOperation : public Type, public DynamicCastHelperForDerived<TypeForTestOperation, Type>
+{
+public:
+	friend class Dialect;
+
+	inline TypeForTestOperation(Dialect& dialect)
+		: Type(SGE_STR("TypeForTestOperation"), dialect)
+	{
+	}
+
+	using DynamicCastHelperForDerived<TypeForTestOperation, Type>::IsInstance;
+};
+
+SGE_DECLARE_TYPE_ID(, TypeForTestOperation);
+SGE_DEFINE_TYPE_ID(, TypeForTestOperation);
+
+class VerifyFailedOperationTypeForTestOperation : public OperationType, public DynamicCastHelperForDerived<VerifyFailedOperationTypeForTestOperation, OperationType>
+{
+public:
+	friend class Dialect;
+
+	inline VerifyFailedOperationTypeForTestOperation(Dialect& dialect)
+		: OperationType(SGE_STR("VerifyFailedOperationTypeForTestOperation"), dialect)
+	{
+	}
+
+	inline bool VerifyArguments(const Vector<const Value*>& arguments) const override
+	{
+		return arguments.GetSize() == 1;
+	}
+
+	inline bool VerifyResults(const Vector<const ResultValue*>& results) const override
+	{
+		return results.GetSize() == 1;
+	}
+
+	using DynamicCastHelperForDerived<VerifyFailedOperationTypeForTestOperation, OperationType>::IsInstance;
+};
+
+SGE_DECLARE_TYPE_ID(, VerifyFailedOperationTypeForTestOperation);
+SGE_DEFINE_TYPE_ID(, VerifyFailedOperationTypeForTestOperation);
+
+class DialectForTestOperation : public Dialect, public DynamicCastHelperForDerived<DialectForTestOperation, Dialect>
+{
+public:
+	friend class Context;
+
+	inline DialectForTestOperation(Context& context)
+		: Dialect(SGE_STR("DialectForTestOperation"), context)
+	{
+		AddOperationType<OperationType1ForTestOperationType>();
+		AddOperationType<VerifyFailedOperationTypeForTestOperation>();
+		AddType<TypeForTestOperation>();
+	}
+
+	using DynamicCastHelperForDerived<DialectForTestOperation, Dialect>::IsInstance;
+};
+
+SGE_DECLARE_TYPE_ID(, DialectForTestOperation);
+SGE_DEFINE_TYPE_ID(, DialectForTestOperation);
+
+TEST(OperationBuilder, BuildTest)
+{
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestOperation>();
+	OperationType& operation_type = dialect.GetOperationType<OperationType1ForTestOperationType>();
+	Type& type = dialect.GetType<TypeForTestOperation>();
+
+	OperationBuilder builder(operation_type);
+	builder.AddArgument<IntegerValue>(1).AddArgument<StringValue>(SGE_STR("test")).AddResult(type);
+	Operation op = builder.Build();
+	ASSERT_TRUE(op.Verify());
+}
+
+TEST(Operation, VerifyTest)
+{
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestOperation>();
+	OperationType& operation_type = dialect.GetOperationType<VerifyFailedOperationTypeForTestOperation>();
+	Type& type = dialect.GetType<TypeForTestOperation>();
+
+	Operation op1 = OperationBuilder(operation_type).AddArgument<IntegerValue>(1).AddResult(type).Build();
+	ASSERT_TRUE(op1.Verify());
+
+	Operation op2 = OperationBuilder(operation_type).AddResult(type).Build();
+	ASSERT_FALSE(op2.Verify());
+
+	Operation op3 = OperationBuilder(operation_type).AddArgument<IntegerValue>(1).Build();
+	ASSERT_FALSE(op3.Verify());
+
+	Operation op4 = OperationBuilder(operation_type).AddArgument<IntegerValue>(1).AddArgument<BooleanValue>(true).AddResult(type).Build();
+	ASSERT_FALSE(op4.Verify());
 }

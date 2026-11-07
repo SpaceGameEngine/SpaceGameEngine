@@ -56,24 +56,32 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 
 	class COMMON_INTERMEDIATE_REPRESENTATION_API Operation
 	{
+	private:
+		Operation(const OperationType& operation_type, Vector<const ResultValue*>&& results, Vector<const Value*>&& arguments, DictionaryAttribute&& attributes);
+
 	public:
-		Operation(OperationType& operation_type);
+		friend class OperationBuilder;
+
 		~Operation();
+		Operation(const Operation&) = delete;
+		Operation(Operation&&);
+		Operation& operator=(const Operation&) = delete;
+		Operation& operator=(Operation&&);
 
-		template<typename ValueType, typename... Args>
-			requires std::derived_from<ValueType, Value>
-		inline ValueType& AddArgument(Args&&... args)
-		{
-			ValueType* new_argument = DefaultAllocator::New<ValueType>(*this, std::forward<Args>(args)...);
-			m_Arguments.PushBack(new_argument);
-			return *new_argument;
-		}
+		SizeType GetArgumentSize() const;
+		const Value& GetArgument(SizeType index) const;
 
-		ResultValue& AddResult(Type& type);
+		SizeType GetResultSize() const;
+		const ResultValue& GetResult(SizeType index) const;
 
 		bool Verify() const;
 
+		// todo
+
 		bool operator==(const Operation& other) const;
+
+	private:
+		void LinkValues();
 
 	private:
 		const OperationType* m_OperationType;
@@ -85,12 +93,41 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API InferReturnTypeOperationTypeInterface
 	{
 	public:
-		virtual const Vector<const Type*>& InferReturnTypes(const Vector<const Value*>& arguments) const = 0;
+		virtual const Vector<const Type*>& InferReturnTypes(const Vector<const Value*>& arguments) const = 0;	 // todo
+	};
+
+	struct OperationBuilderBuildTwiceError
+	{
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The operation builder can only build once.");
+		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool built);
 	};
 
 	class COMMON_INTERMEDIATE_REPRESENTATION_API OperationBuilder
 	{
-		// todo
+	public:
+		OperationBuilder(OperationType& operation_type);
+
+		template<typename ValueType, typename... Args>
+			requires std::derived_from<ValueType, Value>
+		inline OperationBuilder& AddArgument(Args&&... args)
+		{
+			ValueType* new_argument = DefaultAllocator::New<ValueType>(std::forward<Args>(args)...);
+			m_Arguments.PushBack(new_argument);
+			return *this;
+		}
+
+		OperationBuilder& AddResult(Type& type);
+
+		// todo: AddAttribute
+
+		Operation Build();
+
+	private:
+		bool m_Built;
+		const OperationType* m_OperationType;
+		Vector<const ResultValue*> m_Results;
+		Vector<const Value*> m_Arguments;
+		DictionaryAttribute m_Attributes;
 	};
 }
 

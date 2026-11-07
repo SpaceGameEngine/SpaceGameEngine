@@ -56,24 +56,62 @@ bool OperationType::VerifyResults(const Vector<const ResultValue*>& results) con
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::OperationType);
 
-Operation::Operation(OperationType& operation_type)
-	: m_OperationType(&operation_type)
+Operation::Operation(const OperationType& operation_type, Vector<const ResultValue*>&& results, Vector<const Value*>&& arguments, DictionaryAttribute&& attributes)
+	: m_OperationType(&operation_type), m_Results(std::move(results)), m_Arguments(std::move(arguments)), m_Attributes(std::move(attributes))
 {
+	LinkValues();
 }
 
 Operation::~Operation()
 {
-	for (auto iter = m_Arguments.GetBegin(); iter != m_Arguments.GetEnd(); ++iter)
-		DefaultAllocator::Delete(const_cast<Value*>(*iter));
-	for (auto iter = m_Results.GetBegin(); iter != m_Results.GetEnd(); ++iter)
-		DefaultAllocator::Delete(const_cast<ResultValue*>(*iter));
+	if (m_OperationType)
+	{
+		for (auto iter = m_Arguments.GetBegin(); iter != m_Arguments.GetEnd(); ++iter)
+			DefaultAllocator::Delete(const_cast<Value*>(*iter));
+		for (auto iter = m_Results.GetBegin(); iter != m_Results.GetEnd(); ++iter)
+			DefaultAllocator::Delete(const_cast<ResultValue*>(*iter));
+	}
 }
 
-SpaceGameEngine::CommonIntermediateRepresentation::ResultValue& Operation::AddResult(Type& type)
+Operation::Operation(Operation&& other)
+	: m_OperationType(other.m_OperationType), m_Results(std::move(other.m_Results)), m_Arguments(std::move(other.m_Arguments)), m_Attributes(std::move(other.m_Attributes))
 {
-	ResultValue* new_result = DefaultAllocator::New<ResultValue>(*this, type);
-	m_Results.PushBack(new_result);
-	return *new_result;
+	LinkValues();
+	other.m_OperationType = nullptr;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Operation& Operation::operator=(Operation&& other)
+{
+	SGE_ASSERT(SelfAssignmentError, this, &other);
+	m_OperationType = other.m_OperationType;
+	m_Results = std::move(other.m_Results);
+	m_Arguments = std::move(other.m_Arguments);
+	m_Attributes = std::move(other.m_Attributes);
+	LinkValues();
+	other.m_OperationType = nullptr;
+	return *this;
+}
+
+SpaceGameEngine::SizeType Operation::GetArgumentSize() const
+{
+	return m_Arguments.GetSize();
+}
+
+const Value& Operation::GetArgument(SizeType index) const
+{
+	SGE_ASSERT(InvalidValueError, index, 0, m_Arguments.GetSize() - 1);
+	return *m_Arguments[index];
+}
+
+SpaceGameEngine::SizeType Operation::GetResultSize() const
+{
+	return m_Results.GetSize();
+}
+
+const ResultValue& Operation::GetResult(SizeType index) const
+{
+	SGE_ASSERT(InvalidValueError, index, 0, m_Results.GetSize() - 1);
+	return *m_Results[index];
 }
 
 bool Operation::Verify() const
@@ -87,4 +125,36 @@ bool Operation::operator==(const Operation& other) const
 	return true;
 }
 
+void Operation::LinkValues()
+{
+	for (auto iter = m_Arguments.GetBegin(); iter != m_Arguments.GetEnd(); ++iter)
+		const_cast<Value*>(*iter)->SetBelongedOperation(*this);
+	for (auto iter = m_Results.GetBegin(); iter != m_Results.GetEnd(); ++iter)
+		const_cast<ResultValue*>(*iter)->SetBelongedOperation(*this);
+}
+
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::InferReturnTypeOperationTypeInterface);
+
+bool OperationBuilderBuildTwiceError::Judge(bool built)
+{
+	return built;
+}
+
+OperationBuilder::OperationBuilder(OperationType& operation_type)
+	: m_Built(false), m_OperationType(&operation_type)
+{
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::OperationBuilder& OperationBuilder::AddResult(Type& type)
+{
+	ResultValue* new_result = DefaultAllocator::New<ResultValue>(type);
+	m_Results.PushBack(new_result);
+	return *this;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Operation OperationBuilder::Build()
+{
+	SGE_ASSERT(OperationBuilderBuildTwiceError, m_Built);
+	m_Built = true;
+	return Operation(*m_OperationType, std::move(m_Results), std::move(m_Arguments), std::move(m_Attributes));
+}
