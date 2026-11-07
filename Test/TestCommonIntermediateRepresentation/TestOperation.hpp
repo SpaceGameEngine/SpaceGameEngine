@@ -205,6 +205,93 @@ TEST(OperationBuilder, BuildTest)
 	ASSERT_TRUE(op.Verify());
 }
 
+TEST(Operation, MoveConstructionTest)
+{
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestOperation>();
+	OperationType& operation_type = dialect.GetOperationType<OperationType1ForTestOperationType>();
+	Type& type = dialect.GetType<TypeForTestOperation>();
+
+	Operation op1 = OperationBuilder(operation_type).AddArgument<IntegerValue>(1).AddResult(type).Build();
+	const Value* pargument = &op1.GetArgument(0);
+	const ResultValue* presult = &op1.GetResult(0);
+	ASSERT_EQ(pargument->GetBelongedOperation(), &op1);
+	ASSERT_EQ(presult->GetBelongedOperation(), &op1);
+
+	Operation op2(std::move(op1));
+	ASSERT_EQ(op2.GetArgumentSize(), 1);
+	ASSERT_EQ(op2.GetResultSize(), 1);
+	ASSERT_EQ(&op2.GetArgument(0), pargument);
+	ASSERT_EQ(&op2.GetResult(0), presult);
+	ASSERT_EQ(op2.GetArgument(0).GetBelongedOperation(), &op2);
+	ASSERT_EQ(op2.GetResult(0).GetBelongedOperation(), &op2);
+	ASSERT_TRUE(op2.Verify());
+}
+
+TEST(Operation, MoveAssignmentTest)
+{
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestOperation>();
+	OperationType& operation_type = dialect.GetOperationType<OperationType1ForTestOperationType>();
+	Type& type = dialect.GetType<TypeForTestOperation>();
+
+	Operation op1 = OperationBuilder(operation_type).AddArgument<IntegerValue>(1).AddResult(type).Build();
+	const Value* pargument = &op1.GetArgument(0);
+	const ResultValue* presult = &op1.GetResult(0);
+
+	Operation op2 = OperationBuilder(operation_type).AddArgument<BooleanValue>(true).AddArgument<IntegerValue>(2).AddResult(type).AddResult(type).Build();
+	ASSERT_EQ(op2.GetArgumentSize(), 2);
+	ASSERT_EQ(op2.GetResultSize(), 2);
+
+	op2 = std::move(op1);
+	ASSERT_EQ(op2.GetArgumentSize(), 1);
+	ASSERT_EQ(op2.GetResultSize(), 1);
+	ASSERT_EQ(&op2.GetArgument(0), pargument);
+	ASSERT_EQ(&op2.GetResult(0), presult);
+	ASSERT_EQ(DynamicCast<const IntegerValue>(op2.GetArgument(0))->GetValue(), 1);
+	ASSERT_EQ(op2.GetArgument(0).GetBelongedOperation(), &op2);
+	ASSERT_EQ(op2.GetResult(0).GetBelongedOperation(), &op2);
+	ASSERT_TRUE(op2.Verify());
+}
+
+TEST(Operation, GetArgumentTest)
+{
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestOperation>();
+	OperationType& operation_type = dialect.GetOperationType<OperationType1ForTestOperationType>();
+
+	Operation empty_op = OperationBuilder(operation_type).Build();
+	ASSERT_EQ(empty_op.GetArgumentSize(), 0);
+
+	Operation op = OperationBuilder(operation_type).AddArgument<IntegerValue>(42).AddArgument<StringValue>(SGE_STR("test")).Build();
+	ASSERT_EQ(op.GetArgumentSize(), 2);
+	ASSERT_TRUE(IntegerValue::IsInstance(op.GetArgument(0)));
+	ASSERT_EQ(DynamicCast<const IntegerValue>(op.GetArgument(0))->GetValue(), 42);
+	ASSERT_TRUE(StringValue::IsInstance(op.GetArgument(1)));
+	ASSERT_EQ(DynamicCast<const StringValue>(op.GetArgument(1))->GetValue(), SGE_STR("test"));
+	ASSERT_EQ(op.GetArgument(0).GetBelongedOperation(), &op);
+	ASSERT_EQ(op.GetArgument(1).GetBelongedOperation(), &op);
+}
+
+TEST(Operation, GetResultTest)
+{
+	Context context;
+	Dialect& dialect = context.AddDialect<DialectForTestOperation>();
+	OperationType& operation_type = dialect.GetOperationType<OperationType1ForTestOperationType>();
+	Type& type = dialect.GetType<TypeForTestOperation>();
+
+	Operation empty_op = OperationBuilder(operation_type).Build();
+	ASSERT_EQ(empty_op.GetResultSize(), 0);
+
+	Operation op = OperationBuilder(operation_type).AddResult(type).AddResult(type).Build();
+	ASSERT_EQ(op.GetResultSize(), 2);
+	ASSERT_EQ(&op.GetResult(0).GetType(), &type);
+	ASSERT_EQ(&op.GetResult(1).GetType(), &type);
+	ASSERT_NE(&op.GetResult(0), &op.GetResult(1));
+	ASSERT_EQ(op.GetResult(0).GetBelongedOperation(), &op);
+	ASSERT_EQ(op.GetResult(1).GetBelongedOperation(), &op);
+}
+
 TEST(Operation, VerifyTest)
 {
 	Context context;

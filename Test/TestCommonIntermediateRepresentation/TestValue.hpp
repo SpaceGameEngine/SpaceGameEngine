@@ -91,6 +91,16 @@ TEST(Value, GetBelongedOperationTest)
 {
 	Value value;
 	ASSERT_EQ(value.GetBelongedOperation(), nullptr);
+
+	Context context;
+	Operation op = OperationBuilder(GetOperationTypeForTestValue(context))
+					   .AddArgument<IntegerValue>(42)
+					   .AddResult(GetTypeForTestValue(context))
+					   .Build();
+	ASSERT_NE(op.GetArgument(0).GetBelongedOperation(), nullptr);
+	ASSERT_EQ(op.GetArgument(0).GetBelongedOperation(), &op);
+	ASSERT_NE(op.GetResult(0).GetBelongedOperation(), nullptr);
+	ASSERT_EQ(op.GetResult(0).GetBelongedOperation(), &op);
 }
 
 TEST(Value, DynamicCastTest)
