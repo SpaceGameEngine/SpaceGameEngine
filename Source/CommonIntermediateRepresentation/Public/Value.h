@@ -59,7 +59,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	public:
 		friend class ReferenceValue;
 
-		ResultValue(Type& type);
+		ResultValue(const Type& type);
 		virtual ~ResultValue();
 
 		const Type& GetType() const;

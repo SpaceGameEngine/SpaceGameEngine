@@ -35,7 +35,7 @@ void Value::SetBelongedOperation(Operation& operation)
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::Value);
 
-ResultValue::ResultValue(Type& type)
+ResultValue::ResultValue(const Type& type)
 	: m_Type(&type), m_FirstReference(nullptr)
 {
 }

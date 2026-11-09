@@ -145,10 +145,26 @@ OperationBuilder::OperationBuilder(OperationType& operation_type)
 {
 }
 
-SpaceGameEngine::CommonIntermediateRepresentation::OperationBuilder& OperationBuilder::AddResult(Type& type)
+SpaceGameEngine::CommonIntermediateRepresentation::OperationBuilder& OperationBuilder::AddResult(const Type& type)
 {
 	ResultValue* new_result = DefaultAllocator::New<ResultValue>(type);
 	m_Results.PushBack(new_result);
+	return *this;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::OperationBuilder& OperationBuilder::InferReturnValues()
+{
+	auto infer_result_type_interface = m_OperationType->QueryInterface<InferReturnTypeOperationTypeInterface>();
+	if (infer_result_type_interface)
+	{
+		auto return_types = infer_result_type_interface->InferReturnTypes(m_Arguments);
+		if (return_types.HasValue())
+		{
+			const auto& return_types_result = return_types.Get();
+			for (auto iter = return_types_result.GetConstBegin(); iter != return_types_result.GetConstEnd(); ++iter)
+				AddResult(**iter);
+		}
+	}
 	return *this;
 }
 

@@ -19,6 +19,7 @@ limitations under the License.
 #include "Attribute.h"
 #include "Utility/DynamicCast.hpp"
 #include "Container/Vector.hpp"
+#include "Utility/Optional.hpp"
 
 /*!
 @ingroup CommonIntermediateRepresentation
@@ -32,7 +33,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class ResultValue;
 	class Type;
 
-	class COMMON_INTERMEDIATE_REPRESENTATION_API OperationType : public DynamicCastHelperForBase<OperationType>, InterfaceContainer<OperationType>
+	class COMMON_INTERMEDIATE_REPRESENTATION_API OperationType : public DynamicCastHelperForBase<OperationType>, public InterfaceContainer<OperationType>
 	{
 	public:
 		virtual ~OperationType();
@@ -93,7 +94,7 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 	class COMMON_INTERMEDIATE_REPRESENTATION_API InferReturnTypeOperationTypeInterface
 	{
 	public:
-		virtual const Vector<const Type*>& InferReturnTypes(const Vector<const Value*>& arguments) const = 0;	 // todo
+		virtual Optional<Vector<const Type*>> InferReturnTypes(const Vector<const Value*>& arguments) const = 0;
 	};
 
 	struct OperationBuilderBuildTwiceError
@@ -116,9 +117,11 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 			return *this;
 		}
 
-		OperationBuilder& AddResult(Type& type);
+		OperationBuilder& AddResult(const Type& type);
 
 		// todo: AddAttribute
+
+		OperationBuilder& InferReturnValues();
 
 		Operation Build();
 
