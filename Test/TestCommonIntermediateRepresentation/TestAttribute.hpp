@@ -435,18 +435,18 @@ TEST(DictionaryAttribute, CopyConstructionTest)
 	dictionary.UpsertAttribute<StringAttribute>(SGE_STR("str"), SGE_STR("Hello"));
 
 	DictionaryAttribute dictionary2(dictionary);
-	Attribute* pint_attr = dictionary2.GetAttribute(SGE_STR("int"));
+	Attribute* pint_attr = dictionary2.QueryAttribute(SGE_STR("int"));
 	ASSERT_NE(pint_attr, nullptr);
-	ASSERT_NE(pint_attr, dictionary.GetAttribute(SGE_STR("int")));
+	ASSERT_NE(pint_attr, dictionary.QueryAttribute(SGE_STR("int")));
 	IntegerAttribute* pint = DynamicCast<IntegerAttribute>(*pint_attr);
 	ASSERT_NE(pint, nullptr);
 	ASSERT_EQ(pint->GetValue(), 42);
-	Attribute* pstr_attr = dictionary2.GetAttribute(SGE_STR("str"));
+	Attribute* pstr_attr = dictionary2.QueryAttribute(SGE_STR("str"));
 	ASSERT_NE(pstr_attr, nullptr);
 	ASSERT_EQ(DynamicCast<StringAttribute>(*pstr_attr)->GetValue(), SGE_STR("Hello"));
 
 	pint->SetValue(100);
-	ASSERT_EQ(DynamicCast<IntegerAttribute>(*dictionary.GetAttribute(SGE_STR("int")))->GetValue(), 42);
+	ASSERT_EQ(DynamicCast<IntegerAttribute>(*dictionary.QueryAttribute(SGE_STR("int")))->GetValue(), 42);
 }
 
 TEST(DictionaryAttribute, MoveConstructionTest)
@@ -455,7 +455,7 @@ TEST(DictionaryAttribute, MoveConstructionTest)
 	dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 42);
 
 	DictionaryAttribute dictionary2(std::move(dictionary));
-	Attribute* pint_attr = dictionary2.GetAttribute(SGE_STR("int"));
+	Attribute* pint_attr = dictionary2.QueryAttribute(SGE_STR("int"));
 	ASSERT_NE(pint_attr, nullptr);
 	ASSERT_EQ(DynamicCast<IntegerAttribute>(*pint_attr)->GetValue(), 42);
 }
@@ -469,10 +469,10 @@ TEST(DictionaryAttribute, CopyAssignmentTest)
 	dictionary2.UpsertAttribute<StringAttribute>(SGE_STR("str"), SGE_STR("Hello"));
 	dictionary2 = dictionary;
 
-	ASSERT_EQ(dictionary2.GetAttribute(SGE_STR("str")), nullptr);
-	Attribute* pint_attr = dictionary2.GetAttribute(SGE_STR("int"));
+	ASSERT_EQ(dictionary2.QueryAttribute(SGE_STR("str")), nullptr);
+	Attribute* pint_attr = dictionary2.QueryAttribute(SGE_STR("int"));
 	ASSERT_NE(pint_attr, nullptr);
-	ASSERT_NE(pint_attr, dictionary.GetAttribute(SGE_STR("int")));
+	ASSERT_NE(pint_attr, dictionary.QueryAttribute(SGE_STR("int")));
 	ASSERT_EQ(DynamicCast<IntegerAttribute>(*pint_attr)->GetValue(), 42);
 }
 
@@ -485,7 +485,7 @@ TEST(DictionaryAttribute, MoveAssignmentTest)
 	dictionary2.UpsertAttribute<StringAttribute>(SGE_STR("str"), SGE_STR("Hello"));
 	dictionary2 = std::move(dictionary);
 
-	Attribute* pint_attr = dictionary2.GetAttribute(SGE_STR("int"));
+	Attribute* pint_attr = dictionary2.QueryAttribute(SGE_STR("int"));
 	ASSERT_NE(pint_attr, nullptr);
 	ASSERT_EQ(DynamicCast<IntegerAttribute>(*pint_attr)->GetValue(), 42);
 }
@@ -495,7 +495,7 @@ TEST(DictionaryAttribute, UpsertAttributeTest)
 	DictionaryAttribute dictionary;
 	ASSERT_FALSE(dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 42));
 	ASSERT_TRUE(dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 100));
-	Attribute* int_ptr = dictionary.GetAttribute(SGE_STR("int"));
+	Attribute* int_ptr = dictionary.QueryAttribute(SGE_STR("int"));
 	ASSERT_NE(int_ptr, nullptr);
 	IntegerAttribute* int_attribute = DynamicCast<IntegerAttribute>(*int_ptr);
 	ASSERT_NE(int_attribute, nullptr);
@@ -507,7 +507,7 @@ TEST(DictionaryAttribute, UpsertAttributeWithDifferentTypeTest)
 	DictionaryAttribute dictionary;
 	ASSERT_FALSE(dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("key"), 42));
 	ASSERT_TRUE(dictionary.UpsertAttribute<StringAttribute>(SGE_STR("key"), SGE_STR("Hello")));
-	Attribute* attr_ptr = dictionary.GetAttribute(SGE_STR("key"));
+	Attribute* attr_ptr = dictionary.QueryAttribute(SGE_STR("key"));
 	ASSERT_NE(attr_ptr, nullptr);
 	ASSERT_EQ(DynamicCast<IntegerAttribute>(*attr_ptr), nullptr);
 	StringAttribute* string_attribute = DynamicCast<StringAttribute>(*attr_ptr);
@@ -521,23 +521,43 @@ TEST(DictionaryAttribute, RemoveAttributeTest)
 	dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 42);
 	dictionary.UpsertAttribute<FloatAttribute>(SGE_STR("float"), 3.14f);
 	ASSERT_TRUE(dictionary.RemoveAttribute(SGE_STR("int")));
-	ASSERT_EQ(dictionary.GetAttribute(SGE_STR("int")), nullptr);
+	ASSERT_EQ(dictionary.QueryAttribute(SGE_STR("int")), nullptr);
 	ASSERT_FALSE(dictionary.RemoveAttribute(SGE_STR("int")));
-	ASSERT_NE(dictionary.GetAttribute(SGE_STR("float")), nullptr);
+	ASSERT_NE(dictionary.QueryAttribute(SGE_STR("float")), nullptr);
+}
+
+TEST(DictionaryAttribute, QueryAttributeTest)
+{
+	DictionaryAttribute dictionary;
+	ASSERT_EQ(dictionary.QueryAttribute(SGE_STR("key")), nullptr);
+	dictionary.UpsertAttribute<StringAttribute>(SGE_STR("str"), SGE_STR("Hello"));
+	const DictionaryAttribute& const_dictionary = dictionary;
+	const Attribute* str_ptr = const_dictionary.QueryAttribute(SGE_STR("str"));
+	ASSERT_NE(str_ptr, nullptr);
+	const StringAttribute* string_attribute = DynamicCast<StringAttribute>(*str_ptr);
+	ASSERT_NE(string_attribute, nullptr);
+	ASSERT_EQ(string_attribute->GetValue(), SGE_STR("Hello"));
+	ASSERT_EQ(const_dictionary.QueryAttribute(SGE_STR("key")), nullptr);
 }
 
 TEST(DictionaryAttribute, GetAttributeTest)
 {
 	DictionaryAttribute dictionary;
-	ASSERT_EQ(dictionary.GetAttribute(SGE_STR("key")), nullptr);
+	dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 42);
 	dictionary.UpsertAttribute<StringAttribute>(SGE_STR("str"), SGE_STR("Hello"));
+
+	Attribute& int_attr = dictionary.GetAttribute(SGE_STR("int"));
+	ASSERT_EQ(&int_attr, dictionary.QueryAttribute(SGE_STR("int")));
+	IntegerAttribute* int_attribute = DynamicCast<IntegerAttribute>(int_attr);
+	ASSERT_NE(int_attribute, nullptr);
+	ASSERT_EQ(int_attribute->GetValue(), 42);
+
 	const DictionaryAttribute& const_dictionary = dictionary;
-	const Attribute* str_ptr = const_dictionary.GetAttribute(SGE_STR("str"));
-	ASSERT_NE(str_ptr, nullptr);
-	const StringAttribute* string_attribute = DynamicCast<StringAttribute>(*str_ptr);
+	const Attribute& str_attr = const_dictionary.GetAttribute(SGE_STR("str"));
+	ASSERT_EQ(&str_attr, const_dictionary.QueryAttribute(SGE_STR("str")));
+	const StringAttribute* string_attribute = DynamicCast<StringAttribute>(str_attr);
 	ASSERT_NE(string_attribute, nullptr);
 	ASSERT_EQ(string_attribute->GetValue(), SGE_STR("Hello"));
-	ASSERT_EQ(const_dictionary.GetAttribute(SGE_STR("key")), nullptr);
 }
 
 TEST(DictionaryAttribute, VisitTest)
@@ -572,7 +592,7 @@ TEST(DictionaryAttribute, VisitTest)
 	});
 	ASSERT_EQ(count, 2);
 
-	Attribute* pint_attr = dictionary.GetAttribute(SGE_STR("int"));
+	Attribute* pint_attr = dictionary.QueryAttribute(SGE_STR("int"));
 	ASSERT_NE(pint_attr, nullptr);
 	ASSERT_EQ(DynamicCast<IntegerAttribute>(*pint_attr)->GetValue(), 100);
 }
@@ -616,7 +636,7 @@ TEST(DictionaryAttribute, CloneTest)
 	dictionary.UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 42);
 	dictionary.UpsertAttribute<StringAttribute>(SGE_STR("str"), SGE_STR("Hello"));
 	dictionary.UpsertAttribute<DictionaryAttribute>(SGE_STR("dict"));
-	DictionaryAttribute* pinner = DynamicCast<DictionaryAttribute>(*dictionary.GetAttribute(SGE_STR("dict")));
+	DictionaryAttribute* pinner = DynamicCast<DictionaryAttribute>(*dictionary.QueryAttribute(SGE_STR("dict")));
 	ASSERT_NE(pinner, nullptr);
 	pinner->UpsertAttribute<IntegerAttribute>(SGE_STR("int"), 42);
 
@@ -638,9 +658,9 @@ TEST(DictionaryAttribute, CloneTest)
 			DictionaryAttribute* pinner2 = DynamicCast<DictionaryAttribute>(*pattr);
 			ASSERT_NE(pinner2, nullptr);
 			ASSERT_NE(pinner2, pinner);
-			Attribute* pinner_int = pinner2->GetAttribute(SGE_STR("int"));
+			Attribute* pinner_int = pinner2->QueryAttribute(SGE_STR("int"));
 			ASSERT_NE(pinner_int, nullptr);
-			ASSERT_NE(pinner_int, pinner->GetAttribute(SGE_STR("int")));
+			ASSERT_NE(pinner_int, pinner->QueryAttribute(SGE_STR("int")));
 			ASSERT_EQ(DynamicCast<IntegerAttribute>(*pinner_int)->GetValue(), 42);
 		}
 		else
@@ -649,8 +669,8 @@ TEST(DictionaryAttribute, CloneTest)
 	});
 	ASSERT_EQ(count, 3);
 
-	DynamicCast<IntegerAttribute>(*(pdict->GetAttribute(SGE_STR("int"))))->SetValue(100);
-	ASSERT_EQ(DynamicCast<IntegerAttribute>(*dictionary.GetAttribute(SGE_STR("int")))->GetValue(), 42);
+	DynamicCast<IntegerAttribute>(*(pdict->QueryAttribute(SGE_STR("int"))))->SetValue(100);
+	ASSERT_EQ(DynamicCast<IntegerAttribute>(*dictionary.QueryAttribute(SGE_STR("int")))->GetValue(), 42);
 
 	DefaultAllocator::Delete(pclone);
 }

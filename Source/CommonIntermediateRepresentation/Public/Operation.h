@@ -69,17 +69,17 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		Operation& operator=(const Operation&) = delete;
 		Operation& operator=(Operation&&);
 
+		const OperationType& GetOperationType() const;
+
 		SizeType GetArgumentSize() const;
 		const Value& GetArgument(SizeType index) const;
 
 		SizeType GetResultSize() const;
 		const ResultValue& GetResult(SizeType index) const;
 
+		const DictionaryAttribute& GetAttributes() const;
+
 		bool Verify() const;
-
-		// todo
-
-		bool operator==(const Operation& other) const;
 
 	private:
 		void LinkValues();
@@ -119,7 +119,13 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 
 		OperationBuilder& AddResult(const Type& type);
 
-		// todo: AddAttribute
+		template<typename AttributeType, typename... Args>
+			requires std::derived_from<AttributeType, Attribute>
+		inline OperationBuilder& AddAttribute(const String& key, Args&&... args)
+		{
+			m_Attributes.UpsertAttribute<AttributeType>(key, std::forward<Args>(args)...);
+			return *this;
+		}
 
 		OperationBuilder& InferReturnValues();
 

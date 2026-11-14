@@ -92,6 +92,11 @@ SpaceGameEngine::CommonIntermediateRepresentation::Operation& Operation::operato
 	return *this;
 }
 
+const SpaceGameEngine::CommonIntermediateRepresentation::OperationType& Operation::GetOperationType() const
+{
+	return *m_OperationType;
+}
+
 SpaceGameEngine::SizeType Operation::GetArgumentSize() const
 {
 	return m_Arguments.GetSize();
@@ -119,10 +124,9 @@ bool Operation::Verify() const
 	return m_OperationType->VerifyArguments(m_Arguments) && m_OperationType->VerifyResults(m_Results);
 }
 
-bool Operation::operator==(const Operation& other) const
+const SpaceGameEngine::CommonIntermediateRepresentation::DictionaryAttribute& Operation::GetAttributes() const
 {
-	// todo
-	return true;
+	return m_Attributes;
 }
 
 void Operation::LinkValues()

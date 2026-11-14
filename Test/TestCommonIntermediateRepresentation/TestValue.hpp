@@ -405,15 +405,21 @@ TEST(BlockValue, GetOperationsTest)
 	OperationType& operation_type = GetOperationTypeForTestValue(context);
 	BlockValue block_value(List<Operation>{});
 	ASSERT_EQ(block_value.GetOperations().GetSize(), 0);
-	Operation op1 = OperationBuilder(operation_type).AddArgument<IntegerValue>(1).Build();
-	Operation op2 = OperationBuilder(operation_type).AddArgument<IntegerValue>(2).Build();
 	List<Operation> operations;
 	operations.EmplaceBack(OperationBuilder(operation_type).AddArgument<IntegerValue>(1).Build());
 	operations.EmplaceBack(OperationBuilder(operation_type).AddArgument<IntegerValue>(2).Build());
 	BlockValue block_value_with_ops(std::move(operations));
 	ASSERT_EQ(block_value_with_ops.GetOperations().GetSize(), 2);
-	ASSERT_EQ(*block_value_with_ops.GetOperations().GetBegin(), op1);
-	ASSERT_EQ(*(block_value_with_ops.GetOperations().GetBegin() + 1), op2);
+	const Operation& op1 = *block_value_with_ops.GetOperations().GetBegin();
+	const Operation& op2 = *(block_value_with_ops.GetOperations().GetBegin() + 1);
+	ASSERT_EQ(&op1.GetOperationType(), &operation_type);
+	ASSERT_EQ(op1.GetArgumentSize(), 1);
+	ASSERT_EQ(DynamicCast<const IntegerValue>(op1.GetArgument(0))->GetValue(), 1);
+	ASSERT_EQ(op1.GetArgument(0).GetBelongedOperation(), &op1);
+	ASSERT_EQ(&op2.GetOperationType(), &operation_type);
+	ASSERT_EQ(op2.GetArgumentSize(), 1);
+	ASSERT_EQ(DynamicCast<const IntegerValue>(op2.GetArgument(0))->GetValue(), 2);
+	ASSERT_EQ(op2.GetArgument(0).GetBelongedOperation(), &op2);
 }
 
 TEST(BlockValue, DynamicCastTest)

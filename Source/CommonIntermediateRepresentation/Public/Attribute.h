@@ -144,6 +144,12 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 		String m_Value;
 	};
 
+	struct AttributeNotFoundError
+	{
+		inline static const ErrorMessageChar pContent[] = SGE_ESTR("The attribute can not be found.");
+		static COMMON_INTERMEDIATE_REPRESENTATION_API bool Judge(bool found);
+	};
+
 	class COMMON_INTERMEDIATE_REPRESENTATION_API DictionaryAttribute : public Attribute, public DynamicCastHelperForDerived<DictionaryAttribute, Attribute>
 	{
 	public:
@@ -174,8 +180,10 @@ namespace SpaceGameEngine::CommonIntermediateRepresentation
 
 		bool RemoveAttribute(const String& key);
 
-		Attribute* GetAttribute(const String& key);
-		const Attribute* GetAttribute(const String& key) const;
+		Attribute* QueryAttribute(const String& key);
+		const Attribute* QueryAttribute(const String& key) const;
+		Attribute& GetAttribute(const String& key);
+		const Attribute& GetAttribute(const String& key) const;
 
 		template<typename Callable>
 		inline void Visit(Callable&& callable)

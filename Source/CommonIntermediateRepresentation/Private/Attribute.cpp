@@ -160,6 +160,11 @@ SpaceGameEngine::CommonIntermediateRepresentation::Attribute* StringAttribute::C
 
 SGE_DEFINE_TYPE_ID(COMMON_INTERMEDIATE_REPRESENTATION_API, SpaceGameEngine::CommonIntermediateRepresentation::StringAttribute);
 
+bool AttributeNotFoundError::Judge(bool found)
+{
+	return !found;
+}
+
 DictionaryAttribute::~DictionaryAttribute()
 {
 	for (auto iter = m_Attributes.GetBegin(); iter != m_Attributes.GetEnd(); ++iter)
@@ -199,7 +204,7 @@ bool DictionaryAttribute::RemoveAttribute(const String& key)
 		return false;
 }
 
-SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DictionaryAttribute::GetAttribute(const String& key)
+SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DictionaryAttribute::QueryAttribute(const String& key)
 {
 	auto iter = m_Attributes.Find(key);
 	if (iter != m_Attributes.GetEnd())
@@ -208,13 +213,27 @@ SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DictionaryAttribut
 		return nullptr;
 }
 
-const SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DictionaryAttribute::GetAttribute(const String& key) const
+const SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DictionaryAttribute::QueryAttribute(const String& key) const
 {
 	auto iter = m_Attributes.Find(key);
 	if (iter != m_Attributes.GetConstEnd())
 		return iter->m_Second;
 	else
 		return nullptr;
+}
+
+SpaceGameEngine::CommonIntermediateRepresentation::Attribute& DictionaryAttribute::GetAttribute(const String& key)
+{
+	auto iter = m_Attributes.Find(key);
+	SGE_CHECK(AttributeNotFoundError, iter != m_Attributes.GetEnd());
+	return *iter->m_Second;
+}
+
+const SpaceGameEngine::CommonIntermediateRepresentation::Attribute& DictionaryAttribute::GetAttribute(const String& key) const
+{
+	auto iter = m_Attributes.Find(key);
+	SGE_CHECK(AttributeNotFoundError, iter != m_Attributes.GetConstEnd());
+	return *iter->m_Second;
 }
 
 SpaceGameEngine::CommonIntermediateRepresentation::Attribute* DictionaryAttribute::Clone() const
